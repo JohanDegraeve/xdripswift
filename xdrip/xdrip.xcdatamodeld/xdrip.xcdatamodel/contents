@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14460.32" systemVersion="17G3025" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="BgReading" representedClassName="BgReading" syncable="YES">
+        <attribute name="a" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="ageAdjustedRawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="b" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="c" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="calculatedValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="calculatedValueSlope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="calibrationFlag" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="filteredCalculatedValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="filteredData" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="hideSlope" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="ra" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rawCalculated" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rawData" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rb" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rc" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="timeStamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="calibration" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Calibration" syncable="YES"/>
+        <relationship name="sensor" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" syncable="YES"/>
+    </entity>
+    <entity name="Calibration" representedClassName="Calibration" syncable="YES">
+        <attribute name="adjustedRawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="bg" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="checkIn" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="distanceFromEstimate" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="estimateBgAtTimeOfCalibration" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="estimateRawAtTimeOfCalibration" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="firstDecay" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="firstIntercept" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="firstScale" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="firstSlope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="intercept" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="possibleBad" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rawTimeStamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="rawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="secondDecay" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="secondIntercept" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="secondScale" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="secondSlope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="sensorConfidence" attributeType="Double" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="slope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="slopeConfidence" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="sensor" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" syncable="YES"/>
+    </entity>
+    <entity name="Sensor" representedClassName="Sensor" syncable="YES">
+        <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="startDate" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="BgReading" positionX="-249.609375" positionY="43.8203125" width="128" height="315"/>
+        <element name="Calibration" positionX="-282.30078125" positionY="173.79296875" width="128" height="390"/>
+        <element name="Sensor" positionX="-63" positionY="-18" width="128" height="75"/>
+    </elements>
+</model>
