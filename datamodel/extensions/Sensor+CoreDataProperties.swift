@@ -2,7 +2,7 @@
 //  Sensor+CoreDataProperties.swift
 //  xdrip
 //
-//  Created by Johan Degraeve on 02/12/2018.
+//  Created by Johan Degraeve on 06/12/2018.
 //  Copyright © 2018 Johan Degraeve. All rights reserved.
 //
 //
@@ -17,7 +17,8 @@ extension Sensor {
         return NSFetchRequest<Sensor>(entityName: "Sensor")
     }
 
-    @NSManaged public var endDate: NSDate?
-    @NSManaged public var startDate: NSDate?
+    @NSManaged public var endDate: Date
+    @NSManaged public var startDate: Date
+    @NSManaged public var id: String
 
 }

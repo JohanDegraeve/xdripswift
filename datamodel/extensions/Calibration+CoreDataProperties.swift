@@ -2,7 +2,7 @@
 //  Calibration+CoreDataProperties.swift
 //  xdrip
 //
-//  Created by Johan Degraeve on 02/12/2018.
+//  Created by Johan Degraeve on 06/12/2018.
 //  Copyright © 2018 Johan Degraeve. All rights reserved.
 //
 //
@@ -21,7 +21,7 @@ extension Calibration {
     @NSManaged public var bg: Double
     @NSManaged public var checkIn: Bool
     @NSManaged public var distanceFromEstimate: Double
-    @NSManaged public var estimateBgAtTimeOfCalibration: NSDate?
+    @NSManaged public var estimateBgAtTimeOfCalibration: Date
     @NSManaged public var estimateRawAtTimeOfCalibration: Double
     @NSManaged public var firstDecay: Double
     @NSManaged public var firstIntercept: Double
@@ -29,7 +29,7 @@ extension Calibration {
     @NSManaged public var firstSlope: Double
     @NSManaged public var intercept: Double
     @NSManaged public var possibleBad: Bool
-    @NSManaged public var rawTimeStamp: NSDate?
+    @NSManaged public var rawTimeStamp: Date
     @NSManaged public var rawValue: Double
     @NSManaged public var secondDecay: Double
     @NSManaged public var secondIntercept: Double
@@ -38,7 +38,8 @@ extension Calibration {
     @NSManaged public var sensorConfidence: Double
     @NSManaged public var slope: Double
     @NSManaged public var slopeConfidence: Double
-    @NSManaged public var timestamp: NSDate?
+    @NSManaged public var timeStamp: Date
+    @NSManaged public var id: String
     @NSManaged public var sensor: Sensor?
 
 }

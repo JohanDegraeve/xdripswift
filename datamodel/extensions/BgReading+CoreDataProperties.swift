@@ -2,7 +2,7 @@
 //  BgReading+CoreDataProperties.swift
 //  xdrip
 //
-//  Created by Johan Degraeve on 02/12/2018.
+//  Created by Johan Degraeve on 06/12/2018.
 //  Copyright © 2018 Johan Degraeve. All rights reserved.
 //
 //
@@ -32,7 +32,8 @@ extension BgReading {
     @NSManaged public var rawData: Double
     @NSManaged public var rb: Double
     @NSManaged public var rc: Double
-    @NSManaged public var timeStamp: NSDate?
+    @NSManaged public var timeStamp: Date
+    @NSManaged public var id: String
     @NSManaged public var calibration: Calibration?
     @NSManaged public var sensor: Sensor?
 
