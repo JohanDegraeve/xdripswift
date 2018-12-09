@@ -20,17 +20,6 @@ class BgReadingAlgorithms {
     }
     
     /// taken over form xdripplus
-    /// - Parameters:
-    ///     - bgReading : can be nil, if nil then return value is 0
-    static func activeSlope(bgReading:BgReading?) -> Double {
-        if let reading = bgReading {
-            return (2 * reading.a * (Date().toMillisecondsAsDouble())) + reading.b
-        } else {
-            return 0
-        }
-    }
-    
-    /// taken over form xdripplus
     static func calculateSlope(withCurrentBgReading currentBgReading:BgReading, withLastBgReading lastBgReading:BgReading) -> (Double, Bool) {
         if currentBgReading.timeStamp == lastBgReading.timeStamp
             ||
@@ -236,7 +225,7 @@ class BgReadingAlgorithms {
                     let latest:BgReading = last3Readings[0]
                     if let latestReadingCalibration = latest.calibration {
                         if (latest.calibrationFlag && ((latest.timeStamp.toMillisecondsAsDouble() + (60000 * 20)) > timeStampToUse.toMillisecondsAsDouble()) && ((latestReadingCalibration.timeStamp.toMillisecondsAsDouble() + (60000 * 20)) > timeStampToUse.toMillisecondsAsDouble())) {
-                            latestReadingCalibration.calibration.rawValueOverride(BgReading.weightedAverageRaw(latest.timestamp, timeStampToUse, lastBgReading.calibration.timestamp, lastBgReading.ageAdjustedRawValue, bgReading.ageAdjustedRawValue))
+                            latestReadingCalibration.rawValueOverride(BgReading.weightedAverageRaw(latest.timestamp, timeStampToUse, latest.calibration.timestamp, latest.ageAdjustedRawValue, bgReading.ageAdjustedRawValue))
                         }
                     }
                 }
