@@ -1,0 +1,3 @@
+applicationdata folder defines classes for storing application data like readings, calibrations, alarms, ...
+
+The classes should all be singletons.

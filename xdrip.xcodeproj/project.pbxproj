@@ -101,7 +101,6 @@
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
 				F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */,
 				F8AC426B21ADEBD70078C348 /* Info.plist */,
-				F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */,
 			);
 			path = xdrip;
 			sourceTree = "<group>";
@@ -134,6 +133,7 @@
 		F8AC42D021B342910078C348 /* datamodel */ = {
 			isa = PBXGroup;
 			children = (
+				F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */,
 				F8EA6CA421B9A25B0082976B /* classes */,
 				F8EA6CA321B9A21C0082976B /* extensions */,
 			);
@@ -187,8 +187,8 @@
 		F8EA6CA421B9A25B0082976B /* classes */ = {
 			isa = PBXGroup;
 			children = (
-				F8EA6CAA21BC25F00082976B /* BluetoothDevice.swift */,
 				F8EA6C6B21B3CF670082976B /* BgReading+CoreDataClass.swift */,
+				F8EA6CAA21BC25F00082976B /* BluetoothDevice.swift */,
 				F8EA6C6921B3CF670082976B /* Calibration+CoreDataClass.swift */,
 				F8EA6C7621B4743E0082976B /* PersistentContainer.swift */,
 				F8EA6C6D21B3CF670082976B /* Sensor+CoreDataClass.swift */,
