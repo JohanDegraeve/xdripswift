@@ -5,7 +5,7 @@ extension Date {
     /// extension to Date class
     /// - returns:
     ///     time since 1 Jan 1970 in ms, can be negative if Date is before 1 Jan 1970
-    func toMillisecondsAsDouble() -> Double! {
+    func toMillisecondsAsDouble() -> Double {
         return Double(self.timeIntervalSince1970 * 1000)
     }
     

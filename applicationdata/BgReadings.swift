@@ -7,16 +7,14 @@ import Foundation
 /// also used by viewcontroller
 class BgReadings {
     
-    //static let shared:BgReadings = BgReadings()
-    
     /// the latest 24 hours (or more ?) of readings.
     /// the latest element is the youngest
     static private var bgReadings:Array<BgReading> = []
  
-    private init() {
-    }
+    private init() {}
     
     /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil,
+    ///
     /// - parameters:
     ///     - howMany : maximum amount of readings to return
     ///     - forSensor : if not nil, then only readings for the given sensor will be returned - if nil, then sensor is ignored

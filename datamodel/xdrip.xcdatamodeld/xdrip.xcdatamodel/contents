@@ -26,7 +26,7 @@
         <attribute name="bg" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="checkIn" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="distanceFromEstimate" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="estimateBgAtTimeOfCalibration" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="estimateBgAtTimeOfCalibration" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="estimateRawAtTimeOfCalibration" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="firstDecay" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="firstIntercept" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
@@ -45,12 +45,12 @@
         <attribute name="slope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="slopeConfidence" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="timeStamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <relationship name="sensor" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" syncable="YES"/>
+        <relationship name="sensor" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" syncable="YES"/>
     </entity>
     <entity name="Sensor" representedClassName=".Sensor" syncable="YES">
         <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="id" attributeType="String" syncable="YES"/>
-        <attribute name="startDate" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
     </entity>
     <elements>
         <element name="BgReading" positionX="-249.609375" positionY="43.8203125" width="128" height="330"/>

@@ -2,7 +2,7 @@ import Foundation
 
 class ActiveSensor {
 
-    static var activeSensor:Sensor?
+    static var sensor:Sensor?
     
     private init() {
     }

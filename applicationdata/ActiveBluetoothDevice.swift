@@ -1,16 +1,29 @@
-//
-//  ActiveBluetoothDevice.swift
-//  xdrip
-//
-//  Created by Johan Degraeve on 08/12/2018.
-//  Copyright © 2018 Johan Degraeve. All rights reserved.
-//
-
 import Foundation
 
-class ActiveBluetoothDevice : BluetoothDevice {
+class ActiveBluetoothDevice {
  
-    static let shared:ActiveBluetoothDevice = ActiveBluetoothDevice()
+    enum deviceTypes {
+        case none
+        case DexcomxDripG4
+        case DexcomG5
+        case DexcomG6
+        case Blucon
+        case MiaoMiao
+    }
     
+    static var deviceType = deviceTypes.none
     
+    private init() {}
+    
+    static func isTypeLimitter() -> Bool {
+        switch deviceType {
+        case .DexcomxDripG4,.DexcomG5,.DexcomG6 :
+            return false
+        case .Blucon,.MiaoMiao :
+            return true
+        default :
+            return false
+        }
+    }
+
 }

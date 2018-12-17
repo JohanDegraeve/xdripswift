@@ -1,12 +1,3 @@
-//
-//  Calibration+CoreDataProperties.swift
-//  xdrip
-//
-//  Created by Johan Degraeve on 06/12/2018.
-//  Copyright © 2018 Johan Degraeve. All rights reserved.
-//
-//
-
 import Foundation
 import CoreData
 
@@ -21,7 +12,7 @@ extension Calibration {
     @NSManaged public var bg: Double
     @NSManaged public var checkIn: Bool
     @NSManaged public var distanceFromEstimate: Double
-    @NSManaged public var estimateBgAtTimeOfCalibration: Date
+    @NSManaged public var estimateBgAtTimeOfCalibration: Double
     @NSManaged public var estimateRawAtTimeOfCalibration: Double
     @NSManaged public var firstDecay: Double
     @NSManaged public var firstIntercept: Double
@@ -40,6 +31,6 @@ extension Calibration {
     @NSManaged public var slopeConfidence: Double
     @NSManaged public var timeStamp: Date
     @NSManaged public var id: String
-    @NSManaged public var sensor: Sensor?
+    @NSManaged public var sensor: Sensor
 
 }
