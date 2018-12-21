@@ -1,16 +1,11 @@
-//
-//  Sensor+CoreDataClass.swift
-//  xdrip
-//
-//  Created by Johan Degraeve on 02/12/2018.
-//  Copyright © 2018 Johan Degraeve. All rights reserved.
-//
-//
-
 import Foundation
 import CoreData
 
 
 public class Sensor: NSManagedObject {
+
+    private override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {
+        super.init(entity: entity, insertInto: context)
+    }
 
 }

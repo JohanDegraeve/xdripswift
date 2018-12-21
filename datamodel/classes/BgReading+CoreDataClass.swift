@@ -1,17 +1,12 @@
-//
-//  BgReading+CoreDataClass.swift
-//  xdrip
-//
-//  Created by Johan Degraeve on 02/12/2018.
-//  Copyright © 2018 Johan Degraeve. All rights reserved.
-//
-//
-
 import Foundation
 import CoreData
+import UIKit
 
 
 public class BgReading: NSManagedObject {
+    
+    var moc:NSManagedObjectContext!
+    
     init(
         timeStamp:Date,
         sensor:Sensor?,
@@ -43,4 +38,9 @@ public class BgReading: NSManagedObject {
         hideSlope = false
         id = UniqueId.createEventId()
     }
+    
+    private override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {
+        super.init(entity: entity, insertInto: context)
+    }
+    
 }

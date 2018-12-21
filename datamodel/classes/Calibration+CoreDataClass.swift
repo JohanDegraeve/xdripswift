@@ -1,12 +1,3 @@
-//
-//  Calibration+CoreDataClass.swift
-//  xdrip
-//
-//  Created by Johan Degraeve on 02/12/2018.
-//  Copyright © 2018 Johan Degraeve. All rights reserved.
-//
-//
-
 import Foundation
 import CoreData
 
@@ -63,4 +54,9 @@ public class Calibration: NSManagedObject {
             return timeStamp.toMillisecondsAsDouble() - sensor.startDate.toMillisecondsAsDouble()
         }
     }
+    
+    private override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {
+        super.init(entity: entity, insertInto: context)
+    }
+
 }

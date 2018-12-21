@@ -1,4 +1,5 @@
 import Foundation
+import CoreData
 
 /// has the last 24Hr (or more ? ) readings
 ///
@@ -9,9 +10,10 @@ class BgReadings {
     
     /// the latest 24 hours (or more ?) of readings.
     /// the latest element is the youngest
-    static private var bgReadings:Array<BgReading> = []
+    static private var bgReadings = [BgReading]()
  
-    private init() {}
+    private init() {
+    }
     
     /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil,
     ///
@@ -79,6 +81,7 @@ class BgReadings {
         return nil
     }
     
-    
-
+    static func addBgReading(newReading:BgReading) {
+        bgReadings.append(newReading)
+    }
 }
