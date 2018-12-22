@@ -11,7 +11,7 @@ import CoreData
     ///     - lastNoSensor : result of call to BgReadings.getLastReadingNoSensor
     /// - returns:
     ///     - two Calibrations
-    func initialCalibration(with firstCalibrationBgValue:Double, with firstCalibrationTimeStamp:Date, with secondCalibrationBgValue:Double, with secondCalibrationTimeStamp:Date, with sensor:Sensor, with lastReadings:inout Array<BgReading>, with lastNoSensor:BgReading?, nsManagedObjectContext:NSManagedObjectContext, isTypeLimitter:Bool) -> (Calibration, Calibration){
+    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, secondCalibrationTimeStamp:Date, sensor:Sensor, lastReadings:inout Array<BgReading>, lastNoSensor:BgReading?, nsManagedObjectContext:NSManagedObjectContext, isTypeLimitter:Bool) -> (Calibration, Calibration){
         
         var bgReading1 = lastReadings[0]
         var bgReading2 = lastReadings[1]
@@ -21,24 +21,24 @@ import CoreData
         bgReading2.calibrationFlag = true;
         
         var lastMaximum3Readings = Array(lastReadings.prefix(3))
-        findNewCurve(for: &bgReading1, with: &lastMaximum3Readings)
-        findNewRawCurve(for: &bgReading1, with: &lastMaximum3Readings, with: lastNoSensor)
-        findNewCurve(for: &bgReading2, with: &lastMaximum3Readings)
-        findNewRawCurve(for: &bgReading2, with: &lastMaximum3Readings, with: lastNoSensor)
+        findNewCurve(for: &bgReading1, last3Readings: &lastMaximum3Readings)
+        findNewRawCurve(for: &bgReading1, last3Readings: &lastMaximum3Readings, lastNoSensor: lastNoSensor)
+        findNewCurve(for: &bgReading2, last3Readings: &lastMaximum3Readings)
+        findNewRawCurve(for: &bgReading2, last3Readings: &lastMaximum3Readings, lastNoSensor: lastNoSensor)
         
         var calibration1 = Calibration(timeStamp: firstCalibrationTimeStamp, sensor: sensor, bg: firstCalibrationBgValue, rawValue: bgReading1.rawData, adjustedRawValue: bgReading1.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * firstCalibrationBgValue * firstCalibrationBgValue) + (0.6657 * firstCalibrationBgValue) + 36.7505) / 100, rawTimeStamp: bgReading1.timeStamp, slope: 1, intercept: firstCalibrationBgValue, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading1.ageAdjustedRawValue, slopeConfidence: 0.5, nsManagedObjectContext: nsManagedObjectContext)
         var tempCalibrationArray:Array<Calibration> = []
-        calculateWLS(for: &calibration1, with: &tempCalibrationArray, with: calibration1, with: calibration1, isTypeLimitter: isTypeLimitter)
+        calculateWLS(for: &calibration1, last4CalibrationsForActiveSensor: &tempCalibrationArray, firstCalibration: calibration1, lastCalibration: calibration1, isTypeLimitter: isTypeLimitter)
         
         var calibration2 = Calibration(timeStamp: secondCalibrationTimeStamp, sensor: sensor, bg: secondCalibrationBgValue, rawValue: bgReading2.rawData, adjustedRawValue: bgReading2.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * secondCalibrationBgValue * secondCalibrationBgValue) + (0.6657 * secondCalibrationBgValue) + 36.7505) / 100, rawTimeStamp: bgReading2.timeStamp, slope: 1, intercept: secondCalibrationBgValue, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading2.ageAdjustedRawValue, slopeConfidence: 0.5, nsManagedObjectContext: nsManagedObjectContext)
         tempCalibrationArray = [calibration1]
-        calculateWLS(for: &calibration2, with: &tempCalibrationArray, with: calibration1, with: calibration2, isTypeLimitter: isTypeLimitter)
+        calculateWLS(for: &calibration2, last4CalibrationsForActiveSensor: &tempCalibrationArray, firstCalibration: calibration1, lastCalibration: calibration2, isTypeLimitter: isTypeLimitter)
         
         bgReading1.calibration = calibration1
         bgReading2.calibration = calibration2
         
         tempCalibrationArray = [calibration1, calibration2]
-        adjustRecentBgReadings(with: &lastReadings, with: &tempCalibrationArray, with: &lastMaximum3Readings, with: lastNoSensor)
+        adjustRecentBgReadings(readingsToBeAdjusted: &lastReadings, calibrations: &tempCalibrationArray, last3Readings: &lastMaximum3Readings, lastNoSensor: lastNoSensor)
         
         return (calibration1, calibration2)
     }
@@ -49,8 +49,8 @@ import CoreData
     ///     - calibrations : latest calibrations, timestamp large to small. There should be minimum 2 calibrations, if less then the function
     ///     will not do anything.
     ///     Only the three first calibrations will be used.
-    ///     - withLast3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) with sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - it' ok if there's less than 3 readings - inout parameter to improve performance
-    func adjustRecentBgReadings(with readingsToBeAdjusted:inout Array<BgReading>, with calibrations:inout Array<Calibration>, with last3Readings:inout Array<BgReading>, with lastNoSensor:BgReading?) {
+    ///     - withLast3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - it' ok if there's less than 3 readings - inout parameter to improve performance
+    func adjustRecentBgReadings(readingsToBeAdjusted:inout Array<BgReading>, calibrations:inout Array<Calibration>, last3Readings:inout Array<BgReading>, lastNoSensor:BgReading?) {
         
         if (calibrations.count == 3) {
             let denom = Double(readingsToBeAdjusted.count)
@@ -71,8 +71,8 @@ import CoreData
             }
         }
         
-        findNewRawCurve(for: &readingsToBeAdjusted[0], with: &last3Readings, with: lastNoSensor)
-        findNewCurve(for: &readingsToBeAdjusted[0], with: &last3Readings)
+        findNewRawCurve(for: &readingsToBeAdjusted[0], last3Readings: &last3Readings, lastNoSensor: lastNoSensor)
+        findNewCurve(for: &readingsToBeAdjusted[0], last3Readings: &last3Readings)
     }
     
     /// from xdripplus
@@ -80,28 +80,28 @@ import CoreData
     /// forCalibration will get changed
     ///
     /// - parameters:
-    ///     - forCalibration : calibration for which calculation is done
-    ///     - withLast4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
-    ///     - withFirstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
-    ///     - withLastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
-    ///     - isTypeLimitter : type limitter means sensor is Libre
-    func rawValueOverride(for calibration:inout Calibration, with rawValue:Double, with last4CalibrationsForActiveSensor:inout Array<Calibration>, with firstCalibration:Calibration, with lastCalibration:Calibration, isTypeLimitter:Bool) {
-        
-        calibration.estimateRawAtTimeOfCalibration = rawValue
-        calculateWLS(for: &calibration, with: &last4CalibrationsForActiveSensor, with: firstCalibration, with: lastCalibration, isTypeLimitter: isTypeLimitter)
-    }
-    
-    /// from xdripplus
-    ///
-    /// forCalibration will get changed
-    ///
-    /// - parameters:
-    ///     - forCalibration : calibration for which calculation is done
+    ///     - calibration : calibration for which calculation is done
     ///     - last4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
     ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
     ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     ///     - isTypeLimitter : type limitter means sensor is Libre
-    private func calculateWLS(for calibration:inout Calibration, with last4CalibrationsForActiveSensor:inout Array<Calibration>, with firstCalibration:Calibration, with lastCalibration:Calibration, isTypeLimitter:Bool) {
+    func rawValueOverride(for calibration:inout Calibration, rawValue:Double, last4CalibrationsForActiveSensor:inout Array<Calibration>, firstCalibration:Calibration, lastCalibration:Calibration, isTypeLimitter:Bool) {
+        
+        calibration.estimateRawAtTimeOfCalibration = rawValue
+        calculateWLS(for: &calibration, last4CalibrationsForActiveSensor: &last4CalibrationsForActiveSensor, firstCalibration: firstCalibration, lastCalibration: lastCalibration, isTypeLimitter: isTypeLimitter)
+    }
+    
+    /// from xdripplus
+    ///
+    /// forCalibration will get changed
+    ///
+    /// - parameters:
+    ///     - calibration : calibration for which calculation is done
+    ///     - last4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
+    ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
+    ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
+    ///     - isTypeLimitter : type limitter means sensor is Libre
+    private func calculateWLS(for calibration:inout Calibration, last4CalibrationsForActiveSensor:inout Array<Calibration>, firstCalibration:Calibration, lastCalibration:Calibration, isTypeLimitter:Bool) {
         
         let sParams:SlopeParameters = isTypeLimitter ? Constants.CalibrationAlgorithms.liParameters:Constants.CalibrationAlgorithms.dexParameters
         
@@ -119,7 +119,7 @@ import CoreData
             calibration.intercept = calibration.bg - (calibration.rawValue * calibration.slope)
         } else {
             loop2 : for calibrationItem in last4CalibrationsForActiveSensor {
-                w = calculateWeight(forCalibration: calibrationItem, withFirstCalibration: firstCalibration, withLastCalibration: lastCalibration)
+                w = calculateWeight(for: calibrationItem, firstCalibration: firstCalibration, lastCalibration: lastCalibration)
                 l += (w)
                 m += (w * calibrationItem.estimateRawAtTimeOfCalibration)
                 n += (w * calibrationItem.estimateRawAtTimeOfCalibration * calibrationItem.estimateRawAtTimeOfCalibration)
@@ -127,7 +127,7 @@ import CoreData
                 q += (w * calibrationItem.estimateRawAtTimeOfCalibration * calibrationItem.bg)
             }
             
-            w = ((calculateWeight(forCalibration: calibration, withFirstCalibration: firstCalibration, withLastCalibration: lastCalibration)) * (((Double)(last4CalibrationsForActiveSensor.count)) * 0.14))
+            w = ((calculateWeight(for: calibration, firstCalibration: firstCalibration, lastCalibration: lastCalibration)) * (((Double)(last4CalibrationsForActiveSensor.count)) * 0.14))
             l += (w)
             m += (w * calibration.estimateRawAtTimeOfCalibration)
             n += (w * calibration.estimateRawAtTimeOfCalibration * calibration.estimateRawAtTimeOfCalibration)
@@ -159,12 +159,12 @@ import CoreData
     /// taken from xdripplus
     ///
     /// - parameters:
-    ///     - forCalibration : the calibration for which calculateweight will be done
-    ///     - withFirstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor for activeSensor
-    ///     - withLastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor for activeSensor
+    ///     - calibration : the calibration for which calculateweight will be done
+    ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor for activeSensor
+    ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor for activeSensor
     /// - returns:
     ///     - calculated weight
-    private func calculateWeight(forCalibration calibration:Calibration, withFirstCalibration firstCalibration:Calibration, withLastCalibration lastCalibration:Calibration) -> Double {
+    private func calculateWeight(for calibration:Calibration, firstCalibration:Calibration, lastCalibration:Calibration) -> Double {
         
         let firstTimeStarted = firstCalibration.sensorAgeAtTimeOfEstimation
         let lastTimeStarted = lastCalibration.sensorAgeAtTimeOfEstimation

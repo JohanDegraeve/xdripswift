@@ -4,12 +4,12 @@ import CoreData
 
     
     /// converts mgdl to mmol
-    func mgdlToMmol(with mgDlValue: Double) -> Double {
+    func mgdlToMmol(mgDlValue: Double) -> Double {
         return mgDlValue * Constants.BloodGlucose.mgDlToMmoll
     }
 
     /// converts mmol to mgdl
-    func mmolToMgdl(with mmolValue:Double) -> Double {
+    func mmolToMgdl(mmolValue:Double) -> Double {
         return mmolValue * Constants.BloodGlucose.mmollToMgdl
     }
     
@@ -19,8 +19,8 @@ import CoreData
     ///
     /// - parameters:
     ///     - bgReading : reading that needs to be updated
-    ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) with sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - it's ok if there's less than 3 readings - inout parameter to improve performance
-    func findNewCurve(for bgReading:inout BgReading, with last3Readings:inout Array<BgReading>) {
+    ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - it's ok if there's less than 3 readings - inout parameter to improve performance
+    func findNewCurve(for bgReading:inout BgReading, last3Readings:inout Array<BgReading>) {
         
         var y3:Double
         var x3:Double
@@ -74,9 +74,9 @@ import CoreData
     /// new value is not stored in the database
     /// - parameters:
     ///     - bgReading : reading that needs to be updated
-    ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) with sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
+    ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
     ///     - lastNoSensor : result of call to BgReadings.getLastReadingNoSensor, can be nil
-    func findNewRawCurve(for bgReading:inout BgReading, with last3Readings:inout Array<BgReading>, with lastNoSensor:BgReading?) {
+    func findNewRawCurve(for bgReading:inout BgReading, last3Readings:inout Array<BgReading>, lastNoSensor:BgReading?) {
         
         var y3:Double
         var x3:Double
@@ -152,10 +152,10 @@ import CoreData
     ///
     /// - parameters:
     ///     - currentBgReading : reading for which slope is calculated
-    ///     - lastBgReading : last reading result of call to BgReadings.getLatestBgReadings(1, sensor) with sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false
+    ///     - lastBgReading : last reading result of call to BgReadings.getLatestBgReadings(1, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false
     /// - returns:
     ///     - calculated slope
-    private func calculateSlope(with currentBgReading:BgReading, with lastBgReading:BgReading) -> (Double, Bool) {
+    private func calculateSlope(currentBgReading:BgReading, lastBgReading:BgReading) -> (Double, Bool) {
         if currentBgReading.timeStamp == lastBgReading.timeStamp
             ||
             currentBgReading.timeStamp.toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble() > Double(Constants.BGGraphBuilder.maxSlopeInMinutes * 60 * 1000) {
@@ -168,7 +168,7 @@ import CoreData
     ///
     /// - parameters:
     ///     - withTimeStamp : timeStamp :)
-    ///     - withLast1Reading : result of call to BgReadings.getLatestBgReadings(1, sensor) with sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false
+    ///     - withLast1Reading : result of call to BgReadings.getLatestBgReadings(1, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false
     /// - returns:
     ///     - estimatedrawbg
     private func getEstimatedRawBg(withTimeStamp timeStamp:Double, withLast1Reading last1Reading:inout Array<BgReading>) -> Double {
@@ -207,7 +207,7 @@ import CoreData
     ///     - withFilteredData : the filtered data
     ///     - withTimeStamp : optional, if nil then actualy date and time is used
     ///     - withSensor : actual sensor, optional
-    ///     - withLast3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) with sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
+    ///     - withLast3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
     ///     - withSsManagedObjectContext : the nsManagedObjectContext
     ///     - withLastNoSensor : result of call to BgReadings.getLastReadingNoSensor, can be nil
     ///     - withLast4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
@@ -251,21 +251,21 @@ import CoreData
                     let latest:BgReading = last3Readings[0]
                     if var latestReadingCalibration = latest.calibration {
                         if (latest.calibrationFlag && ((latest.timeStamp.toMillisecondsAsDouble() + (60000 * 20)) > timeStampToUse.toMillisecondsAsDouble()) && ((latestReadingCalibration.timeStamp.toMillisecondsAsDouble() + (60000 * 20)) > timeStampToUse.toMillisecondsAsDouble())) {
-                            rawValueOverride(for: &latestReadingCalibration, with: weightedAverageRaw(with: latest.timeStamp, with: timeStampToUse, with: latestReadingCalibration.timeStamp, with: latest.ageAdjustedRawValue, with: bgReading.ageAdjustedRawValue), with: &last4CalibrationsForActiveSensor, with: firstCalibration, with: calibration, isTypeLimitter: isTypeLimitter)
+                            rawValueOverride(for: &latestReadingCalibration, rawValue: weightedAverageRaw(timeA: latest.timeStamp, timeB: timeStampToUse, calibrationTime: latestReadingCalibration.timeStamp, rawA: latest.ageAdjustedRawValue, rawB: bgReading.ageAdjustedRawValue), last4CalibrationsForActiveSensor: &last4CalibrationsForActiveSensor, firstCalibration: firstCalibration, lastCalibration: calibration, isTypeLimitter: isTypeLimitter)
                         }
                     }
                 }
                 bgReading.calculatedValue = ((calibration.slope * bgReading.ageAdjustedRawValue) + calibration.intercept)
-                bgReading.filteredCalculatedValue = ((calibration.slope * ageAdjustedFiltered(with: bgReading, with: lastCalibration)) + calibration.intercept)
+                bgReading.filteredCalculatedValue = ((calibration.slope * ageAdjustedFiltered(bgReading: bgReading, calibration: lastCalibration)) + calibration.intercept)
             }
             updateCalculatedValue(for: &bgReading)
         }
         
-        performCalculations(for: &bgReading, with: &last3Readings, with: lastNoSensor)
+        performCalculations(for: &bgReading, last3Readings: &last3Readings, lastNoSensor: lastNoSensor)
         return bgReading
     }
 
-    private func weightedAverageRaw (with timeA:Date, with timeB:Date, with calibrationTime:Date, with rawA:Double, with rawB:Double) -> Double {
+    private func weightedAverageRaw (timeA:Date, timeB:Date, calibrationTime:Date, rawA:Double, rawB:Double) -> Double {
         
         let relativeSlope:Double = (rawB -  rawA)/(timeB.toMillisecondsAsDouble() - timeA.toMillisecondsAsDouble())
         let relativeIntercept:Double = rawA - (relativeSlope * timeA.toMillisecondsAsDouble())
@@ -280,7 +280,7 @@ import CoreData
     ///     - lastCalibration : last calibration, optional
     /// - returns:
     ///     -   usedRaw
-    func getUsedRaw(with bgReading:BgReading, with lastCalibration:Calibration?) -> Double {
+    func getUsedRaw(bgReading:BgReading, lastCalibration:Calibration?) -> Double {
         
         var returnValue = bgReading.ageAdjustedRawValue
         
@@ -300,14 +300,14 @@ import CoreData
     ///     - calibration : last calibration, optional
     /// - returns:
     ///     -   ageAdjustedFiltered
-    private func ageAdjustedFiltered(with bgReading:BgReading, with calibration:Calibration?) -> Double {
+    private func ageAdjustedFiltered(bgReading:BgReading, calibration:Calibration?) -> Double {
         
-        let usedRaw = getUsedRaw(with: bgReading, with: calibration)
+        let usedRaw = getUsedRaw(bgReading: bgReading, lastCalibration: calibration)
         
         if(usedRaw == bgReading.rawData || bgReading.rawData == 0) {
             return bgReading.filteredData
         } else {
-            // adjust the filtereddata with the same factor as the age adjusted raw value
+            // adjust the filtereddata the same factor as the age adjusted raw value
             return bgReading.filteredData * usedRaw / bgReading.rawData;
         }
     }
@@ -316,19 +316,19 @@ import CoreData
     ///
     /// - parameters:
     ///     - bgReading : reading that will be updated
-    ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) with sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
+    ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
     ///     - withLastNoSensor result of call to BgReadings.getLastReadingNoSensor, can be nil
-    private func performCalculations(for bgReading:inout BgReading, with last3Readings:inout Array<BgReading>, with lastNoSensor:BgReading?)  {
+    private func performCalculations(for bgReading:inout BgReading, last3Readings:inout Array<BgReading>, lastNoSensor:BgReading?)  {
         
-        findNewCurve(for: &bgReading, with: &last3Readings)
+        findNewCurve(for: &bgReading, last3Readings: &last3Readings)
         
-        findNewRawCurve(for: &bgReading, with: &last3Readings, with: lastNoSensor)
+        findNewRawCurve(for: &bgReading, last3Readings: &last3Readings, lastNoSensor: lastNoSensor)
         
         var last2Readings:Array<BgReading> = []
         for (index, bgReadingToAdd) in last3Readings.enumerated() where index < 3 {
             last2Readings.append(bgReadingToAdd)
         }
-        findSlope(for: &bgReading, with: &last2Readings)
+        findSlope(for: &bgReading, last2Readings: &last2Readings)
     }
     
     /// taken from xdripplus
@@ -337,12 +337,12 @@ import CoreData
     ///
     /// - parameters:
     ///     - bgReading : reading that will be updated
-    ///     - last2Readings result of call to BgReadings.getLatestBgReadings(2, sensor) with ignoreRawData and ignoreCalculatedValue false - inout parameter to improve performance
-    func findSlope(for bgReading:inout BgReading, with last2Readings:inout Array<BgReading>) {
+    ///     - last2Readings result of call to BgReadings.getLatestBgReadings(2, sensor) ignoreRawData and ignoreCalculatedValue false - inout parameter to improve performance
+    func findSlope(for bgReading:inout BgReading, last2Readings:inout Array<BgReading>) {
 
         bgReading.hideSlope = true;
         if (last2Readings.count == 2) {
-            let (slope, hide) = calculateSlope(with:bgReading, with:last2Readings[1]);
+            let (slope, hide) = calculateSlope(currentBgReading:bgReading, lastBgReading:last2Readings[1]);
             bgReading.calculatedValueSlope = slope
             bgReading.hideSlope = hide
         } else if (last2Readings.count == 1) {
