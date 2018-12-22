@@ -1,7 +1,7 @@
 import Foundation
 
 class ActiveBluetoothDevice {
- 
+    
     enum deviceTypes {
         case none
         case DexcomxDripG4
@@ -12,9 +12,10 @@ class ActiveBluetoothDevice {
     }
     
     static var deviceType = deviceTypes.none
-    
-    private init() {}
-    
+
+    private init() {
+    }
+
     static func isTypeLimitter() -> Bool {
         switch deviceType {
         case .DexcomxDripG4,.DexcomG5,.DexcomG6 :

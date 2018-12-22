@@ -2,47 +2,43 @@ import Foundation
 import CoreData
 
 
-    
-let dexParameters = SlopeParameters(LOW_SLOPE_1: 0.95, LOW_SLOPE_2: 0.85, HIGH_SLOPE_1: 1.3, HIGH_SLOPE_2: 0.85, DEFAULT_LOW_SLOPE_LOW: 1.08, DEFAULT_LOW_SLOPE_HIGH: 1.15, DEFAULT_SLOPE: 1, DEFAULT_HIGH_SLOPE_HIGH: 1.3, DEFAUL_HIGH_SLOPE_LOW: 1.2)
-    
-let liParameters = SlopeParameters(LOW_SLOPE_1: 1, LOW_SLOPE_2: 1, HIGH_SLOPE_1: 1, HIGH_SLOPE_2: 1, DEFAULT_LOW_SLOPE_LOW: 1, DEFAULT_LOW_SLOPE_HIGH: 1, DEFAULT_SLOPE: 1, DEFAULT_HIGH_SLOPE_HIGH: 1, DEFAUL_HIGH_SLOPE_LOW: 1)
-  
+
 
     /// - parameters:
-    ///     - withfirstBloodGlucoseValueInMgDl : the first (ie the oldest) calibration value
-    ///     - andSecondBloodGlucoseValueInMgDl : the second (ie the youngest) calibration value
+    ///     - firstCalibrationBgValue : the first (ie the oldest) calibration value
+    ///     - secondCalibrationBgValue : the second (ie the youngest) calibration value
     ///     - lastReadings : should be minimum 2 bgReadings, each reading will be adjusted at the end of calibration (in Spike it's 5), index 0 is the youngest, first is the youngest
-    ///     - withLastNoSensor : result of call to BgReadings.getLastReadingNoSensor
+    ///     - lastNoSensor : result of call to BgReadings.getLastReadingNoSensor
     /// - returns:
     ///     - two Calibrations
-    public func initialCalibration(withfirstBloodGlucoseValueInMgDl bg1:Double, timestampCalibration1:Date, andSecondBloodGlucoseValueInMgDl bg2:Double, timestampCalibration2:Date, withActiveSensor sensor:Sensor, withLastReadings lastReadings:inout Array<BgReading>, withLastNoSensor lastNoSensor:BgReading?, nsManagedObjectContext:NSManagedObjectContext, isTypeLimitter:Bool) -> (Calibration, Calibration){
+    func initialCalibration(with firstCalibrationBgValue:Double, with firstCalibrationTimeStamp:Date, with secondCalibrationBgValue:Double, with secondCalibrationTimeStamp:Date, with sensor:Sensor, with lastReadings:inout Array<BgReading>, with lastNoSensor:BgReading?, nsManagedObjectContext:NSManagedObjectContext, isTypeLimitter:Bool) -> (Calibration, Calibration){
         
         var bgReading1 = lastReadings[0]
         var bgReading2 = lastReadings[1]
-        bgReading1.calculatedValue = bg1;
+        bgReading1.calculatedValue = firstCalibrationBgValue;
         bgReading1.calibrationFlag = true;
-        bgReading2.calculatedValue = bg2;
+        bgReading2.calculatedValue = secondCalibrationBgValue;
         bgReading2.calibrationFlag = true;
         
-        var tempReadingsArray = Array(lastReadings.prefix(3))
-        findNewCurve(forBgReading: &bgReading1, withLast3Readings: &tempReadingsArray)
-        findNewRawCurve(forBgReading: &bgReading1, withLast3Readings: &tempReadingsArray, withLastNoSensor: lastNoSensor)
-        findNewCurve(forBgReading: &bgReading2, withLast3Readings: &tempReadingsArray)
-        findNewRawCurve(forBgReading: &bgReading2, withLast3Readings: &tempReadingsArray, withLastNoSensor: lastNoSensor)
+        var lastMaximum3Readings = Array(lastReadings.prefix(3))
+        findNewCurve(for: &bgReading1, with: &lastMaximum3Readings)
+        findNewRawCurve(for: &bgReading1, with: &lastMaximum3Readings, with: lastNoSensor)
+        findNewCurve(for: &bgReading2, with: &lastMaximum3Readings)
+        findNewRawCurve(for: &bgReading2, with: &lastMaximum3Readings, with: lastNoSensor)
         
-        var calibration1 = Calibration(timeStamp: timestampCalibration1, sensor: sensor, bg: bg1, rawValue: bgReading1.rawData, adjustedRawValue: bgReading1.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * bg1 * bg1) + (0.6657 * bg1) + 36.7505) / 100, rawTimeStamp: bgReading1.timeStamp, slope: 1, intercept: bg1, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading1.ageAdjustedRawValue, slopeConfidence: 0.5, nsManagedObjectContext: nsManagedObjectContext)
+        var calibration1 = Calibration(timeStamp: firstCalibrationTimeStamp, sensor: sensor, bg: firstCalibrationBgValue, rawValue: bgReading1.rawData, adjustedRawValue: bgReading1.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * firstCalibrationBgValue * firstCalibrationBgValue) + (0.6657 * firstCalibrationBgValue) + 36.7505) / 100, rawTimeStamp: bgReading1.timeStamp, slope: 1, intercept: firstCalibrationBgValue, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading1.ageAdjustedRawValue, slopeConfidence: 0.5, nsManagedObjectContext: nsManagedObjectContext)
         var tempCalibrationArray:Array<Calibration> = []
-        calculateWLS(forCalibration: &calibration1, withLast4CalibrationsForActiveSensor: &tempCalibrationArray, withFirstCalibration: calibration1, withLastCalibration: calibration1, isTypeLimitter: isTypeLimitter)
+        calculateWLS(for: &calibration1, with: &tempCalibrationArray, with: calibration1, with: calibration1, isTypeLimitter: isTypeLimitter)
         
-        var calibration2 = Calibration(timeStamp: timestampCalibration2, sensor: sensor, bg: bg2, rawValue: bgReading2.rawData, adjustedRawValue: bgReading2.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * bg2 * bg2) + (0.6657 * bg2) + 36.7505) / 100, rawTimeStamp: bgReading2.timeStamp, slope: 1, intercept: bg2, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading2.ageAdjustedRawValue, slopeConfidence: 0.5, nsManagedObjectContext: nsManagedObjectContext)
+        var calibration2 = Calibration(timeStamp: secondCalibrationTimeStamp, sensor: sensor, bg: secondCalibrationBgValue, rawValue: bgReading2.rawData, adjustedRawValue: bgReading2.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * secondCalibrationBgValue * secondCalibrationBgValue) + (0.6657 * secondCalibrationBgValue) + 36.7505) / 100, rawTimeStamp: bgReading2.timeStamp, slope: 1, intercept: secondCalibrationBgValue, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading2.ageAdjustedRawValue, slopeConfidence: 0.5, nsManagedObjectContext: nsManagedObjectContext)
         tempCalibrationArray = [calibration1]
-        calculateWLS(forCalibration: &calibration2, withLast4CalibrationsForActiveSensor: &tempCalibrationArray, withFirstCalibration: calibration1, withLastCalibration: calibration2, isTypeLimitter: isTypeLimitter)
+        calculateWLS(for: &calibration2, with: &tempCalibrationArray, with: calibration1, with: calibration2, isTypeLimitter: isTypeLimitter)
         
         bgReading1.calibration = calibration1
         bgReading2.calibration = calibration2
         
         tempCalibrationArray = [calibration1, calibration2]
-        adjustRecentBgReadings(readingsToBeAdjusted: &lastReadings, calibrations: &tempCalibrationArray, withLast3Readings: &tempReadingsArray, withLastNoSensor: lastNoSensor)
+        adjustRecentBgReadings(with: &lastReadings, with: &tempCalibrationArray, with: &lastMaximum3Readings, with: lastNoSensor)
         
         return (calibration1, calibration2)
     }
@@ -53,8 +49,8 @@ let liParameters = SlopeParameters(LOW_SLOPE_1: 1, LOW_SLOPE_2: 1, HIGH_SLOPE_1:
     ///     - calibrations : latest calibrations, timestamp large to small. There should be minimum 2 calibrations, if less then the function
     ///     will not do anything.
     ///     Only the three first calibrations will be used.
-    ///     - withLast3Readings : result of call to BgReadings.getLatestReadings(3, sensor) with sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - it' ok if there's less than 3 readings - inout parameter to improve performance
-    public func adjustRecentBgReadings(readingsToBeAdjusted:inout Array<BgReading>, calibrations:inout Array<Calibration>, withLast3Readings last3Readings:inout Array<BgReading>, withLastNoSensor lastNoSensor:BgReading?) {
+    ///     - withLast3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) with sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - it' ok if there's less than 3 readings - inout parameter to improve performance
+    func adjustRecentBgReadings(with readingsToBeAdjusted:inout Array<BgReading>, with calibrations:inout Array<Calibration>, with last3Readings:inout Array<BgReading>, with lastNoSensor:BgReading?) {
         
         if (calibrations.count == 3) {
             let denom = Double(readingsToBeAdjusted.count)
@@ -71,12 +67,12 @@ let liParameters = SlopeParameters(LOW_SLOPE_1: 1, LOW_SLOPE_2: 1, HIGH_SLOPE_1:
             for index in 0..<readingsToBeAdjusted.count {
                 let newYvalue = (readingsToBeAdjusted[index].ageAdjustedRawValue * latestCalibration.slope) + latestCalibration.intercept
                 readingsToBeAdjusted[index].calculatedValue = newYvalue
-                updateCalculatedValue(forBgReading: &readingsToBeAdjusted[index])
+                updateCalculatedValue(for: &readingsToBeAdjusted[index])
             }
         }
         
-        findNewRawCurve(forBgReading: &readingsToBeAdjusted[0], withLast3Readings: &last3Readings, withLastNoSensor: lastNoSensor)
-        findNewCurve(forBgReading: &readingsToBeAdjusted[0], withLast3Readings: &last3Readings)
+        findNewRawCurve(for: &readingsToBeAdjusted[0], with: &last3Readings, with: lastNoSensor)
+        findNewCurve(for: &readingsToBeAdjusted[0], with: &last3Readings)
     }
     
     /// from xdripplus
@@ -89,10 +85,10 @@ let liParameters = SlopeParameters(LOW_SLOPE_1: 1, LOW_SLOPE_2: 1, HIGH_SLOPE_1:
     ///     - withFirstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
     ///     - withLastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     ///     - isTypeLimitter : type limitter means sensor is Libre
-    public func rawValueOverride(forCalibration calibration:inout Calibration, rawValue:Double, withLast4CalibrationsForActiveSensor last4CalibrationsForActiveSensor:inout Array<Calibration>, withFirstCalibration firstCalibration:Calibration, withLastCalibration lastCalibration:Calibration, isTypeLimitter:Bool) {
+    func rawValueOverride(for calibration:inout Calibration, with rawValue:Double, with last4CalibrationsForActiveSensor:inout Array<Calibration>, with firstCalibration:Calibration, with lastCalibration:Calibration, isTypeLimitter:Bool) {
         
         calibration.estimateRawAtTimeOfCalibration = rawValue
-        calculateWLS(forCalibration: &calibration, withLast4CalibrationsForActiveSensor: &last4CalibrationsForActiveSensor, withFirstCalibration: firstCalibration, withLastCalibration: lastCalibration, isTypeLimitter: isTypeLimitter)
+        calculateWLS(for: &calibration, with: &last4CalibrationsForActiveSensor, with: firstCalibration, with: lastCalibration, isTypeLimitter: isTypeLimitter)
     }
     
     /// from xdripplus
@@ -101,13 +97,13 @@ let liParameters = SlopeParameters(LOW_SLOPE_1: 1, LOW_SLOPE_2: 1, HIGH_SLOPE_1:
     ///
     /// - parameters:
     ///     - forCalibration : calibration for which calculation is done
-    ///     - withLast4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
-    ///     - withFirstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
-    ///     - withLastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
+    ///     - last4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
+    ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
+    ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     ///     - isTypeLimitter : type limitter means sensor is Libre
-    private func calculateWLS(forCalibration calibration:inout Calibration, withLast4CalibrationsForActiveSensor last4CalibrationsForActiveSensor:inout Array<Calibration>, withFirstCalibration firstCalibration:Calibration, withLastCalibration lastCalibration:Calibration, isTypeLimitter:Bool) {
+    private func calculateWLS(for calibration:inout Calibration, with last4CalibrationsForActiveSensor:inout Array<Calibration>, with firstCalibration:Calibration, with lastCalibration:Calibration, isTypeLimitter:Bool) {
         
-        let sParams:SlopeParameters = ActiveBluetoothDevice.isTypeLimitter() ? liParameters:dexParameters
+        let sParams:SlopeParameters = isTypeLimitter ? Constants.CalibrationAlgorithms.liParameters:Constants.CalibrationAlgorithms.dexParameters
         
         var l:Double = 0
         var m:Double = 0
@@ -201,7 +197,7 @@ let liParameters = SlopeParameters(LOW_SLOPE_1: 1, LOW_SLOPE_2: 1, HIGH_SLOPE_1:
     ///     - calibrations : last 3 calibrations for the active sensor
     private func slopeOOBHandler(withStatus status:Int, withLast3CalibrationsForActiveSensor calibrations:Array<Calibration>, isTypeLimitter:Bool) -> Double {
         
-        let sParams:SlopeParameters = isTypeLimitter ? liParameters:dexParameters
+        let sParams:SlopeParameters = isTypeLimitter ? Constants.CalibrationAlgorithms.liParameters:Constants.CalibrationAlgorithms.dexParameters
         
         let thisCalibration:Calibration = calibrations[0]
         
@@ -230,14 +226,4 @@ let liParameters = SlopeParameters(LOW_SLOPE_1: 1, LOW_SLOPE_2: 1, HIGH_SLOPE_1:
         return Double(sParams.DEFAULT_SLOPE)
     }
     
-    struct SlopeParameters {
-        var LOW_SLOPE_1:Double
-        var LOW_SLOPE_2:Double
-        var HIGH_SLOPE_1:Double
-        var HIGH_SLOPE_2:Double
-        var DEFAULT_LOW_SLOPE_LOW:Double
-        var DEFAULT_LOW_SLOPE_HIGH:Double
-        var DEFAULT_SLOPE:Int
-        var DEFAULT_HIGH_SLOPE_HIGH:Double
-        var DEFAUL_HIGH_SLOPE_LOW:Double
-    }
+

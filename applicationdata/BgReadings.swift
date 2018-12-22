@@ -1,17 +1,13 @@
 import Foundation
 import CoreData
 
-/// has the last 24Hr (or more ? ) readings
-///
-/// also methods to get specific readings, needed in the calibration algorithms
-///
-/// also used by viewcontroller
+
 class BgReadings {
     
     /// the latest 24 hours (or more ?) of readings.
     /// the latest element is the youngest
-    static private var bgReadings = [BgReading]()
- 
+    static var bgReadings = [BgReading]()
+
     private init() {
     }
     
@@ -24,7 +20,7 @@ class BgReadings {
     ///     - if ignoreCalculatedValue = true, then value of calculatedValue will be ignored
     /// - returns: an array with readings, can be empty array.
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
-    static func getLatestReadings(howMany amount:Int, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> Array<BgReading> {
+    static func getLatestBgReadings(howMany amount:Int, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> Array<BgReading> {
         var returnValue:Array<BgReading> = []
         let ignoreSensorId = sensor == nil ? true:false
         loop: if ignoreSensorId {
@@ -84,4 +80,5 @@ class BgReadings {
     static func addBgReading(newReading:BgReading) {
         bgReadings.append(newReading)
     }
+
 }

@@ -11,11 +11,15 @@ class FirstViewController: UIViewController {
                 return
         }
         
+        //load database
         let managedContext =
             appDelegate.persistentContainer.viewContext
-        
         loadData(managedContext: managedContext)
-        
+
+        for (index, reading) in BgReadings.bgReadings.enumerated() {
+            print("Reading nr  \(index) has uniqueid \(reading.id)")
+        }
+
         var testSensor:Sensor?
         var testCalibration:Calibration?
         var testReading = BgReading(timeStamp: Date(), sensor: testSensor, calibration: testCalibration, rawData: 100.2, filteredData: 110.1, nsManagedObjectContext: managedContext)
@@ -27,14 +31,9 @@ class FirstViewController: UIViewController {
     func loadData(managedContext:NSManagedObjectContext) {
         let bgReadingLoadRequest:NSFetchRequest<BgReading> = BgReading.fetchRequest()
         
-        var bgReadings:Array<BgReading> = []
-        
         do {
-            try  bgReadings = managedContext.fetch(bgReadingLoadRequest)
+            try  BgReadings.bgReadings = managedContext.fetch(bgReadingLoadRequest)
             
-            for (index, reading) in bgReadings.enumerated() {
-                print("Reading nr  \(index) has uniqueid \(reading.id)")
-            }
         }catch {
             print("Could not load data")
         }

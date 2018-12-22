@@ -1,9 +1,10 @@
 import Foundation
 
 class ActiveSensor {
-
-    static var sensor:Sensor?
     
+    static var activeSensor:Sensor?
+
     private init() {
     }
+
 }

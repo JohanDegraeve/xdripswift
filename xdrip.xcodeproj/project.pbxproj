@@ -29,6 +29,7 @@
 		F8EA6CAD21BC2CA40082976B /* ActiveBluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CAC21BC2CA40082976B /* ActiveBluetoothDevice.swift */; };
 		F8EA6CAF21C0213C0082976B /* CalibrationAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CAE21C0213C0082976B /* CalibrationAlgorithms.swift */; };
 		F8EA6CB121C05E970082976B /* Calibrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CB021C05E970082976B /* Calibrations.swift */; };
+		F8EA6CB321CD5DD90082976B /* SlopeParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CB221CD5DD90082976B /* SlopeParameters.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,7 @@
 		F8EA6CAC21BC2CA40082976B /* ActiveBluetoothDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveBluetoothDevice.swift; sourceTree = "<group>"; };
 		F8EA6CAE21C0213C0082976B /* CalibrationAlgorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationAlgorithms.swift; sourceTree = "<group>"; };
 		F8EA6CB021C05E970082976B /* Calibrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calibrations.swift; sourceTree = "<group>"; };
+		F8EA6CB221CD5DD90082976B /* SlopeParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlopeParameters.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,6 +193,7 @@
 				F8EA6C6B21B3CF670082976B /* BgReading+CoreDataClass.swift */,
 				F8EA6C6921B3CF670082976B /* Calibration+CoreDataClass.swift */,
 				F8EA6C6D21B3CF670082976B /* Sensor+CoreDataClass.swift */,
+				F8EA6CB221CD5DD90082976B /* SlopeParameters.swift */,
 			);
 			path = classes;
 			sourceTree = "<group>";
@@ -306,6 +309,7 @@
 				F8EA6C7A21B48B390082976B /* BgReadingAlgorithms.swift in Sources */,
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* ActiveBluetoothDevice.swift in Sources */,
+				F8EA6CB321CD5DD90082976B /* SlopeParameters.swift in Sources */,
 				F8EA6CAF21C0213C0082976B /* CalibrationAlgorithms.swift in Sources */,
 				F8EA6C7321B3CF670082976B /* Sensor+CoreDataClass.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* FirstViewController.swift in Sources */,
