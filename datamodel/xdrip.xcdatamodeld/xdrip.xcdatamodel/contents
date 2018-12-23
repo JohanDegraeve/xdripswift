@@ -18,8 +18,8 @@
         <attribute name="rb" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="rc" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="timeStamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <relationship name="calibration" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Calibration" syncable="YES"/>
-        <relationship name="sensor" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" syncable="YES"/>
+        <relationship name="calibration" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Calibration" inverseName="bgreadings" inverseEntity="Calibration" syncable="YES"/>
+        <relationship name="sensor" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" inverseName="readings" inverseEntity="Sensor" syncable="YES"/>
     </entity>
     <entity name="Calibration" representedClassName=".Calibration" syncable="YES">
         <attribute name="adjustedRawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
@@ -45,16 +45,19 @@
         <attribute name="slope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="slopeConfidence" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="timeStamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <relationship name="sensor" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" syncable="YES"/>
+        <relationship name="bgreadings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BgReading" inverseName="calibration" inverseEntity="BgReading" syncable="YES"/>
+        <relationship name="sensor" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" inverseName="calibrations" inverseEntity="Sensor" syncable="YES"/>
     </entity>
     <entity name="Sensor" representedClassName=".Sensor" syncable="YES">
         <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="id" attributeType="String" syncable="YES"/>
         <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="calibrations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Calibration" inverseName="sensor" inverseEntity="Calibration" syncable="YES"/>
+        <relationship name="readings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BgReading" inverseName="sensor" inverseEntity="BgReading" syncable="YES"/>
     </entity>
     <elements>
         <element name="BgReading" positionX="-249.609375" positionY="43.8203125" width="128" height="330"/>
-        <element name="Calibration" positionX="-282.30078125" positionY="173.79296875" width="128" height="405"/>
-        <element name="Sensor" positionX="-63" positionY="-18" width="128" height="90"/>
+        <element name="Calibration" positionX="-282.30078125" positionY="173.79296875" width="128" height="420"/>
+        <element name="Sensor" positionX="-63" positionY="-18" width="128" height="120"/>
     </elements>
 </model>

@@ -1,3 +1,12 @@
+//
+//  Sensor+CoreDataProperties.swift
+//  xdrip
+//
+//  Created by Johan Degraeve on 23/12/2018.
+//  Copyright © 2018 Johan Degraeve. All rights reserved.
+//
+//
+
 import Foundation
 import CoreData
 
@@ -9,7 +18,43 @@ extension Sensor {
     }
 
     @NSManaged public var endDate: Date?
-    @NSManaged public var startDate: Date
-    @NSManaged public var id: String
+    @NSManaged public var id: String?
+    @NSManaged public var startDate: Date?
+    @NSManaged public var calibrations: NSSet?
+    @NSManaged public var readings: NSSet?
+
+}
+
+// MARK: Generated accessors for calibrations
+extension Sensor {
+
+    @objc(addCalibrationsObject:)
+    @NSManaged public func addToCalibrations(_ value: Calibration)
+
+    @objc(removeCalibrationsObject:)
+    @NSManaged public func removeFromCalibrations(_ value: Calibration)
+
+    @objc(addCalibrations:)
+    @NSManaged public func addToCalibrations(_ values: NSSet)
+
+    @objc(removeCalibrations:)
+    @NSManaged public func removeFromCalibrations(_ values: NSSet)
+
+}
+
+// MARK: Generated accessors for readings
+extension Sensor {
+
+    @objc(addReadingsObject:)
+    @NSManaged public func addToReadings(_ value: BgReading)
+
+    @objc(removeReadingsObject:)
+    @NSManaged public func removeFromReadings(_ value: BgReading)
+
+    @objc(addReadings:)
+    @NSManaged public func addToReadings(_ values: NSSet)
+
+    @objc(removeReadings:)
+    @NSManaged public func removeFromReadings(_ values: NSSet)
 
 }

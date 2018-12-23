@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F85DC2EB21CFE2F500B9F74A /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */; };
+		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
+		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
+		F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */; };
+		F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */; };
+		F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
 		F8AC426021ADEBD60078C348 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* FirstViewController.swift */; };
 		F8AC426221ADEBD60078C348 /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC426121ADEBD60078C348 /* SecondViewController.swift */; };
@@ -14,17 +20,11 @@
 		F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */; };
 		F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */; };
-		F8EA6C6F21B3CF670082976B /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C6921B3CF670082976B /* Calibration+CoreDataClass.swift */; };
-		F8EA6C7121B3CF670082976B /* BgReading+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C6B21B3CF670082976B /* BgReading+CoreDataClass.swift */; };
-		F8EA6C7321B3CF670082976B /* Sensor+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C6D21B3CF670082976B /* Sensor+CoreDataClass.swift */; };
 		F8EA6C7A21B48B390082976B /* BgReadingAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C7921B48B390082976B /* BgReadingAlgorithms.swift */; };
 		F8EA6C7C21B491740082976B /* BgReadings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C7B21B491740082976B /* BgReadings.swift */; };
 		F8EA6C7F21B70E390082976B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C7E21B70E390082976B /* Constants.swift */; };
 		F8EA6C8221B723BC0082976B /* DateAndTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C8121B723BC0082976B /* DateAndTime.swift */; };
 		F8EA6C9621B848C20082976B /* ActiveSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C9521B848C20082976B /* ActiveSensor.swift */; };
-		F8EA6CA021B9A0D30082976B /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C9D21B9A0D30082976B /* BgReading+CoreDataProperties.swift */; };
-		F8EA6CA121B9A0D30082976B /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C9E21B9A0D30082976B /* Sensor+CoreDataProperties.swift */; };
-		F8EA6CA221B9A0D30082976B /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C9F21B9A0D30082976B /* Calibration+CoreDataProperties.swift */; };
 		F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CA821BBE3010082976B /* UniqueId.swift */; };
 		F8EA6CAD21BC2CA40082976B /* ActiveBluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CAC21BC2CA40082976B /* ActiveBluetoothDevice.swift */; };
 		F8EA6CAF21C0213C0082976B /* CalibrationAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CAE21C0213C0082976B /* CalibrationAlgorithms.swift */; };
@@ -33,6 +33,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
+		F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataClass.swift"; sourceTree = "<group>"; };
+		F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F8AC425F21ADEBD60078C348 /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
@@ -42,17 +48,11 @@
 		F8AC426921ADEBD70078C348 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F8AC426B21ADEBD70078C348 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F8AC42A021B31F160078C348 /* xdrip.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = xdrip.xcdatamodel; sourceTree = "<group>"; };
-		F8EA6C6921B3CF670082976B /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
-		F8EA6C6B21B3CF670082976B /* BgReading+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataClass.swift"; sourceTree = "<group>"; };
-		F8EA6C6D21B3CF670082976B /* Sensor+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F8EA6C7921B48B390082976B /* BgReadingAlgorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingAlgorithms.swift; sourceTree = "<group>"; };
 		F8EA6C7B21B491740082976B /* BgReadings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadings.swift; sourceTree = "<group>"; };
 		F8EA6C7E21B70E390082976B /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F8EA6C8121B723BC0082976B /* DateAndTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateAndTime.swift; sourceTree = "<group>"; };
 		F8EA6C9521B848C20082976B /* ActiveSensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSensor.swift; sourceTree = "<group>"; };
-		F8EA6C9D21B9A0D30082976B /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		F8EA6C9E21B9A0D30082976B /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		F8EA6C9F21B9A0D30082976B /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F8EA6CA821BBE3010082976B /* UniqueId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniqueId.swift; sourceTree = "<group>"; };
 		F8EA6CAC21BC2CA40082976B /* ActiveBluetoothDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveBluetoothDevice.swift; sourceTree = "<group>"; };
 		F8EA6CAE21C0213C0082976B /* CalibrationAlgorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationAlgorithms.swift; sourceTree = "<group>"; };
@@ -71,6 +71,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F85DC29B21CFCEB800B9F74A /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		F8AC425121ADEBD60078C348 = {
 			isa = PBXGroup;
 			children = (
@@ -82,6 +89,7 @@
 				F8AC427121ADF62A0078C348 /* services */,
 				F8EA6C8021B723A80082976B /* utilities */,
 				F8AC425C21ADEBD60078C348 /* xdrip */,
+				F85DC29B21CFCEB800B9F74A /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -180,9 +188,9 @@
 		F8EA6CA321B9A21C0082976B /* extensions */ = {
 			isa = PBXGroup;
 			children = (
-				F8EA6C9D21B9A0D30082976B /* BgReading+CoreDataProperties.swift */,
-				F8EA6C9F21B9A0D30082976B /* Calibration+CoreDataProperties.swift */,
-				F8EA6C9E21B9A0D30082976B /* Sensor+CoreDataProperties.swift */,
+				F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */,
+				F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */,
+				F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -190,9 +198,9 @@
 		F8EA6CA421B9A25B0082976B /* classes */ = {
 			isa = PBXGroup;
 			children = (
-				F8EA6C6B21B3CF670082976B /* BgReading+CoreDataClass.swift */,
-				F8EA6C6921B3CF670082976B /* Calibration+CoreDataClass.swift */,
-				F8EA6C6D21B3CF670082976B /* Sensor+CoreDataClass.swift */,
+				F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */,
+				F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */,
+				F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */,
 				F8EA6CB221CD5DD90082976B /* SlopeParameters.swift */,
 			);
 			path = classes;
@@ -296,24 +304,24 @@
 			files = (
 				F8EA6C8221B723BC0082976B /* DateAndTime.swift in Sources */,
 				F8AC426221ADEBD60078C348 /* SecondViewController.swift in Sources */,
-				F8EA6CA221B9A0D30082976B /* Calibration+CoreDataProperties.swift in Sources */,
+				F85DC2EB21CFE2F500B9F74A /* Calibration+CoreDataProperties.swift in Sources */,
+				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
+				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
 				F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */,
 				F8EA6CB121C05E970082976B /* Calibrations.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
 				F8EA6C9621B848C20082976B /* ActiveSensor.swift in Sources */,
-				F8EA6C7121B3CF670082976B /* BgReading+CoreDataClass.swift in Sources */,
-				F8EA6CA021B9A0D30082976B /* BgReading+CoreDataProperties.swift in Sources */,
-				F8EA6C6F21B3CF670082976B /* Calibration+CoreDataClass.swift in Sources */,
 				F8EA6C7C21B491740082976B /* BgReadings.swift in Sources */,
-				F8EA6CA121B9A0D30082976B /* Sensor+CoreDataProperties.swift in Sources */,
 				F8EA6C7A21B48B390082976B /* BgReadingAlgorithms.swift in Sources */,
+				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* ActiveBluetoothDevice.swift in Sources */,
+				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
 				F8EA6CB321CD5DD90082976B /* SlopeParameters.swift in Sources */,
 				F8EA6CAF21C0213C0082976B /* CalibrationAlgorithms.swift in Sources */,
-				F8EA6C7321B3CF670082976B /* Sensor+CoreDataClass.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* FirstViewController.swift in Sources */,
 				F8EA6C7F21B70E390082976B /* Constants.swift in Sources */,
+				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
