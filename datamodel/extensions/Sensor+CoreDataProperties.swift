@@ -18,8 +18,8 @@ extension Sensor {
     }
 
     @NSManaged public var endDate: Date?
-    @NSManaged public var id: String?
-    @NSManaged public var startDate: Date?
+    @NSManaged public var id: String
+    @NSManaged public var startDate: Date
     @NSManaged public var calibrations: NSSet?
     @NSManaged public var readings: NSSet?
 

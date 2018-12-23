@@ -27,7 +27,7 @@ extension Calibration {
     @NSManaged public var firstIntercept: Double
     @NSManaged public var firstScale: Double
     @NSManaged public var firstSlope: Double
-    @NSManaged public var id: String?
+    @NSManaged public var id: String
     @NSManaged public var intercept: Double
     @NSManaged public var possibleBad: Bool
     @NSManaged public var rawTimeStamp: Date?
@@ -39,9 +39,9 @@ extension Calibration {
     @NSManaged public var sensorConfidence: Double
     @NSManaged public var slope: Double
     @NSManaged public var slopeConfidence: Double
-    @NSManaged public var timeStamp: Date?
+    @NSManaged public var timeStamp: Date
     @NSManaged public var bgreadings: NSSet?
-    @NSManaged public var sensor: Sensor?
+    @NSManaged public var sensor: Sensor
 
 }
 
