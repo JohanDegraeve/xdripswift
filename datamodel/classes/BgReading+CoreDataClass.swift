@@ -5,8 +5,6 @@ import UIKit
 
 public class BgReading: NSManagedObject {
     
-    var moc:NSManagedObjectContext!
-    
     init(
         timeStamp:Date,
         sensor:Sensor?,
