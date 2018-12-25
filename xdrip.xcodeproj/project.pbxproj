@@ -13,6 +13,7 @@
 		F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */; };
 		F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */; };
 		F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */; };
+		F85DC2F821D2632F00B9F74A /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
 		F8AC426021ADEBD60078C348 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* FirstViewController.swift */; };
 		F8AC426221ADEBD60078C348 /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC426121ADEBD60078C348 /* SecondViewController.swift */; };
@@ -39,6 +40,7 @@
 		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataClass.swift"; sourceTree = "<group>"; };
+		F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F8AC425F21ADEBD60078C348 /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
@@ -78,16 +80,19 @@
 			name = "Recovered References";
 			sourceTree = "<group>";
 		};
+		F85DC2F621D25E3A00B9F74A /* managers */ = {
+			isa = PBXGroup;
+			children = (
+				F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */,
+			);
+			path = managers;
+			sourceTree = "<group>";
+		};
 		F8AC425121ADEBD60078C348 = {
 			isa = PBXGroup;
 			children = (
-				F8EA6CA521BAD5AD0082976B /* algorithms */,
-				F8EA6C7521B474120082976B /* applicationdata */,
-				F8EA6C7D21B70DEA0082976B /* constants */,
-				F8AC42D021B342910078C348 /* datamodel */,
 				F8AC425B21ADEBD60078C348 /* Products */,
 				F8AC427121ADF62A0078C348 /* services */,
-				F8EA6C8021B723A80082976B /* utilities */,
 				F8AC425C21ADEBD60078C348 /* xdrip */,
 				F85DC29B21CFCEB800B9F74A /* Recovered References */,
 			);
@@ -104,6 +109,12 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
+				F85DC2F621D25E3A00B9F74A /* managers */,
+				F8EA6CA521BAD5AD0082976B /* algorithms */,
+				F8EA6C7521B474120082976B /* applicationdata */,
+				F8EA6C7D21B70DEA0082976B /* constants */,
+				F8AC42D021B342910078C348 /* core data */,
+				F8EA6C8021B723A80082976B /* utilities */,
 				F8AC425D21ADEBD60078C348 /* AppDelegate.swift */,
 				F8AC425F21ADEBD60078C348 /* FirstViewController.swift */,
 				F8AC426121ADEBD60078C348 /* SecondViewController.swift */,
@@ -140,14 +151,15 @@
 			path = miaomiao;
 			sourceTree = "<group>";
 		};
-		F8AC42D021B342910078C348 /* datamodel */ = {
+		F8AC42D021B342910078C348 /* core data */ = {
 			isa = PBXGroup;
 			children = (
 				F8EA6CA421B9A25B0082976B /* classes */,
 				F8EA6CA321B9A21C0082976B /* extensions */,
 				F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */,
 			);
-			path = datamodel;
+			name = "core data";
+			path = "xdrip/core data";
 			sourceTree = SOURCE_ROOT;
 		};
 		F8EA6C7521B474120082976B /* applicationdata */ = {
@@ -173,7 +185,8 @@
 			children = (
 				F8EA6C7E21B70E390082976B /* Constants.swift */,
 			);
-			path = constants;
+			name = constants;
+			path = xdrip/constants;
 			sourceTree = SOURCE_ROOT;
 		};
 		F8EA6C8021B723A80082976B /* utilities */ = {
@@ -314,6 +327,7 @@
 				F8EA6C7C21B491740082976B /* BgReadings.swift in Sources */,
 				F8EA6C7A21B48B390082976B /* BgReadingAlgorithms.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
+				F85DC2F821D2632F00B9F74A /* CoreDataManager.swift in Sources */,
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* ActiveBluetoothDevice.swift in Sources */,
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,

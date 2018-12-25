@@ -3,11 +3,11 @@ import Foundation
 
 struct Constants {
     
-    private init()
+    private init() {}
     
     struct BloodGlucose {
 
-        private init()
+        private init() {}
 
         static let mmollToMgdl = 18.01801801801802
         static let mgDlToMmoll = 0.0555
