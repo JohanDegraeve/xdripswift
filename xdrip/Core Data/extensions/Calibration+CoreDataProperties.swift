@@ -40,7 +40,7 @@ extension Calibration {
     @NSManaged public var slope: Double
     @NSManaged public var slopeConfidence: Double
     @NSManaged public var timeStamp: Date
-    @NSManaged public var bgreadings: NSSet?
+    @NSManaged public var bgreadings: NSSet
     @NSManaged public var sensor: Sensor
 
 }

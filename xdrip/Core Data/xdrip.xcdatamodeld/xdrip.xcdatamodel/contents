@@ -45,7 +45,7 @@
         <attribute name="slope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="slopeConfidence" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="timeStamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <relationship name="bgreadings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BgReading" inverseName="calibration" inverseEntity="BgReading" syncable="YES"/>
+        <relationship name="bgreadings" toMany="YES" deletionRule="Deny" destinationEntity="BgReading" inverseName="calibration" inverseEntity="BgReading" syncable="YES"/>
         <relationship name="sensor" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" inverseName="calibrations" inverseEntity="Sensor" syncable="YES"/>
     </entity>
     <entity name="Sensor" representedClassName=".Sensor" syncable="YES">
@@ -56,8 +56,8 @@
         <relationship name="readings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BgReading" inverseName="sensor" inverseEntity="BgReading" syncable="YES"/>
     </entity>
     <elements>
-        <element name="BgReading" positionX="-249.609375" positionY="43.8203125" width="128" height="330"/>
-        <element name="Calibration" positionX="-282.30078125" positionY="173.79296875" width="128" height="420"/>
-        <element name="Sensor" positionX="-63" positionY="-18" width="128" height="120"/>
+        <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
+        <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="420"/>
+        <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="120"/>
     </elements>
 </model>

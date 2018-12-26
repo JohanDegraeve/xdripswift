@@ -80,19 +80,44 @@
 			name = "Recovered References";
 			sourceTree = "<group>";
 		};
-		F85DC2F621D25E3A00B9F74A /* managers */ = {
+		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
 				F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */,
 			);
-			path = managers;
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		F85DC2F921D2CCC000B9F74A /* Storyboards */ = {
+			isa = PBXGroup;
+			children = (
+				F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */,
+				F8AC426321ADEBD60078C348 /* Main.storyboard */,
+			);
+			path = Storyboards;
+			sourceTree = "<group>";
+		};
+		F85DC2FA21D2CD3000B9F74A /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				F8AC425F21ADEBD60078C348 /* FirstViewController.swift */,
+				F8AC426121ADEBD60078C348 /* SecondViewController.swift */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		F85DC2FB21D2CD7000B9F74A /* Application Delegate */ = {
+			isa = PBXGroup;
+			children = (
+				F8AC425D21ADEBD60078C348 /* AppDelegate.swift */,
+			);
+			path = "Application Delegate";
 			sourceTree = "<group>";
 		};
 		F8AC425121ADEBD60078C348 = {
 			isa = PBXGroup;
 			children = (
 				F8AC425B21ADEBD60078C348 /* Products */,
-				F8AC427121ADF62A0078C348 /* services */,
 				F8AC425C21ADEBD60078C348 /* xdrip */,
 				F85DC29B21CFCEB800B9F74A /* Recovered References */,
 			);
@@ -109,57 +134,30 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
-				F85DC2F621D25E3A00B9F74A /* managers */,
+				F85DC2FB21D2CD7000B9F74A /* Application Delegate */,
+				F85DC2FA21D2CD3000B9F74A /* View Controllers */,
+				F85DC2F921D2CCC000B9F74A /* Storyboards */,
 				F8EA6CA521BAD5AD0082976B /* algorithms */,
 				F8EA6C7521B474120082976B /* applicationdata */,
-				F8EA6C7D21B70DEA0082976B /* constants */,
-				F8AC42D021B342910078C348 /* core data */,
-				F8EA6C8021B723A80082976B /* utilities */,
-				F8AC425D21ADEBD60078C348 /* AppDelegate.swift */,
-				F8AC425F21ADEBD60078C348 /* FirstViewController.swift */,
-				F8AC426121ADEBD60078C348 /* SecondViewController.swift */,
-				F8AC426321ADEBD60078C348 /* Main.storyboard */,
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
-				F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */,
+				F8EA6C7D21B70DEA0082976B /* Constants */,
+				F8AC42D021B342910078C348 /* Core Data */,
 				F8AC426B21ADEBD70078C348 /* Info.plist */,
+				F85DC2F621D25E3A00B9F74A /* Managers */,
+				F8EA6C8021B723A80082976B /* Utilities */,
 			);
 			path = xdrip;
 			sourceTree = "<group>";
 		};
-		F8AC427121ADF62A0078C348 /* services */ = {
-			isa = PBXGroup;
-			children = (
-				F8EA6C7821B485450082976B /* calibration */,
-				F8AC427221ADF62A0078C348 /* bluetooth */,
-			);
-			name = services;
-			path = xdrip/services;
-			sourceTree = "<group>";
-		};
-		F8AC427221ADF62A0078C348 /* bluetooth */ = {
-			isa = PBXGroup;
-			children = (
-				F8AC427321ADF62A0078C348 /* miaomiao */,
-			);
-			path = bluetooth;
-			sourceTree = "<group>";
-		};
-		F8AC427321ADF62A0078C348 /* miaomiao */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = miaomiao;
-			sourceTree = "<group>";
-		};
-		F8AC42D021B342910078C348 /* core data */ = {
+		F8AC42D021B342910078C348 /* Core Data */ = {
 			isa = PBXGroup;
 			children = (
 				F8EA6CA421B9A25B0082976B /* classes */,
 				F8EA6CA321B9A21C0082976B /* extensions */,
 				F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */,
 			);
-			name = "core data";
-			path = "xdrip/core data";
+			name = "Core Data";
+			path = "xdrip/Core Data";
 			sourceTree = SOURCE_ROOT;
 		};
 		F8EA6C7521B474120082976B /* applicationdata */ = {
@@ -173,36 +171,29 @@
 			path = applicationdata;
 			sourceTree = "<group>";
 		};
-		F8EA6C7821B485450082976B /* calibration */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = calibration;
-			sourceTree = "<group>";
-		};
-		F8EA6C7D21B70DEA0082976B /* constants */ = {
+		F8EA6C7D21B70DEA0082976B /* Constants */ = {
 			isa = PBXGroup;
 			children = (
 				F8EA6C7E21B70E390082976B /* Constants.swift */,
 			);
-			name = constants;
-			path = xdrip/constants;
+			name = Constants;
+			path = xdrip/Constants;
 			sourceTree = SOURCE_ROOT;
 		};
-		F8EA6C8021B723A80082976B /* utilities */ = {
+		F8EA6C8021B723A80082976B /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
 				F8EA6C8121B723BC0082976B /* DateAndTime.swift */,
 				F8EA6CA821BBE3010082976B /* UniqueId.swift */,
 			);
-			path = utilities;
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 		F8EA6CA321B9A21C0082976B /* extensions */ = {
 			isa = PBXGroup;
 			children = (
-				F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */,
 				F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */,
+				F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */,
 				F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */,
 			);
 			path = extensions;

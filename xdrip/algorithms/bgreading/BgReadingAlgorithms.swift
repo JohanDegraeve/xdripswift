@@ -203,20 +203,20 @@ import CoreData
     /// create a new BgReading
     ///
     /// - parameters:
-    ///     - withRawData : the rawdata value
-    ///     - withFilteredData : the filtered data
-    ///     - withTimeStamp : optional, if nil then actualy date and time is used
-    ///     - withSensor : actual sensor, optional
-    ///     - withLast3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
-    ///     - withSsManagedObjectContext : the nsManagedObjectContext
-    ///     - withLastNoSensor : result of call to BgReadings.getLastReadingNoSensor, can be nil
-    ///     - withLast4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
-    ///     - withFirstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
-    ///     - withLastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
+    ///     - rawData : the rawdata value
+    ///     - filteredData : the filtered data
+    ///     - timeStamp : optional, if nil then actualy date and time is used
+    ///     - sensor : actual sensor, optional
+    ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
+    ///     - nsManagedObjectContext : the nsManagedObjectContext
+    ///     - lastNoSensor : result of call to BgReadings.getLastReadingNoSensor, can be nil
+    ///     - last4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
+    ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
+    ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     ///     - isTypeLimitter : type limitter means sensor is Libre
     /// - returns:
     ///     - the created bgreading
-    func createNewReading(withRawData rawData:Double, withFilteredData filteredData:Double, withTimeStamp timeStamp:Date?, withSensor sensor:Sensor?, withLast3Readings last3Readings:inout Array<BgReading>, withLastNoSensor lastNoSensor:BgReading?, withLast4CalibrationsForActiveSensor last4CalibrationsForActiveSensor:inout Array<Calibration>, withFirstCalibration firstCalibration:Calibration, withLastCalibration lastCalibration:Calibration, isTypeLimitter:Bool, withnSManagedObjectContext nsManagedObjectContext:NSManagedObjectContext ) -> BgReading {
+    func createNewReading(rawData:Double, filteredData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, lastNoSensor:BgReading?, last4CalibrationsForActiveSensor:inout Array<Calibration>, firstCalibration:Calibration, lastCalibration:Calibration, isTypeLimitter:Bool, nsManagedObjectContext:NSManagedObjectContext ) -> BgReading {
       
         var timeStampToUse:Date = Date()
         if let timeStamp = timeStamp {
