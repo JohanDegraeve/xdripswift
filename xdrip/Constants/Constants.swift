@@ -37,4 +37,16 @@ struct Constants {
         static let liParameters = SlopeParameters(LOW_SLOPE_1: 1, LOW_SLOPE_2: 1, HIGH_SLOPE_1: 1, HIGH_SLOPE_2: 1, DEFAULT_LOW_SLOPE_LOW: 1, DEFAULT_LOW_SLOPE_HIGH: 1, DEFAULT_SLOPE: 1, DEFAULT_HIGH_SLOPE_HIGH: 1, DEFAUL_HIGH_SLOPE_LOW: 1)
 
     }
+       
+    /// for use in OSLog
+    struct Log {
+        private init() {}
+
+        /// for use in OSLog
+        static let subSystem = "net.johandegraeve.beatit"
+        /// for use in OSLog
+        static let categoryBlueTooth = "bluetooth"
+        
+        static let categoryCGMMiaoMiao = "cgmmiaomiao"
+    }
 }
