@@ -10,6 +10,7 @@
 		F8025C0821D8DD1F00ECF0C0 /* CGMMiaoMiaoTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0721D8DD1F00ECF0C0 /* CGMMiaoMiaoTransmitter.swift */; };
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
 		F8025C0F21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0E21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift */; };
+		F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */; };
 		F85DC2EB21CFE2F500B9F74A /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
@@ -41,6 +42,7 @@
 		F8025C0721D8DD1F00ECF0C0 /* CGMMiaoMiaoTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMMiaoMiaoTransmitter.swift; sourceTree = "<group>"; };
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
 		F8025C0E21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMTransmitterDelegate.swift; sourceTree = "<group>"; };
+		F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothTransmitterDelegate.swift; sourceTree = "<group>"; };
 		F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 			children = (
 				F8EA6CAC21BC2CA40082976B /* BluetoothTransmitter.swift */,
 				F8025C0E21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift */,
+				F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */,
 			);
 			path = Generic;
 			sourceTree = "<group>";
@@ -394,6 +397,7 @@
 				F8EA6CAF21C0213C0082976B /* CalibrationAlgorithms.swift in Sources */,
 				F8025C0F21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* FirstViewController.swift in Sources */,
+				F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */,
 				F8EA6C7F21B70E390082976B /* Constants.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 			);

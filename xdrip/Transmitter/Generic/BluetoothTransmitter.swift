@@ -3,13 +3,12 @@ import CoreBluetooth
 import os
 
 /// generic class for bluetooth transmitter.
-/// For new transmitters, extend BluetoothTransmitter and implement the protocol BluetoothTransmitterDelegate
+/// For new transmitters, extend BluetoothTransmitter
 ///
 /// class BluetoothTransmitter implements the protocols CBCentralManagerDelegate, CBPeripheralDelegate
 ///
 /// some of those functions might still need override/re-implementation in the deriving specific class
 ///
-/// the protocol BluetoothTransmitterDelegate handles events that need to be treated differently dependent on device type, eg data that is received from the transmitter
 class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
     // MARK: - properties
@@ -37,6 +36,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// peripheral, gets value during connect
     private var peripheral: CBPeripheral?
     
+    private var delegate:BluetoothTransmitterDelegate?
+    
     /// if never connected before to the device, then possibily we expect a specific device name. For example for G5, if transmitter id is ABCDEF, we expect as devicename DexcomEF. For an xDrip bridge, we don't expect a specific devicename, in which case the value stays nil
     /// the value is only used during first time connection to a new device. Once we've connected at least once, we know the final name (eg xBridge) and will store this name in the name attribute, the expectedName value can then be ignored
     private var expectedName:String?
@@ -56,7 +57,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     ///     - CBUUID_Service: service uuid
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
-    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String, CBUUID_Service:String, CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String) {
+    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String, CBUUID_Service:String, CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, delegate:BluetoothTransmitterDelegate) {
         
         switch addressAndName {
         case .alreadyConnectedBefore(let newAddress, let newName):
@@ -65,6 +66,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         case .notYetConnected(let newexpectedName):
             expectedName = newexpectedName
         }
+        
+        //assign delegate
+        self.delegate = delegate
 
         //assign uuid's
         self.CBUUID_Service = CBUUID_Service
@@ -258,7 +262,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
 
     /// if new state is powered on and if address is known then try to retrieveperipherals, if that fails start scanning
-    /// also calls delegate.centralManagerDidUpdateStateD in the end
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         
         os_log("in centralManagerDidUpdateState, new state is %{public}@", log: log, type: .info, "\(central.state.toString())")
@@ -271,6 +274,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 }
             }
         }
+
+        // delegate might be interested also that state has changed
+        delegate?.bluetooth(didUpdateState: central.state)
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {

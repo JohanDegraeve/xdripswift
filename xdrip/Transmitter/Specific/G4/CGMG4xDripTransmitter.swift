@@ -37,7 +37,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter {
         //assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate
 
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G4, CBUUID_Service: CBUUID_Service_G4, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_G4, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_G4)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G4, CBUUID_Service: CBUUID_Service_G4, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_G4, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_G4, delegate: delegate)
     }
     
     // MARK: - functions
@@ -46,21 +46,24 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter {
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
+        
         //In Spike and iosxdripreader, a device connection completed is transmitted in this case
         cgmTransmitterDelegate?.cgmTransmitterdidConnect()
     }
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        //just call super, we might as well just not override the function
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
     }
     
     override func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        //just call super, we might as well just not override the function
         super.centralManagerDidUpdateState(central)
-        cgmTransmitterDelegate?.bluetooth(didUpdateState: central.state)
     }
 
     override func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         super.peripheral(peripheral, didWriteValueFor: characteristic, error: error)
+        
         //In Spike and iosxdripreader, a device connection completed is transmitted in this case
         cgmTransmitterDelegate?.cgmTransmitterdidConnect()
     }

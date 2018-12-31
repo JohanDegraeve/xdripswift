@@ -41,7 +41,7 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
         // assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate
         
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_MiaoMiao, CBUUID_Service: CBUUID_Service_MiaoMiao, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_MiaoMiao, CBUUID_Service: CBUUID_Service_MiaoMiao, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, delegate: delegate)
         
         //blueToothTransmitterDelegate = self
     }
@@ -71,8 +71,8 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
     }
     
     override func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        //just call super, we might as well just not override the function
         super.centralManagerDidUpdateState(central)
-        cgmTransmitterDelegate?.bluetooth(didUpdateState: central.state)
     }
     
     override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
