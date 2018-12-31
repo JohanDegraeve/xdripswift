@@ -1,7 +1,7 @@
 import Foundation
 import CoreBluetooth
 
-final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDelegate {
+final class CGMG4xDripTransmitter: BluetoothTransmitter {
     func centralManagerD(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         //TODO
     }
@@ -38,28 +38,29 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         cgmTransmitterDelegate = delegate
 
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G4, CBUUID_Service: CBUUID_Service_G4, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_G4, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_G4)
-        
-        blueToothTransmitterDelegate = self
     }
     
     // MARK: - functions
     
     // MARK: - BluetoothTransmitterDelegate functions
     
-    func peripheralD(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
         //In Spike and iosxdripreader, a device connection completed is transmitted in this case
         cgmTransmitterDelegate?.cgmTransmitterdidConnect()
     }
     
-    func peripheralD(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        print("hello")
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
     }
     
-    func centralManagerDidUpdateStateD(_ central: CBCentralManager) {
+    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        super.centralManagerDidUpdateState(central)
         cgmTransmitterDelegate?.bluetooth(didUpdateState: central.state)
     }
 
-    func peripheralD(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        super.peripheral(peripheral, didWriteValueFor: characteristic, error: error)
         //In Spike and iosxdripreader, a device connection completed is transmitted in this case
         cgmTransmitterDelegate?.cgmTransmitterdidConnect()
     }

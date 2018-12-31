@@ -2,7 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMGMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate {
+class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
     
     // MARK: - properties
     
@@ -43,7 +43,7 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate
         
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_MiaoMiao, CBUUID_Service: CBUUID_Service_MiaoMiao, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao)
         
-        blueToothTransmitterDelegate = self
+        //blueToothTransmitterDelegate = self
     }
     
     // MARK: - functions
@@ -59,25 +59,29 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate
     
     // MARK: - BluetoothTransmitterDelegate functions
     
-    func peripheralD(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
         if characteristic.isNotifying {
             _ = sendStartReadingCommmand()
         }
     }
     
-    func peripheralD(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         print("hello miaomiao didUpdateValueFor")
     }
     
-    func centralManagerDidUpdateStateD(_ central: CBCentralManager) {
+    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        super.centralManagerDidUpdateState(central)
         cgmTransmitterDelegate?.bluetooth(didUpdateState: central.state)
     }
     
-    func centralManagerD(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        super.centralManager(central, didConnect: peripheral)
         cgmTransmitterDelegate?.cgmTransmitterdidConnect()
     }
     
-    func peripheralD(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        super.peripheral(peripheral, didWriteValueFor: characteristic, error: error)
         //nothing to do for MiaoMiao
     }
 

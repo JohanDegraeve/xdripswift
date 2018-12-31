@@ -37,11 +37,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// peripheral, gets value during connect
     private var peripheral: CBPeripheral?
     
-    /// will be used to pass back bluetooth events to classes that inherit from BluetoothTransmitter
-    ///
-    /// not to be used by any other class than the classes that inherit from BluetoothTransmitter
-    var blueToothTransmitterDelegate:BluetoothTransmitterDelegate?
-    
     /// if never connected before to the device, then possibily we expect a specific device name. For example for G5, if transmitter id is ABCDEF, we expect as devicename DexcomEF. For an xDrip bridge, we don't expect a specific devicename, in which case the value stays nil
     /// the value is only used during first time connection to a new device. Once we've connected at least once, we know the final name (eg xBridge) and will store this name in the name attribute, the expectedName value can then be ignored
     private var expectedName:String?
@@ -249,8 +244,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
         
         peripheral.discoverServices(services)
-        
-        blueToothTransmitterDelegate?.centralManagerD(central, didConnect: peripheral)
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
@@ -278,9 +271,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 }
             }
         }
-        
-        // also inform the delegate
-        blueToothTransmitterDelegate?.centralManagerDidUpdateStateD(central)
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
@@ -340,12 +330,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-        //send to delegate because it needs specific action depending on type of device
-        blueToothTransmitterDelegate?.peripheralD(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        blueToothTransmitterDelegate?.peripheralD(peripheral, didUpdateValueFor: characteristic, error: error)
     }
     
     // MARK: - helpers
