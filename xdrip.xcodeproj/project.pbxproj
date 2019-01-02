@@ -11,6 +11,11 @@
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
 		F8025C0F21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0E21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift */; };
 		F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */; };
+		F8025C1321DA683400ECF0C0 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1221DA683400ECF0C0 /* Data.swift */; };
+		F8025C1821DBC16400ECF0C0 /* CRC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1721DBC16400ECF0C0 /* CRC.swift */; };
+		F8025C1A21DBC1B700ECF0C0 /* LibreSensorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1921DBC1B700ECF0C0 /* LibreSensorState.swift */; };
+		F8025C1E21DBCF4A00ECF0C0 /* RawGlucoseData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1D21DBCF4A00ECF0C0 /* RawGlucoseData.swift */; };
+		F8025C2021DBD0FE00ECF0C0 /* ParseLibreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */; };
 		F85DC2EB21CFE2F500B9F74A /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
@@ -43,6 +48,11 @@
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
 		F8025C0E21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMTransmitterDelegate.swift; sourceTree = "<group>"; };
 		F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothTransmitterDelegate.swift; sourceTree = "<group>"; };
+		F8025C1221DA683400ECF0C0 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		F8025C1721DBC16400ECF0C0 /* CRC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRC.swift; sourceTree = "<group>"; };
+		F8025C1921DBC1B700ECF0C0 /* LibreSensorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreSensorState.swift; sourceTree = "<group>"; };
+		F8025C1D21DBCF4A00ECF0C0 /* RawGlucoseData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawGlucoseData.swift; sourceTree = "<group>"; };
+		F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseLibreData.swift; sourceTree = "<group>"; };
 		F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -87,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				F8025C0721D8DD1F00ECF0C0 /* CGMMiaoMiaoTransmitter.swift */,
+				F8025C1421DBB54E00ECF0C0 /* Utilities */,
 			);
 			path = MiaoMiao;
 			sourceTree = "<group>";
@@ -96,8 +107,19 @@
 			children = (
 				F8EA6C8121B723BC0082976B /* Date.swift */,
 				F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */,
+				F8025C1221DA683400ECF0C0 /* Data.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		F8025C1421DBB54E00ECF0C0 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				F8025C1721DBC16400ECF0C0 /* CRC.swift */,
+				F8025C1921DBC1B700ECF0C0 /* LibreSensorState.swift */,
+				F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 		F85DC29B21CFCEB800B9F74A /* Recovered References */ = {
@@ -170,6 +192,7 @@
 		F85DC2FF21D3E83100B9F74A /* Generic */ = {
 			isa = PBXGroup;
 			children = (
+				F8025C1D21DBCF4A00ECF0C0 /* RawGlucoseData.swift */,
 				F8EA6CAC21BC2CA40082976B /* BluetoothTransmitter.swift */,
 				F8025C0E21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift */,
 				F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */,
@@ -382,9 +405,11 @@
 				F8025C0821D8DD1F00ECF0C0 /* CGMMiaoMiaoTransmitter.swift in Sources */,
 				F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */,
 				F8EA6CB121C05E970082976B /* Calibrations.swift in Sources */,
+				F8025C1E21DBCF4A00ECF0C0 /* RawGlucoseData.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
 				F8EA6C9621B848C20082976B /* ActiveSensor.swift in Sources */,
 				F8EA6C7C21B491740082976B /* BgReadings.swift in Sources */,
+				F8025C1821DBC16400ECF0C0 /* CRC.swift in Sources */,
 				F8EA6C7A21B48B390082976B /* BgReadingAlgorithms.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
 				F85DC2F821D2632F00B9F74A /* CoreDataManager.swift in Sources */,
@@ -397,9 +422,12 @@
 				F8EA6CAF21C0213C0082976B /* CalibrationAlgorithms.swift in Sources */,
 				F8025C0F21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* FirstViewController.swift in Sources */,
+				F8025C1A21DBC1B700ECF0C0 /* LibreSensorState.swift in Sources */,
 				F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */,
 				F8EA6C7F21B70E390082976B /* Constants.swift in Sources */,
+				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
+				F8025C2021DBD0FE00ECF0C0 /* ParseLibreData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
