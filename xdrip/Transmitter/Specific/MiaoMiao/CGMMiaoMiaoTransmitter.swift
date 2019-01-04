@@ -37,8 +37,6 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
     private var startDate:Date
     // receive buffer for miaomiao packets
     private var rxBuffer:Data
-    // to monitor receipt of miaomiao packets
-    weak private var packetRxMonitorTimer: Timer?
     // how long to wait for next packet before sending startreadingcommand
     private static let maxWaitForpacketInSeconds = 8.0
     // length of header added by MiaoMiao in front of data dat is received from Libre sensor
@@ -117,18 +115,6 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
                 if let miaoMiaoResponseState = MiaoMiaoResponseState(rawValue: firstByte) {
                     switch miaoMiaoResponseState {
                     case .dataPacketReceived:
-                        
-                        // Set timer to check if data is still uncomplete after a certain time frame
-                        // if so send start reading comand
-                        packetRxMonitorTimer?.invalidate()
-                        packetRxMonitorTimer = Timer.scheduledTimer(withTimeInterval: CGMGMiaoMiaoTransmitter.maxWaitForpacketInSeconds, repeats: false) { _ in
-                            if self.sendStartReadingCommmand() {
-                                os_log("in peripheral didUpdateValueFor, did not receive packet within %{public}@ seconds, startreadingcommand sent", log: self.log, type: .info, "\(CGMGMiaoMiaoTransmitter.maxWaitForpacketInSeconds)")
-                            } else {
-                                os_log("in peripheral didUpdateValueFor, did not receive packet within %{public}@ seconds, tried to send startreadingcommand but that failed", log: self.log, type: .error, "\(CGMGMiaoMiaoTransmitter.maxWaitForpacketInSeconds)")
-                            }
-                        }
-
                         //if buffer complete, then start processing
                         if rxBuffer.count >= 363  {
                             os_log("in peripheral didUpdateValueFor, Buffer complete", log: log, type: .info)
@@ -150,9 +136,6 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
                                 
                                 //reset the buffer
                                 resetRxBuffer()
-                                
-                                //invalidate the timer
-                                packetRxMonitorTimer?.invalidate()
                             } else {
                                 let temp = resendPacketCounter
                                 resetRxBuffer()
@@ -209,7 +192,6 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
     private func resetRxBuffer() {
         rxBuffer = Data()
         startDate = Date()
-        packetRxMonitorTimer?.invalidate()
         resendPacketCounter = 0
     }
     
