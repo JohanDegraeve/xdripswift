@@ -21,13 +21,13 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
     let expectedDeviceNameMiaoMiao:String = "MiaoMiao"
     
     /// will be used to pass back bluetooth and cgm related events
-    var cgmTransmitterDelegate:CGMTransmitterDelegate?
+    private(set) var cgmTransmitterDelegate:CGMTransmitterDelegate?
 
     
     /// for OS_log
     private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCGMMiaoMiao)
     
-    // used in parsing packet, older readings will not be added in response to delegate
+    // used in parsing packet
     private var timeStampLastBgReading:Date
     
     // counts number of times resend was requested due to crc error
@@ -38,15 +38,14 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
     // receive buffer for miaomiao packets
     private var rxBuffer:Data
     // how long to wait for next packet before sending startreadingcommand
-    private static let maxWaitForpacketInSeconds = 8.0
+    private static let maxWaitForpacketInSeconds = 60.0
     // length of header added by MiaoMiao in front of data dat is received from Libre sensor
     private let miaoMiaoHeaderLength = 18
     
-
     
     // MARK: - functions
     
-    init(addressAndName: CGMGMiaoMiaoTransmitter.MiaoMiaoDeviceAddressAndName, delegate:CGMTransmitterDelegate) {
+    init(addressAndName: CGMGMiaoMiaoTransmitter.MiaoMiaoDeviceAddressAndName, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName
@@ -64,8 +63,8 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
         rxBuffer = Data()
         startDate = Date()
         
-        //initially no readings, set to 0
-        timeStampLastBgReading = Date(timeIntervalSince1970: 0)
+        //initialize timeStampLastBgReading
+        self.timeStampLastBgReading = timeStampLastBgReading
         
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_MiaoMiao, CBUUID_Service: CBUUID_Service_MiaoMiao, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, delegate: delegate)
         
@@ -93,17 +92,16 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
     }
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        os_log("in peripheral didUpdateValueFor", log: log, type: .debug)
+        //os_log("in peripheral didUpdateValueFor", log: log, type: .debug)
 
         if let value = characteristic.value {
-            
             //only for logging
-            let data = value.hexEncodedString()
-            os_log("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .debug, data)
+            //let data = value.hexEncodedString()
+            //os_log("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .debug, data)
             
             //check if buffer needs to be reset
             if (Date() > startDate.addingTimeInterval(CGMGMiaoMiaoTransmitter.maxWaitForpacketInSeconds - 1)) {
-                os_log("in peripheral didUpdateValueFor, more than 10 seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info)
+                os_log("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMGMiaoMiaoTransmitter.maxWaitForpacketInSeconds)
                 resetRxBuffer()
             }
             
@@ -127,6 +125,7 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
 
                                 //get readings from buffer and send to delegate
                                 var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: miaoMiaoHeaderLength)
+                                //TODO: sort glucosedata before calling newReadingsReceived
                                 cgmTransmitterDelegate?.newReadingsReceived(glucoseData: &result.glucoseData, sensorState: result.sensorState, firmware: firmware, hardware: hardware, batteryPercentage: batteryPercentage, sensorTimeInMinutes: result.sensorTimeInMinutes)
 
                                 // set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings

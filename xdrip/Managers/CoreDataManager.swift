@@ -105,7 +105,7 @@ final class CoreDataManager {
     
     // MARK: -
     
-    private func saveChanges() {
+    public func saveChanges() {
         mainManagedObjectContext.performAndWait {
             do {
                 if self.mainManagedObjectContext.hasChanges {

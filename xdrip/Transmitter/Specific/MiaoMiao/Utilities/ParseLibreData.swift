@@ -6,7 +6,7 @@ import Foundation
 ///     - timeStampLastBgReadingStoredInDatabase: this is of the timestamp of the latest reading we already received during previous session
 ///     - headerOffset: location of Libre block in the data because MiaoMiao (or other) header is not stripped off
 /// - returns:
-///     - array of GlucoseData, first is the most recent, LibreSensorState
+///     - array of GlucoseData, first is the most recent, LibreSensorState. Only returns recent readings, ie not the ones that are older than timeStampLastBgReadingStoredInDatabase. 30 seconds are added here, meaning, new reading should be at least 30 seconds more recent than timeStampLastBgReadingStoredInDatabase
 ///     - sensorState: status of the sensor
 ///     - sensorTimeInMinutes: age of sensor in minutes
 func parseLibreData(data:inout Data, timeStampLastBgReadingStoredInDatabase:Date, headerOffset:Int) -> (glucoseData:[RawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int) {
@@ -33,13 +33,14 @@ func parseLibreData(data:inout Data, timeStampLastBgReadingStoredInDatabase:Date
         if i < 0 {i += 16}
         timeInMinutes = max(0, (Double)(sensorTimeInMinutes - index))
         let timeStampOfNewGlucoseData = sensorStartTimeInMilliseconds + timeInMinutes * 60 * 1000
-        if timeStampOfNewGlucoseData > timeStampLastBgReadingStoredInDatabase.toMillisecondsAsDouble()
+        //new reading should be at least 30 seconds younger than timeStampLastBgReadingStoredInDatabase
+        if timeStampOfNewGlucoseData > (timeStampLastBgReadingStoredInDatabase.toMillisecondsAsDouble() + 30000.0)
         {
             if timeStampOfNewGlucoseData < timeStampLastAddedGlucoseData - (5 * 60 * 1000 - 10000) {
                 byte = Data()
                 byte.append(data[headerOffset + (i * 6 + 29)])
                 byte.append(data[headerOffset + (i * 6 + 28)])
-                glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: getGlucoseRaw(bytes: byte))
+                glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * Constants.Libre.libreMultiplier)
                 returnValue.append(glucoseData)
                 timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
             }
@@ -54,13 +55,14 @@ func parseLibreData(data:inout Data, timeStampLastBgReadingStoredInDatabase:Date
         if i < 0 {i += 32}
         timeInMinutes = max(0,(Double)(abs(sensorTimeInMinutes - 3)/15)*15 - (Double)(index*15))
         let timeStampOfNewGlucoseData = sensorStartTimeInMilliseconds + timeInMinutes * 60 * 1000
-        if timeStampOfNewGlucoseData > timeStampLastBgReadingStoredInDatabase.toMillisecondsAsDouble()
+        //new reading should be at least 30 seconds younger than timeStampLastBgReadingStoredInDatabase
+        if timeStampOfNewGlucoseData > (timeStampLastBgReadingStoredInDatabase.toMillisecondsAsDouble() + 30000.0)
         {
             if timeStampOfNewGlucoseData < timeStampLastAddedGlucoseData - (5 * 60 * 1000 - 10000) {
                 byte = Data()
                 byte.append(data[headerOffset + (i * 6 + 125)])
                 byte.append(data[headerOffset + (i * 6 + 124)])
-                glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: getGlucoseRaw(bytes: byte))
+                glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * Constants.Libre.libreMultiplier)
                 returnValue.append(glucoseData)
                 timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
             }

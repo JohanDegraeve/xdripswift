@@ -18,9 +18,8 @@ class Calibrations {
     ///     - withActivesensor
     /// - returns:
     ///     - array of calibrations, can have size 0 if there's no calibration matching
-    ///     - ordered by timestamp, large to small (descending) ie the last is the youngest
+    ///     - ordered by timestamp, large to small (descending) ie the first is the youngest
     static func allForSensor(inLastDays lastdays:Int, withActivesensor sensor:Sensor) -> Array<Calibration> {
-        
         let fourdaysago = Date.nowInMilliSecondsAsDouble() - (Double)(lastdays * 24 * 3600 * 1000)
         
         var returnValue:Array<Calibration> = []
@@ -48,7 +47,6 @@ class Calibrations {
     /// - returns:
     ///     - the first, can be nil
     static func firstCalibrationForActiveSensor(withActivesensor sensor:Sensor) -> Calibration? {
-        
         loop: for calibration in calibrations {
             if calibration.sensor.id == sensor.id
                 &&
@@ -68,7 +66,6 @@ class Calibrations {
     /// - returns:
     ///     - the first, can be nil
     static func lastCalibrationForActiveSensor(withActivesensor sensor:Sensor) -> Calibration? {
-        
         loop: for calibration in calibrations.reversed() {
             if calibration.sensor.id == sensor.id
                 &&
@@ -80,6 +77,36 @@ class Calibrations {
             }
         }
         return nil
+    }
+    
+    /// Returns last calibrations, possibly zero
+    /// - parameters:
+    ///     - howMany: yes how many calibrations, maximum off course because result can be 0 calibrations
+    ///     - forSensor: for which sensor, if nil then sensorid is igored
+    /// - returns:
+    ///     - array of calibrations, can have size 0 if there's no calibration matching
+    ///     - ordered by timestamp, large to small (descending) ie the first is the youngest
+    static func getLatestCalibrations(howMany amount:Int, forSensor sensor:Sensor?) -> Array<Calibration> {
+        var returnValue:Array<Calibration> = []
+        
+        loop: for calibration in calibrations.reversed() {
+            if let sensor = sensor {
+                if sensor.id == calibration.sensor.id {
+                    returnValue.append(calibration)
+                }
+            } else {
+                returnValue.append(calibration)
+            }
+            if returnValue.count == amount {
+                break loop
+            }
+        }
+        
+        return returnValue
+    }
+
+    static func addCalibration(newCalibration:Calibration) {
+        calibrations.append(newCalibration)
     }
 
 }

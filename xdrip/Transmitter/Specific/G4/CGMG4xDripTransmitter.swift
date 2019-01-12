@@ -3,7 +3,7 @@ import CoreBluetooth
 
 final class CGMG4xDripTransmitter: BluetoothTransmitter {
     func centralManagerD(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        //TODO
+        //TODO: when is an xdrip connected ?
     }
     
     
@@ -19,7 +19,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter {
     let CBUUID_WriteCharacteristic_G4: String = "0000FFE1-0000-1000-8000-00805F9B34Fb"
     
     /// will be used to pass back bluetooth and cgm related events
-    var cgmTransmitterDelegate:CGMTransmitterDelegate?
+    private(set) var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
     // MARK: - functions
     

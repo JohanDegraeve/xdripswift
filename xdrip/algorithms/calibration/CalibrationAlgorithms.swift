@@ -1,100 +1,142 @@
 import Foundation
 import CoreData
+import os
 
 
 
-
+    /// creates two calibrations, stored in the database, but context not saved. Also readings will be adpated, also not saved.
+    ///
     /// - parameters:
-    ///     - firstCalibrationBgValue : the first (ie the oldest) calibration value
-    ///     - secondCalibrationBgValue : the second (ie the youngest) calibration value
-    ///     - lastReadings : should be minimum 2 bgReadings, each reading will be adjusted at the end of calibration (in Spike it's 5), index 0 is the youngest, first is the youngest
+    ///     - firstCalibrationBgValue: the first (ie the oldest) calibration value
+    ///     - secondCalibrationBgValue: the second (ie the youngest) calibration value
+    ///     - firstCalibrationTimeStamp: timestamp of the first calibration
+    ///     - secondCalibrationTimeStamp: timestamp of the second calibration
+    ///     - sensor: the current sensor
+    ///     - lastBgReadingsWithCalculatedValue0AndForSensor : the readings that need to be adjusted after the calibration, first is the youngest, result of call to BgReadings.getLatestBgtReadings with ignoreRawData: false, ignoreCalculatedValue: true, minimum 2
     ///     - lastNoSensor : result of call to BgReadings.getLastReadingNoSensor
+    ///     - nsManagedObjectContext: the nsmanagedobject context in which calibration should be created
     /// - returns:
-    ///     - two Calibrations
-    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, secondCalibrationTimeStamp:Date, sensor:Sensor, lastReadings:inout Array<BgReading>, lastNoSensor:BgReading?, nsManagedObjectContext:NSManagedObjectContext, isTypeLimitter:Bool) -> (Calibration, Calibration){
+    ///     - two Calibrations, stored in the context but context not saved. The first calibration and second
+func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, secondCalibrationTimeStamp:Date, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, lastNoSensor:BgReading?, nsManagedObjectContext:NSManagedObjectContext, isTypeLimitter:Bool) -> (firstCalibration: Calibration, secondCalibration: Calibration){
         
-        var bgReading1 = lastReadings[0]
-        var bgReading2 = lastReadings[1]
+        //TODO: is this lastNoSensor really needed ?
+        
+        //let log:OSLog = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.calibration)
+
+        let bgReading1 = lastBgReadingsWithCalculatedValue0AndForSensor[0]
+        let bgReading2 = lastBgReadingsWithCalculatedValue0AndForSensor[1]
         bgReading1.calculatedValue = firstCalibrationBgValue;
         bgReading1.calibrationFlag = true;
         bgReading2.calculatedValue = secondCalibrationBgValue;
         bgReading2.calibrationFlag = true;
         
-        var lastMaximum3Readings = Array(lastReadings.prefix(3))
-        findNewCurve(for: &bgReading1, last3Readings: &lastMaximum3Readings)
-        findNewRawCurve(for: &bgReading1, last3Readings: &lastMaximum3Readings, lastNoSensor: lastNoSensor)
-        findNewCurve(for: &bgReading2, last3Readings: &lastMaximum3Readings)
-        findNewRawCurve(for: &bgReading2, last3Readings: &lastMaximum3Readings, lastNoSensor: lastNoSensor)
+        debuglogging("bgReading 1 = " + bgReading1.log("") + "\nbgReading2 = " + bgReading2.log(""))
+        
+        var last2Readings = Array(lastBgReadingsWithCalculatedValue0AndForSensor.prefix(2))
+
+        debuglogging("bgReading 0 = has calculatedvalue " + last2Readings[0].calculatedValue.description)
+        debuglogging("bgReading 1 = has calculatedvalue " + last2Readings[1].calculatedValue.description)
+
+        findNewCurve(for: bgReading1, last3Readings: &last2Readings)
+        findNewRawCurve(for: bgReading1, last3Readings: &last2Readings, lastNoSensor: lastNoSensor)
+        findNewCurve(for: bgReading2, last3Readings: &last2Readings)
+        findNewRawCurve(for: bgReading2, last3Readings: &last2Readings, lastNoSensor: lastNoSensor)
+        
+        debuglogging("after find new curves, bgReading 1 = " + bgReading1.log("") + "bgReading2 = " + bgReading2.log(""));
         
         var calibration1 = Calibration(timeStamp: firstCalibrationTimeStamp, sensor: sensor, bg: firstCalibrationBgValue, rawValue: bgReading1.rawData, adjustedRawValue: bgReading1.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * firstCalibrationBgValue * firstCalibrationBgValue) + (0.6657 * firstCalibrationBgValue) + 36.7505) / 100, rawTimeStamp: bgReading1.timeStamp, slope: 1, intercept: firstCalibrationBgValue, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading1.ageAdjustedRawValue, slopeConfidence: 0.5, nsManagedObjectContext: nsManagedObjectContext)
         var tempCalibrationArray:Array<Calibration> = []
-        calculateWLS(for: &calibration1, last4CalibrationsForActiveSensor: &tempCalibrationArray, firstCalibration: calibration1, lastCalibration: calibration1, isTypeLimitter: isTypeLimitter)
         
+        debuglogging("calibration1 before calculate wls " + calibration1.log(""))
+
+        calculateWLS(for: &calibration1, last4CalibrationsForActiveSensor: &tempCalibrationArray, firstCalibration: calibration1, lastCalibration: calibration1, isTypeLimitter: isTypeLimitter)
+        debuglogging("calibration1 after calculate wls " + calibration1.log(""))
+
         var calibration2 = Calibration(timeStamp: secondCalibrationTimeStamp, sensor: sensor, bg: secondCalibrationBgValue, rawValue: bgReading2.rawData, adjustedRawValue: bgReading2.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * secondCalibrationBgValue * secondCalibrationBgValue) + (0.6657 * secondCalibrationBgValue) + 36.7505) / 100, rawTimeStamp: bgReading2.timeStamp, slope: 1, intercept: secondCalibrationBgValue, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading2.ageAdjustedRawValue, slopeConfidence: 0.5, nsManagedObjectContext: nsManagedObjectContext)
         tempCalibrationArray = [calibration1]
+        debuglogging("calibration2 before calculate wls " + calibration2.log(""))
+
         calculateWLS(for: &calibration2, last4CalibrationsForActiveSensor: &tempCalibrationArray, firstCalibration: calibration1, lastCalibration: calibration2, isTypeLimitter: isTypeLimitter)
         
+        debuglogging("calibration2 after calculate wls " + calibration2.log(""))
+
+        //assign calibration objects to two first readings
         bgReading1.calibration = calibration1
         bgReading2.calibration = calibration2
         
+        //needed in call to adjustRecentBgReadings
         tempCalibrationArray = [calibration1, calibration2]
-        adjustRecentBgReadings(readingsToBeAdjusted: &lastReadings, calibrations: &tempCalibrationArray, last3Readings: &lastMaximum3Readings, lastNoSensor: lastNoSensor)
+        //reset calculatedValue in bgReading1 and bgReading2, they will be getting a real calculated value in adjustRecentBgReadings
+        bgReading1.calculatedValue = 0.0
+        bgReading2.calculatedValue = 0.0
+        adjustRecentBgReadings(readingsToBeAdjusted: &lastBgReadingsWithCalculatedValue0AndForSensor, calibrations: &tempCalibrationArray, lastNoSensor: lastNoSensor)
         
         return (calibration1, calibration2)
     }
    
-    /// adjust recent readings after a calibration
+    /// adjust recent readings after a calibration, only the latest that have calculatedValue = 0, will be adjusted, as soon as a reading is found with calculatedValue != 0, it stops processing
     /// - parameters:
-    ///     - readingsToBeAdjusted
-    ///     - calibrations : latest calibrations, timestamp large to small. There should be minimum 2 calibrations, if less then the function
+    ///     - readingsToBeAdjusted: must be the latest readings
+    ///     - calibrations: latest calibrations, timestamp large to small (ie young to old). There should be minimum 2 calibrations, if less then the function
     ///     will not do anything.
     ///     Only the three first calibrations will be used.
-    ///     - withLast3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - it' ok if there's less than 3 readings - inout parameter to improve performance
-    func adjustRecentBgReadings(readingsToBeAdjusted:inout Array<BgReading>, calibrations:inout Array<Calibration>, last3Readings:inout Array<BgReading>, lastNoSensor:BgReading?) {
+    private func adjustRecentBgReadings(readingsToBeAdjusted:inout Array<BgReading>, calibrations:inout Array<Calibration>, lastNoSensor:BgReading?) {
         
-        if (calibrations.count == 3) {
+        if (calibrations.count > 2) {
             let denom = Double(readingsToBeAdjusted.count)
             let latestCalibration = calibrations[0]
             var i = 0.0
-            for index in 0..<readingsToBeAdjusted.count {
-                let oldYValue = readingsToBeAdjusted[index].calculatedValue
-                let newYvalue = (readingsToBeAdjusted[index].ageAdjustedRawValue * latestCalibration.slope) + latestCalibration.intercept
-                readingsToBeAdjusted[index].calculatedValue = ((newYvalue * (denom - i)) + (oldYValue * ( i ))) / denom
-                i += 1
+            loop: for index in 0..<readingsToBeAdjusted.count {
+                if readingsToBeAdjusted[index].calculatedValue != 0.0 {
+                    //no further processing needed, all next readings should have a value != 0
+                    break loop
+                } else {
+                    let oldYValue = readingsToBeAdjusted[index].calculatedValue
+                    let newYvalue = (readingsToBeAdjusted[index].ageAdjustedRawValue * latestCalibration.slope) + latestCalibration.intercept
+                    readingsToBeAdjusted[index].calculatedValue = ((newYvalue * (denom - i)) + (oldYValue * ( i ))) / denom
+                    i += 1
+                }
             }
         } else if (calibrations.count == 2) {
+            debuglogging("in adjustRecentBgReadings, reading 0 " + calibrations[0].timeStamp.description);
+            debuglogging("in adjustRecentBgReadings, reading 1 " + calibrations[1].timeStamp.description);
+
             let latestCalibration = calibrations[0]
-            for index in 0..<readingsToBeAdjusted.count {
-                let newYvalue = (readingsToBeAdjusted[index].ageAdjustedRawValue * latestCalibration.slope) + latestCalibration.intercept
-                readingsToBeAdjusted[index].calculatedValue = newYvalue
-                updateCalculatedValue(for: &readingsToBeAdjusted[index])
+            loop: for index in 0..<readingsToBeAdjusted.count {
+                debuglogging("in adjustRecentBgReadings, bgreading processed = " + readingsToBeAdjusted[index].timeStamp.description)
+
+                if readingsToBeAdjusted[index].calculatedValue != 0.0 {
+                    //no further processing needed, all next readings should have a value != 0
+                    break loop
+                } else {
+                    readingsToBeAdjusted[index].calculatedValue = (readingsToBeAdjusted[index].ageAdjustedRawValue * latestCalibration.slope) +  latestCalibration.intercept
+                    debuglogging("bgReading.ageAdjustedRawValue = " + readingsToBeAdjusted[index].ageAdjustedRawValue.description + ", latestCalibration.intercept = " + latestCalibration.intercept.description)
+                    debuglogging("newYvalue = " + readingsToBeAdjusted[index].calculatedValue.description);
+
+                    updateCalculatedValue(for: readingsToBeAdjusted[index])
+                }
             }
         }
         
-        findNewRawCurve(for: &readingsToBeAdjusted[0], last3Readings: &last3Readings, lastNoSensor: lastNoSensor)
-        findNewCurve(for: &readingsToBeAdjusted[0], last3Readings: &last3Readings)
+        findNewRawCurve(for: readingsToBeAdjusted[0], last3Readings: &readingsToBeAdjusted, lastNoSensor: lastNoSensor)
+        findNewCurve(for: readingsToBeAdjusted[0], last3Readings: &readingsToBeAdjusted)
     }
-    
+
+/// forCalibration will get changed
+/// - parameters:
+///     - calibration : calibration for which calculation is done
+///     - last4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
+///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
+///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
+///     - isTypeLimitter : type limitter means sensor is Libre
+func rawValueOverride(for calibration:inout Calibration, rawValue:Double, last4CalibrationsForActiveSensor:inout Array<Calibration>, firstCalibration:Calibration, lastCalibration:Calibration, isTypeLimitter:Bool) {
+    //TODO: - implement value override, there's no update of bgreading here ?
+    calibration.estimateRawAtTimeOfCalibration = rawValue
+    calculateWLS(for: &calibration, last4CalibrationsForActiveSensor: &last4CalibrationsForActiveSensor, firstCalibration: firstCalibration, lastCalibration: lastCalibration, isTypeLimitter: isTypeLimitter)
+}
+
     /// from xdripplus
-    ///
     /// forCalibration will get changed
-    ///
-    /// - parameters:
-    ///     - calibration : calibration for which calculation is done
-    ///     - last4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
-    ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
-    ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
-    ///     - isTypeLimitter : type limitter means sensor is Libre
-    func rawValueOverride(for calibration:inout Calibration, rawValue:Double, last4CalibrationsForActiveSensor:inout Array<Calibration>, firstCalibration:Calibration, lastCalibration:Calibration, isTypeLimitter:Bool) {
-        
-        calibration.estimateRawAtTimeOfCalibration = rawValue
-        calculateWLS(for: &calibration, last4CalibrationsForActiveSensor: &last4CalibrationsForActiveSensor, firstCalibration: firstCalibration, lastCalibration: lastCalibration, isTypeLimitter: isTypeLimitter)
-    }
-    
-    /// from xdripplus
-    ///
-    /// forCalibration will get changed
-    ///
     /// - parameters:
     ///     - calibration : calibration for which calculation is done
     ///     - last4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
@@ -133,8 +175,16 @@ import CoreData
             n += (w * calibration.estimateRawAtTimeOfCalibration * calibration.estimateRawAtTimeOfCalibration)
             p += (w * calibration.bg)
             q += (w * calibration.estimateRawAtTimeOfCalibration * calibration.bg)
+            debuglogging("in calculatewls, loop2 w = " + w.description)
+            debuglogging("in calculatewls, loop2 l = " + l.description)
+            debuglogging("in calculatewls, loop2 m = " + m.description)
+            debuglogging("in calculatewls, loop2 n = " + n.description)
+            debuglogging("in calculatewls, loop2 p = " + p.description)
+            debuglogging("in calculatewls, loop2 q = " + q.description)
             let d:Double = (l * n) - (m * m)
+            debuglogging("in calculatewls, loop2 d = " + d.description)
             calibration.intercept = ((n * p) - (m * q)) / d
+            debuglogging("in calculatewls, 1, intercept = " + calibration.intercept.description)
             calibration.slope = ((l * q) - (m * p)) / d
             
             var last3CalibrationsForActiveSensor = Array(last4CalibrationsForActiveSensor.prefix(3))
@@ -147,11 +197,13 @@ import CoreData
                 calibration.slope = slopeOOBHandler(withStatus:0, withLast3CalibrationsForActiveSensor:last3CalibrationsForActiveSensor, isTypeLimitter:isTypeLimitter)
                 if(last4CalibrationsForActiveSensor.count > 2) { calibration.possibleBad = true }
                 calibration.intercept = calibration.bg - (calibration.estimateRawAtTimeOfCalibration * calibration.slope)
+                debuglogging("in calculatewls, 2, intercept = " + calibration.intercept.description)
             }
             if ((last4CalibrationsForActiveSensor.count == 2 && calibration.slope > sParams.HIGH_SLOPE_1) || (calibration.slope > sParams.HIGH_SLOPE_2)) {
                 calibration.slope = slopeOOBHandler(withStatus:1, withLast3CalibrationsForActiveSensor:last3CalibrationsForActiveSensor, isTypeLimitter:isTypeLimitter)
                 if last4CalibrationsForActiveSensor.count > 2 { calibration.possibleBad = true }
                 calibration.intercept = calibration.bg - (calibration.estimateRawAtTimeOfCalibration * calibration.slope)
+                debuglogging("in calculatewls, 3, intercept = " + calibration.intercept.description)
             }
         }
     }

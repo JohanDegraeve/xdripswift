@@ -41,4 +41,32 @@ public class BgReading: NSManagedObject {
         super.init(entity: entity, insertInto: context)
     }
     
+    /// for logging only
+    public func log(_ indentation:String) -> String {
+        var r:String = "bgreading = "
+        r += "\n" + indentation + "uniqueid = " + id
+        r += "\n" + indentation + "a = " + a.description
+        r += "\n" + indentation + "ageAdjustedRawValue = " + ageAdjustedRawValue.description
+        r += "\n" + indentation + "b = " + b.description
+        r += "\n" + indentation + "c = " + c.description
+        r += "\n" + indentation + "calculatedValue = " + calculatedValue.description
+        r += "\n" + indentation + "calculatedValueSlope = " + calculatedValueSlope.description
+        if let calibration = calibration {
+            r += "\n" + indentation + "calibration = " + calibration.log("      ")
+        }
+        r += "\n" + indentation + "calibrationFlag = " + calibrationFlag.description
+        r += "\n" + indentation + "filteredCalculatedValue = " + filteredCalculatedValue.description
+        r += "\n" + indentation + "filteredData = " + filteredData.description
+        r += "\n" + indentation + "hideSlope = " + hideSlope.description
+        r += "\n" + indentation + "ra = " + ra.description
+        r += "\n" + indentation + "rawCalculated = " + rawCalculated.description
+        r += "\n" + indentation + "rawData = " + rawData.description
+        r += "\n" + indentation + "rb = " + rb.description
+        r += "\n" + indentation + "rc = " + rc.description
+        if let sensor = sensor {
+            r += "\n" + indentation + "sensor = " + sensor.log(indentation: "      ")
+        }
+        r += "\n" + indentation + "timestamp = " + timeStamp.description + "\n"
+        return r
+    }
 }
