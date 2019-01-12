@@ -142,15 +142,13 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
         })
         
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
-            
             if let activeSensor = self.activeSensor {
                 if let textField = alert.textFields {
                     if let first = textField.first {
                         if let value = first.text {
                             let valueAsDouble = Double(value)!
                             var latestReadings = BgReadings.getLatestBgReadings(howMany: 36, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
-                            let lastNoSensor = BgReadings.getLastReadingNoSensor(activeSensor: activeSensor)
-                            var twoCalibrations = initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, secondCalibrationTimeStamp: Date(), sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, lastNoSensor: lastNoSensor, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext, isTypeLimitter: true)
+                            var twoCalibrations = initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, secondCalibrationTimeStamp: Date(), sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext, isTypeLimitter: true)
                             Calibrations.addCalibration(newCalibration: twoCalibrations.firstCalibration)
                             Calibrations.addCalibration(newCalibration: twoCalibrations.secondCalibration)
                             self.coreDataManager.saveChanges()
@@ -182,7 +180,7 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
                 let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
                 let lastCalibrationForActiveSensor = Calibrations.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
                 
-                let newBgReading = createNewReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastNoSensor: BgReadings.getLastReadingNoSensor(activeSensor: activeSensor), last4CalibrationsForActiveSensor: &latest4Calibrations, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, isTypeLimitter: true, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                let newBgReading = createNewReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, last4CalibrationsForActiveSensor: &latest4Calibrations, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, isTypeLimitter: true, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                 
                 debuglogging("newBgReading.calculatedValue = " + newBgReading.calculatedValue.description)
                 

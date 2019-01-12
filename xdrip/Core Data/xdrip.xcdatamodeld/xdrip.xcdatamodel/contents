@@ -13,7 +13,6 @@
         <attribute name="hideSlope" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="id" attributeType="String" syncable="YES"/>
         <attribute name="ra" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="rawCalculated" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="rawData" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="rb" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="rc" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
@@ -56,7 +55,7 @@
         <relationship name="readings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BgReading" inverseName="sensor" inverseEntity="BgReading" syncable="YES"/>
     </entity>
     <elements>
-        <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
+        <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="315"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="420"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="120"/>
     </elements>

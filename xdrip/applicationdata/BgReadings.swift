@@ -70,30 +70,6 @@ class BgReadings {
         return returnValue
     }*/
     
-    /// get last reading for which calculatedValue != 0, rawdata != 0 AND MATCHING SENSORID
-    /// - returns: the last reading for which calculatedValue != 0, rawdata != 0, can be nil
-    static func getLastReadingNoSensor(activeSensor:Sensor) -> BgReading? {
-        loop: for bgReading in bgReadings.reversed() {
-            if let sensor = bgReading.sensor {
-                if (bgReading.calculatedValue != 0 && bgReading.rawData != 0 && sensor.id == activeSensor.id) {
-                    return bgReading
-                }
-            }
-        }
-        return nil
-    }
-    
-    /// get last reading for which calculatedValue != 0
-    /// - returns: the last reading for which calculatedValue != 0, can be nil
-    static func getLastWithCalculatedValue() -> BgReading? {
-        loop: for bgReading in bgReadings.reversed() {
-            if bgReading.calculatedValue != 0 {
-                return bgReading
-            }
-        }
-        return nil
-    }
-    
     static func addBgReading(newReading:BgReading) {
         bgReadings.append(newReading)
     }

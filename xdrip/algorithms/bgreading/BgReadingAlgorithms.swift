@@ -80,9 +80,8 @@ import CoreData
     /// new value is not stored in the database
     /// - parameters:
     ///     - bgReading : reading that needs to be updated
-    ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
-    ///     - lastNoSensor : result of call to BgReadings.getLastReadingNoSensor, can be nil
-    func findNewRawCurve(for bgReading: BgReading, last3Readings:inout Array<BgReading>, lastNoSensor:BgReading?) {
+    ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(x, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
+    func findNewRawCurve(for bgReading: BgReading, last3Readings:inout Array<BgReading>) {
         
         debuglogging("in findNewRawCurve with last3Readings.count = " + last3Readings.count.description)
         
@@ -147,11 +146,7 @@ import CoreData
         } else {
             bgReading.ra = 0
             bgReading.rb = 0
-            if let last = lastNoSensor {
-                bgReading.rc = last.ageAdjustedRawValue
-            } else {
-                bgReading.rc = 105
-            }
+            bgReading.rc = 105
         }
     }
 
@@ -234,15 +229,14 @@ import CoreData
     ///     - sensor : actual sensor, optional
     ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance and also because it's an NSManagedObject
     ///     - nsManagedObjectContext : the nsManagedObjectContext
-    ///     - lastNoSensor : result of call to BgReadings.getLastReadingNoSensor, can be nil
     ///     - last4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
     ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
     ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     ///     - isTypeLimitter : type limitter means sensor is Libre
     /// - returns:
     ///     - the created bgreading
-    func createNewReading(rawData:Double, filteredData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, lastNoSensor:BgReading?, last4CalibrationsForActiveSensor:inout Array<Calibration>, firstCalibration:Calibration?, lastCalibration:Calibration?, isTypeLimitter:Bool, nsManagedObjectContext:NSManagedObjectContext ) -> BgReading {
-      
+    func createNewReading(rawData:Double, filteredData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, last4CalibrationsForActiveSensor:inout Array<Calibration>, firstCalibration:Calibration?, lastCalibration:Calibration?, isTypeLimitter:Bool, nsManagedObjectContext:NSManagedObjectContext ) -> BgReading {
+
         var timeStampToUse:Date = Date()
         if let timeStamp = timeStamp {
             timeStampToUse = timeStamp
@@ -282,7 +276,8 @@ import CoreData
             updateCalculatedValue(for: bgReading)
         }
         
-        performCalculations(for: bgReading, last3Readings: &last3Readings, lastNoSensor: lastNoSensor)
+        performCalculations(for: bgReading, last3Readings: &last3Readings)
+        
         return bgReading
     }
 
@@ -338,12 +333,11 @@ import CoreData
     /// - parameters:
     ///     - bgReading : reading that will be updated
     ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
-    ///     - withLastNoSensor result of call to BgReadings.getLastReadingNoSensor, can be nil
-    private func performCalculations(for bgReading:BgReading, last3Readings:inout Array<BgReading>, lastNoSensor:BgReading?)  {
+    private func performCalculations(for bgReading:BgReading, last3Readings:inout Array<BgReading>)  {
         
         findNewCurve(for: bgReading, last3Readings: &last3Readings)
         
-        findNewRawCurve(for: bgReading, last3Readings: &last3Readings, lastNoSensor: lastNoSensor)
+        findNewRawCurve(for: bgReading, last3Readings: &last3Readings)
         
         findSlope(for: bgReading, last2Readings: &last3Readings)
     }

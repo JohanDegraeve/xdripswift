@@ -13,14 +13,10 @@ import os
     ///     - secondCalibrationTimeStamp: timestamp of the second calibration
     ///     - sensor: the current sensor
     ///     - lastBgReadingsWithCalculatedValue0AndForSensor : the readings that need to be adjusted after the calibration, first is the youngest, result of call to BgReadings.getLatestBgtReadings with ignoreRawData: false, ignoreCalculatedValue: true, minimum 2
-    ///     - lastNoSensor : result of call to BgReadings.getLastReadingNoSensor
     ///     - nsManagedObjectContext: the nsmanagedobject context in which calibration should be created
     /// - returns:
     ///     - two Calibrations, stored in the context but context not saved. The first calibration and second
-func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, secondCalibrationTimeStamp:Date, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, lastNoSensor:BgReading?, nsManagedObjectContext:NSManagedObjectContext, isTypeLimitter:Bool) -> (firstCalibration: Calibration, secondCalibration: Calibration){
-        
-        //TODO: is this lastNoSensor really needed ?
-        
+func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, secondCalibrationTimeStamp:Date, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, nsManagedObjectContext:NSManagedObjectContext, isTypeLimitter:Bool) -> (firstCalibration: Calibration, secondCalibration: Calibration){
         //let log:OSLog = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.calibration)
 
         let bgReading1 = lastBgReadingsWithCalculatedValue0AndForSensor[0]
@@ -38,9 +34,9 @@ func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStam
         debuglogging("bgReading 1 = has calculatedvalue " + last2Readings[1].calculatedValue.description)
 
         findNewCurve(for: bgReading1, last3Readings: &last2Readings)
-        findNewRawCurve(for: bgReading1, last3Readings: &last2Readings, lastNoSensor: lastNoSensor)
+        findNewRawCurve(for: bgReading1, last3Readings: &last2Readings)
         findNewCurve(for: bgReading2, last3Readings: &last2Readings)
-        findNewRawCurve(for: bgReading2, last3Readings: &last2Readings, lastNoSensor: lastNoSensor)
+        findNewRawCurve(for: bgReading2, last3Readings: &last2Readings)
         
         debuglogging("after find new curves, bgReading 1 = " + bgReading1.log("") + "bgReading2 = " + bgReading2.log(""));
         
@@ -69,7 +65,7 @@ func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStam
         //reset calculatedValue in bgReading1 and bgReading2, they will be getting a real calculated value in adjustRecentBgReadings
         bgReading1.calculatedValue = 0.0
         bgReading2.calculatedValue = 0.0
-        adjustRecentBgReadings(readingsToBeAdjusted: &lastBgReadingsWithCalculatedValue0AndForSensor, calibrations: &tempCalibrationArray, lastNoSensor: lastNoSensor)
+        adjustRecentBgReadings(readingsToBeAdjusted: &lastBgReadingsWithCalculatedValue0AndForSensor, calibrations: &tempCalibrationArray)
         
         return (calibration1, calibration2)
     }
@@ -80,7 +76,7 @@ func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStam
     ///     - calibrations: latest calibrations, timestamp large to small (ie young to old). There should be minimum 2 calibrations, if less then the function
     ///     will not do anything.
     ///     Only the three first calibrations will be used.
-    private func adjustRecentBgReadings(readingsToBeAdjusted:inout Array<BgReading>, calibrations:inout Array<Calibration>, lastNoSensor:BgReading?) {
+    private func adjustRecentBgReadings(readingsToBeAdjusted:inout Array<BgReading>, calibrations:inout Array<Calibration>) {
         
         if (calibrations.count > 2) {
             let denom = Double(readingsToBeAdjusted.count)
@@ -118,7 +114,7 @@ func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStam
             }
         }
         
-        findNewRawCurve(for: readingsToBeAdjusted[0], last3Readings: &readingsToBeAdjusted, lastNoSensor: lastNoSensor)
+        findNewRawCurve(for: readingsToBeAdjusted[0], last3Readings: &readingsToBeAdjusted)
         findNewCurve(for: readingsToBeAdjusted[0], last3Readings: &readingsToBeAdjusted)
     }
 

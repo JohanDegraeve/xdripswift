@@ -32,7 +32,6 @@ public class BgReading: NSManagedObject {
         ra = 0
         rb = 0
         rc = 0
-        rawCalculated  = 0
         hideSlope = false
         id = UniqueId.createEventId()
     }
@@ -59,7 +58,6 @@ public class BgReading: NSManagedObject {
         r += "\n" + indentation + "filteredData = " + filteredData.description
         r += "\n" + indentation + "hideSlope = " + hideSlope.description
         r += "\n" + indentation + "ra = " + ra.description
-        r += "\n" + indentation + "rawCalculated = " + rawCalculated.description
         r += "\n" + indentation + "rawData = " + rawData.description
         r += "\n" + indentation + "rb = " + rb.description
         r += "\n" + indentation + "rc = " + rc.description

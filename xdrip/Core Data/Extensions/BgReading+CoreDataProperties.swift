@@ -29,7 +29,6 @@ extension BgReading {
     @NSManaged public var hideSlope: Bool
     @NSManaged public var id: String
     @NSManaged public var ra: Double
-    @NSManaged public var rawCalculated: Double
     @NSManaged public var rawData: Double
     @NSManaged public var rb: Double
     @NSManaged public var rc: Double
