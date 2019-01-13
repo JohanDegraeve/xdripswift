@@ -18,7 +18,7 @@ public class Sensor: NSManagedObject {
         
     }
 
-    /// for logging only
+    /// log the contents to a string
     public func log(indentation:String) -> String {
         var r:String = "sensor = ";
         r += "\n" + indentation + "uniqueid = " + id;
@@ -29,5 +29,4 @@ public class Sensor: NSManagedObject {
         r += "\n"
         return r;
     }
-
 }

@@ -23,23 +23,13 @@
     <entity name="Calibration" representedClassName=".Calibration" syncable="YES">
         <attribute name="adjustedRawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="bg" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="checkIn" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="distanceFromEstimate" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="estimateBgAtTimeOfCalibration" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="estimateRawAtTimeOfCalibration" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="firstDecay" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="firstIntercept" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="firstScale" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="firstSlope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="id" attributeType="String" syncable="YES"/>
         <attribute name="intercept" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="possibleBad" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="rawTimeStamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="rawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="secondDecay" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="secondIntercept" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="secondScale" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="secondSlope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="sensorConfidence" attributeType="Double" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="slope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="slopeConfidence" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
@@ -56,7 +46,7 @@
     </entity>
     <elements>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="315"/>
-        <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="420"/>
+        <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="270"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="120"/>
     </elements>
 </model>

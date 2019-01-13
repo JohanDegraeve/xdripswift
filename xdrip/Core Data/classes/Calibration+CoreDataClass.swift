@@ -35,17 +35,7 @@ public class Calibration: NSManagedObject {
         self.estimateRawAtTimeOfCalibration = estimateRawAtTimeOfCalibration
         self.slopeConfidence = slopeConfidence
         
-        checkIn = false
-        estimateBgAtTimeOfCalibration = 0
-        firstDecay = 0
-        firstIntercept = 0
-        firstScale = 0
-        firstSlope = 0
         possibleBad = false
-        secondDecay = 0
-        secondIntercept = 0
-        secondScale = 0
-        secondSlope = 0
         id = UniqueId.createEventId()
     }
     
@@ -59,30 +49,20 @@ public class Calibration: NSManagedObject {
         super.init(entity: entity, insertInto: context)
     }
 
-    /// for logging only
+    /// log the contents to a string
     public func log(_ indentation:String) -> String {
         var r:String = "calibration = "
         r += "\n" + indentation + "uniqueid = " + id
         r += "\n" + indentation + "adjustedRawValue = " + adjustedRawValue.description
         r += "\n" + indentation + "bg = " + bg.description
-        r += "\n" + indentation + "checkIn = " + checkIn.description
         r += "\n" + indentation + "distanceFromEstimate = " + distanceFromEstimate.description
-        r += "\n" + indentation + "estimateBgAtTimeOfCalibration = " + estimateBgAtTimeOfCalibration.description
         r += "\n" + indentation + "estimateRawAtTimeOfCalibration = " + estimateRawAtTimeOfCalibration.description
-        r += "\n" + indentation + "firstDecay = " + firstDecay.description
-        r += "\n" + indentation + "firstIntercept = " + firstIntercept.description
-        r += "\n" + indentation + "firstScale = " + firstScale.description
-        r += "\n" + indentation + "firstSlope = " + firstSlope.description
         r += "\n" + indentation + "intercept = " + intercept.description
         r += "\n" + indentation + "possibleBad = " + possibleBad.description
         if let rawTimeStamp = rawTimeStamp {
             r += "\n" + indentation + "rawTimestamp = " + rawTimeStamp.description
         }
         r += "\n" + indentation + "rawValue = " + rawValue.description
-        r += "\n" + indentation + "secondDecay = " + secondDecay.description
-        r += "\n" + indentation + "secondIntercept = " + secondIntercept.description
-        r += "\n" + indentation + "secondScale = " + secondScale.description
-        r += "\n" + indentation + "secondSlope = " + secondSlope.description
         r += "\n" + indentation + "sensor = " + sensor.log(indentation: "         ")
         r += "\n" + indentation + "sensorAgeAtTimeOfEstimation = " + sensorAgeAtTimeOfEstimation.description
         r += "\n" + indentation + "sensorConfidence = " + sensorConfidence.description
@@ -91,5 +71,4 @@ public class Calibration: NSManagedObject {
         r += "\n" + indentation + "timestamp = " + timeStamp.description + "\n"
         return r
     }
-
 }

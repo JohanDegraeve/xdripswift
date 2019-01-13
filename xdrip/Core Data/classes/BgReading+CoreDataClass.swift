@@ -2,7 +2,6 @@ import Foundation
 import CoreData
 import UIKit
 
-
 public class BgReading: NSManagedObject {
     
     init(
@@ -40,7 +39,7 @@ public class BgReading: NSManagedObject {
         super.init(entity: entity, insertInto: context)
     }
     
-    /// for logging only
+    /// log the contents to a string
     public func log(_ indentation:String) -> String {
         var r:String = "bgreading = "
         r += "\n" + indentation + "uniqueid = " + id

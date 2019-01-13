@@ -251,7 +251,7 @@ func rawValueOverride(for calibration:inout Calibration, rawValue:Double, last4C
         
         if(status == 0) {
             if calibrations.count == 3 {
-                if ((abs(thisCalibration.bg - thisCalibration.estimateBgAtTimeOfCalibration) < 30) && (calibrations[1].possibleBad)) {
+                if ((abs(thisCalibration.bg) < 30) && (calibrations[1].possibleBad)) {
                     return calibrations[1] .slope
                 } else {
                     return max(((-0.048) * (thisCalibration.sensorAgeAtTimeOfEstimation / (60000 * 60 * 24))) + 1.1, sParams.DEFAULT_LOW_SLOPE_LOW)
@@ -262,7 +262,7 @@ func rawValueOverride(for calibration:inout Calibration, rawValue:Double, last4C
             return Double(sParams.DEFAULT_SLOPE)
         } else {
             if calibrations.count == 3 {
-                if ((abs(thisCalibration.bg - thisCalibration.estimateBgAtTimeOfCalibration) < 30) && (calibrations[1].possibleBad)) {
+                if ((abs(thisCalibration.bg) < 30) && (calibrations[1].possibleBad)) {
                     return calibrations[1].slope
                 } else {
                     return sParams.DEFAULT_HIGH_SLOPE_HIGH
