@@ -40,9 +40,12 @@ func parseLibreData(data:inout Data, timeStampLastBgReadingStoredInDatabase:Date
                 byte = Data()
                 byte.append(data[headerOffset + (i * 6 + 29)])
                 byte.append(data[headerOffset + (i * 6 + 28)])
-                glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * Constants.Libre.libreMultiplier)
-                returnValue.append(glucoseData)
-                timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
+                let glucoseLevelRaw = Double(getGlucoseRaw(bytes: byte))
+                if (glucoseLevelRaw > 0) {
+                    glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * Constants.Libre.libreMultiplier)
+                    returnValue.append(glucoseData)
+                    timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
+                }
             }
         } else {
             break trendloop
@@ -62,9 +65,12 @@ func parseLibreData(data:inout Data, timeStampLastBgReadingStoredInDatabase:Date
                 byte = Data()
                 byte.append(data[headerOffset + (i * 6 + 125)])
                 byte.append(data[headerOffset + (i * 6 + 124)])
-                glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * Constants.Libre.libreMultiplier)
-                returnValue.append(glucoseData)
-                timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
+                let glucoseLevelRaw = Double(getGlucoseRaw(bytes: byte))
+                if (glucoseLevelRaw > 0) {
+                    glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * Constants.Libre.libreMultiplier)
+                    returnValue.append(glucoseData)
+                    timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
+                }
             }
         } else {
             break historyloop
