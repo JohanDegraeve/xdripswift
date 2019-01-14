@@ -118,7 +118,6 @@
 				F8025C1721DBC16400ECF0C0 /* CRC.swift */,
 				F8025C1921DBC1B700ECF0C0 /* LibreSensorState.swift */,
 				F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */,
-				F8025E4B21E6618100ECF0C0 /* Log.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -270,6 +269,7 @@
 		F8EA6C8021B723A80082976B /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				F8025E4B21E6618100ECF0C0 /* Log.swift */,
 				F8EA6CA821BBE3010082976B /* UniqueId.swift */,
 			);
 			path = Utilities;
@@ -576,6 +576,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8DKSZ5HNLB;
 				INFOPLIST_FILE = xdrip/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -594,6 +595,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8DKSZ5HNLB;
 				INFOPLIST_FILE = xdrip/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

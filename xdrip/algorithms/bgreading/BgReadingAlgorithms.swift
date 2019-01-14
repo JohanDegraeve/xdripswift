@@ -19,9 +19,8 @@ func mmolToMgdl(mmolValue:Double) -> Double {
 ///     - bgReading : reading that needs to be updated
 ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - it's ok if there's less than 3 readings - inout parameter to improve performance
 func findNewCurve(for bgReading: BgReading, last3Readings:inout Array<BgReading>) {
-    
-    debuglogging("in findNewCurve with last3Readings.count = " + last3Readings.count.description)
-    
+    //debuglogging("in findNewCurve with last3Readings.count = " + last3Readings.count.description)
+
     var y3:Double
     var x3:Double
     var y2:Double
@@ -44,8 +43,8 @@ func findNewCurve(for bgReading: BgReading, last3Readings:inout Array<BgReading>
         y1 = thirdlatest.calculatedValue
         x1 = thirdlatest.timeStamp.toMillisecondsAsDouble()
         
-        debuglogging("latest = " + latest.log(""))
-        debuglogging("X3 = " + x3.description + ", Y 3 = " + y3.description + ",x2 = " + x2.description + ", y2 = " + y2.description + ", x1 = " + x1.description + ", y1 = " + y1.description);
+        //debuglogging("latest = " + latest.log(""))
+        //debuglogging("X3 = " + x3.description + ", Y 3 = " + y3.description + ",x2 = " + x2.description + ", y2 = " + y2.description + ", x1 = " + x1.description + ", y1 = " + y1.description);
         
         bgReading.a = y1/((x1-x2)*(x1-x3))+y2/((x2-x1)*(x2-x3))+y3/((x3-x1)*(x3-x2))
         bgReading.b = (-y1*(x2+x3)/((x1-x2)*(x1-x3))-y2*(x1+x3)/((x2-x1)*(x2-x3))-y3*(x1+x2)/((x3-x1)*(x3-x2)))
@@ -80,8 +79,7 @@ func findNewCurve(for bgReading: BgReading, last3Readings:inout Array<BgReading>
 ///     - bgReading : reading that needs to be updated
 ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(x, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance
 func findNewRawCurve(for bgReading: BgReading, last3Readings:inout Array<BgReading>) {
-    
-    debuglogging("in findNewRawCurve with last3Readings.count = " + last3Readings.count.description)
+    //debuglogging("in findNewRawCurve with last3Readings.count = " + last3Readings.count.description)
     
     var y3:Double
     var x3:Double
@@ -110,37 +108,26 @@ func findNewRawCurve(for bgReading: BgReading, last3Readings:inout Array<BgReadi
         bgReading.rc = (y1*x2*x3/((x1-x2)*(x1-x3))+y2*x1*x3/((x2-x1)*(x2-x3))+y3*x1*x2/((x3-x1)*(x3-x2)))
         
     } else if (last3Readings.count == 2) {
-        debuglogging("in last3Readings.count == 2")
+        //debuglogging("in last3Readings.count == 2")
         latest = last3Readings[0]
         secondlatest = last3Readings[1]
         
-        debuglogging("latest timestamp =  "  + latest.timeStamp.description)
-        debuglogging("secondlatest timestamp =  "  + secondlatest.timeStamp.description)
-        debuglogging("this reading timestamp =  "  + bgReading.timeStamp.description)
+        //debuglogging("latest timestamp =  "  + latest.timeStamp.description)
+        //debuglogging("secondlatest timestamp =  "  + secondlatest.timeStamp.description)
+        //debuglogging("this reading timestamp =  "  + bgReading.timeStamp.description)
         
         y2 = latest.ageAdjustedRawValue
-        debuglogging("y2 = " + y2.description)
         x2 = latest.timeStamp.toMillisecondsAsDouble()
-        debuglogging("x2 = " + x2.description)
         y1 = secondlatest.ageAdjustedRawValue
-        debuglogging("y1 = " + y1.description)
         x1 = secondlatest.timeStamp.toMillisecondsAsDouble()
-        debuglogging("x1 = " + x1.description)
         
         if(y1 == y2) {
-            debuglogging("y1==Y1");
-            
             bgReading.rb = 0
         } else {
-            debuglogging("y1!=Y1");
             bgReading.rb = (y2 - y1)/(x2 - x1)
         }
         bgReading.ra = 0
         bgReading.rc = -1 * ((latest.rb * x1) - y1)
-        
-        debuglogging("ra = " + bgReading.ra.description + ", rb = " + bgReading.rb.description + ", rc = " + bgReading.rc.description);
-        
-        
     } else {
         bgReading.ra = 0
         bgReading.rb = 0
@@ -171,13 +158,13 @@ func updateCalculatedValue(for bgReading:BgReading) {
 ///     - sensor : actual sensor, optional
 ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance and also because it's an NSManagedObject
 ///     - nsManagedObjectContext : the nsManagedObjectContext
-///     - last4CalibrationsForActiveSensor :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
+///     - lastCalibrationsForActiveSensorInLastXDays :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
 ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
 ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
 ///     - isTypeLimitter : type limitter means sensor is Libre
 /// - returns:
 ///     - the created bgreading
-func createNewReading(rawData:Double, filteredData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, last4CalibrationsForActiveSensor:inout Array<Calibration>, firstCalibration:Calibration?, lastCalibration:Calibration?, isTypeLimitter:Bool, nsManagedObjectContext:NSManagedObjectContext ) -> BgReading {
+func createNewReading(rawData:Double, filteredData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration?, lastCalibration:Calibration?, isTypeLimitter:Bool, nsManagedObjectContext:NSManagedObjectContext ) -> BgReading {
     
     var timeStampToUse:Date = Date()
     if let timeStamp = timeStamp {
@@ -194,14 +181,13 @@ func createNewReading(rawData:Double, filteredData:Double, timeStamp:Date?, sens
     )
     
     calculateAgeAdjustedRawValue(for:bgReading, withSensor:sensor, isTypeLimitter: isTypeLimitter)
-    debuglogging("after calculateAgeAdjustedRawValue bgReading.ageAdjustedRawValue" + bgReading.ageAdjustedRawValue.description)
     
     if let lastCalibration = lastCalibration, let firstCalibration = firstCalibration {
         if (last3Readings.count > 0) {
             let latest:BgReading = last3Readings[0]
             if var latestReadingCalibration = latest.calibration {
                 if (latest.calibrationFlag && ((latest.timeStamp.toMillisecondsAsDouble() + (60000 * 20)) > timeStampToUse.toMillisecondsAsDouble()) && ((latestReadingCalibration.timeStamp.toMillisecondsAsDouble() + (60000 * 20)) > timeStampToUse.toMillisecondsAsDouble())) {
-                    rawValueOverride(for: &latestReadingCalibration, rawValue: weightedAverageRaw(timeA: latest.timeStamp, timeB: timeStampToUse, calibrationTime: latestReadingCalibration.timeStamp, rawA: latest.ageAdjustedRawValue, rawB: bgReading.ageAdjustedRawValue), last4CalibrationsForActiveSensor: &last4CalibrationsForActiveSensor, firstCalibration: firstCalibration, lastCalibration: lastCalibration, isTypeLimitter: isTypeLimitter)
+                    rawValueOverride(for: &latestReadingCalibration, rawValue: weightedAverageRaw(timeA: latest.timeStamp, timeB: timeStampToUse, calibrationTime: latestReadingCalibration.timeStamp, rawA: latest.ageAdjustedRawValue, rawB: bgReading.ageAdjustedRawValue), lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibration, lastCalibration: lastCalibration, isTypeLimitter: isTypeLimitter)
                 }
             }
             bgReading.calculatedValue = ((lastCalibration.slope * bgReading.ageAdjustedRawValue) + lastCalibration.intercept)
@@ -233,18 +219,12 @@ private func calculateSlope(currentBgReading:BgReading, lastBgReading:BgReading)
 
 /// - parameters:
 ///     - withTimeStamp : timeStamp :)
-///     - withLast1Reading : result of call to BgReadings.getLatestBgReadings(1, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false
+///     - withLast1Reading : last reading
 /// - returns:
 ///     - estimatedrawbg
-private func getEstimatedRawBg(withTimeStamp timeStamp:Double, withLast1Reading last1Reading:inout Array<BgReading>) -> Double {
-    var estimate:Double
-    if (last1Reading.count == 0) {
-        estimate = 160
-    } else {
-        let latest:BgReading = last1Reading[0]
-        estimate = (latest.ra * timeStamp * timeStamp) + (latest.rb * timeStamp) + latest.rc
-    }
-    return estimate
+public func getEstimatedRawBg(withTimeStamp timeStamp:Date, withLast1Reading last1Reading:BgReading) -> Double {
+    let timeStampInMs = timeStamp.toMillisecondsAsDouble()
+    return (last1Reading.ra * timeStampInMs * timeStampInMs) + (last1Reading.rb * timeStampInMs) + last1Reading.rc
 }
 
 /// - parameters:
@@ -261,8 +241,7 @@ private func calculateAgeAdjustedRawValue(for bgReading:BgReading, withSensor se
     } else {
         bgReading.ageAdjustedRawValue = bgReading.rawData
     }
-    debuglogging("in calculateAgeAdjustedRawValue bgReading.ageAdjustedRawValue" + bgReading.ageAdjustedRawValue.description)
-    
+    //debuglogging("in calculateAgeAdjustedRawValue bgReading.ageAdjustedRawValue" + bgReading.ageAdjustedRawValue.description)
 }
 
 private func weightedAverageRaw(timeA:Date, timeB:Date, calibrationTime:Date, rawA:Double, rawB:Double) -> Double {

@@ -2,7 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
+class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
     
     // MARK: - properties
     
@@ -45,7 +45,7 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
     
     // MARK: - functions
     
-    init(addressAndName: CGMGMiaoMiaoTransmitter.MiaoMiaoDeviceAddressAndName, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date) {
+    init(addressAndName: CGMMiaoMiaoTransmitter.MiaoMiaoDeviceAddressAndName, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName
@@ -100,8 +100,8 @@ class CGMGMiaoMiaoTransmitter:BluetoothTransmitter {
             //os_log("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .debug, data)
             
             //check if buffer needs to be reset
-            if (Date() > startDate.addingTimeInterval(CGMGMiaoMiaoTransmitter.maxWaitForpacketInSeconds - 1)) {
-                os_log("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMGMiaoMiaoTransmitter.maxWaitForpacketInSeconds)
+            if (Date() > startDate.addingTimeInterval(CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds - 1)) {
+                os_log("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds)
                 resetRxBuffer()
             }
             

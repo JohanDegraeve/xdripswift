@@ -81,24 +81,26 @@ class Calibrations {
     
     /// Returns last calibrations, possibly zero
     /// - parameters:
-    ///     - howMany: yes how many calibrations, maximum off course because result can be 0 calibrations
+    ///     - howManyDays: yes how many days of calibrations, maximum off course because result can be 0 calibrations
     ///     - forSensor: for which sensor, if nil then sensorid is igored
     /// - returns:
     ///     - array of calibrations, can have size 0 if there's no calibration matching
     ///     - ordered by timestamp, large to small (descending) ie the first is the youngest
-    static func getLatestCalibrations(howMany amount:Int, forSensor sensor:Sensor?) -> Array<Calibration> {
+    static func getLatestCalibrations(howManyDays amount:Int, forSensor sensor:Sensor?) -> Array<Calibration> {
         var returnValue:Array<Calibration> = []
+        let nowMinusXDays = Date(timeIntervalSinceNow: Double(-amount*24*3600))
         
         loop: for calibration in calibrations.reversed() {
-            if let sensor = sensor {
-                if sensor.id == calibration.sensor.id {
+            if calibration.timeStamp < nowMinusXDays {
+                break loop
+            } else {
+                if let sensor = sensor {
+                    if sensor.id == calibration.sensor.id {
+                        returnValue.append(calibration)
+                    }
+                } else {
                     returnValue.append(calibration)
                 }
-            } else {
-                returnValue.append(calibration)
-            }
-            if returnValue.count == amount {
-                break loop
             }
         }
         

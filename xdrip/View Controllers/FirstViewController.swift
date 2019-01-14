@@ -7,7 +7,7 @@ import UserNotifications
 class FirstViewController: UIViewController, CGMTransmitterDelegate {
     
     // MARK: - Properties
-    var test:CGMGMiaoMiaoTransmitter?
+    var test:CGMMiaoMiaoTransmitter?
     
     var address:String?
     var name:String?
@@ -37,7 +37,7 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
             timeStampLastBgReading = lastReading.timeStamp
         }
 
-        test = CGMGMiaoMiaoTransmitter(addressAndName: CGMGMiaoMiaoTransmitter.MiaoMiaoDeviceAddressAndName.notYetConnected, delegate:self, timeStampLastBgReading: timeStampLastBgReading)
+        test = CGMMiaoMiaoTransmitter(addressAndName: CGMMiaoMiaoTransmitter.MiaoMiaoDeviceAddressAndName.notYetConnected, delegate:self, timeStampLastBgReading: timeStampLastBgReading)
 
         UNUserNotificationCenter.current().delegate = self
         
@@ -73,6 +73,7 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
     func cgmTransmitterdidConnect() {
         address = test?.address
         name = test?.name
+        os_log("didconnect to device with address %{public}@ and name %{public}@", log: log!, type: .info, address!,name!)
     }
     
     // Only MioaMiao will call this
@@ -148,9 +149,22 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
                         if let value = first.text {
                             let valueAsDouble = Double(value)!
                             var latestReadings = BgReadings.getLatestBgReadings(howMany: 36, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
-                            var twoCalibrations = initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, secondCalibrationTimeStamp: Date(), sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext, isTypeLimitter: true)
-                            Calibrations.addCalibration(newCalibration: twoCalibrations.firstCalibration)
-                            Calibrations.addCalibration(newCalibration: twoCalibrations.secondCalibration)
+                            
+                            var latestCalibrations = Calibrations.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
+                            
+                            if latestCalibrations.count == 0 {
+                                let twoCalibrations = initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, secondCalibrationTimeStamp: Date(), sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext, isTypeLimitter: true)
+                                Calibrations.addCalibration(newCalibration: twoCalibrations.firstCalibration)
+                                Calibrations.addCalibration(newCalibration: twoCalibrations.secondCalibration)
+                            } else {
+                                let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
+
+                                if let firstCalibrationForActiveSensor = firstCalibrationForActiveSensor {
+                                    let newCalibration = create(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, isTypeLimitter: true, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
+                                    Calibrations.addCalibration(newCalibration: newCalibration)
+                                }
+                            }
+
                             self.coreDataManager.saveChanges()
                             self.logAllBgReadings()
                         }
@@ -176,11 +190,11 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 var latest3BgReadings = BgReadings.getLatestBgReadings(howMany: 3, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
                 
-                var latest4Calibrations = Calibrations.getLatestCalibrations(howMany: 4, forSensor: activeSensor)
+                var lastCalibrationsForActiveSensorInLastXDays = Calibrations.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
                 let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
                 let lastCalibrationForActiveSensor = Calibrations.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
                 
-                let newBgReading = createNewReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, last4CalibrationsForActiveSensor: &latest4Calibrations, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, isTypeLimitter: true, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                let newBgReading = createNewReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, isTypeLimitter: true, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                 
                 debuglogging("newBgReading.calculatedValue = " + newBgReading.calculatedValue.description)
                 
@@ -193,9 +207,8 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
             
             coreDataManager.saveChanges()
             
-            if (!checkIfCalibrationsExistAndIfNotAsk()) {
-                logAllBgReadings()
-            }
+            requestCalibrationNotification()
+            logAllBgReadings()
         }
         
         
@@ -323,17 +336,5 @@ extension FirstViewController: UNUserNotificationCenterDelegate {
         }
     }
     
-    /// returns true if calibration exists
-    private func checkIfCalibrationsExistAndIfNotAsk() -> Bool{
-        //check if calibrations exist and if not ask calibration
-        if let activeSensor = activeSensor {
-            let calibrations = Calibrations.allForSensor(inLastDays: 10, withActivesensor: activeSensor)
-            if (calibrations.count == 0) {
-                requestCalibrationNotification()
-                return false
-            }
-        }
-        return true
-    }
 }
 
