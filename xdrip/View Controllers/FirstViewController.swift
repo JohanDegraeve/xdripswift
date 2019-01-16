@@ -19,6 +19,8 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
     // TODO: move to other location ?
     private var coreDataManager = CoreDataManager(modelName: "xdrip")
     
+    private var libre1Calibration = Libre1Calibrator()
+    
     // MARK: - temporary properties
     var activeSensor:Sensor?
 
@@ -153,14 +155,14 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
                             var latestCalibrations = Calibrations.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
                             
                             if latestCalibrations.count == 0 {
-                                let twoCalibrations = initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, secondCalibrationTimeStamp: Date(), sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext, isTypeLimitter: true)
+                                let twoCalibrations = self.libre1Calibration.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, secondCalibrationTimeStamp: Date(), sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
                                 Calibrations.addCalibration(newCalibration: twoCalibrations.firstCalibration)
                                 Calibrations.addCalibration(newCalibration: twoCalibrations.secondCalibration)
                             } else {
                                 let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
 
                                 if let firstCalibrationForActiveSensor = firstCalibrationForActiveSensor {
-                                    let newCalibration = create(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, isTypeLimitter: true, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
+                                    let newCalibration = self.libre1Calibration.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
                                     Calibrations.addCalibration(newCalibration: newCalibration)
                                 }
                             }
@@ -194,7 +196,7 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
                 let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
                 let lastCalibrationForActiveSensor = Calibrations.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
                 
-                let newBgReading = createNewReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, isTypeLimitter: true, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                let newBgReading = self.libre1Calibration.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                 
                 debuglogging("newBgReading.calculatedValue = " + newBgReading.calculatedValue.description)
                 

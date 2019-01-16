@@ -58,7 +58,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
     init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String, CBUUID_Service:String, CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, delegate:BluetoothTransmitterDelegate) {
-        
         switch addressAndName {
         case .alreadyConnectedBefore(let newAddress, let newName):
             address = newAddress

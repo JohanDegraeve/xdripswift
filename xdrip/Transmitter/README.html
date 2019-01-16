@@ -1,3 +1,15 @@
+<p><b>Summary</b></p>
+
+<p>BluetoothTransmitter.swift defines the class BluetoothTransmitter, which implements the bluetooth protocol applicable to any type of peripheral
+and that works with only a receive and a transmit characteristic</p>
+
+<p>Every type of bluetoothtransmitter needs to extend BluetoothTransmitter, important while doing this is to set up the right UUID values
+and also if a specific device name is expected or not. This is achieved in the init function, see for example 
+CGMMiaoMiaoTransmitter and CGMG4xDripTransmitter. MiaoMiao expects a specific device name, xDrip does not. xDrip does have a specific 
+advertising UUID, MioamIoa does not.</p>
+
+<p>The CGM transmitter communicates back via the CGMTransmitterDelegate protocol. Does got be conformed to, for instance by a view.</p>
+
 <ul>
 <li><b>Generic/BluetoothTransmitter.swift</b></li>
 </ul>

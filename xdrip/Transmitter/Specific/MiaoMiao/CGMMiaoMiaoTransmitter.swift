@@ -14,8 +14,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
     let CBUUID_ReceiveCharacteristic_MiaoMiao: String = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
     /// write characteristic
     let CBUUID_WriteCharacteristic_MiaoMiao: String = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
-    // maximum times resend request due to crc error
-    let maxPacketResendRequests = 3;
     
     /// expected device name
     let expectedDeviceNameMiaoMiao:String = "MiaoMiao"
@@ -23,6 +21,8 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
     /// will be used to pass back bluetooth and cgm related events
     private(set) var cgmTransmitterDelegate:CGMTransmitterDelegate?
 
+    // maximum times resend request due to crc error
+    let maxPacketResendRequests = 3;
     
     /// for OS_log
     private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCGMMiaoMiao)
@@ -67,8 +67,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
         self.timeStampLastBgReading = timeStampLastBgReading
         
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_MiaoMiao, CBUUID_Service: CBUUID_Service_MiaoMiao, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, delegate: delegate)
-        
-        //blueToothTransmitterDelegate = self
     }
     
     // MARK: - functions

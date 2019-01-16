@@ -17,6 +17,9 @@
 		F8025C1E21DBCF4A00ECF0C0 /* RawGlucoseData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1D21DBCF4A00ECF0C0 /* RawGlucoseData.swift */; };
 		F8025C2021DBD0FE00ECF0C0 /* ParseLibreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */; };
 		F8025E4C21E6618200ECF0C0 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4B21E6618100ECF0C0 /* Log.swift */; };
+		F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4D21ED450300ECF0C0 /* Double.swift */; };
+		F8025E5021EE746400ECF0C0 /* CalibratorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4F21EE746400ECF0C0 /* CalibratorProtocol.swift */; };
+		F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */; };
 		F85DC2EB21CFE2F500B9F74A /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
@@ -32,13 +35,11 @@
 		F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */; };
 		F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */; };
-		F8EA6C7A21B48B390082976B /* BgReadingAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C7921B48B390082976B /* BgReadingAlgorithms.swift */; };
 		F8EA6C7C21B491740082976B /* BgReadings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C7B21B491740082976B /* BgReadings.swift */; };
 		F8EA6C7F21B70E390082976B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C7E21B70E390082976B /* Constants.swift */; };
 		F8EA6C8221B723BC0082976B /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C8121B723BC0082976B /* Date.swift */; };
 		F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CA821BBE3010082976B /* UniqueId.swift */; };
 		F8EA6CAD21BC2CA40082976B /* BluetoothTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CAC21BC2CA40082976B /* BluetoothTransmitter.swift */; };
-		F8EA6CAF21C0213C0082976B /* CalibrationAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CAE21C0213C0082976B /* CalibrationAlgorithms.swift */; };
 		F8EA6CB121C05E970082976B /* Calibrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CB021C05E970082976B /* Calibrations.swift */; };
 		F8EA6CB321CD5DD90082976B /* SlopeParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CB221CD5DD90082976B /* SlopeParameters.swift */; };
 /* End PBXBuildFile section */
@@ -54,6 +55,9 @@
 		F8025C1D21DBCF4A00ECF0C0 /* RawGlucoseData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawGlucoseData.swift; sourceTree = "<group>"; };
 		F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseLibreData.swift; sourceTree = "<group>"; };
 		F8025E4B21E6618100ECF0C0 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
+		F8025E4D21ED450300ECF0C0 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
+		F8025E4F21EE746400ECF0C0 /* CalibratorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibratorProtocol.swift; sourceTree = "<group>"; };
+		F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre1Calibrator.swift; sourceTree = "<group>"; };
 		F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -71,13 +75,11 @@
 		F8AC426921ADEBD70078C348 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F8AC426B21ADEBD70078C348 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F8AC42A021B31F160078C348 /* xdrip.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = xdrip.xcdatamodel; sourceTree = "<group>"; };
-		F8EA6C7921B48B390082976B /* BgReadingAlgorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingAlgorithms.swift; sourceTree = "<group>"; };
 		F8EA6C7B21B491740082976B /* BgReadings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadings.swift; sourceTree = "<group>"; };
 		F8EA6C7E21B70E390082976B /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F8EA6C8121B723BC0082976B /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		F8EA6CA821BBE3010082976B /* UniqueId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniqueId.swift; sourceTree = "<group>"; };
 		F8EA6CAC21BC2CA40082976B /* BluetoothTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothTransmitter.swift; sourceTree = "<group>"; };
-		F8EA6CAE21C0213C0082976B /* CalibrationAlgorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationAlgorithms.swift; sourceTree = "<group>"; };
 		F8EA6CB021C05E970082976B /* Calibrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calibrations.swift; sourceTree = "<group>"; };
 		F8EA6CB221CD5DD90082976B /* SlopeParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlopeParameters.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -108,6 +110,7 @@
 				F8EA6C8121B723BC0082976B /* Date.swift */,
 				F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */,
 				F8025C1221DA683400ECF0C0 /* Data.swift */,
+				F8025E4D21ED450300ECF0C0 /* Double.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -120,6 +123,14 @@
 				F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */,
 			);
 			path = Utilities;
+			sourceTree = "<group>";
+		};
+		F8025E5221EE8CE500ECF0C0 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				F8025E4F21EE746400ECF0C0 /* CalibratorProtocol.swift */,
+			);
+			path = Protocol;
 			sourceTree = "<group>";
 		};
 		F85DC29B21CFCEB800B9F74A /* Recovered References */ = {
@@ -220,7 +231,7 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
-				F8EA6CA521BAD5AD0082976B /* algorithms */,
+				F8EA6CA521BAD5AD0082976B /* Calibration */,
 				F85DC2FB21D2CD7000B9F74A /* Application Delegate */,
 				F8EA6C7521B474120082976B /* applicationdata */,
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
@@ -296,29 +307,13 @@
 			path = classes;
 			sourceTree = "<group>";
 		};
-		F8EA6CA521BAD5AD0082976B /* algorithms */ = {
+		F8EA6CA521BAD5AD0082976B /* Calibration */ = {
 			isa = PBXGroup;
 			children = (
-				F8EA6CA621BAD5AD0082976B /* bgreading */,
-				F8EA6CA721BAD5AD0082976B /* calibration */,
+				F8025E5221EE8CE500ECF0C0 /* Protocol */,
+				F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */,
 			);
-			path = algorithms;
-			sourceTree = "<group>";
-		};
-		F8EA6CA621BAD5AD0082976B /* bgreading */ = {
-			isa = PBXGroup;
-			children = (
-				F8EA6C7921B48B390082976B /* BgReadingAlgorithms.swift */,
-			);
-			path = bgreading;
-			sourceTree = "<group>";
-		};
-		F8EA6CA721BAD5AD0082976B /* calibration */ = {
-			isa = PBXGroup;
-			children = (
-				F8EA6CAE21C0213C0082976B /* CalibrationAlgorithms.swift */,
-			);
-			path = calibration;
+			path = Calibration;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -399,6 +394,7 @@
 			files = (
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
 				F8AC426221ADEBD60078C348 /* SecondViewController.swift in Sources */,
+				F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */,
 				F85DC2EB21CFE2F500B9F74A /* Calibration+CoreDataProperties.swift in Sources */,
 				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
@@ -409,8 +405,9 @@
 				F8025C1E21DBCF4A00ECF0C0 /* RawGlucoseData.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
 				F8EA6C7C21B491740082976B /* BgReadings.swift in Sources */,
+				F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */,
 				F8025C1821DBC16400ECF0C0 /* CRC.swift in Sources */,
-				F8EA6C7A21B48B390082976B /* BgReadingAlgorithms.swift in Sources */,
+				F8025E5021EE746400ECF0C0 /* CalibratorProtocol.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
 				F85DC2F821D2632F00B9F74A /* CoreDataManager.swift in Sources */,
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
@@ -419,7 +416,6 @@
 				F8EA6CAD21BC2CA40082976B /* BluetoothTransmitter.swift in Sources */,
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
 				F8EA6CB321CD5DD90082976B /* SlopeParameters.swift in Sources */,
-				F8EA6CAF21C0213C0082976B /* CalibrationAlgorithms.swift in Sources */,
 				F8025C0F21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* FirstViewController.swift in Sources */,
 				F8025C1A21DBC1B700ECF0C0 /* LibreSensorState.swift in Sources */,

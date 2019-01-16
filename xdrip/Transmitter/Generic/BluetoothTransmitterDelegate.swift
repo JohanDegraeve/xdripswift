@@ -8,5 +8,4 @@ protocol BluetoothTransmitterDelegate {
     /// whenever status changes to on, and if device address not known yet, then app might want to start scanning
     ///
     func bluetooth(didUpdateState state:CBManagerState)
-
 }
