@@ -1,9 +1,8 @@
-The algorithms folder has protocols and classes which define the Calibration.
-
-Only algorithms, no data storage.
+The algorithms folder has protocols and classes which define the Calibration. Only algorithms, no data storage.<br>
 Also no read of access to data defined in other classes, the necessary data is passed when calling the functions.
 
-CalibratorProtocol.swift
+For a new type of Sensor (only Libre and Dexcom at the moment), a new class needs to be created that conforms to the protocol CalibratorProtocol and then defines only the variables sParams and ageAdjustMentNeeded.<br>
+For the moment only Libre1Calibrator.swift exists
 
 <b>protocol CalibratorProtocol</b><br>
 
@@ -23,5 +22,4 @@ The functions in the protocol are implemented in the extension CalibratorProtoco
 * createNewBgReading<br>
 * createNewCalibration<br>
 
-For a new type of Sensor (only Libre and Dexcom at the moment), a new class needs to be created that conforms to the protocol CalibratorProtocol and then defines only the variables sParams and ageAdjustMentNeeded.<br>
-For the moment only Libre1Calibrator.swift exists
+
