@@ -5,7 +5,6 @@ import CoreBluetooth
 import UserNotifications
 
 class FirstViewController: UIViewController, CGMTransmitterDelegate {
-    
     // MARK: - Properties
     var test:CGMMiaoMiaoTransmitter?
     
@@ -21,6 +20,24 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
     
     private var libre1Calibration = Libre1Calibrator()
     
+    // MARK: - CGMTransmitterDelegate functions
+ 
+    func cgmTransmitterDidConnect() {
+        //TODO:- complete
+    }
+    
+    func cgmTransmitterDidDisconnect() {
+        //TODO:- complete
+    }
+    
+    func didUpdateBluetoothState(state: CBManagerState) {
+        if state == .poweredOn {
+            if address == nil {
+                _ = test?.startScanning()
+            }
+        }
+    }
+
     // MARK: - temporary properties
     var activeSensor:Sensor?
 
@@ -39,7 +56,7 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
             timeStampLastBgReading = lastReading.timeStamp
         }
 
-        test = CGMMiaoMiaoTransmitter(addressAndName: CGMMiaoMiaoTransmitter.MiaoMiaoDeviceAddressAndName.notYetConnected, delegate:self, timeStampLastBgReading: timeStampLastBgReading)
+        test = CGMMiaoMiaoTransmitter(addressAndName: BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: nil), delegate:self, timeStampLastBgReading: timeStampLastBgReading)
 
         UNUserNotificationCenter.current().delegate = self
         
@@ -65,12 +82,6 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
         
     }
     
-    func bluetooth(didUpdateState state: CBManagerState) {
-        if address == nil {
-            _ = test?.startScanning()
-        }
-    }
-
     // called when transmitter considered to be connected
     func cgmTransmitterdidConnect() {
         address = test?.address

@@ -2,12 +2,9 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
-    
+class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitterProtocol {
     // MARK: - properties
     
-    /// uuid used for scanning, can be empty string, if empty string then scan all devices - only possible if app is in foreground
-    let CBUUID_Advertisement_MiaoMiao: String = ""
     /// service to be discovered
     let CBUUID_Service_MiaoMiao: String = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
     /// receive characteristic
@@ -19,7 +16,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
     let expectedDeviceNameMiaoMiao:String = "MiaoMiao"
     
     /// will be used to pass back bluetooth and cgm related events
-    private(set) var cgmTransmitterDelegate:CGMTransmitterDelegate?
+    private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
 
     // maximum times resend request due to crc error
     let maxPacketResendRequests = 3;
@@ -43,9 +40,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
     private let miaoMiaoHeaderLength = 18
     
     
-    // MARK: - functions
+    // MARK: - Initialization
     
-    init(addressAndName: CGMMiaoMiaoTransmitter.MiaoMiaoDeviceAddressAndName, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date) {
+    init(addressAndName: BluetoothTransmitter.DeviceAddressAndName, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName
@@ -66,10 +63,11 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
         //initialize timeStampLastBgReading
         self.timeStampLastBgReading = timeStampLastBgReading
         
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_MiaoMiao, CBUUID_Service: CBUUID_Service_MiaoMiao, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, delegate: delegate)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, CBUUID_Service: CBUUID_Service_MiaoMiao, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao)
+        bluetoothTransmitterDelegate = self
     }
     
-    // MARK: - functions
+    // MARK: - public functions
     
     func sendStartReadingCommmand() -> Bool {
         if writeDataToPeripheral(data: Data.init(bytes: [0xF0]), type: .withoutResponse) {
@@ -82,16 +80,29 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
     
     // MARK: - BluetoothTransmitterDelegate functions
     
-    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
+    func centralManagerDidConnect() {
+        cgmTransmitterDelegate?.cgmTransmitterDidConnect()
+    }
+    
+    func centralManagerDidFailToConnect(error: Error?) {
+    }
+    
+    func centralManagerDidUpdateState(state: CBManagerState) {
+        cgmTransmitterDelegate?.didUpdateBluetoothState(state: state)
+    }
+    
+    func centralManagerDidDisconnectPeripheral(error: Error?) {
+        cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
+    }
+    
+    func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
         if characteristic.isNotifying {
             _ = sendStartReadingCommmand()
         }
     }
     
-    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+    func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
         //os_log("in peripheral didUpdateValueFor", log: log, type: .debug)
-
         if let value = characteristic.value {
             //only for logging
             //let data = value.hexEncodedString()
@@ -120,15 +131,15 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
                                 let firmware = String(describing: rxBuffer[14...15].hexEncodedString())
                                 let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
                                 let batteryPercentage = Int(rxBuffer[13])
-
+                                
                                 //get readings from buffer and send to delegate
                                 var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: miaoMiaoHeaderLength)
                                 //TODO: sort glucosedata before calling newReadingsReceived
                                 cgmTransmitterDelegate?.newReadingsReceived(glucoseData: &result.glucoseData, sensorState: result.sensorState, firmware: firmware, hardware: hardware, batteryPercentage: batteryPercentage, sensorTimeInMinutes: result.sensorTimeInMinutes)
-
+                                
                                 // set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
                                 if result.glucoseData.count > 0 {
-                                   timeStampLastBgReading = result.glucoseData[0].timeStamp
+                                    timeStampLastBgReading = result.glucoseData[0].timeStamp
                                 }
                                 
                                 //reset the buffer
@@ -168,19 +179,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
         }
     }
     
-    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        //just call super, we might as well just not override the function
-        super.centralManagerDidUpdateState(central)
-    }
-    
-    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        super.centralManager(central, didConnect: peripheral)
-        cgmTransmitterDelegate?.cgmTransmitterdidConnect()
-    }
-    
-    override func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
-        super.peripheral(peripheral, didWriteValueFor: characteristic, error: error)
-        //nothing to do for MiaoMiao
+    //MARK: CGMTransmitterProtocol functions
+    func canDetectNewSensor() -> Bool {
+        return false
     }
 
     // MARK: - helpers
@@ -192,16 +193,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter {
         resendPacketCounter = 0
     }
     
-    // MARK: - enum
-
-    /// * if we never connected to a G4 bridge, then we don't know it's name and address as the Device itself is going to send.
-    /// * If we already connected to a device before, then we know it's name and address
-    enum MiaoMiaoDeviceAddressAndName {
-        /// we already connected to the device so we should know the address and name as used by the device
-        case alreadyConnectedBefore (address:String, name:String)
-        /// * We never connected to the device, no need to send an expected device name
-        case notYetConnected
-    }
 }
 
 fileprivate enum MiaoMiaoResponseState: UInt8 {

@@ -2,25 +2,20 @@ import Foundation
 import CoreBluetooth
 import os
 
-/// generic class for bluetooth transmitter.
-/// For new transmitters, extend BluetoothTransmitter
-///
-/// class BluetoothTransmitter implements the protocols CBCentralManagerDelegate, CBPeripheralDelegate
-///
-/// some of those functions might still need override/re-implementation in the deriving specific class
-///
+/// generic bluetoothtransmitter class that handles scanning, connect, discover services, discover characteristics, subscribe to receive characteristic, reconnect.
+/// The class assumes that the transmitter has a receive and transmit characterisitc (which is mostly the case)
 class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
     // MARK: - properties
     
     /// uuid used for scanning, can be empty string, if empty string then scan all devices - only possible if app is in foreground
-    let CBUUID_Advertisement:String
+    private let CBUUID_Advertisement:String?
     /// service to be discovered
-    let CBUUID_Service:String
+    private let CBUUID_Service:String
     /// receive characteristic
-    let CBUUID_ReceiveCharacteristic:String
+    private let CBUUID_ReceiveCharacteristic:String
     /// write characteristic
-    let CBUUID_WriteCharacteristic:String
+    private let CBUUID_WriteCharacteristic:String
 
     /// the address of the transmitter. If nil then transmitter never connected, so we don't know the name.
     public private(set) var address:String?
@@ -36,7 +31,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// peripheral, gets value during connect
     private var peripheral: CBPeripheral?
     
-    private var delegate:BluetoothTransmitterDelegate?
+    public weak var bluetoothTransmitterDelegate:BluetoothTransmitterDelegate?
     
     /// if never connected before to the device, then possibily we expect a specific device name. For example for G5, if transmitter id is ABCDEF, we expect as devicename DexcomEF. For an xDrip bridge, we don't expect a specific devicename, in which case the value stays nil
     /// the value is only used during first time connection to a new device. Once we've connected at least once, we know the final name (eg xBridge) and will store this name in the name attribute, the expectedName value can then be ignored
@@ -51,13 +46,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// - parameters:
     ///     -  addressAndName: if we never connected to a device, then we don't know it's name and address as the Device itself is going to send. We can only have an expectedName which is what needs to be added then in the argument
     ///         * example for G5, if transmitter id is ABCDEF, we expect as devicename DexcomEF.
-    ///         * For an xDrip bridge, we don't expect a specific devicename, in which case the value stays nil
+    ///         * For an xDrip or xBridge, we don't expect a specific devicename, in which case the value stays nil
     ///         * If we already connected to a device before, then we know it's name and address
-    ///     - CBUUID_Advertisement: UUID to use for scanning, if empty string then app will scan for all devices. (Example Blucon, MiaoMiao, should be empty string. For G5 it should have a value. For xDrip it will probably work with or without. Main difference is that if no advertisement UUID is specified, then app is not allowed to scan will in background. For G5 this can create problem for first time connect, because G5 only transmits every 5 minutes, which means the app would need to stay in the foreground for at least 5 minutes.
+    ///     - CBUUID_Advertisement: UUID to use for scanning, if nil  then app will scan for all devices. (Example Blucon, MiaoMiao, should be nil value. For G5 it should have a value. For xDrip it will probably work with or without. Main difference is that if no advertisement UUID is specified, then app is not allowed to scan will in background. For G5 this can create problem for first time connect, because G5 only transmits every 5 minutes, which means the app would need to stay in the foreground for at least 5 minutes.
     ///     - CBUUID_Service: service uuid
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
-    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String, CBUUID_Service:String, CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, delegate:BluetoothTransmitterDelegate) {
+    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, CBUUID_Service:String, CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String) {
         switch addressAndName {
         case .alreadyConnectedBefore(let newAddress, let newName):
             address = newAddress
@@ -66,9 +61,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             expectedName = newexpectedName
         }
         
-        //assign delegate
-        self.delegate = delegate
-
         //assign uuid's
         self.CBUUID_Service = CBUUID_Service
         self.CBUUID_Advertisement = CBUUID_Advertisement
@@ -81,20 +73,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     // MARK: - public functions
-    
-    /// will disconnect the device, if connected
-    func disconnect() {
-        if let newCentralManager = centralManager {
-            if let peripheral = peripheral {
-                os_log("in disconnect, disconnecting")
-                newCentralManager.cancelPeripheralConnection(peripheral)
-            } else {
-                os_log("in disconnect, but peripheral is nil", log: log, type: .info)
-            }
-        } else {
-            os_log("in disconnect, but centralManager is nil", log: log, type: .info)
-        }
-    }
     
     /// start bluetooth scanning for device
     func startScanning() -> BluetoothTransmitter.startScanningResult {
@@ -118,7 +96,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         ///ist of uuid's to scan for, possibily nil, in which case scanning only if app is in foreground and scan for all devices
         var services:[CBUUID]?
-        if CBUUID_Advertisement.count > 0 {
+        if let CBUUID_Advertisement = CBUUID_Advertisement {
             services = [CBUUID(string: CBUUID_Advertisement)]
         }
         
@@ -247,6 +225,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
         
         peripheral.discoverServices(services)
+        
+        bluetoothTransmitterDelegate?.centralManagerDidConnect()
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
@@ -258,6 +238,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
         
         centralManager?.connect(peripheral, options: nil)
+        
+        bluetoothTransmitterDelegate?.centralManagerDidFailToConnect(error: error)
     }
 
     /// if new state is powered on and if address is known then try to retrieveperipherals, if that fails start scanning
@@ -273,9 +255,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 }
             }
         }
-
-        // delegate might be interested also that state has changed
-        delegate?.bluetooth(didUpdateState: central.state)
+        
+        bluetoothTransmitterDelegate?.centralManagerDidUpdateState(state: central.state)
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
@@ -289,6 +270,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             os_log("Will try to connect", log: log, type: .info)
             centralManager?.connect(ownPeripheral, options: nil)
         }
+        
+        bluetoothTransmitterDelegate?.centralManagerDidDisconnectPeripheral(error: error)
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
@@ -335,9 +318,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        bluetoothTransmitterDelegate?.peripheralDidUpdateNotificationStateFor(characteristic: characteristic, error: error)
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        bluetoothTransmitterDelegate?.peripheralDidUpdateValueFor(characteristic: characteristic, error: error)
     }
     
     // MARK: - helpers
@@ -350,6 +335,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// distinguish types of transmitter : miaomiao, blucon, dexcomG5, ...
     enum TransmitterType {
+        //TODO:- should go somewhere else
         case DexcomxDripG4
         case DexcomG5
         case DexcomG6

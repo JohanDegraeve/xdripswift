@@ -1,55 +1,233 @@
-<b>Summary</b>
+<style type="text/css">
+  h2 { margin-left: 10px; }
+  h3 { margin-left: 25px; }
+  h4 { margin-left: 40px; }
+</style>
 
-BluetoothTransmitter.swift defines the class BluetoothTransmitter, which implements the bluetooth protocol applicable to any type of peripheral
-and that works with only a receive and a transmit characteristic. The class handles the scanning, discovery,subscribing to characteristic,
-connect and reconnect, connect after app launch (app needs to connect at least once, then it will remember the address and reconnect automatically at next launch)
+- [Summary](#summary)
+- [Steps for adding new transmitter types](#newtransmitters)
+	- [conform to protocol BluetoothTransmitterDelegate](#protocolbluetoothtransmitterdelegate)
+		- [centralManagerDidConnect](#centralManagerdidconnect)
+		- [centralManagerDidFailToConnect](#centralmanagerdidfailtoconnect)
+		- [centralManagerDidDisconnectPeripheral](#centralmanagerdiddisconnectperipheral)
+		- [centralManagerDidUpdateState](#centralManagerDidUpdateState)
+		- [peripheralDidUpdateNotificationStateFor](#peripheraldidupdatenotificationstatefor)
+		- [peripheralDidUpdateValueFor](#peripheraldidupatevaluefor)
+	- [conform to protocol CGMTransmitterProtocol](#protocolCGMTransmitterProtocol)
+		- [canDetectNewSensor](#canDetectNewSensorprotocol)
+	- [extend class BluetoothTransmitter](#extendclassbuetoothtransmitter)
+		- [initialize the super class BluetoothTransmitter](#initializebluetoothtransmitter)
+			- [BluetoothTransmitter.DeviceAddressAndName](#deviceaddressname)
+			- [CBUUID\_Advertisement](#cbuuidadvertisement)
+			- [CBUUID\_Service](#cbuuidservice)
+			- [CBUUID\_ReceiveCharacteristic](#cbuuidreceivecharacteristic)
+			- [CBUUID\_WriteCharacteristic](#cbuuidwritecharacteristic)
+	- [add a property of type CGMTransmitterDelegate](#protocolcgmtransmitterdelegate)
+		- [cgmTransmitterDidConnect](#cgmTransmitterDidConnect)
+		- [cgmTransmitterDidDisconnect](#cgmTransmitterDidDisconnect)
+		- [didUpdateBluetoothState](#didUpdateBluetoothState)
+		- [newSensorDetected](#newSensorDetected)
+		- [sensorNotDetected](#sensorNotDetected)
+		- [newReadingsReceived](#newReadingsReceived)
+- [Functions and properties available in transmitter classes](#functionsandpropertiesavailableintransmitterclasses)
+	- [Functions in BluetoothTransmitter classes](#functionsinbluetoothtransmitterclasses)
+		- [startScanning](#startScanning)
+		- [writeDataToPeripheral](#writeDataToPeripheral)
+	- [Properties in BluetoothTransmitter classes](#propertiesinbluetoothtransmitterclasses)
+		- [address](#address)
+		- [name](#name)
+	- [Functions in CGM Transmitter classes](#functionsincgmtransmitterclasses)
+		- [canDetectNewSensor](#canDetectNewSensor)
+- [Available CGM transmitter classes](#availablecgmtransmitterclasses)
+	- [CGMMiaoMiaoTransmitter](#CGMMiaoMiaoTransmitter)
+	- [xDripG4](#xDripG4)
+	
 
-Every type of bluetoothtransmitter needs to extend BluetoothTransmitter, important while doing this is to set up the right UUID values
-and also if a specific device name is expected or not. This is achieved in the init function, see for example 
-CGMMiaoMiaoTransmitter and CGMG4xDripTransmitter. MiaoMiao expects a specific device name, xDrip does not. xDrip does have a specific 
-advertising UUID, MioamIoa does not.
+# <a name="summary"></a>Summary
 
-The CGM transmitter communicates back via the CGMTransmitterDelegate protocol. Does got be conformed to, for instance by a view.
+BluetoothTransmitter.swift defines the class BluetoothTransmitter, which implements the bluetooth protocol applicable to any 
+type of peripheral and that works with only a receive and a transmit characteristic. 
+The class handles the scanning, connect, services discovery, characteristics discover, subscribing to characteristic,
+connect and reconnect, connect after app launch 
+(app needs to connect at least once, then it will remember the address and reconnect automatically at next launch)
 
-* <b>Generic/BluetoothTransmitter.swift</b>
+If necessary, each of the functions in the protocols CBCentralManagerDelegate and CBPeripheralDelegatecan be overriden by the inheriting class.
 
-Setting up a connection to a ble device is usually the same process : discover peripheral, connect, discover services, discover characteristics,
-subscribe to notify characteristic. Only after that data is exchanged.
+The protocol BluetoothTransmitterDelegate defines functions that allow to pass bluetooth activity information from the 
+BluetoothTransmitter class to a specific transmitter class. Example when a disconnect occurs, the BlueToothTransmitter class 
+handles the reconnect but the delegate class can for instance show the connection status to the user. It will be informed about
+the connection status via the function centralManagerDidConnect in the BluetoothTransmitterDelegate
 
-Those steps are all be done by the same class : BluetoothTransmitter which implements the protocols CBCentralManagerDelegate and CBPeripheralDelegate
- 
+The CGM transmitter communicates back to the caller via the CGMTransmitterDelegate protocol.<br> 
+Needs to be conformed to, for instance by a view controller, or manager, .. whatever<br>
+This protocol allows passing information like new readings, sensor detected, and also connect/disconnect, bluetooth status change<br>
 
-For any new type of transmitter, create a new class that inherits from BluetoothTransmitter
+#<a name="newtransmitters"></a>Steps for adding new (CGM) transmitter types
 
-Each of the functions in the protocols CBCentralManagerDelegate and CBPeripheralDelegatecan be overriden by the inheriting class.
-It's better to first call the same function in the super class.
+Every new type of bluetoothtransmitter needs to 
+* extend BluetoothTransmitter
+* conform to the protocol BluetoothTransmitterDelegate.
 
-For example
+If it's a CGM transmitter (it could also be a bloodglucose meter that transmits data over bluetooth)
+* conform to the protocol CGMTransmitterProtocol
 
-<font color="purple">func</font> centralManager(_ central: <font color="purple">CBCentralManager</font>, didConnect peripheral: <font color="purple">CBPeripheral</font>) 
-is implemented in BluetoothTransmitter, it will continue with the next step which is to discover services.
+## <a name="protocolbluetoothtransmitterdelegate"></a>conform to protocol BluetoothTransmitterDelegate
 
-But an inheriting class might override this on order to inform the user that the connection is made (via delegate)
-So an inheriting class can override the function, first call the function in the super class and then do what is needed.
+The functions that not be implemented:
 
-* <b>Generic/CGMTransmitterDelegate</b>
+### <a name="centralManagerdidconnect"><font color="purple">func</font> centralManagerDidConnect()
 
-A specific transmitter will send info to a delegate via the protocol CGMTransmitterDelegate
+Called when device disconnects. Can be used to pass information to the user. The new transmitter class can use the protocol CGMTransmitterDelegate 
+to pass back this information to a controlling class
 
-Example<br>
-<font color="purple">func</font> cgmTransmitterdidConnect()
+### <a name="centralmanagerdidfailtoconnect"></a><font color="purple">func</font> centralManagerDidFailToConnect(error: Error?)
 
-The specific class will decide when to call that function. For MiaoMiao this would be when didConnect is called. For an xdrip i prefer to do this only later.
+Called when device fails to connect. Probably not useful, but it's there
 
-It also has functions to pass received readings back to the delegate.
+### <a name="centralmanagerdiddisconnectperipheral"></a><font color="purple">func</font> centralManagerDidDisconnectPeripheral(error: Error?)
 
-* <b>Specific</b>
+Called when device disconnects. Can be used to pass information to the user. The transmitter class can use the protocol CGMTransmitterDelegate 
+to pass back this information to a controlling class
 
-Specific transmitters are defined in this folder. One for xdrip, MiaoMiao, G5, ...<br>
+### <a name="centralManagerDidUpdateState"></a><font color="purple">func</font> centralManagerDidUpdateState(state: <font color="purple">CBManagerState</font>)
 
-Any class or anybody who wants to create a specific transmitter needs to implement the protocol CGMTransmitterDelegate and instantiate the specific transmitter class
+Called when bluetooth state changes, ie when user switches on or off bluetooth. This function also gets called immediately 
+after startup of the application.<br>
+The transmitter class can use the protocol CGMTransmitterDelegate to pass back this information to a controlling class<br>
+It can be used by the controlling class to start scanning.
 
+### <a name="peripheraldidupdatenotificationstatefor"></a><font color="purple">func</font> peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?)
 
+is called when BluetoothTranmsitter class function 
+ peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) is called<br>
+For instance in the MiaoMiao transmitter class, the implementation will call start reading command.<br>
+For other types of transmitters there may be nothing to do.<br>
 
+### <a name="peripheraldidupatevaluefor"></a><font color="purple">func</font> peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?)
 
+This will be the most important function, because it contains the data that needs to be processed by the specific transmitter class.
+
+## <a name="protocolCGMTransmitterProtocol"></a>conform to protocol CGMTransmitterProtocol
+
+### <a name="canDetectNewSensorprotocol"></a>canDetectNewSensor
+
+can the cgm transmitter detect that a new sensor is placed ? Will return true only for Libre type of transmitters, eg MiaoMiao<br>
+If it returns true the the transmitter should also use newSensorDetected
+
+## <a name="extendclassbuetoothtransmitter"></a>extend class BluetoothTransmitter
+
+A new transmitter class needs to extend BluetoothTransmitter and
+
+### <a name="initializebluetoothtransmitter"></a>initialize the super class BluetoothTransmitter
+
+the signature of the initializer of the super class BluetoothTransmitter is<br>
+
+<font color="purple">init</font>(addressAndName:<font color="#516374">BluetoothTransmitter.DeviceAddressAndName</font>, 
+CBUUID\_Advertisement:<font color="purple">String</font>, 
+CBUUID\_Service:<font color="purple">String</font>, 
+CBUUID\_ReceiveCharacteristic:<font color="purple">String</font>, 
+CBUUID\_WriteCharacteristic:<font color="purple">String</font>) {
+  
+#### <a name="deviceaddressname"></a>BluetoothTransmitter.DeviceAddressAndName
+
+If the app never connected to the device, then we don't know it's name and address as the device itself is going to send.<br> 
+Possibly we have an expected device name. Not all devices have a predefined device name (example xdrip/xbridge have different names).<br>
+Usually, if there's no expected device name, there will be a CBUUID\_Advertisement<br>
+
+If the app connected before, then we have the address (should be stored in the settings or somewhere) which needs to be set during
+initialization
+
+DeviceAddressAndName is an enum with two cases :
+* alreadyConnectedBefore in which case we add the address and name as stored in the settings or database.
+The app will only connected to a device if it has the same address.
+* notYetConnected if we have an expected name, then it's added, if we don't then we pass nil<br>
+The app will connected to a device if the name starts with the expected name, or in case the expected name is nil, it will connect
+
+#### <a name="cbuuidadvertisement"></a>CBUUID\_Advertisement
+optional<br>
+If not nil then the app will scan for devices that advertise with this specific UUID.
+The advantage of scanning with advertisement UUID is that the app can also scan while in the background.
+
+#### <a name="cbuuidservice"></a>CBUUID_Service
+
+The service UUID
+
+#### <a name="cbuuidreceivecharacteristic"></a>CBUUID\_ReceiveCharacteristic
+
+receive characteristic UUID, the BlueToothTransmitter class will take care of subscribing to it
+
+#### <a name="cbuuidwritecharacteristic"></a>CBUUID\_WriteCharacteristic
+
+## <a name="protocolcgmtransmitterdelegate"></a>add a property of type CGMTransmitterDelegate
+
+The new transmitter class needs to store a property of type CGMTransmitterDelegate<br>
+This is used to pass back information to the controller<br>
+
+Functions in CGMTransmitterDelegate:
+
+### <a name="cgmTransmitterDidConnect"></a>cgmTransmitterDidConnect
+
+When the transmitter is connected<br>
+This will typically be called in centralManagerDidConnect, however it could be that the class decides to call this at a
+later stage, for example when subscribing to receive characteristic is done.
+
+### <a name="cgmTransmitterDidDisconnect"></a>cgmTransmitterDidDisconnect
+
+When the transmitter is disconnected<br>
+This will typically be called in centralManagerDidDisConnect
+
+### <a name="didUpdateBluetoothState"></a>didUpdateBluetoothState
+
+When the bluetooth status changes<br>
+This will typically be called in centralManagerDidUpdateState
+
+### <a name="newSensorDetected"></a>newSensorDetected
+When a new sensor is detected, only applicable to transmitters that have this functionality
+
+### <a name="sensorNotDetected"></a>sensorNotDetected
+When a sensor is not detected, only applicable to transmitters that have this functionality
+
+### <a name="newReadingsReceived"></a>newReadingsReceived
+This is the most important function, it passes new readings to the delegate
+
+# <a name="functionsandpropertiesavailableintransmitterclasses"></a>Functions and properties available in transmitter classes
+
+## <a name="functionsinbluetoothtransmitterclasses"></a>Functions in BluetoothTransmitter classes
+
+### <a name="startScanning"></a>startScanning
+
+Will scan for the device.<br>
+This should only be used the first time the app connects to a specific device and should not be done for transmittertypes that 
+start scanning at initialization<br>
+//TODO: needs more clarification
+
+### <a name="writeDataToPeripheral"></a>writeDataToPeripheral
+
+to write data to the peripheral
+
+## <a name="propertiesinbluetoothtransmitterclasses"></a>Properties in BluetoothTransmitter classes
+
+### <a name="address"></a>address
+
+the peripheral address, available after successfully connecting
+
+### <a name="name"></a>name
+
+the peripheral name, available after successfully connecting
+
+## <a name="functionsincgmtransmitterclasses"></a>Functions in CGM Transmitter classes
+
+### <a name="canDetectNewSensor"></a>canDetectNewSensor
+
+can the cgm transmitter detect a new sensor ?
+
+# <a name="availablecgmtransmitterclasses"></a>Available CGM transmitter classes
+
+## <a name="CGMMiaoMiaoTransmitter"></a>CGMMiaoMiaoTransmitter 
+
+MiaoMiao transmitter is fully implemented
+
+## <a name="CGMG4xDripTransmitter"></a>CGMG4xDripTransmitter
+
+Still to be completed.
 
