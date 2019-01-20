@@ -19,7 +19,7 @@
 </ul></li>
 <li><a href="#protocolCGMTransmitterProtocol">conform to protocol CGMTransmitterProtocol</a>
 <ul>
-<li><a href="#canDetectNewSensor">canDetectNewSensor</a></li>
+<li><a href="#canDetectNewSensorprotocol">canDetectNewSensor</a></li>
 </ul></li>
 <li><a href="#extendclassbuetoothtransmitter">extend class BluetoothTransmitter</a>
 <ul>
@@ -59,6 +59,11 @@
 <li><a href="#canDetectNewSensor">canDetectNewSensor</a></li>
 </ul></li>
 </ul></li>
+<li><a href="#availablecgmtransmitterclasses">Available CGM transmitter classes</a>
+<ul>
+<li><a href="#CGMMiaoMiaoTransmitter">CGMMiaoMiaoTransmitter</a></li>
+<li><a href="#xDripG4">xDripG4</a></li>
+</ul></li>
 </ul>
 
 <h1><a name="summary"></a>Summary</h1>
@@ -75,6 +80,8 @@ connect and reconnect, connect after app launch
 BluetoothTransmitter class to a specific transmitter class. Example when a disconnect occurs, the BlueToothTransmitter class 
 handles the reconnect but the delegate class can for instance show the connection status to the user. It will be informed about
 the connection status via the function centralManagerDidConnect in the BluetoothTransmitterDelegate</p>
+
+<p>CGMTransmitterProtocol defines functions that CGM transmitter classes need to implement.</p>
 
 <p>The CGM transmitter communicates back to the caller via the CGMTransmitterDelegate protocol.<br> 
 Needs to be conformed to, for instance by a view controller, or manager, .. whatever<br>
@@ -127,7 +134,7 @@ For other types of transmitters there may be nothing to do.<br></p>
 
 <h2><a name="protocolCGMTransmitterProtocol"></a>conform to protocol CGMTransmitterProtocol</h2>
 
-<h3><a name="canDetectNewSensor"></a>canDetectNewSensor</h3>
+<h3><a name="canDetectNewSensorprotocol"></a>canDetectNewSensor</h3>
 
 <p>can the cgm transmitter detect that a new sensor is placed ? Will return true only for Libre type of transmitters, eg MiaoMiao<br>
 If it returns true the the transmitter should also use newSensorDetected</p>
@@ -242,3 +249,13 @@ start scanning at initialization<br>
 <h3><a name="canDetectNewSensor"></a>canDetectNewSensor</h3>
 
 <p>can the cgm transmitter detect a new sensor ?</p>
+
+<h1><a name="availablecgmtransmitterclasses"></a>Available CGM transmitter classes</h1>
+
+<h2><a name="CGMMiaoMiaoTransmitter"></a>CGMMiaoMiaoTransmitter</h2>
+
+<p>MiaoMiao transmitter is fully implemented</p>
+
+<h2><a name="CGMG4xDripTransmitter"></a>CGMG4xDripTransmitter</h2>
+
+<p>Still to be completed.</p>

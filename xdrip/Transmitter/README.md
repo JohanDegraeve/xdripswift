@@ -58,6 +58,8 @@ BluetoothTransmitter class to a specific transmitter class. Example when a disco
 handles the reconnect but the delegate class can for instance show the connection status to the user. It will be informed about
 the connection status via the function centralManagerDidConnect in the BluetoothTransmitterDelegate
 
+CGMTransmitterProtocol defines functions that CGM transmitter classes need to implement.
+
 The CGM transmitter communicates back to the caller via the CGMTransmitterDelegate protocol.<br> 
 Needs to be conformed to, for instance by a view controller, or manager, .. whatever<br>
 This protocol allows passing information like new readings, sensor detected, and also connect/disconnect, bluetooth status change<br>
