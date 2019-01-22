@@ -4,7 +4,7 @@ import os
 import CoreBluetooth
 import UserNotifications
 
-class FirstViewController: UIViewController, CGMTransmitterDelegate {
+class HomeViewController: UIViewController, CGMTransmitterDelegate {
     // MARK: - Properties
     var test:CGMMiaoMiaoTransmitter?
     
@@ -321,7 +321,7 @@ class FirstViewController: UIViewController, CGMTransmitterDelegate {
 
 }
 
-extension FirstViewController: UNUserNotificationCenterDelegate {
+extension HomeViewController: UNUserNotificationCenterDelegate {
     
     //called when notification fired while app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
