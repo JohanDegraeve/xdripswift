@@ -66,7 +66,6 @@ final class CoreDataManager {
                                                               configurationName: nil,
                                                               at: persistentStoreURL,
                                                               options: options)
-            
         } catch {
             fatalError("Unable to Add Persistent Store")
         }

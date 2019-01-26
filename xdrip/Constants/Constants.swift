@@ -3,16 +3,16 @@ import Foundation
 
 struct Constants {
     
-    struct BloodGlucose {
+    enum BloodGlucose {
         static let mmollToMgdl = 18.01801801801802
         static let mgDlToMmoll = 0.0555
     }
     
-    struct BGGraphBuilder {
+    enum BGGraphBuilder {
         static let maxSlopeInMinutes = 21
     }
     
-    struct BgReadingAlgorithms {
+    enum BgReadingAlgorithms {
         // age adjustment constants, only for non Libre
         static let ageAdjustmentTime = 86400000 * 1.9
         static let ageAdjustmentFactor = 0.45
@@ -24,7 +24,7 @@ struct Constants {
     }
     
     /// for use in OSLog
-    struct Log {
+    enum Log {
         /// for use in OSLog
         static let subSystem = "net.johandegraeve.beatit"
         /// for use in OSLog
@@ -38,12 +38,12 @@ struct Constants {
     }
     
     // identifiers for local notifications
-    struct NotificationIdentifiers {
+    enum NotificationIdentifiers {
         /// for initial calibration
         static let initialCalibrationRequest = "InititalCalibrationRequest"
     }
     
-    struct Libre {
+    enum Libre {
         static let libreMultiplier = 117.64705
     }
 }

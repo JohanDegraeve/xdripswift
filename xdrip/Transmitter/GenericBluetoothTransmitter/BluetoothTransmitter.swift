@@ -8,6 +8,14 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     // MARK: - properties
     
+    /// the BluetoothTransmitterDelegate
+    public weak var bluetoothTransmitterDelegate:BluetoothTransmitterDelegate?
+    
+    /// the address of the transmitter. If nil then transmitter never connected, so we don't know the name.
+    public private(set) var address:String?
+    /// the name of the transmitter. If nil then transmitter never connected, so we don't know the name
+    public private(set) var name:String?
+    
     /// uuid used for scanning, can be empty string, if empty string then scan all devices - only possible if app is in foreground
     private let CBUUID_Advertisement:String?
     /// service to be discovered
@@ -17,11 +25,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// write characteristic
     private let CBUUID_WriteCharacteristic:String
 
-    /// the address of the transmitter. If nil then transmitter never connected, so we don't know the name.
-    public private(set) var address:String?
-    /// the name of the transmitter. If nil then transmitter never connected, so we don't know the name
-    public private(set) var name:String?
-    
     // for OS_log,
     private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryBlueTooth)
 
@@ -31,14 +34,14 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// peripheral, gets value during connect
     private var peripheral: CBPeripheral?
     
-    public weak var bluetoothTransmitterDelegate:BluetoothTransmitterDelegate?
-    
     /// if never connected before to the device, then possibily we expect a specific device name. For example for G5, if transmitter id is ABCDEF, we expect as devicename DexcomEF. For an xDrip bridge, we don't expect a specific devicename, in which case the value stays nil
     /// the value is only used during first time connection to a new device. Once we've connected at least once, we know the final name (eg xBridge) and will store this name in the name attribute, the expectedName value can then be ignored
     private var expectedName:String?
     
+    /// the write Characteristic
     private var writeCharacteristic:CBCharacteristic?
     
+    /// the receive Characteristic
     private var receiveCharacteristic:CBCharacteristic?
 
     // MARK: - Initialization
@@ -81,20 +84,20 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         //assign default returnvalue
         var returnValue = BluetoothTransmitter.startScanningResult.Other(reason: "unknown")
         
-        // first check if already connected and if so stop processing
+        // first check if already connected or connecting and if so stop processing
         if let peripheral = peripheral {
-            if peripheral.state == .connected {
+            switch peripheral.state {
+            case .connected:
                 os_log("peripheral is already connected, will not start scanning", log: log, type: .info)
                 return .AlreadyConnected
-            }
-        } else if let peripheral = peripheral {
-            if peripheral.state == .connecting {
+            case .connecting:
                 os_log("peripheral is currently connecting, will not start scanning", log: log, type: .info)
                 return .Connecting
+            default:()
             }
         }
         
-        ///ist of uuid's to scan for, possibily nil, in which case scanning only if app is in foreground and scan for all devices
+        /// list of uuid's to scan for, possibily nil, in which case scanning only if app is in foreground and scan for all devices
         var services:[CBUUID]?
         if let CBUUID_Advertisement = CBUUID_Advertisement {
             services = [CBUUID(string: CBUUID_Advertisement)]
@@ -102,16 +105,15 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         // try to start the scanning
         if let centralManager = centralManager {
+            if centralManager.isScanning {
+                os_log("in startScanning but already scanning", log: log, type: .info)
+                return .AlreadyScanning
+            }
             switch centralManager.state {
             case .poweredOn:
-                if centralManager.isScanning {
-                    os_log("already scanning", log: log, type: .info)
-                    returnValue = .AlreadyScanning
-                } else {
-                    os_log("starting bluetooth scanning", log: log, type: .info)
-                    centralManager.scanForPeripherals(withServices: services, options: nil)
-                    returnValue = .Success
-                }
+                os_log("starting bluetooth scanning", log: log, type: .info)
+                centralManager.scanForPeripherals(withServices: services, options: nil)
+                returnValue = .Success
             default:
                 os_log("bluetooth is not powered on, actual state is %{public}@", log: log, type: .info, "\(centralManager.state.toString())")
                 returnValue = .BluetoothNotPoweredOn(actualStateIs: centralManager.state.toString())
@@ -161,8 +163,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     fileprivate func retrievePeripherals(_ central:CBCentralManager) -> Bool {
         if let address = address {
-            let uuid =  UUID(uuidString: address)
-            if let uuid = uuid {
+            if let uuid = UUID(uuidString: address) {
                 var peripheralArr = central.retrievePeripherals(withIdentifiers: [uuid])
                 if peripheralArr.count > 0 {
                     peripheral = peripheralArr[0]
@@ -277,8 +278,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         os_log("Did discover services", log: log, type: .info)
         if let error = error {
-            os_log("Did discover services error: %{public}@", log: log, type: .error ,  "\(error.localizedDescription)")
-            return
+            os_log("didDiscoverServices error: %{public}@", log: log, type: .error ,  "\(error.localizedDescription)")
         }
         
         if let services = peripheral.services {
@@ -290,10 +290,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        os_log("Did discover characteristics", log: log, type: .info)
+        os_log("didDiscoverCharacteristicsFor", log: log, type: .info)
         if let error = error {
-            os_log("Did discover characteristics error: %{public}@", log: log, type: .error ,  "\(error.localizedDescription)")
-            return
+            os_log("didDiscoverCharacteristicsFor error: %{public}@", log: log, type: .error ,  "\(error.localizedDescription)")
         }
         
         if let characteristics = service.characteristics {
@@ -332,16 +331,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     // MARK: - enum's
-    
-    /// distinguish types of transmitter : miaomiao, blucon, dexcomG5, ...
-    enum TransmitterType {
-        //TODO:- should go somewhere else
-        case DexcomxDripG4
-        case DexcomG5
-        case DexcomG6
-        case Blucon
-        case MiaoMiao
-    }
     
     /// result of call to startscanning
     enum startScanningResult {

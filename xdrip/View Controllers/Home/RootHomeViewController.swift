@@ -4,7 +4,7 @@ import os
 import CoreBluetooth
 import UserNotifications
 
-class HomeViewController: UIViewController, CGMTransmitterDelegate {
+final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
     // MARK: - Properties
     var test:CGMMiaoMiaoTransmitter?
     
@@ -20,29 +20,17 @@ class HomeViewController: UIViewController, CGMTransmitterDelegate {
     
     private var libre1Calibration = Libre1Calibrator()
     
-    // MARK: - CGMTransmitterDelegate functions
- 
-    func cgmTransmitterDidConnect() {
-        //TODO:- complete
-    }
-    
-    func cgmTransmitterDidDisconnect() {
-        //TODO:- complete
-    }
-    
-    func didUpdateBluetoothState(state: CBManagerState) {
-        if state == .poweredOn {
-            if address == nil {
-                _ = test?.startScanning()
-            }
-        }
-    }
-
     // MARK: - temporary properties
     var activeSensor:Sensor?
+    
+    // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Setup View
+        setupView()
+        
         //let test:CGMG4xDripTransmitter = CGMG4xDripTransmitter(addressAndName: CGMG4xDripTransmitter.G4DeviceAddressAndName.notYetConnected)
         log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryFirstView)
         os_log("firstview viewdidload", log: log!, type: .info)
@@ -56,7 +44,11 @@ class HomeViewController: UIViewController, CGMTransmitterDelegate {
             timeStampLastBgReading = lastReading.timeStamp
         }
 
-        test = CGMMiaoMiaoTransmitter(addressAndName: BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: nil), delegate:self, timeStampLastBgReading: timeStampLastBgReading)
+        var addressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: nil)
+        if let address = UserDefaults.standard.bluetoothDeviceAddress, let name = UserDefaults.standard.bluetoothDeviceName {
+            addressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
+        }
+        test = CGMMiaoMiaoTransmitter(addressAndName: addressAndName, delegate:self, timeStampLastBgReading: timeStampLastBgReading)
 
         UNUserNotificationCenter.current().delegate = self
         
@@ -164,7 +156,7 @@ class HomeViewController: UIViewController, CGMTransmitterDelegate {
                             var latestReadings = BgReadings.getLatestBgReadings(howMany: 36, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
                             
                             var latestCalibrations = Calibrations.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
-                            
+
                             if latestCalibrations.count == 0 {
                                 let twoCalibrations = self.libre1Calibration.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, secondCalibrationTimeStamp: Date(), sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
                                 Calibrations.addCalibration(newCalibration: twoCalibrations.firstCalibration)
@@ -319,9 +311,17 @@ class HomeViewController: UIViewController, CGMTransmitterDelegate {
         }
     }
 
+    // MARK: - View Methods
+    
+    private func setupView() {
+        // Configure View
+        view.backgroundColor = UIColor(displayP3Red: 33, green: 33, blue: 33, alpha: 0)//#212121
+    }
+
+
 }
 
-extension HomeViewController: UNUserNotificationCenterDelegate {
+extension RootHomeViewController: UNUserNotificationCenterDelegate {
     
     //called when notification fired while app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
@@ -349,5 +349,29 @@ extension HomeViewController: UNUserNotificationCenterDelegate {
         }
     }
     
+    // MARK: - CGMTransmitterDelegate functions
+    
+    func cgmTransmitterDidConnect() {
+        if let address = test?.address, let name = test?.name {
+            self.address = address
+            self.name = name
+            UserDefaults.standard.bluetoothDeviceAddress = address
+            UserDefaults.standard.bluetoothDeviceName =  name
+        }
+    }
+    
+    func cgmTransmitterDidDisconnect() {
+        //TODO:- complete
+    }
+    
+    func didUpdateBluetoothState(state: CBManagerState) {
+        if state == .poweredOn {
+            if address == nil {
+                _ = test?.startScanning()
+            }
+        }
+    }
+    
+
 }
 

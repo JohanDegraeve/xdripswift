@@ -21,6 +21,9 @@
 		F8025E5021EE746400ECF0C0 /* CalibratorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4F21EE746400ECF0C0 /* CalibratorProtocol.swift */; };
 		F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */; };
 		F8025E5721F4A60900ECF0C0 /* CGMTransmitterProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E5621F4A60900ECF0C0 /* CGMTransmitterProtocol.swift */; };
+		F8025E6421F7BF3300ECF0C0 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E6321F7BF3300ECF0C0 /* UserDefaults.swift */; };
+		F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */; };
+		F8025E6D21F7CD7C00ECF0C0 /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E6C21F7CD7C00ECF0C0 /* UIViewController.swift */; };
 		F85DC2EB21CFE2F500B9F74A /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
@@ -30,8 +33,8 @@
 		F85DC2F821D2632F00B9F74A /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */; };
 		F85DC30121D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC30021D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
-		F8AC426021ADEBD60078C348 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* FirstViewController.swift */; };
-		F8AC426221ADEBD60078C348 /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC426121ADEBD60078C348 /* SecondViewController.swift */; };
+		F8AC426021ADEBD60078C348 /* RootHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* RootHomeViewController.swift */; };
+		F8AC426221ADEBD60078C348 /* RootSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC426121ADEBD60078C348 /* RootSettingsViewController.swift */; };
 		F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426321ADEBD60078C348 /* Main.storyboard */; };
 		F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */; };
@@ -60,6 +63,9 @@
 		F8025E4F21EE746400ECF0C0 /* CalibratorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibratorProtocol.swift; sourceTree = "<group>"; };
 		F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre1Calibrator.swift; sourceTree = "<group>"; };
 		F8025E5621F4A60900ECF0C0 /* CGMTransmitterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMTransmitterProtocol.swift; sourceTree = "<group>"; };
+		F8025E6321F7BF3300ECF0C0 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
+		F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIStoryboard.swift; sourceTree = "<group>"; };
+		F8025E6C21F7CD7C00ECF0C0 /* UIViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
 		F85DC2E521CFE2F500B9F74A /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -70,8 +76,8 @@
 		F85DC30021D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG4xDripTransmitter.swift; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F8AC425F21ADEBD60078C348 /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
-		F8AC426121ADEBD60078C348 /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
+		F8AC425F21ADEBD60078C348 /* RootHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeViewController.swift; sourceTree = "<group>"; };
+		F8AC426121ADEBD60078C348 /* RootSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootSettingsViewController.swift; sourceTree = "<group>"; };
 		F8AC426421ADEBD60078C348 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F8AC426621ADEBD70078C348 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F8AC426921ADEBD70078C348 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -109,10 +115,13 @@
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				F8025E6C21F7CD7C00ECF0C0 /* UIViewController.swift */,
+				F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */,
 				F8EA6C8121B723BC0082976B /* Date.swift */,
 				F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */,
 				F8025C1221DA683400ECF0C0 /* Data.swift */,
 				F8025E4D21ED450300ECF0C0 /* Double.swift */,
+				F8025E6321F7BF3300ECF0C0 /* UserDefaults.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -147,6 +156,38 @@
 			path = CGMBluetoothTransmitter;
 			sourceTree = "<group>";
 		};
+		F8025E5821F7860900ECF0C0 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				F8AC426121ADEBD60078C348 /* RootSettingsViewController.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		F8025E5921F7861200ECF0C0 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				F8AC425F21ADEBD60078C348 /* RootHomeViewController.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		F8025E5A21F7AFA100ECF0C0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		F8025E5B21F7AFC600ECF0C0 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F8AC426B21ADEBD70078C348 /* Info.plist */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		F85DC29B21CFCEB800B9F74A /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -174,8 +215,8 @@
 		F85DC2FA21D2CD3000B9F74A /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				F8AC425F21ADEBD60078C348 /* FirstViewController.swift */,
-				F8AC426121ADEBD60078C348 /* SecondViewController.swift */,
+				F8025E5921F7861200ECF0C0 /* Home */,
+				F8025E5821F7860900ECF0C0 /* Settings */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -234,14 +275,14 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
+				F8025E5B21F7AFC600ECF0C0 /* Supporting Files */,
+				F8025E5A21F7AFA100ECF0C0 /* Resources */,
 				F8EA6CA521BAD5AD0082976B /* Calibration */,
 				F85DC2FB21D2CD7000B9F74A /* Application Delegate */,
 				F8EA6C7521B474120082976B /* applicationdata */,
-				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
 				F8EA6C7D21B70DEA0082976B /* Constants */,
 				F8AC42D021B342910078C348 /* Core Data */,
 				F8025C0B21D9513400ECF0C0 /* Extensions */,
-				F8AC426B21ADEBD70078C348 /* Info.plist */,
 				F85DC2F621D25E3A00B9F74A /* Managers */,
 				F85DC2F921D2CCC000B9F74A /* Storyboards */,
 				F85DC2FC21D3E83100B9F74A /* Transmitter */,
@@ -396,11 +437,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
-				F8AC426221ADEBD60078C348 /* SecondViewController.swift in Sources */,
+				F8AC426221ADEBD60078C348 /* RootSettingsViewController.swift in Sources */,
+				F8025E6D21F7CD7C00ECF0C0 /* UIViewController.swift in Sources */,
 				F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */,
 				F85DC2EB21CFE2F500B9F74A /* Calibration+CoreDataProperties.swift in Sources */,
 				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
+				F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */,
 				F8025C0821D8DD1F00ECF0C0 /* CGMMiaoMiaoTransmitter.swift in Sources */,
 				F8025E4C21E6618200ECF0C0 /* Log.swift in Sources */,
 				F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */,
@@ -417,11 +460,12 @@
 				F8025E5721F4A60900ECF0C0 /* CGMTransmitterProtocol.swift in Sources */,
 				F85DC30121D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift in Sources */,
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
+				F8025E6421F7BF3300ECF0C0 /* UserDefaults.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* BluetoothTransmitter.swift in Sources */,
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
 				F8EA6CB321CD5DD90082976B /* SlopeParameters.swift in Sources */,
 				F8025C0F21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift in Sources */,
-				F8AC426021ADEBD60078C348 /* FirstViewController.swift in Sources */,
+				F8AC426021ADEBD60078C348 /* RootHomeViewController.swift in Sources */,
 				F8025C1A21DBC1B700ECF0C0 /* LibreSensorState.swift in Sources */,
 				F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */,
 				F8EA6C7F21B70E390082976B /* Constants.swift in Sources */,
@@ -575,7 +619,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8DKSZ5HNLB;
-				INFOPLIST_FILE = xdrip/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -584,7 +628,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -594,7 +638,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8DKSZ5HNLB;
-				INFOPLIST_FILE = xdrip/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -603,7 +647,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

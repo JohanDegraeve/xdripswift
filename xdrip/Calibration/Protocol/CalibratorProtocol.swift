@@ -510,7 +510,7 @@ extension CalibratorProtocol {
     ///     - withLast1Reading : last reading
     /// - returns:
     ///     - estimatedrawbg
-    public func getEstimatedRawBg(withTimeStamp timeStamp:Date, withLast1Reading last1Reading:BgReading) -> Double {
+    private func getEstimatedRawBg(withTimeStamp timeStamp:Date, withLast1Reading last1Reading:BgReading) -> Double {
         let timeStampInMs = timeStamp.toMillisecondsAsDouble()
         return (last1Reading.ra * timeStampInMs * timeStampInMs) + (last1Reading.rb * timeStampInMs) + last1Reading.rc
     }
