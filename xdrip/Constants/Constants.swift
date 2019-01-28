@@ -29,12 +29,16 @@ struct Constants {
         static let subSystem = "net.johandegraeve.beatit"
         /// for use in OSLog
         static let categoryBlueTooth = "bluetooth"
-        /// for use in cgm transmitter
+        /// for use in cgm transmitter miaomiao
         static let categoryCGMMiaoMiao = "cgmmiaomiao"
+        /// for use in cgm xdripg4
+        static let categoryCGMxDripG4 = "cgmxdripg4"
         /// for use in firstview
         static let categoryFirstView = "firstview"
         /// calibration
         static let calibration = "Calibration"
+        /// debuglogging
+        static let debuglogging = "xdripdebuglogging"
     }
     
     // identifiers for local notifications

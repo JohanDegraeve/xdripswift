@@ -47,8 +47,8 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName
         switch addressAndName {
-        case .alreadyConnectedBefore(let newAddress, let newName):
-            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: newAddress, name: newName)
+        case .alreadyConnectedBefore(let newAddress):
+            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: newAddress)
         case .notYetConnected:
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameMiaoMiao)
         }
@@ -119,9 +119,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
             
             //check type of message and process according to type
             if let firstByte = rxBuffer.first {
-                if let miaoMiaoResponseState = MiaoMiaoResponseState(rawValue: firstByte) {
+                if let miaoMiaoResponseState = MiaoMiaoResponseType(rawValue: firstByte) {
                     switch miaoMiaoResponseState {
-                    case .dataPacketReceived:
+                    case .dataPacket:
                         //if buffer complete, then start processing
                         if rxBuffer.count >= 363  {
                             os_log("in peripheral didUpdateValueFor, Buffer complete", log: log, type: .info)
@@ -135,7 +135,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                                 //get readings from buffer and send to delegate
                                 var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: miaoMiaoHeaderLength)
                                 //TODO: sort glucosedata before calling newReadingsReceived
-                                cgmTransmitterDelegate?.newReadingsReceived(glucoseData: &result.glucoseData, sensorState: result.sensorState, firmware: firmware, hardware: hardware, batteryPercentage: batteryPercentage, sensorTimeInMinutes: result.sensorTimeInMinutes)
+                                cgmTransmitterDelegate?.newReadingsReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: batteryPercentage, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: firmware, hardware: hardware)
                                 
                                 // set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
                                 if result.glucoseData.count > 0 {
@@ -195,17 +195,17 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     
 }
 
-fileprivate enum MiaoMiaoResponseState: UInt8 {
-    case dataPacketReceived = 0x28
+fileprivate enum MiaoMiaoResponseType: UInt8 {
+    case dataPacket = 0x28
     case newSensor = 0x32
     case noSensor = 0x34
     case frequencyChangedResponse = 0xD1
 }
 
-extension MiaoMiaoResponseState: CustomStringConvertible {
+extension MiaoMiaoResponseType: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .dataPacketReceived:
+        case .dataPacket:
             return "Data packet received"
         case .newSensor:
             return "New sensor detected"

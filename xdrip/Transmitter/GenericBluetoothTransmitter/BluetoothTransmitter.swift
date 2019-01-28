@@ -47,19 +47,18 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - Initialization
     
     /// - parameters:
-    ///     -  addressAndName: if we never connected to a device, then we don't know it's name and address as the Device itself is going to send. We can only have an expectedName which is what needs to be added then in the argument
+    ///     -  addressAndName: if we never connected to a device, then we don't know it's address as the Device itself is going to send. We can only have an expectedName which is what needs to be added then in the argument
     ///         * example for G5, if transmitter id is ABCDEF, we expect as devicename DexcomEF.
     ///         * For an xDrip or xBridge, we don't expect a specific devicename, in which case the value stays nil
-    ///         * If we already connected to a device before, then we know it's name and address
+    ///         * If we already connected to a device before, then we know it's address
     ///     - CBUUID_Advertisement: UUID to use for scanning, if nil  then app will scan for all devices. (Example Blucon, MiaoMiao, should be nil value. For G5 it should have a value. For xDrip it will probably work with or without. Main difference is that if no advertisement UUID is specified, then app is not allowed to scan will in background. For G5 this can create problem for first time connect, because G5 only transmits every 5 minutes, which means the app would need to stay in the foreground for at least 5 minutes.
     ///     - CBUUID_Service: service uuid
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
     init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, CBUUID_Service:String, CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String) {
         switch addressAndName {
-        case .alreadyConnectedBefore(let newAddress, let newName):
+        case .alreadyConnectedBefore(let newAddress):
             address = newAddress
-            name = newName
         case .notYetConnected(let newexpectedName):
             expectedName = newexpectedName
         }
@@ -348,13 +347,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         case Other(reason:String)
     }
     
-    /// * if we never connected to a device, then we don't know it's name and address as the Device itself is going to send. We can only have an expected name,
+    /// * if we never connected to a device, then we don't know it's address as the Device itself is going to send. We can only have an expected name,
     ///     * example for G5, if transmitter id is ABCDEF, we expect as devicename DexcomEF.
     ///     * For an xDrip bridge, we don't expect a specific devicename, in which case the value stays nil
-    /// * If we already connected to a device before, then we know it's name and address
+    /// * If we already connected to a device before, then we know it's address
     enum DeviceAddressAndName {
-        /// we already connected to the device so we should know the address and name as used by the device
-        case alreadyConnectedBefore (address:String, name:String)
+        /// we already connected to the device so we should know the address
+        case alreadyConnectedBefore (address:String)
         /// * We never connected to the device, so we don't know it's name and address as the Device itself is going to send. We can only have an expected name,
         ///     * example for G5, if transmitter id is ABCDEF, we expect as devicename DexcomEF.
         ///     * For an xDrip bridge, we don't expect a specific devicename, in which case the value stays nil

@@ -2,7 +2,8 @@ The algorithms folder has protocols and classes which define the Calibration. On
 Also no read of access to data defined in other classes, the necessary data is passed when calling the functions.
 
 For a new type of Sensor (only Libre and Dexcom at the moment), a new class needs to be created that conforms to the protocol CalibratorProtocol and then defines only the variables sParams and ageAdjustMentNeeded.<br>
-For the moment only Libre1Calibrator.swift exists
+
+To use the CalibratorProtocol, the functions are initialCalibration, createNewBgReading, createNewCalibration
 
 <b>protocol CalibratorProtocol</b><br>
 

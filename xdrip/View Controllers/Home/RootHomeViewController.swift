@@ -6,7 +6,7 @@ import UserNotifications
 
 final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
     // MARK: - Properties
-    var test:CGMMiaoMiaoTransmitter?
+    var test:CGMG4xDripTransmitter?
     
     var address:String?
     var name:String?
@@ -18,7 +18,7 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
     // TODO: move to other location ?
     private var coreDataManager = CoreDataManager(modelName: "xdrip")
     
-    private var libre1Calibration = Libre1Calibrator()
+    private var calibrator = DexcomCalibrator()
     
     // MARK: - temporary properties
     var activeSensor:Sensor?
@@ -44,11 +44,11 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
             timeStampLastBgReading = lastReading.timeStamp
         }
 
-        var addressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: nil)
-        if let address = UserDefaults.standard.bluetoothDeviceAddress, let name = UserDefaults.standard.bluetoothDeviceName {
-            addressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
+        var address:String? = nil
+        if let storedAddress = UserDefaults.standard.bluetoothDeviceAddress {
+            address = storedAddress
         }
-        test = CGMMiaoMiaoTransmitter(addressAndName: addressAndName, delegate:self, timeStampLastBgReading: timeStampLastBgReading)
+        test = CGMG4xDripTransmitter(address: address, transmitterID: "6LSDU", delegate:self)
 
         UNUserNotificationCenter.current().delegate = self
         
@@ -93,17 +93,17 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
     
     /// - parameters:
     ///     - readings: first entry is the most recent
-    func newReadingsReceived(glucoseData: inout [RawGlucoseData], sensorState: LibreSensorState, firmware: String, hardware: String, batteryPercentage: Int, sensorTimeInMinutes: Int) {
-        os_log("sensorstate %{public}@", log: log!, type: .debug, sensorState.description)
-        os_log("firmware %{public}@", log: log!, type: .debug, firmware)
-        os_log("hardware %{public}@", log: log!, type: .debug, hardware)
-        os_log("battery percentage  %{public}d", log: log!, type: .debug, batteryPercentage)
-        os_log("sensor time in minutes  %{public}d", log: log!, type: .debug, sensorTimeInMinutes)
+    func newReadingsReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: Int?, sensorState: LibreSensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?) {
+        os_log("sensorstate %{public}@", log: log!, type: .debug, sensorState?.description ?? "no sensor state found")
+        os_log("firmware %{public}@", log: log!, type: .debug, firmware ?? "no firmware version found")
+        os_log("hardware %{public}@", log: log!, type: .debug, hardware ?? "no firmware version found")
+        os_log("transmitterBatteryInfo  %{public}d", log: log!, type: .debug, transmitterBatteryInfo ?? 0)
+        os_log("sensor time in minutes  %{public}d", log: log!, type: .debug, sensorTimeInMinutes ?? 0)
         for (index, reading) in glucoseData.enumerated() {
             os_log("Reading %{public}d, raw level = %{public}f, realDate = %{public}s", log: log!, type: .debug, index, reading.glucoseLevelRaw, reading.timeStamp.description)
         }
 
-        temptesting(glucoseData: &glucoseData, sensorState: sensorState, firmware: firmware, hardware: hardware, batteryPercentage: batteryPercentage, sensorTimeInMinutes: sensorTimeInMinutes)
+        temptesting(glucoseData: &glucoseData, sensorState: sensorState, firmware: firmware, hardware: hardware, batteryPercentage: transmitterBatteryInfo, sensorTimeInMinutes: sensorTimeInMinutes)
     }
     
     /// request notification authorization to the user for alert, sound and badge
@@ -158,14 +158,14 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
                             var latestCalibrations = Calibrations.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
 
                             if latestCalibrations.count == 0 {
-                                let twoCalibrations = self.libre1Calibration.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, secondCalibrationTimeStamp: Date(), sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
+                                let twoCalibrations = self.calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
                                 Calibrations.addCalibration(newCalibration: twoCalibrations.firstCalibration)
                                 Calibrations.addCalibration(newCalibration: twoCalibrations.secondCalibration)
                             } else {
                                 let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
 
                                 if let firstCalibrationForActiveSensor = firstCalibrationForActiveSensor {
-                                    let newCalibration = self.libre1Calibration.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
+                                    let newCalibration = self.calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
                                     Calibrations.addCalibration(newCalibration: newCalibration)
                                 }
                             }
@@ -181,13 +181,23 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
         self.present(alert, animated: true)
     }
     
-    private func temptesting(glucoseData: inout [RawGlucoseData], sensorState: LibreSensorState, firmware: String, hardware: String, batteryPercentage: Int, sensorTimeInMinutes: Int) {
-        if activeSensor == nil {
+    private func temptesting(glucoseData: inout [RawGlucoseData], sensorState: LibreSensorState?, firmware: String?, hardware: String?, batteryPercentage: Int?, sensorTimeInMinutes: Int?) {
+        
+        //this is for testing MiaoMiao
+        /*if activeSensor == nil {
             activeSensor = Sensor(startDate: Date(timeInterval: -Double(sensorTimeInMinutes * 60), since: Date()),nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
             if let activeSensor = activeSensor {
                 os_log("created sensor with id : %{public}@ and startdate  %{public}@", log: self.log!, type: .info, activeSensor.id, activeSensor.startDate.description)
             } else {
                 os_log("creation active sensor failed", log: self.log!, type: .info)
+            }
+        }*/
+        
+        if activeSensor == nil {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            if let startDate = dateFormatter.date(from: "2019-01-28 16:00:00") {
+                activeSensor = Sensor(startDate: startDate, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
             }
         }
         
@@ -199,7 +209,7 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
                 let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
                 let lastCalibrationForActiveSensor = Calibrations.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
                 
-                let newBgReading = self.libre1Calibration.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                let newBgReading = self.calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                 
                 debuglogging("newBgReading.calculatedValue = " + newBgReading.calculatedValue.description)
                 
@@ -329,7 +339,7 @@ extension RootHomeViewController: UNUserNotificationCenterDelegate {
 
         if notification.request.identifier == Constants.NotificationIdentifiers.initialCalibrationRequest {
             //calibration request was fired, no need to show the notification, show immediately the calibration dialog
-            os_log("userNotificationCenter didReceive, user pressed calibration notification", log: log!, type: .info)
+            os_log("userNotificationCenter didReceive, user pressed calibration notification or app was open the moment the notification was fired", log: log!, type: .info)
             requestCalibration()
         }
     }

@@ -1,23 +1,101 @@
-//
-//  Data.swift
-//  LibreMonitor
-//
-//  Created by Uwe Petersen on 18.03.18.
-//  Copyright © 2018 Uwe Petersen. All rights reserved.
-//
-
 import Foundation
 
-
-// From Stackoverflow, see https://stackoverflow.com/questions/39075043/how-to-convert-data-to-hex-string-in-swift
 extension Data {
     private static let hexAlphabet = "0123456789abcdef".unicodeScalars.map { $0 }
     
+    // String conversion methods, adapted from https://stackoverflow.com/questions/40276322/hex-binary-string-conversion-in-swift/40278391#40278391
+    /// initializer with hexadecimalstring as input
+    init?(hexadecimalString: String) {
+        self.init(capacity: hexadecimalString.utf16.count / 2)
+        
+        // Convert 0 ... 9, a ... f, A ...F to their decimal value,
+        // return nil for all other input characters
+        func decodeNibble(u: UInt16) -> UInt8? {
+            switch u {
+            case 0x30 ... 0x39:  // '0'-'9'
+                return UInt8(u - 0x30)
+            case 0x41 ... 0x46:  // 'A'-'F'
+                return UInt8(u - 0x41 + 10)  // 10 since 'A' is 10, not 0
+            case 0x61 ... 0x66:  // 'a'-'f'
+                return UInt8(u - 0x61 + 10)  // 10 since 'a' is 10, not 0
+            default:
+                return nil
+            }
+        }
+        
+        var even = true
+        var byte: UInt8 = 0
+        for c in hexadecimalString.utf16 {
+            guard let val = decodeNibble(u: c) else { return nil }
+            if even {
+                byte = val << 4
+            } else {
+                byte += val
+                self.append(byte)
+            }
+            even = !even
+        }
+        guard even else { return nil }
+    }
+    
+    // From Stackoverflow, see https://stackoverflow.com/questions/39075043/how-to-convert-data-to-hex-string-in-swift
+    /// conert to hexencoded string
     public func hexEncodedString() -> String {
         return String(self.reduce(into: "".unicodeScalars, { (result, value) in
             result.append(Data.hexAlphabet[Int(value/16)])
             result.append(Data.hexAlphabet[Int(value%16)])
         }))
     }
+    
+    /*var hexadecimalString: String {
+        return map { String(format: "%02hhx", $0) }.joined()
+    }*/
+    
+    
+    /*var uint8: UInt8 {
+        get {
+            var number: UInt8 = 0
+            self.getBytes(&number, length: MemoryLayout.size(ofValue: number))
+            return number
+        }
+    }
+    
+    var uint16: UInt16 {
+        get {
+            var number: UInt16 = 0
+            self.getBytes(&number, length: MemoryLayout.size(ofValue: number))
+            return number
+        }
+    }*/
+    
+    ///takes 4 bytes starting at position and converts to Uint32
+    func uint32 (position:Int)-> UInt32 {
+        let start = position
+        let end = start.advanced(by: 4)
+        let number: UInt32 =  self.subdata(in: start..<end).toInt()
+        return number
+    }
+
+    ///takes 2 bytes starting at position and converts to Uint16
+    func uint16 (position:Int)-> UInt16 {
+        let start = position
+        let end = start.advanced(by: 2)
+        let number: UInt16 =  self.subdata(in: start..<end).toInt()
+        return number
+    }
+    
+    //source Data.Swift CGMBLEKit
+    func to<T: FixedWidthInteger>(_: T.Type) -> T {
+        return self.withUnsafeBytes { (bytes: UnsafePointer<T>) in
+            return T(littleEndian: bytes.pointee)
+        }
+    }
+
+    func toInt<T: FixedWidthInteger>() -> T {
+        return to(T.self)
+    }
+    
 }
+
+
 

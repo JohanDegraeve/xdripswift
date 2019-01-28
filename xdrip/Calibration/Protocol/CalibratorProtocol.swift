@@ -11,15 +11,14 @@ protocol CalibratorProtocol {
     /// creates two calibrations, stored in the database, but context not saved. Also readings will be adpated, also not saved.
     /// - parameters:
     ///     - firstCalibrationBgValue: the first (ie the oldest) calibration value
-    ///     - secondCalibrationBgValue: the second (ie the youngest) calibration value
-    ///     - firstCalibrationTimeStamp: timestamp of the first calibration
-    ///     - secondCalibrationTimeStamp: timestamp of the second calibration
+    ///     - secondCalibrationBgValue: the second (ie the youngest) calibration value (if you don't like to ask the user two calibrations with a delay of 5 minutes each, then use the same bg value for second as first)
+    ///     - firstCalibrationTimeStamp: timestamp of the first calibration (ie should be the one of 5 minutes ago, except if you use only one calibration)
     ///     - sensor: the current sensor
     ///     - lastBgReadingsWithCalculatedValue0AndForSensor : the readings that need to be adjusted after the calibration, first is the youngest, result of call to BgReadings.getLatestBgtReadings with ignoreRawData: false, ignoreCalculatedValue: true, minimum 2
     ///     - nsManagedObjectContext: the nsmanagedobject context in which calibration should be created
     /// - returns:
     ///     - two Calibrations, stored in the context but context not saved. The first calibration and second
-    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, secondCalibrationTimeStamp:Date, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration, secondCalibration: Calibration)
+    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration, secondCalibration: Calibration)
 
     /// create a new BgReading
     /// - parameters:
@@ -48,16 +47,15 @@ extension CalibratorProtocol {
     /// creates two calibrations, stored in the database, but context not saved. Also readings will be adpated, also not saved.
     ///
     /// - parameters:
-    ///     - firstCalibrationBgValue: the first (ie the oldest) calibration value
-    ///     - secondCalibrationBgValue: the second (ie the youngest) calibration value
+    ///     - firstCalibrationBgValue: the first (ie the oldest) calibration value, usually one of 5 minutes ago
+    ///     - secondCalibrationBgValue: the second (ie the youngest) calibration value, should be a value taken 5 minutes later than the first, if that's too much trouble, take the same value as the firstCalibrationBgValue
     ///     - firstCalibrationTimeStamp: timestamp of the first calibration
-    ///     - secondCalibrationTimeStamp: timestamp of the second calibration
     ///     - sensor: the current sensor
     ///     - lastBgReadingsWithCalculatedValue0AndForSensor : the readings that need to be adjusted after the calibration, first is the youngest, result of call to BgReadings.getLatestBgtReadings with ignoreRawData: false, ignoreCalculatedValue: true, minimum 2
     ///     - nsManagedObjectContext: the nsmanagedobject context in which calibration should be created
     /// - returns:
     ///     - two Calibrations, stored in the context but context not saved. The first calibration and second
-    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, secondCalibrationTimeStamp:Date, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration, secondCalibration: Calibration){
+    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration, secondCalibration: Calibration){
         
         let bgReading1 = lastBgReadingsWithCalculatedValue0AndForSensor[0]
         let bgReading2 = lastBgReadingsWithCalculatedValue0AndForSensor[1]
@@ -66,7 +64,9 @@ extension CalibratorProtocol {
         bgReading2.calculatedValue = secondCalibrationBgValue
         bgReading2.calibrationFlag = true
         
-        debuglogging("bgReading 1 = " + bgReading1.log("") + "\nbgReading2 = " + bgReading2.log(""))
+        let secondCalibrationTimeStamp = Date(timeInterval: (5*60), since: firstCalibrationTimeStamp)
+        
+        //debuglogging("bgReading 1 = " + bgReading1.log("") + "\nbgReading2 = " + bgReading2.log(""))
         
         var last2Readings = Array(lastBgReadingsWithCalculatedValue0AndForSensor.prefix(2))
         
@@ -75,7 +75,7 @@ extension CalibratorProtocol {
         findNewCurve(for: bgReading2, last3Readings: &last2Readings)
         findNewRawCurve(for: bgReading2, last3Readings: &last2Readings)
         
-        debuglogging("after find new curves, bgReading 1 = " + bgReading1.log("") + "bgReading2 = " + bgReading2.log(""))
+        //debuglogging("after find new curves, bgReading 1 = " + bgReading1.log("") + "bgReading2 = " + bgReading2.log(""))
         
         let calibration1 = Calibration(timeStamp: firstCalibrationTimeStamp, sensor: sensor, bg: firstCalibrationBgValue, rawValue: bgReading1.rawData, adjustedRawValue: bgReading1.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * firstCalibrationBgValue * firstCalibrationBgValue) + (0.6657 * firstCalibrationBgValue) + 36.7505) / 100, rawTimeStamp: bgReading1.timeStamp, slope: 1, intercept: firstCalibrationBgValue, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading1.ageAdjustedRawValue, slopeConfidence: 0.5, nsManagedObjectContext: nsManagedObjectContext)
         var tempCalibrationArray:Array<Calibration> = []
@@ -96,7 +96,7 @@ extension CalibratorProtocol {
         //reset calculatedValue in bgReading1 and bgReading2, they will be getting a real calculated value in adjustRecentBgReadings
         bgReading1.calculatedValue = 0.0
         bgReading2.calculatedValue = 0.0
-        adjustRecentBgReadings(readingsToBeAdjusted: &lastBgReadingsWithCalculatedValue0AndForSensor, calibrations: &tempCalibrationArray)
+        adjustRecentBgReadings(readingsToBeAdjusted: &lastBgReadingsWithCalculatedValue0AndForSensor, calibrations: &tempCalibrationArray, overwriteCalculatedValue: false)
         
         return (calibration1, calibration2)
     }
@@ -169,7 +169,7 @@ extension CalibratorProtocol {
         lastBgReading.calibrationFlag = true
         
         var temp = [lastBgReading]
-        adjustRecentBgReadings(readingsToBeAdjusted: &temp, calibrations: &lastCalibrationsForActiveSensorInLastXDays)
+        adjustRecentBgReadings(readingsToBeAdjusted: &temp, calibrations: &lastCalibrationsForActiveSensorInLastXDays, overwriteCalculatedValue: true)
         
         return calibration
     }
@@ -178,14 +178,20 @@ extension CalibratorProtocol {
     /// - parameters:
     ///     - readingsToBeAdjusted: must be the latest readings
     ///     - calibrations: latest calibrations, timestamp large to small (ie young to old). There should be minimum 2 calibrations, if less then the function will not do anything.
-    private func adjustRecentBgReadings(readingsToBeAdjusted:inout Array<BgReading>, calibrations:inout Array<Calibration>) {
+    ///     - overwriteCalculatedValue: if true, then if calculatedValue of readingsToBeAdjusted will be overriden, if false, then only readingsToBeAdjusted with calculatedValue = 0.0 will be overwritten
+    private func adjustRecentBgReadings(readingsToBeAdjusted:inout Array<BgReading>, calibrations:inout Array<Calibration>, overwriteCalculatedValue:Bool) {
         //TODO: shouldn't this also add calibrations to those readings who don't have one yet ?
+        
+        guard calibrations.count > 0 else {
+           return
+        }
+        let latestCalibration = calibrations[0]
+        
         if (calibrations.count > 2) {
             let denom = Double(readingsToBeAdjusted.count)
-            let latestCalibration = calibrations[0]
             var i = 0.0
             loop: for index in 0..<readingsToBeAdjusted.count {
-                if readingsToBeAdjusted[index].calculatedValue != 0.0 {
+                if readingsToBeAdjusted[index].calculatedValue != 0.0 && !overwriteCalculatedValue {
                     //no further processing needed, all next readings should have a value != 0
                     break loop
                 } else {
@@ -196,9 +202,8 @@ extension CalibratorProtocol {
                 }
             }
         } else if (calibrations.count == 2) {
-            let latestCalibration = calibrations[0]
             loop: for index in 0..<readingsToBeAdjusted.count {
-                if readingsToBeAdjusted[index].calculatedValue != 0.0 {
+                if readingsToBeAdjusted[index].calculatedValue != 0.0 && !overwriteCalculatedValue {
                     //no further processing needed, all next readings should have a value != 0
                     break loop
                 } else {

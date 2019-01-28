@@ -42,6 +42,7 @@ public class BgReading: NSManagedObject {
     /// log the contents to a string
     public func log(_ indentation:String) -> String {
         var r:String = "bgreading = "
+        r += "\n" + indentation + "timestamp = " + timeStamp.description + "\n"
         r += "\n" + indentation + "uniqueid = " + id
         r += "\n" + indentation + "a = " + a.description
         r += "\n" + indentation + "ageAdjustedRawValue = " + ageAdjustedRawValue.description
@@ -63,7 +64,6 @@ public class BgReading: NSManagedObject {
         if let sensor = sensor {
             r += "\n" + indentation + "sensor = " + sensor.log(indentation: "      ")
         }
-        r += "\n" + indentation + "timestamp = " + timeStamp.description + "\n"
         return r
     }
 }

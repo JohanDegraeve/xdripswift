@@ -1,6 +1,7 @@
 import Foundation
 
 struct SlopeParameters {
+    //TODO: move this to somewhere else ?
     var LOW_SLOPE_1:Double
     var LOW_SLOPE_2:Double
     var HIGH_SLOPE_1:Double

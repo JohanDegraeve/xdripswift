@@ -1,8 +1,8 @@
 import Foundation
 import os
 
-var log:OSLog = {
-    let log:OSLog = OSLog(subsystem: Constants.Log.subSystem, category: "xdripdebuglogging")
+fileprivate var log:OSLog = {
+    let log:OSLog = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.debuglogging)
     return log
 }()
 
