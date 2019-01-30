@@ -2,12 +2,14 @@ import Foundation
 
 //https://stackoverflow.com/questions/32305891/index-of-a-substring-in-a-string-with-swift/32306142
 extension StringProtocol where Index == String.Index {
-    func index(of string: Self, options: String.CompareOptions = []) -> Index? {
+    fileprivate func index(of string: Self, options: String.CompareOptions = []) -> Index? {
         return range(of: string, options: options)?.lowerBound
     }
-    func endIndex(of string: Self, options: String.CompareOptions = []) -> Index? {
+    fileprivate func endIndex(of string: Self, options: String.CompareOptions = []) -> Index? {
         return range(of: string, options: options)?.upperBound
     }
+    
+    ///can be used to split a string in array of strings, splitted by other string
     func indexes(of string: Self, options: String.CompareOptions = []) -> [Index] {
         var result: [Index] = []
         var start = startIndex
@@ -19,7 +21,7 @@ extension StringProtocol where Index == String.Index {
         }
         return result
     }
-    func ranges(of string: Self, options: String.CompareOptions = []) -> [Range<Index>] {
+    fileprivate func ranges(of string: Self, options: String.CompareOptions = []) -> [Range<Index>] {
         var result: [Range<Index>] = []
         var start = startIndex
         while start < endIndex,

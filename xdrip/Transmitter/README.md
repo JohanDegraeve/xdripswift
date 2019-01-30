@@ -39,7 +39,7 @@
 	- [Functions in CGM Transmitter classes](#functionsincgmtransmitterclasses)
 		- [canDetectNewSensor](#canDetectNewSensor)
 - [Available CGM transmitter classes](#availablecgmtransmitterclasses)
-	- [CGMMiaoMiaoTransmitter](#CGMMiaoMiaoTransmitter)
+	- [MiaoMiao](#MiaoMiao)
 	- [xDripG4](#xDripG4)
 	
 
@@ -225,11 +225,11 @@ can the cgm transmitter detect a new sensor ?
 
 # <a name="availablecgmtransmitterclasses"></a>Available CGM transmitter classes
 
-## <a name="CGMMiaoMiaoTransmitter"></a>CGMMiaoMiaoTransmitter 
+## <a name="MiaoMiao"></a>MiaoMiao 
 
 MiaoMiao transmitter is fully implemented
 
-## <a name="CGMG4xDripTransmitter"></a>CGMG4xDripTransmitter
+## <a name="xDripG4"></a>xDripG4
 
 Still to be completed.
 

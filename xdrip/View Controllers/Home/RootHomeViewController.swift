@@ -159,8 +159,10 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
 
                             if latestCalibrations.count == 0 {
                                 let twoCalibrations = self.calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
-                                Calibrations.addCalibration(newCalibration: twoCalibrations.firstCalibration)
-                                Calibrations.addCalibration(newCalibration: twoCalibrations.secondCalibration)
+                                if let firstCalibration = twoCalibrations.firstCalibration, let secondCalibration = twoCalibrations.secondCalibration {
+                                    Calibrations.addCalibration(newCalibration: firstCalibration)
+                                    Calibrations.addCalibration(newCalibration: secondCalibration)
+                                }
                             } else {
                                 let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
 
@@ -381,7 +383,5 @@ extension RootHomeViewController: UNUserNotificationCenterDelegate {
             }
         }
     }
-    
-
 }
 

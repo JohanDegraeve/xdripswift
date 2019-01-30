@@ -17,8 +17,8 @@ protocol CalibratorProtocol {
     ///     - lastBgReadingsWithCalculatedValue0AndForSensor : the readings that need to be adjusted after the calibration, first is the youngest, result of call to BgReadings.getLatestBgtReadings with ignoreRawData: false, ignoreCalculatedValue: true, minimum 2
     ///     - nsManagedObjectContext: the nsmanagedobject context in which calibration should be created
     /// - returns:
-    ///     - two Calibrations, stored in the context but context not saved. The first calibration and second
-    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration, secondCalibration: Calibration)
+    ///     - two Calibrations, stored in the context but context not saved. The first calibration and second. Can be nil values, if anything goes wrong in the algorithm
+    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration?, secondCalibration: Calibration?)
 
     /// create a new BgReading
     /// - parameters:
@@ -55,7 +55,11 @@ extension CalibratorProtocol {
     ///     - nsManagedObjectContext: the nsmanagedobject context in which calibration should be created
     /// - returns:
     ///     - two Calibrations, stored in the context but context not saved. The first calibration and second
-    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration, secondCalibration: Calibration){
+    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration?, secondCalibration: Calibration?){
+        
+        guard lastBgReadingsWithCalculatedValue0AndForSensor.count > 1 else {
+            return (nil,nil)
+        }
         
         let bgReading1 = lastBgReadingsWithCalculatedValue0AndForSensor[0]
         let bgReading2 = lastBgReadingsWithCalculatedValue0AndForSensor[1]
@@ -181,10 +185,10 @@ extension CalibratorProtocol {
     ///     - overwriteCalculatedValue: if true, then if calculatedValue of readingsToBeAdjusted will be overriden, if false, then only readingsToBeAdjusted with calculatedValue = 0.0 will be overwritten
     private func adjustRecentBgReadings(readingsToBeAdjusted:inout Array<BgReading>, calibrations:inout Array<Calibration>, overwriteCalculatedValue:Bool) {
         //TODO: shouldn't this also add calibrations to those readings who don't have one yet ?
-        
         guard calibrations.count > 0 else {
            return
         }
+        
         let latestCalibration = calibrations[0]
         
         if (calibrations.count > 2) {

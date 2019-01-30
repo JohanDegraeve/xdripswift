@@ -20,6 +20,9 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     /// for OS_log
     private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCGMxDripG4)
     
+    /// transmitterId
+    private let transmitterId:String
+    
     // MARK: - functions
     
     /// - parameters:
@@ -35,6 +38,9 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         
         //assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate
+        
+        //assign transmitterId
+        self.transmitterId = transmitterID
 
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G4, CBUUID_Service: CBUUID_Service_G4, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_G4, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_G4)
         
@@ -91,27 +97,48 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
 
         switch XdripResponseType(rawValue: value[1]) {
         case .dataPacket?:
-            //packet length should be 17
-            guard packetLength == 17 else {
-                //value doesn't start with a known xdripresponsetype
-                os_log("in peripheral didUpdateValueFor, packet length is not 17,  no further processing", log: log, type: .info)
+            //process value and get result
+            let result = processxBridgeDataPacket(value: value)
+                
+            // check transmitterid, if not correct write correct value and return
+            if let data = checkTransmitterId(receivedTransmitterId: result.transmitterID, expectedTransmitterId: self.transmitterId, log: log) {
+                os_log("in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, type: .info, self.transmitterId)
+                _ = writeDataToPeripheral(data: data, type: .withoutResponse)//no need to log the result, this is already logged in BluetoothTransmitter.swift
                 return
             }
             
-            //process value and get result, send it to delegate
-            let result = processxDripData(value: value)
+            // Data packet Acknowledgement, to put wixel to sleep
+            _ = writeDataToPeripheral(data: Data(bytes: [0x02,0xF0]), type: .withoutResponse)
+            
             if let glucoseData = result.glucoseData {
                 var glucoseDataArray = [glucoseData]
                 cgmTransmitterDelegate?.newReadingsReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: result.transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
             }
         case .beaconPacket?:
             os_log("in peripheral didUpdateValueFor, received beaconPacket", log: log, type: .info)
+            
+            //packet length should be 7
+            guard packetLength == 7 else {
+                os_log("in peripheral didUpdateValueFor, packet length is not 7,  no further processing", log: log, type: .info)
+                return
+            }
+
+            //read txid
+            let receivedTransmitterId = decodeTxID(TxID: value.uint32(position: 2))
+            os_log("in peripheral didUpdateValueFor, received beaconPacket with txid %{public}@", log: log, type: .info, receivedTransmitterId)
+            
+            // check transmitterid, if not correct write correct value
+            if let data = checkTransmitterId(receivedTransmitterId: receivedTransmitterId, expectedTransmitterId: self.transmitterId, log: log) {
+                os_log("in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, type: .info, self.transmitterId)
+                _ = writeDataToPeripheral(data: data, type: .withoutResponse)//no need to log the result, this is already logged in BluetoothTransmitter.swift
+                return
+            }
         default:
             //value doesn't start with a known xdripresponsetype
             os_log("unknown packet type, looks like an xdrip with old wxl code which starts with the raw_data encoded.", log: log, type: .info)
             
             //process value and get result, send it to delegate
-            let result = processBasicXdripData(value: value)
+            let result = processBasicXdripDataPacket(value: value)
             if let glucoseData = result.glucoseData {
                 var glucoseDataArray = [glucoseData]
                 cgmTransmitterDelegate?.newReadingsReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: result.transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
@@ -124,12 +151,18 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         return false
     }
     
-    // MARK: - helper functions
+    // MARK: helper functions
     
-    private func processxDripData(value:Data) -> (glucoseData:RawGlucoseData?, transmitterBatteryInfo:Int?) {
+    private func processxBridgeDataPacket(value:Data) -> (glucoseData:RawGlucoseData?, transmitterBatteryInfo:Int?, transmitterID:String?) {
+        guard value.count >= 10 else {
+            os_log("processxBridgeDataPacket, value.count = %{public}d, expecting minimum 10 so that we can find at least rawdata and filtereddata", log: log, type: .info, value.count)
+            return (nil, nil, nil)
+        }
+        
         //initialize returnvalues
         var glucoseData:RawGlucoseData?
         var transmitterBatteryInfo:Int?
+        var transmitterID:String?
         
         //get rawdata
         let rawData = value.uint32(position: 2)
@@ -137,15 +170,20 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         //get filtereddata
         let filteredData = value.uint32(position: 6)
         
-        //get transmitter battery volrage
-        transmitterBatteryInfo = Int(value[10])
+        //get transmitter battery voltage, only if value size is big enough to hold it
+        if value.count >= 11 {
+            transmitterBatteryInfo = Int(value[10])
+        }
         
-        os_log("in peripheral didUpdateValueFor, dataPacket received with rawData = %{public}d and filteredData = %{public}d  and transmitterBatteryInfo = %{public}d", log: log, type: .info, rawData, filteredData, transmitterBatteryInfo ?? 0)
+        //get transmitterID, only if value size is big enough to hold it
+        if value.count >= 16 {
+            transmitterID = decodeTxID(TxID: value.uint32(position: 12))
+        }
         
         //create glucosedata
         glucoseData = RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: Double(rawData), glucoseLevelFiltered: Double(filteredData))
 
-        return (glucoseData, transmitterBatteryInfo)
+        return (glucoseData, transmitterBatteryInfo, transmitterID)
     }
     
     ///Supports for example xdrip delivered by xdripkit.co.uk
@@ -155,7 +193,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     ///Example 123632 218 0
     ///
     ///Those packets don't start with a fixed packet length and packet type, as they start with representation of an Integer
-    private func processBasicXdripData(value:Data) -> (glucoseData:RawGlucoseData?, transmitterBatteryInfo:Int?) {
+    private func processBasicXdripDataPacket(value:Data) -> (glucoseData:RawGlucoseData?, transmitterBatteryInfo:Int?) {
         //initialize returnvalues
         var glucoseData:RawGlucoseData?
         var transmitterBatteryInfo:Int?
@@ -191,7 +229,64 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
 
 fileprivate enum XdripResponseType: UInt8 {
     case dataPacket = 0x00
-    case beaconPacket = 0xD6
+    case beaconPacket = 0xF1
+}
+
+// MARK: functions and properties to encode and decode transmitterid
+
+fileprivate let srcNameTable:Array = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "U", "W", "X", "Y" ]
+
+fileprivate func encodeTxID(TxID:String) -> (UInt8, UInt8, UInt8, UInt8 ) {
+    var returnValue:UInt32 = 0
+    let tmpSrc:String = TxID.uppercased()
+    returnValue |= getSrcValue(ch: tmpSrc[0..<1]) << 20
+    returnValue |= getSrcValue(ch: tmpSrc[1..<2]) << 15
+    returnValue |= getSrcValue(ch: tmpSrc[2..<3]) << 10
+    returnValue |= getSrcValue(ch: tmpSrc[3..<4]) << 5
+    returnValue |= getSrcValue(ch: tmpSrc[4..<5])
+    let firstByte = UInt8(returnValue & 0x000000FF)
+    let secondByte = UInt8((returnValue & 0x0000FF00) >> 8)
+    let thirdByte = UInt8((returnValue & 0x00FF0000) >> 16)
+    let forthByte = UInt8((returnValue & 0xFF000000) >> 24)
+    return (firstByte, secondByte, thirdByte, forthByte)
+}
+
+fileprivate func decodeTxID(TxID:UInt32) -> String {
+    var returnValue:String = ""
+    returnValue += srcNameTable[(Int)((TxID >> 20) & 0x1F)]
+    returnValue += srcNameTable[(Int)((TxID >> 15) & 0x1F)]
+    returnValue += srcNameTable[(Int)((TxID >> 10) & 0x1F)]
+    returnValue += srcNameTable[(Int)((TxID >> 5) & 0x1F)]
+    returnValue += srcNameTable[(Int)((TxID >> 0) & 0x1F)]
+    return returnValue
+}
+
+fileprivate func getSrcValue(ch:String) -> UInt32 {
+    for (index, character) in srcNameTable.enumerated() {
+        if character == ch {
+            return (UInt32)(index)
+        }
+    }
+    return 0
+}
+
+/// - returns:
+///     - nil if no transmitter id's match. If no match, then data needs to be written to writecharacteristic
+fileprivate func checkTransmitterId(receivedTransmitterId:String?, expectedTransmitterId:String, log:OSLog) -> Data? {
+    if let receivedTransmitterId = receivedTransmitterId {
+        if receivedTransmitterId != expectedTransmitterId {
+            var datatoSend = Data()
+            datatoSend.append(0x06)
+            datatoSend.append(0x01)
+            let result = encodeTxID(TxID: expectedTransmitterId.uppercased())
+            datatoSend.append(result.0)
+            datatoSend.append(result.1)
+            datatoSend.append(result.2)
+            datatoSend.append(result.3)
+            return datatoSend
+        }
+    }
+    return nil
 }
 
 extension XdripResponseType: CustomStringConvertible {
