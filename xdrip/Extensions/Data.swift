@@ -95,6 +95,11 @@ extension Data {
         return to(T.self)
     }
     
+    mutating func append<T: FixedWidthInteger>(_ newElement: T) {
+        var element = newElement.littleEndian
+        append(UnsafeBufferPointer(start: &element, count: 1))
+    }
+    
 }
 
 

@@ -39,6 +39,8 @@ struct Constants {
         static let calibration = "Calibration"
         /// debuglogging
         static let debuglogging = "xdripdebuglogging"
+        // G5
+        static let categoryCGMG5 = "categoryCGMG5"
     }
     
     // identifiers for local notifications
@@ -49,5 +51,9 @@ struct Constants {
     
     enum Libre {
         static let libreMultiplier = 117.64705
+    }
+    
+    enum DexcomG5 {
+        static let batteryReadPeriodInHours = 12.0
     }
 }

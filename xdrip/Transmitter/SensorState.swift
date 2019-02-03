@@ -8,8 +8,9 @@
 
 import Foundation
 
-/// State of the freestyle libre sensor
+/// State of the sensor
 ///
+/// freestyle Libre
 /// - notYetStarted: 0x01 sensor not yet started
 /// - starting:      0x02 sensor is in the starting phase
 /// - ready:         0x03 sensor is ready, i.e. in normal operation mode
@@ -17,7 +18,10 @@ import Foundation
 /// - expired:       0x05 sensor is expired
 /// - failure:       0x06 sensor has an error
 /// - unknown:       any other state
-enum LibreSensorState {
+///
+/// Dexcom G5
+/// - reset:
+enum SensorState {
     case notYetStarted
     case starting
     case ready
@@ -25,6 +29,7 @@ enum LibreSensorState {
     case shutdown
     case failure
     case unknown
+    case G5Reset//TODO: should be done better, probably define other state enum for dexcom
     
     init(){
         self = .unknown
@@ -63,7 +68,7 @@ enum LibreSensorState {
         case .failure:
             return "Sensor has failure"
         default:
-            return "Unknown sensor state"
+            return "Unknown Sensor state"
         }
     }
 }

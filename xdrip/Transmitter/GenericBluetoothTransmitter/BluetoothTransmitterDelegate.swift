@@ -18,12 +18,14 @@ protocol BluetoothTransmitterDelegate:AnyObject {
     /// if an address is already stored (ie device already connected before) then the BlueToothTransmitter class will try to reconnect and/or scan
     func centralManagerDidUpdateState(state: CBManagerState)
     
-    /// called when centralManager didDisconnectPeripheral was called in BlueToothTransmitter class
     /// if an address is already stored (ie device already connected before) then the BlueToothTransmitter class will try to reconnect and/or scan
+    ///
+    /// the BlueToothTransmitter will also log the error if there is one
     func centralManagerDidDisconnectPeripheral(error: Error?)
     
     /// called when peripheral didUpdateNotificationStateFor was called in BlueToothTransmitter class
-    /// the BlueToothTransmitter class will not do anything just call the delegate function
+    ///
+    /// the BlueToothTransmitter class will log the error if any and call the delegate function
     func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?)
     
     /// called when peripheral didUpdateValueFor was called in BlueToothTransmitter class

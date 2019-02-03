@@ -88,7 +88,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     }
     
     func centralManagerDidUpdateState(state: CBManagerState) {
-        cgmTransmitterDelegate?.didUpdateBluetoothState(state: state)
+        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state)
     }
     
     func centralManagerDidDisconnectPeripheral(error: Error?) {
@@ -135,9 +135,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                                 //get readings from buffer and send to delegate
                                 var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: miaoMiaoHeaderLength)
                                 //TODO: sort glucosedata before calling newReadingsReceived
-                                cgmTransmitterDelegate?.newReadingsReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: batteryPercentage, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: firmware, hardware: hardware)
+                                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: firmware, hardware: hardware)
                                 
-                                // set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
+                                //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
                                 if result.glucoseData.count > 0 {
                                     timeStampLastBgReading = result.glucoseData[0].timeStamp
                                 }

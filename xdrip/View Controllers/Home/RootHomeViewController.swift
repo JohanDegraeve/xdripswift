@@ -6,7 +6,7 @@ import UserNotifications
 
 final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
     // MARK: - Properties
-    var test:CGMG4xDripTransmitter?
+    var test:CGMG5Transmitter?//TODO: should be possible to define as cgmtransmitterprotocol ? that protocol should support a few more functions
     
     var address:String?
     var name:String?
@@ -48,7 +48,8 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
         if let storedAddress = UserDefaults.standard.bluetoothDeviceAddress {
             address = storedAddress
         }
-        test = CGMG4xDripTransmitter(address: address, transmitterID: "6LSDU", delegate:self)
+        //test = CGMG4xDripTransmitter(address: address, transmitterID: "6LSDU", delegate:self)
+        test = CGMG5Transmitter(address: address, transmitterID: "406QWK", delegate: self)
 
         UNUserNotificationCenter.current().delegate = self
         
@@ -93,11 +94,11 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
     
     /// - parameters:
     ///     - readings: first entry is the most recent
-    func newReadingsReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: Int?, sensorState: LibreSensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?) {
+    func cgmTransmitterInfoReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: SensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?) {
         os_log("sensorstate %{public}@", log: log!, type: .debug, sensorState?.description ?? "no sensor state found")
         os_log("firmware %{public}@", log: log!, type: .debug, firmware ?? "no firmware version found")
-        os_log("hardware %{public}@", log: log!, type: .debug, hardware ?? "no firmware version found")
-        os_log("transmitterBatteryInfo  %{public}d", log: log!, type: .debug, transmitterBatteryInfo ?? 0)
+        os_log("hardware %{public}@", log: log!, type: .debug, hardware ?? "no hardware version found")
+        os_log("transmitterBatteryInfo  %{public}d", log: log!, type: .debug, transmitterBatteryInfo?.description ?? 0)
         os_log("sensor time in minutes  %{public}d", log: log!, type: .debug, sensorTimeInMinutes ?? 0)
         for (index, reading) in glucoseData.enumerated() {
             os_log("Reading %{public}d, raw level = %{public}f, realDate = %{public}s", log: log!, type: .debug, index, reading.glucoseLevelRaw, reading.timeStamp.description)
@@ -183,7 +184,7 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
         self.present(alert, animated: true)
     }
     
-    private func temptesting(glucoseData: inout [RawGlucoseData], sensorState: LibreSensorState?, firmware: String?, hardware: String?, batteryPercentage: Int?, sensorTimeInMinutes: Int?) {
+    private func temptesting(glucoseData: inout [RawGlucoseData], sensorState: SensorState?, firmware: String?, hardware: String?, batteryPercentage: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
         
         //this is for testing MiaoMiao
         /*if activeSensor == nil {
@@ -376,12 +377,19 @@ extension RootHomeViewController: UNUserNotificationCenterDelegate {
         //TODO:- complete
     }
     
-    func didUpdateBluetoothState(state: CBManagerState) {
+    func deviceDidUpdateBluetoothState(state: CBManagerState) {
         if state == .poweredOn {
             if address == nil {
                 _ = test?.startScanning()
             }
         }
     }
+    
+    func cgmTransmitterNeedsPairing() {
+        //TODO: needs implementation
+        print("NEEDS IMPLEMENTATION")
+    }
+    
+
 }
 

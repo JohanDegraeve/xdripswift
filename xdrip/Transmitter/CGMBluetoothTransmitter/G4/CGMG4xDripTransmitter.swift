@@ -58,7 +58,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     }
     
     func centralManagerDidUpdateState(state: CBManagerState) {
-        cgmTransmitterDelegate?.didUpdateBluetoothState(state: state)
+        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state)
     }
     
     func centralManagerDidDisconnectPeripheral(error: Error?) {
@@ -112,7 +112,11 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
             
             if let glucoseData = result.glucoseData {
                 var glucoseDataArray = [glucoseData]
-                cgmTransmitterDelegate?.newReadingsReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: result.transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
+                var transmitterBatteryInfo:TransmitterBatteryInfo? = nil
+                if let level = result.batteryLevel {
+                    transmitterBatteryInfo = TransmitterBatteryInfo.DexcomG4(level: level)
+                }
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
             }
         case .beaconPacket?:
             os_log("in peripheral didUpdateValueFor, received beaconPacket", log: log, type: .info)
@@ -141,7 +145,11 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
             let result = processBasicXdripDataPacket(value: value)
             if let glucoseData = result.glucoseData {
                 var glucoseDataArray = [glucoseData]
-                cgmTransmitterDelegate?.newReadingsReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: result.transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
+                var transmitterBatteryInfo:TransmitterBatteryInfo? = nil
+                if let batteryLevel = result.batteryLevel {
+                    transmitterBatteryInfo = TransmitterBatteryInfo.DexcomG4(level: batteryLevel)
+                }
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
             }
         }
     }
@@ -153,7 +161,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     
     // MARK: helper functions
     
-    private func processxBridgeDataPacket(value:Data) -> (glucoseData:RawGlucoseData?, transmitterBatteryInfo:Int?, transmitterID:String?) {
+    private func processxBridgeDataPacket(value:Data) -> (glucoseData:RawGlucoseData?, batteryLevel:Int?, transmitterID:String?) {
         guard value.count >= 10 else {
             os_log("processxBridgeDataPacket, value.count = %{public}d, expecting minimum 10 so that we can find at least rawdata and filtereddata", log: log, type: .info, value.count)
             return (nil, nil, nil)
@@ -161,7 +169,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         
         //initialize returnvalues
         var glucoseData:RawGlucoseData?
-        var transmitterBatteryInfo:Int?
+        var batteryLevel:Int?
         var transmitterID:String?
         
         //get rawdata
@@ -172,7 +180,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         
         //get transmitter battery voltage, only if value size is big enough to hold it
         if value.count >= 11 {
-            transmitterBatteryInfo = Int(value[10])
+            batteryLevel = Int(value[10])
         }
         
         //get transmitterID, only if value size is big enough to hold it
@@ -183,7 +191,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         //create glucosedata
         glucoseData = RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: Double(rawData), glucoseLevelFiltered: Double(filteredData))
 
-        return (glucoseData, transmitterBatteryInfo, transmitterID)
+        return (glucoseData, batteryLevel, transmitterID)
     }
     
     ///Supports for example xdrip delivered by xdripkit.co.uk
@@ -193,10 +201,10 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     ///Example 123632 218 0
     ///
     ///Those packets don't start with a fixed packet length and packet type, as they start with representation of an Integer
-    private func processBasicXdripDataPacket(value:Data) -> (glucoseData:RawGlucoseData?, transmitterBatteryInfo:Int?) {
+    private func processBasicXdripDataPacket(value:Data) -> (glucoseData:RawGlucoseData?, batteryLevel:Int?) {
         //initialize returnvalues
         var glucoseData:RawGlucoseData?
-        var transmitterBatteryInfo:Int?
+        var batteryLevel:Int?
         
         //convert value to string
         if let bufferAsString = String(bytes: value, encoding: .utf8) {
@@ -209,11 +217,11 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
             if indexesOfSplitter.count > 1 {
                 let batteryindex = bufferAsString.index(indexesOfSplitter[0], offsetBy: 1)
                 range = batteryindex..<indexesOfSplitter[1]
-                transmitterBatteryInfo = Int(bufferAsString[range])
+                batteryLevel = Int(bufferAsString[range])
             }
             //create glucoseData
             if let rawData = rawData {
-                os_log("in peripheral didUpdateValueFor, dataPacket received with rawData = %{public}d and batteryInfo =  %{public}d", log: log, type: .info, rawData, transmitterBatteryInfo ?? 0)
+                os_log("in peripheral didUpdateValueFor, dataPacket received with rawData = %{public}d and batteryInfo =  %{public}d", log: log, type: .info, rawData, batteryLevel ?? 0)
                 glucoseData = RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: Double(rawData))
             } else {
                 os_log("in peripheral didUpdateValueFor, no rawdata", log: log, type: .info)
@@ -222,7 +230,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
             os_log("value could not be converted to string", log: log, type: .info)
         }
         
-        return (glucoseData, transmitterBatteryInfo)
+        return (glucoseData, batteryLevel)
     }
 }
 

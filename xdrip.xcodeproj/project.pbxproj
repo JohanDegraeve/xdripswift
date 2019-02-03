@@ -13,7 +13,7 @@
 		F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */; };
 		F8025C1321DA683400ECF0C0 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1221DA683400ECF0C0 /* Data.swift */; };
 		F8025C1821DBC16400ECF0C0 /* CRC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1721DBC16400ECF0C0 /* CRC.swift */; };
-		F8025C1A21DBC1B700ECF0C0 /* LibreSensorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1921DBC1B700ECF0C0 /* LibreSensorState.swift */; };
+		F8025C1A21DBC1B700ECF0C0 /* SensorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1921DBC1B700ECF0C0 /* SensorState.swift */; };
 		F8025C1E21DBCF4A00ECF0C0 /* RawGlucoseData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1D21DBCF4A00ECF0C0 /* RawGlucoseData.swift */; };
 		F8025C2021DBD0FE00ECF0C0 /* ParseLibreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */; };
 		F8025E4C21E6618200ECF0C0 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4B21E6618100ECF0C0 /* Log.swift */; };
@@ -34,6 +34,24 @@
 		F85DC30121D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC30021D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift */; };
 		F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */; };
 		F897AAFB2201018800CDDD10 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAFA2201018800CDDD10 /* String.swift */; };
+		F897AAFE2202577200CDDD10 /* CGMG5Transmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAFD2202577200CDDD10 /* CGMG5Transmitter.swift */; };
+		F897AB1622059E8500CDDD10 /* NSData+CRC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB1522059E8500CDDD10 /* NSData+CRC.swift */; };
+		F897AB1D22059EA000CDDD10 /* TransmitterMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB1722059E9F00CDDD10 /* TransmitterMessage.swift */; };
+		F897AB1F22059EA000CDDD10 /* AuthRequestRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB1922059E9F00CDDD10 /* AuthRequestRxMessage.swift */; };
+		F897AB2022059EA000CDDD10 /* SensorDataTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB1A22059EA000CDDD10 /* SensorDataTxMessage.swift */; };
+		F897AB2122059EA000CDDD10 /* AuthRequestTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB1B22059EA000CDDD10 /* AuthRequestTxMessage.swift */; };
+		F897AB2222059EA000CDDD10 /* Opcode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB1C22059EA000CDDD10 /* Opcode.swift */; };
+		F897AB242206585F00CDDD10 /* AuthChallengeRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB232206585F00CDDD10 /* AuthChallengeRxMessage.swift */; };
+		F897AB2622073C4B00CDDD10 /* AuthChallengeTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB2522073C4A00CDDD10 /* AuthChallengeTxMessage.swift */; };
+		F897AB2A220742E900CDDD10 /* AESCrypt.m in Sources */ = {isa = PBXBuildFile; fileRef = F897AB28220742E700CDDD10 /* AESCrypt.m */; };
+		F897AB2D220761F200CDDD10 /* SensorDataRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB2C220761F200CDDD10 /* SensorDataRxMessage.swift */; };
+		F897AB312207716E00CDDD10 /* FirmwareVersionTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB302207716E00CDDD10 /* FirmwareVersionTxMessage.swift */; };
+		F897AB342207725100CDDD10 /* TransmitterVersionTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB322207725000CDDD10 /* TransmitterVersionTxMessage.swift */; };
+		F897AB352207725100CDDD10 /* TransmitterVersionRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB332207725000CDDD10 /* TransmitterVersionRxMessage.swift */; };
+		F897AB37220775A300CDDD10 /* BatteryStatusRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB36220775A300CDDD10 /* BatteryStatusRxMessage.swift */; };
+		F897AB39220775B100CDDD10 /* BatteryStatusTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB38220775B100CDDD10 /* BatteryStatusTxMessage.swift */; };
+		F897AB3B2208DCE100CDDD10 /* TransmitterBatteryInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB3A2208DCE100CDDD10 /* TransmitterBatteryInfo.swift */; };
+		F897AB3D220A243300CDDD10 /* ResetMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB3C220A243300CDDD10 /* ResetMessage.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
 		F8AC426021ADEBD60078C348 /* RootHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* RootHomeViewController.swift */; };
 		F8AC426221ADEBD60078C348 /* RootSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC426121ADEBD60078C348 /* RootSettingsViewController.swift */; };
@@ -59,7 +77,7 @@
 		F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothTransmitterDelegate.swift; sourceTree = "<group>"; };
 		F8025C1221DA683400ECF0C0 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		F8025C1721DBC16400ECF0C0 /* CRC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRC.swift; sourceTree = "<group>"; };
-		F8025C1921DBC1B700ECF0C0 /* LibreSensorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreSensorState.swift; sourceTree = "<group>"; };
+		F8025C1921DBC1B700ECF0C0 /* SensorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorState.swift; sourceTree = "<group>"; };
 		F8025C1D21DBCF4A00ECF0C0 /* RawGlucoseData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawGlucoseData.swift; sourceTree = "<group>"; };
 		F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseLibreData.swift; sourceTree = "<group>"; };
 		F8025E4B21E6618100ECF0C0 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
@@ -80,6 +98,26 @@
 		F85DC30021D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG4xDripTransmitter.swift; sourceTree = "<group>"; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
 		F897AAFA2201018800CDDD10 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		F897AAFD2202577200CDDD10 /* CGMG5Transmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG5Transmitter.swift; sourceTree = "<group>"; };
+		F897AB1522059E8500CDDD10 /* NSData+CRC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSData+CRC.swift"; sourceTree = "<group>"; };
+		F897AB1722059E9F00CDDD10 /* TransmitterMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransmitterMessage.swift; sourceTree = "<group>"; };
+		F897AB1922059E9F00CDDD10 /* AuthRequestRxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthRequestRxMessage.swift; sourceTree = "<group>"; };
+		F897AB1A22059EA000CDDD10 /* SensorDataTxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorDataTxMessage.swift; sourceTree = "<group>"; };
+		F897AB1B22059EA000CDDD10 /* AuthRequestTxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthRequestTxMessage.swift; sourceTree = "<group>"; };
+		F897AB1C22059EA000CDDD10 /* Opcode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Opcode.swift; sourceTree = "<group>"; };
+		F897AB232206585F00CDDD10 /* AuthChallengeRxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthChallengeRxMessage.swift; sourceTree = "<group>"; };
+		F897AB2522073C4A00CDDD10 /* AuthChallengeTxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthChallengeTxMessage.swift; sourceTree = "<group>"; };
+		F897AB28220742E700CDDD10 /* AESCrypt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AESCrypt.m; sourceTree = "<group>"; };
+		F897AB29220742E800CDDD10 /* AESCrypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AESCrypt.h; sourceTree = "<group>"; };
+		F897AB2B22074E8000CDDD10 /* xdrip-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "xdrip-Bridging-Header.h"; sourceTree = "<group>"; };
+		F897AB2C220761F200CDDD10 /* SensorDataRxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorDataRxMessage.swift; sourceTree = "<group>"; };
+		F897AB302207716E00CDDD10 /* FirmwareVersionTxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirmwareVersionTxMessage.swift; sourceTree = "<group>"; };
+		F897AB322207725000CDDD10 /* TransmitterVersionTxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransmitterVersionTxMessage.swift; sourceTree = "<group>"; };
+		F897AB332207725000CDDD10 /* TransmitterVersionRxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransmitterVersionRxMessage.swift; sourceTree = "<group>"; };
+		F897AB36220775A300CDDD10 /* BatteryStatusRxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryStatusRxMessage.swift; sourceTree = "<group>"; };
+		F897AB38220775B100CDDD10 /* BatteryStatusTxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryStatusTxMessage.swift; sourceTree = "<group>"; };
+		F897AB3A2208DCE100CDDD10 /* TransmitterBatteryInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmitterBatteryInfo.swift; sourceTree = "<group>"; };
+		F897AB3C220A243300CDDD10 /* ResetMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetMessage.swift; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F8AC425F21ADEBD60078C348 /* RootHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeViewController.swift; sourceTree = "<group>"; };
@@ -141,7 +179,6 @@
 			isa = PBXGroup;
 			children = (
 				F8025C1721DBC16400ECF0C0 /* CRC.swift */,
-				F8025C1921DBC1B700ECF0C0 /* LibreSensorState.swift */,
 				F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */,
 			);
 			path = Utilities;
@@ -161,8 +198,10 @@
 				F8025C0E21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift */,
 				F8025E5621F4A60900ECF0C0 /* CGMTransmitterProtocol.swift */,
 				F85DC2FE21D3E83100B9F74A /* G4 */,
+				F897AAFC2202575600CDDD10 /* G5 */,
 				F8025C0621D8DCE700ECF0C0 /* MiaoMiao */,
 				F8025C1D21DBCF4A00ECF0C0 /* RawGlucoseData.swift */,
+				F897AB3A2208DCE100CDDD10 /* TransmitterBatteryInfo.swift */,
 			);
 			path = CGMBluetoothTransmitter;
 			sourceTree = "<group>";
@@ -243,6 +282,7 @@
 		F85DC2FC21D3E83100B9F74A /* Transmitter */ = {
 			isa = PBXGroup;
 			children = (
+				F8025C1921DBC1B700ECF0C0 /* SensorState.swift */,
 				F8025E5521F3418400ECF0C0 /* CGMBluetoothTransmitter */,
 				F85DC2FF21D3E83100B9F74A /* GenericBluetoothTransmitter */,
 			);
@@ -264,6 +304,40 @@
 				F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */,
 			);
 			path = GenericBluetoothTransmitter;
+			sourceTree = "<group>";
+		};
+		F897AAFC2202575600CDDD10 /* G5 */ = {
+			isa = PBXGroup;
+			children = (
+				F897AAFD2202577200CDDD10 /* CGMG5Transmitter.swift */,
+				F897AAFF22036D4300CDDD10 /* G5Messages */,
+			);
+			path = G5;
+			sourceTree = "<group>";
+		};
+		F897AAFF22036D4300CDDD10 /* G5Messages */ = {
+			isa = PBXGroup;
+			children = (
+				F897AB29220742E800CDDD10 /* AESCrypt.h */,
+				F897AB28220742E700CDDD10 /* AESCrypt.m */,
+				F897AB232206585F00CDDD10 /* AuthChallengeRxMessage.swift */,
+				F897AB2522073C4A00CDDD10 /* AuthChallengeTxMessage.swift */,
+				F897AB1922059E9F00CDDD10 /* AuthRequestRxMessage.swift */,
+				F897AB1B22059EA000CDDD10 /* AuthRequestTxMessage.swift */,
+				F897AB36220775A300CDDD10 /* BatteryStatusRxMessage.swift */,
+				F897AB38220775B100CDDD10 /* BatteryStatusTxMessage.swift */,
+				F897AB302207716E00CDDD10 /* FirmwareVersionTxMessage.swift */,
+				F897AB1522059E8500CDDD10 /* NSData+CRC.swift */,
+				F897AB1C22059EA000CDDD10 /* Opcode.swift */,
+				F897AB3C220A243300CDDD10 /* ResetMessage.swift */,
+				F897AB2C220761F200CDDD10 /* SensorDataRxMessage.swift */,
+				F897AB1A22059EA000CDDD10 /* SensorDataTxMessage.swift */,
+				F897AB1722059E9F00CDDD10 /* TransmitterMessage.swift */,
+				F897AB332207725000CDDD10 /* TransmitterVersionRxMessage.swift */,
+				F897AB322207725000CDDD10 /* TransmitterVersionTxMessage.swift */,
+				F897AB2B22074E8000CDDD10 /* xdrip-Bridging-Header.h */,
+			);
+			path = G5Messages;
 			sourceTree = "<group>";
 		};
 		F8AC425121ADEBD60078C348 = {
@@ -404,6 +478,7 @@
 				TargetAttributes = {
 					F8AC425921ADEBD60078C348 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1010;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -449,40 +524,58 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
+				F897AB2022059EA000CDDD10 /* SensorDataTxMessage.swift in Sources */,
 				F8AC426221ADEBD60078C348 /* RootSettingsViewController.swift in Sources */,
 				F8025E6D21F7CD7C00ECF0C0 /* UIViewController.swift in Sources */,
+				F897AB2122059EA000CDDD10 /* AuthRequestTxMessage.swift in Sources */,
 				F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */,
 				F85DC2EB21CFE2F500B9F74A /* Calibration+CoreDataProperties.swift in Sources */,
 				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
 				F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */,
+				F897AB312207716E00CDDD10 /* FirmwareVersionTxMessage.swift in Sources */,
 				F8025C0821D8DD1F00ECF0C0 /* CGMMiaoMiaoTransmitter.swift in Sources */,
 				F8025E4C21E6618200ECF0C0 /* Log.swift in Sources */,
 				F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */,
 				F8EA6CB121C05E970082976B /* Calibrations.swift in Sources */,
 				F8025C1E21DBCF4A00ECF0C0 /* RawGlucoseData.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
+				F897AB352207725100CDDD10 /* TransmitterVersionRxMessage.swift in Sources */,
+				F897AB342207725100CDDD10 /* TransmitterVersionTxMessage.swift in Sources */,
 				F8EA6C7C21B491740082976B /* BgReadings.swift in Sources */,
 				F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */,
 				F8E3C3AD21FE551C00907A04 /* DexcomCalibrator.swift in Sources */,
+				F897AB2D220761F200CDDD10 /* SensorDataRxMessage.swift in Sources */,
 				F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */,
+				F897AB242206585F00CDDD10 /* AuthChallengeRxMessage.swift in Sources */,
 				F8025C1821DBC16400ECF0C0 /* CRC.swift in Sources */,
 				F8025E5021EE746400ECF0C0 /* CalibratorProtocol.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
+				F897AB37220775A300CDDD10 /* BatteryStatusRxMessage.swift in Sources */,
 				F85DC2F821D2632F00B9F74A /* CoreDataManager.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
+				F897AB2622073C4B00CDDD10 /* AuthChallengeTxMessage.swift in Sources */,
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
+				F897AB1D22059EA000CDDD10 /* TransmitterMessage.swift in Sources */,
 				F8025E5721F4A60900ECF0C0 /* CGMTransmitterProtocol.swift in Sources */,
+				F897AB3D220A243300CDDD10 /* ResetMessage.swift in Sources */,
 				F85DC30121D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift in Sources */,
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
+				F897AB3B2208DCE100CDDD10 /* TransmitterBatteryInfo.swift in Sources */,
 				F8025E6421F7BF3300ECF0C0 /* UserDefaults.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* BluetoothTransmitter.swift in Sources */,
+				F897AB2222059EA000CDDD10 /* Opcode.swift in Sources */,
 				F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */,
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
 				F8EA6CB321CD5DD90082976B /* SlopeParameters.swift in Sources */,
 				F8025C0F21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* RootHomeViewController.swift in Sources */,
-				F8025C1A21DBC1B700ECF0C0 /* LibreSensorState.swift in Sources */,
+				F897AB39220775B100CDDD10 /* BatteryStatusTxMessage.swift in Sources */,
+				F8025C1A21DBC1B700ECF0C0 /* SensorState.swift in Sources */,
+				F897AB1F22059EA000CDDD10 /* AuthRequestRxMessage.swift in Sources */,
+				F897AB2A220742E900CDDD10 /* AESCrypt.m in Sources */,
+				F897AAFE2202577200CDDD10 /* CGMG5Transmitter.swift in Sources */,
+				F897AB1622059E8500CDDD10 /* NSData+CRC.swift in Sources */,
 				F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */,
 				F8EA6C7F21B70E390082976B /* Constants.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
@@ -633,6 +726,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8DKSZ5HNLB;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
@@ -643,6 +737,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/Transmitter/CGMBluetoothTransmitter/G5/G5Messages/xdrip-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -652,6 +748,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8DKSZ5HNLB;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
@@ -662,6 +759,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/Transmitter/CGMBluetoothTransmitter/G5/G5Messages/xdrip-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

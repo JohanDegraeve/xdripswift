@@ -12,3 +12,12 @@ extension String {
         return String(self[idx1..<idx2])
     }
 }
+
+/// validates if string matches regex
+extension String {
+    func validate(withRegex regex: NSRegularExpression) -> Bool {
+        let range = NSRange(self.startIndex..., in: self)
+        let matchRange = regex.rangeOfFirstMatch(in: self, options: .reportProgress, range: range)
+        return matchRange.location != NSNotFound
+    }
+}

@@ -76,6 +76,16 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     // MARK: - public functions
     
+    func disconnect() {
+        if let peripheral = peripheral {
+            if let centralManager = centralManager {
+                os_log("disconnect, disconnecting", log: log, type: .info)
+                centralManager.cancelPeripheralConnection(peripheral)
+                //TODO: probably needs changes, because app will automatically reconnect when didDisconnectPeripheral is  called
+            }
+        }
+    }
+    
     /// start bluetooth scanning for device
     func startScanning() -> BluetoothTransmitter.startScanningResult {
         os_log("in startScanning", log: log, type: .info)
@@ -125,6 +135,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         return returnValue
     }
     
+    /// will write to writeCharacteristic with UUID CBUUID_WriteCharacteristic
     /// - returns: true if writeValue was successfully called, doesn't necessarily mean data is successvully written to peripheral
     func writeDataToPeripheral(data:Data, type:CBCharacteristicWriteType)  -> Bool {
         if let peripheral = peripheral, let writeCharacteristic = writeCharacteristic {
@@ -137,6 +148,29 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
     }
 
+    /// will write to characteristicToWriteTo
+    /// - returns: true if writeValue was successfully called, doesn't necessarily mean data is successvully written to peripheral
+    func writeDataToPeripheral(data:Data, characteristicToWriteTo:CBCharacteristic, type:CBCharacteristicWriteType)  -> Bool {
+        if let peripheral = peripheral {
+            os_log("in writeDataToPeripheral for characteristic %{public}@", log: log, type: .info, characteristicToWriteTo.uuid.description)
+            peripheral.writeValue(data, for: characteristicToWriteTo, type: type)
+            return true
+        } else {
+            os_log("in writeDataToPeripheral, failed because either peripheral or characteristicToWriteTo is nil", log: log, type: .error)
+            return false
+        }
+    }
+    
+    /// calls setNotifyValue for characteristic with value enabled
+    func setNotifyValue(_ enabled: Bool, for characteristic: CBCharacteristic) {
+        if let peripheral = peripheral {
+            os_log("setNotifyValue, setting notify for characteristic %{public}@, to %{public}@", log: log, type: .info, characteristic.uuid.uuidString, enabled.description)
+          peripheral.setNotifyValue(enabled, for: characteristic)
+        } else {
+            os_log("setNotifyValue, failed to set notify for characteristic %{public}@, to %{public}@", log: log, type: .error, characteristic.uuid.uuidString, enabled.description)
+        }
+    }
+    
     // MARK: - fileprivate functions
     
     /// stops scanning and connects. To be called after didiscover

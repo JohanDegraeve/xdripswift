@@ -9,7 +9,7 @@ import Foundation
 ///     - array of GlucoseData, first is the most recent, LibreSensorState. Only returns recent readings, ie not the ones that are older than timeStampLastBgReadingStoredInDatabase. 30 seconds are added here, meaning, new reading should be at least 30 seconds more recent than timeStampLastBgReadingStoredInDatabase
 ///     - sensorState: status of the sensor
 ///     - sensorTimeInMinutes: age of sensor in minutes
-func parseLibreData(data:inout Data, timeStampLastBgReadingStoredInDatabase:Date, headerOffset:Int) -> (glucoseData:[RawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int) {
+func parseLibreData(data:inout Data, timeStampLastBgReadingStoredInDatabase:Date, headerOffset:Int) -> (glucoseData:[RawGlucoseData], sensorState:SensorState, sensorTimeInMinutes:Int) {
     var i:Int
     var glucoseData:RawGlucoseData
     var byte:Data
@@ -20,7 +20,7 @@ func parseLibreData(data:inout Data, timeStampLastBgReadingStoredInDatabase:Date
     let sensorTimeInMinutes:Int = 256 * (getByteAt(buffer:data, position: headerOffset + 317) & 0xFF) + (getByteAt(buffer:data, position: headerOffset + 316) & 0xFF)
     let sensorStartTimeInMilliseconds:Double = ourTime.toMillisecondsAsDouble() - (Double)(sensorTimeInMinutes * 60 * 1000)
     var returnValue:Array<RawGlucoseData> = []
-    let sensorState = LibreSensorState(stateByte: data[headerOffset + 4])
+    let sensorState = SensorState(stateByte: data[headerOffset + 4])
     
     /////// loads trend values
     

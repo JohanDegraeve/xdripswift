@@ -13,16 +13,21 @@ protocol CGMTransmitterDelegate:AnyObject {
     /// transmitter did disconnect
     func cgmTransmitterDidDisconnect()
     
-    /// bluetooth status changed 
-    func didUpdateBluetoothState(state: CBManagerState)
+    /// the ios device did change bluetooth status
+    func deviceDidUpdateBluetoothState(state: CBManagerState)
     
-    // will only happen for MiaoMiao transmitter, anyway we can do the stuff for any type of transmitter which means restart the sensor, ask calibration blablabla
+    /// will only happen for MiaoMiao transmitter, anyway we can do the stuff for any type of transmitter which means restart the sensor, ask calibration blablabla
     func newSensorDetected()
     
-    // will only happen for MiaoMiao transmitter, anyway we can do the stuff for any type of transmitter which means send a warning blablabla
+    /// will only happen for MiaoMiao transmitter, anyway we can do the stuff for any type of transmitter which means send a warning blablabla
     func sensorNotDetected()
     
-    func newReadingsReceived(glucoseData:inout [RawGlucoseData], transmitterBatteryInfo:Int?, sensorState:LibreSensorState?, sensorTimeInMinutes:Int?, firmware:String?, hardware:String?)
+    /// - parameters:
+    ///     - glucoseData can be empty array
+    func cgmTransmitterInfoReceived(glucoseData:inout [RawGlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorState:SensorState?, sensorTimeInMinutes:Int?, firmware:String?, hardware:String?)
+    
+    /// transmitter needs bluetooth pairing
+    func cgmTransmitterNeedsPairing()
 }
 
 
