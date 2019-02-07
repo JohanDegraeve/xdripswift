@@ -2,7 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitterProtocol {
+class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
     // MARK: - properties
     
     /// UUID's
@@ -56,8 +56,11 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     /// is G5 reset necessary or not
     private var G5ResetRequested:Bool
     
-    // G5 transmitter firmware version
+    // G5 transmitter firmware version - only used internally, if nil then it was  never received
     private var transmitterVersion:String?
+    
+    // actual device address
+    private var actualDeviceAddress:String?
 
     // MARK: - functions
     
@@ -82,6 +85,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DEXCOM" + transmitterID[transmitterID.index(transmitterID.startIndex, offsetBy: 4)..<transmitterID.endIndex])
         if let address = address {
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address)
+            actualDeviceAddress = address
         }
         
         // set timestampoflastg5reading to 0
@@ -119,11 +123,19 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     // MARK: CBCentralManager overriden functions
     
+    override func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+        if Date() < Date(timeInterval: 60, since: timeStampOfLastG5Reading) {
+            // will probably never come here because reconnect doesn't happen with scanning, hence diddiscover will never be called excep the very first time that an app tries to connect to a G5
+            os_log("diddiscover peripheral, but last reading was less than 1 minute ago, will ignore", log: log, type: .info)
+        } else {
+            super.centralManager(central, didDiscover: peripheral, advertisementData: advertisementData, rssi: RSSI)
+        }
+    }
+
     override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        //Date(timeInterval: (5*60), since: firstCalibrationTimeStamp)
         if Date() < Date(timeInterval: 60, since: timeStampOfLastG5Reading) {
             os_log("connected, but last reading was less than 1 minute ago, disconnecting", log: log, type: .info)
-            //TODO : isn't it better to just do nothing ? wait for dexcom to timeout ?
+            //TODO: is it not better to keep connection open till it times out ? should be tested with new device, see if battery drains, if it does, try with removing the disconnect - Spike also disconnects
             disconnect()
         } else {
             super.centralManager(central, didConnect: peripheral)
@@ -135,7 +147,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         
         // log error if any
         if let error = error {
-            os_log("error: %{public}@", log: log, type: .error , error.localizedDescription)
+            os_log("    error: %{public}@", log: log, type: .error , error.localizedDescription)
         }
         
         if let characteristics = service.characteristics {
@@ -152,11 +164,11 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                         communicationCharacteristic = characteristic
                     case .CBUUID_Receive_Authentication:
                         receiveAuthenticationCharacteristic = characteristic
-                        os_log("calling setNotifyValue true", log: log, type: .info)
+                        os_log("    calling setNotifyValue true", log: log, type: .info)
                         peripheral.setNotifyValue(true, for: characteristic)
                     }
                 } else {
-                    os_log("characteristic UUID unknown", log: log, type: .error)
+                    os_log("    characteristic UUID unknown", log: log, type: .error)
                 }
             }
         } else {
@@ -177,7 +189,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         // if status changed to poweredon, and if address = nil then superclass will not start the scanning
         // but for DexcomG5 we can start scanning
         if state == .poweredOn {
-            if (address == nil) {
+            if (actualDeviceAddress == nil) {
                     _ = startScanning()
             }
         }
@@ -192,10 +204,10 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
         os_log("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
         if let error = error {
-            os_log("error: %{public}@", log: log, type: .error , error.localizedDescription)
+            os_log("    error: %{public}@", log: log, type: .error , error.localizedDescription)
         }
         let ASCIIstring = characteristic.uuid.uuidString
-        os_log("characteristic uuid: %{public}@", log: log, type: .info, ASCIIstring)
+        os_log("    characteristic uuid: %{public}@", log: log, type: .info, ASCIIstring)
         if let characteristicValue = CBUUID_Characteristic_UUID(rawValue: ASCIIstring) {
             switch characteristicValue {
             case .CBUUID_Write_Control:
@@ -213,7 +225,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                 break
             }
         } else {
-            os_log("characteristicValue is nil", log: log, type: .error)
+            os_log("    characteristicValue is nil", log: log, type: .error)
         }
     }
     
@@ -226,45 +238,50 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         if let value = characteristic.value {
             //only for logging
             let data = value.hexEncodedString()
-            os_log(" data = %{public}@", log: log, type: .debug, data)
+            os_log("    data = %{public}@", log: log, type: .debug, data)
             
             //check type of message and process according to type
             if let firstByte = value.first {
                 if let opCode = Opcode(rawValue: firstByte) {
-                    os_log("opcode = %{public}@", log: log, type: .info, opCode.description)
+                    os_log("    opcode = %{public}@", log: log, type: .info, opCode.description)
                     switch opCode {
                     case .authChallengeRx:
                         if let authChallengeRxMessage = AuthChallengeRxMessage(data: value) {
                             if !authChallengeRxMessage.bonded {
                                 cgmTransmitterDelegate?.cgmTransmitterNeedsPairing()
-                                os_log("transmitter needs paring", log: log, type: .info)
+                                os_log("    transmitter needs paring", log: log, type: .info)
+                            } else {
+                                if let writeControlCharacteristic = writeControlCharacteristic {
+                                    setNotifyValue(true, for: writeControlCharacteristic)
+                                } else {
+                                    os_log("    writeControlCharacteristic is nil, can not set notifyValue", log: log, type: .error)
+                                }
                             }
-                        }
-                        if let writeControlCharacteristic = writeControlCharacteristic {
-                            setNotifyValue(true, for: writeControlCharacteristic)
                         } else {
-                            os_log("writeControlCharacteristic is nil, can not set notifyValue", log: log, type: .error)
+                            os_log("    failed to create authChallengeRxMessage", log: log, type: .info)
                         }
                     case .authRequestRx:
                         if let authRequestRxMessage = AuthRequestRxMessage(data: value), let receiveAuthenticationCharacteristic = receiveAuthenticationCharacteristic {
                             guard let challengeHash = CGMG5Transmitter.computeHash(transmitterId, of: authRequestRxMessage.challenge) else {
-                                os_log("failed to calculate challengeHash, no further processing", log: log, type: .error)
+                                os_log("    failed to calculate challengeHash, no further processing", log: log, type: .error)
                                 return
                             }
                             let authChallengeTxMessage = AuthChallengeTxMessage(challengeHash: challengeHash)
                             _ = writeDataToPeripheral(data: authChallengeTxMessage.data, characteristicToWriteTo: receiveAuthenticationCharacteristic, type: .withResponse)
                         } else {
-                            os_log("writeControlCharacteristic is nil or authRequestRxMessage is nil", log: log, type: .error)
+                            os_log("    writeControlCharacteristic is nil or authRequestRxMessage is nil", log: log, type: .error)
                         }
                     case .sensorDataRx:
                         if let sensorDataRxMessage = SensorDataRxMessage(data: value) {
                             if transmitterVersion != nil {
-                                if Date() < Date(timeInterval: Constants.DexcomG5.batteryReadPeriodInHours * 60 * 60, since: timeStampOfLastBatteryReading) {
-                                    os_log("last battery reading was long time, ago requesting now", log: log, type: .info)
+                                // transmitterversion was already recceived, let's see if we need to get the batterystatus
+                                if Date() > Date(timeInterval: Constants.DexcomG5.batteryReadPeriodInHours * 60 * 60, since: timeStampOfLastBatteryReading) {
+                                    os_log("    last battery reading was long time, ago requesting now", log: log, type: .info)
                                     if let writeControlCharacteristic = writeControlCharacteristic {
                                         _ = writeDataToPeripheral(data: BatteryStatusTxMessage().data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
+                                        timeStampOfLastBatteryReading = Date()
                                     } else {
-                                        os_log("writeControlCharacteristic is nil, can not send BatteryStatusTxMessage", log: log, type: .error)
+                                        os_log("    writeControlCharacteristic is nil, can not send BatteryStatusTxMessage", log: log, type: .error)
                                     }
                                     //TODO: strictly speaking a disconnect should be done after having written the data
                                 } else {
@@ -274,16 +291,16 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                                 if let writeControlCharacteristic = writeControlCharacteristic {
                                     _ = writeDataToPeripheral(data: TransmitterVersionTxMessage().data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
                                 } else {
-                                    os_log("writeControlCharacteristic is nil, can not send TransmitterVersionTxMessage", log: log, type: .error)
+                                    os_log("    writeControlCharacteristic is nil, can not send TransmitterVersionTxMessage", log: log, type: .error)
                                 }
                                 //TODO: strictly speaking a disconnect should be done after having written the data
                             }
                             //if reset was done recently, less than 5 minutes ago, then ignore the reading
                             if Date() < Date(timeInterval: 5 * 60, since: timeStampTransmitterReset) {
-                                os_log("last transmitterreset was less than 5 minutes ago, ignoring this reading", log: log, type: .info)
+                                os_log("    last transmitterreset was less than 5 minutes ago, ignoring this reading", log: log, type: .info)
                             } else {
                                 if Date() < Date(timeInterval: 60, since: timeStampOfLastG5Reading) {
-                                    os_log("last reading was less than 1 minute ago, disconnecting", log: log, type: .info)
+                                    os_log("    last reading was less than 1 minute ago, disconnecting", log: log, type: .info)
                                 } else {
                                     timeStampOfLastG5Reading = Date()
                                     let glucoseData = RawGlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: sensorDataRxMessage.unfiltered, glucoseLevelFiltered: sensorDataRxMessage.filtered)
@@ -294,7 +311,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                             //start processing now the sensorDataRxMessage
                             
                         } else {
-                            os_log("sensorDataRxMessagee is nil", log: log, type: .error)
+                            os_log("    sensorDataRxMessagee is nil", log: log, type: .error)
                         }
                     case .resetRx:
                         processResetRxMessage(value: value)
@@ -303,14 +320,14 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                     case .transmitterVersionRx:
                         processTransmitterVersionRxMessage(value: value)
                     default:
-                        os_log("unknown opcode received ", log: log, type: .error)
+                        os_log("    unknown opcode received ", log: log, type: .error)
                         break
                     }
                 } else {
-                    os_log("value doesn't start with a known opcode = %{public}d", log: log, type: .error, firstByte)
+                    os_log("    value doesn't start with a known opcode = %{public}d", log: log, type: .error, firstByte)
                 }
             } else {
-                os_log("characteristic.value is nil", log: log, type: .error)
+                os_log("    characteristic.value is nil", log: log, type: .error)
             }
         }
     }
@@ -329,7 +346,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         if let writeControlCharacteristic = writeControlCharacteristic {
             _ = writeDataToPeripheral(data: SensorDataTxMessage().data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
         } else {
-            os_log("writeControlCharacteristic is nil, not getsensordata", log: log, type: .error)
+            os_log("    writeControlCharacteristic is nil, not getsensordata", log: log, type: .error)
         }
     }
     
@@ -340,7 +357,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
             _ = writeDataToPeripheral(data: ResetTxMessage().data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
             G5ResetRequested = false
         } else {
-            os_log("writeControlCharacteristic is nil, not sending G5 reset", log: log, type: .error)
+            os_log("    writeControlCharacteristic is nil, not sending G5 reset", log: log, type: .error)
         }
     }
     
@@ -367,7 +384,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     private func processBatteryStatusRxMessage(value:Data) {
         if let batteryStatusRxMessage = BatteryStatusRxMessage(data: value) {
             var emptyArray: [RawGlucoseData] = []
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
         } else {
             os_log("batteryStatusRxMessage is nil", log: log, type: .error)
         }
@@ -377,6 +394,8 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         if let transmitterVersionRxMessage = TransmitterVersionRxMessage(data: value) {
             var emptyArray: [RawGlucoseData] = []
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: transmitterVersionRxMessage.firmwareVersion.hexEncodedString(), hardware: nil)
+            // assign transmitterVersion
+            transmitterVersion = transmitterVersionRxMessage.firmwareVersion.hexEncodedString()
         } else {
             os_log("transmitterVersionRxMessage is nil", log: log, type: .error)
         }

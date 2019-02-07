@@ -6,6 +6,8 @@ struct BatteryStatusRxMessage: TransmitterRxMessage {
     let voltageA: Int
     let voltageB: Int
     let resist: Int
+    let runtime: Int
+    let temperature:Int
     
     init?(data: Data) {
         guard data.count >= 12 && data.isCRCValid else {
@@ -17,9 +19,11 @@ struct BatteryStatusRxMessage: TransmitterRxMessage {
         }
         
         status = data[1]
-        voltageA = data[2..<4].toInt()
-        voltageB = data[4..<6].toInt()
-        resist = data[6..<8].toInt()
+        voltageA = Int(data.uint16(position: 2))
+        voltageB = Int(data.uint16(position: 4))
+        resist = Int(data.uint16(position: 6))
+        runtime = Int(data.uint16(position: 8))
+        temperature = Int(data.uint8(position: 10))
     }
     
 }

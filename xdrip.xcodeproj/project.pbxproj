@@ -20,7 +20,7 @@
 		F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4D21ED450300ECF0C0 /* Double.swift */; };
 		F8025E5021EE746400ECF0C0 /* CalibratorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4F21EE746400ECF0C0 /* CalibratorProtocol.swift */; };
 		F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */; };
-		F8025E5721F4A60900ECF0C0 /* CGMTransmitterProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E5621F4A60900ECF0C0 /* CGMTransmitterProtocol.swift */; };
+		F8025E5721F4A60900ECF0C0 /* CGMTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E5621F4A60900ECF0C0 /* CGMTransmitter.swift */; };
 		F8025E6421F7BF3300ECF0C0 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E6321F7BF3300ECF0C0 /* UserDefaults.swift */; };
 		F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */; };
 		F8025E6D21F7CD7C00ECF0C0 /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E6C21F7CD7C00ECF0C0 /* UIViewController.swift */; };
@@ -84,7 +84,7 @@
 		F8025E4D21ED450300ECF0C0 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
 		F8025E4F21EE746400ECF0C0 /* CalibratorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibratorProtocol.swift; sourceTree = "<group>"; };
 		F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre1Calibrator.swift; sourceTree = "<group>"; };
-		F8025E5621F4A60900ECF0C0 /* CGMTransmitterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMTransmitterProtocol.swift; sourceTree = "<group>"; };
+		F8025E5621F4A60900ECF0C0 /* CGMTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMTransmitter.swift; sourceTree = "<group>"; };
 		F8025E6321F7BF3300ECF0C0 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIStoryboard.swift; sourceTree = "<group>"; };
 		F8025E6C21F7CD7C00ECF0C0 /* UIViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
@@ -196,7 +196,7 @@
 			isa = PBXGroup;
 			children = (
 				F8025C0E21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift */,
-				F8025E5621F4A60900ECF0C0 /* CGMTransmitterProtocol.swift */,
+				F8025E5621F4A60900ECF0C0 /* CGMTransmitter.swift */,
 				F85DC2FE21D3E83100B9F74A /* G4 */,
 				F897AAFC2202575600CDDD10 /* G5 */,
 				F8025C0621D8DCE700ECF0C0 /* MiaoMiao */,
@@ -557,7 +557,7 @@
 				F897AB2622073C4B00CDDD10 /* AuthChallengeTxMessage.swift in Sources */,
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
 				F897AB1D22059EA000CDDD10 /* TransmitterMessage.swift in Sources */,
-				F8025E5721F4A60900ECF0C0 /* CGMTransmitterProtocol.swift in Sources */,
+				F8025E5721F4A60900ECF0C0 /* CGMTransmitter.swift in Sources */,
 				F897AB3D220A243300CDDD10 /* ResetMessage.swift in Sources */,
 				F85DC30121D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift in Sources */,
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,

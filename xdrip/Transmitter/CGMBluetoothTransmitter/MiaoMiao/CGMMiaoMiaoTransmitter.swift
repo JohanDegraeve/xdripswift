@@ -2,7 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitterProtocol {
+class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
     // MARK: - properties
     
     /// service to be discovered

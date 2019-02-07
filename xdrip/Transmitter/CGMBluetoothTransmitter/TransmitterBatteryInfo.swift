@@ -5,7 +5,7 @@ enum TransmitterBatteryInfo {
     case percentage (percentage:Int)
     
     /// Dexcom G5 (and also G6 ?) voltageA, voltageB and resist
-    case DexcomG5 (voltageA:Int, voltageB:Int, resist:Int)
+    case DexcomG5 (voltageA:Int, voltageB:Int, resist:Int, runtime:Int, temperature:Int)
     
     /// Dexcom G4, batteryinfo (215 or something like that)
     case DexcomG4 (level:Int)
@@ -14,8 +14,8 @@ enum TransmitterBatteryInfo {
         switch (self) {
         case .DexcomG4(let level):
             return "Battery Level = " + level.description
-        case .DexcomG5(let voltA, let voltB, let res):
-            return "VoltageA = " + voltA.description + " Voltage B = " + voltB.description + " resistance = " + res.description
+        case .DexcomG5(let voltA, let voltB, let res, let runt, let temp):
+            return "VoltageA = " + voltA.description + ", Voltage B = " + voltB.description + ", resistance = " + res.description + ", runtime = " + runt.description + ", temperature = " + temp.description
         case .percentage(let perc):
             return "Battery Percentage = " + perc.description
         }

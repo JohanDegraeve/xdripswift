@@ -13,7 +13,7 @@
 		- [centralManagerDidUpdateState](#centralManagerDidUpdateState)
 		- [peripheralDidUpdateNotificationStateFor](#peripheraldidupdatenotificationstatefor)
 		- [peripheralDidUpdateValueFor](#peripheraldidupatevaluefor)
-	- [conform to protocol CGMTransmitterProtocol](#protocolCGMTransmitterProtocol)
+	- [conform to protocol CGMTransmitter](#protocolCGMTransmitter)
 		- [canDetectNewSensor](#canDetectNewSensorprotocol)
 	- [extend class BluetoothTransmitter](#extendclassbuetoothtransmitter)
 		- [initialize the super class BluetoothTransmitter](#initializebluetoothtransmitter)
@@ -62,7 +62,7 @@ BluetoothTransmitter class to a specific transmitter class. Example when a disco
 handles the reconnect but the delegate class can for instance show the connection status to the user. It will be informed about
 the connection status via the function centralManagerDidConnect in the BluetoothTransmitterDelegate
 
-**CGMTransmitterProtocol** defines functions that CGM transmitter classes need to implement.
+**CGMTransmitter** defines functions that CGM transmitter classes need to implement.
 
 The CGM transmitter communicates back to the caller via the **CGMTransmitterDelegate** protocol.<br> 
 Needs to be conformed to, for instance by a view controller, or manager, .. whatever<br>
@@ -81,7 +81,7 @@ Every new type of bluetoothtransmitter needs to
 
 If it's a CGM transmitter (it could also be a bloodglucose meter that transmits data over bluetooth)
 
-* conform to the protocol CGMTransmitterProtocol
+* conform to the protocol CGMTransmitter
 
 ## <a name="protocolbluetoothtransmitterdelegate"></a>conform to protocol BluetoothTransmitterDelegate
 
@@ -119,7 +119,7 @@ For other types of transmitters there may be nothing to do.<br>
 
 This will be the most important function, because it contains the data that needs to be processed by the specific transmitter class.
 
-## <a name="protocolCGMTransmitterProtocol"></a>conform to protocol CGMTransmitterProtocol
+## <a name="protocolCGMTransmitter"></a>conform to protocol CGMTransmitter
 
 ### <a name="canDetectNewSensorprotocol"></a>canDetectNewSensor
 

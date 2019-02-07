@@ -17,7 +17,7 @@
 <li><a href="#peripheraldidupdatenotificationstatefor">peripheralDidUpdateNotificationStateFor</a></li>
 <li><a href="#peripheraldidupatevaluefor">peripheralDidUpdateValueFor</a></li>
 </ul></li>
-<li><a href="#protocolCGMTransmitterProtocol">conform to protocol CGMTransmitterProtocol</a>
+<li><a href="#protocolCGMTransmitter">conform to protocol CGMTransmitter</a>
 <ul>
 <li><a href="#canDetectNewSensorprotocol">canDetectNewSensor</a></li>
 </ul></li>
@@ -40,6 +40,7 @@
 <li><a href="#newSensorDetected">newSensorDetected</a></li>
 <li><a href="#sensorNotDetected">sensorNotDetected</a></li>
 <li><a href="#newReadingsReceived">newReadingsReceived</a></li>
+<li><a href="#transmitterNeedsPairing">transmitterNeedsPairing</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#functionsandpropertiesavailableintransmitterclasses">Functions and properties available in transmitter classes</a>
@@ -84,7 +85,7 @@ BluetoothTransmitter class to a specific transmitter class. Example when a disco
 handles the reconnect but the delegate class can for instance show the connection status to the user. It will be informed about
 the connection status via the function centralManagerDidConnect in the BluetoothTransmitterDelegate</p>
 
-<p><strong>CGMTransmitterProtocol</strong> defines functions that CGM transmitter classes need to implement.</p>
+<p><strong>CGMTransmitter</strong> defines functions that CGM transmitter classes need to implement.</p>
 
 <p>The CGM transmitter communicates back to the caller via the <strong>CGMTransmitterDelegate</strong> protocol.<br> 
 Needs to be conformed to, for instance by a view controller, or manager, .. whatever<br>
@@ -106,7 +107,7 @@ This protocol allows passing information like new readings, sensor detected, and
 <p>If it's a CGM transmitter (it could also be a bloodglucose meter that transmits data over bluetooth)</p>
 
 <ul>
-<li>conform to the protocol CGMTransmitterProtocol</li>
+<li>conform to the protocol CGMTransmitter</li>
 </ul>
 
 <h2><a name="protocolbluetoothtransmitterdelegate"></a>conform to protocol BluetoothTransmitterDelegate</h2>
@@ -145,7 +146,7 @@ For other types of transmitters there may be nothing to do.<br></p>
 
 <p>This will be the most important function, because it contains the data that needs to be processed by the specific transmitter class.</p>
 
-<h2><a name="protocolCGMTransmitterProtocol"></a>conform to protocol CGMTransmitterProtocol</h2>
+<h2><a name="protocolCGMTransmitter"></a>conform to protocol CGMTransmitter</h2>
 
 <h3><a name="canDetectNewSensorprotocol"></a>canDetectNewSensor</h3>
 
@@ -236,6 +237,10 @@ This will typically be called in centralManagerDidUpdateState</p>
 <h3><a name="newReadingsReceived"></a>newReadingsReceived</h3>
 
 <p>This is the most important function, it passes new readings to the delegate</p>
+
+<h3><a name="transmitterNeedsPairing"></a>transmitterNeedsPairing</h3>
+
+<p>The transmitter needs pairing, app should give warning to user to keep the app in the foreground</p>
 
 <h1><a name="functionsandpropertiesavailableintransmitterclasses"></a>Functions and properties available in transmitter classes</h1>
 

@@ -47,27 +47,6 @@ extension Data {
         }))
     }
     
-    /*var hexadecimalString: String {
-        return map { String(format: "%02hhx", $0) }.joined()
-    }*/
-    
-    
-    /*var uint8: UInt8 {
-        get {
-            var number: UInt8 = 0
-            self.getBytes(&number, length: MemoryLayout.size(ofValue: number))
-            return number
-        }
-    }
-    
-    var uint16: UInt16 {
-        get {
-            var number: UInt16 = 0
-            self.getBytes(&number, length: MemoryLayout.size(ofValue: number))
-            return number
-        }
-    }*/
-    
     ///takes 4 bytes starting at position and converts to Uint32
     func uint32 (position:Int)-> UInt32 {
         let start = position
@@ -81,6 +60,14 @@ extension Data {
         let start = position
         let end = start.advanced(by: 2)
         let number: UInt16 =  self.subdata(in: start..<end).toInt()
+        return number
+    }
+    
+    ///takes 1 byte starting at position and converts to Uint8
+    func uint8 (position:Int)-> UInt8 {
+        let start = position
+        let end = start.advanced(by: 1)
+        let number: UInt8 =  self.subdata(in: start..<end).toInt()
         return number
     }
     

@@ -2,7 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
-final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitterProtocol {
+final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
     // MARK: - properties
     
     /// uuid used for scanning, can be empty string, if empty string then scan all devices - only possible if app is in foreground

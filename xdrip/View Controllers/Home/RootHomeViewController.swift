@@ -6,7 +6,7 @@ import UserNotifications
 
 final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
     // MARK: - Properties
-    var test:CGMG5Transmitter?//TODO: should be possible to define as cgmtransmitterprotocol ? that protocol should support a few more functions
+    var test:CGMTransmitter?
     
     var address:String?
     var name:String?
@@ -75,13 +75,6 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
         
     }
     
-    // called when transmitter considered to be connected
-    func cgmTransmitterdidConnect() {
-        address = test?.address
-        name = test?.name
-        os_log("didconnect to device with address %{public}@ and name %{public}@", log: log!, type: .info, address!,name!)
-    }
-    
     // Only MioaMiao will call this
     func newSensorDetected() {
         os_log("new sensor detected", log: log!, type: .info)
@@ -98,7 +91,7 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
         os_log("sensorstate %{public}@", log: log!, type: .debug, sensorState?.description ?? "no sensor state found")
         os_log("firmware %{public}@", log: log!, type: .debug, firmware ?? "no firmware version found")
         os_log("hardware %{public}@", log: log!, type: .debug, hardware ?? "no hardware version found")
-        os_log("transmitterBatteryInfo  %{public}d", log: log!, type: .debug, transmitterBatteryInfo?.description ?? 0)
+        os_log("transmitterBatteryInfo  %{public}@", log: log!, type: .debug, transmitterBatteryInfo?.description ?? 0)
         os_log("sensor time in minutes  %{public}d", log: log!, type: .debug, sensorTimeInMinutes ?? 0)
         for (index, reading) in glucoseData.enumerated() {
             os_log("Reading %{public}d, raw level = %{public}f, realDate = %{public}s", log: log!, type: .debug, index, reading.glucoseLevelRaw, reading.timeStamp.description)
@@ -362,10 +355,10 @@ extension RootHomeViewController: UNUserNotificationCenterDelegate {
         }
     }
     
-    // MARK: - CGMTransmitterDelegate functions
+    // MARK: - CGMTransmitter protocol functions
     
     func cgmTransmitterDidConnect() {
-        if let address = test?.address, let name = test?.name {
+        if let address = test?.address(), let name = test?.name() {
             self.address = address
             self.name = name
             UserDefaults.standard.bluetoothDeviceAddress = address

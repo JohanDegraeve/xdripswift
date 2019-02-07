@@ -12,9 +12,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     public weak var bluetoothTransmitterDelegate:BluetoothTransmitterDelegate?
     
     /// the address of the transmitter. If nil then transmitter never connected, so we don't know the name.
-    public private(set) var address:String?
+    private var deviceAddress:String?
     /// the name of the transmitter. If nil then transmitter never connected, so we don't know the name
-    public private(set) var name:String?
+    private var deviceName:String?
     
     /// uuid used for scanning, can be empty string, if empty string then scan all devices - only possible if app is in foreground
     private let CBUUID_Advertisement:String?
@@ -58,7 +58,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, CBUUID_Service:String, CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String) {
         switch addressAndName {
         case .alreadyConnectedBefore(let newAddress):
-            address = newAddress
+            deviceAddress = newAddress
         case .notYetConnected(let newexpectedName):
             expectedName = newexpectedName
         }
@@ -177,8 +177,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     fileprivate func stopScanAndconnect(to peripheral: CBPeripheral) {
         
         self.centralManager?.stopScan()
-        self.address = peripheral.identifier.uuidString
-        self.name = peripheral.name
+        self.deviceAddress = peripheral.identifier.uuidString
+        self.deviceName = peripheral.name
         peripheral.delegate = self
         self.peripheral = peripheral
         
@@ -196,8 +196,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     fileprivate func retrievePeripherals(_ central:CBCentralManager) -> Bool {
-        if let address = address {
-            if let uuid = UUID(uuidString: address) {
+        if let deviceAddress = deviceAddress {
+            if let uuid = UUID(uuidString: deviceAddress) {
                 var peripheralArr = central.retrievePeripherals(withIdentifiers: [uuid])
                 if peripheralArr.count > 0 {
                     peripheral = peripheralArr[0]
@@ -225,8 +225,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         os_log("Did discover peripheral with name: %{public}@", log: log, type: .info, String(describing: deviceName))
         
         // check if stored address not nil, in which case we already connected before and we expect a full match with the already known device name
-        if let address = address {
-            if peripheral.identifier.uuidString == address {
+        if let deviceAddress = deviceAddress {
+            if peripheral.identifier.uuidString == deviceAddress {
                 os_log("stored address matches peripheral address, will try to connect", log: log, type: .info)
                 stopScanAndconnect(to: peripheral)
             }
@@ -368,6 +368,15 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         } else {
             bluetoothTransmitterDelegate?.peripheralDidUpdateValueFor(characteristic: characteristic, error: error)
         }
+    }
+    
+    // MARK: methods to get address and name
+    func address() -> String? {
+        return deviceAddress
+    }
+    
+    func name() -> String? {
+        return deviceName
     }
     
     // MARK: - helpers
