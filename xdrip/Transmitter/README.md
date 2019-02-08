@@ -14,7 +14,10 @@
 		- [peripheralDidUpdateNotificationStateFor](#peripheraldidupdatenotificationstatefor)
 		- [peripheralDidUpdateValueFor](#peripheraldidupatevaluefor)
 	- [conform to protocol CGMTransmitter](#protocolCGMTransmitter)
-		- [canDetectNewSensor](#canDetectNewSensorprotocol)
+		- [canDetectNewSensor](#canDetectNewSensor)
+		- [address](#address)
+		- [name](#name)
+		- [startScanning](#startScanning)
 	- [extend class BluetoothTransmitter](#extendclassbuetoothtransmitter)
 		- [initialize the super class BluetoothTransmitter](#initializebluetoothtransmitter)
 			- [BluetoothTransmitter.DeviceAddressAndName](#deviceaddressname)
@@ -28,23 +31,21 @@
 		- [didUpdateBluetoothState](#didUpdateBluetoothState)
 		- [newSensorDetected](#newSensorDetected)
 		- [sensorNotDetected](#sensorNotDetected)
-		- [newReadingsReceived](#newReadingsReceived)
+		- [cgmTransmitterInfoReceived](#cgmTransmitterInfoReceived)
 		- [transmitterNeedsPairing](#transmitterNeedsPairing)
-- [Functions and properties available in transmitter classes](#functionsandpropertiesavailableintransmitterclasses)
-	- [Functions in BluetoothTransmitter classes](#functionsinbluetoothtransmitterclasses)
-		- [disconnect](#disconnect)
-		- [startScanning](#startScanning)
-		- [writeDataToPeripheral(data:Data, type:CBCharacteristicWriteType) -> Bool](#writeDataToPeripheral)
-		- [writeDataToPeripheral(data:Data, characteristicToWriteTo:CBCharacteristic, type:CBCharacteristicWriteType) -> Bool](#writeDataToPeripheral)
-		- [setNotifyValue](#setNotifyValue)
-	- [Properties in BluetoothTransmitter classes](#propertiesinbluetoothtransmitterclasses)
-		- [address](#address)
-		- [name](#name)
-	- [Functions in CGM Transmitter classes](#functionsincgmtransmitterclasses)
-		- [canDetectNewSensor](#canDetectNewSensor)
+	- [Implement the specific protocol](#implementtheprotocol)
+		- [Functions and properties available in transmitter classes](#functionsandpropertiesavailableintransmitterclasses)
+			- [Functions in BluetoothTransmitter classes](#functionsinbluetoothtransmitterclasses)
+				- [disconnect](#disconnect)
+				- [startScanning](#startScanning)
+				- [writeDataToPeripheral(data:Data, type:CBCharacteristicWriteType) -> Bool](#writeDataToPeripheral)
+				- [writeDataToPeripheral(data:Data, characteristicToWriteTo:CBCharacteristic, type:CBCharacteristicWriteType) -> Bool](#writeDataToPeripheral)
+				- [setNotifyValue](#setNotifyValue)
 - [Available CGM transmitter classes](#availablecgmtransmitterclasses)
 	- [MiaoMiao](#MiaoMiao)
 	- [xDripG4](#xDripG4)
+	- [Dexcom G5](#DexcomG5)
+- [Use a transmitter class](#useatransmitterclass)
 	
 
 # <a name="summary"></a>Summary
@@ -69,10 +70,15 @@ Needs to be conformed to, for instance by a view controller, or manager, .. what
 This protocol allows passing information like new readings, sensor detected, and also connect/disconnect, bluetooth status change<br>
 
 Following specific transmitter classes exist:<br>
-**CGMG4xDripTransmitter**<br>
-**CGMG5Transmitter**<br>
 
-#<a name="newtransmitters"></a>Steps for adding new (CGM) transmitter types
+* **CGMMiaoMiaoTransmitter**<br>
+
+* **CGMG4xDripTransmitter**<br>
+
+* **CGMG5Transmitter**<br>
+
+
+# <a name="newtransmitters"></a>Steps to adding new (CGM) transmitter types
 
 Every new type of bluetoothtransmitter needs to
 
@@ -85,7 +91,9 @@ If it's a CGM transmitter (it could also be a bloodglucose meter that transmits 
 
 ## <a name="protocolbluetoothtransmitterdelegate"></a>conform to protocol BluetoothTransmitterDelegate
 
-The functions that not be implemented:
+The protocol is used to pass back information from the BluetoothTransmitter class to the specific Transmitter class.
+
+The functions that need to be implemented:
 
 ### <a name="centralManagerdidconnect"><font color="purple">func</font> centralManagerDidConnect()
 
@@ -125,6 +133,18 @@ This will be the most important function, because it contains the data that need
 
 can the cgm transmitter detect that a new sensor is placed ? Will return true only for Libre type of transmitters, eg MiaoMiao<br>
 If it returns true the the transmitter should also use newSensorDetected
+
+### <a name="address"></a>address
+
+This function is already implemented in the parent class BluetoothTransmitter, there's no need to implement it.
+
+### <a name="name"></a>name
+
+This function is already implemented in the parent class BluetoothTransmitter, there's no need to implement it.
+
+### <a name="startScanning"></a>startScanning
+
+This function is already implemented in the parent class BluetoothTransmitter, there's no need to implement it.
 
 ## <a name="extendclassbuetoothtransmitter"></a>extend class BluetoothTransmitter
 
@@ -179,6 +199,8 @@ write characteristic UUID
 The new transmitter class needs to store a property of type CGMTransmitterDelegate<br>
 This is used to pass back information to the controller<br>
 
+Define it as a weak var
+
 Functions in CGMTransmitterDelegate:
 
 ### <a name="cgmTransmitterDidConnect"></a>cgmTransmitterDidConnect
@@ -205,64 +227,101 @@ When a new sensor is detected, only applicable to transmitters that have this fu
 
 When a sensor is not detected, only applicable to transmitters that have this functionality
 
-### <a name="newReadingsReceived"></a>newReadingsReceived
+### <a name="cgmTransmitterInfoReceived"></a>cgmTransmitterInfoReceived
 
 This is the most important function, it passes new readings to the delegate
+
+also battery info, sensor state, firmware & hardware info if applicable
 
 ### <a name="transmitterNeedsPairing"></a>transmitterNeedsPairing
 
 The transmitter needs pairing, app should give warning to user to keep the app in the foreground
 
-# <a name="functionsandpropertiesavailableintransmitterclasses"></a>Functions and properties available in transmitter classes
+## <a name="implementtheprotocol"></a>Implement the transmitter protocol
 
-## <a name="functionsinbluetoothtransmitterclasses"></a>Functions in BluetoothTransmitter classes
+The specific protocol needs to be implemented.
 
-### <a name="disconnect"></a>disconnect
+See as example already existing cgm transmitter classes.
+
+All functions in the parent class can be overriden.
+
+Following additional functions can be used :
+
+### <a name="functionsandpropertiesavailableintransmitterclasses"></a>Functions and properties available in transmitter classes
+
+#### <a name="functionsinbluetoothtransmitterclasses"></a>Functions in BluetoothTransmitter classes
+
+These functions should only be used by classes that extend the BluetoothTransmitter class.
+
+##### <a name="disconnect"></a>disconnect
 
 will call centralManager.cancelPeripheralConnection
 
-### <a name="startScanning"></a>startScanning
+##### <a name="startScanning"></a>startScanning
 
 Will scan for the device.<br>
 This should only be used the first time the app connects to a specific device and should not be done for transmittertypes that 
 start scanning at initialization<br>
-//TODO: needs more clarification
 
-### <a name="writeDataToPeripheral"></a>writeDataToPeripheral(data:Data, type:CBCharacteristicWriteType)  -> Bool
+##### <a name="writeDataToPeripheral"></a>writeDataToPeripheral(data:Data, type:CBCharacteristicWriteType)  -> Bool
 
-calls peripheral.writeValue for characteristic CBUUID\_WriteCharacteristic
+calls peripheral.writeValue for characteristic CBUUID\_WriteCharacteristic<br>
 
-### <a name="writeDataToPeripheral"></a>writeDataToPeripheral(data:Data, characteristicToWriteTo:CBCharacteristic, type:CBCharacteristicWriteType)  -> Bool
+Make sure that the parent class has initialized the parameter writeCharacteristic.<br>
+This may not be the case of the deriving transmitter class has overriden the method func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?)
+
+##### <a name="writeDataToPeripheral"></a>writeDataToPeripheral(data:Data, characteristicToWriteTo:CBCharacteristic, type:CBCharacteristicWriteType)  -> Bool
 
 calls peripheral.writeValue for characteristic that is given as argment : characteristicToWriteTo
 
-### <a name="setNotifyValuefunc"></a>setNotifyValue(_ enabled: Bool, for characteristic: CBCharacteristic)
+##### <a name="setNotifyValuefunc"></a>setNotifyValue(_ enabled: Bool, for characteristic: CBCharacteristic)
 
 calls setNotifyValue for characteristic with value enabled
-
-## <a name="propertiesinbluetoothtransmitterclasses"></a>Properties in BluetoothTransmitter classes
-
-### <a name="address"></a>address
-
-the peripheral address, available after successfully connecting
-
-### <a name="name"></a>name
-
-the peripheral name, available after successfully connecting
-
-## <a name="functionsincgmtransmitterclasses"></a>Functions in CGM Transmitter classes
-
-### <a name="canDetectNewSensor"></a>canDetectNewSensor
-
-can the cgm transmitter detect a new sensor ?
 
 # <a name="availablecgmtransmitterclasses"></a>Available CGM transmitter classes
 
 ## <a name="MiaoMiao"></a>MiaoMiao 
 
-MiaoMiao transmitter is fully implemented
+MiaoMiao transmitter is fully implemented<br>
+class CGMMiaoMiaoTransmitter
 
 ## <a name="xDripG4"></a>xDripG4
 
-xDripG4 transmitter is fully implemented
+xDripG4 transmitter is fully implemented<br>
+class CGMG4xDripTransmitter
 
+## <a name="DexcomG5"></a>Dexcom G5
+
+Dexcom G5 is implemented:
+
+* no backfilling
+* not yet tested with transmitter on sensor
+
+# <a name="useatransmitterclass"></a>Use a Transmitter class
+
+* conform to protocol CGMTransmitterDelegate
+
+* implement the functions in CGMTransmitterDelegate
+
+  * cgmTransmitterDidConnect :  Called when the transmitter has connected. The function gives the name and address.<br>
+Store the address in permanent storage, next time the transmitter is initialized, give it the address value<br>
+It will ease the initial connect
+
+  * cgmTransmitterDidDisconnect : To give info to the user that the transmitter has disconnected, if needed to give that info.
+
+  * deviceDidUpdateBluetoothState : Gives the status of Bluetooth (on/off ..)<br>
+Specifically useful if first scan still needs to occur. May not be useful at all.
+
+  * newSensorDetected : Typically for MiaoMiao, can be used to automatically start the sensor, no need to ask the user to do this.
+
+  * sensorNotDetected : Typically for MiaoMiao
+
+  * func cgmTransmitterInfoReceived(glucoseData:inout [RawGlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorState:SensorState?, sensorTimeInMinutes:Int?, firmware:String?, hardware:String?)
+Can contain lots of data, like new readings (raw readings), ...
+
+  * cgmTransmitterNeedsPairing : Warn the user that app should stay in foreground
+  
+* Define a variable of type CGMTransmitter and initialize it with any of the transmitter classes
+
+  * In intializer, give it the address if known, or nil if not. If needed also transmitter id and pass it the CGMTransmitterDelegate
+  

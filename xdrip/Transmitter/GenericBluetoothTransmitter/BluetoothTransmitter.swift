@@ -278,7 +278,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         os_log("connected, will discover services", log: log, type: .info)
         peripheral.discoverServices(services)
         
-        bluetoothTransmitterDelegate?.centralManagerDidConnect()
+        bluetoothTransmitterDelegate?.centralManagerDidConnect(address: deviceAddress, name: deviceName)
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {

@@ -8,7 +8,7 @@ protocol CGMTransmitterDelegate:AnyObject {
     /// transmitter reaches final connection status
     ///
     /// needs to be called by deriving specific transmitter class, example in CGMG4xDripTransmitter, the function is called only when subscription to read characteristic has succeeded, whereas for other like MiaoMiao, the function is called as soon as real connection is made
-    func cgmTransmitterDidConnect()
+    func cgmTransmitterDidConnect(address:String?, name:String?)
     
     /// transmitter did disconnect
     func cgmTransmitterDidDisconnect()

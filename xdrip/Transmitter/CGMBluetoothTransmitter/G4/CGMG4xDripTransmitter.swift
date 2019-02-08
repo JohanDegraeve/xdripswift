@@ -50,7 +50,8 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     
     // MARK: - BluetoothTransmitterDelegate functions
     
-    func centralManagerDidConnect() {
+    func centralManagerDidConnect(address:String?, name:String?) {
+        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
     }
     
     func centralManagerDidFailToConnect(error: Error?) {
@@ -65,9 +66,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     }
     
     func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
-        os_log("in peripheralDidUpdateNotificationStateFor, it's an xdrip, assuming here full connect status", log: log, type: .info)
-        //In Spike and iosxdripreader, a device connection completed is transmitted in this case
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect()
+        os_log("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
     }
     
     func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {

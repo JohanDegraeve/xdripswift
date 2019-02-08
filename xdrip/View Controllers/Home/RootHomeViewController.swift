@@ -31,7 +31,6 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
         // Setup View
         setupView()
         
-        //let test:CGMG4xDripTransmitter = CGMG4xDripTransmitter(addressAndName: CGMG4xDripTransmitter.G4DeviceAddressAndName.notYetConnected)
         log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryFirstView)
         os_log("firstview viewdidload", log: log!, type: .info)
         
@@ -49,8 +48,8 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
             address = storedAddress
         }
         //test = CGMMiaoMiaoTransmitter(address: address, delegate: self, timeStampLastBgReading: timeStampLastBgReading)
-        //test = CGMG4xDripTransmitter(address: address, transmitterID: "6LSDU", delegate:self)
-        test = CGMG5Transmitter(address: address, transmitterID: "406QWK", delegate: self)
+        test = CGMG4xDripTransmitter(address: address, transmitterID: "6LSDU", delegate:self)
+        //test = CGMG5Transmitter(address: address, transmitterID: "406QWK", delegate: self)
 
         UNUserNotificationCenter.current().delegate = self
         
@@ -358,8 +357,8 @@ extension RootHomeViewController: UNUserNotificationCenterDelegate {
     
     // MARK: - CGMTransmitter protocol functions
     
-    func cgmTransmitterDidConnect() {
-        if let address = test?.address(), let name = test?.name() {
+    func cgmTransmitterDidConnect(address:String?, name:String?) {
+        if let address = address, let name = name {
             self.address = address
             self.name = name
             UserDefaults.standard.bluetoothDeviceAddress = address

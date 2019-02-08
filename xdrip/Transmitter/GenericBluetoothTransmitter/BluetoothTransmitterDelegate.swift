@@ -8,7 +8,10 @@ import CoreBluetooth
 protocol BluetoothTransmitterDelegate:AnyObject {
     /// called when centralManager didConnect was called in BlueToothTransmitter class
     /// the BlueToothTransmitter class handles the reconnect but the delegate class can for instance show the connection status to the user
-    func centralManagerDidConnect()
+    /// - parameters:
+    ///     - address: the address that was received from the transmitter during connection phase
+    ///     - name: the name that was received from the transmitter during connection phase
+    func centralManagerDidConnect(address:String?, name:String?)
     
     /// called when centralManager didFailToConnect was called in BlueToothTransmitter class
     /// the BlueToothTransmitter class handles will try to reconnect but the delegate class can for instance show the connection status to the user

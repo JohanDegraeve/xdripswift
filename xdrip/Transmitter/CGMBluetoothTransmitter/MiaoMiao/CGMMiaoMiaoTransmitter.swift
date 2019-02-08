@@ -78,8 +78,8 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     
     // MARK: - BluetoothTransmitterDelegate functions
     
-    func centralManagerDidConnect() {
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect()
+    func centralManagerDidConnect(address:String?, name:String?) {
+        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
     }
     
     func centralManagerDidFailToConnect(error: Error?) {
