@@ -60,9 +60,9 @@ If necessary, each of the functions in the protocols CBCentralManagerDelegate an
 The protocol **BluetoothTransmitterDelegate** defines functions that allow to pass bluetooth activity information from the 
 BluetoothTransmitter class to a specific transmitter class. Example when a disconnect occurs, the BlueToothTransmitter class 
 handles the reconnect but the delegate class can for instance show the connection status to the user. It will be informed about
-the connection status via the function centralManagerDidConnect in the BluetoothTransmitterDelegate
+the connection status via the function centralManagerDidConnect in the BluetoothTransmitterDelegate.
 
-**CGMTransmitter** defines functions that CGM transmitter classes need to implement.
+The **CGMTransmitter** protocol defines functions that CGM transmitter classes need to implement.
 
 The CGM transmitter communicates back to the caller via the **CGMTransmitterDelegate** protocol.<br> 
 Needs to be conformed to, for instance by a view controller, or manager, .. whatever<br>

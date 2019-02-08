@@ -29,7 +29,6 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - transmitterID: expected transmitterID, 5 characters
     init(address:String?, transmitterID:String, delegate:CGMTransmitterDelegate) {
-        
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: nil)
         if let address = address {
@@ -102,7 +101,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
                 
             // check transmitterid, if not correct write correct value and return
             if let data = checkTransmitterId(receivedTransmitterId: result.transmitterID, expectedTransmitterId: self.transmitterId, log: log) {
-                os_log("in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, type: .info, self.transmitterId)
+                os_log("    in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, type: .info, self.transmitterId)
                 _ = writeDataToPeripheral(data: data, type: .withoutResponse)//no need to log the result, this is already logged in BluetoothTransmitter.swift
                 return
             }
@@ -119,27 +118,27 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
                 cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
             }
         case .beaconPacket?:
-            os_log("in peripheral didUpdateValueFor, received beaconPacket", log: log, type: .info)
+            os_log("    in peripheral didUpdateValueFor, received beaconPacket", log: log, type: .info)
             
             //packet length should be 7
             guard packetLength == 7 else {
-                os_log("in peripheral didUpdateValueFor, packet length is not 7,  no further processing", log: log, type: .info)
+                os_log("    in peripheral didUpdateValueFor, packet length is not 7,  no further processing", log: log, type: .info)
                 return
             }
 
             //read txid
             let receivedTransmitterId = decodeTxID(TxID: value.uint32(position: 2))
-            os_log("in peripheral didUpdateValueFor, received beaconPacket with txid %{public}@", log: log, type: .info, receivedTransmitterId)
+            os_log("    in peripheral didUpdateValueFor, received beaconPacket with txid %{public}@", log: log, type: .info, receivedTransmitterId)
             
             // check transmitterid, if not correct write correct value
             if let data = checkTransmitterId(receivedTransmitterId: receivedTransmitterId, expectedTransmitterId: self.transmitterId, log: log) {
-                os_log("in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, type: .info, self.transmitterId)
+                os_log("    in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, type: .info, self.transmitterId)
                 _ = writeDataToPeripheral(data: data, type: .withoutResponse)//no need to log the result, this is already logged in BluetoothTransmitter.swift
                 return
             }
         default:
             //value doesn't start with a known xdripresponsetype
-            os_log("unknown packet type, looks like an xdrip with old wxl code which starts with the raw_data encoded.", log: log, type: .info)
+            os_log("    unknown packet type, looks like an xdrip with old wxl code which starts with the raw_data encoded.", log: log, type: .info)
             
             //process value and get result, send it to delegate
             let result = processBasicXdripDataPacket(value: value)

@@ -491,10 +491,10 @@ extension CalibratorProtocol {
     ///     - bgReading : reading that needs to be updated - inout parameter to improve performance
     private func updateCalculatedValue(for bgReading:BgReading) {
         if (bgReading.calculatedValue < 10) {
-            bgReading.calculatedValue = Constants.BgReadingAlgorithms.bgReadingErrorValue
+            bgReading.calculatedValue = Constants.CalibrationAlgorithms.bgReadingErrorValue
             bgReading.hideSlope = true
         } else {
-            bgReading.calculatedValue = min(Constants.BgReadingAlgorithms.maximumBgReadingCalculatedValue, max(Constants.BgReadingAlgorithms.minimumBgReadingCalculatedValue, bgReading.calculatedValue))
+            bgReading.calculatedValue = min(Constants.CalibrationAlgorithms.maximumBgReadingCalculatedValue, max(Constants.CalibrationAlgorithms.minimumBgReadingCalculatedValue, bgReading.calculatedValue))
         }
     }
     
@@ -529,11 +529,11 @@ extension CalibratorProtocol {
     ///     - withSensor : the currently active sensor, optional
     private func calculateAgeAdjustedRawValue(for bgReading:BgReading, withSensor sensor:Sensor?) {
         if let sensor = sensor {
-            let adjustfor:Double = Constants.BgReadingAlgorithms.ageAdjustmentTime - (bgReading.timeStamp.toMillisecondsAsDouble() - sensor.startDate.toMillisecondsAsDouble())
+            let adjustfor:Double = Constants.CalibrationAlgorithms.ageAdjustmentTime - (bgReading.timeStamp.toMillisecondsAsDouble() - sensor.startDate.toMillisecondsAsDouble())
             if (adjustfor <= 0 || !ageAdjustMentNeeded) {
                 bgReading.ageAdjustedRawValue = bgReading.rawData
             } else {
-                bgReading.ageAdjustedRawValue = ((Constants.BgReadingAlgorithms.ageAdjustmentFactor * (adjustfor / Constants.BgReadingAlgorithms.ageAdjustmentTime)) * bgReading.rawData) + bgReading.rawData
+                bgReading.ageAdjustedRawValue = ((Constants.CalibrationAlgorithms.ageAdjustmentFactor * (adjustfor / Constants.CalibrationAlgorithms.ageAdjustmentTime)) * bgReading.rawData) + bgReading.rawData
             }
         } else {
             bgReading.ageAdjustedRawValue = bgReading.rawData

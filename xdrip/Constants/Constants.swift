@@ -12,7 +12,7 @@ struct Constants {
         static let maxSlopeInMinutes = 21
     }
     
-    enum BgReadingAlgorithms {
+    enum CalibrationAlgorithms {
         // age adjustment constants, only for non Libre
         static let ageAdjustmentTime = 86400000 * 1.9
         static let ageAdjustmentFactor = 0.45
@@ -56,4 +56,5 @@ struct Constants {
     enum DexcomG5 {
         static let batteryReadPeriodInHours = 12.0
     }
+    
 }

@@ -41,18 +41,15 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     
     
     // MARK: - Initialization
-    
-    init(addressAndName: BluetoothTransmitter.DeviceAddressAndName, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date) {
-        
+    /// - parameters:
+    ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
+    init(address:String?, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date) {
         // assign addressname and name or expected devicename
-        var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName
-        switch addressAndName {
-        case .alreadyConnectedBefore(let newAddress):
-            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: newAddress)
-        case .notYetConnected:
-            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameMiaoMiao)
+        var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameMiaoMiao)
+        if let address = address {
+            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address)
         }
-        
+
         // assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate
         
@@ -64,6 +61,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         self.timeStampLastBgReading = timeStampLastBgReading
         
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, CBUUID_Service: CBUUID_Service_MiaoMiao, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao)
+        
         bluetoothTransmitterDelegate = self
     }
     
