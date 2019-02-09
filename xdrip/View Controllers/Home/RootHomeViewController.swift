@@ -47,9 +47,10 @@ final class RootHomeViewController: UIViewController, CGMTransmitterDelegate {
         if let storedAddress = UserDefaults.standard.bluetoothDeviceAddress {
             address = storedAddress
         }
+        
         //test = CGMMiaoMiaoTransmitter(address: address, delegate: self, timeStampLastBgReading: timeStampLastBgReading)
-        test = CGMG4xDripTransmitter(address: address, transmitterID: "6LSDU", delegate:self)
-        //test = CGMG5Transmitter(address: address, transmitterID: "406QWK", delegate: self)
+        //test = CGMG4xDripTransmitter(address: address, transmitterID: "6LSDU", delegate:self)
+        test = CGMG5Transmitter(address: address, transmitterID: "406QWK", delegate: self)
 
         UNUserNotificationCenter.current().delegate = self
         
