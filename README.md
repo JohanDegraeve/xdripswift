@@ -1,3 +1,5 @@
-Transmitter classes : https://github.com/JohanDegraeve/xdripswift/blob/master/xdrip/Transmitter/README.md
+Project in development.
 
-Calibration protocol : https://github.com/JohanDegraeve/xdripswift/tree/master/xdrip/Calibration
+Goal is to port iosxdripreader to Swift
+
+Please go to the Wiki : https://github.com/JohanDegraeve/xdripswift/wiki
