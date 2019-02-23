@@ -1,0 +1,16 @@
+PODS:
+  - ActionClosurable (1.2.0)
+
+DEPENDENCIES:
+  - ActionClosurable
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - ActionClosurable
+
+SPEC CHECKSUMS:
+  ActionClosurable: ff826688551b031c6bd936cb4928ebf63571893a
+
+PODFILE CHECKSUM: 1992153c1f3a926bd917de44a464a5d2fbc0825f
+
+COCOAPODS: 1.6.1

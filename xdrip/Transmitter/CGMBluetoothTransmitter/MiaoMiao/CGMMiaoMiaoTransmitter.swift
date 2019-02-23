@@ -177,11 +177,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         }
     }
     
-    //MARK: CGMTransmitterProtocol functions
-    func canDetectNewSensor() -> Bool {
-        return false
-    }
-
     // MARK: - helpers
     
     /// reset rxBuffer, reset startDate, stop packetRxMonitorTimer, set resendPacketCounter to 0

@@ -332,12 +332,6 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         }
     }
 
-    // MARK: CGMTransmitterProtocol functions
-    
-    func canDetectNewSensor() -> Bool {
-        return false
-    }
-    
     // MARK: helper functions
     
     /// sends SensorTxMessage to transmitter

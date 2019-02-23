@@ -152,12 +152,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         }
     }
     
-    //MARK: CGMTransmitterProtocol functions
-    func canDetectNewSensor() -> Bool {
-        return false
-    }
-    
-    // MARK: helper functions
+     // MARK: helper functions
     
     private func processxBridgeDataPacket(value:Data) -> (glucoseData:RawGlucoseData?, batteryLevel:Int?, transmitterID:String?) {
         guard value.count >= 10 else {

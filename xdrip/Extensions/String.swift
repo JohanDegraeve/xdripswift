@@ -1,11 +1,11 @@
 import Foundation
 
-//https://stackoverflow.com/questions/39677330/how-does-string-substring-work-in-swift
-//usage
-//let s = "hello"
-//s[0..<3] // "hel"
-//s[3..<s.count] // "lo"
 extension String {
+    //https://stackoverflow.com/questions/39677330/how-does-string-substring-work-in-swift
+    //usage
+    //let s = "hello"
+    //s[0..<3] // "hel"
+    //s[3..<s.count] // "lo"
     subscript(_ range: CountableRange<Int>) -> String {
         let idx1 = index(startIndex, offsetBy: max(0, range.lowerBound))
         let idx2 = index(startIndex, offsetBy: min(self.count, range.upperBound))
@@ -13,11 +13,45 @@ extension String {
     }
 }
 
-/// validates if string matches regex
 extension String {
+    /// validates if string matches regex
     func validate(withRegex regex: NSRegularExpression) -> Bool {
         let range = NSRange(self.startIndex..., in: self)
         let matchRange = regex.rangeOfFirstMatch(in: self, options: .reportProgress, range: range)
         return matchRange.location != NSNotFound
+    }
+}
+
+extension String {
+    func startsWith(_ prefix: String) -> Bool {
+        return lowercased().hasPrefix(prefix.lowercased())
+    }
+}
+
+extension String {
+    /// will replace check if newValue has correct decimal point
+    func toDouble() -> Double? {
+        
+        // if string is empty then no further processing needed, return nil
+        if self.count == 0 {
+            return nil
+        }
+        
+        let returnValue:Double? = Double(self)
+        if let returnValue = returnValue  {
+            // Double value is correctly created, return it
+            return returnValue
+        } else {
+            // first check if it has ',', replace by '.' and try again
+            // else replace '.' by ',' and try again
+            if self.indexes(of: ",").count > 0 {
+                let newString = self.replacingOccurrences(of: ",", with: ".")
+                return Double(newString)
+            } else if self.indexes(of: ".").count > 0 {
+                let newString = self.replacingOccurrences(of: ".", with: ",")
+                return Double(newString)
+            }
+        }
+        return nil
     }
 }
