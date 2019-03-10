@@ -41,10 +41,10 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
         if let transmitterType = UserDefaults.standard.transmitterType {
             // if transmitter doesn't need transmitterid (like MiaoMiao) then the settings row that asks for transmitterid doesn't need to be shown. That rows is the second row.
             return transmitterType.needsTransmitterId() ? 2:1
+        } else {
+            // transmitterType nil, means this is initial setup, no need to show transmitter id field
+            return 1
         }
-        
-        // default, return count, should
-        return Setting.allCases.count
     }
 
     func text(index: Int) -> String {
