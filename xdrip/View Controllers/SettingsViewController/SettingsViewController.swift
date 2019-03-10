@@ -16,7 +16,7 @@ final class SettingsViewController: UIViewController {
     
     private lazy var pickerViewController: PickerViewController = {
         // Instantiate View Controller
-        var viewController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "PickerViewController") as! PickerViewController
+        var viewController = UIStoryboard.main.instantiateViewController(withIdentifier: "PickerViewController") as! PickerViewController
 
         viewController.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
         return viewController
