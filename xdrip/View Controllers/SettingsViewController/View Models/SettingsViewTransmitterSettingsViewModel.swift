@@ -29,7 +29,7 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
                 selectedRow = data.index(of:transmitterType)
             }
             
-            return SelectedRowAction.selectFromList(title: Texts_SettingsViews.transmitterId, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in UserDefaults.standard.transmitterType = CGMTransmitterType(rawValue: data[index])}, cancelHandler: nil)
+            return SelectedRowAction.selectFromList(title: Texts_SettingsViews.transmitterId, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in UserDefaults.standard.transmitterTypeAsString = data[index]}, cancelHandler: nil)
         }
     }
     

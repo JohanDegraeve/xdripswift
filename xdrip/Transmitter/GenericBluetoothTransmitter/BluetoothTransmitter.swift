@@ -49,6 +49,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// used in BluetoothTransmitter class, eg if after calling discoverServices new method is called and time is exceed, then cancel connection
     let maxTimeToWaitForPeripheralResponse = 5.0
+    
+    /// should the app try to reconnect after disconnect?
+    private var reconnectAfterDisconnect:Bool = true
 
     // MARK: - Initialization
     
@@ -83,6 +86,16 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         initialize()
     }
     
+    // MARK: - De-initialization
+    
+    deinit {
+        // reconnect not necessary
+        reconnectAfterDisconnect = false
+        
+        // disconnect the device
+        disconnect()
+    }
+    
     // MARK: - public functions
     
     func disconnect() {
@@ -90,7 +103,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             if let centralManager = centralManager {
                 os_log("disconnect, disconnecting", log: log, type: .info)
                 centralManager.cancelPeripheralConnection(peripheral)
-                //TODO: probably needs changes, because app will automatically reconnect when didDisconnectPeripheral is  called
             }
         }
     }
@@ -302,7 +314,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         os_log("in centralManagerDidUpdateState, new state is %{public}@", log: log, type: .info, "\(central.state.toString())")
 
         /// in case status changed to powered on and if device address known then try either to retrieveperipherals, or if that doesn't succeed, start scanning
-        if central.state == .poweredOn {
+        if central.state == .poweredOn, reconnectAfterDisconnect {
             if (deviceAddress != nil) {
                 if !retrievePeripherals(central) {
                     _ = startScanning()
@@ -318,6 +330,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         if let error = error {
             os_log("Did disconnect peripheral with error: %{public}@", log: log, type: .error , error.localizedDescription)
+        }
+        
+        // check if automatic reconnect is needed or not
+        if !reconnectAfterDisconnect {
+            os_log("reconnectAfterDisconnect is false, will not try to reconnect", log: log, type: .info)
         }
         
         // if self.peripheral == nil, then a manual disconnect or something like that has occured, no need to reconnect

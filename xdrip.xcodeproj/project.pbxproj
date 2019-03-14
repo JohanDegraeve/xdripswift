@@ -19,10 +19,9 @@
 		F8025C2021DBD0FE00ECF0C0 /* ParseLibreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */; };
 		F8025E4C21E6618200ECF0C0 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4B21E6618100ECF0C0 /* Log.swift */; };
 		F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4D21ED450300ECF0C0 /* Double.swift */; };
-		F8025E5021EE746400ECF0C0 /* CalibratorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4F21EE746400ECF0C0 /* CalibratorProtocol.swift */; };
+		F8025E5021EE746400ECF0C0 /* Calibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4F21EE746400ECF0C0 /* Calibrator.swift */; };
 		F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */; };
 		F8025E5721F4A60900ECF0C0 /* CGMTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E5621F4A60900ECF0C0 /* CGMTransmitter.swift */; };
-		F8025E6421F7BF3300ECF0C0 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E6321F7BF3300ECF0C0 /* UserDefaults.swift */; };
 		F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */; };
 		F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */; };
 		F80610C8223035B700D8F236 /* PickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80610C7223035B700D8F236 /* PickerViewController.swift */; };
@@ -67,7 +66,7 @@
 		F8BDD41E22183CA0006EAB84 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41D22183CA0006EAB84 /* SettingsViewNightScoutSettingsViewModel.swift */; };
 		F8BDD42022183CE9006EAB84 /* SettingsViewAlarmsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41F22183CE9006EAB84 /* SettingsViewAlarmsSettingsViewModel.swift */; };
 		F8BDD42222183CFE006EAB84 /* SettingsViewSpeakSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD42122183CFE006EAB84 /* SettingsViewSpeakSettingsViewModel.swift */; };
-		F8BDD4242218790E006EAB84 /* UserDefaults+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD4232218790E006EAB84 /* UserDefaults+Settings.swift */; };
+		F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD4232218790E006EAB84 /* UserDefaults.swift */; };
 		F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD436221A0349006EAB84 /* Localizable.strings */; };
 		F8BDD43D221B48F2006EAB84 /* SettingsViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD43C221B48F2006EAB84 /* SettingsViewModelProtocol.swift */; };
 		F8BDD43F221B5BAF006EAB84 /* TextsErrorMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD43E221B5BAF006EAB84 /* TextsErrorMessages.swift */; };
@@ -104,10 +103,9 @@
 		F8025C1F21DBD0FE00ECF0C0 /* ParseLibreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseLibreData.swift; sourceTree = "<group>"; };
 		F8025E4B21E6618100ECF0C0 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		F8025E4D21ED450300ECF0C0 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
-		F8025E4F21EE746400ECF0C0 /* CalibratorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibratorProtocol.swift; sourceTree = "<group>"; };
+		F8025E4F21EE746400ECF0C0 /* Calibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calibrator.swift; sourceTree = "<group>"; };
 		F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre1Calibrator.swift; sourceTree = "<group>"; };
 		F8025E5621F4A60900ECF0C0 /* CGMTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMTransmitter.swift; sourceTree = "<group>"; };
-		F8025E6321F7BF3300ECF0C0 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIStoryboard.swift; sourceTree = "<group>"; };
 		F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionClosureable-extension.swift"; sourceTree = "<group>"; };
 		F80610C7223035B700D8F236 /* PickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewController.swift; sourceTree = "<group>"; };
@@ -156,7 +154,7 @@
 		F8BDD41D22183CA0006EAB84 /* SettingsViewNightScoutSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewNightScoutSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8BDD41F22183CE9006EAB84 /* SettingsViewAlarmsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewAlarmsSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8BDD42122183CFE006EAB84 /* SettingsViewSpeakSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewSpeakSettingsViewModel.swift; sourceTree = "<group>"; };
-		F8BDD4232218790E006EAB84 /* UserDefaults+Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Settings.swift"; sourceTree = "<group>"; };
+		F8BDD4232218790E006EAB84 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		F8BDD435221A0005006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		F8BDD437221A0349006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F8BDD439221A096C006EAB84 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -226,16 +224,16 @@
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */,
-				F8EA6C8121B723BC0082976B /* Date.swift */,
-				F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */,
-				F8025C1221DA683400ECF0C0 /* Data.swift */,
-				F8025E4D21ED450300ECF0C0 /* Double.swift */,
-				F8025E6321F7BF3300ECF0C0 /* UserDefaults.swift */,
-				F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */,
-				F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */,
-				F897AAFA2201018800CDDD10 /* String.swift */,
 				F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */,
+				F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */,
+				F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */,
+				F8025C1221DA683400ECF0C0 /* Data.swift */,
+				F8EA6C8121B723BC0082976B /* Date.swift */,
+				F8025E4D21ED450300ECF0C0 /* Double.swift */,
+				F897AAFA2201018800CDDD10 /* String.swift */,
+				F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */,
+				F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */,
+				F8BDD4232218790E006EAB84 /* UserDefaults.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -252,7 +250,7 @@
 		F8025E5221EE8CE500ECF0C0 /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
-				F8025E4F21EE746400ECF0C0 /* CalibratorProtocol.swift */,
+				F8025E4F21EE746400ECF0C0 /* Calibrator.swift */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -482,7 +480,6 @@
 				F8BDD41D22183CA0006EAB84 /* SettingsViewNightScoutSettingsViewModel.swift */,
 				F8BDD42122183CFE006EAB84 /* SettingsViewSpeakSettingsViewModel.swift */,
 				F8BDD41B2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift */,
-				F8BDD4232218790E006EAB84 /* UserDefaults+Settings.swift */,
 			);
 			path = "View Models";
 			sourceTree = "<group>";
@@ -717,7 +714,7 @@
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F897AB242206585F00CDDD10 /* AuthChallengeRxMessage.swift in Sources */,
 				F8025C1821DBC16400ECF0C0 /* CRC.swift in Sources */,
-				F8025E5021EE746400ECF0C0 /* CalibratorProtocol.swift in Sources */,
+				F8025E5021EE746400ECF0C0 /* Calibrator.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
 				F8BDD43D221B48F2006EAB84 /* SettingsViewModelProtocol.swift in Sources */,
 				F897AB37220775A300CDDD10 /* BatteryStatusRxMessage.swift in Sources */,
@@ -732,7 +729,6 @@
 				F85DC30121D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift in Sources */,
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
 				F897AB3B2208DCE100CDDD10 /* TransmitterBatteryInfo.swift in Sources */,
-				F8025E6421F7BF3300ECF0C0 /* UserDefaults.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* BluetoothTransmitter.swift in Sources */,
 				F897AB2222059EA000CDDD10 /* Opcode.swift in Sources */,
 				F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */,
@@ -747,7 +743,7 @@
 				F897AB1F22059EA000CDDD10 /* AuthRequestRxMessage.swift in Sources */,
 				F897AB2A220742E900CDDD10 /* AESCrypt.m in Sources */,
 				F8BDD45C221E0263006EAB84 /* SettingsViewHealthKitSettingsViewModel.swift in Sources */,
-				F8BDD4242218790E006EAB84 /* UserDefaults+Settings.swift in Sources */,
+				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
 				F897AAFE2202577200CDDD10 /* CGMG5Transmitter.swift in Sources */,
 				F897AB1622059E8500CDDD10 /* NSData+CRC.swift in Sources */,
 				F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */,

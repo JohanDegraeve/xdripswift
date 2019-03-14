@@ -1,8 +1,8 @@
 import Foundation
 import CoreData
 
-protocol CalibratorProtocol {
-    ///slope parameters to be defined per type of sensor Dexcom/Libre, in class that conforms to CalibratorProtocol
+protocol Calibrator {
+    ///slope parameters to be defined per type of sensor Dexcom/Libre, in class that conforms to Calibrator protocol
     var sParams:SlopeParameters{get}
 
     /// false for Libre, true for Dexcom
@@ -43,7 +43,7 @@ protocol CalibratorProtocol {
     func createNewCalibration(bgValue:Double, lastBgReading:BgReading, sensor:Sensor, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration, nsManagedObjectContext:NSManagedObjectContext) -> Calibration
 }
 
-extension CalibratorProtocol {
+extension Calibrator {
     /// creates two calibrations, stored in the database, but context not saved. Also readings will be adpated, also not saved.
     ///
     /// - parameters:
