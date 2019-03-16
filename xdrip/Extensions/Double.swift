@@ -25,6 +25,12 @@ extension Double {
             return String(format:"%.1f", self)
         }
     }
+    
+    /// treats the double as timestamp in milliseconds, since 1970 and prints as date string
+    func asTimeStampInMilliSecondsToString() -> String {
+        let asDate = Date(timeIntervalSince1970: self/1000)
+        return asDate.description(with: .current)
+    }
 }
 
 

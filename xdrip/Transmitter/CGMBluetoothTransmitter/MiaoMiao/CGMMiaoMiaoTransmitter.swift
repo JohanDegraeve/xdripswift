@@ -60,7 +60,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         //initialize timeStampLastBgReading
         self.timeStampLastBgReading = timeStampLastBgReading
         
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, CBUUID_Service: CBUUID_Service_MiaoMiao, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao)
         
         bluetoothTransmitterDelegate = self
     }

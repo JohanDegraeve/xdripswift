@@ -43,6 +43,8 @@ struct Constants {
         static let debuglogging = "xdripdebuglogging"
         // G5
         static let categoryCGMG5 = "categoryCGMG5"
+        // GNSEntry
+        static let categoryCGMGNSEntry = "categoryCGMGNSEntry"
     }
     
     // identifiers for local notifications

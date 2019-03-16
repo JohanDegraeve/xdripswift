@@ -23,7 +23,7 @@ func parseLibreData(data:inout Data, timeStampLastBgReadingStoredInDatabase:Date
     let sensorState = SensorState(stateByte: data[headerOffset + 4])
     
     /////// loads trend values
-    
+
     // we will add the most recent readings, but then we'll only add the readings that are at least 5 minutes apart (giving 10 seconds spare)
     // for that variable timeStampLastAddedGlucoseData is used. It's initially set to now + 5 minutes
     var timeStampLastAddedGlucoseData = Date().toMillisecondsAsDouble() + 5 * 60 * 1000

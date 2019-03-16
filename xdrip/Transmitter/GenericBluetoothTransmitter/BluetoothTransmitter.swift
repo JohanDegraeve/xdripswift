@@ -18,10 +18,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// uuid used for scanning, can be empty string, if empty string then scan all devices - only possible if app is in foreground
     private let CBUUID_Advertisement:String?
-    /// service to be discovered
-    private let CBUUID_Service:String
+    
+    /// services to be discovered
+    private let servicesCBUUIDs:[CBUUID]?
+    
     /// receive characteristic
     private let CBUUID_ReceiveCharacteristic:String
+    
     /// write characteristic
     private let CBUUID_WriteCharacteristic:String
 
@@ -61,10 +64,10 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     ///         * For an xDrip or xBridge, we don't expect a specific devicename, in which case the value stays nil
     ///         * If we already connected to a device before, then we know it's address
     ///     - CBUUID_Advertisement: UUID to use for scanning, if nil  then app will scan for all devices. (Example Blucon, MiaoMiao, should be nil value. For G5 it should have a value. For xDrip it will probably work with or without. Main difference is that if no advertisement UUID is specified, then app is not allowed to scan will in background. For G5 this can create problem for first time connect, because G5 only transmits every 5 minutes, which means the app would need to stay in the foreground for at least 5 minutes.
-    ///     - CBUUID_Service: service uuid
+    ///     - servicesCBUUIDs: service uuid's
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
-    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, CBUUID_Service:String, CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String) {
+    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID], CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String) {
         switch addressAndName {
         case .alreadyConnectedBefore(let newAddress):
             deviceAddress = newAddress
@@ -73,7 +76,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
         
         //assign uuid's
-        self.CBUUID_Service = CBUUID_Service
+        self.servicesCBUUIDs = servicesCBUUIDs
         self.CBUUID_Advertisement = CBUUID_Advertisement
         self.CBUUID_WriteCharacteristic = CBUUID_WriteCharacteristic
         self.CBUUID_ReceiveCharacteristic = CBUUID_ReceiveCharacteristic
@@ -282,13 +285,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         timeStampLastStatusUpdate = Date()
         
-        var services:[CBUUID]?
-        if CBUUID_Service.count > 0 {
-            services = [CBUUID(string: CBUUID_Service)]
-        }
-        
         os_log("connected, will discover services", log: log, type: .info)
-        peripheral.discoverServices(services)
+        peripheral.discoverServices(servicesCBUUIDs)
         
         bluetoothTransmitterDelegate?.centralManagerDidConnect(address: deviceAddress, name: deviceName)
     }

@@ -21,6 +21,8 @@ enum CGMTransmitterType:String, CaseIterable {
     case dexcomG5 = "Dexcom G5"
     /// miaomiao
     case miaomiao = "MiaoMiao"
+    /// GNSentry
+    case GNSentry = "GSNentry"
     
     func needsTransmitterId() -> Bool {
         switch self {
@@ -29,6 +31,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG5:
             return true
         case .miaomiao:
+            return false
+        case .GNSentry:
             return false
         }
     }
@@ -42,6 +46,9 @@ enum CGMTransmitterType:String, CaseIterable {
             return false
         case .miaomiao:
             return true
+        case .GNSentry:
+            print("in canDetectNewSensor, to do for gnsentry")
+            return false
         }
     }
     
@@ -68,7 +75,7 @@ enum CGMTransmitterType:String, CaseIterable {
                 return Texts_ErrorMessages.TransmitterIDShouldHaveLength5
             }
             return nil
-        case .miaomiao:
+        case .miaomiao, .GNSentry:
             return nil
         }
     }

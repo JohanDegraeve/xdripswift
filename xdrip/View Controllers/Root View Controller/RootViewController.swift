@@ -188,7 +188,6 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                                 }
                                 self.coreDataManager.saveChanges()
                                 self.logAllBgReadings()
-
                             }
 
                         }
@@ -208,7 +207,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                 case .dexcomG4, .dexcomG5:
                     activeSensor = Sensor(startDate: Date(), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 
-                case .miaomiao:
+                case .miaomiao, .GNSentry:
                     if let sensorTimeInMinutes = sensorTimeInMinutes {
                         activeSensor = Sensor(startDate: Date(timeInterval: -Double(sensorTimeInMinutes * 60), since: Date()),nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                         if let activeSensor = activeSensor {
@@ -217,9 +216,9 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                             os_log("creation active sensor failed", log: self.log!, type: .info)
                         }
                     }
-
                 }
             }
+            coreDataManager.saveChanges()
         }
 
         if let activeSensor = activeSensor, let calibrator = self.calibrator {
@@ -391,15 +390,22 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                     test = CGMG4xDripTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate:self)
                     calibrator = DexcomCalibrator()
                 }
+                
             case .dexcomG5:
                 if let currentTransmitterId = currentTransmitterId {
                     test = CGMG5Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self)
                     calibrator = DexcomCalibrator()
                 }
+                
             case .miaomiao:
                 test = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: timeStampLastBgReading)
                 calibrator = Libre1Calibrator()
+                
+            case .GNSentry:
+                test = CGMGNSEntryTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: timeStampLastBgReading)
+                calibrator = Libre1Calibrator()
             }
+            
             _ = test?.startScanning()
         }
     }
@@ -410,8 +416,6 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
         // Configure View
         view.backgroundColor = UIColor(displayP3Red: 33, green: 33, blue: 33, alpha: 0)//#212121
     }
-
-
 }
 
 extension RootViewController: UNUserNotificationCenterDelegate {
@@ -438,7 +442,9 @@ extension RootViewController: UNUserNotificationCenterDelegate {
     
     private func logAllBgReadings() {
         for (index,reading) in BgReadings.bgReadings.enumerated() {
-            os_log("readings %{public}d timestamp = %{public}@, calculatedValue = %{public}f", log: log!, type: .info, index, reading.timeStamp.description, reading.calculatedValue)
+            if reading.sensor?.id == activeSensor?.id {
+                os_log("readings %{public}d timestamp = %{public}@, calculatedValue = %{public}f", log: log!, type: .info, index, reading.timeStamp.description, reading.calculatedValue)
+            }
         }
     }
     

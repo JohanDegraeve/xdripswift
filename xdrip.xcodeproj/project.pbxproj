@@ -33,6 +33,7 @@
 		F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */; };
 		F85DC2F821D2632F00B9F74A /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */; };
 		F85DC30121D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC30021D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift */; };
+		F88F269C223C215A0090A9A6 /* CGMGNSEntryTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88F269B223C21590090A9A6 /* CGMGNSEntryTransmitter.swift */; };
 		F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */; };
 		F897AAFB2201018800CDDD10 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAFA2201018800CDDD10 /* String.swift */; };
 		F897AAFE2202577200CDDD10 /* CGMG5Transmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAFD2202577200CDDD10 /* CGMG5Transmitter.swift */; };
@@ -117,6 +118,7 @@
 		F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		F85DC30021D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG4xDripTransmitter.swift; sourceTree = "<group>"; };
+		F88F269B223C21590090A9A6 /* CGMGNSEntryTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMGNSEntryTransmitter.swift; sourceTree = "<group>"; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
 		F897AAFA2201018800CDDD10 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		F897AAFD2202577200CDDD10 /* CGMG5Transmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG5Transmitter.swift; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 		F8025E5521F3418400ECF0C0 /* CGMBluetoothTransmitter */ = {
 			isa = PBXGroup;
 			children = (
+				F88F269A223C21110090A9A6 /* GNSEntry */,
 				F8025C0E21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift */,
 				F8025E5621F4A60900ECF0C0 /* CGMTransmitter.swift */,
 				F85DC2FE21D3E83100B9F74A /* G4 */,
@@ -374,6 +377,14 @@
 				F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */,
 			);
 			path = GenericBluetoothTransmitter;
+			sourceTree = "<group>";
+		};
+		F88F269A223C21110090A9A6 /* GNSEntry */ = {
+			isa = PBXGroup;
+			children = (
+				F88F269B223C21590090A9A6 /* CGMGNSEntryTransmitter.swift */,
+			);
+			path = GNSEntry;
 			sourceTree = "<group>";
 		};
 		F897AAFC2202575600CDDD10 /* G5 */ = {
@@ -688,6 +699,7 @@
 				F8BDD41A2217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift in Sources */,
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
 				F897AB2022059EA000CDDD10 /* SensorDataTxMessage.swift in Sources */,
+				F88F269C223C215A0090A9A6 /* CGMGNSEntryTransmitter.swift in Sources */,
 				F8AC426221ADEBD60078C348 /* SettingsViewController.swift in Sources */,
 				F897AB2122059EA000CDDD10 /* AuthRequestTxMessage.swift in Sources */,
 				F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */,
