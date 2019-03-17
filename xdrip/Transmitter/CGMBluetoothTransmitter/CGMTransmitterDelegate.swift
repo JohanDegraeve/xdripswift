@@ -22,6 +22,7 @@ protocol CGMTransmitterDelegate:AnyObject {
     /// will only happen for MiaoMiao transmitter, anyway we can do the stuff for any type of transmitter which means send a warning blablabla
     func sensorNotDetected()
     
+    // TODO:- make glucoseData optional, and when no data is available, return nil in stead of empty array
     /// - parameters:
     ///     - glucoseData can be empty array
     func cgmTransmitterInfoReceived(glucoseData:inout [RawGlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorState:SensorState?, sensorTimeInMinutes:Int?, firmware:String?, hardware:String?)

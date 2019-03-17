@@ -181,16 +181,18 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                     // initialize empty array of bgreadings
                     var readings:Array<RawGlucoseData> = []
                     
-                    // amountofReadingsPerMinute = how many readings per minute - see example code GNSEntry, if only one packet of 20 bytes transmitted, then only 4 readings 1 minute seperated
-                    var amountOfPerMinuteReadings = 4
+                    // amountofReadingsPerMinute = how many readings per minute - see example code GNSEntry, if only one packet of 20 bytes transmitted, then only 5 readings 1 minute seperated
+                    var amountOfPerMinuteReadings = 5
+                    var amountOfPer15MinuteReadings = 0
                     if arrayData.count > 20 {
-                        amountOfPerMinuteReadings = 16
+                        amountOfPerMinuteReadings = 17
+                        amountOfPer15MinuteReadings = 33
                     }
                     
                     // variable to loop through the readdings
                     var i = 0
                     
-                    loop: while 7 + i * 2 < arrayData.count {
+                    loop: while 7 + i * 2 < arrayData.count - 1 && i < amountOfPerMinuteReadings + amountOfPer15MinuteReadings {
                         // timestamp of the reading in minutes, counting from 1 1 1970
                         let readingTimeStampInMinutes = currentTimeInMinutes - (i < amountOfPerMinuteReadings ? i : i * 15)
                         
@@ -222,7 +224,6 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 }
             }
         }
-        
     }
     
     // MARK: CBCentralManager overriden functions

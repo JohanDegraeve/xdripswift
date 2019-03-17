@@ -20,7 +20,8 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     private var currentTransmitterTypeAsString:String?
     
     private var currentTransmitterId:String?
-    
+
+    // used at initial app startup, during creation of constructor, so that cgm transmitter only uses most recent readings
     private  var timeStampLastBgReading:Date = {
       return Date(timeIntervalSince1970: 0)
     }()
@@ -189,7 +190,6 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                                 self.coreDataManager.saveChanges()
                                 self.logAllBgReadings()
                             }
-
                         }
                     }
                 }
@@ -223,26 +223,23 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
 
         if let activeSensor = activeSensor, let calibrator = self.calibrator {
             for (_, glucose) in glucoseData.enumerated().reversed() {
-                var latest3BgReadings = BgReadings.getLatestBgReadings(howMany: 3, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
-                
-                var lastCalibrationsForActiveSensorInLastXDays = Calibrations.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
-                let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
-                let lastCalibrationForActiveSensor = Calibrations.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
-                
-                let newBgReading = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                
-                debuglogging("newBgReading.calculatedValue = " + newBgReading.calculatedValue.description)
-                
-                BgReadings.bgReadings.append(newBgReading)
-                
-                //let newBgReading = BgReading(timeStamp: glucose.timeStamp, sensor: activeSensor, calibration: nil, rawData: (Double)(glucose.glucoseLevelRaw), filteredData: Double(glucose.glucoseLevelRaw), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                
-                //os_log("added new bgreading to bgreadings with  id : %{public}@ and timestamp  %{public}@", log: self.log!, type: .info, newBgReading.id, newBgReading.timeStamp.description)
+                if glucose.timeStamp > timeStampLastBgReading {
+                    var latest3BgReadings = BgReadings.getLatestBgReadings(howMany: 3, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+                    
+                    var lastCalibrationsForActiveSensorInLastXDays = Calibrations.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
+                    let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
+                    let lastCalibrationForActiveSensor = Calibrations.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
+                    
+                    let newBgReading = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    
+                    debuglogging("newBgReading.calculatedValue = " + newBgReading.calculatedValue.description)
+                    
+                    BgReadings.bgReadings.append(newBgReading)
+                }
             }
             
             coreDataManager.saveChanges()
-            
-            requestCalibrationNotification()
+            if glucoseData.count > 0 {requestCalibrationNotification()}
             logAllBgReadings()
         }
         
@@ -344,7 +341,6 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     //zzz
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
-        
         if let keyPath = keyPath {
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
                 switch keyPathEnum {
@@ -356,6 +352,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                         if let activeSensor = activeSensor {
                             activeSensor.endDate = Date()
                         }
+                        coreDataManager.saveChanges()
                         activeSensor = nil
                         test = nil
                         initializeTransmitterType()
@@ -368,6 +365,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                         if let activeSensor = activeSensor {
                             activeSensor.endDate = Date()
                         }
+                        coreDataManager.saveChanges()
                         activeSensor = nil
                         test = nil
                         initializeTransmitterType()
@@ -398,11 +396,11 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                 }
                 
             case .miaomiao:
-                test = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: timeStampLastBgReading)
+                test = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
                 calibrator = Libre1Calibrator()
                 
             case .GNSentry:
-                test = CGMGNSEntryTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: timeStampLastBgReading)
+                test = CGMGNSEntryTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
                 calibrator = Libre1Calibrator()
             }
             

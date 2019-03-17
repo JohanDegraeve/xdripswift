@@ -22,7 +22,7 @@ enum CGMTransmitterType:String, CaseIterable {
     /// miaomiao
     case miaomiao = "MiaoMiao"
     /// GNSentry
-    case GNSentry = "GSNentry"
+    case GNSentry = "GNSentry"
     
     func needsTransmitterId() -> Bool {
         switch self {
