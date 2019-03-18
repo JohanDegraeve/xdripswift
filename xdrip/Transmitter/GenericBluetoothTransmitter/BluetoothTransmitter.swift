@@ -360,6 +360,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 os_log("    Call discovercharacteristics for service with uuid %{public}@", log: log, type: .info, String(describing: service.uuid))
                 peripheral.discoverCharacteristics(nil, for: service)
             }
+        } else {
+            disconnect()
         }
     }
     

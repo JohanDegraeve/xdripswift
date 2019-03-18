@@ -8,6 +8,7 @@ struct RawGlucoseData {
     var glucoseLevelFiltered:Double
     
     init(timeStamp:Date, glucoseLevelRaw:Double, glucoseLevelFiltered:Double) {
+        debuglogging("in init glucoselevelRaw, timestamp = " + timeStamp.toMillisecondsAsDouble().asTimeStampInMilliSecondsToString())
         self.timeStamp = timeStamp
         self.glucoseLevelRaw = glucoseLevelRaw
         self.glucoseLevelFiltered = glucoseLevelFiltered

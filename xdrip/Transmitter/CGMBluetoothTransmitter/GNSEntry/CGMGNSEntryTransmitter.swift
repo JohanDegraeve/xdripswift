@@ -73,7 +73,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     private var actualDeviceAddress:String?
     
     // used in parsing packet
-    private var timeStampLastBgReadingInMinutes:Int
+    private var timeStampLastBgReadingInMinutes:Double
     
     // possible reading errors, as per GNSEntry documentation
     let GNW_BAND_NFC_HW_ERROR = 0
@@ -93,7 +93,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         }
         
         //initialize timeStampLastBgReading
-        self.timeStampLastBgReadingInMinutes = Int(timeStampLastBgReading.toMillisecondsAsDouble()/1000/60)
+        self.timeStampLastBgReadingInMinutes = timeStampLastBgReading.toMillisecondsAsDouble()/1000/60
         
         // initialize - CBUUID_Receive_Authentication.rawValue and CBUUID_Write_Control.rawValue will probably not be used in the superclass, also not the CBUUID_Service
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_GNWService), CBUUID(string: CBUUID_BatteryService), CBUUID(string: CBUUID_DeviceInformationService)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Notify.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Write.rawValue)
@@ -135,10 +135,6 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         
         if let receivedCharacteristic = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString), let value = characteristic.value {
             
-            // convert to hex string, GNS entry seems to use hex string in many cases
-            let dataAsString = value.hexEncodedString()
-            os_log("   received value : %{public}@", log: log, type: .info, dataAsString)
-            
             switch receivedCharacteristic {
                 
             case .CBUUID_SerialNumber:
@@ -148,6 +144,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
             case .CBUUID_Bootloader:
                 break
             case .CBUUID_BatteryLevel:
+                let dataAsString = value.hexEncodedString()
                 if let batteryLevel = Int(dataAsString, radix: 16) {
                     var emptyArray: [RawGlucoseData] = []
                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryLevel), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
@@ -158,10 +155,13 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 break
             case .CBUUID_GNW_Notify:
                 // decode as explained in GNSEntry documentation
-                var arrayData = XORENC(inD: [UInt8](value))
+                var valueDecoded = XORENC(inD: [UInt8](value))
+                
+                let valueDecodedAsHexString = Data(valueDecoded).hexEncodedString()
+                 os_log("   in peripheralDidUpdateValueFor, GNW Notify with hex value = %{public}@", log: log, type: .error , valueDecodedAsHexString)
                 
                 // reading status, as per GNSEntry documentation
-                let readingStatus = getIntAtPosition(numberOfBytes: 1, position: 0, data: &arrayData)
+                let readingStatus = getIntAtPosition(numberOfBytes: 1, position: 0, data: &valueDecoded)
                 
                 if readingStatus == GNW_BAND_NFC_HW_ERROR || readingStatus == GNW_BAND_NFC_READING_ERROR {
                     os_log("   in peripheralDidUpdateValueFor, readingStatus is not OK", log: log, type: .info)
@@ -169,44 +169,52 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 } else {
                     
                     // get sensor elapsed time and initialize sensorStartTimeInMilliseconds
-                    let sensorElapsedTimeInMinutes = getIntAtPosition(numberOfBytes: 2, position: 3, data: &arrayData)
+                    let sensorElapsedTimeInMinutes = getIntAtPosition(numberOfBytes: 2, position: 3, data: &valueDecoded)
                     // we will add the most recent readings, but then we'll only add the readings that are at least 5 minutes apart (giving 10 seconds spare)
                     // for that variable timeStampLastAddedGlucoseData is used. It's initially set to now + 5 minutes
-                    let currentTimeInMinutes:Int = Int(Date().toMillisecondsAsDouble()/1000/60)
-                    var timeStampLastAddedGlucoseDataInMinutes:Int = currentTimeInMinutes + 5
+                    let currentTimeInMinutes:Double = Date().toMillisecondsAsDouble()/1000/60
+                    var timeStampLastAddedGlucoseDataInMinutes:Double = currentTimeInMinutes + 5.0
                     
                     // read sensor status
-                    let sensorStatus = SensorState(stateByte: UInt8(getIntAtPosition(numberOfBytes: 1, position: 5, data: &arrayData)))
+                    let sensorStatus = SensorState(stateByte: UInt8(getIntAtPosition(numberOfBytes: 1, position: 5, data: &valueDecoded)))
                     
                     // initialize empty array of bgreadings
                     var readings:Array<RawGlucoseData> = []
                     
                     // amountofReadingsPerMinute = how many readings per minute - see example code GNSEntry, if only one packet of 20 bytes transmitted, then only 5 readings 1 minute seperated
-                    var amountOfPerMinuteReadings = 5
-                    var amountOfPer15MinuteReadings = 0
-                    if arrayData.count > 20 {
-                        amountOfPerMinuteReadings = 17
-                        amountOfPer15MinuteReadings = 33
+                    var amountOfPerMinuteReadings:Double = 5.0
+                    var amountOfPer15MinuteReadings:Double = 0.0
+                    if valueDecoded.count > 20 {
+                        amountOfPerMinuteReadings = 17.0
+                        amountOfPer15MinuteReadings = 33.0
                     }
                     
                     // variable to loop through the readdings
-                    var i = 0
+                    var i = 0.0
                     
-                    loop: while 7 + i * 2 < arrayData.count - 1 && i < amountOfPerMinuteReadings + amountOfPer15MinuteReadings {
+                    loop: while Int(7.0 + i * 2.0) < valueDecoded.count - 1 && i < amountOfPerMinuteReadings + amountOfPer15MinuteReadings {
                         // timestamp of the reading in minutes, counting from 1 1 1970
-                        let readingTimeStampInMinutes = currentTimeInMinutes - (i < amountOfPerMinuteReadings ? i : i * 15)
-                        
+                        let readingTimeStampInMinutes:Double = currentTimeInMinutes - (i < amountOfPerMinuteReadings ? i : i * 15.0)
+                        debuglogging("new reading with readingTimeStampInMinutes "  + Double(readingTimeStampInMinutes * 60 * 1000).asTimeStampInMilliSecondsToString())
                         // get the reading value (mgdl)
-                        let readingValueInMgDl = getIntAtPosition(numberOfBytes: 2, position: 7 + i * 2, data: &arrayData)
+                        let readingValueInMgDl = getIntAtPosition(numberOfBytes: 2, position: Int(7 + i * 2), data: &valueDecoded)
+                        debuglogging("   with readingValueInMgDl = " + readingValueInMgDl.description)
                         
                         //new reading should be at least 30 seconds younger than timeStampLastBgReadingStoredInDatabase
                         if readingTimeStampInMinutes > ((timeStampLastBgReadingInMinutes * 2) + 1)/2 {
                             
-                            if readingTimeStampInMinutes * 60 * 1000 < timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) {
-                                let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * Constants.Libre.libreMultiplier)
-                                readings.append(glucoseData)
-                                timeStampLastAddedGlucoseDataInMinutes = readingTimeStampInMinutes
+                            // sometimes 0 values are received, skip those
+                            if readingValueInMgDl > 0 {
+                                debuglogging("    readingTimeStampInMinutes * 60 * 1000 =                                        " + ((Int)(readingTimeStampInMinutes * 60 * 1000)).description)
+                                debuglogging("    timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 =                           " + (Int)(timeStampLastAddedGlucoseDataInMinutes * 60 * 1000).description)
+                                debuglogging("    timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) = " + (Int)(timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000)).description)
+                                if readingTimeStampInMinutes * 60 * 1000 < timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) {
+                                    let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * Constants.Libre.libreMultiplier)
+                                    readings.append(glucoseData)
+                                    timeStampLastAddedGlucoseDataInMinutes = readingTimeStampInMinutes
+                                }
                             }
+
                         } else {
                             break loop
                         }
@@ -219,7 +227,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                     
                     //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
                     if readings.count > 0 {
-                        timeStampLastBgReadingInMinutes = Int(readings[0].timeStamp.toMillisecondsAsDouble()/1000/60)
+                        timeStampLastBgReadingInMinutes = readings[0].timeStamp.toMillisecondsAsDouble()/1000/60
                     }
                 }
             }
