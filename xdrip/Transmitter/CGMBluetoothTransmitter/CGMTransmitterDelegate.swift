@@ -25,7 +25,9 @@ protocol CGMTransmitterDelegate:AnyObject {
     // TODO:- make glucoseData optional, and when no data is available, return nil in stead of empty array
     /// - parameters:
     ///     - glucoseData can be empty array
-    func cgmTransmitterInfoReceived(glucoseData:inout [RawGlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorState:SensorState?, sensorTimeInMinutes:Int?, firmware:String?, hardware:String?)
+    ///     - serialNumber : for the moment only used by GNSentry
+    ///     - bootloader : for the moment only used by GNSentry
+    func cgmTransmitterInfoReceived(glucoseData:inout [RawGlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorState:SensorState?, sensorTimeInMinutes:Int?, firmware:String?, hardware:String?, serialNumber:String?, bootloader:String?)
     
     /// transmitter needs bluetooth pairing
     func cgmTransmitterNeedsPairing()

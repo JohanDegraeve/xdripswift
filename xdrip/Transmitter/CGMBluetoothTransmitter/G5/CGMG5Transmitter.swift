@@ -61,7 +61,10 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     // actual device address
     private var actualDeviceAddress:String?
-
+    
+    /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
+    var emptyArray: [RawGlucoseData] = []
+    
     // MARK: - functions
     
     /// - parameters:
@@ -306,7 +309,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                                     timeStampOfLastG5Reading = Date()
                                     let glucoseData = RawGlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: sensorDataRxMessage.unfiltered, glucoseLevelFiltered: sensorDataRxMessage.filtered)
                                     var glucoseDataArray = [glucoseData]
-                                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
+                                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
                                 }
                             }
                             //start processing now the sensorDataRxMessage
@@ -369,8 +372,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     private func processResetRxMessage(value:Data) {
         if let resetRxMessage = ResetRxMessage(data: value) {
             os_log("resetRxMessage status is %{public}d", log: log, type: .info, resetRxMessage.status)
-            var emptyArray: [RawGlucoseData] = []
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: SensorState.G5Reset, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: SensorState.G5Reset, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
         } else {
             os_log("resetRxMessage is nil", log: log, type: .error)
         }
@@ -378,8 +380,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     private func processBatteryStatusRxMessage(value:Data) {
         if let batteryStatusRxMessage = BatteryStatusRxMessage(data: value) {
-            var emptyArray: [RawGlucoseData] = []
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
         } else {
             os_log("batteryStatusRxMessage is nil", log: log, type: .error)
         }
@@ -387,8 +388,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     private func processTransmitterVersionRxMessage(value:Data) {
         if let transmitterVersionRxMessage = TransmitterVersionRxMessage(data: value) {
-            var emptyArray: [RawGlucoseData] = []
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: transmitterVersionRxMessage.firmwareVersion.hexEncodedString(), hardware: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: transmitterVersionRxMessage.firmwareVersion.hexEncodedString(), hardware: nil, serialNumber: nil, bootloader: nil)
             // assign transmitterVersion
             transmitterVersion = transmitterVersionRxMessage.firmwareVersion.hexEncodedString()
         } else {

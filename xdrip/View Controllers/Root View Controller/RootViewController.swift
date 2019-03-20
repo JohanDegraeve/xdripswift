@@ -90,12 +90,14 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     
     /// - parameters:
     ///     - readings: first entry is the most recent
-    func cgmTransmitterInfoReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: SensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?) {
+    func cgmTransmitterInfoReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: SensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?, serialNumber: String?, bootloader: String?) {
         os_log("sensorstate %{public}@", log: log!, type: .debug, sensorState?.description ?? "no sensor state found")
         os_log("firmware %{public}@", log: log!, type: .debug, firmware ?? "no firmware version found")
+        os_log("bootloader %{public}@", log: log!, type: .debug, bootloader ?? "no bootloader  found")
+        os_log("serialNumber %{public}@", log: log!, type: .debug, serialNumber ?? "no serialNumber  found")
         os_log("hardware %{public}@", log: log!, type: .debug, hardware ?? "no hardware version found")
         os_log("transmitterBatteryInfo  %{public}@", log: log!, type: .debug, transmitterBatteryInfo?.description ?? 0)
-        os_log("sensor time in minutes  %{public}d", log: log!, type: .debug, sensorTimeInMinutes ?? 0)
+        os_log("sensor time in minutes  %{public}@", log: log!, type: .debug, sensorTimeInMinutes?.description ?? "not received")
         for (index, reading) in glucoseData.enumerated() {
             os_log("Reading %{public}d, raw level = %{public}f, realDate = %{public}s", log: log!, type: .debug, index, reading.glucoseLevelRaw, reading.timeStamp.description)
         }

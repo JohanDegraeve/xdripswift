@@ -69,15 +69,27 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     /// for OS_log
     private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCGMGNSEntry)
     
-    // actual device address
+    /// actual device address
     private var actualDeviceAddress:String?
     
-    // used in parsing packet
+    /// used in parsing packet
     private var timeStampLastBgReadingInMinutes:Double
     
-    // possible reading errors, as per GNSEntry documentation
+    /// possible reading errors, as per GNSEntry documentation
     let GNW_BAND_NFC_HW_ERROR = 0
     let GNW_BAND_NFC_READING_ERROR = 1
+    
+    /// serial number received
+    var actualSerialNumber:String?
+    
+    /// firmware version received
+    var actualFirmWareVersion:String?
+    
+    /// bootloader received frm device
+    var actualBootLoader:String?
+    
+    /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
+    var emptyArray: [RawGlucoseData] = []
     
     // MARK: - functions
     
@@ -127,27 +139,35 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     
     func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
         // log the receivec characteristic value
-        os_log("in peripheralDidUpdateValueFor with characteristic %{public}@", log: log, type: .info, CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString)?.description ?? "(not available)")
+        os_log("in peripheralDidUpdateValueFor with characteristic UUID = %{public}@, matches characteristic name %{public}@", log: log, type: .info, characteristic.uuid.uuidString, receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString)?.description ?? "not available")
         
         if let error = error {
-            os_log("error: %{public}@", log: log, type: .error , error.localizedDescription)
+            os_log("   error: %{public}@", log: log, type: .error , error.localizedDescription)
         }
         
-        if let receivedCharacteristic = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString), let value = characteristic.value {
+        if let receivedCharacteristic = receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString), let value = characteristic.value {
             
             switch receivedCharacteristic {
                 
             case .CBUUID_SerialNumber:
-                break
+                actualSerialNumber = String(data: value, encoding: String.Encoding.utf8)
+                if let actualSerialNumber = actualSerialNumber {
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: actualSerialNumber, bootloader: nil)
+                }
             case .CBUUID_Firmware:
-                break
+                actualFirmWareVersion = String(data: value, encoding: String.Encoding.utf8)
+                if let actualFirmWareVersion = actualFirmWareVersion {
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: actualFirmWareVersion, hardware: nil, serialNumber: nil, bootloader: nil)
+                }
             case .CBUUID_Bootloader:
-                break
+                actualBootLoader = String(data: value, encoding: String.Encoding.utf8)
+                if let actualBootLoader = actualBootLoader {
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: actualBootLoader)
+                }
             case .CBUUID_BatteryLevel:
                 let dataAsString = value.hexEncodedString()
                 if let batteryLevel = Int(dataAsString, radix: 16) {
-                    var emptyArray: [RawGlucoseData] = []
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryLevel), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryLevel), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
                 } else {
                     os_log("   in peripheralDidUpdateValueFor, could not read batterylevel, received hex value = %{public}@", log: log, type: .error , dataAsString)
                 }
@@ -158,13 +178,13 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 var valueDecoded = XORENC(inD: [UInt8](value))
                 
                 let valueDecodedAsHexString = Data(valueDecoded).hexEncodedString()
-                 os_log("   in peripheralDidUpdateValueFor, GNW Notify with hex value = %{public}@", log: log, type: .error , valueDecodedAsHexString)
+                 os_log("   in peripheralDidUpdateValueFor, GNW Notify with hex value = %{public}@", log: log, type: .info , valueDecodedAsHexString)
                 
                 // reading status, as per GNSEntry documentation
                 let readingStatus = getIntAtPosition(numberOfBytes: 1, position: 0, data: &valueDecoded)
                 
                 if readingStatus == GNW_BAND_NFC_HW_ERROR || readingStatus == GNW_BAND_NFC_READING_ERROR {
-                    os_log("   in peripheralDidUpdateValueFor, readingStatus is not OK", log: log, type: .info)
+                    os_log("   in peripheralDidUpdateValueFor, readingStatus is not OK", log: log, type: .error)
                     // TODO: what to do here ?
                 } else {
                     
@@ -195,19 +215,21 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                     loop: while Int(7.0 + i * 2.0) < valueDecoded.count - 1 && i < amountOfPerMinuteReadings + amountOfPer15MinuteReadings {
                         // timestamp of the reading in minutes, counting from 1 1 1970
                         let readingTimeStampInMinutes:Double = currentTimeInMinutes - (i < amountOfPerMinuteReadings ? i : i * 15.0)
-                        debuglogging("new reading with readingTimeStampInMinutes "  + Double(readingTimeStampInMinutes * 60 * 1000).asTimeStampInMilliSecondsToString())
+
                         // get the reading value (mgdl)
                         let readingValueInMgDl = getIntAtPosition(numberOfBytes: 2, position: Int(7 + i * 2), data: &valueDecoded)
-                        debuglogging("   with readingValueInMgDl = " + readingValueInMgDl.description)
+
+                        //debuglogging("new reading with readingTimeStampInMinutes "  + Double(readingTimeStampInMinutes * 60 * 1000).asTimeStampInMilliSecondsToString() + " and raw value  " + (Double(readingValueInMgDl) * Constants.Libre.libreMultiplier).description)
+                        //debuglogging("   with readingValueInMgDl = " + readingValueInMgDl.description)
                         
                         //new reading should be at least 30 seconds younger than timeStampLastBgReadingStoredInDatabase
                         if readingTimeStampInMinutes > ((timeStampLastBgReadingInMinutes * 2) + 1)/2 {
                             
                             // sometimes 0 values are received, skip those
                             if readingValueInMgDl > 0 {
-                                debuglogging("    readingTimeStampInMinutes * 60 * 1000 =                                        " + ((Int)(readingTimeStampInMinutes * 60 * 1000)).description)
-                                debuglogging("    timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 =                           " + (Int)(timeStampLastAddedGlucoseDataInMinutes * 60 * 1000).description)
-                                debuglogging("    timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) = " + (Int)(timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000)).description)
+                                //debuglogging("    readingTimeStampInMinutes * 60 * 1000 =                                        " + ((Int)(readingTimeStampInMinutes * 60 * 1000)).description)
+                                //debuglogging("    timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 =                           " + (Int)(timeStampLastAddedGlucoseDataInMinutes * 60 * 1000).description)
+                                //debuglogging("    timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) = " + (Int)(timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000)).description)
                                 if readingTimeStampInMinutes * 60 * 1000 < timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) {
                                     let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * Constants.Libre.libreMultiplier)
                                     readings.append(glucoseData)
@@ -223,7 +245,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                         i = i + 1
                     }
                     
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &readings, transmitterBatteryInfo: nil, sensorState: sensorStatus, sensorTimeInMinutes: Int(sensorElapsedTimeInMinutes), firmware: nil, hardware: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &readings, transmitterBatteryInfo: nil, sensorState: sensorStatus, sensorTimeInMinutes: Int(sensorElapsedTimeInMinutes), firmware: actualFirmWareVersion, hardware: nil, serialNumber: actualSerialNumber, bootloader: actualBootLoader)
                     
                     //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
                     if readings.count > 0 {
@@ -249,36 +271,73 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 let ASCIIstring = characteristic.uuid.uuidString
                 os_log("characteristic uuid: %{public}@", log: log, type: .info, ASCIIstring)
                 
-                if CBUUID_Characteristic_UUID.CBUUID_BatteryLevel.rawValue.containsIgnoringCase(find: characteristic.uuid.uuidString) {
-                    os_log("    found batteryLevelCharacteristic", log: log, type: .info)
-                    batteryLevelCharacteristic = characteristic
-                    peripheral.setNotifyValue(true, for: characteristic)
-                } else if CBUUID_Characteristic_UUID.CBUUID_Bootloader.rawValue.containsIgnoringCase(find: characteristic.uuid.uuidString) {
-                    os_log("    found bootLoaderCharacteristic", log: log, type: .info)
-                    bootLoaderCharacteristic = characteristic
-                } else if CBUUID_Characteristic_UUID.CBUUID_SerialNumber.rawValue.containsIgnoringCase(find: characteristic.uuid.uuidString) {
-                    os_log("    found serialNumberCharacteristic", log: log, type: .info)
-                    serialNumberCharacteristic = characteristic
-                } else if CBUUID_Characteristic_UUID.CBUUID_Firmware.rawValue.containsIgnoringCase(find: characteristic.uuid.uuidString) {
-                    os_log("    found firmwareCharacteristic", log: log, type: .info)
-                    firmwareCharacteristic = characteristic
-                } else if CBUUID_Characteristic_UUID.CBUUID_GNW_Write.rawValue.containsIgnoringCase(find: characteristic.uuid.uuidString) {
-                    os_log("    found GNWWriteCharacteristic", log: log, type: .info)
-                    GNWWriteCharacteristic = characteristic
-                } else if CBUUID_Characteristic_UUID.CBUUID_GNW_Notify.rawValue.containsIgnoringCase(find: characteristic.uuid.uuidString) {
-                    os_log("    found GNWNotifyCharacteristic", log: log, type: .info)
-                    GNWNotifyCharacteristic = characteristic
-                    peripheral.setNotifyValue(true, for: characteristic)
-                } else  {
+                if let receivedCharacteristic = receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString) {
+                    switch receivedCharacteristic {
+                        
+                    case .CBUUID_SerialNumber:
+                        os_log("    found serialNumberCharacteristic", log: log, type: .info)
+                        serialNumberCharacteristic = characteristic
+                        if actualSerialNumber == nil {
+                            peripheral.setNotifyValue(true, for: characteristic)
+                            peripheral.readValue(for: characteristic)
+                        }
+                    case .CBUUID_Firmware:
+                        os_log("    found firmwareCharacteristic", log: log, type: .info)
+                        firmwareCharacteristic = characteristic
+                        if actualFirmWareVersion == nil {
+                            peripheral.setNotifyValue(true, for: characteristic)
+                            peripheral.readValue(for: characteristic)
+                        }
+                    case .CBUUID_Bootloader:
+                        os_log("    found bootLoaderCharacteristic", log: log, type: .info)
+                        bootLoaderCharacteristic = characteristic
+                        if actualBootLoader == nil {
+                            peripheral.setNotifyValue(true, for: characteristic)
+                            peripheral.readValue(for: characteristic)
+                        }
+                    case .CBUUID_BatteryLevel:
+                        os_log("    found batteryLevelCharacteristic", log: log, type: .info)
+                        batteryLevelCharacteristic = characteristic
+                        peripheral.setNotifyValue(true, for: characteristic)
+                        peripheral.readValue(for: characteristic)
+                    case .CBUUID_GNW_Write:
+                        os_log("    found GNWWriteCharacteristic", log: log, type: .info)
+                        GNWWriteCharacteristic = characteristic
+                    case .CBUUID_GNW_Notify:
+                        os_log("    found GNWNotifyCharacteristic", log: log, type: .info)
+                        GNWNotifyCharacteristic = characteristic
+                        peripheral.setNotifyValue(true, for: characteristic)
+                    }
+                } else {
                     os_log("    characteristic UUID unknown", log: log, type: .error)
                 }
-                
             }
         } else {
             os_log("characteristics is nil. There must be some error.", log: log, type: .error)
         }
     }
     
+    private func receivedCharacteristicUUIDToCharacteristic(characteristicUUID:String) -> CBUUID_Characteristic_UUID? {
+        if CBUUID_Characteristic_UUID.CBUUID_BatteryLevel.rawValue.containsIgnoringCase(find: characteristicUUID) {
+            return CBUUID_Characteristic_UUID.CBUUID_BatteryLevel
+        }
+        if CBUUID_Characteristic_UUID.CBUUID_Firmware.rawValue.containsIgnoringCase(find: characteristicUUID) {
+            return CBUUID_Characteristic_UUID.CBUUID_Firmware
+        }
+        if CBUUID_Characteristic_UUID.CBUUID_GNW_Write.rawValue.containsIgnoringCase(find: characteristicUUID) {
+            return CBUUID_Characteristic_UUID.CBUUID_GNW_Write
+        }
+        if CBUUID_Characteristic_UUID.CBUUID_GNW_Notify.rawValue.containsIgnoringCase(find: characteristicUUID) {
+            return CBUUID_Characteristic_UUID.CBUUID_GNW_Notify
+        }
+        if CBUUID_Characteristic_UUID.CBUUID_Bootloader.rawValue.containsIgnoringCase(find: characteristicUUID) {
+            return CBUUID_Characteristic_UUID.CBUUID_Bootloader
+        }
+        if CBUUID_Characteristic_UUID.CBUUID_SerialNumber.rawValue.containsIgnoringCase(find: characteristicUUID) {
+            return CBUUID_Characteristic_UUID.CBUUID_SerialNumber
+        }
+        return nil
+    }
     
 }
 
