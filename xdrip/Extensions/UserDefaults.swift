@@ -3,7 +3,9 @@ import Foundation
 extension UserDefaults {
     public enum Key: String {
         //User configurable Settings
+        
         //General
+        
         //blood glucose  unit
         case bloodGlucoseUnit = "bloodGlucoseUnit"
         //low value
@@ -40,6 +42,9 @@ extension UserDefaults {
         case speakTrend = "speakTrend"
         // speak interval
         case speakInterval = "speakInterval"
+        
+        // Other Settings (not user configurable)
+        
         // active BluetoothTransmitter address
         case bluetoothDeviceAddress = "bluetoothDeviceAddress"
         // active BluetoothTransmitter name

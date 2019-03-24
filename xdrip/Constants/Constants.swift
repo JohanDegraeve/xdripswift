@@ -45,6 +45,8 @@ struct Constants {
         static let categoryCGMG5 = "categoryCGMG5"
         // GNSEntry
         static let categoryCGMGNSEntry = "categoryCGMGNSEntry"
+        // core data manager
+        static let categoryCoreDataManager = "categoryCoreDataManager"
     }
     
     // identifiers for local notifications
@@ -59,6 +61,10 @@ struct Constants {
     
     enum DexcomG5 {
         static let batteryReadPeriodInHours = 12.0
+    }
+    
+    enum CoreData {
+        static let modelName = "xdrip"
     }
     
 }

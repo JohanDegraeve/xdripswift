@@ -1,11 +1,23 @@
 import CoreData
 import UIKit
+import os
 
+/// development as explained in cocoacasts.com https://cocoacasts.com/bring-your-own
 final class CoreDataManager {
+    
+    // MARK: - Type Aliases
+    
+    public typealias CoreDataManagerCompletion = () -> ()
     
     // MARK: - Properties
     
     private let modelName: String
+    
+    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCoreDataManager)
+    
+    // MARK: -
+    
+    private let completion: CoreDataManagerCompletion
     
     // MARK: -
     
@@ -19,7 +31,7 @@ final class CoreDataManager {
         return managedObjectContext
     }()
     
-    private(set) lazy var privateManagedObjectContext: NSManagedObjectContext = {
+    private lazy var privateManagedObjectContext: NSManagedObjectContext = {
         let managedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         
         managedObjectContext.persistentStoreCoordinator = self.persistentStoreCoordinator
@@ -42,9 +54,10 @@ final class CoreDataManager {
     }()
     
     private lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
-        // Initialize Persistent Store Coordinator
-        let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
-        
+        return NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
+    }()
+    
+    private func addPersistentStore(to persistentStoreCoordinator: NSPersistentStoreCoordinator) {
         // Helpers
         let fileManager = FileManager.default
         let storeName = "\(self.modelName).sqlite"
@@ -66,19 +79,21 @@ final class CoreDataManager {
                                                               configurationName: nil,
                                                               at: persistentStoreURL,
                                                               options: options)
+            
         } catch {
             fatalError("Unable to Add Persistent Store")
         }
-        
-        return persistentStoreCoordinator
-    }()
+    }
     
     // MARK: - Initialization
     
-    init(modelName: String) {
+    init(modelName: String, completion: @escaping CoreDataManagerCompletion) {
+        // Set Properties
         self.modelName = modelName
+        self.completion = completion
         
-        setupNotificationHandling()
+        // Setup Core Data Stack
+        setupCoreDataStack()
     }
     
     // MARK: - Notification Handling
@@ -89,30 +104,32 @@ final class CoreDataManager {
     
     // MARK: - Helper Methods
     
-    private func setupNotificationHandling() {
-        let notificationCenter = NotificationCenter.default
-        notificationCenter.addObserver(self,
-                                       selector: #selector(saveChanges(_:)),
-                                       name: UIApplication.willTerminateNotification,
-                                       object: nil)
+    private func setupCoreDataStack() {
+        // Fetch Persistent Store Coordinator
+        guard let persistentStoreCoordinator = mainManagedObjectContext.persistentStoreCoordinator else {
+            fatalError("Unable to Set Up Core Data Stack")
+        }
         
-        notificationCenter.addObserver(self,
-                                       selector: #selector(saveChanges(_:)),
-                                       name: UIApplication.didEnterBackgroundNotification,
-                                       object: nil)
+        DispatchQueue.global().async {
+            // Add Persistent Store
+            self.addPersistentStore(to: persistentStoreCoordinator)
+            
+            // Invoke Completion On Main Queue
+            DispatchQueue.main.async { self.completion() }
+        }
     }
-    
+
     // MARK: -
     
     public func saveChanges() {
+        
         mainManagedObjectContext.performAndWait {
             do {
                 if self.mainManagedObjectContext.hasChanges {
                     try self.mainManagedObjectContext.save()
                 }
             } catch {
-                print("Unable to Save Changes of Main Managed Object Context")
-                print("\(error), \(error.localizedDescription)")
+                os_log("in savechanges,  Unable to Save Changes of Main Managed Object Context, error.localizedDescription  = %{public}@", log: log, type: .info, error.localizedDescription)
             }
         }
         
@@ -122,8 +139,7 @@ final class CoreDataManager {
                     try self.privateManagedObjectContext.save()
                 }
             } catch {
-                print("Unable to Save Changes of Private Managed Object Context")
-                print("\(error), \(error.localizedDescription)")
+                os_log("in savechanges,  Unable to Save Changes of Private Managed Object Context, error.localizedDescription  = %{public}@", log: self.log, type: .info, error.localizedDescription)
             }
         }
     }

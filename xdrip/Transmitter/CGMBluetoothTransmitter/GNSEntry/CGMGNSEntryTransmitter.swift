@@ -119,10 +119,12 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     // MARK: BluetoothTransmitterDelegate functions
     
     func centralManagerDidConnect(address:String?, name:String?) {
+        os_log("in centralManagerDidConnect", log: log, type: .info)
         cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
     }
     
     func centralManagerDidFailToConnect(error: Error?) {
+        os_log("in centralManagerDidFailToConnect", log: log, type: .info)
     }
     
     func centralManagerDidUpdateState(state: CBManagerState) {
@@ -130,6 +132,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     }
     
     func centralManagerDidDisconnectPeripheral(error: Error?) {
+        os_log("in centralManagerDidDisconnectPeripheral", log: log, type: .info)
         cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
     }
     

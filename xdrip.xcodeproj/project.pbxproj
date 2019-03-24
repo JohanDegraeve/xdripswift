@@ -34,6 +34,7 @@
 		F85DC2F821D2632F00B9F74A /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */; };
 		F85DC30121D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC30021D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift */; };
 		F88F269C223C215A0090A9A6 /* CGMGNSEntryTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88F269B223C21590090A9A6 /* CGMGNSEntryTransmitter.swift */; };
+		F88F269E224628900090A9A6 /* NightScoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88F269D2246288F0090A9A6 /* NightScoutManager.swift */; };
 		F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */; };
 		F897AAFB2201018800CDDD10 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAFA2201018800CDDD10 /* String.swift */; };
 		F897AAFE2202577200CDDD10 /* CGMG5Transmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAFD2202577200CDDD10 /* CGMG5Transmitter.swift */; };
@@ -119,6 +120,7 @@
 		F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		F85DC30021D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG4xDripTransmitter.swift; sourceTree = "<group>"; };
 		F88F269B223C21590090A9A6 /* CGMGNSEntryTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMGNSEntryTransmitter.swift; sourceTree = "<group>"; };
+		F88F269D2246288F0090A9A6 /* NightScoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightScoutManager.swift; sourceTree = "<group>"; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
 		F897AAFA2201018800CDDD10 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		F897AAFD2202577200CDDD10 /* CGMG5Transmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG5Transmitter.swift; sourceTree = "<group>"; };
@@ -318,6 +320,7 @@
 			isa = PBXGroup;
 			children = (
 				F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */,
+				F88F269D2246288F0090A9A6 /* NightScoutManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -443,17 +446,17 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
-				F8BDD44C221CAA26006EAB84 /* Texts */,
-				F8025E5B21F7AFC600ECF0C0 /* Supporting Files */,
-				F8025E5A21F7AFA100ECF0C0 /* Resources */,
-				F8EA6CA521BAD5AD0082976B /* Calibration */,
 				F85DC2FB21D2CD7000B9F74A /* Application Delegate */,
-				F8EA6C7521B474120082976B /* applicationdata */,
+				F8EA6C7521B474120082976B /* Applicationdata */,
+				F8EA6CA521BAD5AD0082976B /* Calibration */,
 				F8EA6C7D21B70DEA0082976B /* Constants */,
 				F8AC42D021B342910078C348 /* Core Data */,
 				F8025C0B21D9513400ECF0C0 /* Extensions */,
 				F85DC2F621D25E3A00B9F74A /* Managers */,
+				F8025E5A21F7AFA100ECF0C0 /* Resources */,
 				F85DC2F921D2CCC000B9F74A /* Storyboards */,
+				F8025E5B21F7AFC600ECF0C0 /* Supporting Files */,
+				F8BDD44C221CAA26006EAB84 /* Texts */,
 				F85DC2FC21D3E83100B9F74A /* Transmitter */,
 				F8EA6C8021B723A80082976B /* Utilities */,
 				F85DC2FA21D2CD3000B9F74A /* View Controllers */,
@@ -505,13 +508,13 @@
 			path = Texts;
 			sourceTree = "<group>";
 		};
-		F8EA6C7521B474120082976B /* applicationdata */ = {
+		F8EA6C7521B474120082976B /* Applicationdata */ = {
 			isa = PBXGroup;
 			children = (
 				F8EA6C7B21B491740082976B /* BgReadings.swift */,
 				F8EA6CB021C05E970082976B /* Calibrations.swift */,
 			);
-			path = applicationdata;
+			path = Applicationdata;
 			sourceTree = "<group>";
 		};
 		F8EA6C7D21B70DEA0082976B /* Constants */ = {
@@ -764,6 +767,7 @@
 				F8EA6C7F21B70E390082976B /* Constants.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
+				F88F269E224628900090A9A6 /* NightScoutManager.swift in Sources */,
 				F8025C2021DBD0FE00ECF0C0 /* ParseLibreData.swift in Sources */,
 				F8BDD45A221E0225006EAB84 /* SettingsViewDexcomSettingsViewModel.swift in Sources */,
 			);

@@ -6,9 +6,14 @@ class BgReadings {
     
     /// the latest 24 hours (or more ?) of readings.
     /// the latest element is the youngest
-    static var bgReadings = [BgReading]()
+    var bgReadings:[BgReading]
+    
+    // CoreDataManager to use
+    private let coreDataManager:CoreDataManager
 
-    private init() {
+    public init(coreDataManager:CoreDataManager) {
+        self.coreDataManager = coreDataManager
+        self.bgReadings = [BgReading]()
     }
     
     /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil,
@@ -20,7 +25,9 @@ class BgReadings {
     ///     - if ignoreCalculatedValue = true, then value of calculatedValue will be ignored
     /// - returns: an array with readings, can be empty array.
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
-    static func getLatestBgReadings(howMany amount:Int, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> Array<BgReading> {
+    func getLatestBgReadings(howMany amount:Int, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> Array<BgReading> {
+        
+        debuglogging("start getLatestBgReadings at " + Date().description(with: .current))
         
         var returnValue:Array<BgReading> = []
         
@@ -46,11 +53,11 @@ class BgReadings {
                 break loop
             }
         }
-
+        
         return returnValue
     }
     
-    static func addBgReading(newReading:BgReading) {
+    func addBgReading(newReading:BgReading) {
         bgReadings.append(newReading)
     }
 }
