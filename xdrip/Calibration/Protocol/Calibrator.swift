@@ -28,13 +28,14 @@ protocol Calibrator {
     ///     - sensor : actual sensor, optional
     ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance and also because it's an NSManagedObject
     ///     - nsManagedObjectContext : the nsManagedObjectContext
-    ///     - lastCalibrationsForActiveSensorInLastXDays :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
+    ///     - lastCalibrationsForActiveSensorInLastXDays :  result of call to getLatestCalibrations(howManyDays:4, forSensor: active sensor) - inout parameter to improve performance
     ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
     ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     /// - returns:
     ///     - the created bgreading
     func createNewBgReading(rawData:Double, filteredData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration?, lastCalibration:Calibration?, nsManagedObjectContext:NSManagedObjectContext ) -> BgReading
     
+    /// creates a calibration, stored in the database, but context not saved. Also readings will be adpated, also not saved.
     /// - parameters:
     ///     - bgValue: calibration value
     ///     - lastBgReading: latest bgreading
@@ -114,7 +115,7 @@ extension Calibrator {
     ///     - sensor : actual sensor, optional
     ///     - last3Readings : result of call to BgReadings.getLatestBgReadings(3, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false - inout parameter to improve performance and also because it's an NSManagedObject
     ///     - nsManagedObjectContext : the nsManagedObjectContext
-    ///     - lastCalibrationsForActiveSensorInLastXDays :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
+    ///     - lastCalibrationsForActiveSensorInLastXDays :  result of call to getLatestCalibrations(howManyDays:4, forSensor: active sensor) - inout parameter to improve performance
     ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
     ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     /// - returns:
@@ -225,7 +226,7 @@ extension Calibrator {
     /// forCalibration will get changed
     /// - parameters:
     ///     - calibration : calibration for which calculation is done
-    ///     - lastCalibrationsForActiveSensorInLastXDays :  result of call to Calibrations.allForSensor(4, active sensor) - inout parameter to improve performance
+    ///     - lastCalibrationsForActiveSensorInLastXDays :  result of call to getLatestCalibrations(howManyDays:4, forSensor: active sensor) - inout parameter to improve performance
     ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
     ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     private func rawValueOverride(for calibration:inout Calibration, rawValue:Double, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration, lastCalibration:Calibration) {
@@ -238,7 +239,7 @@ extension Calibrator {
     /// forCalibration will get changed
     /// - parameters:
     ///     - calibration : calibration for which calculation is done
-    ///     - lastCalibrationsForActiveSensorInLastXDays :  result of call to Calibrations.allForSensor(x, active sensor) - inout parameter to improve performance - with x number of days (in Spike/xDripplus x = 4)
+    ///     - lastCalibrationsForActiveSensorInLastXDays :  result of call to getLatestCalibrations(howManyDays:4, forSensor: active sensor) - inout parameter to improve performance
     ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
     ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     private func calculateWLS(for calibration:Calibration, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration, lastCalibration:Calibration) {

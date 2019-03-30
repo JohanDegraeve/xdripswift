@@ -5,7 +5,9 @@ import CoreBluetooth
 import UserNotifications
 
 final class RootViewController: UIViewController, CGMTransmitterDelegate {
+
     // MARK: - Properties
+
     private var test:CGMTransmitter?
     
     private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryFirstView)
@@ -25,10 +27,13 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     /// temporary ?
     private var currentTransmitterId:String?
     
-    /// temporary ?
+    /// BgReadings instance
     private var bgReadings:BgReadings?
+    
+    /// Calibrations instance
+    private var calibrations:Calibrations?
 
-    // used at initial app startup, during creation of constructor, so that cgm transmitter only uses most recent readings
+    // maybe not needed in future
     private  var timeStampLastBgReading:Date = {
       return Date(timeIntervalSince1970: 0)
     }()
@@ -81,20 +86,42 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     }
     
     private func setupApplicationData() {
+        
+        // if coreDataManager is nil then there's no reason to continue
         guard let coreDataManager = coreDataManager else {
             fatalError("In setupApplicationData but coreDataManager == nil")
         }
+
+        activeSensor = Sensors.init(coreDataManager: coreDataManager).fetchActiveSensor()
+        
+        // test
+        /*if let activeSensor = activeSensor {
+            debuglogging("activesensor has id " + activeSensor.id + " and starttime " + activeSensor.startDate.description(with: .current))
+        }*/
+
+        // instantiate bgReadings
         bgReadings = BgReadings(coreDataManager: coreDataManager)
-        
-        tempfetchActiveSensor()
-        tempfetchAllBgReadings()
-        
-        if let bgReadings = bgReadings, let lastReading = bgReadings.bgReadings.last {
-            timeStampLastBgReading = lastReading.timeStamp
+        guard let bgReadings = bgReadings else {
+            fatalError("In setupApplicationData, failed to initialize bgReadings")
         }
         
-        //logAllBgReadings()
-        tempfetchAllCalibrations()
+        // set timeStampLastBgReading
+        if let lastReading = bgReadings.last(forSensor: activeSensor) {
+            timeStampLastBgReading = lastReading.timeStamp
+            debuglogging("timestamplastBgReading = " + timeStampLastBgReading.description(with: .current))
+        }
+        
+        // instantiate calibrations
+        calibrations = Calibrations(coreDataManager: coreDataManager)
+        guard calibrations != nil else {
+            fatalError("In setupApplicationData, failed to initialize calibrations")
+        }
+        
+        /// test
+        /*for (index,calibration) in  calibrations.getLatestCalibrations(howManyDays: 2, forSensor: nil).enumerated() {
+            debuglogging("calibration nr " + index.description + ", timestamp " + calibration.timeStamp.description(with: .current) + ", sensor id = " + calibration.sensor.id)
+        }*/
+        
     }
     
     // Only MioaMiao will call this
@@ -142,7 +169,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
         
         // Configure Notification Content
         if let activeSensor = activeSensor, let bgReadings = bgReadings {
-            let lastReading = bgReadings.getLatestBgReadings(howMany: 1, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+            let lastReading = bgReadings.getLatestBgReadings(limit: 1, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
             let calculatedValueAsString:String?
             if lastReading.count > 0 {
                 var calculatedValue = lastReading[0].calculatedValue
@@ -175,6 +202,12 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     }
     
     private func requestCalibration() {
+        
+        // check that calibrations is not nil
+        guard let calibrations = calibrations else {
+            fatalError("in requestCalibration, calibrations is nil")
+        }
+        
         let alert = UIAlertController(title: "enter calibration value", message: nil, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
@@ -189,27 +222,24 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                     if let first = textField.first {
                         if let value = first.text {
                             let valueAsDouble = Double(value)!
-                            var latestReadings = bgReadings.getLatestBgReadings(howMany: 36, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
+                            var latestReadings = bgReadings.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
                             
-                            var latestCalibrations = Calibrations.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
+                            var latestCalibrations = calibrations.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
 
                             if let calibrator = self.calibrator {
                                 if latestCalibrations.count == 0 {
-                                    let twoCalibrations = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                                    if let firstCalibration = twoCalibrations.firstCalibration, let secondCalibration = twoCalibrations.secondCalibration {
-                                        Calibrations.addCalibration(newCalibration: firstCalibration)
-                                        Calibrations.addCalibration(newCalibration: secondCalibration)
-                                    }
+                                    // calling initialCalibration will create two calibrations, they are returned also but we don't need them
+                                    _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                                 } else {
-                                    let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
+                                    let firstCalibrationForActiveSensor = calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
                                     
                                     if let firstCalibrationForActiveSensor = firstCalibrationForActiveSensor {
-                                        let newCalibration = calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                                        Calibrations.addCalibration(newCalibration: newCalibration)
+                                        // calling createNewCalibration will create a new  calibrations, it is returned but we don't need it
+                                        _ = calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                                     }
                                 }
+                                // this will store the newly created calibration(s) in coredata
                                 coreDataManager.saveChanges()
-                                //self.logAllBgReadings()
                             }
                         }
                     }
@@ -221,7 +251,12 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     
     private func temptesting(glucoseData: inout [RawGlucoseData], sensorState: SensorState?, firmware: String?, hardware: String?, batteryPercentage: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
         
-        if activeSensor == nil, let coreDataManager = coreDataManager {
+        // check that calibrations and coredata manager is not nil
+        guard let calibrations = calibrations, let coreDataManager = coreDataManager else {
+            fatalError("in temptesting, calibrations or coreDataManager is nil")
+        }
+
+        if activeSensor == nil {
             if let transmitterType = UserDefaults.standard.transmitterType {
                 switch transmitterType {
                     
@@ -242,20 +277,19 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
             coreDataManager.saveChanges()
         }
 
-        if let activeSensor = activeSensor, let calibrator = self.calibrator, let coreDataManager = coreDataManager, let bgReadings = self.bgReadings {
+        if let activeSensor = activeSensor, let calibrator = self.calibrator, let bgReadings = self.bgReadings {
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 if glucose.timeStamp > timeStampLastBgReading {
-                    var latest3BgReadings = bgReadings.getLatestBgReadings(howMany: 3, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
                     
-                    var lastCalibrationsForActiveSensorInLastXDays = Calibrations.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
-                    let firstCalibrationForActiveSensor = Calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
-                    let lastCalibrationForActiveSensor = Calibrations.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
+                    var latest3BgReadings = bgReadings.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+                    
+                    var lastCalibrationsForActiveSensorInLastXDays = calibrations.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
+                    let firstCalibrationForActiveSensor = calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
+                    let lastCalibrationForActiveSensor = calibrations.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
                     
                     let newBgReading = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
-                    debuglogging("newBgReading.calculatedValue = " + newBgReading.calculatedValue.description)
-                    
-                    bgReadings.addBgReading(newReading: newBgReading)
+                    debuglogging("newBgReading, timestamp = " + newBgReading.timeStamp.description(with: .current) + ", calculatedValue = " + newBgReading.calculatedValue.description)
                 }
             }
             
@@ -273,98 +307,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
             os_log("bgreading %{public}d has rawvalue  %{public}f", log: self.log, type: .info, index, reading.rawData)
         }*/
     }
-    
-    private func tempfetchActiveSensor() {
-        let fetchRequest: NSFetchRequest<Sensor> = Sensor.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Sensor.startDate), ascending: false)]
-        
-        if let coreDataManager = coreDataManager {
-            coreDataManager.mainManagedObjectContext.performAndWait {
-                do {
-                    // Execute Fetch Request
-                    let sensors = try fetchRequest.execute()
-                    
-                    sensorloop: for sensor in sensors {
-                        os_log("Found sensor with id : %{public}@ and startdate %{public}@", log: self.log, type: .info, sensor.id, sensor.startDate.description)
-                        if sensor.endDate == nil {
-                            //there should only be one sensor with enddate nil, the active sensor
-                            // should be improved eg store the active sensor id in settings
-                            activeSensor = sensor
-                            break sensorloop
-                        }
-                    }
-                    
-                    //go through calibrations and readings and print the identifiers
-                    if let activeSensor = activeSensor {
-                        os_log("Found active sensor with id : %{public}@", log: self.log, type: .info, activeSensor.id)
-                        if let setOfCalibrations = activeSensor.calibrations {
-                            for element in setOfCalibrations {
-                                if let calibration = element as? Calibration {
-                                    os_log("Found calibration in that sensor with id : %{public}@", log: self.log, type: .info, calibration.id)
-                                }
-                            }
-                        }
-                        /*if let setOfReadings = activeSensor.readings {
-                         for element in setOfReadings {
-                         if let reading = element as? BgReading {
-                         os_log("Found bgreading in that sensor with id : %{public}@", log: self.log, type: .info, reading.id)
-                         }
-                         }
-                         }*/
-                    }
-                    
-                } catch {
-                    let fetchError = error as NSError
-                    os_log("Unable to Execute Sensor Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
-                }
-            }
-        }
-    }
 
-    private func tempfetchAllBgReadings() {
-        let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: true)]
-        
-        if let coreDataManager = coreDataManager, let bgReadings = bgReadings {
-            coreDataManager.mainManagedObjectContext.performAndWait {
-                do {
-                    // Execute Fetch Request
-                    let readings = try fetchRequest.execute()
-                    
-                    readingloop: for reading in readings {
-                        bgReadings.addBgReading(newReading: reading)
-                        //os_log("Found reading with id : %{public}@, timestamp : %{public}@, calculatedvalue %{public}d, rawdata %{public}f", log: self.log, type: .info, reading.id, reading.timeStamp.description, reading.calculatedValue, reading.rawData)
-                    }
-                } catch {
-                    let fetchError = error as NSError
-                    os_log("Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
-                }
-            }
-        }
-    }
-
-    private func tempfetchAllCalibrations() {
-        let fetchRequest: NSFetchRequest<Calibration> = Calibration.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Calibration.timeStamp), ascending: true)]
-        
-        if let coreDataManager = coreDataManager {
-            coreDataManager.mainManagedObjectContext.performAndWait {
-                do {
-                    // Execute Fetch Request
-                    let calibrations = try fetchRequest.execute()
-                    
-                    calibrationloop: for calibration in calibrations {
-                        Calibrations.calibrations.append(calibration)
-                        os_log("Found calibration with id : %{public}@, timestamp : %{public}@", log: self.log, type: .info, calibration.id, calibration.timeStamp.description)
-                    }
-                } catch {
-                    let fetchError = error as NSError
-                    os_log("Unable to Execute Calibration Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
-                }
-            }
-        }
-    }
-    
     // when user changes transmitter type or transmitter id, then new transmitter needs to be setup. That's why observer for these settings is required
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
@@ -466,7 +409,8 @@ extension RootViewController: UNUserNotificationCenterDelegate {
     
     private func logAllBgReadings() {
         if let bgReadings = bgReadings {
-            for (index,reading) in bgReadings.bgReadings.enumerated() {
+            let readings = bgReadings.getLatestBgReadings(limit: nil, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: true)
+            for (index,reading) in readings.enumerated() {
                 if reading.sensor?.id == activeSensor?.id {
                     os_log("readings %{public}d timestamp = %{public}@, calculatedValue = %{public}f", log: log, type: .info, index, reading.timeStamp.description, reading.calculatedValue)
                 }

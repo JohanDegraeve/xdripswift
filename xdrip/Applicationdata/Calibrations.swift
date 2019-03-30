@@ -1,82 +1,41 @@
 import Foundation
-
+import os
+import CoreData
 
 class Calibrations {
     
-    //don't know yet how many calibrations will be stored here
-    //the last element is the youngest, meaning small to large
-    static var calibrations:Array<Calibration> = []
-
-    private init() {
+    // MARK: - Properties
+    
+    /// for logging
+    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryApplicationDataCalibrations)
+    
+    /// CoreDataManager to use
+    private let coreDataManager:CoreDataManager
+    
+    // MARK: - initializer
+    
+    init(coreDataManager:CoreDataManager) {
+        self.coreDataManager = coreDataManager
     }
     
-    /// Returns calibrations for which, sensorConfidence != 0, slopeConfidence != 0,
-    /// sensor == active sensor,
-    /// timestamp within last days days
-    /// - parameters:
-    ///     - inLastDays : calibrations with timestamp in last days
-    ///     - withActivesensor
-    /// - returns:
-    ///     - array of calibrations, can have size 0 if there's no calibration matching
-    ///     - ordered by timestamp, large to small (descending) ie the first is the youngest
-    static func allForSensor(inLastDays lastdays:Int, withActivesensor sensor:Sensor) -> Array<Calibration> {
-        let fourdaysago = Date.nowInMilliSecondsAsDouble() - (Double)(lastdays * 24 * 3600 * 1000)
-        
-        var returnValue:Array<Calibration> = []
-        
-        loop: for calibration in calibrations.reversed() {
-            if calibration.timeStamp.toMillisecondsAsDouble() > fourdaysago {
-                if calibration.sensor.id == sensor.id
-                    &&
-                    calibration.sensorConfidence != 0
-                    &&
-                    calibration.slopeConfidence != 0
-                {
-                    returnValue.insert(calibration, at: 0)
-                }
-            } else {
-                break loop
-            }
-        }
-        return returnValue
-    }
-
+    // MARK: - functions
+    
     /// get first calibration (ie oldest) for currently active sensor and with sensorconfidence and slopeconfidence != 0
     /// - parameters:
     ///     - withActivesensor : should be currently active sensor
     /// - returns:
-    ///     - the first, can be nil
-    static func firstCalibrationForActiveSensor(withActivesensor sensor:Sensor) -> Calibration? {
-        loop: for calibration in calibrations {
-            if calibration.sensor.id == sensor.id
-                &&
-                calibration.sensorConfidence != 0
-                &&
-                calibration.slopeConfidence != 0
-            {
-                return calibration
-            }
-        }
-        return nil
+    ///     - the first calibration, can be nil
+    func firstCalibrationForActiveSensor(withActivesensor sensor:Sensor) -> Calibration? {
+        return getFirstOrLastCalibration(withActivesensor: sensor, first: true)
     }
 
     /// get last calibration (ie youngest) for currently active sensor and with sensorconfidence and slopeconfidence != 0
     /// - parameters:
     ///     - withActivesensor : should be currently active sensor
     /// - returns:
-    ///     - the first, can be nil
-    static func lastCalibrationForActiveSensor(withActivesensor sensor:Sensor) -> Calibration? {
-        loop: for calibration in calibrations.reversed() {
-            if calibration.sensor.id == sensor.id
-                &&
-                calibration.sensorConfidence != 0
-                &&
-                calibration.slopeConfidence != 0
-            {
-                return calibration
-            }
-        }
-        return nil
+    ///     - the last calibration, can be nil
+    func lastCalibrationForActiveSensor(withActivesensor sensor:Sensor) -> Calibration? {
+        return getFirstOrLastCalibration(withActivesensor: sensor, first: false)
     }
     
     /// Returns last calibrations, possibly zero
@@ -86,9 +45,28 @@ class Calibrations {
     /// - returns:
     ///     - array of calibrations, can have size 0 if there's no calibration matching
     ///     - ordered by timestamp, large to small (descending) ie the first is the youngest
-    static func getLatestCalibrations(howManyDays amount:Int, forSensor sensor:Sensor?) -> Array<Calibration> {
-        var returnValue:Array<Calibration> = []
-        let nowMinusXDays = Date(timeIntervalSinceNow: Double(-amount*24*3600))
+    func getLatestCalibrations(howManyDays amount:Int, forSensor sensor:Sensor?) -> Array<Calibration> {
+        
+        // create fetchrequest
+        let fetchRequest: NSFetchRequest<Calibration> = Calibration.fetchRequest()
+        
+        // sort ascending, ie first element will be first calibration
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Calibration.timeStamp), ascending: false)]
+        
+        // define predicates
+        var subPredicate1:NSPredicate?
+        if let sensor = sensor {
+            subPredicate1 = NSPredicate(format: "sensor == %@", sensor)
+        }
+        let subPredicate2 = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSinceNow: Double(-amount*24*3600)))
+        if let subPredicate1 = subPredicate1 {
+            fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [subPredicate1, subPredicate2])
+        } else {
+            fetchRequest.predicate = subPredicate2
+        }
+
+        var calibrations = [Calibration]()
+        /*let nowMinusXDays = Date(timeIntervalSinceNow: Double(-amount*24*3600))
         
         loop: for calibration in calibrations.reversed() {
             if calibration.timeStamp < nowMinusXDays {
@@ -96,19 +74,70 @@ class Calibrations {
             } else {
                 if let sensor = sensor {
                     if sensor.id == calibration.sensor.id {
-                        returnValue.append(calibration)
+                        calibrations.append(calibration)
                     }
                 } else {
-                    returnValue.append(calibration)
+                    calibrations.append(calibration)
                 }
             }
-        }
+        }*/
         
-        return returnValue
+        // fetch the calibrations
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            do {
+                // Execute Fetch Request
+                calibrations = try fetchRequest.execute()
+            } catch {
+                let fetchError = error as NSError
+                os_log("in getLatestCalibrations, Unable to Execute Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+            }
+        }
+        return calibrations
     }
+    
+    // MARK: - private helper functions
+    
+    private func getFirstOrLastCalibration(withActivesensor sensor:Sensor, first:Bool) -> Calibration? {
+        // create fetchrequest
+        let fetchRequest: NSFetchRequest<Calibration> = Calibration.fetchRequest()
+        
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Calibration.timeStamp), ascending: first)]
+        
+        // define predicates
+        let subPredicate1 = NSPredicate(format: "sensor == %@", sensor)
+        let subPredicate2 = NSPredicate(format: "sensorConfidence != %@", 0.0)
+        let subPredicate3 = NSPredicate(format: "slopeConfidence != %@", 0.0)
+        fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [subPredicate1, subPredicate2, subPredicate3])
+        
+        // set limit to 1
+        fetchRequest.fetchLimit = 1
+        
+        var calibrations = [Calibration]()
+        
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            do {
+                // Execute Fetch Request
+                calibrations = try fetchRequest.execute()
+            } catch {
+                let fetchError = error as NSError
+                os_log("in getFirstOrLastCalibration, Unable to Execute Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+            }
+        }
+        /* loop: for calibration in calibrations {
+         if calibration.sensor.id == sensor.id
+         &&
+         calibration.sensorConfidence != 0
+         &&
+         calibration.slopeConfidence != 0
+         {
+         return calibration
+         }
+         }*/
 
-    static func addCalibration(newCalibration:Calibration) {
-        calibrations.append(newCalibration)
+        if calibrations.count > 0 {
+            return calibrations[0]
+        } else {
+            return nil
+        }
     }
-
 }

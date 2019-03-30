@@ -1,41 +1,44 @@
 import Foundation
 import CoreData
-
+import os
 
 class BgReadings {
     
-    /// the latest 24 hours (or more ?) of readings.
-    /// the latest element is the youngest
-    var bgReadings:[BgReading]
+    // MARK: - Properties
     
-    // CoreDataManager to use
+    /// for logging
+    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryApplicationDataBgReadings)
+    
+    /// CoreDataManager to use
     private let coreDataManager:CoreDataManager
-
-    public init(coreDataManager:CoreDataManager) {
+    
+    // MARK: - initializer
+    
+    init(coreDataManager:CoreDataManager) {
         self.coreDataManager = coreDataManager
-        self.bgReadings = [BgReading]()
     }
+    
+    // MARK: - functions
     
     /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil,
     ///
     /// - parameters:
-    ///     - howMany : maximum amount of readings to return
+    ///     - limit : maximum amount of readings to return, if nil then no limit in amount
+    ///     - howOld : maximum age in days, it will calculate exacte (24 hours) * howOld, if nil then no limit in age
     ///     - forSensor : if not nil, then only readings for the given sensor will be returned - if nil, then sensor is ignored
     ///     - if ignoreRawData = true, then value of rawdata will be ignored
     ///     - if ignoreCalculatedValue = true, then value of calculatedValue will be ignored
     /// - returns: an array with readings, can be empty array.
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
-    func getLatestBgReadings(howMany amount:Int, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> Array<BgReading> {
+    func getLatestBgReadings(limit:Int?, howOld maximumDays:Int?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> [BgReading] {
         
-        debuglogging("start getLatestBgReadings at " + Date().description(with: .current))
-        
-        var returnValue:Array<BgReading> = []
+        var returnValue:[BgReading] = []
         
         let ignoreSensorId = sensor == nil ? true:false
         
-        loop: for (_,bgReading) in bgReadings.enumerated().reversed() {
-            //TODO: delete this --- let tocheck:BgReading = bgReading
-            //TODO: delete this --- debuglogging(index.description + " calculatedvalue = " + bgReading.calculatedValue.description)
+        let bgReadings = fetchBgReadings(limit: limit, howOld: maximumDays)
+        
+        loop: for (_,bgReading) in bgReadings.enumerated() {
             if ignoreSensorId {
                 if (bgReading.calculatedValue != 0.0 || ignoreCalculatedValue) && (bgReading.rawData != 0.0 || ignoreRawData) {
                     returnValue.append(bgReading)
@@ -49,15 +52,62 @@ class BgReadings {
                     }
                 }
             }
-            if returnValue.count == amount {
-                break loop
+            
+            if let limit = limit {
+                if returnValue.count == limit {
+                    break loop
+                }
             }
         }
         
         return returnValue
     }
     
-    func addBgReading(newReading:BgReading) {
-        bgReadings.append(newReading)
+    /// gets last reading, ignores rawData and calculatedValue
+    /// - parameters:
+    ///     - sensor: sensor for which reading is asked, if nil then sensor value is ignored
+    func last(forSensor sensor:Sensor?) -> BgReading? {
+        let readings = getLatestBgReadings(limit: 1, howOld: nil, forSensor: sensor, ignoreRawData: true, ignoreCalculatedValue: true)
+        if readings.count > 0 {
+            return readings.last
+        } else {
+            return nil
+        }
+    }
+    
+    // MARK: - private helper functions
+    
+    /// returnvalue can be empty array
+    /// - parameters:
+    ///     - limit: maximum amount of readings to fetch, if 0 then no limit
+    ///     - howOld : how many full days to go back
+    private func fetchBgReadings(limit:Int?, howOld:Int?) -> [BgReading] {
+        let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: false)]
+        
+        // if maximum age specified then create predicate
+        if let howOld = howOld, howOld >= 0 {
+            let fromDate = NSDate(timeIntervalSinceNow: Double(-howOld * 60 * 60 * 24))
+            let predicate = NSPredicate(format: "timeStamp > %@", fromDate)
+            fetchRequest.predicate = predicate
+        }
+        
+        // set fetchLimit
+        if let limit = limit, limit >= 0 {
+            fetchRequest.fetchLimit = limit
+        }
+        
+        var bgReadings = [BgReading]()
+        
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            do {
+                // Execute Fetch Request
+                bgReadings = try fetchRequest.execute()
+            } catch {
+                let fetchError = error as NSError
+                os_log("in fetchBgReadings, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+            }
+        }
+        return bgReadings
     }
 }

@@ -47,6 +47,12 @@ struct Constants {
         static let categoryCGMGNSEntry = "categoryCGMGNSEntry"
         // core data manager
         static let categoryCoreDataManager = "categoryCoreDataManager"
+        // application data bgreadings
+        static let categoryApplicationDataBgReadings = "categoryApplicationDataBgReadings"
+        // application data calibrations
+        static let categoryApplicationDataCalibrations = "categoryApplicationDataCalibrations"
+        // application data sensors
+        static let categoryApplicationDataSensors = "categoryApplicationDataSensors"
     }
     
     // identifiers for local notifications
@@ -66,5 +72,4 @@ struct Constants {
     enum CoreData {
         static let modelName = "xdrip"
     }
-    
 }
