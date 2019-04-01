@@ -1,60 +1,66 @@
 import Foundation
 
 extension UserDefaults {
+    /// keys for settings and user defaults. For reading and writing settings, the keys should not be used, the specific functions kan be used.
     public enum Key: String {
-        //User configurable Settings
+        // User configurable Settings
         
-        //General
+        // General
         
-        //blood glucose  unit
+        /// bloodglucose  unit
         case bloodGlucoseUnit = "bloodGlucoseUnit"
-        //low value
+        /// low value
         case lowMarkValue = "lowMarkValue"
-        //high value
+        /// high value
         case highMarkValue = "highMarkValue"
-        // transmitter type
+        /// transmitter type
         case transmitterTypeAsString = "transmitterTypeAsString"
-        // transmitterid
+        /// transmitterid
         case transmitterId = "transmitterId"
-        // should readings be stored in healthkit, true or false
+        /// should readings be stored in healthkit, true or false
         case storeReadingsInHealthkit = "storeReadingsInHealthkit"
-        // should readings be uploaded to nightscout
+        /// should readings be uploaded to nightscout
         case uploadReadingsToNightScout = "uploadReadingsToNightScout"
-        // nightscout url
+        /// nightscout url
         case nightScoutUrl = "nightScoutUrl"
-        // nightscout api key
+        /// nightscout api key
         case nightScoutAPIKey = "nightScoutAPIKey"
-        // should readings be uploaded to Dexcom share
+        /// should readings be uploaded to Dexcom share
         case uploadReadingstoDexcomShare = "uploadReadingstoDexcomShare"
-        // dexcom share account name
+        /// dexcom share account name
         case dexcomShareAccountName = "dexcomShareAccountName"
-        // dexcom share password
+        /// dexcom share password
         case dexcomSharePassword = "dexcomSharePassword"
-        // use US dexcomshare url true or false
+        /// use US dexcomshare url true or false
         case useUSDexcomShareurl = "useUSDexcomShareurl"
-        // dexcom share serial number
+        /// dexcom share serial number
         case dexcomShareSerialNumber = "dexcomShareSerialNumber"
-        // speak readings
+        /// speak readings
         case speakReadings = "speakReadings"
-        // speak delta
+        /// speak delta
         case speakDelta = "speakDelta"
-        // speak trend
+        /// speak trend
         case speakTrend = "speakTrend"
-        // speak interval
+        /// speak interval
         case speakInterval = "speakInterval"
         
         // Other Settings (not user configurable)
         
-        // active BluetoothTransmitter address
+        // Bluetooth
+        /// active BluetoothTransmitter address
         case bluetoothDeviceAddress = "bluetoothDeviceAddress"
-        // active BluetoothTransmitter name
+        /// active BluetoothTransmitter name
         case bluetoothDeviceName = "bluetoothDeviceName"
-
+        
+        // Nightscout
+        /// timestamp lastest uploaded reading
+        case timeStampLatestUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
     }
     
     // MARK: - =====  User Configurable Settings ======
     
     // MARK: General
+    
     /// true if unit is mgdl, false if mmol is used
     @objc dynamic var bloodGlucoseUnitIsMgDl: Bool {
         //default value for bool in userdefaults is false, false is for mgdl, true is for mmol
@@ -332,6 +338,15 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.bluetoothDeviceName.rawValue)
+        }
+    }
+    
+    var timeStampLatestUploadedBgReading:Date? {
+        get {
+            return object(forKey: Key.timeStampLatestUploadedBgReadingToNightScout.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestUploadedBgReadingToNightScout.rawValue)
         }
     }
 

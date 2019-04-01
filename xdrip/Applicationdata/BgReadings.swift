@@ -32,11 +32,23 @@ class BgReadings {
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
     func getLatestBgReadings(limit:Int?, howOld maximumDays:Int?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> [BgReading] {
         
+        // if maximum age specified then create fromdate
+        var fromDate:Date?
+        if let maximumDays = maximumDays, maximumDays >= 0 {
+            fromDate = Date(timeIntervalSinceNow: Double(-maximumDays * 60 * 60 * 24))
+        }
+        
+        return getLatestBgReadings(limit: limit, fromDate: fromDate, forSensor: sensor, ignoreRawData: ignoreRawData, ignoreCalculatedValue: ignoreCalculatedValue)
+        
+    }
+    
+    func getLatestBgReadings(limit:Int?, fromDate:Date?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> [BgReading] {
+        
         var returnValue:[BgReading] = []
         
         let ignoreSensorId = sensor == nil ? true:false
         
-        let bgReadings = fetchBgReadings(limit: limit, howOld: maximumDays)
+        let bgReadings = fetchBgReadings(limit: limit, fromDate: fromDate)
         
         loop: for (_,bgReading) in bgReadings.enumerated() {
             if ignoreSensorId {
@@ -80,15 +92,14 @@ class BgReadings {
     /// returnvalue can be empty array
     /// - parameters:
     ///     - limit: maximum amount of readings to fetch, if 0 then no limit
-    ///     - howOld : how many full days to go back
-    private func fetchBgReadings(limit:Int?, howOld:Int?) -> [BgReading] {
+    ///     - fromDate : if specified, only return readings with timestamp > fromDate
+    private func fetchBgReadings(limit:Int?, fromDate:Date?) -> [BgReading] {
         let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: false)]
         
-        // if maximum age specified then create predicate
-        if let howOld = howOld, howOld >= 0 {
-            let fromDate = NSDate(timeIntervalSinceNow: Double(-howOld * 60 * 60 * 24))
-            let predicate = NSPredicate(format: "timeStamp > %@", fromDate)
+        // if fromDate specified then create predicate
+        if let fromDate = fromDate {
+            let predicate = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSinceReferenceDate))
             fetchRequest.predicate = predicate
         }
         

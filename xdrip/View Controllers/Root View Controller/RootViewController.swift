@@ -32,6 +32,9 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     
     /// Calibrations instance
     private var calibrations:Calibrations?
+    
+    /// NightScoutManager instance
+    private var nightScoutManager:NightScoutManager?
 
     // maybe not needed in future
     private  var timeStampLastBgReading:Date = {
@@ -108,7 +111,6 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
         // set timeStampLastBgReading
         if let lastReading = bgReadings.last(forSensor: activeSensor) {
             timeStampLastBgReading = lastReading.timeStamp
-            debuglogging("timestamplastBgReading = " + timeStampLastBgReading.description(with: .current))
         }
         
         // instantiate calibrations
@@ -122,6 +124,8 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
             debuglogging("calibration nr " + index.description + ", timestamp " + calibration.timeStamp.description(with: .current) + ", sensor id = " + calibration.sensor.id)
         }*/
         
+        // setup nightscout synchronizer
+        nightScoutManager = NightScoutManager(bgReadings: bgReadings)
     }
     
     // Only MioaMiao will call this

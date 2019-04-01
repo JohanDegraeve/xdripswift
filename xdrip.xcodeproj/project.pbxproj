@@ -33,6 +33,7 @@
 		F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */; };
 		F85DC2F821D2632F00B9F74A /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */; };
 		F85DC30121D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC30021D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift */; };
+		F867E2592252A9B1000FD265 /* BgReading+NightScout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F867E2582252A9B1000FD265 /* BgReading+NightScout.swift */; };
 		F88F269C223C215A0090A9A6 /* CGMGNSEntryTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88F269B223C21590090A9A6 /* CGMGNSEntryTransmitter.swift */; };
 		F88F269E224628900090A9A6 /* NightScoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88F269D2246288F0090A9A6 /* NightScoutManager.swift */; };
 		F88F26A0224EC8B10090A9A6 /* Sensors.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88F269F224EC8B10090A9A6 /* Sensors.swift */; };
@@ -120,6 +121,7 @@
 		F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		F85DC30021D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG4xDripTransmitter.swift; sourceTree = "<group>"; };
+		F867E2582252A9B1000FD265 /* BgReading+NightScout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgReading+NightScout.swift"; sourceTree = "<group>"; };
 		F88F269B223C21590090A9A6 /* CGMGNSEntryTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMGNSEntryTransmitter.swift; sourceTree = "<group>"; };
 		F88F269D2246288F0090A9A6 /* NightScoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightScoutManager.swift; sourceTree = "<group>"; };
 		F88F269F224EC8B10090A9A6 /* Sensors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sensors.swift; sourceTree = "<group>"; };
@@ -322,7 +324,6 @@
 			isa = PBXGroup;
 			children = (
 				F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */,
-				F88F269D2246288F0090A9A6 /* NightScoutManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -382,6 +383,23 @@
 				F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */,
 			);
 			path = GenericBluetoothTransmitter;
+			sourceTree = "<group>";
+		};
+		F867E2562252A97D000FD265 /* Share */ = {
+			isa = PBXGroup;
+			children = (
+				F867E2572252A98A000FD265 /* NightScout */,
+			);
+			path = Share;
+			sourceTree = "<group>";
+		};
+		F867E2572252A98A000FD265 /* NightScout */ = {
+			isa = PBXGroup;
+			children = (
+				F88F269D2246288F0090A9A6 /* NightScoutManager.swift */,
+				F867E2582252A9B1000FD265 /* BgReading+NightScout.swift */,
+			);
+			path = NightScout;
 			sourceTree = "<group>";
 		};
 		F88F269A223C21110090A9A6 /* GNSEntry */ = {
@@ -456,6 +474,7 @@
 				F8025C0B21D9513400ECF0C0 /* Extensions */,
 				F85DC2F621D25E3A00B9F74A /* Managers */,
 				F8025E5A21F7AFA100ECF0C0 /* Resources */,
+				F867E2562252A97D000FD265 /* Share */,
 				F85DC2F921D2CCC000B9F74A /* Storyboards */,
 				F8025E5B21F7AFC600ECF0C0 /* Supporting Files */,
 				F8BDD44C221CAA26006EAB84 /* Texts */,
@@ -739,6 +758,7 @@
 				F897AB37220775A300CDDD10 /* BatteryStatusRxMessage.swift in Sources */,
 				F85DC2F821D2632F00B9F74A /* CoreDataManager.swift in Sources */,
 				F8BDD452221DEAB2006EAB84 /* TextsSettingsViews.swift in Sources */,
+				F867E2592252A9B1000FD265 /* BgReading+NightScout.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
 				F897AB2622073C4B00CDDD10 /* AuthChallengeTxMessage.swift in Sources */,
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
