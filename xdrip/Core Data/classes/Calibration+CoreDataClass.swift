@@ -16,6 +16,7 @@ public class Calibration: NSManagedObject {
         distanceFromEstimate: Double,
         estimateRawAtTimeOfCalibration: Double,
         slopeConfidence: Double,
+        deviceName:String?,
         nsManagedObjectContext:NSManagedObjectContext
         ) {
         
@@ -34,6 +35,7 @@ public class Calibration: NSManagedObject {
         self.distanceFromEstimate = distanceFromEstimate
         self.estimateRawAtTimeOfCalibration = estimateRawAtTimeOfCalibration
         self.slopeConfidence = slopeConfidence
+        self.deviceName = deviceName
         
         possibleBad = false
         id = UniqueId.createEventId()

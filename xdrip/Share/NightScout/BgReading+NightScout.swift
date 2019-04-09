@@ -1,34 +1,60 @@
 import Foundation
 
 extension BgReading {
+    /// dictionary representation for upload to NightScout
     public var dictionaryRepresentation: [String: Any] {
-        var representation: [String: Any] = [
-            "device": device,
-            "date": timestamp.timeIntervalSince1970 * 1000,
-            "dateString": TimeFormat.timestampStrFromDate(timestamp)
+        return  [
+            "_id": id,
+            "device": deviceName ?? "",
+            "date": Int((timeStamp.timeIntervalSince1970 * 1000)),
+            "dateString": TimeFormat.timestampNightScoutFormatFromDate(timeStamp),
+            "type": "sgv",
+            "sgv": Int(calculatedValue.roundToDecimal(0)),
+            "direction": slopeName,
+            "filtered": round(ageAdjustedFiltered() * 1000),
+            "unfiltered": ageAdjustedRawValue,
+            "noise": 1,
+            "sysTime": TimeFormat.timestampNightScoutFormatFromDate(timeStamp)
         ]
-        
-        switch glucoseType {
-        case .Meter:
-            representation["type"] = "mbg"
-            representation["mbg"] = glucose
-        case .Sensor:
-            representation["type"] = "sgv"
-            representation["sgv"] = glucose
-        }
-        
-        if let direction = direction {
-            representation["direction"] = direction
-        }
-        
-        if let previousSGV = previousSGV {
-            representation["previousSGV"] = previousSGV
-        }
-        
-        if let previousSGVNotActive = previousSGVNotActive {
-            representation["previousSGVNotActive"] = previousSGVNotActive
-        }
-        
-        return representation
     }
+    
+    /// slopeName for upload to NightScout
+    private var slopeName:String {
+        let slope_by_minute:Double = calculatedValueSlope * 60000
+        var arrow = "NONE"
+        if (slope_by_minute <= (-3.5)) {
+            arrow = "DoubleDown"
+        } else if (slope_by_minute <= (-2)) {
+            arrow = "SingleDown"
+        } else if (slope_by_minute <= (-1)) {
+            arrow = "FortyFiveDown"
+        } else if (slope_by_minute <= (1)) {
+            arrow = "Flat"
+        } else if (slope_by_minute <= (2)) {
+            arrow = "FortyFiveUp"
+        } else if (slope_by_minute <= (3.5)) {
+            arrow = "SingleUp"
+        } else if (slope_by_minute <= (40)) {
+            arrow = "DoubleUp"
+        }
+        
+        if(hideSlope) {
+            arrow = "NOT COMPUTABLE"
+        }
+        return arrow
+    }
+
+    /// same function as defined in Calibrator
+    private func ageAdjustedFiltered() -> Double {
+        let usedRaw = ageAdjustedRawValue
+        
+        if(usedRaw == rawData || rawData == 0) {
+            return filteredData
+        } else {
+            // adjust the filtereddata the same factor as the age adjusted raw value
+            return filteredData * usedRaw / rawData;
+        }
+    }
+    
 }
+

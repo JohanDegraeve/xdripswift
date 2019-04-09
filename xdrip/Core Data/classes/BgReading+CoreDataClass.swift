@@ -10,6 +10,7 @@ public class BgReading: NSManagedObject {
         calibration:Calibration?,
         rawData:Double,
         filteredData:Double,
+        deviceName:String?,
         nsManagedObjectContext:NSManagedObjectContext
     ) {
         let entity = NSEntityDescription.entity(forEntityName: "BgReading", in: nsManagedObjectContext)!
@@ -19,6 +20,7 @@ public class BgReading: NSManagedObject {
         self.calibration = calibration
         self.rawData = rawData
         self.filteredData = filteredData
+        self.deviceName = deviceName
         
         ageAdjustedRawValue = 0
         calibrationFlag = false

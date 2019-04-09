@@ -2,8 +2,8 @@
 //  Calibration+CoreDataProperties.swift
 //  xdrip
 //
-//  Created by Johan Degraeve on 23/12/2018.
-//  Copyright © 2018 Johan Degraeve. All rights reserved.
+//  Created by Johan Degraeve on 01/04/2019.
+//  Copyright © 2019 Johan Degraeve. All rights reserved.
 //
 //
 
@@ -30,6 +30,7 @@ extension Calibration {
     @NSManaged public var slope: Double
     @NSManaged public var slopeConfidence: Double
     @NSManaged public var timeStamp: Date
+    @NSManaged public var deviceName: String?
     @NSManaged public var bgreadings: NSSet
     @NSManaged public var sensor: Sensor
 

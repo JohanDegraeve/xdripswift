@@ -54,7 +54,7 @@ extension UserDefaults {
         
         // Nightscout
         /// timestamp lastest uploaded reading
-        case timeStampLatestUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
+        case timeStampLatestNSUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -341,12 +341,12 @@ extension UserDefaults {
         }
     }
     
-    var timeStampLatestUploadedBgReading:Date? {
+    var timeStampLatestNightScoutUploadedBgReading:Date? {
         get {
-            return object(forKey: Key.timeStampLatestUploadedBgReadingToNightScout.rawValue) as? Date
+            return object(forKey: Key.timeStampLatestNSUploadedBgReadingToNightScout.rawValue) as? Date
         }
         set {
-            set(newValue, forKey: Key.timeStampLatestUploadedBgReadingToNightScout.rawValue)
+            set(newValue, forKey: Key.timeStampLatestNSUploadedBgReadingToNightScout.rawValue)
         }
     }
 

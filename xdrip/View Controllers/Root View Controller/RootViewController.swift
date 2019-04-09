@@ -34,7 +34,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     private var calibrations:Calibrations?
     
     /// NightScoutManager instance
-    private var nightScoutManager:NightScoutManager?
+    private var nightScoutManager:NightScoutUploader?
 
     // maybe not needed in future
     private  var timeStampLastBgReading:Date = {
@@ -125,7 +125,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
         }*/
         
         // setup nightscout synchronizer
-        nightScoutManager = NightScoutManager(bgReadings: bgReadings)
+        nightScoutManager = NightScoutUploader(bgReadings: bgReadings)
     }
     
     // Only MioaMiao will call this
@@ -233,13 +233,13 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                             if let calibrator = self.calibrator {
                                 if latestCalibrations.count == 0 {
                                     // calling initialCalibration will create two calibrations, they are returned also but we don't need them
-                                    _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                                    _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName:UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                                 } else {
                                     let firstCalibrationForActiveSensor = calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
                                     
                                     if let firstCalibrationForActiveSensor = firstCalibrationForActiveSensor {
                                         // calling createNewCalibration will create a new  calibrations, it is returned but we don't need it
-                                        _ = calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                                        _ = calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName:UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                                     }
                                 }
                                 // this will store the newly created calibration(s) in coredata
@@ -291,7 +291,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                     let firstCalibrationForActiveSensor = calibrations.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
                     let lastCalibrationForActiveSensor = calibrations.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
                     
-                    let newBgReading = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    let newBgReading = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName:UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
                     debuglogging("newBgReading, timestamp = " + newBgReading.timeStamp.description(with: .current) + ", calculatedValue = " + newBgReading.calculatedValue.description)
                 }
@@ -299,7 +299,9 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
             
             coreDataManager.saveChanges()
             if glucoseData.count > 0 {requestCalibrationNotification()}
-            //logAllBgReadings()
+            if let nightScoutManager = nightScoutManager {
+                nightScoutManager.synchronize()
+            }
         }
         
         

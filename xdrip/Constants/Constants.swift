@@ -53,6 +53,8 @@ struct Constants {
         static let categoryApplicationDataCalibrations = "categoryApplicationDataCalibrations"
         // application data sensors
         static let categoryApplicationDataSensors = "categoryApplicationDataSensors"
+        // nightscout uploader
+        static let categoryNightScoutUploader = "categoryNightScoutUploader"
     }
     
     // identifiers for local notifications

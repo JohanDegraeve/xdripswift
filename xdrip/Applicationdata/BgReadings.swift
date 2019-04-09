@@ -42,7 +42,17 @@ class BgReadings {
         
     }
     
-    func getLatestBgReadings(limit:Int?, fromDate:Date?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> [BgReading] {
+    /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil,
+    ///
+    /// - parameters:
+    ///     - limit : maximum amount of readings to return, if nil then no limit in amount
+    ///     - fromDate : reading must have date > fromDate
+    ///     - forSensor : if not nil, then only readings for the given sensor will be returned - if nil, then sensor is ignored
+    ///     - if ignoreRawData = true, then value of rawdata will be ignored
+    ///     - if ignoreCalculatedValue = true, then value of calculatedValue will be ignored
+    /// - returns: an array with readings, can be empty array.
+    ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
+   func getLatestBgReadings(limit:Int?, fromDate:Date?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> [BgReading] {
         
         var returnValue:[BgReading] = []
         
@@ -99,7 +109,7 @@ class BgReadings {
         
         // if fromDate specified then create predicate
         if let fromDate = fromDate {
-            let predicate = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSinceReferenceDate))
+            let predicate = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970))
             fetchRequest.predicate = predicate
         }
         
@@ -119,6 +129,8 @@ class BgReadings {
                 os_log("in fetchBgReadings, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
             }
         }
+        
+        debuglogging("bgreadings.count = " + bgReadings.count.description)
         return bgReadings
     }
 }

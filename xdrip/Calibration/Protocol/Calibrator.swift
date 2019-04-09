@@ -18,7 +18,7 @@ protocol Calibrator {
     ///     - nsManagedObjectContext: the nsmanagedobject context in which calibration should be created
     /// - returns:
     ///     - two Calibrations, stored in the context but context not saved. The first calibration and second. Can be nil values, if anything goes wrong in the algorithm
-    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration?, secondCalibration: Calibration?)
+    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, deviceName:String?, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration?, secondCalibration: Calibration?)
 
     /// create a new BgReading
     /// - parameters:
@@ -33,7 +33,7 @@ protocol Calibrator {
     ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     /// - returns:
     ///     - the created bgreading
-    func createNewBgReading(rawData:Double, filteredData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration?, lastCalibration:Calibration?, nsManagedObjectContext:NSManagedObjectContext ) -> BgReading
+    func createNewBgReading(rawData:Double, filteredData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration?, lastCalibration:Calibration?, deviceName:String?,  nsManagedObjectContext:NSManagedObjectContext ) -> BgReading
     
     /// creates a calibration, stored in the database, but context not saved. Also readings will be adpated, also not saved.
     /// - parameters:
@@ -41,7 +41,7 @@ protocol Calibrator {
     ///     - lastBgReading: latest bgreading
     ///     - lastCalibrationsForActiveSensorInLastXDays: ... the latest calibrations in x days, in Spike/xdripplus it's 4. Order by timestamp, large to small, ie the first is the youngest
     ///     - firstCalibration: the very first calibration for the sensor
-    func createNewCalibration(bgValue:Double, lastBgReading:BgReading, sensor:Sensor, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration, nsManagedObjectContext:NSManagedObjectContext) -> Calibration
+    func createNewCalibration(bgValue:Double, lastBgReading:BgReading, sensor:Sensor, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration,deviceName:String?, nsManagedObjectContext:NSManagedObjectContext) -> Calibration
 }
 
 extension Calibrator {
@@ -53,10 +53,11 @@ extension Calibrator {
     ///     - firstCalibrationTimeStamp: timestamp of the first calibration
     ///     - sensor: the current sensor
     ///     - lastBgReadingsWithCalculatedValue0AndForSensor : the readings that need to be adjusted after the calibration, first is the youngest, result of call to BgReadings.getLatestBgtReadings with ignoreRawData: false, ignoreCalculatedValue: true, minimum 2
+    ///     - deviceName, ie bluetoothdevice name when calibration is created
     ///     - nsManagedObjectContext: the nsmanagedobject context in which calibration should be created
     /// - returns:
     ///     - two Calibrations, stored in the context but context not saved. The first calibration and second
-    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration?, secondCalibration: Calibration?){
+    func initialCalibration(firstCalibrationBgValue:Double, firstCalibrationTimeStamp:Date, secondCalibrationBgValue:Double, sensor:Sensor, lastBgReadingsWithCalculatedValue0AndForSensor:inout Array<BgReading>, deviceName:String?, nsManagedObjectContext:NSManagedObjectContext) -> (firstCalibration: Calibration?, secondCalibration: Calibration?){
         
         guard lastBgReadingsWithCalculatedValue0AndForSensor.count > 1 else {
             return (nil,nil)
@@ -82,12 +83,12 @@ extension Calibrator {
         
         //debuglogging("after find new curves, bgReading 1 = " + bgReading1.log("") + "bgReading2 = " + bgReading2.log(""))
         
-        let calibration1 = Calibration(timeStamp: firstCalibrationTimeStamp, sensor: sensor, bg: firstCalibrationBgValue, rawValue: bgReading1.rawData, adjustedRawValue: bgReading1.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * firstCalibrationBgValue * firstCalibrationBgValue) + (0.6657 * firstCalibrationBgValue) + 36.7505) / 100, rawTimeStamp: bgReading1.timeStamp, slope: 1, intercept: firstCalibrationBgValue, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading1.ageAdjustedRawValue, slopeConfidence: 0.5, nsManagedObjectContext: nsManagedObjectContext)
+        let calibration1 = Calibration(timeStamp: firstCalibrationTimeStamp, sensor: sensor, bg: firstCalibrationBgValue, rawValue: bgReading1.rawData, adjustedRawValue: bgReading1.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * firstCalibrationBgValue * firstCalibrationBgValue) + (0.6657 * firstCalibrationBgValue) + 36.7505) / 100, rawTimeStamp: bgReading1.timeStamp, slope: 1, intercept: firstCalibrationBgValue, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading1.ageAdjustedRawValue, slopeConfidence: 0.5, deviceName:deviceName, nsManagedObjectContext: nsManagedObjectContext)
         var tempCalibrationArray:Array<Calibration> = []
         
         calculateWLS(for: calibration1, lastCalibrationsForActiveSensorInLastXDays: &tempCalibrationArray, firstCalibration: calibration1, lastCalibration: calibration1)
         
-        let calibration2 = Calibration(timeStamp: secondCalibrationTimeStamp, sensor: sensor, bg: secondCalibrationBgValue, rawValue: bgReading2.rawData, adjustedRawValue: bgReading2.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * secondCalibrationBgValue * secondCalibrationBgValue) + (0.6657 * secondCalibrationBgValue) + 36.7505) / 100, rawTimeStamp: bgReading2.timeStamp, slope: 1, intercept: secondCalibrationBgValue, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading2.ageAdjustedRawValue, slopeConfidence: 0.5, nsManagedObjectContext: nsManagedObjectContext)
+        let calibration2 = Calibration(timeStamp: secondCalibrationTimeStamp, sensor: sensor, bg: secondCalibrationBgValue, rawValue: bgReading2.rawData, adjustedRawValue: bgReading2.ageAdjustedRawValue, sensorConfidence: ((-0.0018 * secondCalibrationBgValue * secondCalibrationBgValue) + (0.6657 * secondCalibrationBgValue) + 36.7505) / 100, rawTimeStamp: bgReading2.timeStamp, slope: 1, intercept: secondCalibrationBgValue, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: bgReading2.ageAdjustedRawValue, slopeConfidence: 0.5, deviceName:deviceName, nsManagedObjectContext: nsManagedObjectContext)
         tempCalibrationArray = [calibration1]
         
         calculateWLS(for: calibration2, lastCalibrationsForActiveSensorInLastXDays: &tempCalibrationArray, firstCalibration: calibration1, lastCalibration: calibration2)
@@ -120,7 +121,7 @@ extension Calibrator {
     ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     /// - returns:
     ///     - the created bgreading
-    func createNewBgReading(rawData:Double, filteredData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration?, lastCalibration:Calibration?, nsManagedObjectContext:NSManagedObjectContext ) -> BgReading {
+    func createNewBgReading(rawData:Double, filteredData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration?, lastCalibration:Calibration?, deviceName:String?, nsManagedObjectContext:NSManagedObjectContext ) -> BgReading {
         
         var timeStampToUse:Date = Date()
         if let timeStamp = timeStamp {
@@ -133,6 +134,7 @@ extension Calibrator {
             calibration:lastCalibration,
             rawData:rawData / 1000,
             filteredData:filteredData / 1000,
+            deviceName:deviceName,
             nsManagedObjectContext:nsManagedObjectContext
         )
         
@@ -163,10 +165,10 @@ extension Calibrator {
     ///     - lastBgReading: latest bgreading
     ///     - lastCalibrationsForActiveSensorInLastXDays: ... the latest calibrations in x days, in Spike/xdripplus it's 4. Order by timestamp, large to small, ie the first is the youngest
     ///     - firstCalibration: the very first calibration for the sensor
-    func createNewCalibration(bgValue:Double, lastBgReading:BgReading, sensor:Sensor, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration, nsManagedObjectContext:NSManagedObjectContext) -> Calibration {
+    func createNewCalibration(bgValue:Double, lastBgReading:BgReading, sensor:Sensor, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration, deviceName:String?, nsManagedObjectContext:NSManagedObjectContext) -> Calibration {
         let estimatedRawBg = getEstimatedRawBg(withTimeStamp: Date(), withLast1Reading: lastBgReading)
         
-        let calibration = Calibration(timeStamp: Date(), sensor: sensor, bg: bgValue, rawValue: lastBgReading.rawData, adjustedRawValue: lastBgReading.ageAdjustedRawValue, sensorConfidence: max(((-0.0018 * bgValue * bgValue) + (0.6657 * bgValue) + 36.7505) / 100, 0), rawTimeStamp: lastBgReading.timeStamp, slope: 0.0, intercept: 0.0, distanceFromEstimate: abs(bgValue - lastBgReading.calculatedValue), estimateRawAtTimeOfCalibration: abs(estimatedRawBg - lastBgReading.ageAdjustedRawValue) > 20 ? lastBgReading.ageAdjustedRawValue : estimatedRawBg, slopeConfidence: min(max(((4 - abs((lastBgReading.calculatedValueSlope) * 60000))/4), 0), 1), nsManagedObjectContext: nsManagedObjectContext)
+        let calibration = Calibration(timeStamp: Date(), sensor: sensor, bg: bgValue, rawValue: lastBgReading.rawData, adjustedRawValue: lastBgReading.ageAdjustedRawValue, sensorConfidence: max(((-0.0018 * bgValue * bgValue) + (0.6657 * bgValue) + 36.7505) / 100, 0), rawTimeStamp: lastBgReading.timeStamp, slope: 0.0, intercept: 0.0, distanceFromEstimate: abs(bgValue - lastBgReading.calculatedValue), estimateRawAtTimeOfCalibration: abs(estimatedRawBg - lastBgReading.ageAdjustedRawValue) > 20 ? lastBgReading.ageAdjustedRawValue : estimatedRawBg, slopeConfidence: min(max(((4 - abs((lastBgReading.calculatedValueSlope) * 60000))/4), 0), 1), deviceName:deviceName, nsManagedObjectContext: nsManagedObjectContext)
         
         calculateWLS(for: calibration, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibration, lastCalibration: lastCalibrationsForActiveSensorInLastXDays[0])
         
