@@ -222,12 +222,13 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             
             switch selectedRowAction {
                 
-            case let .askText(title, message, keyboardType, placeHolder, actionTitle, cancelTitle, actionHandler, cancelHandler):
+            case let .askText(title, message, keyboardType, text, placeHolder, actionTitle, cancelTitle, actionHandler, cancelHandler):
                 
                 //create uialertcontroller
                 let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
                 alert.addTextField { (textField:UITextField) in
-                    if let placeHolder = placeHolder { textField.placeholder = placeHolder }
+                    textField.placeholder = placeHolder
+                    textField.text = text
                     if let keyboardType = keyboardType { textField.keyboardType = keyboardType }
                 }
                 // add actions Ok and Cancel

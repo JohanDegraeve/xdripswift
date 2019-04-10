@@ -18,10 +18,10 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         case .uploadReadingsToNightScout:
             return SelectedRowAction.nothing
         case .nightScoutUrl:
-            return SelectedRowAction.askText(title: Texts_SettingsViews.nightScoutUrl, message: UserDefaults.standard.nightScoutUrl, keyboardType: .URL, placeHolder: UserDefaults.standard.nightScoutUrl, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in UserDefaults.standard.nightScoutUrl = serialNumber}, cancelHandler: nil)
+            return SelectedRowAction.askText(title: Texts_SettingsViews.nightScoutUrl, message: UserDefaults.standard.nightScoutUrl, keyboardType: .URL, text: UserDefaults.standard.nightScoutUrl, placeHolder: "yoursitename", actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in UserDefaults.standard.nightScoutUrl = serialNumber}, cancelHandler: nil)
 
         case .nightScoutAPIKey:
-            return SelectedRowAction.askText(title: Texts_SettingsViews.nightScoutAPIKey, message: UserDefaults.standard.nightScoutAPIKey, keyboardType: .default, placeHolder: UserDefaults.standard.nightScoutAPIKey, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in UserDefaults.standard.nightScoutAPIKey = serialNumber}, cancelHandler: nil)
+            return SelectedRowAction.askText(title: Texts_SettingsViews.nightScoutAPIKey, message: UserDefaults.standard.nightScoutAPIKey, keyboardType: .default, text: UserDefaults.standard.nightScoutAPIKey, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in UserDefaults.standard.nightScoutAPIKey = serialNumber}, cancelHandler: nil)
         }
     }
     

@@ -23,7 +23,7 @@ class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
         case .speakDelta:
             return .nothing
         case .speakInterval:
-            return SelectedRowAction.askText(title: Texts_SettingsViews.speakInterval, message: nil, keyboardType: .numberPad, placeHolder: UserDefaults.standard.speakInterval.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.speakInterval = Int(interval)}}, cancelHandler: nil)
+            return SelectedRowAction.askText(title: Texts_SettingsViews.speakInterval, message: nil, keyboardType: .numberPad, text: UserDefaults.standard.speakInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.speakInterval = Int(interval)}}, cancelHandler: nil)
         }
     }
     

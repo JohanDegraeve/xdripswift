@@ -24,15 +24,15 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
         case .dexcomShareAccountName:
             var textAddon = ""
             if let currentValue = UserDefaults.standard.dexcomShareAccountName {textAddon = "\n" + currentValue}
-            return SelectedRowAction.askText(title: Texts_SettingsViews.dexcomShareAccountName, message: Texts_SettingsViews.giveDexcomShareAccountName + textAddon, keyboardType: UIKeyboardType.alphabet, placeHolder: UserDefaults.standard.dexcomShareAccountName, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName}, cancelHandler: nil)
+            return SelectedRowAction.askText(title: Texts_SettingsViews.dexcomShareAccountName, message: Texts_SettingsViews.giveDexcomShareAccountName + textAddon, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName}, cancelHandler: nil)
         case .dexcomSharePassword:
-            return SelectedRowAction.askText(title: Texts_Common.password, message: Texts_SettingsViews.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, placeHolder: "", actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password}, cancelHandler: nil)
+            return SelectedRowAction.askText(title: Texts_Common.password, message: Texts_SettingsViews.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, text: nil, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password}, cancelHandler: nil)
         case .useUSDexcomShareurl:
             return SelectedRowAction.nothing
         case .dexcomShareSerialNumber:
             var textAddon = ""
             if let currentValue = UserDefaults.standard.dexcomShareSerialNumber {textAddon = "\n" + currentValue}
-            return SelectedRowAction.askText(title: Texts_SettingsViews.dexcomShareSerialNumber, message: Texts_SettingsViews.giveDexcomShareSerialNumber + textAddon, keyboardType: UIKeyboardType.alphabet, placeHolder: UserDefaults.standard.dexcomShareSerialNumber, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in UserDefaults.standard.dexcomShareSerialNumber = serialNumber}, cancelHandler: nil)
+            return SelectedRowAction.askText(title: Texts_SettingsViews.dexcomShareSerialNumber, message: Texts_SettingsViews.giveDexcomShareSerialNumber + textAddon, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareSerialNumber, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in UserDefaults.standard.dexcomShareSerialNumber = serialNumber}, cancelHandler: nil)
         }
     }
     

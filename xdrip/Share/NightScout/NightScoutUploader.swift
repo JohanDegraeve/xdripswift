@@ -1,7 +1,8 @@
 import Foundation
 import os
+import UIKit
 
-public class NightScoutUploader {
+public class NightScoutUploader:NSObject {
     
     // MARK: - properties
     
@@ -23,9 +24,19 @@ public class NightScoutUploader {
     /// BgReadings instance
     private let bgReadings:BgReadings
     
+    // MARK: - initializer
+    
     init(bgReadings:BgReadings) {
         self.bgReadings = bgReadings
+        
+        super.init()
+        
+        // add observers for nightscout settings which may require testing and/or start synchronize
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutAPIKey.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new, context: nil)
     }
+    
+    // MARK: - public functions
     
     /// synchronizes all NightScout related, if needed
     public func synchronize() {
@@ -34,6 +45,36 @@ public class NightScoutUploader {
             uploadBgReadingsToNightScout(siteURL: siteURL, apiKey: apiKey)
         }
     }
+    
+    // MARK: - overriden functions
+    
+    // when one of the observed settings get changed, possible actions to take
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if let keyPath = keyPath {
+            if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
+                switch keyPathEnum {
+                case UserDefaults.Key.nightScoutUrl, UserDefaults.Key.nightScoutAPIKey  :
+                    if let apiKey = UserDefaults.standard.nightScoutAPIKey, let siteUrl = UserDefaults.standard.nightScoutUrl {
+                        testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
+                            DispatchQueue.main.async {
+                                self.presentNightScoutTestCredentialsResult(success: success, error: error)
+                                if success {
+                                    self.synchronize()
+                                } else {
+                                     os_log("in observeValue, NightScout credential check failed zzz", log: self.log, type: .info)
+                                }
+                            }
+                        })
+                    }
+                default:
+                    break
+                }
+            }
+        }
+    }
+    
+    // MARK: - private helper functions
     
     private func uploadBgReadingsToNightScout(siteURL:String, apiKey:String) {
         
@@ -116,5 +157,57 @@ public class NightScoutUploader {
             os_log("    no readings to upload", log: self.log, type: .info)
         }
         
+    }
+    
+    private func testNightScoutCredentials(apiKey:String, siteURL:String, _ completion: @escaping (_ success: Bool, _ error: Error?) -> Void) {
+        
+        if let url = URL(string: siteURL) {
+            let testURL = url.appendingPathComponent(nightScoutAuthTestPath)
+            
+            var request = URLRequest(url: testURL)
+            request.setValue("application/json", forHTTPHeaderField:"Content-Type")
+            request.setValue("application/json", forHTTPHeaderField:"Accept")
+            request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
+            
+            let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
+                if let error = error {
+                    completion(false, error)
+                    return
+                }
+                
+                if let httpResponse = response as? HTTPURLResponse ,
+                    httpResponse.statusCode != 200, let data = data {
+                    completion(false, NSError(domain: "", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: String.Encoding.utf8)!]))
+                } else {
+                    completion(true, nil)
+                }
+            })
+            task.resume()
+        }
+    }
+    
+    private func presentNightScoutTestCredentialsResult(success:Bool, error:Error?) {
+        // define the title text
+        var title = Texts_NightScoutTestResult.verificationSuccessFulAlertTitle
+        if !success {
+            title = Texts_NightScoutTestResult.verificationErrorAlertTitle
+        }
+        
+        // define the message text
+        var message = Texts_NightScoutTestResult.verificationSuccessFulAlertBody
+        if !success {
+            if let error = error {
+                message = error.localizedDescription
+            } else {
+                message = "unknown error"// shouldn't happen
+            }
+        }
+
+        // define and present alertcontroller
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let defaultAction = UIAlertAction(title: Texts_Common.Ok, style: .default, handler: nil)
+        alertController.addAction(defaultAction)
+        
+        alertController.presentInOwnWindow(animated: true, completion: {})
     }
 }

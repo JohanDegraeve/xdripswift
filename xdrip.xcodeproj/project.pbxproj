@@ -66,6 +66,9 @@
 		F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */; };
 		F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */; };
+		F8B3A783225D37F2004BA588 /* TextsNightScoutTestResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A782225D37F2004BA588 /* TextsNightScoutTestResult.swift */; };
+		F8B3A786225D4473004BA588 /* NightScoutTestResult.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A788225D4473004BA588 /* NightScoutTestResult.strings */; };
+		F8B3A78B225D473D004BA588 /* UIAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A78A225D473D004BA588 /* UIAlertController.swift */; };
 		F8BDD41722176B4A006EAB84 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41622176B4A006EAB84 /* SettingsTableViewCell.swift */; };
 		F8BDD41A2217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD4192217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift */; };
 		F8BDD41C2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41B2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift */; };
@@ -160,6 +163,10 @@
 		F8AC426921ADEBD70078C348 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F8AC426B21ADEBD70078C348 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F8AC42A021B31F160078C348 /* xdrip.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = xdrip.xcdatamodel; sourceTree = "<group>"; };
+		F8B3A782225D37F2004BA588 /* TextsNightScoutTestResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsNightScoutTestResult.swift; sourceTree = "<group>"; };
+		F8B3A787225D4473004BA588 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/NightScoutTestResult.strings; sourceTree = "<group>"; };
+		F8B3A789225D447A004BA588 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/NightScoutTestResult.strings; sourceTree = "<group>"; };
+		F8B3A78A225D473D004BA588 /* UIAlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIAlertController.swift; sourceTree = "<group>"; };
 		F8BDD41622176B4A006EAB84 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
 		F8BDD4192217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewGeneralSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8BDD41B2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTransmitterSettingsViewModel.swift; sourceTree = "<group>"; };
@@ -246,6 +253,7 @@
 				F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */,
 				F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */,
 				F8BDD4232218790E006EAB84 /* UserDefaults.swift */,
+				F8B3A78A225D473D004BA588 /* UIAlertController.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -341,6 +349,7 @@
 				F8BDD444221C9D0D006EAB84 /* Common.strings */,
 				F8BDD44A221C9D70006EAB84 /* ErrorMessages.strings */,
 				F8BDD457221DEF22006EAB84 /* SettingsViews.strings */,
+				F8B3A788225D4473004BA588 /* NightScoutTestResult.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -531,6 +540,7 @@
 				F8BDD43E221B5BAF006EAB84 /* TextsErrorMessages.swift */,
 				F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */,
 				F8BDD451221DEAB1006EAB84 /* TextsSettingsViews.swift */,
+				F8B3A782225D37F2004BA588 /* TextsNightScoutTestResult.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -664,6 +674,7 @@
 				F8BDD442221C9D0D006EAB84 /* Common.strings in Resources */,
 				F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */,
 				F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */,
+				F8B3A786225D4473004BA588 /* NightScoutTestResult.strings in Resources */,
 				F8BDD448221C9D70006EAB84 /* ErrorMessages.strings in Resources */,
 				F8BDD455221DEF22006EAB84 /* SettingsViews.strings in Resources */,
 				F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */,
@@ -772,6 +783,7 @@
 				F897AB1D22059EA000CDDD10 /* TransmitterMessage.swift in Sources */,
 				F8025E5721F4A60900ECF0C0 /* CGMTransmitter.swift in Sources */,
 				F897AB3D220A243300CDDD10 /* ResetMessage.swift in Sources */,
+				F8B3A783225D37F2004BA588 /* TextsNightScoutTestResult.swift in Sources */,
 				F85DC30121D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift in Sources */,
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
 				F897AB3B2208DCE100CDDD10 /* TransmitterBatteryInfo.swift in Sources */,
@@ -783,6 +795,7 @@
 				F8025C0F21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */,
 				F8BDD42022183CE9006EAB84 /* SettingsViewAlarmsSettingsViewModel.swift in Sources */,
+				F8B3A78B225D473D004BA588 /* UIAlertController.swift in Sources */,
 				F8BDD41722176B4A006EAB84 /* SettingsTableViewCell.swift in Sources */,
 				F897AB39220775B100CDDD10 /* BatteryStatusTxMessage.swift in Sources */,
 				F8025C1A21DBC1B700ECF0C0 /* SensorState.swift in Sources */,
@@ -825,6 +838,15 @@
 				F8BDD439221A096C006EAB84 /* nl */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		F8B3A788225D4473004BA588 /* NightScoutTestResult.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F8B3A787225D4473004BA588 /* en */,
+				F8B3A789225D447A004BA588 /* nl */,
+			);
+			name = NightScoutTestResult.strings;
 			sourceTree = "<group>";
 		};
 		F8BDD436221A0349006EAB84 /* Localizable.strings */ = {

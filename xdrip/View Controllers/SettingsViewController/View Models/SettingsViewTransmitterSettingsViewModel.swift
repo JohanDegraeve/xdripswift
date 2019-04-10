@@ -15,7 +15,7 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
         switch setting {
             
         case .transmitterId:
-            return SelectedRowAction.askText(title: Texts_SettingsViews.transmitterId, message: Texts_SettingsViews.giveTransmitterId, keyboardType: UIKeyboardType.alphabet, placeHolder: UserDefaults.standard.transmitterId, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in UserDefaults.standard.transmitterId = serialNumber}, cancelHandler: nil)
+            return SelectedRowAction.askText(title: Texts_SettingsViews.transmitterId, message: Texts_SettingsViews.giveTransmitterId, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.transmitterId, placeHolder: "00000", actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in UserDefaults.standard.transmitterId = serialNumber}, cancelHandler: nil)
             
         case .transmitterType:
             var data = [String]()
