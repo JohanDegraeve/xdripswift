@@ -20,9 +20,7 @@ from the home screen
 alertentry
 Each alert has a list of alertentries. 
 - start, start time in minutes from 0 to 24*60 (first needs be 0) - as of when is the alert applicable, till the next entry
-- needsvalue, needs a value yes or no, example high alert needs glucose value above which alert should fire. iPhone muted alert doesn't need a value
 - value, the value 
-- unit, the unit, enum type. Optional, eg battery level doesn't have a unit
 - alerttype, applicable alerttype for the period
 - alert, the alert to which the entry belongs
 

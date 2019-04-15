@@ -5,9 +5,7 @@
         <relationship name="alertEntries" toMany="YES" deletionRule="Nullify" destinationEntity="AlertEntry" inverseName="alert" inverseEntity="AlertEntry" syncable="YES"/>
     </entity>
     <entity name="AlertEntry" representedClassName=".AlertEntry" syncable="YES">
-        <attribute name="needsvalue" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="start" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="unit" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="value" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="alert" maxCount="1" deletionRule="Nullify" destinationEntity="Alert" inverseName="alertEntries" inverseEntity="Alert" syncable="YES"/>
         <relationship name="alertType" maxCount="1" deletionRule="Nullify" destinationEntity="AlertType" inverseName="alertEntries" inverseEntity="AlertType" syncable="YES"/>
@@ -69,7 +67,7 @@
     </entity>
     <elements>
         <element name="Alert" positionX="-639" positionY="198" width="128" height="75"/>
-        <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="135"/>
+        <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="150"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
