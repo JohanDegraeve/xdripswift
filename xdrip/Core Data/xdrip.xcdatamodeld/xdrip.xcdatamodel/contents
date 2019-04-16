@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.98" systemVersion="18E226" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Alert" representedClassName=".Alert" syncable="YES">
-        <attribute name="type" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="kind" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="alertEntries" toMany="YES" deletionRule="Nullify" destinationEntity="AlertEntry" inverseName="alert" inverseEntity="AlertEntry" syncable="YES"/>
     </entity>
     <entity name="AlertEntry" representedClassName=".AlertEntry" syncable="YES">
@@ -13,6 +13,7 @@
     <entity name="AlertType" representedClassName=".AlertType" syncable="YES">
         <attribute name="enabled" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="name" attributeType="String" syncable="YES"/>
+        <attribute name="overridemute" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="snooze" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="snoozeperiod" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="soundname" optional="YES" attributeType="String" syncable="YES"/>
@@ -68,7 +69,7 @@
     <elements>
         <element name="Alert" positionX="-639" positionY="198" width="128" height="75"/>
         <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
-        <element name="AlertType" positionX="-657" positionY="180" width="128" height="150"/>
+        <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="120"/>

@@ -16,6 +16,7 @@ Each alertentry must have an alerttype.
 - snoozeperiod,  If snooze = yes, then the value defines how long the alert will be snoozed if the user snoozes
 from the home screen
 - soundname?, name of the sound as stored in the assets - if not present then default ios sound to use
+- overridemute, yes or no, should mute be overriden or not
 
 alertentry
 Each alert has a list of alertentries. 

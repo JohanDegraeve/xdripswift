@@ -24,6 +24,7 @@ extension AlertType {
     @NSManaged public var snoozeperiod: Int16
     @NSManaged public var soundname: String?
     @NSManaged public var alertEntries: NSSet?
+    @NSManaged public var overridemute: Bool
 
 }
 
