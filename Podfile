@@ -6,6 +6,6 @@ target 'xdrip' do
   use_frameworks!
 
   # Pods for xdrip
-  pod "ActionClosurable"
+  pod "ActionClosurable", :git => 'https://github.com/takasek/ActionClosurable.git'
 
 end
