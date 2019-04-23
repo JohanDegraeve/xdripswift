@@ -68,4 +68,149 @@ public class BgReading: NSManagedObject {
         }
         return r
     }
+    
+    func slopeArrow() -> String {
+        let slope_by_minute = calculatedValueSlope * 60000
+        if (slope_by_minute <= (-3.5)) {
+            return "\u{2193}\u{2193}"
+        } else if (slope_by_minute <= (-2)) {
+            return "\u{2193}"
+        } else if (slope_by_minute <= (-1)) {
+            return "\u{2198}"
+        } else if (slope_by_minute <= (1)) {
+            return "\u{2192}"
+        } else if (slope_by_minute <= (2)) {
+            return "\u{2197}"
+        } else if (slope_by_minute <= (3.5)) {
+            return "\u{2191}"
+        } else {
+            return "\u{2191}\u{2191}"
+        }
+    }
+    
+    func slopeOrdinal() -> Int {
+        let slope_by_minute = calculatedValueSlope * 60000
+        var ordinal = 0
+        if(!hideSlope) {
+            if (slope_by_minute <= (-3.5)) {
+                ordinal = 7
+            } else if (slope_by_minute <= (-2)) {
+                ordinal = 6
+            } else if (slope_by_minute <= (-1)) {
+                ordinal = 5
+            } else if (slope_by_minute <= (1)) {
+                ordinal = 4
+            } else if (slope_by_minute <= (2)) {
+                ordinal = 3
+            } else if (slope_by_minute <= (3.5)) {
+                ordinal = 2
+            } else {
+                ordinal = 1
+            }
+        }
+        return ordinal
+    }
+    
+    /// creates string with bg value in correct unit or "HIGH" or "LOW", or other like ???
+    func unitizedString(unitIsMgDl:Bool) -> String {
+        var returnValue:String
+        if (calculatedValue >= 400) {
+            returnValue = "HIGH"
+        } else if (calculatedValue >= 40) {
+            returnValue = calculatedValue.bgValuetoString(mgdl: unitIsMgDl)
+        } else if (calculatedValue > 12) {
+            returnValue = "LOW"
+        } else {
+            switch(calculatedValue) {
+            case 0:
+                returnValue = "??0"
+                break
+            case 1:
+                returnValue = "?SN"
+                break
+            case 2:
+                returnValue = "??2"
+                break
+            case 3:
+                returnValue = "?NA"
+                break
+            case 5:
+                returnValue = "?NC"
+                break
+            case 6:
+                returnValue = "?CD"
+                break
+            case 9:
+                returnValue = "?AD"
+                break
+            case 12:
+                returnValue = "?RF"
+                break
+            default:
+                returnValue = "???"
+                break
+            }
+        }
+        return returnValue
+    }
+    
+    /// creates string with difference from previous reading and also unit
+    func unitizedDeltaString(previousBgReading:BgReading?, showUnit:Bool, highGranularity:Bool) -> String {
+        
+        guard let previousBgReading = previousBgReading else {
+            return "???"
+        }
+        
+        if timeStamp.timeIntervalSince(previousBgReading.timeStamp) > Double(Constants.BGGraphBuilder.maxSlopeInMinutes * 60) {
+            // don't show delta if there are not enough values or the values are more than 20 mintes apart
+            return "???";
+        }
+        
+        let value = currentSlope(previousBgReading: previousBgReading) * 5 * 60 * 1000;
+        if(abs(value) > 100){
+            // a delta > 100 will not happen with real BG values -> problematic sensor data
+            return "ERR";
+        }
+        
+        let valueAsString = value.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        
+        var deltaSign:String = ""
+        if (value > 0) { deltaSign = "+"; }
+        
+        if (UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+            return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mgdl):"");
+        } else {
+            return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mmol):"");
+        }
+    }
+
+    func currentSlope(previousBgReading:BgReading?) -> Double {
+        
+        if let previousBgReading = previousBgReading {
+            let (slope,_) = calculateSlope(lastBgReading: previousBgReading);
+            return slope
+        } else {
+            return 0.0
+        }
+
+    }
+    
+    /// taken over form xdripplus
+    ///
+    /// - parameters:
+    ///     - currentBgReading : reading for which slope is calculated
+    ///     - lastBgReading : last reading result of call to BgReadings.getLatestBgReadings(1, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false
+    /// - returns:
+    ///     - calculated slope
+    func calculateSlope(lastBgReading:BgReading) -> (Double, Bool) {
+        if timeStamp == lastBgReading.timeStamp
+            ||
+            timeStamp.toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble() > Double(Constants.BGGraphBuilder.maxSlopeInMinutes * 60 * 1000) {
+            return (0,true)
+        }
+        return ((lastBgReading.calculatedValue - calculatedValue) / (lastBgReading.timeStamp.toMillisecondsAsDouble() - timeStamp.toMillisecondsAsDouble()), false)
+    }
+    
+
+
 }

@@ -31,5 +31,17 @@ class Texts_Common {
     static let password = {
         return NSLocalizedString("common_password", tableName: filename, bundle: Bundle.main, value: "Password", comment: "literally password")
     }()
+    
+    static let default0 = {
+        return NSLocalizedString("common_default", tableName: filename, bundle: Bundle.main, value: "Default", comment: "literally default, will be the name of default alerttypes that will be created during initial app launch")
+    }()
 
+    static let highCapitals = {
+        return NSLocalizedString("common_highcapitals", tableName: filename, bundle: Bundle.main, value: "HIGH", comment: "the word HIGH, in capitals")
+    }()
+    
+    static let lowCapitals = {
+        return NSLocalizedString("common_lowcapitals", tableName: filename, bundle: Bundle.main, value: "LOW", comment: "the word LOW, in capitals")
+    }()
+    
 }

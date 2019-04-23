@@ -501,22 +501,6 @@ extension Calibrator {
         }
     }
     
-    /// taken over form xdripplus
-    ///
-    /// - parameters:
-    ///     - currentBgReading : reading for which slope is calculated
-    ///     - lastBgReading : last reading result of call to BgReadings.getLatestBgReadings(1, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false
-    /// - returns:
-    ///     - calculated slope
-    private func calculateSlope(currentBgReading:BgReading, lastBgReading:BgReading) -> (Double, Bool) {
-        if currentBgReading.timeStamp == lastBgReading.timeStamp
-            ||
-            currentBgReading.timeStamp.toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble() > Double(Constants.BGGraphBuilder.maxSlopeInMinutes * 60 * 1000) {
-            return (0,true)
-        }
-        return ((lastBgReading.calculatedValue - currentBgReading.calculatedValue) / (lastBgReading.timeStamp.toMillisecondsAsDouble() - currentBgReading.timeStamp.toMillisecondsAsDouble()), false)
-    }
-    
     /// - parameters:
     ///     - withTimeStamp : timeStamp :)
     ///     - withLast1Reading : last reading
@@ -588,7 +572,7 @@ extension Calibrator {
     private func findSlope(for bgReading: BgReading, last2Readings:inout Array<BgReading>) {
         bgReading.hideSlope = true;
         if (last2Readings.count > 2) {
-            let (slope, hide) = calculateSlope(currentBgReading:bgReading, lastBgReading:last2Readings[1]);
+            let (slope, hide) = bgReading.calculateSlope(lastBgReading:last2Readings[1]);
             bgReading.calculatedValueSlope = slope
             bgReading.hideSlope = hide
         } else if (last2Readings.count == 1) {

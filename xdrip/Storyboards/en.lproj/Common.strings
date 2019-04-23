@@ -5,4 +5,6 @@
 "common_bloodglucoseunit" = "Bloodglucose Unit";
 "common_bloodglucoseunit_short" = "Bg Unit";
 "common_password" = "Password";
-
+"common_default" = "Default";
+"common_high" = "HIGH";
+"common_low" = "LOW";

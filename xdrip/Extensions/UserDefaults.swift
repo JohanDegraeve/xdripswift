@@ -55,6 +55,10 @@ extension UserDefaults {
         // Nightscout
         /// timestamp lastest uploaded reading
         case timeStampLatestNSUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
+        
+        // Transmitter
+        /// Transmitter Battery Level
+        case transmitterBatteryLevel = "transmitterbatterylevel"
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -311,7 +315,7 @@ extension UserDefaults {
         }
     }
     
-    /// should trend be spoken or not
+    /// speak readings interval
     @objc dynamic var speakInterval: Int {
         get {
             return integer(forKey: Key.speakInterval.rawValue)
@@ -347,6 +351,18 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.timeStampLatestNSUploadedBgReadingToNightScout.rawValue)
+        }
+    }
+    
+    /// if value 0 stored in settings, then return value of this method will be nil
+    var transmitterBatteryLevel:Int? {
+        get {
+            let returnValue = integer(forKey: Key.transmitterBatteryLevel.rawValue)
+            if returnValue == 0 {return nil}
+            return returnValue
+        }
+        set {
+            set(newValue, forKey: Key.speakInterval.rawValue)
         }
     }
 

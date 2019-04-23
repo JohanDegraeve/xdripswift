@@ -130,7 +130,6 @@ class BgReadings {
             }
         }
         
-        debuglogging("bgreadings.count = " + bgReadings.count.description)
         return bgReadings
     }
 }

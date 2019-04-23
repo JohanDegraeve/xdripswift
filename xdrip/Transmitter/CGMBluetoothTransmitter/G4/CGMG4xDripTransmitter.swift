@@ -3,6 +3,7 @@ import CoreBluetooth
 import os
 
 final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
+    
     // MARK: - properties
     
     /// uuid used for scanning, can be empty string, if empty string then scan all devices - only possible if app is in foreground
@@ -23,7 +24,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     /// transmitterId
     private let transmitterId:String
     
-    // MARK: - functions
+    // MARK: - initializer
     
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil

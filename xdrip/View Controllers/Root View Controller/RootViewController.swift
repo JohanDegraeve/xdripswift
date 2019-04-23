@@ -35,6 +35,12 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     
     /// NightScoutManager instance
     private var nightScoutManager:NightScoutUploader?
+    
+    /// AlerManager instance
+    private var alertManager:AlertManager?
+    
+    /// PlaySound instance
+    private var soundPlayer:SoundPlayer?
 
     // maybe not needed in future
     private  var timeStampLastBgReading:Date = {
@@ -126,11 +132,25 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
         
         // setup nightscout synchronizer
         nightScoutManager = NightScoutUploader(bgReadings: bgReadings)
+        
+        // setup playsound
+        soundPlayer = SoundPlayer()
+        
+        // setup alertmanager
+        if let soundPlayer = soundPlayer {
+            alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
+        }
+       
     }
     
     // Only MioaMiao will call this
     func newSensorDetected() {
         os_log("new sensor detected", log: log, type: .info)
+        if let activeSensor = activeSensor, let coreDataManager = coreDataManager {
+            activeSensor.endDate = Date()
+            coreDataManager.saveChanges()
+        }
+        activeSensor = nil
     }
     
     // Only MioaMiao will call this
@@ -192,10 +212,10 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
         }
         
         //notificationContent.subtitle = "Local Notifications"
-        notificationContent.body = "Open the to calibrate."
+        notificationContent.body = "Open the notification to calibrate."
         
         // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: Constants.NotificationIdentifiers.initialCalibrationRequest, content: notificationContent, trigger: nil)
+        let notificationRequest = UNNotificationRequest(identifier: Constants.Notifications.NotificationIdentifiersForAlerts.initialCalibrationRequest, content: notificationContent, trigger: nil)
         
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
@@ -244,6 +264,14 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
                                 }
                                 // this will store the newly created calibration(s) in coredata
                                 coreDataManager.saveChanges()
+                                
+                                if let nightScoutManager = self.nightScoutManager {
+                                    nightScoutManager.synchronize()
+                                }
+                                if let alertManager = self.alertManager {
+                                    alertManager.checkAlerts()
+                                }
+
                             }
                         }
                     }
@@ -301,6 +329,9 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
             if glucoseData.count > 0 {requestCalibrationNotification()}
             if let nightScoutManager = nightScoutManager {
                 nightScoutManager.synchronize()
+            }
+            if let alertManager = alertManager {
+                alertManager.checkAlerts()
             }
         }
         
@@ -397,7 +428,7 @@ extension RootViewController: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         os_log("userNotificationCenter willPresent, calling completionhandler", log: log, type: .info)
 
-        if notification.request.identifier == Constants.NotificationIdentifiers.initialCalibrationRequest {
+        if notification.request.identifier == Constants.Notifications.NotificationIdentifiersForAlerts.initialCalibrationRequest {
             //calibration request was fired, no need to show the notification, show immediately the calibration dialog
             os_log("userNotificationCenter didReceive, user pressed calibration notification or app was open the moment the notification was fired", log: log, type: .info)
             requestCalibration()
@@ -407,7 +438,7 @@ extension RootViewController: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         os_log("userNotificationCenter didReceive", log: log, type: .info)
         
-        if response.notification.request.identifier == Constants.NotificationIdentifiers.initialCalibrationRequest {
+        if response.notification.request.identifier == Constants.Notifications.NotificationIdentifiersForAlerts.initialCalibrationRequest {
             os_log("userNotificationCenter didReceive, user pressed calibration notification", log: log, type: .info)
             requestCalibration()
         }

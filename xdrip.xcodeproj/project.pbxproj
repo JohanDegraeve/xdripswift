@@ -73,8 +73,29 @@
 		F8B3A79522635A25004BA588 /* AlertType+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A79022635A25004BA588 /* AlertType+CoreDataProperties.swift */; };
 		F8B3A79622635A25004BA588 /* AlertEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A79122635A25004BA588 /* AlertEntry+CoreDataClass.swift */; };
 		F8B3A79722635A25004BA588 /* AlertEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A79222635A25004BA588 /* AlertEntry+CoreDataProperties.swift */; };
-		F8B3A79822635A25004BA588 /* Alert+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A79322635A25004BA588 /* Alert+CoreDataClass.swift */; };
-		F8B3A79922635A25004BA588 /* Alert+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A79422635A25004BA588 /* Alert+CoreDataProperties.swift */; };
+		F8B3A7A4226522CF004BA588 /* AlertTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7A3226522CF004BA588 /* AlertTypes.swift */; };
+		F8B3A7A6226522DB004BA588 /* AlertEntries.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7A5226522DB004BA588 /* AlertEntries.swift */; };
+		F8B3A7AA22652559004BA588 /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7A922652559004BA588 /* AlertManager.swift */; };
+		F8B3A7AC226526FE004BA588 /* AlertKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7AB226526FE004BA588 /* AlertKind.swift */; };
+		F8B3A7AE22666193004BA588 /* AlertEntryUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7AD22666193004BA588 /* AlertEntryUnit.swift */; };
+		F8B3A7B022691CE5004BA588 /* SnoozeParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7AF22691CE5004BA588 /* SnoozeParameters.swift */; };
+		F8B3A7B2226A0878004BA588 /* TextsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7B1226A0878004BA588 /* TextsAlerts.swift */; };
+		F8B3A7B5226A0A71004BA588 /* Alerts.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7B3226A0A71004BA588 /* Alerts.strings */; };
+		F8B3A7C6226CC0B7004BA588 /* shortlow2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7B8226CC0B7004BA588 /* shortlow2.mp3 */; };
+		F8B3A7C7226CC0B7004BA588 /* shortlow3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7B9226CC0B7004BA588 /* shortlow3.mp3 */; };
+		F8B3A7C8226CC0B7004BA588 /* bruteforce.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7BA226CC0B7004BA588 /* bruteforce.mp3 */; };
+		F8B3A7C9226CC0B7004BA588 /* modern2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7BB226CC0B7004BA588 /* modern2.mp3 */; };
+		F8B3A7CA226CC0B7004BA588 /* shortlow1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7BC226CC0B7004BA588 /* shortlow1.mp3 */; };
+		F8B3A7CB226CC0B7004BA588 /* shortlow4.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7BD226CC0B7004BA588 /* shortlow4.mp3 */; };
+		F8B3A7CC226CC0B7004BA588 /* shorthigh1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7BE226CC0B7004BA588 /* shorthigh1.mp3 */; };
+		F8B3A7CD226CC0B7004BA588 /* shorthigh3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7BF226CC0B7004BA588 /* shorthigh3.mp3 */; };
+		F8B3A7CE226CC0B7004BA588 /* shorthigh2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7C0226CC0B7004BA588 /* shorthigh2.mp3 */; };
+		F8B3A7CF226CC0B7004BA588 /* shorthigh4.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7C1226CC0B7004BA588 /* shorthigh4.mp3 */; };
+		F8B3A7D0226CC0B7004BA588 /* modernalarm.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7C2226CC0B7004BA588 /* modernalarm.mp3 */; };
+		F8B3A7D1226CC0B7004BA588 /* betterwakeup.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7C3226CC0B7004BA588 /* betterwakeup.mp3 */; };
+		F8B3A7D2226CC0B7004BA588 /* spaceship.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7C4226CC0B7004BA588 /* spaceship.mp3 */; };
+		F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7C5226CC0B7004BA588 /* xdripalert.aif */; };
+		F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7DE226E48C1004BA588 /* SoundPlayer.swift */; };
 		F8BDD41722176B4A006EAB84 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41622176B4A006EAB84 /* SettingsTableViewCell.swift */; };
 		F8BDD41A2217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD4192217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift */; };
 		F8BDD41C2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41B2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift */; };
@@ -177,8 +198,30 @@
 		F8B3A79022635A25004BA588 /* AlertType+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlertType+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F8B3A79122635A25004BA588 /* AlertEntry+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlertEntry+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F8B3A79222635A25004BA588 /* AlertEntry+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlertEntry+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		F8B3A79322635A25004BA588 /* Alert+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Alert+CoreDataClass.swift"; sourceTree = "<group>"; };
-		F8B3A79422635A25004BA588 /* Alert+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Alert+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		F8B3A7A3226522CF004BA588 /* AlertTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertTypes.swift; sourceTree = "<group>"; };
+		F8B3A7A5226522DB004BA588 /* AlertEntries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertEntries.swift; sourceTree = "<group>"; };
+		F8B3A7A922652559004BA588 /* AlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
+		F8B3A7AB226526FE004BA588 /* AlertKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertKind.swift; sourceTree = "<group>"; };
+		F8B3A7AD22666193004BA588 /* AlertEntryUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertEntryUnit.swift; sourceTree = "<group>"; };
+		F8B3A7AF22691CE5004BA588 /* SnoozeParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeParameters.swift; sourceTree = "<group>"; };
+		F8B3A7B1226A0878004BA588 /* TextsAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsAlerts.swift; sourceTree = "<group>"; };
+		F8B3A7B4226A0A71004BA588 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
+		F8B3A7B6226A0B12004BA588 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Alerts.strings; sourceTree = "<group>"; };
+		F8B3A7B8226CC0B7004BA588 /* shortlow2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = shortlow2.mp3; sourceTree = "<group>"; };
+		F8B3A7B9226CC0B7004BA588 /* shortlow3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = shortlow3.mp3; sourceTree = "<group>"; };
+		F8B3A7BA226CC0B7004BA588 /* bruteforce.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = bruteforce.mp3; sourceTree = "<group>"; };
+		F8B3A7BB226CC0B7004BA588 /* modern2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = modern2.mp3; sourceTree = "<group>"; };
+		F8B3A7BC226CC0B7004BA588 /* shortlow1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = shortlow1.mp3; sourceTree = "<group>"; };
+		F8B3A7BD226CC0B7004BA588 /* shortlow4.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = shortlow4.mp3; sourceTree = "<group>"; };
+		F8B3A7BE226CC0B7004BA588 /* shorthigh1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = shorthigh1.mp3; sourceTree = "<group>"; };
+		F8B3A7BF226CC0B7004BA588 /* shorthigh3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = shorthigh3.mp3; sourceTree = "<group>"; };
+		F8B3A7C0226CC0B7004BA588 /* shorthigh2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = shorthigh2.mp3; sourceTree = "<group>"; };
+		F8B3A7C1226CC0B7004BA588 /* shorthigh4.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = shorthigh4.mp3; sourceTree = "<group>"; };
+		F8B3A7C2226CC0B7004BA588 /* modernalarm.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = modernalarm.mp3; sourceTree = "<group>"; };
+		F8B3A7C3226CC0B7004BA588 /* betterwakeup.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = betterwakeup.mp3; sourceTree = "<group>"; };
+		F8B3A7C4226CC0B7004BA588 /* spaceship.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = spaceship.mp3; sourceTree = "<group>"; };
+		F8B3A7C5226CC0B7004BA588 /* xdripalert.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = xdripalert.aif; sourceTree = "<group>"; };
+		F8B3A7DE226E48C1004BA588 /* SoundPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundPlayer.swift; sourceTree = "<group>"; };
 		F8BDD41622176B4A006EAB84 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
 		F8BDD4192217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewGeneralSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8BDD41B2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTransmitterSettingsViewModel.swift; sourceTree = "<group>"; };
@@ -249,7 +292,8 @@
 				F8025C0721D8DD1F00ECF0C0 /* CGMMiaoMiaoTransmitter.swift */,
 				F8025C1421DBB54E00ECF0C0 /* Utilities */,
 			);
-			path = MiaoMiao;
+			name = MiaoMiao;
+			path = ../MiaoMiao;
 			sourceTree = "<group>";
 		};
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
@@ -295,7 +339,6 @@
 				F8025E5621F4A60900ECF0C0 /* CGMTransmitter.swift */,
 				F85DC2FE21D3E83100B9F74A /* G4 */,
 				F897AAFC2202575600CDDD10 /* G5 */,
-				F8025C0621D8DCE700ECF0C0 /* MiaoMiao */,
 				F8025C1D21DBCF4A00ECF0C0 /* RawGlucoseData.swift */,
 				F897AB3A2208DCE100CDDD10 /* TransmitterBatteryInfo.swift */,
 			);
@@ -324,6 +367,7 @@
 		F8025E5A21F7AFA100ECF0C0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				F8B3A7B7226CC0B7004BA588 /* sounds */,
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
 			);
 			path = Resources;
@@ -347,6 +391,7 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				F8B3A7A82265254D004BA588 /* Alerts */,
 				F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */,
 			);
 			path = Managers;
@@ -362,6 +407,7 @@
 				F8BDD44A221C9D70006EAB84 /* ErrorMessages.strings */,
 				F8BDD457221DEF22006EAB84 /* SettingsViews.strings */,
 				F8B3A788225D4473004BA588 /* NightScoutTestResult.strings */,
+				F8B3A7B3226A0A71004BA588 /* Alerts.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -440,6 +486,7 @@
 		F897AAFC2202575600CDDD10 /* G5 */ = {
 			isa = PBXGroup;
 			children = (
+				F8025C0621D8DCE700ECF0C0 /* MiaoMiao */,
 				F897AAFD2202577200CDDD10 /* CGMG5Transmitter.swift */,
 				F897AAFF22036D4300CDDD10 /* G5Messages */,
 			);
@@ -522,6 +569,46 @@
 			path = "xdrip/Core Data";
 			sourceTree = SOURCE_ROOT;
 		};
+		F8B3A7A82265254D004BA588 /* Alerts */ = {
+			isa = PBXGroup;
+			children = (
+				F8B3A7A922652559004BA588 /* AlertManager.swift */,
+				F8B3A7AB226526FE004BA588 /* AlertKind.swift */,
+				F8B3A7AD22666193004BA588 /* AlertEntryUnit.swift */,
+				F8B3A7AF22691CE5004BA588 /* SnoozeParameters.swift */,
+			);
+			name = Alerts;
+			sourceTree = "<group>";
+		};
+		F8B3A7B7226CC0B7004BA588 /* sounds */ = {
+			isa = PBXGroup;
+			children = (
+				F8B3A7C3226CC0B7004BA588 /* betterwakeup.mp3 */,
+				F8B3A7BA226CC0B7004BA588 /* bruteforce.mp3 */,
+				F8B3A7BB226CC0B7004BA588 /* modern2.mp3 */,
+				F8B3A7C2226CC0B7004BA588 /* modernalarm.mp3 */,
+				F8B3A7BE226CC0B7004BA588 /* shorthigh1.mp3 */,
+				F8B3A7C0226CC0B7004BA588 /* shorthigh2.mp3 */,
+				F8B3A7BF226CC0B7004BA588 /* shorthigh3.mp3 */,
+				F8B3A7C1226CC0B7004BA588 /* shorthigh4.mp3 */,
+				F8B3A7BC226CC0B7004BA588 /* shortlow1.mp3 */,
+				F8B3A7B8226CC0B7004BA588 /* shortlow2.mp3 */,
+				F8B3A7B9226CC0B7004BA588 /* shortlow3.mp3 */,
+				F8B3A7BD226CC0B7004BA588 /* shortlow4.mp3 */,
+				F8B3A7C4226CC0B7004BA588 /* spaceship.mp3 */,
+				F8B3A7C5226CC0B7004BA588 /* xdripalert.aif */,
+			);
+			path = sounds;
+			sourceTree = "<group>";
+		};
+		F8B3A7DD226E48C1004BA588 /* SoundPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				F8B3A7DE226E48C1004BA588 /* SoundPlayer.swift */,
+			);
+			path = SoundPlayer;
+			sourceTree = "<group>";
+		};
 		F8BDD41522176B2B006EAB84 /* Table View Cells */ = {
 			isa = PBXGroup;
 			children = (
@@ -552,6 +639,7 @@
 				F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */,
 				F8BDD451221DEAB1006EAB84 /* TextsSettingsViews.swift */,
 				F8B3A782225D37F2004BA588 /* TextsNightScoutTestResult.swift */,
+				F8B3A7B1226A0878004BA588 /* TextsAlerts.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -562,6 +650,8 @@
 				F8EA6C7B21B491740082976B /* BgReadings.swift */,
 				F8EA6CB021C05E970082976B /* Calibrations.swift */,
 				F88F269F224EC8B10090A9A6 /* Sensors.swift */,
+				F8B3A7A3226522CF004BA588 /* AlertTypes.swift */,
+				F8B3A7A5226522DB004BA588 /* AlertEntries.swift */,
 			);
 			path = Applicationdata;
 			sourceTree = "<group>";
@@ -578,6 +668,7 @@
 		F8EA6C8021B723A80082976B /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				F8B3A7DD226E48C1004BA588 /* SoundPlayer */,
 				F8025E4B21E6618100ECF0C0 /* Log.swift */,
 				F8EA6CA821BBE3010082976B /* UniqueId.swift */,
 			);
@@ -587,8 +678,6 @@
 		F8EA6CA421B9A25B0082976B /* classes */ = {
 			isa = PBXGroup;
 			children = (
-				F8B3A79322635A25004BA588 /* Alert+CoreDataClass.swift */,
-				F8B3A79422635A25004BA588 /* Alert+CoreDataProperties.swift */,
 				F8B3A79122635A25004BA588 /* AlertEntry+CoreDataClass.swift */,
 				F8B3A79222635A25004BA588 /* AlertEntry+CoreDataProperties.swift */,
 				F8B3A78C22622953004BA588 /* AlertType+CoreDataClass.swift */,
@@ -686,9 +775,24 @@
 				F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */,
 				F8B3A786225D4473004BA588 /* NightScoutTestResult.strings in Resources */,
 				F8BDD448221C9D70006EAB84 /* ErrorMessages.strings in Resources */,
+				F8B3A7C9226CC0B7004BA588 /* modern2.mp3 in Resources */,
+				F8B3A7CD226CC0B7004BA588 /* shorthigh3.mp3 in Resources */,
+				F8B3A7D0226CC0B7004BA588 /* modernalarm.mp3 in Resources */,
+				F8B3A7C8226CC0B7004BA588 /* bruteforce.mp3 in Resources */,
+				F8B3A7C6226CC0B7004BA588 /* shortlow2.mp3 in Resources */,
+				F8B3A7CA226CC0B7004BA588 /* shortlow1.mp3 in Resources */,
+				F8B3A7D1226CC0B7004BA588 /* betterwakeup.mp3 in Resources */,
 				F8BDD455221DEF22006EAB84 /* SettingsViews.strings in Resources */,
+				F8B3A7C7226CC0B7004BA588 /* shortlow3.mp3 in Resources */,
+				F8B3A7CB226CC0B7004BA588 /* shortlow4.mp3 in Resources */,
+				F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */,
 				F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */,
+				F8B3A7CF226CC0B7004BA588 /* shorthigh4.mp3 in Resources */,
+				F8B3A7CE226CC0B7004BA588 /* shorthigh2.mp3 in Resources */,
+				F8B3A7CC226CC0B7004BA588 /* shorthigh1.mp3 in Resources */,
 				F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */,
+				F8B3A7B5226A0A71004BA588 /* Alerts.strings in Resources */,
+				F8B3A7D2226CC0B7004BA588 /* spaceship.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -770,6 +874,8 @@
 				F8025C1E21DBCF4A00ECF0C0 /* RawGlucoseData.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
 				F897AB352207725100CDDD10 /* TransmitterVersionRxMessage.swift in Sources */,
+				F8B3A7B022691CE5004BA588 /* SnoozeParameters.swift in Sources */,
+				F8B3A7B2226A0878004BA588 /* TextsAlerts.swift in Sources */,
 				F897AB342207725100CDDD10 /* TransmitterVersionTxMessage.swift in Sources */,
 				F8EA6C7C21B491740082976B /* BgReadings.swift in Sources */,
 				F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */,
@@ -793,10 +899,12 @@
 				F8B3A79622635A25004BA588 /* AlertEntry+CoreDataClass.swift in Sources */,
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
 				F897AB1D22059EA000CDDD10 /* TransmitterMessage.swift in Sources */,
+				F8B3A7A6226522DB004BA588 /* AlertEntries.swift in Sources */,
 				F8025E5721F4A60900ECF0C0 /* CGMTransmitter.swift in Sources */,
 				F897AB3D220A243300CDDD10 /* ResetMessage.swift in Sources */,
 				F8B3A783225D37F2004BA588 /* TextsNightScoutTestResult.swift in Sources */,
 				F85DC30121D3F5CC00B9F74A /* CGMG4xDripTransmitter.swift in Sources */,
+				F8B3A7AC226526FE004BA588 /* AlertKind.swift in Sources */,
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
 				F897AB3B2208DCE100CDDD10 /* TransmitterBatteryInfo.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* BluetoothTransmitter.swift in Sources */,
@@ -816,16 +924,18 @@
 				F897AB1F22059EA000CDDD10 /* AuthRequestRxMessage.swift in Sources */,
 				F897AB2A220742E900CDDD10 /* AESCrypt.m in Sources */,
 				F8BDD45C221E0263006EAB84 /* SettingsViewHealthKitSettingsViewModel.swift in Sources */,
+				F8B3A7AE22666193004BA588 /* AlertEntryUnit.swift in Sources */,
+				F8B3A7AA22652559004BA588 /* AlertManager.swift in Sources */,
+				F8B3A7A4226522CF004BA588 /* AlertTypes.swift in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
+				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				F897AAFE2202577200CDDD10 /* CGMG5Transmitter.swift in Sources */,
 				F897AB1622059E8500CDDD10 /* NSData+CRC.swift in Sources */,
-				F8B3A79922635A25004BA588 /* Alert+CoreDataProperties.swift in Sources */,
 				F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */,
 				F8BDD41C2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift in Sources */,
 				F80610C8223035B700D8F236 /* PickerViewController.swift in Sources */,
 				F8EA6C7F21B70E390082976B /* Constants.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
-				F8B3A79822635A25004BA588 /* Alert+CoreDataClass.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 				F88F269E224628900090A9A6 /* NightScoutUploader.swift in Sources */,
 				F8025C2021DBD0FE00ECF0C0 /* ParseLibreData.swift in Sources */,
@@ -863,6 +973,15 @@
 				F8B3A789225D447A004BA588 /* nl */,
 			);
 			name = NightScoutTestResult.strings;
+			sourceTree = "<group>";
+		};
+		F8B3A7B3226A0A71004BA588 /* Alerts.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F8B3A7B4226A0A71004BA588 /* en */,
+				F8B3A7B6226A0B12004BA588 /* nl */,
+			);
+			name = Alerts.strings;
 			sourceTree = "<group>";
 		};
 		F8BDD436221A0349006EAB84 /* Localizable.strings */ = {

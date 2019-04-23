@@ -234,7 +234,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                                 //debuglogging("    timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 =                           " + (Int)(timeStampLastAddedGlucoseDataInMinutes * 60 * 1000).description)
                                 //debuglogging("    timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) = " + (Int)(timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000)).description)
                                 if readingTimeStampInMinutes * 60 * 1000 < timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) {
-                                    let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * Constants.Libre.libreMultiplier)
+                                    let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * Constants.BloodGlucose.libreMultiplier)
                                     readings.append(glucoseData)
                                     timeStampLastAddedGlucoseDataInMinutes = readingTimeStampInMinutes
                                 }

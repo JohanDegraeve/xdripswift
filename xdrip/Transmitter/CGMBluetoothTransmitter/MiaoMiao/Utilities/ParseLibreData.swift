@@ -42,7 +42,7 @@ func parseLibreData(data:inout Data, timeStampLastBgReadingStoredInDatabase:Date
                 byte.append(data[headerOffset + (i * 6 + 28)])
                 let glucoseLevelRaw = Double(getGlucoseRaw(bytes: byte))
                 if (glucoseLevelRaw > 0) {
-                    glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * Constants.Libre.libreMultiplier)
+                    glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * Constants.BloodGlucose.libreMultiplier)
                     returnValue.append(glucoseData)
                     timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
                 }
@@ -67,7 +67,7 @@ func parseLibreData(data:inout Data, timeStampLastBgReadingStoredInDatabase:Date
                 byte.append(data[headerOffset + (i * 6 + 124)])
                 let glucoseLevelRaw = Double(getGlucoseRaw(bytes: byte))
                 if (glucoseLevelRaw > 0) {
-                    glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * Constants.Libre.libreMultiplier)
+                    glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * Constants.BloodGlucose.libreMultiplier)
                     returnValue.append(glucoseData)
                     timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
                 }

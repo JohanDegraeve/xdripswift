@@ -19,7 +19,7 @@ extension AlertEntry {
 
     @NSManaged public var start: Int16
     @NSManaged public var value: Int16
-    @NSManaged public var alert: Alert
+    @NSManaged public var alertkind: Int16
     @NSManaged public var alertType: AlertType
 
 }

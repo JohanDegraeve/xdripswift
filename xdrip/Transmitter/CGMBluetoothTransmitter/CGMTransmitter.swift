@@ -79,4 +79,19 @@ enum CGMTransmitterType:String, CaseIterable {
             return nil
         }
     }
+    
+    /// returns default battery alert level, below this level an alert should be generated - this default value will be used when changing transmittertype
+    func defaultBatteryAlertLevel() -> Int {
+        switch self {
+            
+        case .dexcomG4:
+            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelDexcomG4
+        case .dexcomG5:
+            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
+        case .miaomiao:
+            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
+        case .GNSentry:
+            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelGNSEntry
+        }
+    }
 }

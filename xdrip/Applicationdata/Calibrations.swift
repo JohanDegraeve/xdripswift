@@ -66,21 +66,6 @@ class Calibrations {
         }
 
         var calibrations = [Calibration]()
-        /*let nowMinusXDays = Date(timeIntervalSinceNow: Double(-amount*24*3600))
-        
-        loop: for calibration in calibrations.reversed() {
-            if calibration.timeStamp < nowMinusXDays {
-                break loop
-            } else {
-                if let sensor = sensor {
-                    if sensor.id == calibration.sensor.id {
-                        calibrations.append(calibration)
-                    }
-                } else {
-                    calibrations.append(calibration)
-                }
-            }
-        }*/
         
         // fetch the calibrations
         coreDataManager.mainManagedObjectContext.performAndWait {
@@ -123,17 +108,7 @@ class Calibrations {
                 os_log("in getFirstOrLastCalibration, Unable to Execute Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
             }
         }
-        /* loop: for calibration in calibrations {
-         if calibration.sensor.id == sensor.id
-         &&
-         calibration.sensorConfidence != 0
-         &&
-         calibration.slopeConfidence != 0
-         {
-         return calibration
-         }
-         }*/
-
+        
         if calibrations.count > 0 {
             return calibrations[0]
         } else {
