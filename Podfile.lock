@@ -2,15 +2,20 @@ PODS:
   - ActionClosurable (1.2.0)
 
 DEPENDENCIES:
-  - ActionClosurable
+  - ActionClosurable (from `https://github.com/takasek/ActionClosurable.git`)
 
-SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
-    - ActionClosurable
+EXTERNAL SOURCES:
+  ActionClosurable:
+    :git: https://github.com/takasek/ActionClosurable.git
+
+CHECKOUT OPTIONS:
+  ActionClosurable:
+    :commit: 918fbedcfe9f5d916c53d7195a6db889aece9022
+    :git: https://github.com/takasek/ActionClosurable.git
 
 SPEC CHECKSUMS:
   ActionClosurable: ff826688551b031c6bd936cb4928ebf63571893a
 
-PODFILE CHECKSUM: 1992153c1f3a926bd917de44a464a5d2fbc0825f
+PODFILE CHECKSUM: 347a5d9f3343257452289e61c10025c2eed103bb
 
 COCOAPODS: 1.6.1
