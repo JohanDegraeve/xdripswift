@@ -9,8 +9,11 @@ extension Date {
         return Double(self.timeIntervalSince1970 * 1000)
     }
     
-    /// gives current date in milliseconds since 1 Jan 1970
-    static func nowInMilliSecondsAsDouble() -> Double {
-        return Date().toMillisecondsAsDouble()
+    /// gives number of minutes since 00:00 local time
+    func minutesSinceMidNightLocalTime() -> Int {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: self)
+        let minute = calendar.component(.minute, from: self)
+        return Int(hour * 60 + minute)
     }
 }

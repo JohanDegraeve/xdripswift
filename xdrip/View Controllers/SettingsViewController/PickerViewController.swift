@@ -3,9 +3,12 @@ import UIKit
 final class PickerViewController : UIViewController {
   
     //MARK: - Properties
+
+    /// maintitle to use for pickerview
+    var mainTitle:String?
     
-    /// title to use for pickerview
-    var pickerTitle:String?
+    /// subtitle to use for pickerview
+    var subTitle:String?
     
     /// will have the soure data in the pickerview
     var dataSource:[String] = []
@@ -25,22 +28,35 @@ final class PickerViewController : UIViewController {
     /// handler to execute when user clicks cancelHandler
     var cancelHandler:(() -> Void)?
     
+    /// priority to be applied
+    private var priority:PickerViewPriority?
+    
     //MARK: Actions
     
     @IBAction func cancelButtonPressed(_ sender: Any) {
         // call cancelhandler
         if let cancelHandler = cancelHandler { cancelHandler() }
+        
+        // remove the uiviewcontroller
+        remove()
     }
     
     @IBAction func addButtonPressed(_ sender: Any) {
         // call actionhandler
         if let selectedIndex = selectedRow { addHandler(selectedIndex) }
+        
+        // remove the uiviewcontroller
+        remove()
+
     }
     
     //MARK: Outlets
     
-    // label on top of the pickerview
-    @IBOutlet weak var pickerViewTitle: UILabel!
+    // maintitle on top of the pickerview
+    @IBOutlet weak var pickerViewMainTitle: UILabel!
+    
+    // subtitle on top of the pickerview
+    @IBOutlet weak var pickerViewSubTitle: UILabel!
     
     // the pickerview itself
     @IBOutlet weak var pickerView: UIPickerView!
@@ -94,11 +110,86 @@ final class PickerViewController : UIViewController {
             pickerView.selectRow(selectedRow, inComponent: 0, animated: false)
         }
         
+        // set picker maintitle
+        if let mainTitle = mainTitle {
+            pickerViewMainTitle.text = mainTitle
+        } else {
+            
+        }
+        
         // set title of pickerview
-        if let pickerTitle = pickerTitle {
-            pickerViewTitle.text = pickerTitle
+        if let subTitle = subTitle {
+            pickerViewSubTitle.text = subTitle
+        }
+        
+        /// TODO:- the actual color to be used should be defined somewhere else
+        // if priority defined then if high priority, apply other color
+        if let priority = priority {
+            switch priority {
+                
+            case .normal:
+                break
+            case .high:
+                pickerViewMainTitle.textColor = UIColor.red
+            }
         }
     }
+    
+    public func remove() {
+        self.dismiss(animated: true, completion: nil)
+
+        // Notify Child View Controller
+        self.willMove(toParent: nil)
+        
+        // Remove Child View From Superview
+        self.view.removeFromSuperview()
+        
+        // Notify Child View Controller
+        self.removeFromParent()
+    }
+    
+    /// creates and presents a new PickerViewController in the parentController - if there's already another uiviewcontroller being presented by the specified parentController, then the cancelhandler will be called immediately without trying to present anything
+    /// - parameters:
+    ///     - pickerViewData : data to use in the pickerviewcontroller
+    ///     - parentController : the parentController to which the pickerviewcontroller will be added
+    public static func displayPickerViewController(pickerViewData:PickerViewData, parentController:UIViewController) {
+        
+        // check if there's already another uiviewcontroller being presented, if so just call the cancelhandler
+        if parentController.presentedViewController == nil {
+            
+            let pickerViewController = UIStoryboard.main.instantiateViewController(withIdentifier: "PickerViewController") as! PickerViewController
+            pickerViewController.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+            
+            //configure pickerViewController
+            if let mainTitle = pickerViewData.mainTitle {
+                pickerViewController.mainTitle = mainTitle
+            } else {
+                pickerViewController.mainTitle = ""
+            }
+            pickerViewController.subTitle = pickerViewData.subTitle
+            pickerViewController.dataSource = pickerViewData.data
+            pickerViewController.selectedRow = pickerViewData.selectedRow
+            pickerViewController.addButtonTitle = pickerViewData.actionTitle
+            pickerViewController.cancelButtonTitle = pickerViewData.cancelTitle
+            pickerViewController.priority = pickerViewData.priority
+            pickerViewController.addHandler = {(_ index: Int) in
+                pickerViewData.actionHandler(index)
+                pickerViewController.remove()
+            }
+            pickerViewController.cancelHandler = {
+                if let cancelHandler = pickerViewData.cancelHandler { cancelHandler() }
+                pickerViewController.remove()
+            }
+            
+            // present it
+            parentController.present(pickerViewController, animated: true)
+        } else {
+            if let cancelHandler = pickerViewData.cancelHandler { cancelHandler() }
+        }
+        
+    }
+
+
 }
 
 extension PickerViewController:UIPickerViewDelegate {

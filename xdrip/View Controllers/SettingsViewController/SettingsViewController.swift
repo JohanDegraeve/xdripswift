@@ -61,19 +61,6 @@ final class SettingsViewController: UIViewController {
         pickerViewController.didMove(toParent: self)
     }
 
-    /// removes a child view controller, will be used for pickerviewcontroller
-    /// see https://cocoacasts.com/managing-view-controllers-with-container-view-controllers
-    private func removePickerViewController() {
-        // Notify Child View Controller
-        pickerViewController.willMove(toParent: nil)
-        
-        // Remove Child View From Superview
-        pickerViewController.view.removeFromSuperview()
-        
-        // Notify Child View Controller
-        pickerViewController.removeFromParent()
-    }
-
 }
 
 extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
@@ -254,6 +241,7 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
                 break
                 
             case let .callFunction(function):
+                
                 // call function
                 function()
                 
@@ -263,19 +251,20 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             case let .selectFromList(title, data, selectedRow, actionTitle, cancelTitle, actionHandler, cancelHandler):
                 
                 //configure pickerViewController
-                pickerViewController.pickerTitle = title
+                pickerViewController.mainTitle = nil
+                pickerViewController.subTitle = title
                 pickerViewController.dataSource = data
                 pickerViewController.selectedRow = selectedRow
                 pickerViewController.addButtonTitle = actionTitle
                 pickerViewController.cancelButtonTitle = cancelTitle
                 pickerViewController.addHandler = {(_ index: Int) in
                     actionHandler(index)
-                    self.removePickerViewController()
+                    self.pickerViewController.remove()
                     tableView.reloadSections(IndexSet(integer: indexPath.section), with: .none)
                 }
                 pickerViewController.cancelHandler = {
                     if let cancelHandler = cancelHandler { cancelHandler() }
-                    self.removePickerViewController()
+                    self.pickerViewController.remove()
                 }
                 
                 // display controller's view

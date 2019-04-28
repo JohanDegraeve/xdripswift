@@ -1,5 +1,9 @@
-"alerts_highalertbody" = "High Alert";
-"alerts_veryhighalertbody" = "Very High Alert";
-"alerts_lowalertbody" = "Low Alert";
-"alerts_verylowalertbody" = "Very Low Alert";
+"alerts_highalerttitle" = "High Alert";
+"alerts_veryhighalerttitle" = "Very High Alert";
+"alerts_lowalerttitle" = "Low Alert";
+"alerts_verylowalerttitle" = "Very Low Alert";
 "alerts_snooze" = "Snooze";
+"alerts_select_snooze_time" = "Select Snooze Time";
+"alerts_missedreadingalerttitle" = "Missed Reading";
+"alerts_calibrationneeded" = "Calibration Needed";
+"alerts_batterylow" = "Battery Low";

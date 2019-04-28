@@ -40,8 +40,24 @@ class Texts_Common {
         return NSLocalizedString("common_highcapitals", tableName: filename, bundle: Bundle.main, value: "HIGH", comment: "the word HIGH, in capitals")
     }()
     
-    static let lowCapitals = {
-        return NSLocalizedString("common_lowcapitals", tableName: filename, bundle: Bundle.main, value: "LOW", comment: "the word LOW, in capitals")
+    static let hour = {
+        return NSLocalizedString("common_hour", tableName: filename, bundle: Bundle.main, value: "hour", comment: "literal translation needed")
+    }()
+    
+    static let hours = {
+        return NSLocalizedString("common_hours", tableName: filename, bundle: Bundle.main, value: "hours", comment: "literal translation needed")
+    }()
+    
+    static let minutes = {
+        return NSLocalizedString("common_minutes", tableName: filename, bundle: Bundle.main, value: "minutes", comment: "literal translation needed")
+    }()
+    
+    static let day = {
+        return NSLocalizedString("common_day", tableName: filename, bundle: Bundle.main, value: "day", comment: "literal translation needed")
+    }()
+    
+    static let week = {
+        return NSLocalizedString("common_week", tableName: filename, bundle: Bundle.main, value: "week", comment: "literal translation needed")
     }()
     
 }

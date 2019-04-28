@@ -1,7 +1,13 @@
 import Foundation
 import CoreData
 
-@objc(AlertEntry)
+/// Per kind of alert, a list of AlertEntry can be defined. It can define per minute of the day which value and alertype is applicable
+///
+/// properties :
+///
+/// - value : meaning depends on the kind of alert, example for low or high alert, value is the glucose value in mgdl, for missed raeding alert, it is the time since last reading in minutes, for calibration alert, it is the time since last calibration in hours
+/// - start : at which minute of the day (local time) does the alertentry apply
+/// - alertType : which alerttype is applicable
 public class AlertEntry: NSManagedObject {
 
     init(

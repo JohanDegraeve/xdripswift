@@ -96,6 +96,7 @@
 		F8B3A7D2226CC0B7004BA588 /* spaceship.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7C4226CC0B7004BA588 /* spaceship.mp3 */; };
 		F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7C5226CC0B7004BA588 /* xdripalert.aif */; };
 		F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7DE226E48C1004BA588 /* SoundPlayer.swift */; };
+		F8B3A7E72274DCE6004BA588 /* PickerViewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7E62274DCE6004BA588 /* PickerViewData.swift */; };
 		F8BDD41722176B4A006EAB84 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41622176B4A006EAB84 /* SettingsTableViewCell.swift */; };
 		F8BDD41A2217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD4192217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift */; };
 		F8BDD41C2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41B2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift */; };
@@ -144,7 +145,7 @@
 		F8025E5621F4A60900ECF0C0 /* CGMTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMTransmitter.swift; sourceTree = "<group>"; };
 		F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIStoryboard.swift; sourceTree = "<group>"; };
 		F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionClosureable-extension.swift"; sourceTree = "<group>"; };
-		F80610C7223035B700D8F236 /* PickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewController.swift; sourceTree = "<group>"; };
+		F80610C7223035B700D8F236 /* PickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PickerViewController.swift; path = ../SettingsViewController/PickerViewController.swift; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BgReading+CoreDataProperties.swift"; path = "../Extensions/BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Sensor+CoreDataProperties.swift"; path = "../Extensions/Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -222,6 +223,7 @@
 		F8B3A7C4226CC0B7004BA588 /* spaceship.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = spaceship.mp3; sourceTree = "<group>"; };
 		F8B3A7C5226CC0B7004BA588 /* xdripalert.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = xdripalert.aif; sourceTree = "<group>"; };
 		F8B3A7DE226E48C1004BA588 /* SoundPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundPlayer.swift; sourceTree = "<group>"; };
+		F8B3A7E62274DCE6004BA588 /* PickerViewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewData.swift; sourceTree = "<group>"; };
 		F8BDD41622176B4A006EAB84 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
 		F8BDD4192217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewGeneralSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8BDD41B2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTransmitterSettingsViewModel.swift; sourceTree = "<group>"; };
@@ -351,7 +353,6 @@
 				F8BDD4182217FEE6006EAB84 /* View Models */,
 				F8BDD41522176B2B006EAB84 /* Table View Cells */,
 				F8AC426121ADEBD60078C348 /* SettingsViewController.swift */,
-				F80610C7223035B700D8F236 /* PickerViewController.swift */,
 			);
 			path = SettingsViewController;
 			sourceTree = "<group>";
@@ -415,6 +416,7 @@
 		F85DC2FA21D2CD3000B9F74A /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				F8B3A7E52274DCC7004BA588 /* Picker View Controller */,
 				F8025E5921F7861200ECF0C0 /* Root View Controller */,
 				F8025E5821F7860900ECF0C0 /* SettingsViewController */,
 			);
@@ -607,6 +609,15 @@
 				F8B3A7DE226E48C1004BA588 /* SoundPlayer.swift */,
 			);
 			path = SoundPlayer;
+			sourceTree = "<group>";
+		};
+		F8B3A7E52274DCC7004BA588 /* Picker View Controller */ = {
+			isa = PBXGroup;
+			children = (
+				F80610C7223035B700D8F236 /* PickerViewController.swift */,
+				F8B3A7E62274DCE6004BA588 /* PickerViewData.swift */,
+			);
+			path = "Picker View Controller";
 			sourceTree = "<group>";
 		};
 		F8BDD41522176B2B006EAB84 /* Table View Cells */ = {
@@ -924,6 +935,7 @@
 				F897AB1F22059EA000CDDD10 /* AuthRequestRxMessage.swift in Sources */,
 				F897AB2A220742E900CDDD10 /* AESCrypt.m in Sources */,
 				F8BDD45C221E0263006EAB84 /* SettingsViewHealthKitSettingsViewModel.swift in Sources */,
+				F8B3A7E72274DCE6004BA588 /* PickerViewData.swift in Sources */,
 				F8B3A7AE22666193004BA588 /* AlertEntryUnit.swift in Sources */,
 				F8B3A7AA22652559004BA588 /* AlertManager.swift in Sources */,
 				F8B3A7A4226522CF004BA588 /* AlertTypes.swift in Sources */,

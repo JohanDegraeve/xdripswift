@@ -1,3 +1,8 @@
 "common_mgdl" = "mg/dL";
 "common_mmol" = "mmol/l";
 "common_bloodglucoseunit" = "Bloedglucose Eenheid";
+"common_hour" = "uur";
+"common_hours" = "uren";
+"common_minutes" = "minuten";
+"common_day" = "dag";
+"common_week" = "week";

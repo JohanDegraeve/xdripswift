@@ -72,18 +72,27 @@ public enum AlertKind:Int, CaseIterable {
     ///
     /// The closure in the return value has several optional input parameters. Not every input parameter will be used, depending on the alertKind. For example, alertKind .calibration will not use the lastBgReading, it will use the lastCalibration
     ///
-    /// The closure returns a bool which indicates if an alert needs to be raised or not, and an optional alertBody and alertTitle and an optional int, which is the optional delay
+    ///     * lastBgReading should be reading for the currently active sensor with calculated value != 0
+    ///     * lastButOneBgReading should als be for the currently active sensor with calculated value != 0, it is only there to be able to calculate the unitizedDeltaString for the alertBody
+    ///     * lastCalibration is to allow to raise a calibration alert
+    ///     * batteryLevel is to allow to raise a battery level alert
+    ///
+    /// The closure returns a bool which indicates if an alert needs to be raised or not, and an optional alertBody and alertTitle and an optional int, which is the optional delay that the alert notification should  have
     ///
     /// For missed reading alert : this is the only case where the delay in the return will have a value.
     ///
     /// - returns:
-    ///     - a closure that needs to be called to verify if an alert is needed or not. The closure returns a tuble with a bool, an alertbody, alerttitle and delay. If the bool is false, then there's no need to raise an alert. AlertBody, alertTitle and delay are used if an alert needs to be raised for the notification. The input to the closure are the currently applicable alertEntry, the next alertEntry (from time point of view), two bg readings, last and lastbutone, last calibration and batteryLevel is the current transmitter battery level
+    ///     - a closure that needs to be called to verify if an alert is needed or not. The closure returns a tuple with a bool, an alertbody, alerttitle and delay. If the bool is false, then there's no need to raise an alert. AlertBody, AlertTitle and delay are used if an alert needs to be raised for the notification. The input to the closure are the currently applicable alertEntry, the next alertEntry (from time point of view), two bg readings, last and lastbutone, last calibration and batteryLevel is the current transmitter battery level - the two bg readings should be readings for the currently active sensor with calculated value != 0, the last calibration must be one for the currently active sensor. If there's no sensor active then there should also  not be bgreadings and a calibration
     func alertNeededChecker() -> (AlertEntry, AlertEntry?, BgReading?, BgReading?, Calibration?, Int?) -> (alertNeeded:Bool, alertBody:String?, alertTitle:String?, delay:Int?) {
         //Not all input parameters in the closure are needed for every type of alert. - this is to make it generic
         switch self {
             
         case .low,.verylow:
             return { (alertEntry:AlertEntry, nextAlertEntry:AlertEntry?, lastBgReading:BgReading?, _ lastButOneBgReading:BgReading?, lastCalibration:Calibration?, batteryLevel:Int?) -> (alertNeeded:Bool, alertBody:String?, alertTitle:String?, delay:Int?) in
+                
+                // if alertEntry not enabled, return false
+                if !alertEntry.alertType.enabled {return (false, nil, nil, nil)}
+                
                 if let lastBgReading = lastBgReading {
                     // first check if lastBgReading not nil and calculatedValue > 0.0, never know that it's not been checked by caller
                     if lastBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
@@ -93,8 +102,13 @@ public enum AlertKind:Int, CaseIterable {
                     } else {return (false, nil, nil, nil)}
                 } else {return (false, nil, nil, nil)}
             }
+            
         case .high,.veryhigh:
             return { (alertEntry:AlertEntry, nextAlertEntry:AlertEntry?, lastBgReading:BgReading?, _ lastButOneBgReading:BgReading?, lastCalibration:Calibration?, batteryLevel:Int?) -> (alertNeeded:Bool, alertBody:String?, alertTitle:String?, delay:Int?) in
+                
+                // if alertEntry not enabled, return false
+                if !alertEntry.alertType.enabled {return (false, nil, nil, nil)}
+                
                 if let lastBgReading = lastBgReading {
                     // first check if calculatedValue > 0.0, never know that it's not been checked by caller
                     if lastBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
@@ -104,19 +118,65 @@ public enum AlertKind:Int, CaseIterable {
                     } else {return (false, nil, nil, nil)}
                 } else {return (false, nil, nil, nil)}
             }
+            
         case .missedreading:
-            return { (alertEntry:AlertEntry, nextAlertEntry:AlertEntry?, lastBgReading:BgReading?, _ lastButOneBgReading:BgReading?, lastCalibration:Calibration?, batteryLevel:Int?) -> (alertNeeded:Bool, alertBody:String?, alertTitle:String?, delay:Int?) in
-                // TODO: finish this
-                return (false, nil, nil, nil)
+            return { (currentAlertEntry:AlertEntry, nextAlertEntry:AlertEntry?, lastBgReading:BgReading?, _ lastButOneBgReading:BgReading?, lastCalibration:Calibration?, batteryLevel:Int?) -> (alertNeeded:Bool, alertBody:String?, alertTitle:String?, delayInSeconds:Int?) in
+                
+                // if no valid lastbgreading then there's definitely no need to plan an alert
+                guard let lastBgReading = lastBgReading else {return (false, nil, nil, nil)}
+                
+                // this will be the delay of the planned notification, in seconds
+                var delayToUseInSeconds:Int?
+                //this will be the alertentry to use, either the current one, or the next one, or none
+                var alertEntryToUse:AlertEntry?
+                
+                // so there's a reading, let's find the applicable alertentry
+                if currentAlertEntry.alertType.enabled {
+                    alertEntryToUse = currentAlertEntry
+                } else {
+                    if let nextAlertEntry = nextAlertEntry {
+                        if nextAlertEntry.alertType.enabled {
+                            alertEntryToUse = nextAlertEntry
+                        }
+                    }
+                }
+                
+                // now see if we found an alertentry, and if yes prepare the return value
+                if let alertEntryToUse = alertEntryToUse {
+                    // the current alert entry is enabled, we'll use that one to plan the missed reading alert
+                    let timeSinceLastReadingInMinutes:Int = Int((Date().toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble())/1000/60)
+                    // delay to use in the alert is value in the alertEntry - time since last reading in minutes
+                    delayToUseInSeconds = (Int(alertEntryToUse.value) - timeSinceLastReadingInMinutes) * 60
+                    return (true, "", Texts_Alerts.missedReadingAlertTitle, delayToUseInSeconds)
+                } else {
+                    // none of alertentries enables missed reading, nothing to plan
+                    return (false, nil, nil, nil)
+                }
+                
             }
+            
         case .calibration:
             return { (alertEntry:AlertEntry, nextAlertEntry:AlertEntry?, lastBgReading:BgReading?, _ lastButOneBgReading:BgReading?, lastCalibration:Calibration?, batteryLevel:Int?) -> (alertNeeded:Bool, alertBody:String?, alertTitle:String?, delay:Int?) in
-                // TODO: finish this
+                
+                // if alertEntry not enabled, return false
+                if !alertEntry.alertType.enabled || lastCalibration == nil {return (false, nil, nil, nil)}
+                                
+                // if lastCalibration not nil, check the timestamp and check if delay > value (in hours)
+                if abs(lastCalibration!.timeStamp.timeIntervalSinceNow) > TimeInterval(Int(alertEntry.value) * 3600) {
+                    return(true, "", Texts_Alerts.calibrationNeededAlertTitle, nil)
+                }
                 return (false, nil, nil, nil)
             }
+            
         case .batterylow:
             return { (alertEntry:AlertEntry, nextAlertEntry:AlertEntry?, lastBgReading:BgReading?, _ lastButOneBgReading:BgReading?, lastCalibration:Calibration?, batteryLevel:Int?) -> (alertNeeded:Bool, alertBody:String?, alertTitle:String?, delay:Int?) in
-                // TODO: finish this
+                
+                // if alertEntry not enabled, return false
+                if !alertEntry.alertType.enabled || batteryLevel == nil {return (false, nil, nil, nil)}
+                
+                if alertEntry.value > batteryLevel! {
+                    return (true, "", Texts_Alerts.batteryLowAlertTitle, nil)
+                }
                 return (false, nil, nil, nil)
             }
         }
@@ -143,24 +203,24 @@ public enum AlertKind:Int, CaseIterable {
         }
     }
     
-    /// returns category identifier for local notifications, for specific alertKind.
-    func categoryIdentifier() -> String {
+    /// to be used in pickerview, as main title.
+    func alertPickerViewMainTitle() -> String {
         switch self {
             
         case .low:
-            return Constants.Notifications.CategoryIdentifiersForAlerts.lowAlert
+            return Texts_Alerts.lowAlertTitle
         case .high:
-            return Constants.Notifications.CategoryIdentifiersForAlerts.highAlert
+            return Texts_Alerts.highAlertTitle
         case .verylow:
-            return Constants.Notifications.CategoryIdentifiersForAlerts.veryLowAlert
+            return Texts_Alerts.veryLowAlertTitle
         case .veryhigh:
-            return Constants.Notifications.CategoryIdentifiersForAlerts.veryHighAlert
+            return Texts_Alerts.veryHighAlertTitle
         case .missedreading:
-            return Constants.Notifications.CategoryIdentifiersForAlerts.missedReadingAlert
+            return Texts_Alerts.missedReadingAlertTitle
         case .calibration:
-            return Constants.Notifications.CategoryIdentifiersForAlerts.subsequentCalibrationRequest
+            return Texts_Alerts.calibrationNeededAlertTitle
         case .batterylow:
-            return Constants.Notifications.CategoryIdentifiersForAlerts.batteryLow
+            return Texts_Alerts.batteryLowAlertTitle
         }
     }
     
@@ -170,17 +230,17 @@ public enum AlertKind:Int, CaseIterable {
 fileprivate func createAlertTitleForBgReadingAlerts(bgReading:BgReading, alertKind:AlertKind) -> String {
     var returnValue:String = ""
     
-    // the start of the body, which says likz "High Alert"
+    // the start of the body, which says like "High Alert"
     switch alertKind {
         
     case .low:
-        returnValue = returnValue + Texts_Alerts.lowAlertBody
+        returnValue = returnValue + Texts_Alerts.lowAlertTitle
     case .high:
-        returnValue = returnValue + Texts_Alerts.highAlertBody
+        returnValue = returnValue + Texts_Alerts.highAlertTitle
     case .verylow:
-        returnValue = returnValue + Texts_Alerts.veryLowAlertBody
+        returnValue = returnValue + Texts_Alerts.veryLowAlertTitle
     case .veryhigh:
-        returnValue = returnValue + Texts_Alerts.veryHighAlertBody
+        returnValue = returnValue + Texts_Alerts.veryHighAlertTitle
     default:
         return returnValue
     }

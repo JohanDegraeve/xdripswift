@@ -4,7 +4,7 @@ import os
 import CoreBluetooth
 import UserNotifications
 
-final class RootViewController: UIViewController, CGMTransmitterDelegate {
+final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUserNotificationCenterDelegate {
 
     // MARK: - Properties
 
@@ -47,7 +47,6 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
       return Date(timeIntervalSince1970: 0)
     }()
     
-    // MARK: - temporary properties
     var activeSensor:Sensor?
     
     // MARK: - View Life Cycle
@@ -228,8 +227,13 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     private func requestCalibration() {
         
         // check that calibrations is not nil
-        guard let calibrations = calibrations else {
+        guard let calibrations = calibrations, let activeSensor = activeSensor else {
             fatalError("in requestCalibration, calibrations is nil")
+        }
+        
+        // temporary check if a calibration already exists, this is to test the pickerviewcontroller
+        if calibrations.getLatestCalibrations(howManyDays: 30, forSensor: activeSensor).count > 0 {
+            return
         }
         
         let alert = UIAlertController(title: "enter calibration value", message: nil, preferredStyle: .alert)
@@ -422,16 +426,23 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate {
     }
 }
 
-extension RootViewController: UNUserNotificationCenterDelegate {
+extension RootViewController {
     
     //called when notification fired while app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        os_log("userNotificationCenter willPresent, calling completionhandler", log: log, type: .info)
 
         if notification.request.identifier == Constants.Notifications.NotificationIdentifiersForAlerts.initialCalibrationRequest {
-            //calibration request was fired, no need to show the notification, show immediately the calibration dialog
-            os_log("userNotificationCenter didReceive, user pressed calibration notification or app was open the moment the notification was fired", log: log, type: .info)
-            requestCalibration()
+            // request calibration
+             requestCalibration()
+            
+            // call completionhandler
+            completionHandler([])
+        } else {
+            if let pickerViewData = alertManager?.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler) {
+                
+                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+
+            }
         }
     }
     
@@ -440,7 +451,17 @@ extension RootViewController: UNUserNotificationCenterDelegate {
         
         if response.notification.request.identifier == Constants.Notifications.NotificationIdentifiersForAlerts.initialCalibrationRequest {
             os_log("userNotificationCenter didReceive, user pressed calibration notification", log: log, type: .info)
+            // request calibration
             requestCalibration()
+            
+            // call completionhandler
+            completionHandler()
+        } else {
+            if let pickerViewData = alertManager?.userNotificationCenter(center, didReceive: response, withCompletionHandler: completionHandler) {
+                
+                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+
+            }
         }
     }
     

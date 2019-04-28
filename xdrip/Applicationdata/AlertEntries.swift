@@ -21,7 +21,9 @@ class AlertEntries {
     // MARK: - functions
     
     /// will check for the specified date (only the time of the day will be used) which AlertEntry is applicable, then for that Alertentry, get the AlertType. Should not be nil. In case it is, a default value will be returned
-    func getCurrentAndNextAlertEntry(alertKind:AlertKind, forWhen:Date, alertTypes:AlertTypes) -> (currentAlertEntry:AlertEntry, nextAlertEntry: AlertEntry?) {
+    ///
+    /// if the currentAlertEntry is the last of the day, then the nextAlertEntry in the return value will be nil, even though there might be a new one that starts at midnight (ie morning next day)
+    func getCurrentAndNextAlertEntry(forAlertKind alertKind:AlertKind, forWhen when:Date, alertTypes:AlertTypes) -> (currentAlertEntry:AlertEntry, nextAlertEntry: AlertEntry?) {
         
         // create fetchrequest
         let fetchRequest: NSFetchRequest<AlertEntry> = AlertEntry.fetchRequest()
@@ -45,14 +47,13 @@ class AlertEntries {
         }
         
         // get the number of minutes in the date
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: forWhen)
-        let minute = calendar.component(.minute, from: forWhen)
-        let minutes:Int16 = Int16(hour * 60 + minute)
-        
-        // search through the alert entries for the current and next alertentry
+        let minutes = Int16(when.minutesSinceMidNightLocalTime())
+
+        // initialize currentEntry and nextAlertEntry with nil
         var currentEntry:AlertEntry?
         var nextAlertEntry:AlertEntry?
+
+        // search through the alert entries for the current and next alertentry
         loop: for alertEntry in alertEntries {
             if alertEntry.value <= minutes {
                 currentEntry = alertEntry
@@ -61,6 +62,8 @@ class AlertEntries {
                 break loop
             }
         }
+        
+        // if no alertEntry found, then create a default one, otherwise return both current and next (which may be nil)
         if let currentAlertEntry = currentEntry {
             return (currentAlertEntry, nextAlertEntry)
         } else {

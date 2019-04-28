@@ -127,7 +127,7 @@ struct Constants {
         static let veryHigh = 250
         static let veryLow = 50
         static let high = 170
-        static let low = 200
+        static let low = 70
         
         // in minutes, after how many minutes of now reading should alert be raised
         static let missedReading = 30

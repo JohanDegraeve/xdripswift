@@ -1,12 +1,19 @@
 import Foundation
 
 public class SnoozeParameters {
+    
+    // MARK: private properties
+    
     /// this is snooze period chosen by user, nil value is not snoozed
     private(set) var snoozePeriodInMinutes:Int?
+    
     /// when was the alert snoozed, nil is not snoozed
     private(set) var snoozeTimeStamp:Date?
+    
     /// was the alert presnoozed by the user
     private(set) var preSnoozed:Bool = false
+    
+    // MARK: public functions
     
     /// store snoozeperiod in minutes, snoozetimestamp = now, set preSnoozed to false
     public func snooze(snoozePeriodInMinutes:Int) {
@@ -15,7 +22,7 @@ public class SnoozeParameters {
         preSnoozed = false
     }
     
-    /// store snoozeperiod in minutes, snoozetimestamp = now, set preSnoozed to trye
+    /// store snoozeperiod in minutes, snoozetimestamp = now, set preSnoozed to true
     public func preSnooze(snoozePeriodInMinutes:Int) {
         snooze(snoozePeriodInMinutes: snoozePeriodInMinutes)
         preSnoozed = true
@@ -35,12 +42,12 @@ public class SnoozeParameters {
     ///     - remainingSeconds : if the alert is snoozed, then this says how many seconds remaining
     public func getSnoozeValue() -> (isSnoozed:Bool, isPreSnoozed:Bool?, remainingSeconds:Int?) {
         if let snoozeTimeStamp = snoozeTimeStamp, let snoozePeriodInMinutes = snoozePeriodInMinutes {
-            if Date(timeInterval: TimeInterval(snoozePeriodInMinutes * 60), since: snoozeTimeStamp) > Date() {
+            if Date(timeInterval: TimeInterval(snoozePeriodInMinutes * 60), since: snoozeTimeStamp) < Date() {
                 // snooze attributes are set, however they are expired
                 unSnooze() // set attributes to nil
                 return (false, nil, nil)
             } else {
-                // alert is still snoozed, calculate
+                // alert is still snoozed, calculate remaining seconds
                 return (true, preSnoozed, Int((snoozeTimeStamp.toMillisecondsAsDouble() + Double(snoozePeriodInMinutes) * 60 * 1000 - Date().toMillisecondsAsDouble())/1000))
             }
         } else {

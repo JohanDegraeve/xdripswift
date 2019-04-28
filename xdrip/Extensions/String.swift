@@ -30,7 +30,7 @@ extension String {
 }
 
 extension String {
-    /// will replace check if newValue has correct decimal point
+    /// converts String to Double, works with decimal seperator . or , - if conversion fails then returns nil
     func toDouble() -> Double? {
         
         // if string is empty then no further processing needed, return nil

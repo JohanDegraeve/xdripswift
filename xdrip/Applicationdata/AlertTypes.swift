@@ -48,7 +48,7 @@ class AlertTypes {
         if let alertType = alertTypes.first {
             return alertType
         } else {
-            let defaultAlertType =  AlertType(enabled: true, name: Texts_Common.default0, overrideMute: true, snooze: true, snoozePeriod: 60, vibrate: false, soundName: "xDrip Alert", alertEntries: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+            let defaultAlertType =  AlertType(enabled: true, name: Texts_Common.default0, overrideMute: false, snooze: true, snoozePeriod: 60, vibrate: true, soundName: "xDrip Alert", alertEntries: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
             coreDataManager.saveChanges()
             return defaultAlertType
         }

@@ -8,3 +8,8 @@
 "common_default" = "Default";
 "common_high" = "HIGH";
 "common_low" = "LOW";
+"common_hour" = "hour";
+"common_hours" = "hours";
+"common_minutes" = "minutes";
+"common_day" = "day";
+"common_week" = "week";
