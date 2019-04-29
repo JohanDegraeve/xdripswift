@@ -162,6 +162,9 @@ public class AlertManager:NSObject {
     ///     - PickerViewData : contains data that user needs to pick from, nil means nothing to pick from
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) -> PickerViewData? {
         
+        // declare returnValue
+        var returnValue:PickerViewData?
+        
         // loop through alertKinds to find matching notificationIdentifier
         loop: for alertKind in AlertKind.allCases {
             if response.notification.request.identifier == alertKind.notificationIdentifier() {
@@ -173,22 +176,24 @@ public class AlertManager:NSObject {
                     
                 case snoozeActionIdentifier:
 
-                    os_log("in userNotificationCenter, received actionIdentifier : snoozeActionIdentifier", log: self.log, type: .info)
-
                     // get the appicable alertEntry so we can find the alertType and default snooze value
                     let (currentAlertEntry, _) = alertEntries.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypes: alertTypes)
+                    
+                    os_log("in userNotificationCenter, received actionIdentifier : snoozeActionIdentifier, snoozing alert %{public}@ for %{public}@ minutes", log: self.log, type: .info, alertKind.descriptionForLogging(), Int(currentAlertEntry.alertType.snoozeperiod).description)
                     
                     // snooze
                     getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: Int(currentAlertEntry.alertType.snoozeperiod))
 
-                    os_log("    snoozing alert %{public}@ for %{public}@ minutes", log: self.log, type: .info, alertKind.descriptionForLogging(), Int(currentAlertEntry.alertType.snoozeperiod).description)
 
                 case UNNotificationDefaultActionIdentifier:
                     os_log("in userNotificationCenter, received actionIdentifier : UNNotificationDefaultActionIdentifier (user clicked the notification which opens the app, but not the snooze action)", log: self.log, type: .info)
-                    
+
+                    // create pickerViewData for the alertKind for which alert went off, and return it to the caller who in turn needs to allow the user to select a snoozeperiod
+                    returnValue = createPickerViewData(forAlertKind: alertKind)
+
                 case UNNotificationDismissActionIdentifier:
                     os_log("in userNotificationCenter, received actionIdentifier : UNNotificationDismissActionIdentifier", log: self.log, type: .info)
-                    
+
                 default:
                     os_log("in userNotificationCenter, received actionIdentifier : default", log: self.log, type: .info)
                     
@@ -202,7 +207,7 @@ public class AlertManager:NSObject {
             }
         }
         
-        return nil
+        return returnValue
     }
     
     /// Function to be called that receives the notification actions. Will handle the response. completionHandler will not necessarily be called. Only if the identifier (response.notification.request.identifier) is one of the alert notification identifers, then it will handle the response and also call completionhandler.
@@ -212,6 +217,9 @@ public class AlertManager:NSObject {
     ///     - PickerViewData : contains data that user needs to pick from, nil means nothing to pick from
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) -> PickerViewData? {
 
+        // declare returnValue
+        var returnValue:PickerViewData?
+        
         /// check if it's for one of the alert notification
         loop: for alertKind in AlertKind.allCases {
             if alertKind.notificationIdentifier() == notification.request.identifier {
@@ -220,11 +228,12 @@ public class AlertManager:NSObject {
                 // none of them seems useful here
                 completionHandler([])
                 
-                return createPickerViewData(forAlertKind: alertKind)
+                // create pickerViewData for the alertKind for which alert went off, and return it to the caller who in turn needs to allow the user to select a snoozeperiod
+                returnValue = createPickerViewData(forAlertKind: alertKind)
                 
             }
         }
-        return nil
+        return returnValue
     }
     
     // MARK: - overriden functions
@@ -310,8 +319,10 @@ public class AlertManager:NSObject {
             if let alertBody = alertBody {content.body = alertBody}
             if let alertTitle = alertTitle {content.title = alertTitle}
             
-            // set categoryIdentifier
-            content.categoryIdentifier = snoozeCategoryIdentifier
+            // if snooze from notification in homescreen is needed then set the categoryIdentifier
+            if applicableAlertType.snooze {
+                content.categoryIdentifier = snoozeCategoryIdentifier
+            }
 
             // The sound
             // Start by creating the sound that will be added to the notification content
@@ -436,8 +447,8 @@ public class AlertManager:NSObject {
         // create the snooze action
         let action = UNNotificationAction(identifier: snoozeActionIdentifier, title: Texts_Alerts.snooze, options: [])
         
-        // create the category
-        let generalCategory = UNNotificationCategory(identifier: snoozeCategoryIdentifier, actions: [action], intentIdentifiers: [], options: [])
+        // create the category - add option customDismissAction, this to make sure userNotificationCenter with didReceive will be called, which in turn will stop the soundPlayer, otherwise the user would dismiss the notification but in case off override mute, the sound keeps on playing
+        let generalCategory = UNNotificationCategory(identifier: snoozeCategoryIdentifier, actions: [action], intentIdentifiers: [], options: [.customDismissAction])
         
         // add the category to the UNUserNotificationCenter
         mutableExistingCategories.insert(generalCategory)
