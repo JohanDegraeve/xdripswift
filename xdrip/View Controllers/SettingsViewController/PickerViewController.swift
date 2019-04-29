@@ -38,7 +38,7 @@ final class PickerViewController : UIViewController {
         if let cancelHandler = cancelHandler { cancelHandler() }
         
         // remove the uiviewcontroller
-        remove()
+        self.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func addButtonPressed(_ sender: Any) {
@@ -46,7 +46,7 @@ final class PickerViewController : UIViewController {
         if let selectedIndex = selectedRow { addHandler(selectedIndex) }
         
         // remove the uiviewcontroller
-        remove()
+        self.dismiss(animated: true, completion: nil)
 
     }
     
@@ -114,7 +114,7 @@ final class PickerViewController : UIViewController {
         if let mainTitle = mainTitle {
             pickerViewMainTitle.text = mainTitle
         } else {
-            
+            pickerViewMainTitle.text = ""
         }
         
         // set title of pickerview
@@ -133,19 +133,6 @@ final class PickerViewController : UIViewController {
                 pickerViewMainTitle.textColor = UIColor.red
             }
         }
-    }
-    
-    public func remove() {
-        self.dismiss(animated: true, completion: nil)
-
-        // Notify Child View Controller
-        self.willMove(toParent: nil)
-        
-        // Remove Child View From Superview
-        self.view.removeFromSuperview()
-        
-        // Notify Child View Controller
-        self.removeFromParent()
     }
     
     /// creates and presents a new PickerViewController in the parentController - if there's already another uiviewcontroller being presented by the specified parentController, then the cancelhandler will be called immediately without trying to present anything
@@ -174,11 +161,11 @@ final class PickerViewController : UIViewController {
             pickerViewController.priority = pickerViewData.priority
             pickerViewController.addHandler = {(_ index: Int) in
                 pickerViewData.actionHandler(index)
-                pickerViewController.remove()
+                pickerViewController.dismiss(animated: true, completion: nil)
             }
             pickerViewController.cancelHandler = {
                 if let cancelHandler = pickerViewData.cancelHandler { cancelHandler() }
-                pickerViewController.remove()
+                pickerViewController.dismiss(animated: true, completion: nil)
             }
             
             // present it

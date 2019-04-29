@@ -250,25 +250,16 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
                 
             case let .selectFromList(title, data, selectedRow, actionTitle, cancelTitle, actionHandler, cancelHandler):
                 
-                //configure pickerViewController
-                pickerViewController.mainTitle = nil
-                pickerViewController.subTitle = title
-                pickerViewController.dataSource = data
-                pickerViewController.selectedRow = selectedRow
-                pickerViewController.addButtonTitle = actionTitle
-                pickerViewController.cancelButtonTitle = cancelTitle
-                pickerViewController.addHandler = {(_ index: Int) in
+                // configure pickerViewData
+                let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: title, withData: data, selectedRow: selectedRow, withPriority: nil, actionButtonText: actionTitle, cancelButtonText: cancelTitle, onActionClick: {(_ index: Int) in
                     actionHandler(index)
-                    self.pickerViewController.remove()
                     tableView.reloadSections(IndexSet(integer: indexPath.section), with: .none)
-                }
-                pickerViewController.cancelHandler = {
+                }, onCancelClick: {
                     if let cancelHandler = cancelHandler { cancelHandler() }
-                    self.pickerViewController.remove()
-                }
-                
-                // display controller's view
-                addPickerViewController()
+                })
+
+                // create and present pickerviewcontroller
+                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
 
                 break
             }
