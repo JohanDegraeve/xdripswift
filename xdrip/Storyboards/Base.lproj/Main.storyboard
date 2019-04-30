@@ -127,7 +127,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HPe-YM-BbI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2231.25" y="485.625"/>
+            <point key="canvasLocation" x="0.0" y="878"/>
         </scene>
         <!--Second-->
         <scene sceneID="wg7-f3-ORb">
@@ -192,6 +192,34 @@
                 </textField>
             </objects>
             <point key="canvasLocation" x="749.60000000000002" y="359.37031484257875"/>
+        </scene>
+        <!--Alert Settings View Controller-->
+        <scene sceneID="cJz-P0-7kQ">
+            <objects>
+                <viewController id="bOi-eq-Rm7" customClass="AlertSettingsViewController" customModule="xdrip" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="x4w-Di-MPx">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2BX-WQ-VT0">
+                                <rect key="frame" x="0.0" y="28" width="320" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="2BX-WQ-VT0" firstAttribute="top" secondItem="hfo-Cq-lC8" secondAttribute="top" constant="8" id="9J0-Ul-V74"/>
+                            <constraint firstItem="hfo-Cq-lC8" firstAttribute="trailing" secondItem="2BX-WQ-VT0" secondAttribute="trailing" id="KyB-S8-zTD"/>
+                            <constraint firstItem="2BX-WQ-VT0" firstAttribute="leading" secondItem="hfo-Cq-lC8" secondAttribute="leading" id="UBH-8m-TSP"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="hfo-Cq-lC8"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Dml-kg-jX5" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1744" y="359"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="yl2-sM-qoP">

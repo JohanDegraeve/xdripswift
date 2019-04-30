@@ -97,23 +97,24 @@
 		F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */ = {isa = PBXBuildFile; fileRef = F8B3A7C5226CC0B7004BA588 /* xdripalert.aif */; };
 		F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7DE226E48C1004BA588 /* SoundPlayer.swift */; };
 		F8B3A7E72274DCE6004BA588 /* PickerViewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7E62274DCE6004BA588 /* PickerViewData.swift */; };
-		F8BDD41722176B4A006EAB84 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41622176B4A006EAB84 /* SettingsTableViewCell.swift */; };
-		F8BDD41A2217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD4192217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift */; };
-		F8BDD41C2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41B2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift */; };
-		F8BDD41E22183CA0006EAB84 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41D22183CA0006EAB84 /* SettingsViewNightScoutSettingsViewModel.swift */; };
-		F8BDD42022183CE9006EAB84 /* SettingsViewAlarmsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD41F22183CE9006EAB84 /* SettingsViewAlarmsSettingsViewModel.swift */; };
-		F8BDD42222183CFE006EAB84 /* SettingsViewSpeakSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD42122183CFE006EAB84 /* SettingsViewSpeakSettingsViewModel.swift */; };
+		F8B3A7EE227638DA004BA588 /* AlertSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7ED227638DA004BA588 /* AlertSettingsViewController.swift */; };
+		F8B3A7F82278E0E8004BA588 /* SettingsViewDexcomSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7F02278E0E7004BA588 /* SettingsViewDexcomSettingsViewModel.swift */; };
+		F8B3A7F92278E0E8004BA588 /* SettingsViewTransmitterSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7F12278E0E7004BA588 /* SettingsViewTransmitterSettingsViewModel.swift */; };
+		F8B3A7FA2278E0E8004BA588 /* SettingsViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7F22278E0E7004BA588 /* SettingsViewModelProtocol.swift */; };
+		F8B3A7FB2278E0E8004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7F32278E0E7004BA588 /* SettingsViewNightScoutSettingsViewModel.swift */; };
+		F8B3A7FC2278E0E8004BA588 /* SettingsViewHealthKitSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7F42278E0E7004BA588 /* SettingsViewHealthKitSettingsViewModel.swift */; };
+		F8B3A7FD2278E0E8004BA588 /* SettingsViewAlertSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7F52278E0E8004BA588 /* SettingsViewAlertSettingsViewModel.swift */; };
+		F8B3A7FE2278E0E8004BA588 /* SettingsViewSpeakSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7F62278E0E8004BA588 /* SettingsViewSpeakSettingsViewModel.swift */; };
+		F8B3A7FF2278E0E8004BA588 /* SettingsViewGeneralSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7F72278E0E8004BA588 /* SettingsViewGeneralSettingsViewModel.swift */; };
+		F8B3A8022278E112004BA588 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A8012278E112004BA588 /* SettingsTableViewCell.swift */; };
 		F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD4232218790E006EAB84 /* UserDefaults.swift */; };
 		F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD436221A0349006EAB84 /* Localizable.strings */; };
-		F8BDD43D221B48F2006EAB84 /* SettingsViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD43C221B48F2006EAB84 /* SettingsViewModelProtocol.swift */; };
 		F8BDD43F221B5BAF006EAB84 /* TextsErrorMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD43E221B5BAF006EAB84 /* TextsErrorMessages.swift */; };
 		F8BDD442221C9D0D006EAB84 /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD444221C9D0D006EAB84 /* Common.strings */; };
 		F8BDD448221C9D70006EAB84 /* ErrorMessages.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD44A221C9D70006EAB84 /* ErrorMessages.strings */; };
 		F8BDD450221CAA64006EAB84 /* TextsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */; };
 		F8BDD452221DEAB2006EAB84 /* TextsSettingsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD451221DEAB1006EAB84 /* TextsSettingsViews.swift */; };
 		F8BDD455221DEF22006EAB84 /* SettingsViews.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD457221DEF22006EAB84 /* SettingsViews.strings */; };
-		F8BDD45A221E0225006EAB84 /* SettingsViewDexcomSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD459221E0225006EAB84 /* SettingsViewDexcomSettingsViewModel.swift */; };
-		F8BDD45C221E0263006EAB84 /* SettingsViewHealthKitSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD45B221E0263006EAB84 /* SettingsViewHealthKitSettingsViewModel.swift */; };
 		F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */; };
 		F8E3C3AD21FE551C00907A04 /* DexcomCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */; };
 		F8EA6C7C21B491740082976B /* BgReadings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C7B21B491740082976B /* BgReadings.swift */; };
@@ -224,19 +225,22 @@
 		F8B3A7C5226CC0B7004BA588 /* xdripalert.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = xdripalert.aif; sourceTree = "<group>"; };
 		F8B3A7DE226E48C1004BA588 /* SoundPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundPlayer.swift; sourceTree = "<group>"; };
 		F8B3A7E62274DCE6004BA588 /* PickerViewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewData.swift; sourceTree = "<group>"; };
-		F8BDD41622176B4A006EAB84 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
-		F8BDD4192217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewGeneralSettingsViewModel.swift; sourceTree = "<group>"; };
-		F8BDD41B2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTransmitterSettingsViewModel.swift; sourceTree = "<group>"; };
-		F8BDD41D22183CA0006EAB84 /* SettingsViewNightScoutSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewNightScoutSettingsViewModel.swift; sourceTree = "<group>"; };
-		F8BDD41F22183CE9006EAB84 /* SettingsViewAlarmsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewAlarmsSettingsViewModel.swift; sourceTree = "<group>"; };
-		F8BDD42122183CFE006EAB84 /* SettingsViewSpeakSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewSpeakSettingsViewModel.swift; sourceTree = "<group>"; };
+		F8B3A7ED227638DA004BA588 /* AlertSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSettingsViewController.swift; sourceTree = "<group>"; };
+		F8B3A7F02278E0E7004BA588 /* SettingsViewDexcomSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewDexcomSettingsViewModel.swift; sourceTree = "<group>"; };
+		F8B3A7F12278E0E7004BA588 /* SettingsViewTransmitterSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewTransmitterSettingsViewModel.swift; sourceTree = "<group>"; };
+		F8B3A7F22278E0E7004BA588 /* SettingsViewModelProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewModelProtocol.swift; sourceTree = "<group>"; };
+		F8B3A7F32278E0E7004BA588 /* SettingsViewNightScoutSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewNightScoutSettingsViewModel.swift; sourceTree = "<group>"; };
+		F8B3A7F42278E0E7004BA588 /* SettingsViewHealthKitSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewHealthKitSettingsViewModel.swift; sourceTree = "<group>"; };
+		F8B3A7F52278E0E8004BA588 /* SettingsViewAlertSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewAlertSettingsViewModel.swift; sourceTree = "<group>"; };
+		F8B3A7F62278E0E8004BA588 /* SettingsViewSpeakSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewSpeakSettingsViewModel.swift; sourceTree = "<group>"; };
+		F8B3A7F72278E0E8004BA588 /* SettingsViewGeneralSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewGeneralSettingsViewModel.swift; sourceTree = "<group>"; };
+		F8B3A8012278E112004BA588 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
 		F8BDD4232218790E006EAB84 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		F8BDD435221A0005006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		F8BDD437221A0349006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F8BDD439221A096C006EAB84 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F8BDD43A221A096C006EAB84 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Main.strings; sourceTree = "<group>"; };
 		F8BDD43B221A096D006EAB84 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
-		F8BDD43C221B48F2006EAB84 /* SettingsViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModelProtocol.swift; sourceTree = "<group>"; };
 		F8BDD43E221B5BAF006EAB84 /* TextsErrorMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsErrorMessages.swift; sourceTree = "<group>"; };
 		F8BDD443221C9D0D006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Common.strings; sourceTree = "<group>"; };
 		F8BDD445221C9D10006EAB84 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Common.strings; sourceTree = "<group>"; };
@@ -246,8 +250,6 @@
 		F8BDD451221DEAB1006EAB84 /* TextsSettingsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsSettingsViews.swift; sourceTree = "<group>"; };
 		F8BDD456221DEF22006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F8BDD458221DEF24006EAB84 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SettingsViews.strings; sourceTree = "<group>"; };
-		F8BDD459221E0225006EAB84 /* SettingsViewDexcomSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewDexcomSettingsViewModel.swift; sourceTree = "<group>"; };
-		F8BDD45B221E0263006EAB84 /* SettingsViewHealthKitSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewHealthKitSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
 		F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomCalibrator.swift; sourceTree = "<group>"; };
 		F8EA6C7B21B491740082976B /* BgReadings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadings.swift; sourceTree = "<group>"; };
@@ -350,8 +352,8 @@
 		F8025E5821F7860900ECF0C0 /* SettingsViewController */ = {
 			isa = PBXGroup;
 			children = (
-				F8BDD4182217FEE6006EAB84 /* View Models */,
-				F8BDD41522176B2B006EAB84 /* Table View Cells */,
+				F8B3A8002278E112004BA588 /* SettingsTableViewCells */,
+				F8B3A7EF2278E0E7004BA588 /* SettingsViewModels */,
 				F8AC426121ADEBD60078C348 /* SettingsViewController.swift */,
 			);
 			path = SettingsViewController;
@@ -416,6 +418,7 @@
 		F85DC2FA21D2CD3000B9F74A /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				F8B3A7EC227638C2004BA588 /* AlertSettingsViewController */,
 				F8B3A7E52274DCC7004BA588 /* Picker View Controller */,
 				F8025E5921F7861200ECF0C0 /* Root View Controller */,
 				F8025E5821F7860900ECF0C0 /* SettingsViewController */,
@@ -620,27 +623,35 @@
 			path = "Picker View Controller";
 			sourceTree = "<group>";
 		};
-		F8BDD41522176B2B006EAB84 /* Table View Cells */ = {
+		F8B3A7EC227638C2004BA588 /* AlertSettingsViewController */ = {
 			isa = PBXGroup;
 			children = (
-				F8BDD41622176B4A006EAB84 /* SettingsTableViewCell.swift */,
+				F8B3A7ED227638DA004BA588 /* AlertSettingsViewController.swift */,
 			);
-			path = "Table View Cells";
+			path = AlertSettingsViewController;
 			sourceTree = "<group>";
 		};
-		F8BDD4182217FEE6006EAB84 /* View Models */ = {
+		F8B3A7EF2278E0E7004BA588 /* SettingsViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				F8BDD41F22183CE9006EAB84 /* SettingsViewAlarmsSettingsViewModel.swift */,
-				F8BDD459221E0225006EAB84 /* SettingsViewDexcomSettingsViewModel.swift */,
-				F8BDD4192217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift */,
-				F8BDD45B221E0263006EAB84 /* SettingsViewHealthKitSettingsViewModel.swift */,
-				F8BDD43C221B48F2006EAB84 /* SettingsViewModelProtocol.swift */,
-				F8BDD41D22183CA0006EAB84 /* SettingsViewNightScoutSettingsViewModel.swift */,
-				F8BDD42122183CFE006EAB84 /* SettingsViewSpeakSettingsViewModel.swift */,
-				F8BDD41B2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift */,
+				F8B3A7F02278E0E7004BA588 /* SettingsViewDexcomSettingsViewModel.swift */,
+				F8B3A7F12278E0E7004BA588 /* SettingsViewTransmitterSettingsViewModel.swift */,
+				F8B3A7F22278E0E7004BA588 /* SettingsViewModelProtocol.swift */,
+				F8B3A7F32278E0E7004BA588 /* SettingsViewNightScoutSettingsViewModel.swift */,
+				F8B3A7F42278E0E7004BA588 /* SettingsViewHealthKitSettingsViewModel.swift */,
+				F8B3A7F52278E0E8004BA588 /* SettingsViewAlertSettingsViewModel.swift */,
+				F8B3A7F62278E0E8004BA588 /* SettingsViewSpeakSettingsViewModel.swift */,
+				F8B3A7F72278E0E8004BA588 /* SettingsViewGeneralSettingsViewModel.swift */,
 			);
-			path = "View Models";
+			path = SettingsViewModels;
+			sourceTree = "<group>";
+		};
+		F8B3A8002278E112004BA588 /* SettingsTableViewCells */ = {
+			isa = PBXGroup;
+			children = (
+				F8B3A8012278E112004BA588 /* SettingsTableViewCell.swift */,
+			);
+			path = SettingsTableViewCells;
 			sourceTree = "<group>";
 		};
 		F8BDD44C221CAA26006EAB84 /* Texts */ = {
@@ -862,21 +873,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8BDD450221CAA64006EAB84 /* TextsCommon.swift in Sources */,
-				F8BDD42222183CFE006EAB84 /* SettingsViewSpeakSettingsViewModel.swift in Sources */,
-				F8BDD41A2217FF42006EAB84 /* SettingsViewGeneralSettingsViewModel.swift in Sources */,
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
+				F8B3A7FC2278E0E8004BA588 /* SettingsViewHealthKitSettingsViewModel.swift in Sources */,
 				F897AB2022059EA000CDDD10 /* SensorDataTxMessage.swift in Sources */,
 				F88F26A0224EC8B10090A9A6 /* Sensors.swift in Sources */,
 				F88F269C223C215A0090A9A6 /* CGMGNSEntryTransmitter.swift in Sources */,
 				F8AC426221ADEBD60078C348 /* SettingsViewController.swift in Sources */,
 				F897AB2122059EA000CDDD10 /* AuthRequestTxMessage.swift in Sources */,
 				F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */,
-				F8BDD41E22183CA0006EAB84 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,
 				F8BDD43F221B5BAF006EAB84 /* TextsErrorMessages.swift in Sources */,
+				F8B3A7FA2278E0E8004BA588 /* SettingsViewModelProtocol.swift in Sources */,
 				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
 				F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */,
 				F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */,
+				F8B3A7FB2278E0E8004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,
 				F897AB312207716E00CDDD10 /* FirmwareVersionTxMessage.swift in Sources */,
 				F8025C0821D8DD1F00ECF0C0 /* CGMMiaoMiaoTransmitter.swift in Sources */,
 				F8025E4C21E6618200ECF0C0 /* Log.swift in Sources */,
@@ -896,11 +907,11 @@
 				F867E2652253F3D8000FD265 /* NSDateFormatter.swift in Sources */,
 				F8B3A79722635A25004BA588 /* AlertEntry+CoreDataProperties.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
+				F8B3A7FD2278E0E8004BA588 /* SettingsViewAlertSettingsViewModel.swift in Sources */,
 				F897AB242206585F00CDDD10 /* AuthChallengeRxMessage.swift in Sources */,
 				F8025C1821DBC16400ECF0C0 /* CRC.swift in Sources */,
 				F8025E5021EE746400ECF0C0 /* Calibrator.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
-				F8BDD43D221B48F2006EAB84 /* SettingsViewModelProtocol.swift in Sources */,
 				F897AB37220775A300CDDD10 /* BatteryStatusRxMessage.swift in Sources */,
 				F85DC2F821D2632F00B9F74A /* CoreDataManager.swift in Sources */,
 				F8BDD452221DEAB2006EAB84 /* TextsSettingsViews.swift in Sources */,
@@ -926,32 +937,33 @@
 				F8EA6CB321CD5DD90082976B /* SlopeParameters.swift in Sources */,
 				F8025C0F21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift in Sources */,
 				F8B3A79522635A25004BA588 /* AlertType+CoreDataProperties.swift in Sources */,
+				F8B3A8022278E112004BA588 /* SettingsTableViewCell.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */,
-				F8BDD42022183CE9006EAB84 /* SettingsViewAlarmsSettingsViewModel.swift in Sources */,
 				F8B3A78B225D473D004BA588 /* UIAlertController.swift in Sources */,
-				F8BDD41722176B4A006EAB84 /* SettingsTableViewCell.swift in Sources */,
 				F897AB39220775B100CDDD10 /* BatteryStatusTxMessage.swift in Sources */,
 				F8025C1A21DBC1B700ECF0C0 /* SensorState.swift in Sources */,
 				F897AB1F22059EA000CDDD10 /* AuthRequestRxMessage.swift in Sources */,
 				F897AB2A220742E900CDDD10 /* AESCrypt.m in Sources */,
-				F8BDD45C221E0263006EAB84 /* SettingsViewHealthKitSettingsViewModel.swift in Sources */,
 				F8B3A7E72274DCE6004BA588 /* PickerViewData.swift in Sources */,
 				F8B3A7AE22666193004BA588 /* AlertEntryUnit.swift in Sources */,
+				F8B3A7EE227638DA004BA588 /* AlertSettingsViewController.swift in Sources */,
 				F8B3A7AA22652559004BA588 /* AlertManager.swift in Sources */,
 				F8B3A7A4226522CF004BA588 /* AlertTypes.swift in Sources */,
+				F8B3A7F82278E0E8004BA588 /* SettingsViewDexcomSettingsViewModel.swift in Sources */,
+				F8B3A7FF2278E0E8004BA588 /* SettingsViewGeneralSettingsViewModel.swift in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
+				F8B3A7F92278E0E8004BA588 /* SettingsViewTransmitterSettingsViewModel.swift in Sources */,
 				F897AAFE2202577200CDDD10 /* CGMG5Transmitter.swift in Sources */,
 				F897AB1622059E8500CDDD10 /* NSData+CRC.swift in Sources */,
 				F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */,
-				F8BDD41C2217FFB0006EAB84 /* SettingsViewTransmitterSettingsViewModel.swift in Sources */,
+				F8B3A7FE2278E0E8004BA588 /* SettingsViewSpeakSettingsViewModel.swift in Sources */,
 				F80610C8223035B700D8F236 /* PickerViewController.swift in Sources */,
 				F8EA6C7F21B70E390082976B /* Constants.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 				F88F269E224628900090A9A6 /* NightScoutUploader.swift in Sources */,
 				F8025C2021DBD0FE00ECF0C0 /* ParseLibreData.swift in Sources */,
-				F8BDD45A221E0225006EAB84 /* SettingsViewDexcomSettingsViewModel.swift in Sources */,
 				F867E2632253BDE3000FD265 /* TimeFormat.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

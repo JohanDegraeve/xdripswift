@@ -11,7 +11,7 @@ final class SettingsViewController: UIViewController {
     fileprivate var nightScoutSettingsViewModel = SettingsViewNightScoutSettingsViewModel()
     fileprivate var dexcomSettingsViewModel = SettingsViewDexcomSettingsViewModel()
     fileprivate var healthKitSettingsViewModel = SettingsViewHealthKitSettingsViewModel()
-    fileprivate var alarmsSettingsViewModel = SettingsViewAlarmsSettingsViewModel()
+    fileprivate var alarmsSettingsViewModel = SettingsViewAlertSettingsViewModel()
     fileprivate var speakSettingsViewModel = SettingsViewSpeakSettingsViewModel()
     
     private lazy var pickerViewController: PickerViewController = {

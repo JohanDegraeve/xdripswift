@@ -1,6 +1,6 @@
 import UIKit
 
-struct SettingsViewAlarmsSettingsViewModel:SettingsViewModelProtocol {
+struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     func onRowSelect(index: Int) -> SelectedRowAction {
         return .nothing
     }
