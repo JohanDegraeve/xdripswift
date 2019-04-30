@@ -147,8 +147,8 @@ struct Constants {
         /// name of the sound as shown to the user, and also stored in the alerttype
         case batterwakeup = "Better Wake Up/betterwakeup.mp3"
         case bruteforce = "Brute Force/bruteforce.mp3"
-        case modernalarm2 = "Modern Alarm 2/modern2.mp3"
-        case modernalarm = "Modern Alarm/modernalarm.mp3"
+        case modernalarm2 = "Modern Alert 2/modern2.mp3"
+        case modernalarm = "Modern Alert/modernalarm.mp3"
         case shorthigh1 = "Short High 1/shorthigh1.mp3"
         case shorthigh2 = "Short High 2/shorthigh2.mp3"
         case shorthigh3 = "Short High 3/shorthigh3.mp3"

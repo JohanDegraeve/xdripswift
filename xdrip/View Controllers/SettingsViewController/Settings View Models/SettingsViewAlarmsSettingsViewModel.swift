@@ -10,7 +10,7 @@ struct SettingsViewAlarmsSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsViews.sectionTitleAlarms
+        return Texts_SettingsViews.sectionTitleAlerts
     }
     
     func numberOfRows() -> Int {

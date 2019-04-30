@@ -40,10 +40,10 @@ class Texts_SettingsViews {
         return NSLocalizedString("settingsviews_givetransmitterid", tableName: filename, bundle: Bundle.main, value: "Enter Transmitter Id", comment: "transmitter settings, pop up that asks user to inter transmitter id")
     }()
     
-    // MARK: - Section Alarms
+    // MARK: - Section Alerts
     
-    static let sectionTitleAlarms: String = {
-        return NSLocalizedString("settingsviews_sectiontitlealarms", tableName: filename, bundle: Bundle.main, value: "Alarms", comment: "alarm settings, section title")
+    static let sectionTitleAlerts: String = {
+        return NSLocalizedString("settingsviews_sectiontitlealarms", tableName: filename, bundle: Bundle.main, value: "Alerts", comment: "alert settings, section title")
     }()
 
     static let sectionTitleHealthKit: String = {

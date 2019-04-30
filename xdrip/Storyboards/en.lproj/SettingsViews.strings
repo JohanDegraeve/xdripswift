@@ -6,7 +6,7 @@
 "settingsviews_transmittertype" = "Transmitter Type";
 "settingsviews_transmitterid" = "Transmitter Id";
 "settingsviews_givetransmitterid" = "Enter Transmitter Id";
-"settingsviews_sectiontitlealarms" = "Alarms";
+"settingsviews_sectiontitlealarms" = "Alerts";
 "settingsviews_sectiontitlehealthkit" = "HealthKit";
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
 "settingsviews_uploadReadingstoDexcomShare" = "Dexcom Share Upload";
