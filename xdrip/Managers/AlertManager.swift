@@ -297,8 +297,8 @@ public class AlertManager:NSObject {
         // get the applicable current and next alertType from core data
         let (currentAlertEntry, nextAlertEntry) = alertEntries.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypes: alertTypes)
         
-        // check if notification is required
-        let (alertNeeded, alertBody, alertTitle, delayInSeconds) = alertKind.alertNeededChecker()(currentAlertEntry, nextAlertEntry, lastBgReading, lastButOneBgREading, lastCalibration, batteryLevel)
+        // check if alert is required
+        let (alertNeeded, alertBody, alertTitle, delayInSeconds) = alertKind.alertNeeded(currentAlertEntry: currentAlertEntry, nextAlertEntry: nextAlertEntry, lastBgReading: lastBgReading, lastButOneBgREading, lastCalibration: lastCalibration, batteryLevel: batteryLevel)
         
         if alertNeeded {
             // alert needs to be raised
