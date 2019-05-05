@@ -13,3 +13,6 @@
 "common_minutes" = "minutes";
 "common_day" = "day";
 "common_week" = "week";
+"warning" ="Warning !";
+"update" = "Update";
+"add" = "Add";

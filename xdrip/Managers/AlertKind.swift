@@ -2,9 +2,13 @@ import Foundation
 
 /// low, high, very low, very high, ...
 public enum AlertKind:Int, CaseIterable {
-    case low = 0
-    case high = 1
-    case verylow = 2
+    // when adding alertkinds, try to add new cases at the end (ie 7, ...)
+    // if this is done in the middle ((eg rapid rise alert might seem better positioned after veryhigh), then a database migration would be required, because the rawvalue is stored as Int16 in the coredata, namely the alertkind
+    // the order of the alerts will also be the order in the settings
+    
+    case verylow = 0
+    case low = 1
+    case high = 2
     case veryhigh = 3
     case missedreading = 4
     case calibration = 5
@@ -17,6 +21,19 @@ public enum AlertKind:Int, CaseIterable {
         switch self {
         case .low, .high, .verylow,.veryhigh,.missedreading,.calibration,.batterylow:
             return true
+        }
+    }
+    
+    /// if value is a bg value, the conversion to mmol will be needed
+    ///
+    /// will only be useful in UI
+    func valueNeedsConversionToMmol() -> Bool {
+        switch self {
+            
+        case .low, .high, .verylow, .veryhigh:
+            return true
+        case .missedreading, .calibration, .batterylow:
+            return false
         }
     }
     
@@ -83,7 +100,7 @@ public enum AlertKind:Int, CaseIterable {
     ///     - bool : If the bool is false, then there's no need to raise an alert.
     ///     - alertbody : AlertBody, AlertTitle and delay are used if an alert needs to be raised for the notification.
     ///     - alerttitle : AlertBody, AlertTitle and delay are used if an alert needs to be raised for the notification.
-    ///     - delay : If delay > 0, then the alert will be a future planned Alert. This will only be applicable to missed reading alerts.
+    ///     - delayInSeconds : If delayInSeconds not nil and > 0 or if delayInSeconds is nil, then the alert will be a future planned Alert. This will only be applicable to missed reading alerts.
     func alertNeeded(currentAlertEntry:AlertEntry, nextAlertEntry:AlertEntry?, lastBgReading:BgReading?, _ lastButOneBgReading:BgReading?, lastCalibration:Calibration?, batteryLevel:Int?) -> (alertNeeded:Bool, alertBody:String?, alertTitle:String?, delayInSeconds:Int?) {
         //Not all input parameters in the closure are needed for every type of alert. - this is to make it generic
         switch self {
@@ -188,8 +205,8 @@ public enum AlertKind:Int, CaseIterable {
         }
     }
     
-    /// to be used in pickerview, as main title.
-    func alertPickerViewMainTitle() -> String {
+    /// to be used in when name of alert needs be shown, eg pickerview, or in list of alert setings
+    func alertTitle() -> String {
         switch self {
             
         case .low:
@@ -209,6 +226,21 @@ public enum AlertKind:Int, CaseIterable {
         }
     }
     
+    /// for UI, when value is requested, text should show also the unit (eg mgdl, mmol, minutes, days ...)
+    /// What is this text ?
+    func valueUnitText() -> String {
+        switch self {
+            
+        case .verylow, .low, .high, .veryhigh:
+            return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl:Texts_Common.mmol
+        case .missedreading:
+            return Texts_Common.minutes
+        case .calibration:
+            return Texts_Common.hours
+        case .batterylow:
+            return ""
+        }
+    }
 }
 
 // specifically for high, low, very high, very low because these need the same kind of alertTitle
@@ -231,7 +263,7 @@ fileprivate func createAlertTitleForBgReadingAlerts(bgReading:BgReading, alertKi
     }
     
     // add unit
-    returnValue = returnValue + " " + bgReading.calculatedValue.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+    returnValue = returnValue + " " + bgReading.calculatedValue.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
     
     // add slopeArrow
     if !bgReading.hideSlope {

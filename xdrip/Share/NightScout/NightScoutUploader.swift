@@ -22,12 +22,19 @@ public class NightScoutUploader:NSObject {
     private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryNightScoutUploader)
     
     /// BgReadings instance
-    private let bgReadings:BgReadings
+    private let bgReadingsAccessor:BgReadingsAccessor
+    
+    /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
+    private let keyValueObserverTimer:KeyValueObserverTimeKeeper
     
     // MARK: - initializer
     
-    init(bgReadings:BgReadings) {
-        self.bgReadings = bgReadings
+    init(bgReadingsAccessor:BgReadingsAccessor) {
+        // init bgReadingsAccessor
+        self.bgReadingsAccessor = bgReadingsAccessor
+        
+        // init own, non optional properties
+        self.keyValueObserverTimer = KeyValueObserverTimeKeeper()
         
         super.init()
         
@@ -53,20 +60,25 @@ public class NightScoutUploader:NSObject {
         
         if let keyPath = keyPath {
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
+                
                 switch keyPathEnum {
                 case UserDefaults.Key.nightScoutUrl, UserDefaults.Key.nightScoutAPIKey  :
-                    if let apiKey = UserDefaults.standard.nightScoutAPIKey, let siteUrl = UserDefaults.standard.nightScoutUrl {
-                        testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
-                            DispatchQueue.main.async {
-                                self.presentNightScoutTestCredentialsResult(success: success, error: error)
-                                if success {
-                                    self.synchronize()
-                                } else {
-                                     os_log("in observeValue, NightScout credential check failed zzz", log: self.log, type: .info)
+                    // apikey or nightscout api key change is triggered by user, should not be done within 200 ms
+                    if (keyValueObserverTimer.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
+                        if let apiKey = UserDefaults.standard.nightScoutAPIKey, let siteUrl = UserDefaults.standard.nightScoutUrl {
+                            testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
+                                DispatchQueue.main.async {
+                                    self.presentNightScoutTestCredentialsResult(success: success, error: error)
+                                    if success {
+                                        self.synchronize()
+                                    } else {
+                                        os_log("in observeValue, NightScout credential check failed zzz", log: self.log, type: .info)
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
                     }
+                    
                 default:
                     break
                 }
@@ -80,7 +92,7 @@ public class NightScoutUploader:NSObject {
         
         os_log("in uploadBgReadingsToNightScout", log: self.log, type: .info)
 
-        let bgReadingsToUpload = bgReadings.getLatestBgReadings(limit: nil, fromDate: UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         if bgReadingsToUpload.count > 0 {
             os_log("    number of readings to upload : %{public}@", log: self.log, type: .info, bgReadingsToUpload.count.description)
@@ -204,10 +216,6 @@ public class NightScoutUploader:NSObject {
         }
 
         // define and present alertcontroller
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let defaultAction = UIAlertAction(title: Texts_Common.Ok, style: .default, handler: nil)
-        alertController.addAction(defaultAction)
-        
-        alertController.presentInOwnWindow(animated: true, completion: {})
+        UIAlertController(title: title, message: message).presentInOwnWindow(animated: true, completion: {})
     }
 }

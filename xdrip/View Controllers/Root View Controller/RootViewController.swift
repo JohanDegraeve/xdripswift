@@ -4,6 +4,7 @@ import os
 import CoreBluetooth
 import UserNotifications
 
+/// viewcontroller for the home screen
 final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUserNotificationCenterDelegate {
 
     // MARK: - Properties
@@ -28,10 +29,10 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
     private var currentTransmitterId:String?
     
     /// BgReadings instance
-    private var bgReadings:BgReadings?
+    private var bgReadingsAccessor:BgReadingsAccessor?
     
     /// Calibrations instance
-    private var calibrations:Calibrations?
+    private var calibrationsAccessor:CalibrationsAccessor?
     
     /// NightScoutManager instance
     private var nightScoutManager:NightScoutUploader?
@@ -47,7 +48,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
       return Date(timeIntervalSince1970: 0)
     }()
     
-    var activeSensor:Sensor?
+    var activeSensorAccessor:Sensor?
     
     // MARK: - View Life Cycle
 
@@ -63,7 +64,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
         
         // Setup View
         setupView()
-
+        
         // when user changes transmitter type or transmitter id, then new transmitter needs to be setup. That's why observer for these settings is required
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterTypeAsString.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterId.rawValue, options: .new, context: nil)
@@ -91,6 +92,9 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
                 self.notificationsAuthorized = true
             }
         }
+        
+        // setup self as delegate for tabbarcontrolelr
+        self.tabBarController?.delegate = self
     }
     
     private func setupApplicationData() {
@@ -100,7 +104,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
             fatalError("In setupApplicationData but coreDataManager == nil")
         }
 
-        activeSensor = Sensors.init(coreDataManager: coreDataManager).fetchActiveSensor()
+        activeSensorAccessor = SensorsAccessor.init(coreDataManager: coreDataManager).fetchActiveSensor()
         
         // test
         /*if let activeSensor = activeSensor {
@@ -108,19 +112,19 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
         }*/
 
         // instantiate bgReadings
-        bgReadings = BgReadings(coreDataManager: coreDataManager)
-        guard let bgReadings = bgReadings else {
+        bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+        guard let bgReadingsAccessor = bgReadingsAccessor else {
             fatalError("In setupApplicationData, failed to initialize bgReadings")
         }
         
         // set timeStampLastBgReading
-        if let lastReading = bgReadings.last(forSensor: activeSensor) {
+        if let lastReading = bgReadingsAccessor.last(forSensor: activeSensorAccessor) {
             timeStampLastBgReading = lastReading.timeStamp
         }
         
         // instantiate calibrations
-        calibrations = Calibrations(coreDataManager: coreDataManager)
-        guard calibrations != nil else {
+        calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
+        guard calibrationsAccessor != nil else {
             fatalError("In setupApplicationData, failed to initialize calibrations")
         }
         
@@ -130,7 +134,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
         }*/
         
         // setup nightscout synchronizer
-        nightScoutManager = NightScoutUploader(bgReadings: bgReadings)
+        nightScoutManager = NightScoutUploader(bgReadingsAccessor: bgReadingsAccessor)
         
         // setup playsound
         soundPlayer = SoundPlayer()
@@ -139,17 +143,17 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
         if let soundPlayer = soundPlayer {
             alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
         }
-       
+        
     }
     
     // Only MioaMiao will call this
     func newSensorDetected() {
         os_log("new sensor detected", log: log, type: .info)
-        if let activeSensor = activeSensor, let coreDataManager = coreDataManager {
+        if let activeSensor = activeSensorAccessor, let coreDataManager = coreDataManager {
             activeSensor.endDate = Date()
             coreDataManager.saveChanges()
         }
-        activeSensor = nil
+        activeSensorAccessor = nil
     }
     
     // Only MioaMiao will call this
@@ -191,17 +195,12 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
         let notificationContent = UNMutableNotificationContent()
         
         // Configure Notification Content
-        if let activeSensor = activeSensor, let bgReadings = bgReadings {
+        if let activeSensor = activeSensorAccessor, let bgReadings = bgReadingsAccessor {
             let lastReading = bgReadings.getLatestBgReadings(limit: 1, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
             let calculatedValueAsString:String?
             if lastReading.count > 0 {
-                var calculatedValue = lastReading[0].calculatedValue
-                if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
-                    calculatedValue = calculatedValue.mgdlToMmol()
-                    calculatedValueAsString = calculatedValue.bgValuetoString(mgdl: false)
-                } else {
-                    calculatedValueAsString = calculatedValue.bgValuetoString(mgdl: true)
-                }
+                let calculatedValue = lastReading[0].calculatedValue
+                calculatedValueAsString = calculatedValue.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                 notificationContent.title = "New Reading " + calculatedValueAsString!
             } else {
                 notificationContent.title = "New Reading"
@@ -227,7 +226,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
     private func requestCalibration() {
         
         // check that calibrations is not nil
-        guard let calibrations = calibrations, let activeSensor = activeSensor else {
+        guard let calibrations = calibrationsAccessor, let activeSensor = activeSensorAccessor else {
             fatalError("in requestCalibration, calibrations is nil")
         }
         
@@ -245,7 +244,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
         })
         
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
-            if let activeSensor = self.activeSensor, let coreDataManager = self.coreDataManager, let bgReadings = self.bgReadings {
+            if let activeSensor = self.activeSensorAccessor, let coreDataManager = self.coreDataManager, let bgReadings = self.bgReadingsAccessor {
                 if let textField = alert.textFields {
                     if let first = textField.first {
                         if let value = first.text {
@@ -288,21 +287,21 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
     private func temptesting(glucoseData: inout [RawGlucoseData], sensorState: SensorState?, firmware: String?, hardware: String?, batteryPercentage: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
         
         // check that calibrations and coredata manager is not nil
-        guard let calibrations = calibrations, let coreDataManager = coreDataManager else {
+        guard let calibrations = calibrationsAccessor, let coreDataManager = coreDataManager else {
             fatalError("in temptesting, calibrations or coreDataManager is nil")
         }
 
-        if activeSensor == nil {
+        if activeSensorAccessor == nil {
             if let transmitterType = UserDefaults.standard.transmitterType {
                 switch transmitterType {
                     
                 case .dexcomG4, .dexcomG5:
-                    activeSensor = Sensor(startDate: Date(), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    activeSensorAccessor = Sensor(startDate: Date(), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 
                 case .miaomiao, .GNSentry:
                     if let sensorTimeInMinutes = sensorTimeInMinutes {
-                        activeSensor = Sensor(startDate: Date(timeInterval: -Double(sensorTimeInMinutes * 60), since: Date()),nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                        if let activeSensor = activeSensor {
+                        activeSensorAccessor = Sensor(startDate: Date(timeInterval: -Double(sensorTimeInMinutes * 60), since: Date()),nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        if let activeSensor = activeSensorAccessor {
                             os_log("created sensor with id : %{public}@ and startdate  %{public}@", log: self.log, type: .info, activeSensor.id, activeSensor.startDate.description)
                         } else {
                             os_log("creation active sensor failed", log: self.log, type: .info)
@@ -313,7 +312,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
             coreDataManager.saveChanges()
         }
 
-        if let activeSensor = activeSensor, let calibrator = self.calibrator, let bgReadings = self.bgReadings {
+        if let activeSensor = activeSensorAccessor, let calibrator = self.calibrator, let bgReadings = self.bgReadingsAccessor {
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 if glucose.timeStamp > timeStampLastBgReading {
                     
@@ -360,11 +359,11 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
                         currentTransmitterTypeAsString = UserDefaults.standard.transmitterTypeAsString
                         UserDefaults.standard.bluetoothDeviceAddress = nil
                         UserDefaults.standard.bluetoothDeviceName =  nil
-                        if let activeSensor = activeSensor {
+                        if let activeSensor = activeSensorAccessor {
                             activeSensor.endDate = Date()
                         }
                         coreDataManager.saveChanges()
-                        activeSensor = nil
+                        activeSensorAccessor = nil
                         test = nil
                         initializeTransmitterType()
                     }
@@ -373,11 +372,11 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
                         currentTransmitterId = UserDefaults.standard.transmitterId
                         UserDefaults.standard.bluetoothDeviceAddress = nil
                         UserDefaults.standard.bluetoothDeviceName =  nil
-                        if let activeSensor = activeSensor {
+                        if let activeSensor = activeSensorAccessor {
                             activeSensor.endDate = Date()
                         }
                         coreDataManager.saveChanges()
-                        activeSensor = nil
+                        activeSensorAccessor = nil
                         test = nil
                         initializeTransmitterType()
                     }
@@ -466,10 +465,10 @@ extension RootViewController {
     }
     
     private func logAllBgReadings() {
-        if let bgReadings = bgReadings {
-            let readings = bgReadings.getLatestBgReadings(limit: nil, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: true)
+        if let bgReadingsAccessor = bgReadingsAccessor {
+            let readings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: true)
             for (index,reading) in readings.enumerated() {
-                if reading.sensor?.id == activeSensor?.id {
+                if reading.sensor?.id == activeSensorAccessor?.id {
                     os_log("readings %{public}d timestamp = %{public}@, calculatedValue = %{public}f", log: log, type: .info, index, reading.timeStamp.description, reading.calculatedValue)
                 }
             }
@@ -500,6 +499,17 @@ extension RootViewController {
     func cgmTransmitterNeedsPairing() {
         //TODO: needs implementation
         print("NEEDS IMPLEMENTATION")
+    }
+}
+
+/// conform to UITabBarControllerDelegate, want to receive info when user clicks specific tabs
+extension RootViewController: UITabBarControllerDelegate {
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        
+        // if user clicks the tab for settings, then configure
+        if let navigationController = viewController as? SettingsNavigationController {
+            navigationController.configure(coreDataManager: coreDataManager)
+        }
     }
 }
 

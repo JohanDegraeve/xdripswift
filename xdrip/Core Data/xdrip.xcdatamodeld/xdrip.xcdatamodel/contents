@@ -4,7 +4,7 @@
         <attribute name="alertkind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="start" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="value" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="alertType" maxCount="1" deletionRule="Deny" destinationEntity="AlertType" inverseName="alertEntries" inverseEntity="AlertType" syncable="YES"/>
+        <relationship name="alertType" maxCount="1" deletionRule="No Action" destinationEntity="AlertType" inverseName="alertEntries" inverseEntity="AlertType" syncable="YES"/>
     </entity>
     <entity name="AlertType" representedClassName=".AlertType" syncable="YES">
         <attribute name="enabled" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>

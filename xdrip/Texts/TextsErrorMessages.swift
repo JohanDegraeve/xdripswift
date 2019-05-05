@@ -1,5 +1,6 @@
 import Foundation
 
+/// all texts for Error Messages related texts
 enum Texts_ErrorMessages {
     static private let errorMessagesFileName = "ErrorMessages"
     

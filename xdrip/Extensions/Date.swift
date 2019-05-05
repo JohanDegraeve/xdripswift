@@ -16,4 +16,14 @@ extension Date {
         let minute = calendar.component(.minute, from: self)
         return Int(hour * 60 + minute)
     }
+    
+    /// changes the date to 00:00 the same day, local time, and returns the result as a new Date object
+    func toMidnight() -> Date {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: self)
+        let minute = calendar.component(.minute, from: self)
+        let seconds = calendar.component(.second, from: self)
+        let timeInterval = TimeInterval(-(hour * 3600 + minute * 60 + seconds))
+        return Date(timeIntervalSinceNow: timeInterval)
+    }
 }

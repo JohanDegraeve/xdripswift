@@ -21,19 +21,19 @@ public class AlertManager:NSObject {
     private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryAlertManager)
     
     /// BgReadings instance
-    private let bgReadings:BgReadings
+    private let bgReadingsAccessor:BgReadingsAccessor
     
     /// Calibrations instance
-    private let calibrations:Calibrations
+    private let calibrationsAccessor:CalibrationsAccessor
     
     /// Sensors instance
-    private let sensors:Sensors
+    private let sensorsAccessor:SensorsAccessor
     
     /// for getting alertTypes from coredata
-    private var alertTypes:AlertTypes
+    private var alertTypesAccessor:AlertTypesAccessor
     
     /// for getting alertEntries from coredata
-    private var alertEntries:AlertEntries
+    private var alertEntriesAccessor:AlertEntriesAccessor
     
     /// playSound instance
     private var soundPlayer:SoundPlayer
@@ -58,12 +58,12 @@ public class AlertManager:NSObject {
     // MARK: - initializer
     
     init(coreDataManager:CoreDataManager, soundPlayer:SoundPlayer) {
-        // assign properties
-        self.bgReadings = BgReadings(coreDataManager: coreDataManager)
-        self.alertTypes = AlertTypes(coreDataManager: coreDataManager)
-        self.alertEntries = AlertEntries(coreDataManager: coreDataManager)
-        self.calibrations = Calibrations(coreDataManager: coreDataManager)
-        self.sensors = Sensors(coreDataManager: coreDataManager)
+        // initialize properties
+        self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+        self.alertTypesAccessor = AlertTypesAccessor(coreDataManager: coreDataManager)
+        self.alertEntriesAccessor = AlertEntriesAccessor(coreDataManager: coreDataManager)
+        self.calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
+        self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.soundPlayer = soundPlayer
         self.uNUserNotificationCenter = UNUserNotificationCenter.current()
         
@@ -101,17 +101,19 @@ public class AlertManager:NSObject {
         uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: alertNotificationIdentifers)
         
         // get last bgreading, ignore sensor, because sensor is not known here, not necessary to check if the readings match the current sensor
-        let latestBgReadings = bgReadings.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
+        let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
         
         // get latest calibration
         var lastCalibration:Calibration?
-        if let latestSensor = sensors.fetchActiveSensor() {
-            lastCalibration = calibrations.lastCalibrationForActiveSensor(withActivesensor: latestSensor)
+        if let latestSensor = sensorsAccessor.fetchActiveSensor() {
+            lastCalibration = calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: latestSensor)
         }
         
         // get batteryLevel
         let batteryLevel = UserDefaults.standard.transmitterBatteryLevel
         
+        // all alerts will only be created if there's a reading for an active sensor, less than 60 seconds old
+        // excepet for batterylevel alert
         if latestBgReadings.count > 0 {
             let lastBgReading = latestBgReadings[0]
             if let sensor = lastBgReading.sensor {
@@ -147,7 +149,7 @@ public class AlertManager:NSObject {
                                 }
                             }
                         }
-                        // finally check missed reading alert
+                        // set missed reading alert, this will be a future planned alert
                         _ = checkAlertAndFire(alertKind: .missedreading, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, batteryLevel: batteryLevel)
                     }
                 }
@@ -177,7 +179,7 @@ public class AlertManager:NSObject {
                 case snoozeActionIdentifier:
 
                     // get the appicable alertEntry so we can find the alertType and default snooze value
-                    let (currentAlertEntry, _) = alertEntries.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypes: alertTypes)
+                    let (currentAlertEntry, _) = alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor)
                     
                     os_log("in userNotificationCenter, received actionIdentifier : snoozeActionIdentifier, snoozing alert %{public}@ for %{public}@ minutes", log: self.log, type: .info, alertKind.descriptionForLogging(), Int(currentAlertEntry.alertType.snoozeperiod).description)
                     
@@ -240,7 +242,7 @@ public class AlertManager:NSObject {
     
     // interested in changes to some of the settings
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
+
         if let keyPath = keyPath {
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
                 switch keyPathEnum {
@@ -259,7 +261,7 @@ public class AlertManager:NSObject {
     
     private func createPickerViewData(forAlertKind alertKind:AlertKind) -> PickerViewData {
         // find the default snooze period, so we can set selectedRow in the pickerviewdata
-        let defaultSnoozePeriodInMinutes = Int(alertEntries.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypes: alertTypes).currentAlertEntry.alertType.snoozeperiod)
+        let defaultSnoozePeriodInMinutes = Int(alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor).currentAlertEntry.alertType.snoozeperiod)
         var defaultRow = 0
         for (index, _) in snoozeValueMinutes.enumerated() {
             if snoozeValueMinutes[index] > defaultSnoozePeriodInMinutes {
@@ -269,7 +271,7 @@ public class AlertManager:NSObject {
             }
         }
         
-        return PickerViewData(withMainTitle: alertKind.alertPickerViewMainTitle(), withSubTitle: Texts_Alerts.selectSnoozeTime, withData: snoozeValueStrings, selectedRow: defaultRow, withPriority: .high, actionButtonText: Texts_Common.Ok, cancelButtonText: Texts_Common.Cancel,
+        return PickerViewData(withMainTitle: alertKind.alertTitle(), withSubTitle: Texts_Alerts.selectSnoozeTime, withData: snoozeValueStrings, selectedRow: defaultRow, withPriority: .high, actionButtonText: Texts_Common.Ok, cancelButtonText: Texts_Common.Cancel,
                               onActionClick: {
                                 (snoozeIndex:Int) -> Void in
                                 self.soundPlayer.stopPlaying()
@@ -295,19 +297,22 @@ public class AlertManager:NSObject {
         }
         
         // get the applicable current and next alertType from core data
-        let (currentAlertEntry, nextAlertEntry) = alertEntries.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypes: alertTypes)
+        let (currentAlertEntry, nextAlertEntry) = alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor)
         
         // check if alert is required
         let (alertNeeded, alertBody, alertTitle, delayInSeconds) = alertKind.alertNeeded(currentAlertEntry: currentAlertEntry, nextAlertEntry: nextAlertEntry, lastBgReading: lastBgReading, lastButOneBgREading, lastCalibration: lastCalibration, batteryLevel: batteryLevel)
+        
+        // create a new property for delayInSeconds, if it's nil then set to 0 - because returnvalue might either be nil or 0, to be treated int he same way
+        let delayInSecondsToUse = delayInSeconds == nil ? 0:delayInSeconds!
         
         if alertNeeded {
             // alert needs to be raised
             
             // find the applicable alertentry which depends on the delayInSeconds
             var applicableAlertType = currentAlertEntry.alertType
-            if let delayInSeconds = delayInSeconds, let nextAlertEntry = nextAlertEntry {
+            if delayInSecondsToUse > 0, let nextAlertEntry = nextAlertEntry {
                 // check if current time + delayInSeconds falls within timezone of nextAlertEntry
-                if Date().minutesSinceMidNightLocalTime() + delayInSeconds * 60 > nextAlertEntry.value {
+                if Date().minutesSinceMidNightLocalTime() + delayInSecondsToUse * 60 > nextAlertEntry.value {
                     applicableAlertType = nextAlertEntry.alertType
                 }
             }
@@ -334,13 +339,14 @@ public class AlertManager:NSObject {
             // Start with default sound
             var soundToSet:String?
             
-            // AlertType.soundname is optional
+            // if applicableAlertType.soundname is nil, then keep soundToSet nil, otherwise find the sound file name
             if let alertTypeSoundName = applicableAlertType.soundname {
                 if alertTypeSoundName == "" {
                     // no sound to play
                     soundToSet = ""
                 } else {
-                    // a sound name has been found in the alertType different empty string (ie a sound must be played and it's not the default iOS sound)
+                    // a sound name has been found in the alertType different from empty string (ie a sound must be played and it's not the default iOS sound)
+                    // need to find the corresponding sound file name in Constants.Sounds
                     // start by setting it to to xdripalert, because the soundname found in the alert type might not be found in the list of sounds stored in the resources (although that shouldn't happen)
                     soundToSet = "xdripalert.aif"
                     soundloop: for sound in Constants.Sounds.allCases {
@@ -366,15 +372,19 @@ public class AlertManager:NSObject {
             }
             // now we have the name of the file that has the soundfilename, we'll use it later to assign it to the content
             
-            // assign the sound to the notification, or play it here, depending on overridemute value - except if it's the default sound, because we don't have the default iOS sound as a mp3 or whatever type of file
-            // add the sound if there is one defined, otherwise the iOS default sound will be used
+            // if soundToSet == nil, it means user selected the default iOS sound in the alert type, however we don't have the mp3, so if overridemute is on and delayInSeconds = nil, then we need to be able to play the sound here with the soundplayer, so we set soundToSet to xdrip sound
+            if soundToSet == nil && applicableAlertType.overridemute && delayInSecondsToUse == 0 {
+                soundToSet = "xdripalert.aif"
+            }
+            
+            // assign the sound to the notification, or play it here, depending on value
             if let soundToSet = soundToSet {
                 if soundToSet == "" {
                     // no sound to play
                 } else {
                     // if override mute is on, then play the sound via code here
                     // also delayInSeconds must be nil, if delayInSeconds is not nil then we can not play the sound here at now, it must be added to the notification
-                    if applicableAlertType.overridemute && delayInSeconds == nil {
+                    if applicableAlertType.overridemute && delayInSecondsToUse == 0 {
                         // play the sound
                         soundPlayer.playSound(soundFileName: soundToSet, withVolume: nil)
                     } else {
@@ -389,8 +399,8 @@ public class AlertManager:NSObject {
             
             // create the trigger, only for notifications with delay
             var trigger:UNTimeIntervalNotificationTrigger?
-            if let delay = delayInSeconds {
-                trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(delay), repeats: false)
+            if delayInSecondsToUse > 0 {
+                trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(delayInSecondsToUse), repeats: false)
             }
             
             // create the notificationrequest
@@ -404,14 +414,14 @@ public class AlertManager:NSObject {
             }
 
             // if vibrate required , and if delay is nil, then vibrate
-            if delayInSeconds == nil, currentAlertEntry.alertType.vibrate {
+            if delayInSecondsToUse == 0, currentAlertEntry.alertType.vibrate {
                 AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
             }
             
             // log the result
             os_log("in checkAlert, raising alert %{public}@", log: self.log, type: .info, alertKind.descriptionForLogging())
-            if let delayInSeconds = delayInSeconds {
-                os_log("   delay = %{public}@", log: self.log, type: .info, delayInSeconds.description)
+            if delayInSecondsToUse > 0 {
+                os_log("   delay = %{public}@", log: self.log, type: .info, delayInSecondsToUse.description)
             }
 
             return true

@@ -1,5 +1,6 @@
 import Foundation
 
+// all common texts 
 class Texts_Common {
     static private let filename = "Common"
     
@@ -58,6 +59,18 @@ class Texts_Common {
     
     static let week = {
         return NSLocalizedString("common_week", tableName: filename, bundle: Bundle.main, value: "week", comment: "literal translation needed")
+    }()
+    
+    static let warning = {
+        return NSLocalizedString("warning", tableName: filename, bundle: Bundle.main, value: "Warning !", comment: "literally warning")
+    }()
+ 
+    static let update = {
+        return NSLocalizedString("update", tableName: filename, bundle: Bundle.main, value: "Update", comment: "literally update")
+    }()
+
+    static let add = {
+        return NSLocalizedString("add", tableName: filename, bundle: Bundle.main, value: "Add", comment: "literally add")
     }()
     
 }

@@ -6,6 +6,15 @@ extension Double {
         return self * Constants.BloodGlucose.mgDlToMmoll
     }
     
+    /// converts mgdl to mmol if parameter mgdl = false
+    func mgdlToMmol(mgdl:Bool) -> Double {
+        if mgdl {
+            return self
+        } else {
+            return self * Constants.BloodGlucose.mgDlToMmoll
+        }
+    }
+    
     /// converts mmol to mgdl
     func mmolToMgdl() -> Double {
         return self * Constants.BloodGlucose.mmollToMgdl
@@ -23,6 +32,17 @@ extension Double {
             return String(format:"%.0f", self)
         } else {
             return String(format:"%.1f", self)
+        }
+    }
+    
+    /// converts mmol to mgdl if parametermgdl = false and, converts value to string, round. Number of digits after decimal seperator depends on the unit. For mg/dl 0 digits after decimal seperator, for mmol, 1 digit after decimal seperator
+    ///
+    /// this function is actually a combination of mmolToMgdl if mgdl = true and bgValuetoString
+    func mgdlToMmolAndToString(mgdl:Bool) -> String {
+        if mgdl {
+            return String(format:"%.0f", self)
+        } else {
+            return String(format:"%.1f", self.mgdlToMmol())
         }
     }
     

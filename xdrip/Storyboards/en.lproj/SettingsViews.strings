@@ -1,3 +1,4 @@
+"settingsviews_settingstitle" = "Settings";
 "settingsviews_sectiontitlegeneral" = "General";
 "settingsviews_selectbgunit" = "Select Unit";
 "settingsviews_lowValue" = "Low Value";
@@ -6,7 +7,9 @@
 "settingsviews_transmittertype" = "Transmitter Type";
 "settingsviews_transmitterid" = "Transmitter Id";
 "settingsviews_givetransmitterid" = "Enter Transmitter Id";
-"settingsviews_sectiontitlealarms" = "Alerts";
+"settingsviews_sectiontitlealerting" = "Alerting";
+"settingsviews_row_alert_types" = "Alert Types";
+"settingsviews_row_alerts" = "Alerts";
 "settingsviews_sectiontitlehealthkit" = "HealthKit";
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
 "settingsviews_uploadReadingstoDexcomShare" = "Dexcom Share Upload";
@@ -19,9 +22,9 @@
 "settingsviews_sectiontitlenightscout" = "NightScout";
 "settingsviews_uploadReadingsToNightScout" = "NightScout Upload";
 "settingsviews_nightScoutUrl" = "Url";
-"settingsviews_giveNightScoutUrl" = "Give NightScout Url";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "Give NightScout API Key";
+"settingsviews_giveNightScoutUrl" = "Enter NightScout Url";
+"settingsviews_nightScoutAPIKey" = "API Secret";
+"settingsviews_giveNightScoutAPIKey" = "Enter NightScout API Key";
 "settingsviews_sectiontitlespeak" = "Speak";
 "settingsviews_speakBgReadings" = "Speak BG Readings";
 "settingsviews_speakTrend" = "Speak Trend";

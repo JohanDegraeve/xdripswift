@@ -1,35 +1,36 @@
 import Foundation
 
+/// all texts for Alerts related texts (texts in notifications, etc.) and Alert Settings Views related texts
 class Texts_Alerts {
     static private let filename = "alerts"
     
     // MARK:- Body Text in the alerts
     static let highAlertTitle: String = {
-        return NSLocalizedString("alerts_highalerttitle", tableName: filename, bundle: Bundle.main, value: "High Alert", comment: "When high alert rises, this is the start of the text shown in the title of the alert notification")
+        return NSLocalizedString("alerts_highalerttitle", tableName: filename, bundle: Bundle.main, value: "High Alert", comment: "When high alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
     
     static let veryHighAlertTitle: String = {
-        return NSLocalizedString("alerts_veryhighalerttitle", tableName: filename, bundle: Bundle.main, value: "Very High Alert", comment: "When very high alert rises, this is the start of the text shown in the title of the alert notification")
+        return NSLocalizedString("alerts_veryhighalerttitle", tableName: filename, bundle: Bundle.main, value: "Very High Alert", comment: "When very high alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
     
     static let lowAlertTitle: String = {
-        return NSLocalizedString("alerts_lowalerttitle", tableName: filename, bundle: Bundle.main, value: "Low Alert", comment: "When very low alert rises, this is the start of the text shown in the title of the alert notification")
+        return NSLocalizedString("alerts_lowalerttitle", tableName: filename, bundle: Bundle.main, value: "Low Alert", comment: "When very low alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
     
     static let veryLowAlertTitle: String = {
-        return NSLocalizedString("alerts_verylowalerttitle", tableName: filename, bundle: Bundle.main, value: "Very Low Alert", comment: "When very low alert rises, this is the start of the text shown in the title of the alert notification")
+        return NSLocalizedString("alerts_verylowalerttitle", tableName: filename, bundle: Bundle.main, value: "Very Low Alert", comment: "When very low alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
     
     static let missedReadingAlertTitle: String = {
-        return NSLocalizedString("alerts_missedreadingalerttitle", tableName: filename, bundle: Bundle.main, value: "Missed Reading", comment: "When Missed reading alert happens, this is the title of the alert notification")
+        return NSLocalizedString("alerts_missedreadingalerttitle", tableName: filename, bundle: Bundle.main, value: "Missed Reading", comment: "When Missed reading alert happens, this is the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
     
     static let calibrationNeededAlertTitle: String = {
-        return NSLocalizedString("alerts_calibrationneeded", tableName: filename, bundle: Bundle.main, value: "Calibration Needed", comment: "when calibration is needed, this is the title of the alert notification")
+        return NSLocalizedString("alerts_calibrationneeded", tableName: filename, bundle: Bundle.main, value: "Calibration Needed Alert", comment: "when calibration is needed, this is the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
     
     static let batteryLowAlertTitle: String = {
-        return NSLocalizedString("alerts_batterylow", tableName: filename, bundle: Bundle.main, value: "Battery Low", comment: "transmitter battery low, this is the title of the alert notification")
+        return NSLocalizedString("alerts_batterylow", tableName: filename, bundle: Bundle.main, value: "Battery Low Alert", comment: "transmitter battery low, this is the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
     
     static let snooze: String = {
@@ -38,6 +39,30 @@ class Texts_Alerts {
     
     static let selectSnoozeTime: String = {
         return NSLocalizedString("alerts_select_snooze_time", tableName: filename, bundle: Bundle.main, value: "Select Snooze Time", comment: "When pop up is shown to let user pick the snooze time, this is the title of this pop up")
+    }()
+    
+    static let alertsScreenTitle: String = {
+        return NSLocalizedString("alertssettingsview_screentitle", tableName: filename, bundle: Bundle.main, value: "Alerts", comment: "shown on top of the screen that allows user to view all the alerts in one table")
+    }()
+    
+    static let editAlertScreenTitle: String = {
+        return NSLocalizedString("alertsettingsview_screentitle", tableName: filename, bundle: Bundle.main, value: "Edit Alert", comment: "shown on top of the screen that allows user to edit an alert")
+    }()
+
+    static let alertStart: String = {
+        return NSLocalizedString("alertstart", tableName: filename, bundle: Bundle.main, value: "Applicable as of", comment: "an alentry is applicable as of a certain timestamp in the day, this is the text in the field in the settings screen that allows to modify this timestamp")
+    }()
+    
+    static let alertValue: String = {
+        return NSLocalizedString("alertvalue", tableName: filename, bundle: Bundle.main, value: "Value", comment: "an alentry is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule")
+    }()
+    
+    static let alerttype: String = {
+        return NSLocalizedString("alerttype", tableName: filename, bundle: Bundle.main, value: "Alert Type", comment: "an alentry is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule")
+    }()
+    
+    static let changeAlertValue: String = {
+        return NSLocalizedString("changealertvalue", tableName: filename, bundle: Bundle.main, value: "Change Alert Value", comment: "when editing an alert value, a pop is shown, this is the explanation message in the pop up")
     }()
     
 }

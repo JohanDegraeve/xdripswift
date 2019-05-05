@@ -1,5 +1,6 @@
 import Foundation
 
+/// all texts for NightScout related texts
 class Texts_NightScoutTestResult {
     static private let filename = "NightScoutTestResult"
     

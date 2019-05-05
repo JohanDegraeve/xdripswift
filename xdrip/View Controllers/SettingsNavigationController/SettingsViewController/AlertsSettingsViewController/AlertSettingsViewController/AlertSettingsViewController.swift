@@ -1,0 +1,143 @@
+import UIKit
+
+/// to update an existing alertentry
+final class AlertSettingsViewController: UIViewController {
+
+    // MARK: - Properties
+    
+    var alertSettingsViewControllerData:AlertSettingsViewControllerData!
+    
+    /// the alertentry being edited - will only be used , and in the end to update the alertentry
+    private var alertEntryAsNSObject:AlertEntry!
+    
+    @IBOutlet weak var tableView: UITableView!
+    
+    @IBOutlet weak var topLabelOutlet: UILabel!
+    
+    // done button, to confirm changes
+    @IBAction func doneButtonAction(_ sender: UIBarButtonItem) {
+        
+        alertEntryAsNSObject.alertkind = alertSettingsViewControllerData.alertKind
+        alertEntryAsNSObject.alertType = alertSettingsViewControllerData.alertType
+        alertEntryAsNSObject.start = alertSettingsViewControllerData.start
+        alertEntryAsNSObject.value = alertSettingsViewControllerData.value
+        
+        // save the alertentry
+        alertSettingsViewControllerData.coreDataManager.saveChanges()
+        
+        // go back to the alerts settings screen
+        performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
+    }
+    
+    // to delete the alertentry
+    @IBAction func trashButtonAction(_ sender: UIBarButtonItem) {
+        // delete the alertentry
+        if let alertEntry = alertEntryAsNSObject {
+            alertSettingsViewControllerData.coreDataManager.mainManagedObjectContext.delete(alertEntry)
+            alertSettingsViewControllerData.coreDataManager.saveChanges()
+        }
+        // go back to alerts settings screen
+        performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
+    }
+    
+    @IBAction func addButtonAction(_ sender: UIBarButtonItem) {
+        // user clicks add button, need to perform segue to open new alertsettingsviewcontroller
+        // sender = alertKind, minimumStart value for new alert = current alert + 1, maximumstart for new alert which is equal to maximumstart of current alertentry
+        self.performSegue(withIdentifier:NewAlertSettingsViewController.SegueIdentifiers.alertToNewAlertSettings.rawValue, sender: (alertSettingsViewControllerData.alertKind, alertSettingsViewControllerData.start + 1, alertSettingsViewControllerData.maximumStart))
+    }
+    
+    @IBOutlet weak var trashButtonOutlet: UIBarButtonItem!
+    
+    // MARK:- public functions
+    
+    /// to be called by viewcontroller that opens this viewcontroller
+    /// - parameters:
+    ///     - alertEntry : which is to be edited here
+    ///     - minimumStart : what's the minimum allowed value for the start
+    ///     - maximumStart : what's the maximum allowed value for the start
+    ///     - coreDataManager : reference to the coredatamanager
+    public func configure(alertEntry:AlertEntry, minimumStart:Int16, maximumStart:Int16, coreDataManager:CoreDataManager) {
+        
+        // alertEntryAsNSObject will be used in the end when user clicks Trash or Done button
+        self.alertEntryAsNSObject = alertEntry
+        
+        // initialize alertSettingsViewControllerData
+        alertSettingsViewControllerData = AlertSettingsViewControllerData(start: alertEntry.start, value: alertEntry.value, alertKind: alertEntry.alertkind, alertType: alertEntry.alertType, minimumStart: minimumStart, maximumStart: maximumStart, uIViewController: self, coreDataManager: coreDataManager)
+    }
+    
+    // MARK: - View Life Cycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // configures the view
+        setupView()
+    }
+    
+    // MARK: - View Methods
+    
+    private func setupView() {
+        
+        // set title of the screen to empty string
+        title = ""
+
+        // if it's the alertEntry with start 0, then it can't be deleted, disable the trash button
+        if alertSettingsViewControllerData.start == 0 {
+            trashButtonOutlet.isEnabled = false
+        }
+        
+        // set toplabel text
+        topLabelOutlet.text = Texts_Common.update + " " + AlertSettingsViewControllerData.getAlertKind(alertKind: alertSettingsViewControllerData.alertKind).alertTitle()
+        
+        /// setup tableView datasource, delegate, seperatorInset
+        if let tableView = tableView {
+            tableView.separatorInset = UIEdgeInsets.zero
+            tableView.dataSource = alertSettingsViewControllerData
+            tableView.delegate = alertSettingsViewControllerData
+        }
+
+    }
+    
+    // MARK: - other overriden functions
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let segueIdentifier = segue.identifier else {
+            fatalError("In AlertSettingsViewController, prepare for segue, Segue had no identifier")
+        }
+        
+        guard let segueIdentifierAsCase = NewAlertSettingsViewController.SegueIdentifiers(rawValue: segueIdentifier) else {
+            fatalError("In AlertSettingsViewController, segueIdentifierAsCase could not be initialized")
+        }
+        
+        switch segueIdentifierAsCase {
+            
+        case NewAlertSettingsViewController.SegueIdentifiers.alertToNewAlertSettings:
+            guard let vc = segue.destination as? NewAlertSettingsViewController, let (alertKind, minimumStart, maximumStart) = sender as? (Int16, Int16, Int16) else {
+                fatalError("In AlertSettingsViewController, prepare for segue, viewcontroller is not AlertSettingsViewController or sender is not (Int16, Int16, Int16)" )
+            }
+            
+            guard let alertKindAsAlertKind = AlertKind(rawValue: Int(alertKind)) else {fatalError("in AlertSettingsViewController, prepare for segue, failed to cretae AlertKind")}
+            
+            // configure view controller
+            vc.configure(alertKind: alertKindAsAlertKind, minimumStart: minimumStart, maximumStart: maximumStart, coreDataManager: alertSettingsViewControllerData.coreDataManager )
+            
+        default:
+            break
+        }
+    }
+
+    // MARK: - private helper functions
+    
+}
+
+
+/// defines perform segue identifiers used within AlertSettingsViewController
+extension AlertSettingsViewController {
+    
+    public enum SegueIdentifiers:String {
+        /// to go from alerts settings screen to alert  settings screen
+        case alertsToAlertSettings = "alertsToAlertSettings"
+        /// to go back from alert settings screen to alerts settings screen
+        case unwindToAlertsSettingsViewController = "unwindToAlertsSettingsViewController"
+    }
+}

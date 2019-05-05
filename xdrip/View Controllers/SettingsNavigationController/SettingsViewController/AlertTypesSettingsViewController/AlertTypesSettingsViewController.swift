@@ -1,0 +1,122 @@
+import UIKit
+
+/// overview of alert types, in a tableview, with a button top right that allows adding alert types
+///
+/// to edit or delete an alert type, user needs to click a row
+final class AlertTypesSettingsViewController: UIViewController {
+    
+    // MARK: - Properties
+    
+    @IBOutlet weak var tableView: UITableView!
+    
+    @IBAction func unwindToAlertTypesSettingsViewController(segue: UIStoryboardSegue) {
+        tableView.reloadSections(IndexSet(integer: 0), with: .none)
+    }
+
+    // user clicks the add button, to add new alert type
+    @IBAction func addButtonAction(_ sender: UIBarButtonItem) {
+        self.performSegue(withIdentifier:AlertTypeSettingsViewController.SegueIdentifiers.alertTypesToAlertTypeSettings.rawValue, sender: nil)
+    }
+    
+    private var coreDataManager:CoreDataManager?
+    
+    private lazy var alertTypesAccessor:AlertTypesAccessor = {
+            return AlertTypesAccessor(coreDataManager: getCoreDataManager())
+    }()
+    
+    // MARK:- public functions
+    
+    public func configure(coreDataManager:CoreDataManager?) {
+        self.coreDataManager = coreDataManager
+    }
+    // MARK: - View Life Cycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        title = Texts_AlertTypeSettingsView.alertTypesScreenTitle
+        
+        setupView()
+    }
+    
+    // MARK: - other overriden functions
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let segueIdentifier = segue.identifier else {
+            fatalError("In AlertTypesSettingsViewController, prepare for segue, Segue had no identifier")
+        }
+        
+        guard let segueIdentifierAsCase = AlertTypeSettingsViewController.SegueIdentifiers(rawValue: segueIdentifier) else {
+            fatalError("In AlertTypesSettingsViewController, segueIdentifierAsCase could not be initialized")
+        }
+        
+        switch segueIdentifierAsCase {
+            
+        case AlertTypeSettingsViewController.SegueIdentifiers.alertTypesToAlertTypeSettings:
+            guard let vc = segue.destination as? AlertTypeSettingsViewController, let coreDataManager = coreDataManager else {
+                fatalError("In AlertTypesSettingsViewController, prepare for segue, viewcontroller is not AlertTypeSettingsViewController or coreDataManager is nil" )
+            }
+
+            vc.configure(alertType: sender as? AlertType, coreDataManager: coreDataManager)
+        }
+    }
+
+    // MARK: - Private Helper functions
+    
+    private func getCoreDataManager() -> CoreDataManager {
+        if let coreDataManager = coreDataManager {
+            return coreDataManager
+        } else {
+            fatalError("in AlertTypesSettingsViewController, coreDataManager is nil")
+        }
+    }
+    
+    private func setupView() {
+        setupTableView()
+    }
+    
+    /// setup datasource, delegate, seperatorInset
+    private func setupTableView() {
+        if let tableView = tableView {
+            tableView.separatorInset = UIEdgeInsets.zero
+            tableView.dataSource = self
+            tableView.delegate = self
+        }
+    }
+}
+
+extension AlertTypesSettingsViewController: UITableViewDataSource, UITableViewDelegate {
+    
+    // MARK: - UITableViewDataSource and UITableViewDelegate protocol Methods
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return alertTypesAccessor.getAllAlertTypes().count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("Unexpected Table View Cell") }
+        
+        // textLabel should be the name of the alerttype
+        cell.textLabel?.text = alertTypesAccessor.getAllAlertTypes()[indexPath.row].name
+        
+        // no detail text to be shown
+        cell.detailTextLabel?.text = nil
+        
+        // clicking the cell will always open a new screen which allows the user to edit the alert type
+        cell.accessoryType = .disclosureIndicator
+        
+        return cell
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        // only 1 section, namely the list of alert types
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        self.performSegue(withIdentifier:AlertTypeSettingsViewController.SegueIdentifiers.alertTypesToAlertTypeSettings.rawValue, sender: alertTypesAccessor.getAllAlertTypes()[indexPath.row])
+    }
+
+}

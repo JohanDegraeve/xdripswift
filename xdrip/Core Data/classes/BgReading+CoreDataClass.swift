@@ -117,7 +117,7 @@ public class BgReading: NSManagedObject {
         if (calculatedValue >= 400) {
             returnValue = "HIGH"
         } else if (calculatedValue >= 40) {
-            returnValue = calculatedValue.bgValuetoString(mgdl: unitIsMgDl)
+            returnValue = calculatedValue.mgdlToMmolAndToString(mgdl: unitIsMgDl)
         } else if (calculatedValue > 12) {
             returnValue = "LOW"
         } else {
@@ -156,6 +156,7 @@ public class BgReading: NSManagedObject {
     
     /// creates string with difference from previous reading and also unit
     func unitizedDeltaString(previousBgReading:BgReading?, showUnit:Bool, highGranularity:Bool) -> String {
+        // TODO: add unit as parameter in stead of fetching it from userdefalts ?
         
         guard let previousBgReading = previousBgReading else {
             return "???"
@@ -172,7 +173,7 @@ public class BgReading: NSManagedObject {
             return "ERR";
         }
         
-        let valueAsString = value.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        let valueAsString = value.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         
         var deltaSign:String = ""
         if (value > 0) { deltaSign = "+"; }
