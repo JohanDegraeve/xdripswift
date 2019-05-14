@@ -167,8 +167,8 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        // if the alerttype is not enabled, then don't show all the other rows, just the first
-        if !enabled {return 1}
+        // if the alerttype is not enabled, then only show the enable UISwitch and the name of the alerttype
+        if !enabled {return 2}
         
         // if snooze via notifiation screen not enabled, then don't show
         //if !snooze {return Setting.allCases.count - 1}
