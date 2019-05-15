@@ -22,7 +22,7 @@ class Texts_Alerts {
     }()
     
     static let missedReadingAlertTitle: String = {
-        return NSLocalizedString("alerts_missedreadingalerttitle", tableName: filename, bundle: Bundle.main, value: "Missed Reading", comment: "When Missed reading alert happens, this is the title of the alert notification, also in alert settings list, for the name of the alert")
+        return NSLocalizedString("alerts_missedreadingalerttitle", tableName: filename, bundle: Bundle.main, value: "Missed Reading Alert", comment: "When Missed reading alert happens, this is the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
     
     static let calibrationNeededAlertTitle: String = {

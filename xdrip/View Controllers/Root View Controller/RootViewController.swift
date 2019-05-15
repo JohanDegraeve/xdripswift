@@ -7,8 +7,25 @@ import UserNotifications
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUserNotificationCenterDelegate {
 
-    // MARK: - Properties
-
+    // MARK: - Properties - Outlets and Actions for buttons and labels in home screen
+    
+    @IBOutlet weak var calibrateButtonOutlet: UIButton!
+    
+    @IBAction func calibrateButtonAction(_ sender: UIButton) {
+    }
+    
+    @IBOutlet weak var transmitterButtonOutlet: UIButton!
+    
+    @IBAction func transmitterButtonAction(_ sender: UIButton) {
+    }
+    
+    @IBOutlet weak var preSnoozeButtonOutlet: UIButton!
+    
+    @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
+    }
+    
+    
+    
     private var test:CGMTransmitter?
     
     private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryFirstView)
@@ -189,8 +206,13 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
         }
     }
     
-    // send request calibration notification
-    private func requestCalibrationNotification() {
+    // creates notification with bg reading
+    // for the moment also creates calibration request if there's no calibration done yet
+    private func createBGReadingNotification() {
+        
+        // first remove existing notification
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifiersForAlerts.initialCalibrationRequest])
+
         // Create Notification Content
         let notificationContent = UNMutableNotificationContent()
         
@@ -329,7 +351,7 @@ final class RootViewController: UIViewController, CGMTransmitterDelegate, UNUser
             }
             
             coreDataManager.saveChanges()
-            if glucoseData.count > 0 {requestCalibrationNotification()}
+            if glucoseData.count > 0 {createBGReadingNotification()}
             if let nightScoutManager = nightScoutManager {
                 nightScoutManager.synchronize()
             }

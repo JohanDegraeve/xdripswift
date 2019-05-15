@@ -330,12 +330,11 @@ public class AlertManager:NSObject {
             }
 
             // The sound
-            // Start by creating the sound that will be added to the notification content
-            // depending on mute override on or off, the sound will either be added to the notification content, or will be played by code here
+            // depending on mute override off or on, the sound will either be added to the notification content, or will be played by code here respectively - except if delayInSecondsToUse > 0, in which case we must use the sound in the notification
             
             // soundToSet is the sound that will be played,
             // if soundToSet is nil ==> then default sound must be used,
-            // if soundToSet = "" , empty string ==> no sound will be played
+            // if soundToSet = "" , empty string ==> no sound needs to be played
             // Start with default sound
             var soundToSet:String?
             
@@ -388,7 +387,7 @@ public class AlertManager:NSObject {
                         // play the sound
                         soundPlayer.playSound(soundFileName: soundToSet, withVolume: nil)
                     } else {
-                        // mute should not be overriden, by adding the sound to the notification, we let iOS decide of the sound will be played or not
+                        // mute should not be overriden, by adding the sound to the notification, we let iOS decide if the sound will be played or not
                         content.sound = UNNotificationSound.init(named: UNNotificationSoundName.init(soundToSet))
                     }
                 }
