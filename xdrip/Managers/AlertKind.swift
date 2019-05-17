@@ -199,7 +199,7 @@ public enum AlertKind:Int, CaseIterable {
         case .missedreading:
             return Constants.Notifications.NotificationIdentifiersForAlerts.missedReadingAlert
         case .calibration:
-            return Constants.Notifications.NotificationIdentifiersForAlerts.subsequentCalibrationRequest
+            return Constants.Notifications.NotificationIdentifiersForCalibration.subsequentCalibrationRequest
         case .batterylow:
             return Constants.Notifications.NotificationIdentifiersForAlerts.batteryLow
         }

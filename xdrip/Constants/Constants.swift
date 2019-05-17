@@ -123,10 +123,6 @@ struct Constants {
 
         /// identifiers for alert notifications
         enum NotificationIdentifiersForAlerts {
-            /// for initial calibration
-            static let initialCalibrationRequest = "InititalCalibrationRequest"
-            /// subsequent calibration request
-            static let subsequentCalibrationRequest = "SubsequentCalibrationRequest"
             /// high alert
             static let highAlert = "highAlert"
             /// low alert
@@ -141,6 +137,18 @@ struct Constants {
             static let batteryLow = "batteryLow"
         }
         
+        /// identifiers for calibration requests
+        enum NotificationIdentifiersForCalibration {
+            /// for initial calibration
+            static let initialCalibrationRequest = "initialCalibrationRequest"
+            /// subsequent calibration request
+            static let subsequentCalibrationRequest = "subsequentCalibrationRequest"
+        }
+        
+        enum NotificationIdentifierForBgReading {
+            /// bgreading notification
+            static let bgReadingNotificationRequest = "bgReadingNotificationRequest"
+        }
     }
     
     /// defines name of the Soundfile and name of the sound shown to the user with an extra function - both are defined in one case, seperated by a backslash

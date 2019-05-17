@@ -35,12 +35,18 @@ final class AlertTypeSettingsViewController: UIViewController {
     @IBAction func trashButtonAction(_ sender: UIBarButtonItem) {
         // delete the alerttype if one exists
         if let alertTypeAsNSObject = alertTypeAsNSObject {
-            coreDataManager?.mainManagedObjectContext.delete(alertTypeAsNSObject)
-            coreDataManager?.saveChanges()
+            // first ask user if ok to delete and if yes delete
+            UIAlertController(title: Texts_AlertTypeSettingsView.confirmDeletionAlertType + alertTypeAsNSObject.name + "?", message: nil, actionHandler: {
+                self.coreDataManager?.mainManagedObjectContext.delete(alertTypeAsNSObject)
+                self.coreDataManager?.saveChanges()
+                // go back to alerttypes settings screen
+                self.performSegue(withIdentifier: UnwindSegueIdentifiers.unwindToAlertTypesSettingsViewController.rawValue, sender: self)
+                }, cancelHandler: nil).presentInOwnWindow(animated: true, completion: {})
+            
+        } else {
+            // go back to alerttypes settings screen
+            performSegue(withIdentifier: UnwindSegueIdentifiers.unwindToAlertTypesSettingsViewController.rawValue, sender: self)
         }
-        
-        // go back to alerttypes settings screen
-        performSegue(withIdentifier: UnwindSegueIdentifiers.unwindToAlertTypesSettingsViewController.rawValue, sender: self)
     }
 
     @IBOutlet weak var trashButtonOutlet: UIBarButtonItem!

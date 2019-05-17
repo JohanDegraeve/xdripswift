@@ -6,12 +6,21 @@ extension Double {
         return self * Constants.BloodGlucose.mgDlToMmoll
     }
     
-    /// converts mgdl to mmol if parameter mgdl = false
+    /// converts mgdl to mmol if parameter mgdl = false. If mgdl = true then just returns self
     func mgdlToMmol(mgdl:Bool) -> Double {
         if mgdl {
             return self
         } else {
             return self * Constants.BloodGlucose.mgDlToMmoll
+        }
+    }
+    
+    /// converts mmol to mgdl if parameter mgdl = false. If mgdl = true then just returns self
+    func mmolToMgdl(mgdl:Bool) -> Double {
+        if mgdl {
+            return self
+        } else {
+            return self.mmolToMgdl()
         }
     }
     

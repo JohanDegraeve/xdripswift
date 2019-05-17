@@ -2,7 +2,7 @@ import Foundation
 
 /// all texts for Alert Type Settings Views related texts
 class Texts_AlertTypeSettingsView {
-    static private let filename = "AlertTypeSettingsViews"
+    static private let filename = "AlertTypesSettingsView"
     
     // MARK: - Title of the screen
     
@@ -65,6 +65,11 @@ class Texts_AlertTypeSettingsView {
     static let alertTypeNameAlreadyExistsMessage: String = {
         return NSLocalizedString("alerttypenamealreadyexistsmessages", tableName: filename, bundle: Bundle.main, value: "An Alert Type with this name already exists. Change the name.", comment: "when adding a new alert type, but the name is already used for another alert type, this is the error messages")
     }()
+
+    static let confirmDeletionAlertType: String = {
+        return NSLocalizedString("confirmdeletionalerttype", tableName: filename, bundle: Bundle.main, value: "Do you want to delete Alert Type with name ", comment: "when trying to delete an alert type, user needs to confirm first, this is the message")
+    }()
     
+
 
 }

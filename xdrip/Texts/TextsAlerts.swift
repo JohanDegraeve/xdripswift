@@ -2,7 +2,7 @@ import Foundation
 
 /// all texts for Alerts related texts (texts in notifications, etc.) and Alert Settings Views related texts
 class Texts_Alerts {
-    static private let filename = "alerts"
+    static private let filename = "Alerts"
     
     // MARK:- Body Text in the alerts
     static let highAlertTitle: String = {
@@ -63,6 +63,10 @@ class Texts_Alerts {
     
     static let changeAlertValue: String = {
         return NSLocalizedString("changealertvalue", tableName: filename, bundle: Bundle.main, value: "Change Alert Value", comment: "when editing an alert value, a pop is shown, this is the explanation message in the pop up")
+    }()
+    
+    static let confirmDeletionAlert: String = {
+        return NSLocalizedString("confirmdeletionalert", tableName: filename, bundle: Bundle.main, value: "Do you want to delete the Alert?", comment: "when trying to delete an alert, user needs to confirm first, this is the message")
     }()
     
 }

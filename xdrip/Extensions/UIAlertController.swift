@@ -21,7 +21,26 @@ extension UIAlertController {
         addAction(UIAlertAction(title: Texts_Common.Ok, style: .default, handler: nil))
     }
     
-
+    /// a title and message in UIAlertController and adds an ok button and a cancel button, if ok click then the actionHandler is executed, if cancel clicked then the cancelhandler which is optional
+    /// - parameters:
+    ///     - title : title, optional, used in init(title: title, message: message, preferredStyle: .alert)
+    ///     - message : message, optional, used in init(title: title, message: message, preferredStyle: .alert)
+    ///     - actionHandler : closure with no input parameters and no result, will be executed when user clicks ok
+    ///     - cancelHandler : closure with no input parameters and no result, will be executed when user clicks cancel
+    convenience init(title:String?, message:String?, actionHandler: @escaping (() -> Void), cancelHandler: (() -> Void)?) {
+        
+        self.init(title: title, message: message, preferredStyle: .alert)
+        
+        // add action for when user clicks ok
+        addAction(UIAlertAction(title: Texts_Common.Ok, style: .default, handler: { (action:UIAlertAction) in
+            actionHandler()
+        }))
+        
+        // add action for when user clicks cancel
+        addAction(UIAlertAction(title: Texts_Common.Cancel, style: .default, handler: { (action:UIAlertAction) in
+            if let cancelHandler = cancelHandler {cancelHandler()}
+        }))
+    }
     
     /// textField will be added and two actions. One to confirm the entered text (action button), another one to cancel (cancel button)
     /// - parameters:

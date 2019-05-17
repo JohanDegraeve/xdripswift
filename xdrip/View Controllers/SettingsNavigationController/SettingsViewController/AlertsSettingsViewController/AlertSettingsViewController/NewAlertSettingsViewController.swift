@@ -25,6 +25,8 @@ final class NewAlertSettingsViewController:UIViewController {
         performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
     }
     
+    @IBOutlet weak var doneButtonOutlet: UIBarButtonItem!    
+    
     /// to be called by viewcontroller that opens this viewcontroller
     /// - parameters:
     ///     - alertKind : used to create default alertentry
@@ -34,7 +36,11 @@ final class NewAlertSettingsViewController:UIViewController {
     public func configure(alertKind:AlertKind, minimumStart:Int16, maximumStart:Int16, coreDataManager:CoreDataManager) {
         
         // initialize alertSettingsViewControllerData
-        alertSettingsViewControllerData = AlertSettingsViewControllerData(start: minimumStart, value: Int16(alertKind.defaultAlertValue()), alertKind: Int16(alertKind.rawValue), alertType: AlertTypesAccessor(coreDataManager: coreDataManager).getDefaultAlertType(), minimumStart: minimumStart, maximumStart: maximumStart, uIViewController: self, coreDataManager: coreDataManager)
+        alertSettingsViewControllerData = AlertSettingsViewControllerData(start: minimumStart, value: Int16(alertKind.defaultAlertValue()), alertKind: Int16(alertKind.rawValue), alertType: AlertTypesAccessor(coreDataManager: coreDataManager).getDefaultAlertType(), minimumStart: minimumStart, maximumStart: maximumStart, uIViewController: self, toCallWhenUserResetsProperties: {
+            self.doneButtonOutlet.isEnabled = false
+        }, toCallWhenUserChangesProperties: {
+            self.doneButtonOutlet.isEnabled = true
+        }, coreDataManager: coreDataManager)
         
     }
     

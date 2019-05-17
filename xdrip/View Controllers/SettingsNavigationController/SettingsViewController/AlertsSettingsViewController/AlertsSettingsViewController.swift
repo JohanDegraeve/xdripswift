@@ -110,6 +110,7 @@ final class AlertsSettingsViewController: UIViewController {
         }
     }
     
+    // setup the view
     private func setupView() {
         setupTableView()
     }
@@ -122,6 +123,7 @@ final class AlertsSettingsViewController: UIViewController {
             tableView.delegate = self
         }
     }
+    
 }
 
 extension AlertsSettingsViewController:UITableViewDataSource, UITableViewDelegate {

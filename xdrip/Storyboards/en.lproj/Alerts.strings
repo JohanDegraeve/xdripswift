@@ -13,3 +13,4 @@
 "alertvalue" = "Value";
 "alerttype" = "Alert Type";
 "changealertvalue" = "Change Alert Value";
+"confirmdeletionalert" = "Do you want to delete the Alert ?";

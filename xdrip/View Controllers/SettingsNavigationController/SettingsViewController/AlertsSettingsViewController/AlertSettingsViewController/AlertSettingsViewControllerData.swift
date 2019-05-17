@@ -21,16 +21,28 @@ fileprivate enum Setting:Int, CaseIterable {
 /// the classes AlertSettingsViewController and NewAlertSettingsViewController  will have a property of type AlertSettingsViewControllerData, and the tableView in each of them will use that property as delegate and datasource
 class AlertSettingsViewControllerData:NSObject, UITableViewDataSource, UITableViewDelegate  {
     
-    // following properties are used to temporary store alertEntry attributes which can be modified. The actual update of the alertEntry being processed will be done only when the user clicks the done button
-    // the values need to be set during configuration of the viewcontroller (see method configure) - they are not optional here because then it's to much unwrapping code
-    /// global temp variable, start of alertEntry being modified
+    // MARK:- properties
+    
+    // following properties are used to store alertEntry attributes which can be modified.
+    /// start of alertEntry being modified
     public var start:Int16
-    /// global temp variable, value of alertEntry being modified
+    /// will be used to compare original value to changed value, to detect changes on the screen
+    private let tempStart:Int16
+    
+    /// value of alertEntry being modified
     public var value:Int16
-    /// global temp variable, alertKind of alertEntry being modified
+    /// will be used to compare original value to changed value, to detect changes on the screen
+    private let tempValue:Int16
+    
+    /// alertKind of alertEntry being modified
     public var alertKind:Int16
-    /// global temp variable, alertType of alertEntry being modified, default nil because it can't be initialized
+    /// will be used to compare original value to changed value, to detect changes on the screen
+    private let tempAlertKind:Int16
+    
+    /// alertType of alertEntry being modified, default nil because it can't be initialized
     public var alertType:AlertType
+    /// will be used to compare original value to changed value, to detect changes on the screen
+    private let tempAlertType:AlertType
     
     /// when modifying the start value, this is the minimum value
     public var minimumStart:Int16
@@ -42,18 +54,53 @@ class AlertSettingsViewControllerData:NSObject, UITableViewDataSource, UITableVi
     
     /// coredatamanager
     public var coreDataManager:CoreDataManager
+    
+    /// when user changes properties, before pressing save button, this function will be called, can be set by AlertSettingsViewController which can assign to closure that disables "Add" button
+    private var toCallWhenUserChangesProperties:(() -> ())?
+    
+    /// user may have changed some properties, but changes them back to original value, AlertSettingsViewController can re-enable the add button and even disable the save button
+    private var toCallWhenUserResetsProperties:(() -> ())?
 
+    // MARK:- initializer
+    
     /// initializer
-    init(start:Int16, value:Int16, alertKind:Int16, alertType:AlertType, minimumStart:Int16, maximumStart:Int16, uIViewController:UIViewController, coreDataManager:CoreDataManager) {
+    init(start:Int16, value:Int16, alertKind:Int16, alertType:AlertType, minimumStart:Int16, maximumStart:Int16, uIViewController:UIViewController, toCallWhenUserResetsProperties:(() -> ())?, toCallWhenUserChangesProperties:(() -> ())?, coreDataManager:CoreDataManager) {
+        
+        // initialze all parameters, and also temp variables
         self.start = start
+        self.tempStart = start
         self.value = value
+        self.tempValue = value
         self.alertKind = alertKind
+        self.tempAlertKind = alertKind
         self.alertType = alertType
+        self.tempAlertType = alertType
+        
+        // intialize toCallWhenUserChangesProperties and toCallWhenUserResetsProperties
+        self.toCallWhenUserChangesProperties = toCallWhenUserChangesProperties
+        self.toCallWhenUserResetsProperties = toCallWhenUserResetsProperties
+        
         self.minimumStart = minimumStart
         self.maximumStart = maximumStart
         self.uIViewController = uIViewController
         self.coreDataManager = coreDataManager
     }
+    
+    // MARK:- private helper functions
+    
+    // will check if properties have changed, if yes calls toCallWhenUserChangesProperties, if not calls toCallWhenUserResetsProperties
+    private func checkIfPropertiesChanged() {
+        if (start == tempStart && value == tempValue && alertKind == tempAlertKind && alertType.name == tempAlertType.name) {
+            if let toCallWhenUserResetsProperties = toCallWhenUserResetsProperties {
+                toCallWhenUserResetsProperties()
+            }
+        } else {
+            if let toCallWhenUserChangesProperties = toCallWhenUserChangesProperties {
+                toCallWhenUserChangesProperties()
+            }
+        }
+    }
+    
 }
 
 // UITableViewDataSource and UITableViewDelegate protocol Methods
@@ -138,8 +185,12 @@ extension AlertSettingsViewControllerData {
             let startAsDate = Date(timeInterval: TimeInterval(Int(start) * 60), since: nowAt000)
             
             let timePickAlertController = UIAlertController(title:nil, message:nil, datePickerMode: .time, date: startAsDate, minimumDate: Date(timeInterval: TimeInterval(Int(minimumStart) * 60), since: nowAt000), maximumDate: Date(timeInterval: TimeInterval(Int(maximumStart) * 60), since:nowAt000), actionHandler: {(timePicker) in
+                // set new start value
                 self.start = Int16(timePicker.date.minutesSinceMidNightLocalTime())
+                // table may need reload to show new value
                 tableView.reloadRows(at: [IndexPath(row: Setting.start.rawValue, section: 0)], with: .none)
+                // checkIfPropertiesChanged
+                self.checkIfPropertiesChanged()
             }, cancelHandler: nil)
             
             uIViewController.present(timePickAlertController, animated: true, completion: nil)
@@ -148,7 +199,7 @@ extension AlertSettingsViewControllerData {
             // for keyboard type : normally keyboard type is numeric only, except if value is bg value, and userdefaults is mmol
             var keyboardType = UIKeyboardType.numberPad
             if AlertSettingsViewControllerData.getAlertKind(alertKind: alertKind).valueNeedsConversionToMmol() && !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
-                keyboardType = .numbersAndPunctuation
+                keyboardType = .decimalPad
             }
             let alert = UIAlertController(title: AlertSettingsViewControllerData.getAlertKind(alertKind: alertKind).alertTitle(), message: Texts_Alerts.changeAlertValue + " (" + alertKindAsAlertKind.valueUnitText() + ")", keyboardType: keyboardType, text: Double(value).mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
                 if var asdouble = text.toDouble() {
@@ -157,6 +208,8 @@ extension AlertSettingsViewControllerData {
                     }
                     self.value = Int16(asdouble)
                     tableView.reloadRows(at: [IndexPath(row: Setting.value.rawValue, section: 0)], with: .none)
+                    // checkIfPropertiesChanged
+                    self.checkIfPropertiesChanged()
                 }
             }, cancelHandler: nil)
             
@@ -178,6 +231,8 @@ extension AlertSettingsViewControllerData {
             let pickerViewData = PickerViewData(withMainTitle: Texts_Alerts.alerttype, withSubTitle: nil, withData: allAlertTypeNames, selectedRow: 0, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ index: Int) in
                 self.alertType = allAlertTypes[index]
                 tableView.reloadRows(at: [IndexPath(row: Setting.alertType.rawValue, section: 0)], with: .none)
+                // checkIfPropertiesChanged
+                self.checkIfPropertiesChanged()
             }, onCancelClick: {})
             
             // create and present pickerviewcontroller

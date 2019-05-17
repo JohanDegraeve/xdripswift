@@ -29,16 +29,30 @@ final class AlertSettingsViewController: UIViewController {
         performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
     }
     
+    @IBOutlet weak var doneButtonOutlet: UIBarButtonItem!
+    
     // to delete the alertentry
     @IBAction func trashButtonAction(_ sender: UIBarButtonItem) {
         // delete the alertentry
         if let alertEntry = alertEntryAsNSObject {
-            alertSettingsViewControllerData.coreDataManager.mainManagedObjectContext.delete(alertEntry)
-            alertSettingsViewControllerData.coreDataManager.saveChanges()
+            
+            // first ask user if ok to delete and if yes delete
+            UIAlertController(title: Texts_Alerts.confirmDeletionAlert, message: nil, actionHandler: {
+                self.alertSettingsViewControllerData.coreDataManager.mainManagedObjectContext.delete(alertEntry)
+                self.alertSettingsViewControllerData.coreDataManager.saveChanges()
+                // go back to alerts settings screen
+                self.performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
+                // go back to alerts settings screen
+                self.performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
+            }, cancelHandler: nil).presentInOwnWindow(animated: true, completion: {})
+            
+        } else {
+            // go back to alerts settings screen
+            performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
         }
-        // go back to alerts settings screen
-        performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
     }
+    
+    @IBOutlet weak var trashButtonOutlet: UIBarButtonItem!
     
     @IBAction func addButtonAction(_ sender: UIBarButtonItem) {
         // user clicks add button, need to perform segue to open new alertsettingsviewcontroller
@@ -46,7 +60,8 @@ final class AlertSettingsViewController: UIViewController {
         self.performSegue(withIdentifier:NewAlertSettingsViewController.SegueIdentifiers.alertToNewAlertSettings.rawValue, sender: (alertSettingsViewControllerData.alertKind, alertSettingsViewControllerData.start + 1, alertSettingsViewControllerData.maximumStart))
     }
     
-    @IBOutlet weak var trashButtonOutlet: UIBarButtonItem!
+    
+    @IBOutlet weak var addButtonOutlet: UIBarButtonItem!
     
     // MARK:- public functions
     
@@ -62,7 +77,15 @@ final class AlertSettingsViewController: UIViewController {
         self.alertEntryAsNSObject = alertEntry
         
         // initialize alertSettingsViewControllerData
-        alertSettingsViewControllerData = AlertSettingsViewControllerData(start: alertEntry.start, value: alertEntry.value, alertKind: alertEntry.alertkind, alertType: alertEntry.alertType, minimumStart: minimumStart, maximumStart: maximumStart, uIViewController: self, coreDataManager: coreDataManager)
+        alertSettingsViewControllerData = AlertSettingsViewControllerData(start: alertEntry.start, value: alertEntry.value, alertKind: alertEntry.alertkind, alertType: alertEntry.alertType, minimumStart: minimumStart, maximumStart: maximumStart, uIViewController: self, toCallWhenUserResetsProperties: {
+            self.addButtonOutlet.isEnabled = true
+            self.doneButtonOutlet.isEnabled = false
+            self.trashButtonOutlet.isEnabled = self.alertSettingsViewControllerData.start != 0
+        }, toCallWhenUserChangesProperties: {
+            self.addButtonOutlet.isEnabled = false
+            self.doneButtonOutlet.isEnabled = true
+            self.trashButtonOutlet.isEnabled = false
+        }, coreDataManager: coreDataManager)
     }
     
     // MARK: - View Life Cycle
@@ -82,10 +105,11 @@ final class AlertSettingsViewController: UIViewController {
         title = ""
 
         // if it's the alertEntry with start 0, then it can't be deleted, disable the trash button
-        if alertSettingsViewControllerData.start == 0 {
-            trashButtonOutlet.isEnabled = false
-        }
+        trashButtonOutlet.isEnabled = alertSettingsViewControllerData.start != 0
         
+        // initially set done button to disabled, it will get enabled as soon as user changes something, this is done in AlertSettingsViewControllerData
+        doneButtonOutlet.isEnabled = false
+
         // set toplabel text
         topLabelOutlet.text = Texts_Common.update + " " + AlertSettingsViewControllerData.getAlertKind(alertKind: alertSettingsViewControllerData.alertKind).alertTitle()
         
