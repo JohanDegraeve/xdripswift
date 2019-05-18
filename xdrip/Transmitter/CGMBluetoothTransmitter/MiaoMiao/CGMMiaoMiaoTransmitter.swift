@@ -60,7 +60,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         //initialize timeStampLastBgReading
         self.timeStampLastBgReading = timeStampLastBgReading
         
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, startScanningAfterInit: CGMTransmitterType.miaomiao.startScanningAfterInit())
         
         bluetoothTransmitterDelegate = self
     }
@@ -119,6 +119,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
             if let firstByte = rxBuffer.first {
                 if let miaoMiaoResponseState = MiaoMiaoResponseType(rawValue: firstByte) {
                     switch miaoMiaoResponseState {
+                        
                     case .dataPacket:
                         //if buffer complete, then start processing
                         if rxBuffer.count >= 363  {
@@ -158,12 +159,32 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                         
                     case .frequencyChangedResponse:
                         os_log("in peripheral didUpdateValueFor, frequencyChangedResponse received, shound't happen ?", log: log, type: .error)
+                        
                     case .newSensor:
                         os_log("in peripheral didUpdateValueFor, new sensor detected", log: log, type: .info)
                         cgmTransmitterDelegate?.newSensorDetected()
+                        // send 0xD3 and 0x01 to confirm sensor change as defined in MiaoMiao protocol documentation
+                        // after that send start reading command, each with delay of 200 milliseconds
+                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(200)) {
+                            if self.writeDataToPeripheral(data: Data.init(bytes: [0xD3, 0x01]), type: .withoutResponse) {
+                                os_log("in peripheralDidUpdateValueFor, successfully sent 0xD3 and 0x01, confirm sensor change to MiaoMiao", log: self.log, type: .info)
+                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(200)) {
+                                    if !self.sendStartReadingCommmand() {
+                                        os_log("in peripheralDidUpdateValueFor, sendStartReadingCommmand failed", log: self.log, type: .error)
+                                    } else {
+                                        os_log("in peripheralDidUpdateValueFor, successfully sent startReadingCommand to MiaoMiao", log: self.log, type: .info)
+                                    }
+                                }
+                            } else {
+                                os_log("in peripheralDidUpdateValueFor, write D301 failed", log: self.log, type: .error)
+                            }
+                        }
+                        
                     case .noSensor:
                         os_log("in peripheral didUpdateValueFor, sensor not detected", log: log, type: .info)
+                        // call to delegate
                         cgmTransmitterDelegate?.sensorNotDetected()
+                        
                     }
                 } else {
                     //rxbuffer doesn't start with a known miaomiaoresponse
