@@ -157,7 +157,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 returnValue = .bluetoothNotPoweredOn(actualStateIs: centralManager.state.toString())
             }
         } else {
-            os_log("    centralManager is nil, can not start scanning", log: log, type: .error)
+            os_log("    centralManager is nil, can not starting scanning", log: log, type: .error)
             returnValue = .other(reason:"centralManager is nil, can not start scanning")
         }
         

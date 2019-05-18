@@ -25,7 +25,7 @@ public class NightScoutUploader:NSObject {
     private let bgReadingsAccessor:BgReadingsAccessor
     
     /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
-    private let keyValueObserverTimer:KeyValueObserverTimeKeeper
+    private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper
     
     // MARK: - initializer
     
@@ -34,7 +34,7 @@ public class NightScoutUploader:NSObject {
         self.bgReadingsAccessor = bgReadingsAccessor
         
         // init own, non optional properties
-        self.keyValueObserverTimer = KeyValueObserverTimeKeeper()
+        self.keyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
         
         super.init()
         
@@ -64,7 +64,7 @@ public class NightScoutUploader:NSObject {
                 switch keyPathEnum {
                 case UserDefaults.Key.nightScoutUrl, UserDefaults.Key.nightScoutAPIKey  :
                     // apikey or nightscout api key change is triggered by user, should not be done within 200 ms
-                    if (keyValueObserverTimer.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
+                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
                         if let apiKey = UserDefaults.standard.nightScoutAPIKey, let siteUrl = UserDefaults.standard.nightScoutUrl {
                             testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
                                 DispatchQueue.main.async {

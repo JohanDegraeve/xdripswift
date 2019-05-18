@@ -35,14 +35,11 @@ final class RootViewController: UIViewController {
     /// coreDataManager to be used throughout the project
     private var coreDataManager:CoreDataManager?
     
-    /// temporary ?
+    /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
+    private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
+
+    /// calibrator to be used for calibration, value will depend on transmitter type
     private var calibrator:Calibrator?
-    
-    /// temporary ?
-    private var currentTransmitterTypeAsString:String?
-    
-    /// temporary ?
-    private var currentTransmitterId:String?
     
     /// BgReadings instance
     private var bgReadingsAccessor:BgReadingsAccessor?
@@ -262,13 +259,16 @@ final class RootViewController: UIViewController {
     
     // when user changes transmitter type or transmitter id, then new transmitter needs to be setup. That's why observer for these settings is required
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
+
         if let keyPath = keyPath, let coreDataManager = coreDataManager {
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
+                
                 switch keyPathEnum {
-                case UserDefaults.Key.transmitterTypeAsString :
-                    if currentTransmitterTypeAsString != UserDefaults.standard.transmitterTypeAsString {
-                        currentTransmitterTypeAsString = UserDefaults.standard.transmitterTypeAsString
+                    
+                case UserDefaults.Key.transmitterTypeAsString, UserDefaults.Key.transmitterId :
+                    
+                    // transmittertype change triggered by user, should not be done within 200 ms
+                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
                         UserDefaults.standard.bluetoothDeviceAddress = nil
                         UserDefaults.standard.bluetoothDeviceName =  nil
                         if let activeSensor = activeSensor {
@@ -279,19 +279,7 @@ final class RootViewController: UIViewController {
                         cgmTransmitter = nil
                         initializeTransmitterType()
                     }
-                case UserDefaults.Key.transmitterId:
-                    if currentTransmitterId != UserDefaults.standard.transmitterId {
-                        currentTransmitterId = UserDefaults.standard.transmitterId
-                        UserDefaults.standard.bluetoothDeviceAddress = nil
-                        UserDefaults.standard.bluetoothDeviceName =  nil
-                        if let activeSensor = activeSensor {
-                            activeSensor.endDate = Date()
-                        }
-                        coreDataManager.saveChanges()
-                        activeSensor = nil
-                        cgmTransmitter = nil
-                        initializeTransmitterType()
-                    }
+                    
                 default:
                     break
                 }
@@ -383,13 +371,13 @@ final class RootViewController: UIViewController {
             switch currentTransmitterTypeAsEnum {
                 
             case .dexcomG4:
-                if let currentTransmitterId = currentTransmitterId {
+                if let currentTransmitterId = UserDefaults.standard.transmitterId {
                     cgmTransmitter = CGMG4xDripTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate:self)
                     calibrator = DexcomCalibrator()
                 }
                 
             case .dexcomG5:
-                if let currentTransmitterId = currentTransmitterId {
+                if let currentTransmitterId = UserDefaults.standard.transmitterId {
                     cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self)
                     calibrator = DexcomCalibrator()
                 }
@@ -403,7 +391,7 @@ final class RootViewController: UIViewController {
                 calibrator = Libre1Calibrator()
             }
             
-            _ = cgmTransmitter?.startScanning()
+            //_ = cgmTransmitter?.startScanning()
         }
     }
 

@@ -16,7 +16,16 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
         switch setting {
             
         case .transmitterId:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTransmitterId, message: Texts_SettingsView.labelGiveTransmitterId, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.transmitterId, placeHolder: "00000", actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in UserDefaults.standard.transmitterId = serialNumber}, cancelHandler: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTransmitterId, message: Texts_SettingsView.labelGiveTransmitterId, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.transmitterId, placeHolder: "00000", actionTitle: nil, cancelTitle: nil, actionHandler: {(transmitterId:String) in
+                if let currentTransmitterId = UserDefaults.standard.transmitterId {
+                    if currentTransmitterId != transmitterId {
+                        UserDefaults.standard.transmitterId = transmitterId
+                    }
+                } else {
+                    UserDefaults.standard.transmitterId = transmitterId
+                }
+                
+            }, cancelHandler: nil)
             
         case .transmitterType:
             var data = [String]()
@@ -30,7 +39,11 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
                 selectedRow = data.index(of:transmitterType)
             }
             
-            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelTransmitterId, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in UserDefaults.standard.transmitterTypeAsString = data[index]}, cancelHandler: nil)
+            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelTransmitterId, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+                if index != selectedRow {
+                    UserDefaults.standard.transmitterTypeAsString = data[index]
+                }
+            }, cancelHandler: nil)
         }
     }
     

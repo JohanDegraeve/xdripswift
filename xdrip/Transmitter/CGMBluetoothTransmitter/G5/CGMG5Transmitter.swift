@@ -115,6 +115,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         bluetoothTransmitterDelegate = self
         
         // we can immediately start scanning
+        debuglogging("right before startscanning dexcom G5")
         _ = startScanning()
     }
 
