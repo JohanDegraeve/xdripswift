@@ -134,12 +134,12 @@ public class AlertManager:NSObject {
                         // alerts are checked in order of importance - there should be only one alert raised, except missed reading alert which will always be checked.
                         // first check very low alert
                         if (!checkAlertAndFire(alertKind: .verylow, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                            // very low not fired, check low alert
-                            if (!checkAlertAndFire(alertKind: .low, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
+                            // very low not fired, check low alert - if very low alert snoozed, skip the check for low alert and continue to next step
+                            if getSnoozeParameters(alertKind: AlertKind.verylow).getSnoozeValue().isSnoozed || (!checkAlertAndFire(alertKind: .low, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
                                 //  low not fired, check very high alert
                                 if (!checkAlertAndFire(alertKind: .veryhigh, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                                    // very high not fired, check high alert
-                                    if (!checkAlertAndFire(alertKind: .high, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
+                                    // very high not fired, check high alert - if very high alert snoozed, skip the check for high alert and continue to next step
+                                    if getSnoozeParameters(alertKind: AlertKind.veryhigh).getSnoozeValue().isSnoozed || (!checkAlertAndFire(alertKind: .high, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
                                         // very high not fired check calibration alert
                                         if (!checkAlertAndFire(alertKind: .calibration, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
                                             // finally let's check the battery level alert
