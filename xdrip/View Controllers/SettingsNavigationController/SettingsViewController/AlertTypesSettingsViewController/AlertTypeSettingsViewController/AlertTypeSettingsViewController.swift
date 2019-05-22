@@ -139,8 +139,8 @@ final class AlertTypeSettingsViewController: UIViewController {
         for alertTypeAlreadyStored in alertTypesAccessor.getAllAlertTypes() {
             // if name == alertTypeAlreadyStored.name and alertTypeAlreadyStored is not the same object as alertTypeAsNSObject then not ok
             if alertTypeAlreadyStored.name == name && (alertTypeAsNSObject == nil || alertTypeAlreadyStored != alertTypeAsNSObject) {
-                // define and present alertcontroller
-                UIAlertController(title: Texts_Common.warning, message: Texts_AlertTypeSettingsView.alertTypeNameAlreadyExistsMessage).presentInOwnWindow(animated: true, completion: {})
+                // define and present alertcontroller, this will show message and an ok button, without action when clicking ok
+                UIAlertController(title: Texts_Common.warning, message: Texts_AlertTypeSettingsView.alertTypeNameAlreadyExistsMessage, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
                 return
             }
         }

@@ -3,6 +3,7 @@ import CoreBluetooth
 import os
 
 /// generic bluetoothtransmitter class that handles scanning, connect, discover services, discover characteristics, subscribe to receive characteristic, reconnect.
+///
 /// The class assumes that the transmitter has a receive and transmit characterisitc (which is mostly the case)
 class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
@@ -27,6 +28,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// write characteristic
     private let CBUUID_WriteCharacteristic:String
+    
+    /// if true, then scanning can start automatically as soon as an instance of the BluetoothTransmitter is created. This is typical for eg Dexcom G5, where an individual transitter can be idenfied via the transmitter id. Also the case for Blucon. For MiaoMiao and G4 xdrip this is different.
+    ///
+    /// parameter needs to be set during initialisation
+    private let startScanningAfterInit:Bool
 
     // for OS_log,
     private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryBlueTooth)
@@ -67,7 +73,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     ///     - servicesCBUUIDs: service uuid's
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
-    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID], CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String) {
+    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID], CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, startScanningAfterInit:Bool) {
         switch addressAndName {
         case .alreadyConnectedBefore(let newAddress):
             deviceAddress = newAddress
@@ -80,6 +86,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         self.CBUUID_Advertisement = CBUUID_Advertisement
         self.CBUUID_WriteCharacteristic = CBUUID_WriteCharacteristic
         self.CBUUID_ReceiveCharacteristic = CBUUID_ReceiveCharacteristic
+        
+        // assign startScanningAfterInit
+        self.startScanningAfterInit = startScanningAfterInit
         
         //initialize timeStampLastStatusUpdate
         timeStampLastStatusUpdate = Date()
@@ -100,6 +109,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     // MARK: - public functions
+    
+    // gets peripheral connection status, nil if peripheral not existing yet
+    func getConnectionStatus() -> CBPeripheralState? {
+        return peripheral?.state
+    }
     
     func disconnect() {
         if let peripheral = peripheral {
@@ -224,6 +238,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
     }
     
+    /// try to connect to peripheral to which connection was successfully done previously, and that has a uuid that matches the stored deviceAddress. If such peripheral exists, then try to connect, it's not necessary to start scanning. iOS will connect as soon as the peripheral comes in range, or bluetooth status is switched on, whatever is necessary
+    ///
+    /// the result of the attempt to try to find such device, is returned
     fileprivate func retrievePeripherals(_ central:CBCentralManager) -> Bool {
         if let deviceAddress = deviceAddress {
             if let uuid = UUID(uuidString: deviceAddress) {
@@ -305,7 +322,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         bluetoothTransmitterDelegate?.centralManagerDidFailToConnect(error: error)
     }
 
-    /// if new state is powered on and if address is known then try to retrieveperipherals, if that fails start scanning
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         timeStampLastStatusUpdate = Date()
         
@@ -314,7 +330,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         /// in case status changed to powered on and if device address known then try either to retrieveperipherals, or if that doesn't succeed, start scanning
         if central.state == .poweredOn, reconnectAfterDisconnect {
             if (deviceAddress != nil) {
-                if !retrievePeripherals(central) {
+                /// try to connect to device to which connection was successfully done previously, this attempt is done by callling retrievePeripherals(central) - if that fails and if it's a device for which we can always scan (eg DexcomG5), then start scanning
+                if !retrievePeripherals(central) && startScanningAfterInit {
                     _ = startScanning()
                 }
             }
@@ -455,6 +472,24 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         case connecting
         // any other, reason specified in text
         case other(reason:String)
+        
+        func description() -> String {
+            switch self {
+                
+            case .success:
+                return "success"
+            case .alreadyScanning:
+                return "alreadyScanning"
+            case .bluetoothNotPoweredOn(let actualState):
+                return "not powered on, actual status =" + actualState
+            case .alreadyConnected:
+                return "alreadyConnected"
+            case .connecting:
+                return "connecting"
+            case .other(let reason):
+                return "other reason : " + reason
+            }
+        }
     }
     
     /// * if we never connected to a device, then we don't know it's address as the Device itself is going to send. We can only have an expected name,

@@ -2,8 +2,11 @@ import Foundation
 import CoreBluetooth
 
 /// Defines functions similar as CBCentralManagerDelegate, CBPeripheralDelegate, with a different name and signature
+///
 /// Goal is that delegates that conform to this protocol have a way to receive information about bluetooth activities. Example centralManager didDisconnectPeripheral is handled in class BluetoothTransmitter, however a delegate may be interested that a disconnect occurred for showing info to the user. The implementation of centralManager didDisconnectPeripheral in BluetoothTransmitter class would first do own stuff (eg try to reconnect) and at the end call the corresponding delegate function. For some methods, the implementation in the class BluetoothTransmitter will do nothing but calling the corresponding method in the protocol BluetoothTransmitterDelegate, example centralManager didUpdateValueFor characteristic.
+///
 /// If a Delegate is not interested in information, then it just needs to implement an empty closure
+///
 /// Most delegates will only implement just a very fiew of the methods
 protocol BluetoothTransmitterDelegate:AnyObject {
     /// called when centralManager didConnect was called in BlueToothTransmitter class

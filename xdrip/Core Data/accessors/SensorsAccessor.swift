@@ -20,13 +20,19 @@ class SensorsAccessor {
     
     // MARK: - functions
     
-    /// will actually get last stored sensor (ie highest startdate) and if enddate of that sensor is nil then returns that sensor
+    /// will get sensor with enddate nil (ie not stopped) and highest startDate,
     /// otherwise returns nil
+    ///
+    ///
     func fetchActiveSensor() -> Sensor? {
         // create fetchRequest
         let fetchRequest: NSFetchRequest<Sensor> = Sensor.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Sensor.startDate), ascending: false)]
         fetchRequest.fetchLimit = 1
+        
+        // only sensors with endDate nil, ie not started, should be only one in the end
+        let predicate = NSPredicate(format: "endDate == nil")
+        fetchRequest.predicate = predicate
 
         // define returnvalue
         var returnValue:Sensor?

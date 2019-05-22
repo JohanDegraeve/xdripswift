@@ -42,8 +42,9 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         //assign transmitterId
         self.transmitterId = transmitterID
 
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G4, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G4)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_G4, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_G4)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G4, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G4)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_G4, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_G4, startScanningAfterInit: CGMTransmitterType.dexcomG4.startScanningAfterInit())
         
+        // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
         bluetoothTransmitterDelegate = self
     }
     

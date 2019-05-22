@@ -141,7 +141,7 @@ extension AlertSettingsViewControllerData {
             }
         case .value:
             // note that value will not be shown if alerttype not enabled or alertkind doesn't need a value, means if that's the case, setting will never be .value
-            cell.textLabel?.text = Texts_Alerts.alertValue + " (" + alertKindAsAlertKind.valueUnitText() + ")"
+            cell.textLabel?.text = Texts_Alerts.alertValue + (alertKindAsAlertKind.valueUnitText(transmitterType: UserDefaults.standard.transmitterType) != "" ? (" (" + alertKindAsAlertKind.valueUnitText(transmitterType: UserDefaults.standard.transmitterType) + ")"):"")
             if alertKindAsAlertKind.valueNeedsConversionToMmol() {
                 cell.detailTextLabel?.text = Double(value).mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             } else {
@@ -201,7 +201,7 @@ extension AlertSettingsViewControllerData {
             if AlertSettingsViewControllerData.getAlertKind(alertKind: alertKind).valueNeedsConversionToMmol() && !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
                 keyboardType = .decimalPad
             }
-            let alert = UIAlertController(title: AlertSettingsViewControllerData.getAlertKind(alertKind: alertKind).alertTitle(), message: Texts_Alerts.changeAlertValue + " (" + alertKindAsAlertKind.valueUnitText() + ")", keyboardType: keyboardType, text: Double(value).mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
+            let alert = UIAlertController(title: AlertSettingsViewControllerData.getAlertKind(alertKind: alertKind).alertTitle(), message: Texts_Alerts.changeAlertValue + " (" + alertKindAsAlertKind.valueUnitText(transmitterType: UserDefaults.standard.transmitterType) + ")", keyboardType: keyboardType, text: Double(value).mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
                 if var asdouble = text.toDouble() {
                     if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
                         asdouble = asdouble.mmolToMgdl()

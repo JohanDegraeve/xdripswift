@@ -95,13 +95,13 @@ public enum AlertKind:Int, CaseIterable {
     ///     - lastBgReading : should be reading for the currently active sensor with calculated value != 0
     ///     - lastButOneBgReading : should als be for the currently active sensor with calculated value != 0, it is only there to be able to calculate the unitizedDeltaString for the alertBody
     ///     - lastCalibration : is to allow to raise a calibration alert
-    ///     - batteryLevel : is to allow to raise a battery level alert
+    ///     - transmitterBatteryInfo : is to allow to raise a battery level alert
     /// - returns:
     ///     - bool : If the bool is false, then there's no need to raise an alert.
     ///     - alertbody : AlertBody, AlertTitle and delay are used if an alert needs to be raised for the notification.
     ///     - alerttitle : AlertBody, AlertTitle and delay are used if an alert needs to be raised for the notification.
     ///     - delayInSeconds : If delayInSeconds not nil and > 0 or if delayInSeconds is nil, then the alert will be a future planned Alert. This will only be applicable to missed reading alerts.
-    func alertNeeded(currentAlertEntry:AlertEntry, nextAlertEntry:AlertEntry?, lastBgReading:BgReading?, _ lastButOneBgReading:BgReading?, lastCalibration:Calibration?, batteryLevel:Int?) -> (alertNeeded:Bool, alertBody:String?, alertTitle:String?, delayInSeconds:Int?) {
+    func alertNeeded(currentAlertEntry:AlertEntry, nextAlertEntry:AlertEntry?, lastBgReading:BgReading?, _ lastButOneBgReading:BgReading?, lastCalibration:Calibration?, transmitterBatteryInfo:TransmitterBatteryInfo?) -> (alertNeeded:Bool, alertBody:String?, alertTitle:String?, delayInSeconds:Int?) {
         //Not all input parameters in the closure are needed for every type of alert. - this is to make it generic
         switch self {
             
@@ -175,11 +175,27 @@ public enum AlertKind:Int, CaseIterable {
             
         case .batterylow:
                 // if alertEntry not enabled, return false
-                if !currentAlertEntry.alertType.enabled || batteryLevel == nil {return (false, nil, nil, nil)}
+                if !currentAlertEntry.alertType.enabled {return (false, nil, nil, nil)}
                 
-                if currentAlertEntry.value > batteryLevel! {
+                // if transmitterBatteryInfo is nil, return false
+                guard let transmitterBatteryInfo = transmitterBatteryInfo else {return (false, nil, nil, nil)}
+                
+                // get level
+                var batteryLevelToCheck:Int?
+                
+                switch transmitterBatteryInfo {
+                case .percentage(let percentage):
+                    batteryLevelToCheck = percentage
+                case .DexcomG5(let voltageA, _, _, _, _):
+                    batteryLevelToCheck = voltageA
+                case .DexcomG4(let level):
+                    batteryLevelToCheck = level
+                }
+
+                if let batteryLevelToCheck = batteryLevelToCheck, currentAlertEntry.value > batteryLevelToCheck {
                     return (true, "", Texts_Alerts.batteryLowAlertTitle, nil)
                 }
+                
                 return (false, nil, nil, nil)
             }
     }
@@ -228,7 +244,7 @@ public enum AlertKind:Int, CaseIterable {
     
     /// for UI, when value is requested, text should show also the unit (eg mgdl, mmol, minutes, days ...)
     /// What is this text ?
-    func valueUnitText() -> String {
+    func valueUnitText(transmitterType:CGMTransmitterType?) -> String {
         switch self {
             
         case .verylow, .low, .high, .veryhigh:
@@ -238,7 +254,11 @@ public enum AlertKind:Int, CaseIterable {
         case .calibration:
             return Texts_Common.hours
         case .batterylow:
-            return ""
+            if let transmitterType = transmitterType {
+                return transmitterType.batteryUnit()
+            } else {
+                return ""// even though 20 is used as default alert level (assuming 20%) give as default value empty string
+            }
         }
     }
 }

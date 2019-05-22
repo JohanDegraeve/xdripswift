@@ -10,18 +10,21 @@ extension UIAlertController {
         alertWindow.rootViewController?.present(self, animated: animated, completion: completion)
     }
     
-    /// simple pop up which display a title and message in UIAlertController and adds an ok button
+    /// creates a UIAlertController of type alert with a title and message and adds an ok button, nothing else
     /// - parameters:
     ///     - title : title, optional, used in init(title: title, message: message, preferredStyle: .alert)
     ///     - message : message, optional, used in init(title: title, message: message, preferredStyle: .alert)
-    convenience init(title:String?, message:String?) {
+    ///     - actionHandler : optional closure which will be executed when user clickx ok, without in- output
+    convenience init(title:String?, message:String?, actionHandler: (() -> Void)?) {
 
         self.init(title: title, message: message, preferredStyle: .alert)
 
-        addAction(UIAlertAction(title: Texts_Common.Ok, style: .default, handler: nil))
+        addAction(UIAlertAction(title: Texts_Common.Ok, style: .default, handler: { (action:UIAlertAction) in
+            if let actionHandler = actionHandler {actionHandler()}
+        }))
     }
     
-    /// a title and message in UIAlertController and adds an ok button and a cancel button, if ok click then the actionHandler is executed, if cancel clicked then the cancelhandler which is optional
+    /// creates a UIAlertController of type alert with a title and message and adds an ok button and a cancel button, if ok click then the actionHandler is executed, if cancel clicked then the cancelhandler which is optional
     /// - parameters:
     ///     - title : title, optional, used in init(title: title, message: message, preferredStyle: .alert)
     ///     - message : message, optional, used in init(title: title, message: message, preferredStyle: .alert)
@@ -42,7 +45,7 @@ extension UIAlertController {
         }))
     }
     
-    /// textField will be added and two actions. One to confirm the entered text (action button), another one to cancel (cancel button)
+    /// creates a UIAlertController of type alert, with a textField and two actions. One to confirm the entered text (action button), another one to cancel (cancel button)
     /// - parameters:
     ///     - title : title, optional, used in init(title: title, message: message, preferredStyle: .alert)
     ///     - message : message, optional, used in init(title: title, message: message, preferredStyle: .alert)
@@ -80,10 +83,13 @@ extension UIAlertController {
         addAction(UIAlertAction(title: cancel!, style: .cancel, handler: (cancelHandler != nil) ? {(action:UIAlertAction) in cancelHandler!()}:nil))
     }
     
-    /// UIDatePicker will be added, with ok and cancelhandler, date can be set, minimum and maximum date, actionhandler is called when user clicks the Ok button, it has a UIDatePicker as input
+    /// creates a UIAlertController of type alert, with UIDatePicker, with ok and cancelhandler, date can be set, minimum and maximum date, actionhandler is called when user clicks the Ok button, it has a UIDatePicker as input
     /// - parameters:
     ///     - title : title, optional, used in init(title: title, message: message, preferredStyle: .alert)
     ///     - message : message, optional, used in init(title: title, message: message, preferredStyle: .alert)
+    ///     - datePickerMode : should be .date or .time
+    ///     - minimumDate : optional Date
+    ///     - maximumDate : optional Date
     ///     - actionHandler : action to take when user clicks the action button, text is the text entered by the user
     ///     - cancelHandler : action to take when user clicks the cancel button, optional
     convenience init(title: String?, message: String?, datePickerMode:UIDatePicker.Mode, date:Date?, minimumDate:Date?, maximumDate:Date?, actionHandler: @escaping (UIDatePicker) -> (), cancelHandler: (() -> Void)?) {
@@ -107,5 +113,26 @@ extension UIAlertController {
 
         let height:NSLayoutConstraint = NSLayoutConstraint(item: self.view, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 250)
         self.view.addConstraint(height);
+    }
+    
+    /// creates a UIAlertController of type actionSheet.
+    /// - parameters:
+    ///     - title : title, optional, used in init(title: title, message: message, preferredStyle: .alert)
+    ///     - message : message, optional, used in init(title: title, message: message, preferredStyle: .alert)
+    ///     - actions : dictionary of UIAlertAction's with style .default that will be added. The key is the title of the action, the value is the handler when the user clicks the action
+    ///     - cancelAction : UIAlertAction of type cancel, tuple consisting of String which is the title and handler
+    convenience init(title: String?, message: String?, actions: [String : ((UIAlertAction) -> Void)], cancelAction: (String, ((UIAlertAction) -> Void)?)) {
+        
+        self.init(title: title, message: message, preferredStyle: .actionSheet)
+        
+        // add each action of type default
+        for (actionTitle, actionHandler) in actions {
+            addAction(UIAlertAction(title: actionTitle, style: .default
+                , handler: actionHandler))
+        }
+        
+        // add the cancel action
+        addAction(UIAlertAction(title: cancelAction.0, style: .cancel, handler: cancelAction.1))
+        
     }
 }

@@ -47,6 +47,14 @@ extension Data {
         }))
     }
     
+    ///takes 8 bytes starting at position and converts to Uint32
+    func uint64 (position:Int)-> UInt64 {
+        let start = position
+        let end = start.advanced(by: 8)
+        let number: UInt64 =  self.subdata(in: start..<end).toInt()
+        return number
+    }
+    
     ///takes 4 bytes starting at position and converts to Uint32
     func uint32 (position:Int)-> UInt32 {
         let start = position

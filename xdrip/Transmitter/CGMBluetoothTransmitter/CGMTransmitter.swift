@@ -1,4 +1,5 @@
 import Foundation
+import CoreBluetooth
 
 protocol CGMTransmitter {
     /// get device address, cgmtransmitters should also derive from BlueToothTransmitter, hence no need to implement this function
@@ -11,6 +12,9 @@ protocol CGMTransmitter {
     /// - returns:
     ///     the scanning result
     func startScanning() -> BluetoothTransmitter.startScanningResult
+    
+    /// get connection status, nil if peripheral not yet known, ie never connected or discovered the transmitter
+    func getConnectionStatus() -> CBPeripheralState?
 }
 
 /// cgm transmitter types
@@ -37,6 +41,8 @@ enum CGMTransmitterType:String, CaseIterable {
         }
     }
     
+    /// if true, then a class conforming to the protocol CGMTransmitterDelegate will call newSensorDetected if it detects a new sensor is placed. Means there's no need to let the user start and stop a sensor
+    ///
     /// example MiaoMiao can detect new sensor, implementation should return true, Dexcom transmitter's can't
     func canDetectNewSensor() -> Bool {
         switch self {
@@ -47,7 +53,6 @@ enum CGMTransmitterType:String, CaseIterable {
         case .miaomiao:
             return true
         case .GNSentry:
-            print("in canDetectNewSensor, to do for gnsentry")
             return false
         }
     }
@@ -92,6 +97,41 @@ enum CGMTransmitterType:String, CaseIterable {
             return Constants.DefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
         case .GNSentry:
             return Constants.DefaultAlertLevels.defaultBatteryAlertLevelGNSEntry
+        }
+    }
+    
+    /// if true, then scanning can start automatically as soon as an instance of the CGM transmitter is created. This is typical for eg Dexcom G5, where an individual transitter can be idenfied via the transmitter id. Also the case for Blucon. For MiaoMiao and G4 xdrip this is different.
+    ///
+    /// for this type of devices, there's no need to give an option in the UI to manually start scanning.
+    func startScanningAfterInit() -> Bool {
+        switch self {
+            
+        case .dexcomG4:
+            return false
+        case .dexcomG5:
+            return true
+        case .miaomiao:
+            return false
+        case .GNSentry:
+            return false
+        }
+    }
+    
+    /// what unit to use for battery level, like '%', Volt, or nothing at all
+    ///
+    /// to be used for UI stuff
+    func batteryUnit() -> String {
+        switch self {
+            
+        case .dexcomG4:
+            return ""
+        case .dexcomG5:
+            return "voltA"
+        case .miaomiao:
+            return "%"
+        case .GNSentry:
+            // TODO:- check if GNSentry is indeed percentage
+            return ""
         }
     }
 }

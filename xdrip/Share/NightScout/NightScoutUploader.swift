@@ -215,7 +215,7 @@ public class NightScoutUploader:NSObject {
             }
         }
 
-        // define and present alertcontroller
-        UIAlertController(title: title, message: message).presentInOwnWindow(animated: true, completion: {})
+        // show alert with just info text and ok button
+        UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
     }
 }

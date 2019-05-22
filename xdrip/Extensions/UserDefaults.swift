@@ -44,6 +44,11 @@ extension UserDefaults {
         /// speak interval
         case speakInterval = "speakInterval"
         
+        // Settings that Keep track of alert and info messages shown to the user ======
+        
+        /// message shown when user starts a sensor, which tells that timing should be exact, was it already shown or not
+        case startSensorTimeInfoGiven = "startSensorTimeInfoGiven"
+        
         // Other Settings (not user configurable)
         
         // Bluetooth
@@ -51,6 +56,8 @@ extension UserDefaults {
         case bluetoothDeviceAddress = "bluetoothDeviceAddress"
         /// active BluetoothTransmitter name
         case bluetoothDeviceName = "bluetoothDeviceName"
+        /// timestamp of last bluetooth disconnect
+        case lastdisConnectTimestamp = "lastdisConnectTimestamp"
         
         // Nightscout
         /// timestamp lastest uploaded reading
@@ -58,7 +65,7 @@ extension UserDefaults {
         
         // Transmitter
         /// Transmitter Battery Level
-        case transmitterBatteryLevel = "transmitterbatterylevel"
+        case transmitterBatteryInfo = "transmitterbatteryinfo"
         
         // Application
         // is app in foreground or not
@@ -330,6 +337,18 @@ extension UserDefaults {
         }
     }
     
+    // MARK: - =====  Keep track of alert and info messages shown to the user ======
+    
+    /// message shown when user starts a sensor, which tells that timing should be exact, was it already shown or not
+    var startSensorTimeInfoGiven:Bool {
+        get {
+            return bool(forKey: Key.startSensorTimeInfoGiven.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.startSensorTimeInfoGiven.rawValue)
+        }
+    }
+    
     // MARK: - =====  Other Settings ======
     
     var bluetoothDeviceAddress: String? {
@@ -349,6 +368,15 @@ extension UserDefaults {
             set(newValue, forKey: Key.bluetoothDeviceName.rawValue)
         }
     }
+
+    var lastdisConnectTimestamp:Date? {
+        get {
+            return object(forKey: Key.lastdisConnectTimestamp.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.lastdisConnectTimestamp.rawValue)
+        }
+    }
     
     var timeStampLatestNightScoutUploadedBgReading:Date? {
         get {
@@ -359,15 +387,22 @@ extension UserDefaults {
         }
     }
     
-    /// if value 0 stored in settings, then return value of this method will be nil
-    var transmitterBatteryLevel:Int? {
+    /// transmitterBatteryInfo
+    var transmitterBatteryInfo:TransmitterBatteryInfo? {
         get {
-            let returnValue = integer(forKey: Key.transmitterBatteryLevel.rawValue)
-            if returnValue == 0 {return nil}
-            return returnValue
+            if let data = object(forKey: Key.transmitterBatteryInfo.rawValue) as? Data {
+                return TransmitterBatteryInfo(data: data)
+            } else {
+                return nil
+            }
+            
         }
         set {
-            set(newValue, forKey: Key.speakInterval.rawValue)
+            if let newValue = newValue {
+                set(newValue.toData(), forKey: Key.transmitterBatteryInfo.rawValue)
+            } else {
+                set(nil, forKey: Key.transmitterBatteryInfo.rawValue)
+            }
         }
     }
     
@@ -381,8 +416,6 @@ extension UserDefaults {
         }
     }
     
-
-
 }
 
 
