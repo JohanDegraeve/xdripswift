@@ -22,7 +22,7 @@ class AlertEntriesAccessor {
     
     /// will check for the specified date (only the time of the day will be used) which AlertEntry is applicable, then for that Alertentry, get the AlertType. Should not be nil. In case it is, a default value will be returned
     ///
-    /// if the currentAlertEntry is the last of the day, then the nextAlertEntry in the return value will be nil, even though there might be a new one that starts at midnight (ie morning next day)
+    /// if the currentAlertEntry is the last of the day, then the nextAlertEntry in the return value will be the alertentry with start 0
     func getCurrentAndNextAlertEntry(forAlertKind alertKind:AlertKind, forWhen when:Date, alertTypesAccessor:AlertTypesAccessor) -> (currentAlertEntry:AlertEntry, nextAlertEntry: AlertEntry?) {
         
         // fetch the alert entries
@@ -43,6 +43,11 @@ class AlertEntriesAccessor {
                 nextAlertEntry = alertEntry
                 break loop
             }
+        }
+        
+        // if there's no nextalertentry, but there is a currententry with start > 0 then pick as nextalertentry the first of the day, this one is applicable the day after at 00:00
+        if nextAlertEntry == nil && currentEntry!.start > 0 {
+            nextAlertEntry = alertEntries[0]
         }
         
         // explicitly unwrap, because when calling getAllEntries, there should have been at least one alertEntry

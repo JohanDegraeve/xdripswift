@@ -132,37 +132,85 @@ public enum AlertKind:Int, CaseIterable {
                 } else {return (false, nil, nil, nil)}
             
         case .missedreading:
-                // if no valid lastbgreading then there's definitely no need to plan an alert
-                guard let lastBgReading = lastBgReading else {return (false, nil, nil, nil)}
+            // if no valid lastbgreading then there's definitely no need to plan an alert
+            guard let lastBgReading = lastBgReading else {return (false, nil, nil, nil)}
+            
+            // this will be the delay of the planned notification, in seconds
+            var delayToUseInSeconds:Int?
+            
+            // calculate time since last reading in minutes
+            let timeSinceLastReadingInMinutes:Int = Int((Date().toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble())/1000/60)
+            
+            // first check if currentalertEntry has an enabled alerttype
+            if currentAlertEntry.alertType.enabled {
                 
-                // this will be the delay of the planned notification, in seconds
-                var delayToUseInSeconds:Int?
-                //this will be the alertentry to use, either the current one, or the next one, or none
-                var alertEntryToUse:AlertEntry?
+                // delay to use in the alert is value in the alertEntry - time since last reading in minutes
+                delayToUseInSeconds = (Int(currentAlertEntry.value) - timeSinceLastReadingInMinutes) * 60
                 
-                // so there's a reading, let's find the applicable alertentry
-                if currentAlertEntry.alertType.enabled {
-                    alertEntryToUse = currentAlertEntry
-                } else {
-                    if let nextAlertEntry = nextAlertEntry {
-                        if nextAlertEntry.alertType.enabled {
-                            alertEntryToUse = nextAlertEntry
+                // check now if there's a next alert entry , and if so, check if the alert time would be in the time period of that next alert, and if it's not enabled,  if so then no alert will not be scheduled
+                if let nextAlertEntry = nextAlertEntry {
+
+                    // if start of nextAlertEntry < start of currentAlertEntry, then ad 24 hours, because it means the nextAlertEntry is actually the one of the day after
+                    var nextAlertEntryStartValueToUse = nextAlertEntry.start
+                    if nextAlertEntry.start < currentAlertEntry.start {
+                        nextAlertEntryStartValueToUse += nextAlertEntryStartValueToUse + 24 * 60
+                    }
+                    
+                    if !nextAlertEntry.alertType.enabled {
+                        
+                        // calculate when alert would fire and check if >= nextAlertEntry.start , if so don't plan an alert
+                        if Date().minutesSinceMidNightLocalTime() + delayToUseInSeconds!/60 >= nextAlertEntryStartValueToUse {
+                            // no need to plan a missed reading alert
+                            return (false, nil, nil, nil)
+                        }
+                        
+                    } else {
+                        // next alertentry is enabled, maybe the missed reading alert value is higher
+                        if nextAlertEntry.value > currentAlertEntry.value && Date().minutesSinceMidNightLocalTime() + delayToUseInSeconds!/60 > nextAlertEntryStartValueToUse {
+                            delayToUseInSeconds = (Int(nextAlertEntry.value) - timeSinceLastReadingInMinutes) * 60
                         }
                     }
+                    
                 }
+                    
+                // there's no nextAlertEntry, use the already calculated value for delayToUseInSeconds based on currentAlertEntry
+                return (true, "", Texts_Alerts.missedReadingAlertTitle, delayToUseInSeconds)
                 
-                // now see if we found an alertentry, and if yes prepare the return value
-                if let alertEntryToUse = alertEntryToUse {
-                    // the current alert entry is enabled, we'll use that one to plan the missed reading alert
-                    let timeSinceLastReadingInMinutes:Int = Int((Date().toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble())/1000/60)
-                    // delay to use in the alert is value in the alertEntry - time since last reading in minutes
-                    delayToUseInSeconds = (Int(alertEntryToUse.value) - timeSinceLastReadingInMinutes) * 60
+            } else {
+                
+                // current alertEntry is not enabled but maybe the next one is and it's enabled
+                if let nextAlertEntry = nextAlertEntry, nextAlertEntry.alertType.enabled {
+                    
+                    // earliest expiry of alert should be time that nextAlertEntry is valid
+                    // if the diff between that time and time of latestreading is less than nextAlertEntry.value, then we set actual delay to nextAlertEntry.value
+                    
+                    // start with maximum value
+                    delayToUseInSeconds = (Int(nextAlertEntry.value) - timeSinceLastReadingInMinutes) * 60 // usually timeSinceLastReadingInMinutes will be 0 because this code is executed immediately after having received a reading
+                    
+                    // if start of nextAlertEntry < start of currentAlertEntry, then ad 24 hours, because it means the nextAlertEntry is actually the one of the day after
+                    var nextAlertEntryStartValueToUse = nextAlertEntry.start
+                    if nextAlertEntry.start < currentAlertEntry.start {
+                        nextAlertEntryStartValueToUse += nextAlertEntryStartValueToUse + 24 * 60
+                    }
+                    
+                    // if this would be before start of nextAlertEntry then increase the delay
+                    var minutesSinceMidnightOfExpirtyTime = Date(timeInterval: TimeInterval(delayToUseInSeconds!), since: lastBgReading.timeStamp).minutesSinceMidNightLocalTime()
+                    if minutesSinceMidnightOfExpirtyTime < Date().minutesSinceMidNightLocalTime() {
+                        minutesSinceMidnightOfExpirtyTime += 24 * 60
+                    }
+                    let diffInMinutes = Int(nextAlertEntryStartValueToUse) - minutesSinceMidnightOfExpirtyTime
+                    if diffInMinutes > 0 {
+                        delayToUseInSeconds = delayToUseInSeconds! + diffInMinutes * 60
+                    }
+                    
                     return (true, "", Texts_Alerts.missedReadingAlertTitle, delayToUseInSeconds)
+                    
                 } else {
                     // none of alertentries enables missed reading, nothing to plan
                     return (false, nil, nil, nil)
                 }
-                
+            }
+
         case .calibration:
                 // if alertEntry not enabled, return false
                 if !currentAlertEntry.alertType.enabled || lastCalibration == nil {return (false, nil, nil, nil)}

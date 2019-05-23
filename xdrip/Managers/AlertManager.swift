@@ -311,8 +311,15 @@ public class AlertManager:NSObject {
             // find the applicable alertentry which depends on the delayInSeconds
             var applicableAlertType = currentAlertEntry.alertType
             if delayInSecondsToUse > 0, let nextAlertEntry = nextAlertEntry {
+                
+                // if start of nextAlertEntry < start of currentAlertEntry, then ad 24 hours, because it means the nextAlertEntry is actually the one of the day after
+                var nextAlertEntryStartValueToUse = nextAlertEntry.start
+                if nextAlertEntry.start < currentAlertEntry.start {
+                    nextAlertEntryStartValueToUse += nextAlertEntryStartValueToUse + 24 * 60
+                }
+
                 // check if current time + delayInSeconds falls within timezone of nextAlertEntry
-                if Date().minutesSinceMidNightLocalTime() + delayInSecondsToUse * 60 > nextAlertEntry.value {
+                if Date().minutesSinceMidNightLocalTime() + delayInSecondsToUse / 60 > nextAlertEntryStartValueToUse {
                     applicableAlertType = nextAlertEntry.alertType
                 }
             }
@@ -420,7 +427,7 @@ public class AlertManager:NSObject {
             // log the result
             os_log("in checkAlert, raising alert %{public}@", log: self.log, type: .info, alertKind.descriptionForLogging())
             if delayInSecondsToUse > 0 {
-                os_log("   delay = %{public}@", log: self.log, type: .info, delayInSecondsToUse.description)
+                os_log("   delay = %{public}@ seconds, = %{public}@ minutes", log: self.log, type: .info, delayInSecondsToUse.description, ((round(Double(delayInSecondsToUse)/60*10))/10).description)
             }
 
             return true
