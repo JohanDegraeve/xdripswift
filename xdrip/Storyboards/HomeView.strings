@@ -17,3 +17,4 @@
 "transmitterbatterylevel" = "Transmitter Battery Level";
 "connected" = "connected";
 "neverconnected" = "Didn't connect yet";
+"ago" = "ago";

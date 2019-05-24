@@ -20,7 +20,7 @@ class BgReadingsAccessor {
     
     // MARK: - functions
     
-    /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil,
+    /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil, with maximumDays old
     ///
     /// - parameters:
     ///     - limit : maximum amount of readings to return, if nil then no limit in amount
@@ -42,7 +42,7 @@ class BgReadingsAccessor {
         
     }
     
-    /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil,
+    /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil, with timestamp higher than fromDate
     ///
     /// - parameters:
     ///     - limit : maximum amount of readings to return, if nil then no limit in amount

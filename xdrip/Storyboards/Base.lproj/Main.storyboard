@@ -42,8 +42,8 @@
                                     <action selector="preSnoozeButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="nuJ-Sh-3Xy"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-----" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="We3-bN-ffR">
-                                <rect key="frame" x="43" y="252.5" width="289" height="162"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="---" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="We3-bN-ffR">
+                                <rect key="frame" x="0.0" y="252.5" width="375" height="203"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="95"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -65,16 +65,16 @@
                         <constraints>
                             <constraint firstItem="zWo-AR-qJE" firstAttribute="leading" secondItem="fSY-nc-amN" secondAttribute="trailing" constant="10" id="25g-Is-au8" userLabel="Transmitter Button Outlet.leading = Pre Snooze Button Outlet.trailing + 20"/>
                             <constraint firstItem="7Wo-wd-80o" firstAttribute="top" secondItem="uyn-2k-K74" secondAttribute="bottom" constant="10" id="ARe-Dm-DA6"/>
-                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="bottom" secondItem="We3-bN-ffR" secondAttribute="bottom" constant="203.5" id="Dh8-YX-1qs"/>
                             <constraint firstItem="fSY-nc-amN" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" id="Gsa-fG-7Wh"/>
                             <constraint firstItem="We3-bN-ffR" firstAttribute="centerY" secondItem="tsR-hK-woN" secondAttribute="centerY" id="Ihy-GJ-OoS"/>
                             <constraint firstItem="fSY-nc-amN" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="20" id="TFc-gV-Hzd"/>
                             <constraint firstItem="zWo-AR-qJE" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" id="WMb-YS-LdS"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="We3-bN-ffR" secondAttribute="trailing" id="Wne-W8-qR6"/>
                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="leading" secondItem="zWo-AR-qJE" secondAttribute="trailing" constant="10" id="YZw-LD-39g" userLabel="Calibrate Button Outlet.leading = Transmitter Button Outlet.trailing + 20"/>
                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" id="Ydd-ev-OLz"/>
+                            <constraint firstItem="We3-bN-ffR" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" id="Z2H-jd-XOW"/>
                             <constraint firstItem="uyn-2k-K74" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="10" id="fmo-f7-DDl"/>
                             <constraint firstItem="We3-bN-ffR" firstAttribute="centerX" secondItem="tsR-hK-woN" secondAttribute="centerX" id="fz5-iV-QmC"/>
-                            <constraint firstItem="We3-bN-ffR" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="43" id="ghV-YB-SJY"/>
                             <constraint firstItem="uyn-2k-K74" firstAttribute="top" secondItem="fSY-nc-amN" secondAttribute="bottom" constant="10" id="pqR-9I-Dpv"/>
                             <constraint firstItem="7Wo-wd-80o" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="10" id="rno-l9-zuR"/>
                         </constraints>
@@ -85,13 +85,16 @@
                     </tabBarItem>
                     <connections>
                         <outlet property="calibrateButtonOutlet" destination="mSJ-jy-nHJ" id="XSS-W3-gbX"/>
+                        <outlet property="diffLabelOutlet" destination="7Wo-wd-80o" id="nnn-w9-1sX"/>
+                        <outlet property="minutesLabelOutlet" destination="uyn-2k-K74" id="XXm-rq-Suy"/>
                         <outlet property="preSnoozeButtonOutlet" destination="fSY-nc-amN" id="T25-Z1-3Ad"/>
                         <outlet property="transmitterButtonOutlet" destination="zWo-AR-qJE" id="uuB-WI-JKe"/>
+                        <outlet property="valueLabelOutlet" destination="We3-bN-ffR" id="wtY-sZ-mev"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="750" y="-320"/>
+            <point key="canvasLocation" x="749.60000000000002" y="-320.68965517241384"/>
         </scene>
         <!--Picker View Controller-->
         <scene sceneID="6RW-Ef-2Hm">

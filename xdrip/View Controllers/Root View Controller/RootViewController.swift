@@ -26,6 +26,15 @@ final class RootViewController: UIViewController {
     @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
     }
     
+    /// outlet for label that shows how many minutes ago and so on
+    @IBOutlet weak var minutesLabelOutlet: UILabel!
+
+    /// outlet for label that shows difference with previous reading
+    @IBOutlet weak var diffLabelOutlet: UILabel!
+    
+    /// outlet for label that shows the current reading
+    @IBOutlet weak var valueLabelOutlet: UILabel!
+    
     /// a reference to the CGMTransmitter currently in use - nil means there's none, because user hasn't selected yet all required settings
     private var cgmTransmitter:CGMTransmitter?
     
@@ -69,6 +78,13 @@ final class RootViewController: UIViewController {
     
     // MARK: - View Life Cycle
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // latest reading value needs to be shown on the view
+        updateLabels()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -76,7 +92,13 @@ final class RootViewController: UIViewController {
         // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like setting up the transmitter, start scanning
         // In the exceptional case that the transmitter would give a new reading before the DataManager is set up, then this new reading will be ignored
         coreDataManager = CoreDataManager(modelName: Constants.CoreData.modelName, completion: {
+            
+            //
             self.setupApplicationData()
+            
+            // update label texts, minutes ago, diff and value
+            self.updateLabels()
+
         })
         
         // Setup View
@@ -112,8 +134,10 @@ final class RootViewController: UIViewController {
         
         // setup self as delegate for tabbarcontrolelr
         self.tabBarController?.delegate = self
+        
     }
     
+    // crates activeSensor, bgreadingsAccessor, timeStampLastBgReading, calibrationsAccessor, nightScoutUploader, soundPlayer
     private func setupApplicationData() {
         
         // if coreDataManager is nil then there's no reason to continue
@@ -145,9 +169,7 @@ final class RootViewController: UIViewController {
         soundPlayer = SoundPlayer()
         
         // setup alertmanager
-        if let soundPlayer = soundPlayer {
-            alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
-        }
+        alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
         
     }
     
@@ -221,11 +243,15 @@ final class RootViewController: UIViewController {
             
             // if a new reading is created, created either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
-                // if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification
+                
+                // if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
                 if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil {
                     createInitialCalibrationRequest()
                 } else {
+                    // update notification
                     createBgReadingNotification()
+                    // update all text in  first screen
+                    updateLabels()
                 }
                 
                 if let nightScoutUploader = nightScoutUploader {
@@ -270,7 +296,7 @@ final class RootViewController: UIViewController {
                         // set up na transmitter
                         initializeCGMTransmitter()
                     }
-                    
+                   
                 default:
                     break
                 }
@@ -283,6 +309,7 @@ final class RootViewController: UIViewController {
     /// Configure View
     private func setupView() {
         
+        // set texts for buttons on top
         calibrateButtonOutlet.setTitle(Texts_HomeView.calibrationButton, for: .normal)
         preSnoozeButtonOutlet.setTitle(Texts_HomeView.snoozeButton, for: .normal)
         transmitterButtonOutlet.setTitle(Texts_HomeView.transmitter, for: .normal)
@@ -485,7 +512,7 @@ final class RootViewController: UIViewController {
             calculatedValueAsString = calculatedValueAsString + " " + lastReading[0].slopeArrow()
         }
         if lastReading.count > 1 {
-            calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true)
+            calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         }
         notificationContent.title = calculatedValueAsString
 
@@ -500,6 +527,71 @@ final class RootViewController: UIViewController {
         }
     }
     
+    /// updates the homescreen
+    private func updateLabels() {
+        
+        // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabels is called from viewDidload at app launch
+        guard let bgReadingsAccessor = bgReadingsAccessor else {return}
+        
+        // last reading and lateButOneReading variable definition - optional
+        var lastReading:BgReading?
+        var lastButOneReading:BgReading?
+        
+        // assign latestReading if it exists
+        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: 1, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
+        if latestReadings.count > 0 {
+            lastReading = latestReadings[0]
+        }
+        if latestReadings.count > 1 {
+            lastButOneReading = latestReadings[1]
+        }
+        
+        // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's no going to be a latestReading
+        if let lastReading = lastReading {
+            
+            // start creating text for valueLabelOutlet, first the calculated value
+            var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            
+            // if latestReading older dan 11 minutes, then it should be strikethrough
+            if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
+                
+                let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
+                attributeString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
+                
+                valueLabelOutlet.attributedText = attributeString
+                
+            } else {
+                if !lastReading.hideSlope {
+                    calculatedValueAsString = calculatedValueAsString + " " + lastReading.slopeArrow()
+                }
+                valueLabelOutlet.text = calculatedValueAsString
+            }
+            
+            // set color, depending on value lower than low mark or higher than high mark
+            if lastReading.calculatedValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+                valueLabelOutlet.textColor = UIColor.red
+            } else if lastReading.calculatedValue >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+                valueLabelOutlet.textColor = "#a0b002".hexStringToUIColor()
+            } else {
+                valueLabelOutlet.textColor = UIColor.black
+            }
+            
+            // get minutes ago and create text for minutes ago label
+            let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
+            let minutesAgoText = minutesAgo.description + " " + (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) + " " + Texts_HomeView.ago
+            minutesLabelOutlet.text = minutesAgoText
+            
+            // create delta text
+            diffLabelOutlet.text = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            
+        } else {
+            valueLabelOutlet.text = "---"
+            minutesLabelOutlet.text = ""
+            diffLabelOutlet.text = ""
+        }
+    }
+    
+    /// when user clicks transmitter button, this will create and present the actionsheet, contents depend on type of transmitter and sensor status
     private func createAndPresentTransmitterButtonActionSheet() {
         // intialize list of actions
         var listOfActions = [String : ((UIAlertAction) -> Void)]()

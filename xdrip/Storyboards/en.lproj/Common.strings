@@ -11,6 +11,7 @@
 "common_hour" = "hour";
 "common_hours" = "hours";
 "common_minutes" = "minutes";
+"common_minute" = "minute";
 "common_day" = "day";
 "common_week" = "week";
 "warning" ="Warning !";

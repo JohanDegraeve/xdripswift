@@ -36,7 +36,7 @@ public class AlertManager:NSObject {
     private var alertEntriesAccessor:AlertEntriesAccessor
     
     /// playSound instance
-    private var soundPlayer:SoundPlayer
+    private var soundPlayer:SoundPlayer?
     
     // snooze parameters
     private var snoozeParameters = [Int: SnoozeParameters]()
@@ -57,7 +57,7 @@ public class AlertManager:NSObject {
     
     // MARK: - initializer
     
-    init(coreDataManager:CoreDataManager, soundPlayer:SoundPlayer) {
+    init(coreDataManager:CoreDataManager, soundPlayer:SoundPlayer?) {
         // initialize properties
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.alertTypesAccessor = AlertTypesAccessor(coreDataManager: coreDataManager)
@@ -172,7 +172,9 @@ public class AlertManager:NSObject {
             if response.notification.request.identifier == alertKind.notificationIdentifier() {
                 
                 // user clicked an alert notification, time to stop playing if play
-                soundPlayer.stopPlaying()
+                if let soundPlayer = soundPlayer {
+                    soundPlayer.stopPlaying()
+                }
                 
                 switch response.actionIdentifier {
                     
@@ -249,7 +251,9 @@ public class AlertManager:NSObject {
                     
                 case .appInForeGround:
                     // app comes to foreground, if app would still be playing sound, then it doesn't make sense to continue playing, it would mean that app was playing while in the background, most probably for an alert, user opens the app, there's no need to continue alerting the user
-                    soundPlayer.stopPlaying()
+                    if let soundPlayer = self.soundPlayer {
+                        soundPlayer.stopPlaying()
+                    }
                 default:
                     break
                 }
@@ -274,14 +278,18 @@ public class AlertManager:NSObject {
         return PickerViewData(withMainTitle: alertKind.alertTitle(), withSubTitle: Texts_Alerts.selectSnoozeTime, withData: snoozeValueStrings, selectedRow: defaultRow, withPriority: .high, actionButtonText: Texts_Common.Ok, cancelButtonText: Texts_Common.Cancel,
                               onActionClick: {
                                 (snoozeIndex:Int) -> Void in
-                                self.soundPlayer.stopPlaying()
+                                if let soundPlayer = self.soundPlayer {
+                                    soundPlayer.stopPlaying()
+                                }
                                 let alertPeriod = self.snoozeValueMinutes[snoozeIndex]
                                 self.getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: alertPeriod)
                                 os_log("    snoozing alert %{public}@ for %{public}@ minutes", log: self.log, type: .info, alertKind.descriptionForLogging(), alertPeriod.description)
         },
                               onCancelClick: {
                                 () -> Void in
-                                self.soundPlayer.stopPlaying()
+                                if let soundPlayer = self.soundPlayer {
+                                    soundPlayer.stopPlaying()
+                                }
         }
         )
 
@@ -392,7 +400,9 @@ public class AlertManager:NSObject {
                     // also delayInSeconds must be nil, if delayInSeconds is not nil then we can not play the sound here at now, it must be added to the notification
                     if applicableAlertType.overridemute && delayInSecondsToUse == 0 {
                         // play the sound
-                        soundPlayer.playSound(soundFileName: soundToSet, withVolume: nil)
+                        if let soundPlayer = self.soundPlayer {
+                            soundPlayer.playSound(soundFileName: soundToSet, withVolume: nil)
+                        }
                     } else {
                         // mute should not be overriden, by adding the sound to the notification, we let iOS decide if the sound will be played or not
                         content.sound = UNNotificationSound.init(named: UNNotificationSoundName.init(soundToSet))
