@@ -15,6 +15,10 @@ final class CoreDataManager {
     
     private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCoreDataManager)
     
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - for closure that will stop playing sound
+    private let applicationManagerKeySaveChanges = "coredatamanagersavechanges"
+
+    
     // MARK: -
     
     private let completion: CoreDataManagerCompletion
@@ -96,12 +100,6 @@ final class CoreDataManager {
         setupCoreDataStack()
     }
     
-    // MARK: - Notification Handling
-    
-    @objc func saveChanges(_ notification: Notification) {
-        saveChanges()
-    }
-    
     // MARK: - Helper Methods
     
     private func setupCoreDataStack() {
@@ -117,6 +115,9 @@ final class CoreDataManager {
             // Invoke Completion On Main Queue
             DispatchQueue.main.async { self.completion() }
         }
+        
+        // when app terminates, call saveChanges, just in case that somewhere in the code
+        ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeySaveChanges, closure: {self.saveChanges()})
     }
 
     // MARK: -

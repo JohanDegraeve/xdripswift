@@ -673,7 +673,7 @@ final class RootViewController: UIViewController {
         }
         
         // add transmitterBatteryInfo if known
-        if let transmitterBatteryInfo = UserDefaults.standard.transmitterBatteryInfo, let transmitterType = UserDefaults.standard.transmitterType {
+        if let transmitterBatteryInfo = UserDefaults.standard.transmitterBatteryInfo {
             textToShow += Texts_HomeView.transmitterBatteryLevel + " : " + transmitterBatteryInfo.description
             // add 1 newline with last connection timestamp
             textToShow += "\r\n\r\n"

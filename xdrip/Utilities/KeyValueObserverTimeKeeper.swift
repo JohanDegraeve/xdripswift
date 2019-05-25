@@ -6,6 +6,7 @@ import Foundation
 ///
 /// where this needs to be checked, create an instance of KeyValueObserverTimeKeeper, example in NightScoutUploader
 class KeyValueObserverTimeKeeper {
+    
     private var keyObserverKeeper = [String: Date]()
     
     /// call this to check if last observe of key was at least withMinimumDelayMilliSeconds ago

@@ -31,6 +31,7 @@
 		F81FA006228E09D40028C70F /* TextsCalibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81FA005228E09D40028C70F /* TextsCalibration.swift */; };
 		F81FA008228F52450028C70F /* HomeView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F81FA007228F52450028C70F /* HomeView.strings */; };
 		F81FA00A228F53680028C70F /* TextsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81FA009228F53680028C70F /* TextsHomeView.swift */; };
+		F81FA00C2298A0190028C70F /* ApplicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81FA00B2298A0170028C70F /* ApplicationManager.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
 		F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */; };
@@ -170,6 +171,7 @@
 		F81FA005228E09D40028C70F /* TextsCalibration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsCalibration.swift; sourceTree = "<group>"; };
 		F81FA007228F52450028C70F /* HomeView.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = HomeView.strings; sourceTree = "<group>"; };
 		F81FA009228F53680028C70F /* TextsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsHomeView.swift; sourceTree = "<group>"; };
+		F81FA00B2298A0170028C70F /* ApplicationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationManager.swift; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BgReading+CoreDataProperties.swift"; path = "../Extensions/BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Sensor+CoreDataProperties.swift"; path = "../Extensions/Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -423,6 +425,7 @@
 			children = (
 				F8B3A7A82265254D004BA588 /* Alerts */,
 				F85DC2F721D2632F00B9F74A /* CoreDataManager.swift */,
+				F81FA00B2298A0170028C70F /* ApplicationManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -1046,6 +1049,7 @@
 				F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */,
 				F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */,
 				F8B3A834227F08AC004BA588 /* PickerViewData.swift in Sources */,
+				F81FA00C2298A0190028C70F /* ApplicationManager.swift in Sources */,
 				F8025C0F21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift in Sources */,
 				F8B3A79522635A25004BA588 /* AlertType+CoreDataProperties.swift in Sources */,
 				F8B3A84C227F090E004BA588 /* SettingsViewController.swift in Sources */,

@@ -38,22 +38,25 @@ public class AlertManager:NSObject {
     /// playSound instance
     private var soundPlayer:SoundPlayer?
     
-    // snooze parameters
+    /// snooze parameters
     private var snoozeParameters = [Int: SnoozeParameters]()
     
-    // helper array with all alert notification identifiers
+    /// helper array with all alert notification identifiers
     private var alertNotificationIdentifers = [String]()
     
-    // permanent reference to notificationcenter
+    /// permanent reference to notificationcenter
     private let uNUserNotificationCenter:UNUserNotificationCenter
     
-    // snooze times in minutes
+    /// snooze times in minutes
     private let snoozeValueMinutes = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 75, 90, 120, 150, 180, 240, 300, 360, 420, 480, 540, 600, 1440, 10080]
     
-    // snooze times as shown to the user, actual strings will be replaced during init
+    /// snooze times as shown to the user, actual strings will be replaced during init
     private var snoozeValueStrings = ["5 minutes", "10 minutes", "15 minutes", "20 minutes", "25 minutes", "30 minutes", "35 minutes",
                                                    "40 minutes", "45 minutes", "50 minutes", "55 minutes", "1 hour", "1 hour 15 minutes", "1,5 hours", "2 hours", "2,5 hours", "3 hours", "4 hours",
                                                    "5 hours", "6 hours", "7 hours", "8 hours", "9 hours", "10 hours", "1 day", "1 week"]
+    
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - for closure that will stop playing sound
+    private let applicationManagerKeyStopPlayingSound = "alertmanagerstopplayingsound"
     
     // MARK: - initializer
     
@@ -83,12 +86,17 @@ public class AlertManager:NSObject {
         //  initialize array of alertNotifications
         initAlertNotificationIdentiferArray()
         
-        // need to set the alert notification categories, get the existing ones first
+        // need to set the alert notification categories, get the existing categories first, call setAlertNotificationCategories in competionhandler
         UNUserNotificationCenter.current().getNotificationCategories(completionHandler: setAlertNotificationCategories(_:))
         
-        // observe changes to app status, foreground or background
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.appInForeGround.rawValue, options: .new, context: nil)
-
+        // alertManager may have raised an alert with a sound played by soundplayer. If user brings the app to the foreground, the soundPlayer needs to stop playing
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStopPlayingSound, closure: {
+            if let soundPlayer = soundPlayer {
+                soundPlayer.stopPlaying()
+            }
+            
+        })
+        
     }
     
     // MARK: - public functions
@@ -238,27 +246,6 @@ public class AlertManager:NSObject {
             }
         }
         return returnValue
-    }
-    
-    // MARK: - overriden functions
-    
-    // interested in changes to some of the settings
-    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-
-        if let keyPath = keyPath {
-            if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
-                switch keyPathEnum {
-                    
-                case .appInForeGround:
-                    // app comes to foreground, if app would still be playing sound, then it doesn't make sense to continue playing, it would mean that app was playing while in the background, most probably for an alert, user opens the app, there's no need to continue alerting the user
-                    if let soundPlayer = self.soundPlayer {
-                        soundPlayer.stopPlaying()
-                    }
-                default:
-                    break
-                }
-            }
-        }
     }
     
     // MARK: - private helper functions

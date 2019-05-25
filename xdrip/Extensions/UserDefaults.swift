@@ -67,9 +67,6 @@ extension UserDefaults {
         /// Transmitter Battery Level
         case transmitterBatteryInfo = "transmitterbatteryinfo"
         
-        // Application
-        // is app in foreground or not
-        case appInForeGround = "appInForeGround"
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -405,17 +402,6 @@ extension UserDefaults {
             }
         }
     }
-    
-    /// is app in foreground or not
-    @objc dynamic var appInForeGround: Bool {
-        get {
-            return bool(forKey: Key.appInForeGround.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.appInForeGround.rawValue)
-        }
-    }
-    
 }
 
 
