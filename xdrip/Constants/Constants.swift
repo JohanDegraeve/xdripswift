@@ -205,4 +205,10 @@ struct Constants {
         static let soundName:String? = nil
     }
 
+    /// constants for home view, ie first view
+    enum HomeView {
+        
+        /// how often to update the labels in the homeview (ie label with latest reading, minutes ago, etc..)
+        static let updateHomeViewIntervalInSeconds = 15.0
+    }
 }

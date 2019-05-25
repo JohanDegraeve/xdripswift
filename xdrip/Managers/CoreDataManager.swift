@@ -15,7 +15,7 @@ final class CoreDataManager {
     
     private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCoreDataManager)
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - for closure that will stop playing sound
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillTerminate
     private let applicationManagerKeySaveChanges = "coredatamanagersavechanges"
 
     

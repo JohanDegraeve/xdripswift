@@ -28,16 +28,16 @@ class ApplicationManager {
     
     private func setupNotificationHandling() {
         
-        /// listen for required notifications
+        /// define notification center
         let notificationCenter = NotificationCenter.default
         
-        /// did enter background
+        /// add observer for did enter background
         notificationCenter.addObserver(self, selector: #selector(runWhenAppDidEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
         
-        /// will enter foreground
+        /// add observer for will enter foreground
         notificationCenter.addObserver(self, selector: #selector(runWhenAppWillEnterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
         
-        /// will terminate
+        /// add observer for will terminate
         notificationCenter.addObserver(self, selector: #selector(runWhenAppWillTerminate(_:)), name: UIApplication.willTerminateNotification, object: nil)
         
     }

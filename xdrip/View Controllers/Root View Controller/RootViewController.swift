@@ -71,10 +71,16 @@ final class RootViewController: UIViewController {
     private var timeStampLastBgReading:Date = Date(timeIntervalSince1970: 0)
     
     // reference to activeSensor
-    var activeSensor:Sensor?
+    private var activeSensor:Sensor?
     
     // if true, user manually started scanning for a device, when connection is made, we'll inform the user, see cgmTransmitterDidConnect
-    var userDidInitiateScanning = false
+    private var userDidInitiateScanning = false
+    
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - fire updatelabelstimer
+    private let applicationManagerKeyFireUpdateLabelsTimer = "FireUpdateLabelsTimer"
+    
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - fire updatelabelstimer
+    private let applicationManagerKeyInvalidateUpdateLabelsTimer = "InvalidateUpdateLabelsTimer"
     
     // MARK: - View Life Cycle
 
@@ -134,6 +140,9 @@ final class RootViewController: UIViewController {
         
         // setup self as delegate for tabbarcontrolelr
         self.tabBarController?.delegate = self
+        
+        // setup the timer logic for updating the view regularly
+        setupUpdateLabelsTimer()
         
     }
     
@@ -317,6 +326,39 @@ final class RootViewController: UIViewController {
     }
     
     // MARK: - private helper functions
+    
+    /// launches timer that will do regular screen updates - and adds closure to ApplicationManager : when going to background, stop the timer, when coming to foreground, restart the timer
+    ///
+    /// should be called only once immediately after app start, ie in viewdidload
+    private func setupUpdateLabelsTimer() {
+        
+        // this is the actual timer
+        var updateLabelsTimer:Timer?
+        
+        // create closure to invalide the timer, if it's running
+        let invalidateUpdateLabelsTimer = {
+            if let updateLabelsTimer = updateLabelsTimer {
+                updateLabelsTimer.invalidate()
+            }
+        }
+        
+        // create closure that launches the timer to update the first view every x seconds, and returns the created timer
+        let scheduleUpdateLabelsTimer:() -> Timer = {
+            // check if timer already exists, if so stop it
+            invalidateUpdateLabelsTimer()
+            // now recreate, schedule and return
+            return Timer.scheduledTimer(timeInterval: Constants.HomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabels), userInfo: nil, repeats: true)
+        }
+        
+        // call scheduleUpdateLabelsTimer function now - as the function setupUpdateLabelsTimer is called from viewdidload, it will be created immediately after app launch
+        updateLabelsTimer = scheduleUpdateLabelsTimer()
+        
+        // timer needs to be invalidated when app goes to background
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyFireUpdateLabelsTimer, closure: {updateLabelsTimer = scheduleUpdateLabelsTimer()})
+        
+        // timer needs to be recreated when app comes back to foreground
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateUpdateLabelsTimer, closure: {invalidateUpdateLabelsTimer()})
+    }
     
     /// sets parameter cgmTransmitter to nil and also other settings
     ///
@@ -528,8 +570,8 @@ final class RootViewController: UIViewController {
     }
     
     /// updates the homescreen
-    private func updateLabels() {
-        
+    @objc private func updateLabels() {
+        debuglogging("in updatelabels")
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabels is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
