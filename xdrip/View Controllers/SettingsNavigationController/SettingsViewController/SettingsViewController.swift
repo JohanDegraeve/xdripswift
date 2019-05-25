@@ -133,7 +133,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return Section.allCases.count
+        // temporary returning 5 because healthkit and others are not yet ready
+        return 4//Section.allCases.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
