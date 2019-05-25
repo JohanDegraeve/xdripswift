@@ -83,5 +83,25 @@ enum Texts_HomeView {
     static let ago:String = {
         return NSLocalizedString("ago", tableName: filename, bundle: Bundle.main, value: "ago", comment: "for home view, where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'")
     }()
+
+    static let licenseInfo:String = {
+        return NSLocalizedString("licenseinfo", tableName: filename, bundle: Bundle.main, value: "This program is free software distributed under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\r\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.  See http://www.gnu.org/licenses/gpl.txt for more details\r\n\r\nInfo : ", comment: "for home view, license info")
+    }()
+
+    static let info:String = {
+        return NSLocalizedString("info", tableName: filename, bundle: Bundle.main, value: "Info", comment: "for home view, title of pop up that gives info about how to select the transmitter. Simply the word Info")
+    }()
+    
+    static let transmitterInfo:String = {
+        return NSLocalizedString("transmitterinfo", tableName: filename, bundle: Bundle.main, value: "First go to the settings tab where you can select you transmitter type and (if applicable) transmitter id. Depending on device type, you will need to come back to this tab here (the Home) tab where you can start scanning.", comment: "for home view, Info how to start : set transmitter and id, then go back to home screen, start scanning")
+    }()
+    
+    static let startSensorBeforeCalibration:String = {
+        return NSLocalizedString("startsensorbeforecalibration", tableName: filename, bundle: Bundle.main, value: "You can not calibrate as long as there's no sensor started.", comment: "for home view, user clicks calibrate but there's no sensor started yet")
+    }()
+    
+    static let thereMustBeAreadingBeforeCalibration:String = {
+        return NSLocalizedString("theremustbeareadingbeforecalibration", tableName: filename, bundle: Bundle.main, value: "There must be at least one reading before you can calibrate. You will be requested to calibrate as soon as a reading arrives.", comment: "for home view, user clicks calibrate but there's no reading yet")
+    }()
     
 }

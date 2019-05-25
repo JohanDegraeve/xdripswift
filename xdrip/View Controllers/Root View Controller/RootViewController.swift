@@ -12,7 +12,7 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var calibrateButtonOutlet: UIButton!
     
     @IBAction func calibrateButtonAction(_ sender: UIButton) {
-        requestCalibration()
+        requestCalibration(userRequested: true)
     }
     
     @IBOutlet weak var transmitterButtonOutlet: UIButton!
@@ -24,6 +24,7 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var preSnoozeButtonOutlet: UIButton!
     
     @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
+        UIAlertController(title: "Info", message: "Unfortuantely, presnooze functionality is not yet implemented", actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
     }
     
     /// outlet for label that shows how many minutes ago and so on
@@ -99,7 +100,6 @@ final class RootViewController: UIViewController {
         // In the exceptional case that the transmitter would give a new reading before the DataManager is set up, then this new reading will be ignored
         coreDataManager = CoreDataManager(modelName: Constants.CoreData.modelName, completion: {
             
-            //
             self.setupApplicationData()
             
             // update label texts, minutes ago, diff and value
@@ -143,6 +143,19 @@ final class RootViewController: UIViewController {
         
         // setup the timer logic for updating the view regularly
         setupUpdateLabelsTimer()
+        
+        // if licenseinfo not yet accepted, show license info with only ok button
+        if !UserDefaults.standard.licenseInfoAccepted {
+            UIAlertController(title: Constants.HomeView.applicationName, message: Texts_HomeView.licenseInfo + Constants.HomeView.infoEmailAddress, actionHandler: {
+                
+                // set licenseInfoAccepted to true
+                UserDefaults.standard.licenseInfoAccepted = true
+                
+                // create info screen about transmitters
+                UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterInfo, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+                
+            }).presentInOwnWindow(animated: true, completion: nil)
+        }
         
     }
     
@@ -381,11 +394,25 @@ final class RootViewController: UIViewController {
     }
     
     /// opens an alert, that requests user to enter a calibration value, and calibrates
-    private func requestCalibration() {
+    /// - parameters:
+    ///     - userRequested : if true, it's a requestCalibration initiated by user clicking on the calibrate button in the homescreen
+    private func requestCalibration(userRequested:Bool) {
         
         // check that calibrationsAccessor is not nil
         guard let calibrationsAccessor = calibrationsAccessor else {
             fatalError("in requestCalibration, calibrationsAccessor is nil")
+        }
+        
+        // check if sensor active and if not don't continue
+        guard let activeSensor = activeSensor else {
+            UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.startSensorBeforeCalibration, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+            return
+        }
+        
+        // if it's a user requested calibration, but there's no calibration yet, then give info and return - first calibration will be requested by app via notification
+        if calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) == nil && userRequested {
+            UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.thereMustBeAreadingBeforeCalibration, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+            return
         }
         
         let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: nil, preferredStyle: .alert)
@@ -574,7 +601,7 @@ final class RootViewController: UIViewController {
     
     /// updates the homescreen
     @objc private func updateLabels() {
-        debuglogging("in updatelabels")
+
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabels is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
@@ -920,7 +947,7 @@ extension RootViewController:UNUserNotificationCenterDelegate {
         
         if notification.request.identifier == Constants.Notifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
             // request calibration
-            requestCalibration()
+            requestCalibration(userRequested: false)
             
             // call completionhandler
             completionHandler([])
@@ -940,7 +967,7 @@ extension RootViewController:UNUserNotificationCenterDelegate {
         if response.notification.request.identifier == Constants.Notifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
             os_log("     userNotificationCenter didReceive, user pressed calibration notification to open the app", log: log, type: .info)
             // request calibration
-            requestCalibration()
+            requestCalibration(userRequested: false)
             
             // call completionhandler
             completionHandler()

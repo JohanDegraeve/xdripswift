@@ -49,6 +49,9 @@ extension UserDefaults {
         /// message shown when user starts a sensor, which tells that timing should be exact, was it already shown or not
         case startSensorTimeInfoGiven = "startSensorTimeInfoGiven"
         
+        /// license info accepted by user yes or no
+        case licenseInfoAccepted = "licenseInfoAccepted"
+        
         // Other Settings (not user configurable)
         
         // Bluetooth
@@ -343,6 +346,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.startSensorTimeInfoGiven.rawValue)
+        }
+    }
+    
+    /// license info accepted by user yes or no
+    var licenseInfoAccepted:Bool {
+        get {
+            return bool(forKey: Key.licenseInfoAccepted.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.licenseInfoAccepted.rawValue)
         }
     }
     
