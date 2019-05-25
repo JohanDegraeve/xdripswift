@@ -5,7 +5,7 @@ public class PickerViewData {
     var mainTitle:String?
     var subTitle:String?
     var data:[String]
-    var selectedRow:Int?
+    var selectedRow:Int
     var actionTitle:String?
     var cancelTitle:String?
     var actionHandler: ((_ index: Int) -> Void)
@@ -26,7 +26,7 @@ public class PickerViewData {
         self.mainTitle = mainTitle
         self.subTitle = subTitle
         self.data = data
-        self.selectedRow = selectedRow
+        self.selectedRow = selectedRow != nil ? selectedRow!:0
         self.actionTitle = actionTitle
         self.cancelTitle = cancelTitle
         self.actionHandler = actionHandler
