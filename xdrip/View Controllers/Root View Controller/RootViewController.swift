@@ -335,7 +335,7 @@ final class RootViewController: UIViewController {
         // this is the actual timer
         var updateLabelsTimer:Timer?
         
-        // create closure to invalide the timer, if it's running
+        // create closure to invalide the timer, if it exists
         let invalidateUpdateLabelsTimer = {
             if let updateLabelsTimer = updateLabelsTimer {
                 updateLabelsTimer.invalidate()
@@ -344,19 +344,19 @@ final class RootViewController: UIViewController {
         
         // create closure that launches the timer to update the first view every x seconds, and returns the created timer
         let scheduleUpdateLabelsTimer:() -> Timer = {
-            // check if timer already exists, if so stop it
+            // check if timer already exists, if so invalidate it
             invalidateUpdateLabelsTimer()
             // now recreate, schedule and return
             return Timer.scheduledTimer(timeInterval: Constants.HomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabels), userInfo: nil, repeats: true)
         }
         
-        // call scheduleUpdateLabelsTimer function now - as the function setupUpdateLabelsTimer is called from viewdidload, it will be created immediately after app launch
+        // call scheduleUpdateLabelsTimer function now - as the function setupUpdateLabelsTimer is called from viewdidload, it will be called immediately after app launch
         updateLabelsTimer = scheduleUpdateLabelsTimer()
         
-        // timer needs to be invalidated when app goes to background
+        // timer needs to be invalidated when app comes back from background to foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyFireUpdateLabelsTimer, closure: {updateLabelsTimer = scheduleUpdateLabelsTimer()})
         
-        // timer needs to be recreated when app comes back to foreground
+        // timer needs to be recreated when app goes to background
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateUpdateLabelsTimer, closure: {invalidateUpdateLabelsTimer()})
     }
     
