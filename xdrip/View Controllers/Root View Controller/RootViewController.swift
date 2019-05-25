@@ -433,6 +433,9 @@ final class RootViewController: UIViewController {
                                 if let alertManager = self.alertManager {
                                     alertManager.checkAlerts()
                                 }
+                                
+                                // update labels
+                                self.updateLabels()
                             }
                         }
                     }
