@@ -135,6 +135,8 @@ final class PickerViewController : UIViewController {
         }
     }
     
+    // MARK: - Public Methods
+    
     /// creates and presents a new PickerViewController in the parentController - if there's already another uiviewcontroller being presented by the specified parentController, then the cancelhandler will be called immediately without trying to present anything
     /// - parameters:
     ///     - pickerViewData : data to use in the pickerviewcontroller

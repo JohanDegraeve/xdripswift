@@ -39,6 +39,7 @@ final class RootViewController: UIViewController {
     /// a reference to the CGMTransmitter currently in use - nil means there's none, because user hasn't selected yet all required settings
     private var cgmTransmitter:CGMTransmitter?
     
+    /// for logging
     private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryFirstView)
     
     /// did user authorize notifications ?
@@ -77,11 +78,14 @@ final class RootViewController: UIViewController {
     // if true, user manually started scanning for a device, when connection is made, we'll inform the user, see cgmTransmitterDidConnect
     private var userDidInitiateScanning = false
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - fire updatelabelstimer
-    private let applicationManagerKeyFireUpdateLabelsTimer = "FireUpdateLabelsTimer"
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updatelabelstimer
+    private let applicationManagerKeyCreateUpdateLabelsTimer = "CreateUpdateLabelsTimer"
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - fire updatelabelstimer
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate updatelabelstimer
     private let applicationManagerKeyInvalidateUpdateLabelsTimer = "InvalidateUpdateLabelsTimer"
+    
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - updateLabels
+    private let applicationManagerKeyUpdateLabels = "UpdateLabels"
     
     // MARK: - View Life Cycle
 
@@ -156,6 +160,9 @@ final class RootViewController: UIViewController {
                 
             }).presentInOwnWindow(animated: true, completion: nil)
         }
+        
+        // whenever app comes from-back to freground, updateLabels needs to be called
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyCreateUpdateLabelsTimer, closure: {self.updateLabels()})
         
     }
     
@@ -367,7 +374,7 @@ final class RootViewController: UIViewController {
         updateLabelsTimer = scheduleUpdateLabelsTimer()
         
         // timer needs to be invalidated when app comes back from background to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyFireUpdateLabelsTimer, closure: {updateLabelsTimer = scheduleUpdateLabelsTimer()})
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyCreateUpdateLabelsTimer, closure: {updateLabelsTimer = scheduleUpdateLabelsTimer()})
         
         // timer needs to be recreated when app goes to background
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateUpdateLabelsTimer, closure: {invalidateUpdateLabelsTimer()})
@@ -942,7 +949,7 @@ extension RootViewController: UITabBarControllerDelegate {
 /// conform to UNUserNotificationCenterDelegate, for notifications
 extension RootViewController:UNUserNotificationCenterDelegate {
     
-    //called when notification fired while app is in foreground
+    //called when notification created while app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
         if notification.request.identifier == Constants.Notifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
