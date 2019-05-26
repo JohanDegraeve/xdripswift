@@ -2,13 +2,17 @@ Project in development.
 
 Goal is to port iosxdripreader to Swift
 
-Current restrictions (when comparing to iosxdripreader)
+Current Status
+- Supported transmitters :
+    - no Blucon
+    - G5 not recently tested, was tested 3 months ago and worked, my batteries are empty for the moment
+    - MiaoMiao supported
+    - G4 with xBridge supported
+- no follower mode ==> this is my next priority
 - no translations, English only
-- no Blucon
 - no upload to Dexcom share servers
 - no healthkit store
 - no speak readings
-- no follower mode
 - no sidiary
 - no graph on the homescreen
 
