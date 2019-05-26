@@ -42,9 +42,6 @@ final class RootViewController: UIViewController {
     /// for logging
     private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryFirstView)
     
-    /// did user authorize notifications ?
-    private var notificationsAuthorized:Bool = false;
-
     /// coreDataManager to be used throughout the project
     private var coreDataManager:CoreDataManager?
     
@@ -127,18 +124,14 @@ final class RootViewController: UIViewController {
         // check if app is allowed to send local notification and if not ask it
         UNUserNotificationCenter.current().getNotificationSettings { (notificationSettings) in
             switch notificationSettings.authorizationStatus {
-            case .notDetermined:
-                self.requestNotificationAuthorization(completionHandler: { (success) in
-                    guard success else {
-                        os_log("failed to request notification authorization", log: self.log, type: .info)
-                        return
+            case .notDetermined, .denied:
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (success, error) in
+                    if let error = error {
+                        os_log("Request Notification Authorization Failed : %{public}@", log: self.log, type: .error, error.localizedDescription)
                     }
-                    self.notificationsAuthorized = true
-                })
-            case  .denied:
-                os_log("notification authorization denied", log: self.log, type: .info)
+                }
             default:
-                self.notificationsAuthorized = true
+                break
             }
         }
         
@@ -200,17 +193,6 @@ final class RootViewController: UIViewController {
         // setup alertmanager
         alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
         
-    }
-    
-    /// request notification authorization to the user for alert, sound and badge
-    private func requestNotificationAuthorization(completionHandler: @escaping (_ success: Bool) -> ()) {
-        // Request Authorization
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (success, error) in
-            if let error = error {
-                os_log("Request Notification Authorization Failed : %{public}@", log: self.log, type: .error, error.localizedDescription)
-            }
-            completionHandler(success)
-        }
     }
     
     private func processNewCGMInfo(glucoseData: inout [RawGlucoseData], sensorState: SensorState?, firmware: String?, hardware: String?, transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
