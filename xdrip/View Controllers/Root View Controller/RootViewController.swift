@@ -70,8 +70,8 @@ final class RootViewController: UIViewController {
     /// Calibrations instance
     private var calibrationsAccessor:CalibrationsAccessor?
     
-    /// NightScoutUploader instance
-    private var nightScoutUploader:NightScoutUploader?
+    /// NightScoutManager instance
+    private var nightScoutManager:NightScoutManager?
     
     /// AlerManager instance
     private var alertManager:AlertManager?
@@ -163,7 +163,7 @@ final class RootViewController: UIViewController {
         
     }
     
-    // crates activeSensor, bgreadingsAccessor, timeStampLastBgReading, calibrationsAccessor, nightScoutUploader, soundPlayer
+    // crates activeSensor, bgreadingsAccessor, timeStampLastBgReading, calibrationsAccessor, nightScoutManager, soundPlayer
     private func setupApplicationData() {
         
         // if coreDataManager is nil then there's no reason to continue
@@ -189,7 +189,7 @@ final class RootViewController: UIViewController {
         calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         
         // setup nightscout synchronizer
-        nightScoutUploader = NightScoutUploader(bgReadingsAccessor: bgReadingsAccessor)
+        nightScoutManager = NightScoutManager(bgReadingsAccessor: bgReadingsAccessor)
         
         // setup playsound
         soundPlayer = SoundPlayer()
@@ -269,8 +269,8 @@ final class RootViewController: UIViewController {
                     updateLabels()
                 }
                 
-                if let nightScoutUploader = nightScoutUploader {
-                    nightScoutUploader.synchronize()
+                if let nightScoutManager = nightScoutManager {
+                    nightScoutManager.synchronize()
                 }
                 
                 if let alertManager = alertManager {
@@ -445,15 +445,15 @@ final class RootViewController: UIViewController {
                                 coreDataManager.saveChanges()
                                 
                                 // initiate upload to NightScout, if needed
-                                if let nightScoutUploader = self.nightScoutUploader {
-                                    nightScoutUploader.synchronize()
+                                if let nightScoutManager = self.nightScoutManager {
+                                    nightScoutManager.synchronize()
                                 }
                                 
                                 // check alerts
                                 if let alertManager = self.alertManager {
                                     alertManager.checkAlerts()
                                 }
-                                
+
                                 // update labels
                                 self.updateLabels()
                             }

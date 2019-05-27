@@ -92,7 +92,7 @@ struct Constants {
         // application data alertentries
         static let categoryApplicationDataAlertEntries = "categoryApplicationDataAlertEntries"
         // nightscout uploader
-        static let categoryNightScoutUploader = "categoryNightScoutUploader"
+        static let categoryNightScoutManager = "categoryNightScoutManager"
         // alertmanager
         static let categoryAlertManager = "categoryAlertManager"
         // playsound
