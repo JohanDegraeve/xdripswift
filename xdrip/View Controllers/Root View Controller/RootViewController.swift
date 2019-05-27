@@ -36,6 +36,19 @@ final class RootViewController: UIViewController {
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
     
+    // MARK: - Constants for ApplicationManager usage
+
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updatelabelstimer
+    private let applicationManagerKeyCreateUpdateLabelsTimer = "CreateUpdateLabelsTimer"
+    
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate updatelabelstimer
+    private let applicationManagerKeyInvalidateUpdateLabelsTimer = "InvalidateUpdateLabelsTimer"
+    
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - updateLabels
+    private let applicationManagerKeyUpdateLabels = "UpdateLabels"
+
+    // MARK: - Properties - other private properties
+    
     /// a reference to the CGMTransmitter currently in use - nil means there's none, because user hasn't selected yet all required settings
     private var cgmTransmitter:CGMTransmitter?
     
@@ -75,21 +88,12 @@ final class RootViewController: UIViewController {
     // if true, user manually started scanning for a device, when connection is made, we'll inform the user, see cgmTransmitterDidConnect
     private var userDidInitiateScanning = false
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updatelabelstimer
-    private let applicationManagerKeyCreateUpdateLabelsTimer = "CreateUpdateLabelsTimer"
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate updatelabelstimer
-    private let applicationManagerKeyInvalidateUpdateLabelsTimer = "InvalidateUpdateLabelsTimer"
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - updateLabels
-    private let applicationManagerKeyUpdateLabels = "UpdateLabels"
-    
     // MARK: - View Life Cycle
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // latest reading value needs to be shown on the view
+        // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabels()
     }
     
@@ -115,7 +119,7 @@ final class RootViewController: UIViewController {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterTypeAsString.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterId.rawValue, options: .new, context: nil)
 
-        // create transmitter
+        // create transmitter based on UserDefaults
         initializeCGMTransmitter()
         
         // setup delegate for UNUserNotificationCenter
