@@ -13,12 +13,18 @@ extension UserDefaults {
         case lowMarkValue = "lowMarkValue"
         /// high value
         case highMarkValue = "highMarkValue"
+        /// master or follower
+        case isMaster = "isMaster"
+        
+        // Transmitter
+        
         /// transmitter type
         case transmitterTypeAsString = "transmitterTypeAsString"
         /// transmitterid
         case transmitterId = "transmitterId"
-        /// should readings be stored in healthkit, true or false
-        case storeReadingsInHealthkit = "storeReadingsInHealthkit"
+        
+        // Nightscout
+        
         /// should readings be uploaded to nightscout
         case uploadReadingsToNightScout = "uploadReadingsToNightScout"
         /// nightscout url
@@ -26,6 +32,9 @@ extension UserDefaults {
         /// nightscout api key
         case nightScoutAPIKey = "nightScoutAPIKey"
         /// should readings be uploaded to Dexcom share
+        
+        // Dexcom Share
+        
         case uploadReadingstoDexcomShare = "uploadReadingstoDexcomShare"
         /// dexcom share account name
         case dexcomShareAccountName = "dexcomShareAccountName"
@@ -35,6 +44,14 @@ extension UserDefaults {
         case useUSDexcomShareurl = "useUSDexcomShareurl"
         /// dexcom share serial number
         case dexcomShareSerialNumber = "dexcomShareSerialNumber"
+        
+        // Healthkit
+        
+        /// should readings be stored in healthkit, true or false
+        case storeReadingsInHealthkit = "storeReadingsInHealthkit"
+        
+        // Speak readings
+        
         /// speak readings
         case speakReadings = "speakReadings"
         /// speak delta
@@ -124,6 +141,17 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
+        }
+    }
+    
+    /// true if device is master, false if follower
+    @objc dynamic var isMaster: Bool {
+        // default value for bool in userdefaults is false, false is for master, true is for follower
+        get {
+            return !bool(forKey: Key.isMaster.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.isMaster.rawValue)
         }
     }
     

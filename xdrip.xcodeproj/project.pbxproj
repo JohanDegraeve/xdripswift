@@ -41,6 +41,7 @@
 		F821CF5E229BF43A005C1E43 /* BgReading+NightScout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF53229BF43A005C1E43 /* BgReading+NightScout.swift */; };
 		F821CF5F229BF43A005C1E43 /* ApplicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF55229BF43A005C1E43 /* ApplicationManager.swift */; };
 		F821CF61229BF4A2005C1E43 /* NightScoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF60229BF4A2005C1E43 /* NightScoutManager.swift */; };
+		F821CF64229C6962005C1E43 /* FollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF63229C6962005C1E43 /* FollowManager.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
 		F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */; };
@@ -181,6 +182,7 @@
 		F821CF53229BF43A005C1E43 /* BgReading+NightScout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+NightScout.swift"; sourceTree = "<group>"; };
 		F821CF55229BF43A005C1E43 /* ApplicationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationManager.swift; sourceTree = "<group>"; };
 		F821CF60229BF4A2005C1E43 /* NightScoutManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightScoutManager.swift; sourceTree = "<group>"; };
+		F821CF63229C6962005C1E43 /* FollowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowManager.swift; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BgReading+CoreDataProperties.swift"; path = "../Extensions/BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Sensor+CoreDataProperties.swift"; path = "../Extensions/Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -451,6 +453,14 @@
 			path = Application;
 			sourceTree = "<group>";
 		};
+		F821CF62229C6947005C1E43 /* Follower */ = {
+			isa = PBXGroup;
+			children = (
+				F821CF63229C6962005C1E43 /* FollowManager.swift */,
+			);
+			path = Follower;
+			sourceTree = "<group>";
+		};
 		F85DC29B21CFCEB800B9F74A /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -461,6 +471,7 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				F821CF62229C6947005C1E43 /* Follower */,
 				F821CF48229BF43A005C1E43 /* Alerts */,
 				F821CF54229BF43A005C1E43 /* Application */,
 				F821CF4D229BF43A005C1E43 /* CoreData */,
@@ -1070,6 +1081,7 @@
 				F897AB1F22059EA000CDDD10 /* AuthRequestRxMessage.swift in Sources */,
 				F897AB2A220742E900CDDD10 /* AESCrypt.m in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
+				F821CF64229C6962005C1E43 /* FollowManager.swift in Sources */,
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				F8B3A820227DEC92004BA588 /* AlertTypesAccessor.swift in Sources */,
 				F8B3A81E227DEC92004BA588 /* BgReadingsAccessor.swift in Sources */,
@@ -1308,7 +1320,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/Transmitter/CGMBluetoothTransmitter/G5/G5Messages/xdrip-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1331,7 +1343,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/Transmitter/CGMBluetoothTransmitter/G5/G5Messages/xdrip-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;

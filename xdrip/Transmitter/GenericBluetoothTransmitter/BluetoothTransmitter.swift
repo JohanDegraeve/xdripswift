@@ -243,17 +243,24 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// the result of the attempt to try to find such device, is returned
     fileprivate func retrievePeripherals(_ central:CBCentralManager) -> Bool {
         if let deviceAddress = deviceAddress {
+            debuglogging("in retrievePeripherals, deviceaddress is not nil")
             if let uuid = UUID(uuidString: deviceAddress) {
+                debuglogging("    in retrievePeripherals, uuid is not nil")
                 var peripheralArr = central.retrievePeripherals(withIdentifiers: [uuid])
                 if peripheralArr.count > 0 {
                     peripheral = peripheralArr[0]
                     if let peripheral = peripheral {
+                        debuglogging("    in retrievePeripherals, peripheral is not nil")
                         os_log("in retrievePeripherals, trying to connect", log: log, type: .info)
                         peripheral.delegate = self
                         central.connect(peripheral, options: nil)
                         return true
+                    } else {
+                        debuglogging("    in retrievePeripherals, peripheral isfstart nil")
                     }
                 }
+            } else {
+                debuglogging("    in retrievePeripherals, uuid is nil")
             }
         }
         return false

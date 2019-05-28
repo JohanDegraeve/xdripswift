@@ -217,4 +217,11 @@ struct Constants {
         /// application name, appears in licenseInfo as title
         static let applicationName = "xDrip"
     }
+    
+    // constants for follower mode
+    enum Follower {
+        
+        /// maximum days of readings to download
+        static let maxiumDaysOfReadingsToDownlod = 1
+    }
 }

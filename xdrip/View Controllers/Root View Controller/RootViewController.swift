@@ -118,6 +118,9 @@ final class RootViewController: UIViewController {
         // when user changes transmitter type or transmitter id, then new transmitter needs to be setup. That's why observer for these settings is required
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterTypeAsString.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterId.rawValue, options: .new, context: nil)
+        // changing from follower to master or vice versa also requires transmitter setup
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new
+            , context: nil)
 
         // create transmitter based on UserDefaults
         initializeCGMTransmitter()
@@ -296,17 +299,16 @@ final class RootViewController: UIViewController {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.transmitterTypeAsString, UserDefaults.Key.transmitterId :
+                // for these three settings, a forgetdevice can be done and reinitialize cgmTransmitter. In case of switching from master to follower, initializeCGMTransmitter will not initialize a cgmTransmitter, so it's ok to call that function
+                case UserDefaults.Key.transmitterTypeAsString, UserDefaults.Key.transmitterId, UserDefaults.Key.isMaster :
                     
                     // transmittertype change triggered by user, should not be done within 200 ms
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
-                        UserDefaults.standard.bluetoothDeviceAddress = nil
-                        UserDefaults.standard.bluetoothDeviceName =  nil
-
-                        // there's no need to stop the sensor, maybe the user is just switching from xdrip a to xdrip b
                         
-                        // setting cgmTransmitter to nil, if currently cgmTransmitter is not nil, by assign to nil the deinit function of the currently used cgmTransmitter will be called, which will deconnect the device
-                        setCGMTransmitterToNil()
+                        // there's no need to stop the sensor here, maybe the user is just switching from xdrip a to xdrip b
+                        
+                        // forget current device
+                        forgetDevice()
                         
                         // set up na transmitter
                         initializeCGMTransmitter()
@@ -364,26 +366,6 @@ final class RootViewController: UIViewController {
         
         // timer needs to be recreated when app goes to background
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateUpdateLabelsTimer, closure: {invalidateUpdateLabelsTimer()})
-    }
-    
-    /// sets parameter cgmTransmitter to nil and also other settings
-    ///
-    ///     - cgmTransmitter to nil
-    ///     - UserDefaults.standard.transmitterBatteryInfo to nil
-    ///     - UserDefaults.standard.lastdisConnectTimestamp to nil
-    ///     - stops the active sensor
-    private func setCGMTransmitterToNil() {
-        
-        cgmTransmitter = nil // here don't use setCGMTransmitterToNil(), because it's not the goal tha transmitterBatteryInfo is set to nil at each app startup
-        
-        // reset also UserDefaults.standard.transmitterBatteryInfo
-        UserDefaults.standard.transmitterBatteryInfo = nil
-        
-        // set lastdisconnecttimestamp to nil
-        UserDefaults.standard.lastdisConnectTimestamp = nil
-        
-        // stop active sensor
-        stopSensor()
     }
     
     /// opens an alert, that requests user to enter a calibration value, and calibrates
@@ -466,14 +448,17 @@ final class RootViewController: UIViewController {
     }
     
 
-    /// will set first cgmTransmitter to nil, reads transmittertype from userdefaults, and if available creates the transmitter and start the scanning
+    /// will set first cgmTransmitter to nil, reads transmittertype from userdefaults, if applicable also transmitterid and if available creates the property cgmTransmitter - if follower mode then cgmTransmitter is set to nil
+    ///
+    /// depending on transmitter type, scanning will automatically start as soon as cgmTransmitter is created
     private func initializeCGMTransmitter() {
         
         // setting cgmTransmitter to nil, if currently cgmTransmitter is not nil, by assign to nil the deinit function of the currently used cgmTransmitter will be called, which will deconnect the device
         // setting to nil is also done in other places, doing it again just to be 100% sure
         cgmTransmitter = nil
         
-        if let currentTransmitterTypeAsEnum = UserDefaults.standard.transmitterType {
+        // if transmitter type is set and device is master
+        if let currentTransmitterTypeAsEnum = UserDefaults.standard.transmitterType, UserDefaults.standard.isMaster {
             
             // first create transmitter
             switch currentTransmitterTypeAsEnum {
@@ -658,7 +643,7 @@ final class RootViewController: UIViewController {
     
     /// when user clicks transmitter button, this will create and present the actionsheet, contents depend on type of transmitter and sensor status
     private func createAndPresentTransmitterButtonActionSheet() {
-        // intialize list of actions
+        // initialize list of actions
         var listOfActions = [String : ((UIAlertAction) -> Void)]()
         
         // first action is to show the status
@@ -675,7 +660,7 @@ final class RootViewController: UIViewController {
                     if UserDefaults.standard.bluetoothDeviceAddress == nil {
                         listOfActions[Texts_HomeView.scanBluetoothDeviceActionTitle] = {(UIAlertAction) in self.userInitiatesStartScanning()}
                     } else {
-                        listOfActions[Texts_HomeView.forgetBluetoothDeviceActionTitle] = {(UIAlertAction) in self.userInitiatesForgetDevice()}
+                        listOfActions[Texts_HomeView.forgetBluetoothDeviceActionTitle] = {(UIAlertAction) in self.forgetDevice()}
                     }
                 }
             }
@@ -778,18 +763,31 @@ final class RootViewController: UIViewController {
         }
     }
     
-    /// user clicked forget device action, this function will forget the device
-    private func userInitiatesForgetDevice() {
+    ///     - cgmTransmitter to nil, this disconnects also the existing transmitter
+    ///     - UserDefaults.standard.transmitterBatteryInfo to nil
+    ///     - UserDefaults.standard.lastdisConnectTimestamp to nil
+    ///     - UserDefaults.standard.bluetoothDeviceAddress to nil
+    ///     - UserDefaults.standard.bluetoothDeviceName to nil
+    ///     -
+    ///     - calls also initializeCGMTransmitter which recreated the cgmTransmitter property, depending on settings
+    private func forgetDevice() {
         
         // set device address and name to nil in userdefaults
         UserDefaults.standard.bluetoothDeviceAddress = nil
         UserDefaults.standard.bluetoothDeviceName =  nil
 
         // setting cgmTransmitter to nil,  the deinit function of the currently used cgmTransmitter will be called, which will disconnect the device
-        setCGMTransmitterToNil()
+        // set cgmTransmitter to nil, this will call the deinit function which will disconnect first
+        cgmTransmitter = nil
         
-        // by calling initializeCGMTransmitter, a new cgmTransmitter will be created - as it should be a device which does not automatically start scanning (otherwise we wouldn't be here). It will just create the transmitter but it will not scan, this needs to be initiated by the user
+        // by calling initializeCGMTransmitter, a new cgmTransmitter will be created, assuming it's not follower mode, and transmittertype is selected and if applicable transmitter id is set
         initializeCGMTransmitter()
+
+        // reset also UserDefaults.standard.transmitterBatteryInfo
+        UserDefaults.standard.transmitterBatteryInfo = nil
+        
+        // set lastdisconnecttimestamp to nil
+        UserDefaults.standard.lastdisConnectTimestamp = nil
 
     }
     

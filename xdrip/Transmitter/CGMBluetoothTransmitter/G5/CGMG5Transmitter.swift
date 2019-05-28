@@ -115,6 +115,8 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
         bluetoothTransmitterDelegate = self
         
+        // start scanning
+        _ = startScanning()
     }
 
     // MARK: public functions
@@ -265,10 +267,12 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                         }
                     case .authRequestRx:
                         if let authRequestRxMessage = AuthRequestRxMessage(data: value), let receiveAuthenticationCharacteristic = receiveAuthenticationCharacteristic {
+                            debuglogging("transmitterid = " + transmitterId)
                             guard let challengeHash = CGMG5Transmitter.computeHash(transmitterId, of: authRequestRxMessage.challenge) else {
                                 os_log("    failed to calculate challengeHash, no further processing", log: log, type: .error)
                                 return
                             }
+                            debuglogging("challengehash = " + challengeHash.hexEncodedString())
                             let authChallengeTxMessage = AuthChallengeTxMessage(challengeHash: challengeHash)
                             _ = writeDataToPeripheral(data: authChallengeTxMessage.data, characteristicToWriteTo: receiveAuthenticationCharacteristic, type: .withResponse)
                         } else {

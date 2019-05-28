@@ -17,12 +17,16 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
             
         case .transmitterId:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTransmitterId, message: Texts_SettingsView.labelGiveTransmitterId, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.transmitterId, placeHolder: "00000", actionTitle: nil, cancelTitle: nil, actionHandler: {(transmitterId:String) in
+                // convert to uppercase
+                let transmitterIdUpper = transmitterId.uppercased()
+                
+                // if changed then store new value
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    if currentTransmitterId != transmitterId {
-                        UserDefaults.standard.transmitterId = transmitterId
+                    if currentTransmitterId != transmitterIdUpper {
+                        UserDefaults.standard.transmitterId = transmitterIdUpper
                     }
                 } else {
-                    UserDefaults.standard.transmitterId = transmitterId
+                    UserDefaults.standard.transmitterId = transmitterIdUpper
                 }
                 
             }, cancelHandler: nil)

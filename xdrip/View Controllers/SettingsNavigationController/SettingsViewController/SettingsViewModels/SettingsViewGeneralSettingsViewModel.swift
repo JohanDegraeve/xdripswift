@@ -7,7 +7,8 @@ fileprivate enum Setting:Int, CaseIterable {
     case lowMarkValue = 1
     //high value
     case highMarkValue = 2
-    // transmitter type
+    // choose between master and follower
+    case masterfolllower = 3
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
@@ -23,6 +24,8 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
 
         case .highMarkValue:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelHighValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.highMarkValueInUserChosenUnitRounded, placeHolder: Constants.BGGraphBuilder.defaultHighMmarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(highMarkValue:String) in UserDefaults.standard.highMarkValueInUserChosenUnitRounded = highMarkValue}, cancelHandler: nil)
+        case .masterfolllower:
+            return SettingsSelectedRowAction.callFunction(function: {UserDefaults.standard.isMaster ? (UserDefaults.standard.isMaster) = false : (UserDefaults.standard.isMaster = true)})
         }
     }
     
@@ -31,7 +34,7 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
     }
 
     func numberOfRows() -> Int {
-        return Setting.allCases.count
+        return 3//Setting.allCases.count
     }
 
     func settingsRowText(index: Int) -> String {
@@ -44,6 +47,8 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.labelLowValue
         case .highMarkValue:
             return Texts_SettingsView.labelHighValue
+        case .masterfolllower:
+            return Texts_SettingsView.labelMasterOrFollower
         }
     }
     
@@ -57,6 +62,8 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
             return UITableViewCell.AccessoryType.disclosureIndicator
         case .highMarkValue:
             return UITableViewCell.AccessoryType.disclosureIndicator
+        case .masterfolllower:
+            return UITableViewCell.AccessoryType.none
         }
     }
     
@@ -65,15 +72,13 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
 
         switch setting {
         case .bloodGlucoseUnit:
-            if UserDefaults.standard.bloodGlucoseUnitIsMgDl {
-                return Texts_Common.mgdl
-            } else {
-                return Texts_Common.mmol
-            }
+            return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl:Texts_Common.mmol
         case .lowMarkValue:
             return UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         case .highMarkValue:
             return UserDefaults.standard.highMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        case .masterfolllower:
+            return UserDefaults.standard.isMaster ? Texts_SettingsView.master:Texts_SettingsView.follower
         }
     }
     

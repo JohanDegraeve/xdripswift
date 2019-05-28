@@ -14,6 +14,8 @@ class ApplicationManager {
     /// list of closures to run when app will terminate
     private var closuresToRunWhenAppWillTerminate = [String : (() -> ())]()
     
+    // MARK: - public properties
+    
     /// access to shared instance of ApplicationManager
     static let shared = ApplicationManager()
     
@@ -24,22 +26,6 @@ class ApplicationManager {
         
         // setup notification handling
         setupNotificationHandling()
-    }
-    
-    private func setupNotificationHandling() {
-        
-        /// define notification center
-        let notificationCenter = NotificationCenter.default
-        
-        /// add observer for did enter background
-        notificationCenter.addObserver(self, selector: #selector(runWhenAppDidEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
-        
-        /// add observer for will enter foreground
-        notificationCenter.addObserver(self, selector: #selector(runWhenAppWillEnterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
-        
-        /// add observer for will terminate
-        notificationCenter.addObserver(self, selector: #selector(runWhenAppWillTerminate(_:)), name: UIApplication.willTerminateNotification, object: nil)
-        
     }
     
     // MARK: - public functions
@@ -66,6 +52,22 @@ class ApplicationManager {
     }
     
     // MARK: - private helper functions
+    
+    private func setupNotificationHandling() {
+        
+        /// define notification center
+        let notificationCenter = NotificationCenter.default
+        
+        /// add observer for did enter background
+        notificationCenter.addObserver(self, selector: #selector(runWhenAppDidEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        
+        /// add observer for will enter foreground
+        notificationCenter.addObserver(self, selector: #selector(runWhenAppWillEnterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
+        
+        /// add observer for will terminate
+        notificationCenter.addObserver(self, selector: #selector(runWhenAppWillTerminate(_:)), name: UIApplication.willTerminateNotification, object: nil)
+        
+    }
     
     @objc private func runWhenAppDidEnterBackground(_ : Notification) {
         // run the closures

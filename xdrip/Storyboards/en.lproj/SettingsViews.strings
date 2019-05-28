@@ -30,3 +30,7 @@
 "settingsviews_speakTrend" = "Speak Trend";
 "settingsviews_speakDelta" = "Speak Delta";
 "settingsviews_speakInterval" = "Interval";
+"settingsviews_masterorfollower" = "Master or Follower ?";
+"settingsviews_master" = "Master";
+"settingsviews_follower" = "Follower";
+

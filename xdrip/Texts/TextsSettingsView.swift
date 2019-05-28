@@ -28,6 +28,18 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_highValue", tableName: filename, bundle: Bundle.main, value: "High Value", comment: "general settings, high value")
     }()
     
+    static let labelMasterOrFollower: String = {
+        return NSLocalizedString("settingsviews_masterorfollower", tableName: filename, bundle: Bundle.main, value: "Master or Follower ?", comment: "general settings, master or follower")
+    }()
+    
+    static let master: String = {
+        return NSLocalizedString("settingsviews_master", tableName: filename, bundle: Bundle.main, value: "Master", comment: "general settings, literally master")
+    }()
+    
+    static let follower: String = {
+        return NSLocalizedString("settingsviews_follower", tableName: filename, bundle: Bundle.main, value: "Follower", comment: "general settings, literally follower")
+    }()
+    
     // MARK: - Section Transmitter
     
     static let sectionTitleTransmitter: String = {
