@@ -28,35 +28,71 @@ enum TransmitterBatteryInfo {
     /// used to store TransmitterBatteryInfo as NSData in UserDefaults
     ///
     /// would need to be extended if new cases are added to TransmitterBatteryInfo
-    init(data:Data) {
-        if data.count < 1 {fatalError("in TransmitterBatteryInfo init with data, length < 1")}
+    init?(data:Data) {
+        
+        if data.count < 1 {return nil}
         
         let type = data.uint8(position: 0)
         
-        let uint64size = 8
-        
         switch type {
-        case 0:// percentage
-            if data.count < 5 {fatalError("in TransmitterBatteryInfo init with data, type is percentage but length < 5")}
-            let percentage = Int(data.uint64(position: 1))
-            self = .percentage(percentage: percentage)
+        case 0,2:// percentage or DexcomG4
+            
+            // get value,
+            var percentageOrLevel:Int?
+            switch data.count {// check total length 5 or 9, if values are stored with 4 bytes, then it will be 5 otherwise 9
+            case 5:
+                percentageOrLevel = Int(data.uint32(position: 1))
+            case 9:
+                percentageOrLevel = Int(data.uint64(position: 1))
+            default:
+                break
+            }
+            
+            // if percentageOrLevel found, return it as percentage or DexcomG4 batterylevel
+            if let percentageOrLevel = percentageOrLevel {
+                if type == 0 {//percentage
+                    self = .percentage(percentage: percentageOrLevel)
+                } else {//dexcomG4
+                    self = .DexcomG4(level: percentageOrLevel)
+                }
+            } else {
+                return nil
+            }
+            
         case 1://dexcomg5
-            if data.count < 21 {fatalError("in TransmitterBatteryInfo init with data, type is dexcomg5 but length < 21")}
-            let voltageA = Int(data.uint64(position: 1))
-            let voltageB = Int(data.uint64(position: 1 + uint64size * 1))
-            let resist = Int(data.uint64(position: 1 + uint64size * 2))
-            let runtime = Int(data.uint64(position: 1 + uint64size * 3))
-            let temperature = Int(data.uint64(position: 1 + uint64size * 4))
-            self = .DexcomG5(voltageA: voltageA, voltageB: voltageB, resist: resist, runtime: runtime, temperature: temperature)
-        case 2://dexcomG4
-            if data.count < 5 {fatalError("in TransmitterBatteryInfo init with data, type is dexcomG4 but length < 5")}
-            let level = Int(data.uint64(position: 1))
-            self = .DexcomG4(level: level)
+            
+            // intialize values as nil
+            var voltageA:Int?
+            var voltageB:Int?
+            var resist:Int?
+            var runtime:Int?
+            var temperature:Int?
+            
+            switch data.count {// check total length 5 or 9, if values are stored with 4 bytes, then it will be 5 otherwise 9
+            case 21:// if values are stored with 4 bytes per it
+                voltageA = Int(data.uint32(position: 1))
+                voltageB = Int(data.uint32(position: 1 + 4))
+                resist = Int(data.uint32(position: 1 + 8))
+                runtime = Int(data.uint32(position: 1 + 12))
+                temperature = Int(data.uint32(position: 1 + 16))
+            case 41:// if values are stored with 8 bytes per it
+                voltageA = Int(data.uint64(position: 1))
+                voltageB = Int(data.uint64(position: 1 + 8))
+                resist = Int(data.uint64(position: 1 + 16))
+                runtime = Int(data.uint64(position: 1 + 24))
+                temperature = Int(data.uint64(position: 1 + 32))
+            default:
+                break
+            }
 
-        default://assume percentage
-            if data.count < 5 {fatalError("in TransmitterBatteryInfo init with data, type is percentage but length < 5")}
-            let percentage = Int(data.uint64(position: 1))
-            self = .percentage(percentage: percentage)
+            if let voltageA = voltageA, let voltageB = voltageB, let resist = resist, let runtime = runtime, let temperature = temperature {
+                self = .DexcomG5(voltageA: voltageA, voltageB: voltageB, resist: resist, runtime: runtime, temperature: temperature)
+            } else {
+                return nil
+            }
+
+        default:
+            return nil
 
         }
         
