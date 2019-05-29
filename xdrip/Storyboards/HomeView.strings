@@ -22,4 +22,4 @@
 "transmitterinfo" = "First go to the settings tab where you can select your transmitter type and (if applicable) transmitter id. Depending on device type, you will need to come back to this tab here (the Home) tab where you can start scanning. For Dexcom G5 there's no need to start scanning.";
 "info" = "Info";
 "startsensorbeforecalibration" = "You can not calibrate as long as there's no sensor started.";
-"theremustbeareadingbeforecalibration" = "There must be at least one reading before you can calibrate. You will be requested to calibrate as soon as a reading arrives.";
+"theremustbeareadingbeforecalibration" = "There must be at least two readings before you can calibrate. You will be requested to calibrate as soon as a reading arrives.";

@@ -2,7 +2,7 @@ import Foundation
 import os
 import UIKit
 
-public class NightScoutManager:NSObject {
+public class NightScoutUploadManager:NSObject {
     
     // MARK: - properties
     
@@ -19,7 +19,7 @@ public class NightScoutManager:NSObject {
     private let nightScoutAuthTestPath = "/api/v1/experiments/test"
 
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryNightScoutManager)
+    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryNightScoutUploadManager)
     
     /// BgReadings instance
     private let bgReadingsAccessor:BgReadingsAccessor

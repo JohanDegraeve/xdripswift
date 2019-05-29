@@ -40,8 +40,9 @@
 		F821CF5D229BF43A005C1E43 /* NSDateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF52229BF43A005C1E43 /* NSDateFormatter.swift */; };
 		F821CF5E229BF43A005C1E43 /* BgReading+NightScout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF53229BF43A005C1E43 /* BgReading+NightScout.swift */; };
 		F821CF5F229BF43A005C1E43 /* ApplicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF55229BF43A005C1E43 /* ApplicationManager.swift */; };
-		F821CF61229BF4A2005C1E43 /* NightScoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF60229BF4A2005C1E43 /* NightScoutManager.swift */; };
-		F821CF64229C6962005C1E43 /* FollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF63229C6962005C1E43 /* FollowManager.swift */; };
+		F821CF61229BF4A2005C1E43 /* NightScoutUploadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF60229BF4A2005C1E43 /* NightScoutUploadManager.swift */; };
+		F821CF66229EE68B005C1E43 /* NightScoutFollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF65229EE68B005C1E43 /* NightScoutFollowManager.swift */; };
+		F821CF68229EE7F7005C1E43 /* NightScoutExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF67229EE7F7005C1E43 /* NightScoutExtension.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
 		F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */; };
@@ -181,8 +182,9 @@
 		F821CF52229BF43A005C1E43 /* NSDateFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSDateFormatter.swift; sourceTree = "<group>"; };
 		F821CF53229BF43A005C1E43 /* BgReading+NightScout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+NightScout.swift"; sourceTree = "<group>"; };
 		F821CF55229BF43A005C1E43 /* ApplicationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationManager.swift; sourceTree = "<group>"; };
-		F821CF60229BF4A2005C1E43 /* NightScoutManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightScoutManager.swift; sourceTree = "<group>"; };
-		F821CF63229C6962005C1E43 /* FollowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowManager.swift; sourceTree = "<group>"; };
+		F821CF60229BF4A2005C1E43 /* NightScoutUploadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightScoutUploadManager.swift; sourceTree = "<group>"; };
+		F821CF65229EE68B005C1E43 /* NightScoutFollowManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightScoutFollowManager.swift; sourceTree = "<group>"; };
+		F821CF67229EE7F7005C1E43 /* NightScoutExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightScoutExtension.swift; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BgReading+CoreDataProperties.swift"; path = "../Extensions/BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Sensor+CoreDataProperties.swift"; path = "../Extensions/Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -437,10 +439,12 @@
 		F821CF4F229BF43A005C1E43 /* NightScout */ = {
 			isa = PBXGroup;
 			children = (
-				F821CF60229BF4A2005C1E43 /* NightScoutManager.swift */,
+				F821CF65229EE68B005C1E43 /* NightScoutFollowManager.swift */,
+				F821CF60229BF4A2005C1E43 /* NightScoutUploadManager.swift */,
 				F821CF50229BF43A005C1E43 /* TimeFormat.swift */,
 				F821CF52229BF43A005C1E43 /* NSDateFormatter.swift */,
 				F821CF53229BF43A005C1E43 /* BgReading+NightScout.swift */,
+				F821CF67229EE7F7005C1E43 /* NightScoutExtension.swift */,
 			);
 			path = NightScout;
 			sourceTree = "<group>";
@@ -453,14 +457,6 @@
 			path = Application;
 			sourceTree = "<group>";
 		};
-		F821CF62229C6947005C1E43 /* Follower */ = {
-			isa = PBXGroup;
-			children = (
-				F821CF63229C6962005C1E43 /* FollowManager.swift */,
-			);
-			path = Follower;
-			sourceTree = "<group>";
-		};
 		F85DC29B21CFCEB800B9F74A /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -471,7 +467,6 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
-				F821CF62229C6947005C1E43 /* Follower */,
 				F821CF48229BF43A005C1E43 /* Alerts */,
 				F821CF54229BF43A005C1E43 /* Application */,
 				F821CF4D229BF43A005C1E43 /* CoreData */,
@@ -1023,7 +1018,7 @@
 				F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */,
 				F81FA00A228F53680028C70F /* TextsHomeView.swift in Sources */,
 				F8E3C3AD21FE551C00907A04 /* DexcomCalibrator.swift in Sources */,
-				F821CF61229BF4A2005C1E43 /* NightScoutManager.swift in Sources */,
+				F821CF61229BF4A2005C1E43 /* NightScoutUploadManager.swift in Sources */,
 				F897AB2D220761F200CDDD10 /* SensorDataRxMessage.swift in Sources */,
 				F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */,
 				F821CF57229BF43A005C1E43 /* SnoozeParameters.swift in Sources */,
@@ -1036,6 +1031,7 @@
 				F8B3A848227F090E004BA588 /* SettingsViewHealthKitSettingsViewModel.swift in Sources */,
 				F8025E5021EE746400ECF0C0 /* Calibrator.swift in Sources */,
 				F821CF59229BF43A005C1E43 /* AlertEntryUnit.swift in Sources */,
+				F821CF68229EE7F7005C1E43 /* NightScoutExtension.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
 				F8B3A844227F090E004BA588 /* SettingsViewAlertSettingsViewModel.swift in Sources */,
 				F8B3A82D227F07D6004BA588 /* SettingsNavigationController.swift in Sources */,
@@ -1081,7 +1077,7 @@
 				F897AB1F22059EA000CDDD10 /* AuthRequestRxMessage.swift in Sources */,
 				F897AB2A220742E900CDDD10 /* AESCrypt.m in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
-				F821CF64229C6962005C1E43 /* FollowManager.swift in Sources */,
+				F821CF66229EE68B005C1E43 /* NightScoutFollowManager.swift in Sources */,
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				F8B3A820227DEC92004BA588 /* AlertTypesAccessor.swift in Sources */,
 				F8B3A81E227DEC92004BA588 /* BgReadingsAccessor.swift in Sources */,

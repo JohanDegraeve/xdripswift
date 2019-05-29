@@ -65,6 +65,9 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
     var emptyArray: [RawGlucoseData] = []
     
+    // for creating testreadings
+    private var testAmount:Double = 150000.0
+    
     // MARK: - functions
     
     /// - parameters:
@@ -119,15 +122,21 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         _ = startScanning()
     }
     
-    public func temptesting() {
-        // test
-        let testdata = RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: 130000, glucoseLevelFiltered: 130000)
-        let testdata2 = RawGlucoseData(timeStamp: Date(timeIntervalSinceNow: -300), glucoseLevelRaw: 120000, glucoseLevelFiltered: 120000)
-        debuglogging("timestamp testdata = " + testdata.timeStamp.description)
-        debuglogging("timestamp testdata2 = " + testdata2.timeStamp.description)
-        var testdataasarray = [testdata,testdata2]
+    /// for testing , make the function public and call it after having activate a sensor in rootviewcontroller
+    ///
+    /// amount is rawvalue for testreading, should be number like 150000
+    private func temptesting(amount:Double) {
+        testAmount = amount
+        Timer.scheduledTimer(timeInterval: 60 * 5, target: self, selector: #selector(self.createTestReading), userInfo: nil, repeats: true)
+    }
+    
+    /// for testing, used by temptesting
+    @objc private func createTestReading() {
+        let testdata = RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: testAmount, glucoseLevelFiltered: testAmount)
+        debuglogging("timestamp testdata = " + testdata.timeStamp.description + ", with amount = " + testAmount.description)
+        var testdataasarray = [testdata]
         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &testdataasarray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
-        
+        testAmount = testAmount + 1
     }
     
     // MARK: public functions

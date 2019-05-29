@@ -1,7 +1,7 @@
 import Foundation
 
 /// instance of this class will do the follower functionality. Just make an instance, it will listen to the settings, do the regular download if needed - it could be deallocated when isMaster setting in Userdefaults changes, but that's not necessary to do
-class FollowManager {
+class NightScoutFollowManager {
     
     // MARK: - public properties
     
@@ -36,7 +36,7 @@ class FollowManager {
         // maximum timeStamp to download initially set to 1 day back
         var timeStampOfFirstBgReadingToDowload = Date(timeIntervalSinceNow: TimeInterval(-Constants.Follower.maxiumDaysOfReadingsToDownload * 24 * 3600))
         
-        // check timestamp of lastest stored bgreading with calculated value, if more recent then use this as timestamp
+        // check timestamp of lastest stored bgreading with calculated value, if more recent then use this as timeStampOfFirstBgReadingToDowload
         let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         if latestBgReadings.count > 0 {
             timeStampOfFirstBgReadingToDowload = max(latestBgReadings[0].timeStamp, timeStampOfFirstBgReadingToDowload)

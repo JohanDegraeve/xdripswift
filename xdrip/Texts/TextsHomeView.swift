@@ -101,7 +101,7 @@ enum Texts_HomeView {
     }()
     
     static let thereMustBeAreadingBeforeCalibration:String = {
-        return NSLocalizedString("theremustbeareadingbeforecalibration", tableName: filename, bundle: Bundle.main, value: "There must be at least one reading before you can calibrate. You will be requested to calibrate as soon as a reading arrives.", comment: "for home view, user clicks calibrate but there's no reading yet")
+        return NSLocalizedString("theremustbeareadingbeforecalibration", tableName: filename, bundle: Bundle.main, value: "There must be at least two readings before you can calibrate. You will be requested to calibrate as soon as a reading arrives.", comment: "for home view, user clicks calibrate but there's no reading yet")
     }()
     
 }
