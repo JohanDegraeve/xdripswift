@@ -222,6 +222,6 @@ struct Constants {
     enum Follower {
         
         /// maximum days of readings to download
-        static let maxiumDaysOfReadingsToDownlod = 1
+        static let maxiumDaysOfReadingsToDownload = 1
     }
 }

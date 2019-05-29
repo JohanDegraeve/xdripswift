@@ -104,8 +104,6 @@ public class NightScoutManager:NSObject {
                 // transform to json
                 let sendData = try JSONSerialization.data(withJSONObject: bgReadingsDictionaryRepresentation, options: [])
                 
-                // then do this map thing
-                
                 // get shared URLSession
                 let sharedSession = URLSession.shared
                 

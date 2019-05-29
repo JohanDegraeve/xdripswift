@@ -34,7 +34,7 @@ class FollowManager {
     private func download() {
         
         // maximum timeStamp to download initially set to 1 day back
-        var timeStampOfFirstBgReadingToDowload = Date(timeIntervalSinceNow: TimeInterval(-Constants.Follower.maxiumDaysOfReadingsToDownlod * 24 * 3600))
+        var timeStampOfFirstBgReadingToDowload = Date(timeIntervalSinceNow: TimeInterval(-Constants.Follower.maxiumDaysOfReadingsToDownload * 24 * 3600))
         
         // check timestamp of lastest stored bgreading with calculated value, if more recent then use this as timestamp
         let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
