@@ -109,6 +109,9 @@ final class RootViewController: UIViewController {
             
             // update label texts, minutes ago, diff and value
             self.updateLabels()
+            
+            // create transmitter based on UserDefaults
+            self.initializeCGMTransmitter()
 
         })
         
@@ -122,9 +125,6 @@ final class RootViewController: UIViewController {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new
             , context: nil)
 
-        // create transmitter based on UserDefaults
-        initializeCGMTransmitter()
-        
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
         
@@ -232,7 +232,7 @@ final class RootViewController: UIViewController {
             }
         }
 
-        if let activeSensor = activeSensor, let calibrator = self.calibrator, let bgReadingsAccessor = self.bgReadingsAccessor {
+        if let activeSensor = activeSensor, let calibrator = calibrator, let bgReadingsAccessor = bgReadingsAccessor {
 
             // initialize help variables
             var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
@@ -264,7 +264,13 @@ final class RootViewController: UIViewController {
                 
                 // if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
                 if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil {
-                    createInitialCalibrationRequest()
+                    // there must be at least 2 readings
+                    let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
+
+                    if latestReadings.count > 1 {
+                        createInitialCalibrationRequest()
+                    }
+                    
                 } else {
                     // update notification
                     createBgReadingNotification()
@@ -323,7 +329,7 @@ final class RootViewController: UIViewController {
     
     // MARK: - View Methods
 
-    /// Configure View
+    /// Configure View, only stuff that is independent of coredata
     private func setupView() {
         
         // set texts for buttons on top
@@ -471,8 +477,8 @@ final class RootViewController: UIViewController {
                 
             case .dexcomG5:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self)
                     calibrator = DexcomCalibrator()
+                    cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self)
                 }
                 
             case .miaomiao:

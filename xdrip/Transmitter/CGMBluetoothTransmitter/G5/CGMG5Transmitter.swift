@@ -118,7 +118,18 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         // start scanning
         _ = startScanning()
     }
-
+    
+    public func temptesting() {
+        // test
+        let testdata = RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: 130000, glucoseLevelFiltered: 130000)
+        let testdata2 = RawGlucoseData(timeStamp: Date(timeIntervalSinceNow: -300), glucoseLevelRaw: 120000, glucoseLevelFiltered: 120000)
+        debuglogging("timestamp testdata = " + testdata.timeStamp.description)
+        debuglogging("timestamp testdata2 = " + testdata2.timeStamp.description)
+        var testdataasarray = [testdata,testdata2]
+        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &testdataasarray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
+        
+    }
+    
     // MARK: public functions
     
     func doG5Reset() {
