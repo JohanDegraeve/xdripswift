@@ -233,7 +233,9 @@ extension UserDefaults {
         }
     }
     
-    /// the nightscout url
+    /// the nightscout url - starts with http
+    ///
+    /// when assigning a new value, it will be checked if it starts with http, if not then automatically https:// will be added
     @objc dynamic var nightScoutUrl:String? {
         get {
             return string(forKey: Key.nightScoutUrl.rawValue)

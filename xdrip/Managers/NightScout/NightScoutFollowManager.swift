@@ -45,6 +45,17 @@ class NightScoutFollowManager {
         // calculate count, which is a parameter in the nightscout api - divide by 60, worst case NightScout has a reading every minute, this can be the case for MiaoMiao
         let count = -timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow / 60 + 1
         
-        
+       /* do {
+            
+            // get shared URLSession
+            let sharedSession = URLSession.shared
+
+            // ceate endpoint to get latest entries
+            let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: UserDefaults.standard.nightScoutUrl, count: count, olderThan: timeStampOfFirstBgReadingToDowload)
+            
+        } catch let error {
+            os_log("     %{public}@", log: self.log, type: .info, error.localizedDescription)
+        }*/
+            
     }
 }
