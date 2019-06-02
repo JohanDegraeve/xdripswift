@@ -12,7 +12,7 @@ extension BgReading {
             "sgv": Int(calculatedValue.roundToDecimal(0)),
             "direction": slopeName,
             "filtered": round(ageAdjustedFiltered() * 1000),
-            "unfiltered": ageAdjustedRawValue,
+            "unfiltered": round(ageAdjustedRawValue * 1000),
             "noise": 1,
             "sysTime": TimeFormat.timestampNightScoutFormatFromDate(timeStamp)
         ]
