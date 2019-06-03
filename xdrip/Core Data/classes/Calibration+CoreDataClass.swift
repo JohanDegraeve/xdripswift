@@ -3,6 +3,10 @@ import CoreData
 
 
 public class Calibration: NSManagedObject {
+    
+    /// creates Calibration with given parameters.
+    ///
+    /// property possibleBad gets value false. id gets new value
     init(
         timeStamp: Date,
         sensor: Sensor,

@@ -26,7 +26,7 @@ extension UserDefaults {
         // Nightscout
         
         /// should readings be uploaded to nightscout
-        case uploadReadingsToNightScout = "uploadReadingsToNightScout"
+        case nightScoutEnabled = "nightScoutEnabled"
         /// nightscout url
         case nightScoutUrl = "nightScoutUrl"
         /// nightscout api key
@@ -223,13 +223,13 @@ extension UserDefaults {
     
     // MARK: Nightscout Share Settings
     
-    /// should readings be uploaded in nightscout ? true or false
-    @objc dynamic var uploadReadingsToNightScout: Bool {
+    /// nightscout enabled ? this impats follower mode (download) and master mode (upload)
+    @objc dynamic var nightScoutEnabled: Bool {
         get {
-            return bool(forKey: Key.uploadReadingsToNightScout.rawValue)
+            return bool(forKey: Key.nightScoutEnabled.rawValue)
         }
         set {
-            set(newValue, forKey: Key.uploadReadingsToNightScout.rawValue)
+            set(newValue, forKey: Key.nightScoutEnabled.rawValue)
         }
     }
     

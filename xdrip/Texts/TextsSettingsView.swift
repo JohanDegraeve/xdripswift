@@ -122,8 +122,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_sectiontitlenightscout", tableName: filename, bundle: Bundle.main, value: "NightScout", comment: "nightscout settings, section title")
     }()
     
-    static let labelUploadReadingsToNightScout = {
-        return NSLocalizedString("settingsviews_uploadReadingsToNightScout", tableName: filename, bundle: Bundle.main, value: "Nightscout upload", comment: "nightscout settings, where user can enable or disable upload to nightscout")
+    static let labelNightScoutEnabled = {
+        return NSLocalizedString("settingsviews_nightScoutEnabled", tableName: filename, bundle: Bundle.main, value: "Nightscout enabled", comment: "nightscout settings, where user can enable or disable nightscout")
     }()
 
     static let labelNightScoutUrl = {

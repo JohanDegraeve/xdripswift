@@ -223,17 +223,11 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                         // get the reading value (mgdl)
                         let readingValueInMgDl = getIntAtPosition(numberOfBytes: 2, position: Int(7 + i * 2), data: &valueDecoded)
 
-                        //debuglogging("new reading with readingTimeStampInMinutes "  + Double(readingTimeStampInMinutes * 60 * 1000).asTimeStampInMilliSecondsToString() + " and raw value  " + (Double(readingValueInMgDl) * Constants.Libre.libreMultiplier).description)
-                        //debuglogging("   with readingValueInMgDl = " + readingValueInMgDl.description)
-                        
                         //new reading should be at least 30 seconds younger than timeStampLastBgReadingStoredInDatabase
                         if readingTimeStampInMinutes > ((timeStampLastBgReadingInMinutes * 2) + 1)/2 {
                             
                             // sometimes 0 values are received, skip those
                             if readingValueInMgDl > 0 {
-                                //debuglogging("    readingTimeStampInMinutes * 60 * 1000 =                                        " + ((Int)(readingTimeStampInMinutes * 60 * 1000)).description)
-                                //debuglogging("    timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 =                           " + (Int)(timeStampLastAddedGlucoseDataInMinutes * 60 * 1000).description)
-                                //debuglogging("    timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) = " + (Int)(timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000)).description)
                                 if readingTimeStampInMinutes * 60 * 1000 < timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) {
                                     let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * Constants.BloodGlucose.libreMultiplier)
                                     readings.append(glucoseData)

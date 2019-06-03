@@ -32,23 +32,41 @@ struct Endpoint {
 /// enums for http, https, ...
 enum EndPointScheme:String, CaseIterable {
     
-    /// http://, rawvalue includes ://
-    case http = "http://"
-    
     /// https://, rawvalue includes ://
-    case https = "https://"
+    case https = "https"
+    
+    /// http://, rawvalue includes ://
+    case http = "http"
     
     /// takes a hostname inclusive scheme as input, returns the host and scheme splitted
     ///
     /// example, hostAndScheme = https://www.example.com then returnvalue is www.example.com and EndPointScheme.https
+    /// Note that EndPointScheme.https rawValue is 'https' and not 'https://'
     ///
-    /// if hostAndScheme doesn't start with one of the cases in EndPointScheme, then returns hostAndScheme and nil
+    /// if hostAndScheme doesn't start with one of the cases in EndPointScheme, then returns (hostAndScheme, nil)
     static func getHostAndScheme(hostAndScheme:String) -> (String, EndPointScheme?) {
+        
         for scheme in EndPointScheme.allCases {
+            
             if hostAndScheme.lowercased().startsWith(scheme.rawValue) {
-                return (hostAndScheme[scheme.rawValue.count..<hostAndScheme.count], scheme)
+                
+                // remove the scheme from hostAndScheme and replace : by empty string
+                var shortnedHost = hostAndScheme[scheme.rawValue.count..<hostAndScheme.count]
+                
+                // if hostname starts with : remove the :
+                if shortnedHost.startsWith(":") {
+                    shortnedHost = shortnedHost[1..<shortnedHost.count]
+                }
+                
+                // if hostname starts with // remove the //
+                if shortnedHost.startsWith("//") {
+                    shortnedHost = shortnedHost[2..<shortnedHost.count]
+                }
+                
+                return (shortnedHost, scheme)
             }
         }
+        
         return (hostAndScheme, nil)
     }
 }

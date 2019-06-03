@@ -2,7 +2,7 @@ import UIKit
 
 fileprivate enum Setting:Int, CaseIterable {
     ///should readings be uploaded or not
-    case uploadReadingsToNightScout = 0
+    case nightScoutEnabled = 0
     ///nightscout url
     case nightScoutUrl = 1
     /// nightscout api key
@@ -16,7 +16,7 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-        case .uploadReadingsToNightScout:
+        case .nightScoutEnabled:
             return SettingsSelectedRowAction.nothing
         case .nightScoutUrl:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightScoutUrl, message: Texts_SettingsView.giveNightScoutUrl, keyboardType: .URL, text: UserDefaults.standard.nightScoutUrl, placeHolder: "yoursitename", actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in UserDefaults.standard.nightScoutUrl = serialNumber}, cancelHandler: nil)
@@ -32,8 +32,9 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
     }
 
     func numberOfRows() -> Int {
-        // if nightscout upload not enabled then only one row to be shown
-        if UserDefaults.standard.uploadReadingsToNightScout {
+        
+        // if nightscout upload not enabled then only first row is shown
+        if UserDefaults.standard.nightScoutEnabled {
             return Setting.allCases.count
         } else {
             return 1
@@ -48,8 +49,8 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.labelNightScoutAPIKey
         case .nightScoutUrl:
             return Texts_SettingsView.labelNightScoutUrl
-        case .uploadReadingsToNightScout:
-            return Texts_SettingsView.labelUploadReadingsToNightScout
+        case .nightScoutEnabled:
+            return Texts_SettingsView.labelNightScoutEnabled
         }
     }
     
@@ -57,7 +58,7 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-        case .uploadReadingsToNightScout:
+        case .nightScoutEnabled:
             return UITableViewCell.AccessoryType.none
         case .nightScoutUrl:
             return UITableViewCell.AccessoryType.disclosureIndicator
@@ -70,7 +71,7 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-        case .uploadReadingsToNightScout:
+        case .nightScoutEnabled:
             return nil
         case .nightScoutAPIKey:
             return UserDefaults.standard.nightScoutAPIKey
@@ -83,8 +84,8 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-        case .uploadReadingsToNightScout:
-            return (UISwitch(isOn: UserDefaults.standard.uploadReadingsToNightScout, action: {(isOn:Bool) in UserDefaults.standard.uploadReadingsToNightScout = isOn}), true)
+        case .nightScoutEnabled:
+            return (UISwitch(isOn: UserDefaults.standard.nightScoutEnabled, action: {(isOn:Bool) in UserDefaults.standard.nightScoutEnabled = isOn}), true)
         default:
             return (nil, false)
         }

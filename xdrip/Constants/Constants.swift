@@ -62,7 +62,7 @@ struct Constants {
     /// for use in OSLog
     enum Log {
         /// for use in OSLog
-        static let subSystem = "net.johandegraeve.beatit"
+        static let subSystem = "xDrip"
         /// for use in OSLog
         static let categoryBlueTooth = "bluetooth"
         /// for use in cgm transmitter miaomiao
@@ -93,6 +93,8 @@ struct Constants {
         static let categoryApplicationDataAlertEntries = "categoryApplicationDataAlertEntries"
         // nightscout uploader
         static let categoryNightScoutUploadManager = "categoryNightScoutUploadManager"
+        // nightscout follow
+        static let categoryNightScoutFollowManager = "categoryNightScoutFollowManager"
         // alertmanager
         static let categoryAlertManager = "categoryAlertManager"
         // playsound
@@ -149,10 +151,16 @@ struct Constants {
             /// bgreading notification
             static let bgReadingNotificationRequest = "bgReadingNotificationRequest"
         }
+        
+        enum NotificationIdentifierForSensorNotDetected {
+            /// sensor not detected notification
+            static let sensorNotDetected = "sensorNotDetected"
+        }
     }
     
-    /// defines name of the Soundfile and name of the sound shown to the user with an extra function - both are defined in one case, seperated by a backslash
+    /// defines name of the Soundfile and name of the sound shown to the user with an extra function - both are defined in one case, seperated by a backslash - to be used for alerts - all these sounds will be shown
     enum Sounds: String, CaseIterable {
+        
         // here using case iso properties because we want to iterate through them
         /// name of the sound as shown to the user, and also stored in the alerttype
         case batterwakeup = "Better Wake Up/betterwakeup.mp3"
@@ -218,10 +226,30 @@ struct Constants {
         static let applicationName = "xDrip"
     }
     
-    // constants for follower mode
+    /// constants for follower mode
     enum Follower {
         
         /// maximum days of readings to download
         static let maxiumDaysOfReadingsToDownload = 1
+        
+        /// maximum age in seconds, of reading in alert flow. If age of latest reading is more than this number, then no alert check will be done
+        static let maximumBgReadingAgeForAlertsInSeconds = 240.0
+    }
+    
+    /// constants typically for master mode
+    enum Master {
+        
+        /// maximum age in seconds, of reading in alert flow. If age of latest reading is more than this number, then no alert check will be done
+        static let maximumBgReadingAgeForAlertsInSeconds = 60.0
+    }
+    
+    /// suspension prevention
+    enum SuspensionPrevention {
+        
+        /// name of the file that has the sound to play
+        static let soundFileName = "1-millisecond-of-silence.mp3"//20ms-of-silence.caf"
+        
+        /// how often to play the sound, in seconds
+        static let interval = 5
     }
 }

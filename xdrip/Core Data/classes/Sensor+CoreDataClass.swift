@@ -4,6 +4,9 @@ import CoreData
 
 public class Sensor: NSManagedObject {
 
+    /// creates Sensor.
+    ///
+    /// id gets new value - all other optional values will get value nil
     init(startDate:Date, nsManagedObjectContext:NSManagedObjectContext) {
         let entity = NSEntityDescription.entity(forEntityName: "Sensor", in: nsManagedObjectContext)!
         

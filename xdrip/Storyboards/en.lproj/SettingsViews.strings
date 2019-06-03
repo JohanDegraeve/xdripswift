@@ -20,7 +20,7 @@
 "settingsviews_giveDexcomShareAccountName" = "Enter Dexcom Share Account Name";
 "settingsviews_giveDexcomSharePassword" = "Give Dexcom Share Password";
 "settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_uploadReadingsToNightScout" = "NightScout Upload";
+"settingsviews_nightScoutEnabled" = "NightScout Enabled";
 "settingsviews_nightScoutUrl" = "Url";
 "settingsviews_giveNightScoutUrl" = "Enter NightScout Url";
 "settingsviews_nightScoutAPIKey" = "API Secret";

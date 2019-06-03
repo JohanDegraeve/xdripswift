@@ -104,4 +104,7 @@ enum Texts_HomeView {
         return NSLocalizedString("theremustbeareadingbeforecalibration", tableName: filename, bundle: Bundle.main, value: "There must be at least two readings before you can calibrate. You will be requested to calibrate as soon as a reading arrives.", comment: "for home view, user clicks calibrate but there's no reading yet")
     }()
     
+    static let sensorNotDetected:String = {
+        return NSLocalizedString("sensornotdetected", tableName: filename, bundle: Bundle.main, value: "Sensor not detected. Check if the MiaoMiao is well placed on the sensor.", comment: "for home view, miaomiao doesn't detect a sensor")
+    }()
 }

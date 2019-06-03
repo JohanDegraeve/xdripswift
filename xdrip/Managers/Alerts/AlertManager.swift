@@ -56,7 +56,7 @@ public class AlertManager:NSObject {
                                                    "5 hours", "6 hours", "7 hours", "8 hours", "9 hours", "10 hours", "1 day", "1 week"]
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - for closure that will stop playing sound
-    private let applicationManagerKeyStopPlayingSound = "alertmanagerstopplayingsound"
+    private let applicationManagerKeyStopPlayingSound = "AlertManager-stopplayingsound"
     
     // MARK: - initializer
     
@@ -102,13 +102,15 @@ public class AlertManager:NSObject {
     // MARK: - public functions
     
     /// check all alerts and fire if needed
-    public func checkAlerts() {
+    /// - parameters:
+    ///     - maxAgeOfLastBgReadingInSeconds : for master mode max 1 minute should be ok, but for follower mode it could be interesting to take a higher value
+    public func checkAlerts(maxAgeOfLastBgReadingInSeconds:Double) {
         
         // first of all remove all existing notifications, there should be only one open alert on the home screen. The most relevant one will be reraised
         uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: alertNotificationIdentifers)
         uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: alertNotificationIdentifers)
         
-        // get last bgreading, ignore sensor, because sensor is not known here, not necessary to check if the readings match the current sensor
+        // get last bgreading, ignore sensor, because it must also work for follower mode
         let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
         
         // get latest calibration
@@ -120,48 +122,48 @@ public class AlertManager:NSObject {
         // get transmitterBatteryInfo
         let transmitterBatteryInfo = UserDefaults.standard.transmitterBatteryInfo
         
-        // all alerts will only be created if there's a reading for an active sensor, less than 60 seconds old
-        // excepet for transmitterBatteryInfo alert
+        // all alerts will only be created if there's a reading, less than 60 seconds old
+        // except for transmitterBatteryInfo alert
         if latestBgReadings.count > 0 {
+            
             let lastBgReading = latestBgReadings[0]
-            if let sensor = lastBgReading.sensor {
-                // it's a reading with a sensor
-                if sensor.endDate == nil {
-                    // it's an active sensor
-                    if abs(lastBgReading.timeStamp.timeIntervalSinceNow) < 60 {
-                        // reading is for an active sensor and is less than 60 seconds old, let's check the alerts
-                        // need to call checkAlert
-                        
-                        // if latestBgReadings[1] exists then assign it to lastButOneBgREading
-                        var lastButOneBgREading:BgReading?
-                        if latestBgReadings.count > 1 {
-                            lastButOneBgREading = latestBgReadings[1]
-                        }
-                        
-                        
-                        // alerts are checked in order of importance - there should be only one alert raised, except missed reading alert which will always be checked.
-                        // first check very low alert
-                        if (!checkAlertAndFire(alertKind: .verylow, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                            // very low not fired, check low alert - if very low alert snoozed, skip the check for low alert and continue to next step
-                            if getSnoozeParameters(alertKind: AlertKind.verylow).getSnoozeValue().isSnoozed || (!checkAlertAndFire(alertKind: .low, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                                //  low not fired, check very high alert
-                                if (!checkAlertAndFire(alertKind: .veryhigh, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                                    // very high not fired, check high alert - if very high alert snoozed, skip the check for high alert and continue to next step
-                                    if getSnoozeParameters(alertKind: AlertKind.veryhigh).getSnoozeValue().isSnoozed || (!checkAlertAndFire(alertKind: .high, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                                        // very high not fired check calibration alert
-                                        if (!checkAlertAndFire(alertKind: .calibration, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                                            // finally let's check the battery level alert
-                                            _ = checkAlertAndFire(alertKind: .batterylow, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
-                                        }
-                                    }
+
+            if abs(lastBgReading.timeStamp.timeIntervalSinceNow) < maxAgeOfLastBgReadingInSeconds {
+                // reading is for an active sensor and is less than 60 seconds old, let's check the alerts
+                // need to call checkAlert
+                
+                // if latestBgReadings[1] exists then assign it to lastButOneBgREading
+                var lastButOneBgREading:BgReading?
+                if latestBgReadings.count > 1 {
+                    lastButOneBgREading = latestBgReadings[1]
+                }
+                
+                
+                // alerts are checked in order of importance - there should be only one alert raised, except missed reading alert which will always be checked.
+                // first check very low alert
+                if (!checkAlertAndFire(alertKind: .verylow, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
+                    // very low not fired, check low alert - if very low alert snoozed, skip the check for low alert and continue to next step
+                    if getSnoozeParameters(alertKind: AlertKind.verylow).getSnoozeValue().isSnoozed || (!checkAlertAndFire(alertKind: .low, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
+                        //  low not fired, check very high alert
+                        if (!checkAlertAndFire(alertKind: .veryhigh, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
+                            // very high not fired, check high alert - if very high alert snoozed, skip the check for high alert and continue to next step
+                            if getSnoozeParameters(alertKind: AlertKind.veryhigh).getSnoozeValue().isSnoozed || (!checkAlertAndFire(alertKind: .high, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
+                                // very high not fired check calibration alert
+                                if (!checkAlertAndFire(alertKind: .calibration, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
+                                    // finally let's check the battery level alert
+                                    _ = checkAlertAndFire(alertKind: .batterylow, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
                                 }
                             }
                         }
-                        // set missed reading alert, this will be a future planned alert
-                        _ = checkAlertAndFire(alertKind: .missedreading, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
                     }
                 }
+                // set missed reading alert, this will be a future planned alert
+                _ = checkAlertAndFire(alertKind: .missedreading, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
+            } else {
+                os_log("in checkAlerts, latestBgReadings is older than %{public}@ minutes", log: self.log, type: .info, maxAgeOfLastBgReadingInSeconds.description)
             }
+        } else {
+            os_log("in checkAlerts, latestBgReadings.count == 0", log: self.log, type: .info)
         }
     }
     

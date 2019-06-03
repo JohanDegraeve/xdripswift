@@ -3,7 +3,10 @@ import CoreData
 import UIKit
 
 public class BgReading: NSManagedObject {
-    
+
+    /// creates BgReading with given parameters.
+    ///
+    /// properties that are not in the parameter list get either value 0 or false (depending on type). id gets new value
     init(
         timeStamp:Date,
         sensor:Sensor?,
@@ -202,7 +205,7 @@ public class BgReading: NSManagedObject {
     ///     - currentBgReading : reading for which slope is calculated
     ///     - lastBgReading : last reading result of call to BgReadings.getLatestBgReadings(1, sensor) sensor the current sensor and ignore calculatedValue and ignoreRawData both set to false
     /// - returns:
-    ///     - calculated slope
+    ///     - calculated slope and hideSlope
     func calculateSlope(lastBgReading:BgReading) -> (Double, Bool) {
         if timeStamp == lastBgReading.timeStamp
             ||

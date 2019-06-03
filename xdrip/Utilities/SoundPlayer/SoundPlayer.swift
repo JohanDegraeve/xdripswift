@@ -18,14 +18,6 @@ class SoundPlayer {
     
     // MARK: - initializer
     
-    init() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
-        } catch let error {
-            os_log("in init, could not set AVAudioSession category to playback and mixwithOthers, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
-        }
-    }
-
     /// plays the sound, overrides mute
     /// - parameters:
     ///     - soundFileName : name of the file with the sound, the filename must include the extension, eg mp3
@@ -38,8 +30,6 @@ class SoundPlayer {
         }
         
         do {
-            //try AVAudioSession.sharedInstance().setActive(true)
-            
             try audioPlayer = AVAudioPlayer(contentsOf: url)
             
             if let audioPlayer = audioPlayer {

@@ -48,7 +48,7 @@ public class NightScoutUploadManager:NSObject {
     /// synchronizes all NightScout related, if needed
     public func synchronize() {
         // check if NightScout upload is enabled
-        if UserDefaults.standard.uploadReadingsToNightScout, let siteURL = UserDefaults.standard.nightScoutUrl, let apiKey = UserDefaults.standard.nightScoutAPIKey {
+        if UserDefaults.standard.nightScoutEnabled, let siteURL = UserDefaults.standard.nightScoutUrl, let apiKey = UserDefaults.standard.nightScoutAPIKey {
             uploadBgReadingsToNightScout(siteURL: siteURL, apiKey: apiKey)
         }
     }
@@ -62,23 +62,48 @@ public class NightScoutUploadManager:NSObject {
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
                 
                 switch keyPathEnum {
-                case UserDefaults.Key.nightScoutUrl, UserDefaults.Key.nightScoutAPIKey  :
+                case UserDefaults.Key.nightScoutUrl, UserDefaults.Key.nightScoutAPIKey :
                     // apikey or nightscout api key change is triggered by user, should not be done within 200 ms
+                    
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
+                        
                         if let apiKey = UserDefaults.standard.nightScoutAPIKey, let siteUrl = UserDefaults.standard.nightScoutUrl {
+                            
                             testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
                                 DispatchQueue.main.async {
                                     self.presentNightScoutTestCredentialsResult(success: success, error: error)
                                     if success {
                                         self.synchronize()
                                     } else {
-                                        os_log("in observeValue, NightScout credential check failed zzz", log: self.log, type: .info)
+                                        os_log("in observeValue, NightScout credential check failed", log: self.log, type: .info)
                                     }
                                 }
                             })
                         }
                     }
                     
+                case UserDefaults.Key.nightScoutEnabled :
+                    
+                    // if changing to enabled, then do a credentials test and if ok start synchronize, if fail don't give warning, that's the only difference with previous cases
+                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
+                        
+                        if UserDefaults.standard.nightScoutEnabled {
+                            
+                            if let apiKey = UserDefaults.standard.nightScoutAPIKey, let siteUrl = UserDefaults.standard.nightScoutUrl {
+                                
+                                testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
+                                    DispatchQueue.main.async {
+                                        if success {
+                                            self.synchronize()
+                                        } else {
+                                            os_log("in observeValue, NightScout credential check failed", log: self.log, type: .info)
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    }
+
                 default:
                     break
                 }
@@ -134,6 +159,7 @@ public class NightScoutUploadManager:NSObject {
                             return
                         }
                         
+                        // check that response is HTTPURLResponse and error code between 200 and 299
                         if let response = response as? HTTPURLResponse {
                             guard (200...299).contains(response.statusCode) else {
                                 os_log("    failed to upload, statuscode = %{public}@", log: self.log, type: .error, response.statusCode.description)
@@ -216,4 +242,5 @@ public class NightScoutUploadManager:NSObject {
         // show alert with just info text and ok button
         UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
     }
+    
 }

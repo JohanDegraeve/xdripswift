@@ -3,6 +3,8 @@ import CoreData
 import os
 import CoreBluetooth
 import UserNotifications
+import AVFoundation
+import AudioToolbox
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController {
@@ -39,13 +41,13 @@ final class RootViewController: UIViewController {
     // MARK: - Constants for ApplicationManager usage
 
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updatelabelstimer
-    private let applicationManagerKeyCreateUpdateLabelsTimer = "CreateUpdateLabelsTimer"
+    private let applicationManagerKeyCreateUpdateLabelsTimer = "RootViewController-CreateUpdateLabelsTimer"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate updatelabelstimer
-    private let applicationManagerKeyInvalidateUpdateLabelsTimer = "InvalidateUpdateLabelsTimer"
+    private let applicationManagerKeyInvalidateUpdateLabelsTimer = "RootViewController-InvalidateUpdateLabelsTimer"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - updateLabels
-    private let applicationManagerKeyUpdateLabels = "UpdateLabels"
+    private let applicationManagerKeyUpdateLabels = "RootViewController-UpdateLabels"
 
     // MARK: - Properties - other private properties
     
@@ -76,12 +78,12 @@ final class RootViewController: UIViewController {
     /// AlerManager instance
     private var alertManager:AlertManager?
     
-    /// PlaySound instance
+    /// SoundPlayer instance
     private var soundPlayer:SoundPlayer?
-
-    // to keep track of latest processed reading, because transmitters like MiaoMiao will return a whole range of readings each time, we need to skip those that were already processed - this variable will be set during startup to the timestamp of the latest reading in coredata (if there's already readings)
-    private var timeStampLastBgReading:Date = Date(timeIntervalSince1970: 0)
     
+    /// nightScoutFollowManager instance
+    private var nightScoutFollowManager:NightScoutFollowManager?
+
     // reference to activeSensor
     private var activeSensor:Sensor?
     
@@ -162,11 +164,25 @@ final class RootViewController: UIViewController {
         }
         
         // whenever app comes from-back to freground, updateLabels needs to be called
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyCreateUpdateLabelsTimer, closure: {self.updateLabels()})
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabels, closure: {self.updateLabels()})
+        
+        // setup AVAudioSession
+        setupAVAudioSession()
         
     }
     
-    // crates activeSensor, bgreadingsAccessor, timeStampLastBgReading, calibrationsAccessor, NightScoutUploadManager, soundPlayer
+    /// sets AVAudioSession category to AVAudioSession.Category.playback with option mixWithOthers and
+    /// AVAudioSession.sharedInstance().setActive(true)
+    private func setupAVAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch let error {
+            os_log("in init, could not set AVAudioSession category to playback and mixwithOthers, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+        }
+    }
+    
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer
     private func setupApplicationData() {
         
         // if coreDataManager is nil then there's no reason to continue
@@ -183,23 +199,23 @@ final class RootViewController: UIViewController {
             fatalError("In setupApplicationData, failed to initialize bgReadings")
         }
         
-        // set timeStampLastBgReading
-        if let lastReading = bgReadingsAccessor.last(forSensor: activeSensor) {
-            timeStampLastBgReading = lastReading.timeStamp
-        }
-        
         // instantiate calibrations
         calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         
         // setup nightscout synchronizer
         nightScoutUploadManager = NightScoutUploadManager(bgReadingsAccessor: bgReadingsAccessor)
         
-        // setup playsound
+        // setup SoundPlayer
         soundPlayer = SoundPlayer()
         
+        // setup FollowManager
+        guard let soundPlayer = soundPlayer else { fatalError("In setupApplicationData, this looks very in appropriate, shame")}
+        
+        nightScoutFollowManager = NightScoutFollowManager(coreDataManager: coreDataManager, nightScoutFollowerDelegate: self)
+
         // setup alertmanager
         alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
-        
+
     }
     
     private func processNewCGMInfo(glucoseData: inout [RawGlucoseData], sensorState: SensorState?, firmware: String?, hardware: String?, transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
@@ -243,6 +259,13 @@ final class RootViewController: UIViewController {
             // was a new reading created or not
             var newReadingCreated = false
 
+            // assign value of timeStampLastBgReading
+            var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
+            if let lastReading = bgReadingsAccessor.last(forSensor: activeSensor) {
+                timeStampLastBgReading = lastReading.timeStamp
+            }
+            
+            // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 if glucose.timeStamp > timeStampLastBgReading {
                     
@@ -283,7 +306,7 @@ final class RootViewController: UIViewController {
                 }
                 
                 if let alertManager = alertManager {
-                    alertManager.checkAlerts()
+                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: Constants.Master.maximumBgReadingAgeForAlertsInSeconds)
                 }
             }
         }
@@ -312,6 +335,10 @@ final class RootViewController: UIViewController {
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
                         
                         // there's no need to stop the sensor here, maybe the user is just switching from xdrip a to xdrip b
+                        // except if moving to follower
+                        if !UserDefaults.standard.isMaster {
+                            stopSensor()
+                        }
                         
                         // forget current device
                         forgetDevice()
@@ -345,7 +372,7 @@ final class RootViewController: UIViewController {
     ///
     /// should be called only once immediately after app start, ie in viewdidload
     private func setupUpdateLabelsTimer() {
-        
+
         // this is the actual timer
         var updateLabelsTimer:Timer?
         
@@ -357,7 +384,7 @@ final class RootViewController: UIViewController {
         }
         
         // create closure that launches the timer to update the first view every x seconds, and returns the created timer
-        let scheduleUpdateLabelsTimer:() -> Timer = {
+        let createAndScheduleUpdateLabelsTimer:() -> Timer = {
             // check if timer already exists, if so invalidate it
             invalidateUpdateLabelsTimer()
             // now recreate, schedule and return
@@ -365,12 +392,12 @@ final class RootViewController: UIViewController {
         }
         
         // call scheduleUpdateLabelsTimer function now - as the function setupUpdateLabelsTimer is called from viewdidload, it will be called immediately after app launch
-        updateLabelsTimer = scheduleUpdateLabelsTimer()
+        updateLabelsTimer = createAndScheduleUpdateLabelsTimer()
         
-        // timer needs to be invalidated when app comes back from background to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyCreateUpdateLabelsTimer, closure: {updateLabelsTimer = scheduleUpdateLabelsTimer()})
+        // updateLabelsTimer needs to be created when app comes back from background to foreground
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyCreateUpdateLabelsTimer, closure: {updateLabelsTimer = createAndScheduleUpdateLabelsTimer()})
         
-        // timer needs to be recreated when app goes to background
+        // updateLabelsTimer needs to be invalidated when app goes to background
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateUpdateLabelsTimer, closure: {invalidateUpdateLabelsTimer()})
     }
     
@@ -439,7 +466,7 @@ final class RootViewController: UIViewController {
                                 
                                 // check alerts
                                 if let alertManager = self.alertManager {
-                                    alertManager.checkAlerts()
+                                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: Constants.Master.maximumBgReadingAgeForAlertsInSeconds)
                                 }
 
                                 // update labels
@@ -537,27 +564,30 @@ final class RootViewController: UIViewController {
     // creates bgreading notification
     private func createBgReadingNotification() {
         
-        // if activeSensor nil, then no reason to continue - bgReadings should not be nil at all, but let's not create a fatal error for that, there's already enough checks for it
-        guard let activeSensor = activeSensor, let bgReadingsAccessor = bgReadingsAccessor else {
+        // bgReadingsAccessor should not be nil at all, but let's not create a fatal error for that, there's already enough checks for it
+        guard  let bgReadingsAccessor = bgReadingsAccessor else {
             // no need to create a notification
             return
         }
 
-        // get lastReading for the currently activeSensor, wich a calculatedValue
-        let lastReading = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+        // get lastReading, with a calculatedValue - no check on activeSensor because in follower mode there is no active sensor
+        let lastReading = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         // if there's no reading for active sensor with calculated value , then no reason to continue
         if lastReading.count == 0 {
             return
         }
         
-        // if reading is older than 4.5 minutes, then also no reason to continue - should probably never happen but let's check it anyway
-        if Date().timeIntervalSince(lastReading[0].timeStamp) > 4.5 * 70 {
+        // if reading is older than 4.5 minutes, then also no reason to continue - this may happen eg in case of follower mode
+        if Date().timeIntervalSince(lastReading[0].timeStamp) > 4.5 * 60 {
             return
         }
         
         // remove existing notification if any
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest])
+        
+        // also remove the sensor not detected notification, if any
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected])
         
         // Create Notification Content
         let notificationContent = UNMutableNotificationContent()
@@ -587,8 +617,9 @@ final class RootViewController: UIViewController {
     @objc private func updateLabels() {
 
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabels is called from viewDidload at app launch
+
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
-        
+
         // last reading and lateButOneReading variable definition - optional
         var lastReading:BgReading?
         var lastButOneReading:BgReading?
@@ -604,7 +635,7 @@ final class RootViewController: UIViewController {
         
         // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's no going to be a latestReading
         if let lastReading = lastReading {
-            
+
             // start creating text for valueLabelOutlet, first the calculated value
             var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
@@ -635,6 +666,7 @@ final class RootViewController: UIViewController {
             // get minutes ago and create text for minutes ago label
             let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
             let minutesAgoText = minutesAgo.description + " " + (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) + " " + Texts_HomeView.ago
+
             minutesLabelOutlet.text = minutesAgoText
             
             // create delta text
@@ -672,9 +704,9 @@ final class RootViewController: UIViewController {
             }
         }
         
-        // next action is to start or stop the sensor, can also be omitted depending on type of device
+        // next action is to start or stop the sensor, can also be omitted depending on type of device - also not applicable for follower mode
         if let transmitterType = UserDefaults.standard.transmitterType {
-            if !transmitterType.canDetectNewSensor() {
+            if !transmitterType.canDetectNewSensor() && !UserDefaults.standard.isMaster {
                 // user needs to start and stop the sensor manually
                 if activeSensor != nil {
                     listOfActions[Texts_HomeView.stopSensorActionTitle] = {(UIAlertAction) in self.stopSensor()}
@@ -907,6 +939,24 @@ extension RootViewController:CGMTransmitterDelegate {
     // Only MioaMiao will call this
     func sensorNotDetected() {
         os_log("sensor not detected", log: log, type: .info)
+        
+        // Create Notification Content
+        let notificationContent = UNMutableNotificationContent()
+        
+        // Configure NnotificationContent title
+        notificationContent.title = Texts_Common.warning
+        
+        notificationContent.body = Texts_HomeView.sensorNotDetected
+        
+        // Create Notification Request
+        let notificationRequest = UNNotificationRequest(identifier: Constants.Notifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected, content: notificationContent, trigger: nil)
+
+        // Add Request to User Notification Center
+        UNUserNotificationCenter.current().add(notificationRequest) { (error) in
+            if let error = error {
+                os_log("Unable to Add sensor not detected Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
+            }
+        }
     }
     
     /// - parameters:
@@ -948,7 +998,12 @@ extension RootViewController:UNUserNotificationCenterDelegate {
             
             // call completionhandler
             completionHandler([])
+        } else if notification.request.identifier == Constants.Notifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
+            
+            // call completionhandler to show the notification even though the app is in the foreground, without sound
+            completionHandler([.alert])
         } else {
+            // this will verify if it concerns an alert notification, if not pickerviewData will be nil
             if let pickerViewData = alertManager?.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler) {
                 
                 PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
@@ -968,6 +1023,11 @@ extension RootViewController:UNUserNotificationCenterDelegate {
             
             // call completionhandler
             completionHandler()
+        } else if response.notification.request.identifier == Constants.Notifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
+
+            // if user clicks notification "sensor not detected", then show uialert with title and body
+            UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.sensorNotDetected, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+            
         } else {
             // it's not an initial calibration request notification that the user clicked, by calling alertManager?.userNotificationCenter, we check if it was an alert notification that was clicked and if yes pickerViewData will have the list of alert snooze values
             if let pickerViewData = alertManager?.userNotificationCenter(center, didReceive: response, withCompletionHandler: completionHandler) {
@@ -979,5 +1039,60 @@ extension RootViewController:UNUserNotificationCenterDelegate {
             }
         }
     }
+}
+
+extension RootViewController:NightScoutFollowerDelegate {
+    
+    func nightScoutFollowerInfoReceived(followGlucoseDataArray: inout [FollowGlucoseData]) {
+        
+        if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor, let nightScoutFollowManager = nightScoutFollowManager {
+        
+            // assign value of timeStampLastBgReading
+            var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
+            if let lastReading = bgReadingsAccessor.last(forSensor: activeSensor) {
+                timeStampLastBgReading = lastReading.timeStamp
+            }
+
+            // was a new reading created or not
+            var newReadingCreated = false
+            
+            // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
+            for (_, followGlucoseData) in followGlucoseDataArray.enumerated().reversed() {
+                
+                if followGlucoseData.timeStamp > timeStampLastBgReading {
+                    
+                    // creata a new reading
+                    _ = nightScoutFollowManager.createBgReading(followGlucoseData: followGlucoseData)
+                    
+                    // a new reading was created
+                    newReadingCreated = true
+                    
+                    // save in core data
+                    coreDataManager.saveChanges()
+                    
+                    // set timeStampLastBgReading to new timestamp
+                    timeStampLastBgReading = followGlucoseData.timeStamp
+                    
+                }
+            }
+            
+            if newReadingCreated {
+                
+                // update notification
+                createBgReadingNotification()
+                
+                // update all text in  first screen
+                updateLabels()
+
+                // check alerts
+                if let alertManager = alertManager {
+                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: Constants.Follower.maximumBgReadingAgeForAlertsInSeconds)
+                }
+
+            }
+        }
+    }
+    
+    
 }
 

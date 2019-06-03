@@ -51,6 +51,27 @@ class ApplicationManager {
         closuresToRunWhenAppWillTerminate[key] = closure
     }
     
+    /// removes closure to run identified by key, when app moved to background
+    ///
+    /// closures are stored in a dictionary, key is the identifier
+    func removeClosureToRunWhenAppDidEnterBackground(key:String) {
+        closuresToRunWhenAppDidEnterBackground[key] = nil
+    }
+    
+    /// removes closure to run identified by key, when app moved to foreground
+    ///
+    /// closures are stored in a dictionary, key is the identifier
+    func removeClosureToRunWhenAppWillEnterForeground(key:String) {
+        closuresToRunWhenAppWillEnterForeground[key] = nil
+    }
+    
+    /// removes closure to run identified by key, when app will terminate
+    ///
+    /// closures are stored in a dictionary, key is the identifier
+    func removeClosureToRunWhenAppWillTerminate(key:String) {
+        closuresToRunWhenAppWillTerminate[key] = nil
+    }
+    
     // MARK: - private helper functions
     
     private func setupNotificationHandling() {

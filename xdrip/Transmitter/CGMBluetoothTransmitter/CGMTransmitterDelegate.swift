@@ -22,11 +22,16 @@ protocol CGMTransmitterDelegate:AnyObject {
     /// will only happen for MiaoMiao transmitter, anyway we can do the stuff for any type of transmitter which means send a warning blablabla
     func sensorNotDetected()
     
-    // TODO:- make glucoseData optional, and when no data is available, return nil in stead of empty array
+    /// to pass back transmitter data from cgmtransmitter
     /// - parameters:
-    ///     - glucoseData can be empty array
-    ///     - serialNumber : for the moment only used by GNSentry
-    ///     - bootloader : for the moment only used by GNSentry
+    ///     - glucoseData : array of RawGlucoseData, can be empty array, first entry is the youngest
+    ///     - transmitterBatteryInfo :
+    ///     - sensorState : only if transmitter can give that info, eg MiaoMiao, otherwise nil
+    ///     - sensorTimeInMinutes : sensor age in minutes, only if transmitter can give that info, eg MiaoMiao, otherwise nil
+    ///     - firmware : only if transmitter can give that info, eg G5, otherwise nil
+    ///     - hardware : only if transmitter can give that info, eg G5, otherwise nil
+    ///     - serialNumber : only if transmitter can give that info, eg G5, otherwise nil
+    ///     - bootloader : for the moment only used by GNSentry, otherwise nil
     func cgmTransmitterInfoReceived(glucoseData:inout [RawGlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorState:SensorState?, sensorTimeInMinutes:Int?, firmware:String?, hardware:String?, serialNumber:String?, bootloader:String?)
     
     /// transmitter needs bluetooth pairing

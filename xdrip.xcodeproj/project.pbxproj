@@ -44,6 +44,11 @@
 		F821CF66229EE68B005C1E43 /* NightScoutFollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF65229EE68B005C1E43 /* NightScoutFollowManager.swift */; };
 		F821CF6B229FC22D005C1E43 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF6A229FC22D005C1E43 /* Endpoint.swift */; };
 		F821CF6F229FC280005C1E43 /* Endpoint+NightScout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF6E229FC280005C1E43 /* Endpoint+NightScout.swift */; };
+		F821CF7922A1AB47005C1E43 /* FollowGlucoseData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF7822A1AB46005C1E43 /* FollowGlucoseData.swift */; };
+		F821CF7B22A1D359005C1E43 /* NightScoutFollowerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF7A22A1D359005C1E43 /* NightScoutFollowerDelegate.swift */; };
+		F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 */; };
+		F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */ = {isa = PBXBuildFile; fileRef = F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */; };
+		F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
 		F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */; };
@@ -187,6 +192,11 @@
 		F821CF65229EE68B005C1E43 /* NightScoutFollowManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightScoutFollowManager.swift; sourceTree = "<group>"; };
 		F821CF6A229FC22D005C1E43 /* Endpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
 		F821CF6E229FC280005C1E43 /* Endpoint+NightScout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Endpoint+NightScout.swift"; sourceTree = "<group>"; };
+		F821CF7822A1AB46005C1E43 /* FollowGlucoseData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowGlucoseData.swift; sourceTree = "<group>"; };
+		F821CF7A22A1D359005C1E43 /* NightScoutFollowerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightScoutFollowerDelegate.swift; sourceTree = "<group>"; };
+		F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "1-millisecond-of-silence.mp3"; sourceTree = "<group>"; };
+		F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "20ms-of-silence.caf"; sourceTree = "<group>"; };
+		F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BgReading+CoreDataProperties.swift"; path = "../Extensions/BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Sensor+CoreDataProperties.swift"; path = "../Extensions/Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -447,6 +457,8 @@
 				F821CF52229BF43A005C1E43 /* NSDateFormatter.swift */,
 				F821CF53229BF43A005C1E43 /* BgReading+NightScout.swift */,
 				F821CF6E229FC280005C1E43 /* Endpoint+NightScout.swift */,
+				F821CF7822A1AB46005C1E43 /* FollowGlucoseData.swift */,
+				F821CF7A22A1D359005C1E43 /* NightScoutFollowerDelegate.swift */,
 			);
 			path = NightScout;
 			sourceTree = "<group>";
@@ -643,6 +655,8 @@
 		F8B3A7B7226CC0B7004BA588 /* sounds */ = {
 			isa = PBXGroup;
 			children = (
+				F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */,
+				F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 */,
 				F8B3A7C3226CC0B7004BA588 /* betterwakeup.mp3 */,
 				F8B3A7BA226CC0B7004BA588 /* bruteforce.mp3 */,
 				F8B3A7BB226CC0B7004BA588 /* modern2.mp3 */,
@@ -812,6 +826,7 @@
 				F8025E4B21E6618100ECF0C0 /* Log.swift */,
 				F8EA6CA821BBE3010082976B /* UniqueId.swift */,
 				F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */,
+				F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -932,7 +947,9 @@
 				F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */,
 				F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */,
 				F8B3A7CF226CC0B7004BA588 /* shorthigh4.mp3 in Resources */,
+				F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 in Resources */,
 				F8B3A7CE226CC0B7004BA588 /* shorthigh2.mp3 in Resources */,
+				F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */,
 				F8B3A7CC226CC0B7004BA588 /* shorthigh1.mp3 in Resources */,
 				F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */,
 				F81FA004228E09440028C70F /* CalibrationRequest.strings in Resources */,
@@ -1017,6 +1034,7 @@
 				F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */,
 				F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */,
 				F897AB312207716E00CDDD10 /* FirmwareVersionTxMessage.swift in Sources */,
+				F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */,
 				F821CF6F229FC280005C1E43 /* Endpoint+NightScout.swift in Sources */,
 				F8025C0821D8DD1F00ECF0C0 /* CGMMiaoMiaoTransmitter.swift in Sources */,
 				F821CF5D229BF43A005C1E43 /* NSDateFormatter.swift in Sources */,
@@ -1048,6 +1066,7 @@
 				F8B3A82D227F07D6004BA588 /* SettingsNavigationController.swift in Sources */,
 				F897AB37220775A300CDDD10 /* BatteryStatusRxMessage.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
+				F821CF7922A1AB47005C1E43 /* FollowGlucoseData.swift in Sources */,
 				F8B3A81C227DEC92004BA588 /* AlertEntriesAccessor.swift in Sources */,
 				F8BDD452221DEAB2006EAB84 /* TextsSettingsView.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
@@ -1074,6 +1093,7 @@
 				F821CF5A229BF43A005C1E43 /* CoreDataManager.swift in Sources */,
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
 				F8EA6CB321CD5DD90082976B /* SlopeParameters.swift in Sources */,
+				F821CF7B22A1D359005C1E43 /* NightScoutFollowerDelegate.swift in Sources */,
 				F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */,
 				F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */,
 				F821CF5F229BF43A005C1E43 /* ApplicationManager.swift in Sources */,
@@ -1328,7 +1348,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/Transmitter/CGMBluetoothTransmitter/G5/G5Messages/xdrip-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1351,7 +1371,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/Transmitter/CGMBluetoothTransmitter/G5/G5Messages/xdrip-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
