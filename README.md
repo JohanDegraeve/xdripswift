@@ -4,12 +4,11 @@ If you want to participate to the testing, send an email to xdrip@proximus.be
 
 Current Status
 - Supported transmitters :
-    - no Blucon
-    - G5 not recently tested, was tested 3 months ago and worked, my batteries are empty for the moment
-    - MiaoMiao supported
-    - G4 with xBridge supported
+    - G5 
+    - MiaoMiao
+    - G4 with xBridge
 - Alerting
-- Uplaod to Nightscout
+- Upload to Nightscout
 
 Not yet supported
 - follower mode ==> this is my next priority
