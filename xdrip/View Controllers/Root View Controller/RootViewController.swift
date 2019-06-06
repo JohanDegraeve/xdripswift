@@ -706,7 +706,7 @@ final class RootViewController: UIViewController {
         
         // next action is to start or stop the sensor, can also be omitted depending on type of device - also not applicable for follower mode
         if let transmitterType = UserDefaults.standard.transmitterType {
-            if !transmitterType.canDetectNewSensor() && !UserDefaults.standard.isMaster {
+            if !transmitterType.canDetectNewSensor() && UserDefaults.standard.isMaster {
                 // user needs to start and stop the sensor manually
                 if activeSensor != nil {
                     listOfActions[Texts_HomeView.stopSensorActionTitle] = {(UIAlertAction) in self.stopSensor()}
