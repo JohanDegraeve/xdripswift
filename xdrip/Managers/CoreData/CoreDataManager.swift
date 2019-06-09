@@ -117,13 +117,13 @@ final class CoreDataManager {
         }
         
         // when app terminates, call saveChanges, just in case that somewhere in the code
-        ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeySaveChanges, closure: {self.saveChanges()})
+        ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeySaveChanges, closure: {self.saveChangesAtTermination()})
     }
 
     // MARK: -
     
     public func saveChanges() {
-        
+debuglogging("in savechanges")
         mainManagedObjectContext.performAndWait {
             do {
                 if self.mainManagedObjectContext.hasChanges {
@@ -144,5 +144,29 @@ final class CoreDataManager {
             }
         }
     }
-    
+
+    /// to be used when app terminates, difference with savechanges is that it calls privateManagedObjectContext.save synchronously
+    private func saveChangesAtTermination() {
+        
+        mainManagedObjectContext.performAndWait {
+            do {
+                if self.mainManagedObjectContext.hasChanges {
+                    try self.mainManagedObjectContext.save()
+                }
+            } catch {
+                os_log("in saveChangesAtTermination,  Unable to Save Changes of Main Managed Object Context, error.localizedDescription  = %{public}@", log: log, type: .info, error.localizedDescription)
+            }
+        }
+        
+        privateManagedObjectContext.performAndWait {
+            do {
+                if self.privateManagedObjectContext.hasChanges {
+                    try self.privateManagedObjectContext.save()
+                }
+            } catch {
+                os_log("in saveChangesAtTermination,  Unable to Save Changes of Private Managed Object Context, error.localizedDescription  = %{public}@", log: self.log, type: .info, error.localizedDescription)
+            }
+        }
+    }
+
 }
