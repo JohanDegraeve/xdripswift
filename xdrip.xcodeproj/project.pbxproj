@@ -49,6 +49,8 @@
 		F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 */; };
 		F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */ = {isa = PBXBuildFile; fileRef = F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */; };
 		F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */; };
+		F821CF8E22AB090C005C1E43 /* DatePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF8D22AB090C005C1E43 /* DatePickerViewController.swift */; };
+		F821CF9022AB1068005C1E43 /* DatePickerViewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF8F22AB1068005C1E43 /* DatePickerViewData.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
 		F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */; };
@@ -197,6 +199,8 @@
 		F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "1-millisecond-of-silence.mp3"; sourceTree = "<group>"; };
 		F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "20ms-of-silence.caf"; sourceTree = "<group>"; };
 		F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
+		F821CF8D22AB090C005C1E43 /* DatePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerViewController.swift; sourceTree = "<group>"; };
+		F821CF8F22AB1068005C1E43 /* DatePickerViewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerViewData.swift; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BgReading+CoreDataProperties.swift"; path = "../Extensions/BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Sensor+CoreDataProperties.swift"; path = "../Extensions/Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -479,6 +483,15 @@
 			path = Network;
 			sourceTree = "<group>";
 		};
+		F821CF8C22AB08F6005C1E43 /* Date Picker View Controller */ = {
+			isa = PBXGroup;
+			children = (
+				F821CF8D22AB090C005C1E43 /* DatePickerViewController.swift */,
+				F821CF8F22AB1068005C1E43 /* DatePickerViewData.swift */,
+			);
+			path = "Date Picker View Controller";
+			sourceTree = "<group>";
+		};
 		F85DC29B21CFCEB800B9F74A /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -686,6 +699,7 @@
 		F8B3A806227A28F9004BA588 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				F821CF8C22AB08F6005C1E43 /* Date Picker View Controller */,
 				F8B3A831227F08AC004BA588 /* Picker View Controller */,
 				F8B3A82E227F085A004BA588 /* SettingsTableViewCell */,
 				F8B3A7F22278E0E7004BA588 /* SettingsViewModelProtocol.swift */,
@@ -1023,6 +1037,7 @@
 				F8B3A85D22821BB6004BA588 /* Int.swift in Sources */,
 				F88F269C223C215A0090A9A6 /* CGMGNSEntryTransmitter.swift in Sources */,
 				F897AB2122059EA000CDDD10 /* AuthRequestTxMessage.swift in Sources */,
+				F821CF9022AB1068005C1E43 /* DatePickerViewData.swift in Sources */,
 				F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */,
 				F8B3A853227F2743004BA588 /* AlertsSettingsViewController.swift in Sources */,
 				F8B3A849227F090E004BA588 /* SettingsViewSpeakSettingsViewModel.swift in Sources */,
@@ -1074,6 +1089,7 @@
 				F8B3A847227F090E004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,
 				F8B3A79622635A25004BA588 /* AlertEntry+CoreDataClass.swift in Sources */,
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
+				F821CF8E22AB090C005C1E43 /* DatePickerViewController.swift in Sources */,
 				F897AB1D22059EA000CDDD10 /* TransmitterMessage.swift in Sources */,
 				F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */,
 				F8B3A858227F6971004BA588 /* UISwitch.swift in Sources */,
@@ -1348,7 +1364,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/Transmitter/CGMBluetoothTransmitter/G5/G5Messages/xdrip-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1371,7 +1387,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/Transmitter/CGMBluetoothTransmitter/G5/G5Messages/xdrip-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;

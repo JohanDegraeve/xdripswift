@@ -83,38 +83,6 @@ extension UIAlertController {
         addAction(UIAlertAction(title: cancel!, style: .cancel, handler: (cancelHandler != nil) ? {(action:UIAlertAction) in cancelHandler!()}:nil))
     }
     
-    /// creates a UIAlertController of type alert, with UIDatePicker, with ok and cancelhandler, date can be set, minimum and maximum date, actionhandler is called when user clicks the Ok button, it has a UIDatePicker as input
-    /// - parameters:
-    ///     - title : title, optional, used in init(title: title, message: message, preferredStyle: .alert)
-    ///     - message : message, optional, used in init(title: title, message: message, preferredStyle: .alert)
-    ///     - datePickerMode : should be .date or .time
-    ///     - minimumDate : optional Date
-    ///     - maximumDate : optional Date
-    ///     - actionHandler : action to take when user clicks the action button, text is the text entered by the user
-    ///     - cancelHandler : action to take when user clicks the cancel button, optional
-    convenience init(title: String?, message: String?, datePickerMode:UIDatePicker.Mode, date:Date?, minimumDate:Date?, maximumDate:Date?, actionHandler: @escaping (UIDatePicker) -> (), cancelHandler: (() -> Void)?) {
-        self.init(title: title, message: message, preferredStyle: .alert)
-        
-        let dateTimePicker = UIDatePicker()
-        dateTimePicker.datePickerMode = datePickerMode
-        dateTimePicker.minimumDate = minimumDate
-        dateTimePicker.maximumDate = maximumDate
-        if let date = date {dateTimePicker.setDate(date, animated: true)}
-        
-        self.view.addSubview(dateTimePicker)
-        
-        let cancelAction = UIAlertAction(title: Texts_Common.Cancel, style: .cancel) {(action) in}
-        self.addAction(cancelAction)
-
-        let okAction = UIAlertAction(title: Texts_Common.Ok, style: .default) { (action) in
-            actionHandler(dateTimePicker)
-        }
-        self.addAction(okAction)
-
-        let height:NSLayoutConstraint = NSLayoutConstraint(item: self.view, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 250)
-        self.view.addConstraint(height);
-    }
-    
     /// creates a UIAlertController of type actionSheet.
     /// - parameters:
     ///     - title : title, optional, used in init(title: title, message: message, preferredStyle: .alert)

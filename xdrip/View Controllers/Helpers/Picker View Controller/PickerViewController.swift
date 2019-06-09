@@ -23,7 +23,7 @@ final class PickerViewController : UIViewController {
     var cancelButtonTitle:String?
     
     // handler to executed when user clicks actionButton
-    var addHandler:((_ index: Int) -> Void) = {_ in fatalError("in PickerViewController, actionHandler is nil")}
+    var addHandler:((_ index: Int) -> Void) = {_ in fatalError("in PickerViewController, actionHandler is not initialized")}
     
     /// handler to execute when user clicks cancelHandler
     var cancelHandler:(() -> Void)?

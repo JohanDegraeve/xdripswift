@@ -184,16 +184,23 @@ extension AlertSettingsViewControllerData {
             // the actual date of start is nowAt000 + the number of minutes in the entry
             let startAsDate = Date(timeInterval: TimeInterval(Int(start) * 60), since: nowAt000)
             
-            let timePickAlertController = UIAlertController(title:nil, message:nil, datePickerMode: .time, date: startAsDate, minimumDate: Date(timeInterval: TimeInterval(Int(minimumStart) * 60), since: nowAt000), maximumDate: Date(timeInterval: TimeInterval(Int(maximumStart) * 60), since:nowAt000), actionHandler: {(timePicker) in
-                // set new start value
-                self.start = Int16(timePicker.date.minutesSinceMidNightLocalTime())
-                // table may need reload to show new value
-                tableView.reloadRows(at: [IndexPath(row: Setting.start.rawValue, section: 0)], with: .none)
-                // checkIfPropertiesChanged
-                self.checkIfPropertiesChanged()
-            }, cancelHandler: nil)
+            // create date pickerviewdata
+            let datePickerViewData = DatePickerViewData(withMainTitle: alertKindAsAlertKind.alertTitle(), withSubTitle: Texts_Alerts.alertStart, datePickerMode: .time, date: startAsDate, minimumDate: Date(timeInterval: TimeInterval(Int(minimumStart) * 60), since: nowAt000), maximumDate: Date(timeInterval: TimeInterval(Int(maximumStart) * 60), since: nowAt000), okButtonText: nil, cancelButtonText: nil
+                , onOkClick: {(date) in
+                    
+                    // set new start value
+                    self.start = Int16(date.minutesSinceMidNightLocalTime())
+                    
+                    // table may need reload to show new value
+                    tableView.reloadRows(at: [IndexPath(row: Setting.start.rawValue, section: 0)], with: .none)
+                    
+                    // checkIfPropertiesChanged
+                    self.checkIfPropertiesChanged()
+                    
+            }, onCancelClick: nil)
             
-            uIViewController.present(timePickAlertController, animated: true, completion: nil)
+            // present datepickerview
+            DatePickerViewController.displayDatePickerViewController(datePickerViewData: datePickerViewData, parentController: uIViewController)
             
         case .value:
             // for keyboard type : normally keyboard type is numeric only, except if value is bg value, and userdefaults is mmol

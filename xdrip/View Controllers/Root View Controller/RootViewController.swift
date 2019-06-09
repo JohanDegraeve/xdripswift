@@ -711,7 +711,7 @@ final class RootViewController: UIViewController {
                 if activeSensor != nil {
                     listOfActions[Texts_HomeView.stopSensorActionTitle] = {(UIAlertAction) in self.stopSensor()}
                 } else {
-                    listOfActions[Texts_HomeView.startSensorActionTitle] = {(UIAlertAction) in self.startSensor()}
+                    listOfActions[Texts_HomeView.startSensorActionTitle] = {(UIAlertAction) in self.startSensorAskUserForStarttime()}
                 }
             }
         }
@@ -841,29 +841,37 @@ final class RootViewController: UIViewController {
         coreDataManager?.saveChanges()
     }
     
-    // start a new sensor
-    private func startSensor() {
+    // start a new sensor, ask user for starttime
+    private func startSensorAskUserForStarttime() {
         
-        // craete timePickAlertController , but don't open it yet
-        let timePickAlertController = UIAlertController(title:nil, message:nil, datePickerMode: .dateAndTime, date: Date(), minimumDate: nil, maximumDate: nil, actionHandler: {(dateTimePicker) in
-            // set sensorStartTime
+        // craete datePickerViewData
+        let datePickerViewData = DatePickerViewData(withMainTitle: Texts_HomeView.startSensorActionTitle, withSubTitle: nil, datePickerMode: .dateAndTime, date: Date(), minimumDate: nil, maximumDate: Date(), okButtonText: Texts_Common.Ok, cancelButtonText: Texts_Common.Cancel, onOkClick: {(date) in
             if let coreDataManager = self.coreDataManager {
-                let sensorStartTime = dateTimePicker.date
+                
+                // set sensorStartTime
+                let sensorStartTime = date
                 self.activeSensor = Sensor(startDate: sensorStartTime, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                
                 // save the newly created Sensor permenantly in coredata
                 coreDataManager.saveChanges()
+                
             }
-        }, cancelHandler: nil)
+        }, onCancelClick: nil)
         
         // if this is the first time user starts a sensor, give warning that time should be correct
         // if not the first them, then immediately open the timePickAlertController
         if (!UserDefaults.standard.startSensorTimeInfoGiven) {
             UIAlertController(title: Texts_HomeView.startSensorActionTitle, message: Texts_HomeView.startSensorTimeInfo, actionHandler: {
-                self.present(timePickAlertController, animated: true, completion: nil)
+                
+                // create and present pickerviewcontroller
+                DatePickerViewController.displayDatePickerViewController(datePickerViewData: datePickerViewData, parentController: self)
+                
+                // no need to display sensor start time info next sensor start
                 UserDefaults.standard.startSensorTimeInfoGiven = true
+                
             }).presentInOwnWindow(animated: true, completion: nil)
         } else {
-            self.present(timePickAlertController, animated: true, completion: nil)
+            DatePickerViewController.displayDatePickerViewController(datePickerViewData: datePickerViewData, parentController: self)
         }
 
     }
