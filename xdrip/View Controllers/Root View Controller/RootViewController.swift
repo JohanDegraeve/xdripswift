@@ -566,7 +566,6 @@ final class RootViewController: UIViewController {
         
         // bgReadingsAccessor should not be nil at all, but let's not create a fatal error for that, there's already enough checks for it
         guard  let bgReadingsAccessor = bgReadingsAccessor else {
-            // no need to create a notification
             return
         }
 
@@ -601,6 +600,9 @@ final class RootViewController: UIViewController {
             calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         }
         notificationContent.title = calculatedValueAsString
+        
+        // must set a body otherwise notification doesn't show up on iOS10
+        notificationContent.body = " "
 
         // Create Notification Request
         let notificationRequest = UNNotificationRequest(identifier: Constants.Notifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest, content: notificationContent, trigger: nil)
