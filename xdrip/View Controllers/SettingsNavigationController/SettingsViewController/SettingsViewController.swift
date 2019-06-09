@@ -89,6 +89,19 @@ final class SettingsViewController: UIViewController {
         pickerViewController.didMove(toParent: self)
     }
 
+    /// for specified UITableView, viewModel, rowIndex and sectionIndex, check if a refresh of just the section is needed or the complete settings view, and refresh so
+    ///
+    /// Changing one setting value, may need hiding or masking or other setting rows. Goal is to minimize the refresh to the section if possible and to avoid refreshing the whole screen as much as possible.
+    /// This function will verify if complete reload is needed or not
+    private func checkIfReloadNeededAndReloadIfNeeded(tableView: UITableView, viewModel:SettingsViewModelProtocol, rowIndex:Int, sectionIndex:Int ) {
+
+        if viewModel.completeSettingsViewRefreshNeeded(index: rowIndex) {
+            tableView.reloadSections(IndexSet(integersIn: 0..<tableView.numberOfSections), with: .none)
+        } else {
+            tableView.reloadSections(IndexSet(integer: sectionIndex), with: .none)
+        }
+    }
+    
 }
 
 extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
@@ -179,25 +192,53 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
         case .speak:
             viewModel = speakSettingsViewModel
         }
+
         
+        // Configure Cell
         if let viewModel = viewModel {
-            // Configure Cell
+            
+            // setting not enabled, set color to grey, no accessory type to be added
+            cell.textLabel?.textColor = UIColor.black
+            cell.detailTextLabel?.textColor = UIColor.black
+            
+            // first the two textfields
             cell.textLabel?.text = viewModel.settingsRowText(index: indexPath.row)
-
-            cell.accessoryType = viewModel.accessoryType(index: indexPath.row)
-            switch cell.accessoryType {
-            case .checkmark, .detailButton, .detailDisclosureButton, .disclosureIndicator:
-                cell.selectionStyle = .gray
-            case .none:
-                cell.selectionStyle = .none
-            }
-
             cell.detailTextLabel?.text = viewModel.detailedText(index: indexPath.row)
 
-            cell.accessoryView = viewModel.uiView(index: indexPath.row).view
-            // if uiview is an uiswitch then possibly section needs reload
-            if let view = cell.accessoryView as? UISwitch, viewModel.uiView(index: indexPath.row).reloadSection {
-                view.addTarget(self, action: {(theSwitch:UISwitch) in tableView.reloadSections(IndexSet(integer: indexPath.section), with: .none)}, for: UIControl.Event.valueChanged)
+            // if not enabled, then no need to adding anything else
+            if viewModel.isEnabled(index: indexPath.row) {
+                
+                // setting enabled, get accessory type and accessory view
+                cell.accessoryType = viewModel.accessoryType(index: indexPath.row)
+                
+                switch cell.accessoryType {
+                case .checkmark, .detailButton, .detailDisclosureButton, .disclosureIndicator:
+                    cell.selectionStyle = .gray
+                case .none:
+                    cell.selectionStyle = .none
+                }
+                
+                cell.accessoryView = viewModel.uiView(index: indexPath.row)
+                
+                // if uiview is an uiswitch then initiate a reload, either complete view or just the section
+                if let view = cell.accessoryView as? UISwitch {
+                    view.addTarget(self, action: {
+                        (theSwitch:UISwitch) in
+                        
+                        self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: indexPath.row, sectionIndex: indexPath.section)
+                        
+                    }, for: UIControl.Event.valueChanged)
+                }
+                
+            } else {
+                
+                // setting not enabled, set color to grey, no accessory type to be added
+                cell.textLabel?.textColor = UIColor.gray
+                cell.detailTextLabel?.textColor = UIColor.gray
+                
+                // set accessory type to none, because no action is required when user clicks the row
+                cell.accessoryType = .none
+                
             }
             
         } else {
@@ -214,75 +255,87 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         guard let section = Section(rawValue: indexPath.section) else { fatalError("Unexpected Section") }
-        
-        var selectedRowAction:SettingsSelectedRowAction?
+ 
+        var viewModel:SettingsViewModelProtocol?
         
         switch section {
         case .general:
-            selectedRowAction = generalSettingsViewModel.onRowSelect(index: indexPath.row)
+            viewModel = generalSettingsViewModel
         case .transmitter:
-            selectedRowAction = transmitterSettingsViewModel.onRowSelect(index: indexPath.row)
+            viewModel = transmitterSettingsViewModel
         case .nightscout:
-            selectedRowAction = nightScoutSettingsViewModel.onRowSelect(index: indexPath.row)
+            viewModel = nightScoutSettingsViewModel
         case .dexcom:
-            selectedRowAction = dexcomSettingsViewModel.onRowSelect(index: indexPath.row)
+            viewModel = dexcomSettingsViewModel
         case .healthkit:
-            selectedRowAction = healthKitSettingsViewModel.onRowSelect(index: indexPath.row)
+            viewModel = healthKitSettingsViewModel
         case .alarms:
-            selectedRowAction = alarmsSettingsViewModel.onRowSelect(index: indexPath.row)
+            viewModel = alarmsSettingsViewModel
         case .speak:
-            selectedRowAction = speakSettingsViewModel.onRowSelect(index: indexPath.row)
+            viewModel = speakSettingsViewModel
         }
         
-        if let selectedRowAction = selectedRowAction {
+        if let viewModel = viewModel {
             
-            switch selectedRowAction {
+            if viewModel.isEnabled(index: indexPath.row) {
                 
-            case let .askText(title, message, keyboardType, text, placeHolder, actionTitle, cancelTitle, actionHandler, cancelHandler):
+                let selectedRowAction = viewModel.onRowSelect(index: indexPath.row)
                 
-                let alert = UIAlertController(title: title, message: message, keyboardType: keyboardType, text: text, placeHolder: placeHolder, actionTitle: actionTitle, cancelTitle: cancelTitle, actionHandler: { (text:String) in
-                            actionHandler(text)
-                            // after calling action handler, setting may have changed possibly all settings in the section, refresh the section
-                            tableView.reloadSections(IndexSet(integer: indexPath.section), with: .none)
-                }, cancelHandler: cancelHandler)
-                
-                // present the alert
-                self.present(alert, animated: true, completion: nil)
+                switch selectedRowAction {
+                    
+                case let .askText(title, message, keyboardType, text, placeHolder, actionTitle, cancelTitle, actionHandler, cancelHandler):
+                    
+                    let alert = UIAlertController(title: title, message: message, keyboardType: keyboardType, text: text, placeHolder: placeHolder, actionTitle: actionTitle, cancelTitle: cancelTitle, actionHandler: { (text:String) in
+                        
+                        // do the action
+                        actionHandler(text)
+                        
+                        // check if refresh is needed, either complete settingsview or individual section
+                        self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: indexPath.row, sectionIndex: indexPath.section)
 
-            case .nothing:
-                break
-                
-            case let .callFunction(function):
-                
-                // call function
-                function()
-                
-                // after calling action handler, setting may have changed possibly all settings in the section, refresh the section
-                tableView.reloadSections(IndexSet(integer: indexPath.section), with: .none)
-                
-            case let .selectFromList(title, data, selectedRow, actionTitle, cancelTitle, actionHandler, cancelHandler):
-                
-                // configure pickerViewData
-                let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: title, withData: data, selectedRow: selectedRow, withPriority: nil, actionButtonText: actionTitle, cancelButtonText: cancelTitle, onActionClick: {(_ index: Int) in
-                    actionHandler(index)
-                    tableView.reloadSections(IndexSet(integer: indexPath.section), with: .none)
-                }, onCancelClick: {
-                    if let cancelHandler = cancelHandler { cancelHandler() }
-                })
+                    }, cancelHandler: cancelHandler)
+                    
+                    // present the alert
+                    self.present(alert, animated: true, completion: nil)
+                    
+                case .nothing:
+                    break
+                    
+                case let .callFunction(function):
+                    
+                    // call function
+                    function()
+                    
+                    // check if refresh is needed, either complete settingsview or individual section
+                    self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: indexPath.row, sectionIndex: indexPath.section)
 
-                // create and present pickerviewcontroller
-                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+                case let .selectFromList(title, data, selectedRow, actionTitle, cancelTitle, actionHandler, cancelHandler):
+                    
+                    // configure pickerViewData
+                    let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: title, withData: data, selectedRow: selectedRow, withPriority: nil, actionButtonText: actionTitle, cancelButtonText: cancelTitle, onActionClick: {(_ index: Int) in
+                        actionHandler(index)
+                        
+                        // check if refresh is needed, either complete settingsview or individual section
+                        self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: indexPath.row, sectionIndex: indexPath.section)
 
-                break
-                
-            case .performSegue(let withIdentifier):
-                self.performSegue(withIdentifier: withIdentifier, sender: nil)
+                    }, onCancelClick: {
+                        if let cancelHandler = cancelHandler { cancelHandler() }
+                    })
+                    
+                    // create and present pickerviewcontroller
+                    PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+                    
+                    break
+                    
+                case .performSegue(let withIdentifier):
+                    self.performSegue(withIdentifier: withIdentifier, sender: nil)
+                }
+
+            } else {
+                // setting not enabled, nothing to do
             }
-        } else {
-            fatalError("in tableView didSelectRowAt, selectedRowAction is nil")
         }
     }
-    
 }
 
 /// defines perform segue identifiers used within settingsviewcontroller

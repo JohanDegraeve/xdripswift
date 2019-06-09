@@ -10,6 +10,19 @@ fileprivate enum Setting:Int, CaseIterable {
 /// conforms to SettingsViewModelProtocol for all transmitter settings in the first sections screen
 struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
     
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        return false
+    }
+    
+    func isEnabled(index: Int) -> Bool {
+        // in follower mode, all transmitter settings can be disabled
+        if UserDefaults.standard.isMaster {
+            return true
+        } else {
+            return false
+        }
+    }
+    
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Setting in SettingsViewTransmitterSettingsViewModel onRowSelect") }
         
@@ -91,7 +104,7 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
         }
     }
     
-    func uiView(index: Int) ->(view: UIView?, reloadSection: Bool) {
-        return (nil, false)
+    func uiView(index: Int) -> UIView? {
+        return nil
     }
 }

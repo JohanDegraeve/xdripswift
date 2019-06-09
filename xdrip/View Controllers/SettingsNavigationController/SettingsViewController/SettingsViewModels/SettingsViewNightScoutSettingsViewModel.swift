@@ -12,6 +12,22 @@ fileprivate enum Setting:Int, CaseIterable {
 /// conforms to SettingsViewModelProtocol for all nightscout settings in the first sections screen
 class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
     
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        return false
+    }
+    
+    func isEnabled(index: Int) -> Bool {
+        // in follower mode, then nightScoutAPIKey setting can be disabled, as it is not necessary
+        if !UserDefaults.standard.isMaster {
+
+            if index == Setting.nightScoutAPIKey.rawValue {
+                return false
+            }
+        }
+
+        return true
+    }
+    
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
@@ -80,14 +96,14 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         }
     }
     
-    func uiView(index: Int) -> (view: UIView?, reloadSection: Bool) {
+    func uiView(index: Int) -> UIView? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
         case .nightScoutEnabled:
-            return (UISwitch(isOn: UserDefaults.standard.nightScoutEnabled, action: {(isOn:Bool) in UserDefaults.standard.nightScoutEnabled = isOn}), true)
+            return UISwitch(isOn: UserDefaults.standard.nightScoutEnabled, action: {(isOn:Bool) in UserDefaults.standard.nightScoutEnabled = isOn})
         default:
-            return (nil, false)
+            return nil
         }
     }
 }

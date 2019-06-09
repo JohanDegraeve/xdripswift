@@ -9,6 +9,15 @@ fileprivate enum Setting:Int, CaseIterable {
 
 /// conforms to SettingsViewModelProtocol for all alert settings in the first sections screen
 struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
+    
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        return false
+    }
+        
+    func isEnabled(index: Int) -> Bool {
+        return true
+    }
+    
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Setting in SettingsViewAlertSettingsViewModel onRowSelect") }
 
@@ -32,8 +41,8 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
         return 2
     }
     
-    func uiView(index: Int) -> (view: UIView?, reloadSection: Bool) {
-        return (nil, false)
+    func uiView(index: Int) -> UIView? {
+        return nil
     }
     
     func settingsRowText(index: Int) -> String {

@@ -13,6 +13,19 @@ fileprivate enum Setting:Int, CaseIterable {
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
 struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
+    
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        
+        // changing follower to master or master to follower requires changing ui for nightscout settings and transmitter type settings
+        if index == Setting.masterFollower.rawValue {return true}
+        
+        return false
+    }
+    
+    func isEnabled(index: Int) -> Bool {
+        return true
+    }
+    
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 
@@ -28,8 +41,8 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
             return SettingsSelectedRowAction.callFunction(function: {
                 UserDefaults.standard.isMaster ? (UserDefaults.standard.isMaster) = false : (UserDefaults.standard.isMaster = true)
 
-                // if being set to follower then fix enable nightscout
-                if UserDefaults.standard.isMaster {
+                // if being set to follower then enable nightscout
+                if !UserDefaults.standard.isMaster {
                     UserDefaults.standard.nightScoutEnabled = true
                 }
 
@@ -91,8 +104,8 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
         }
     }
     
-    func uiView(index: Int) -> (view: UIView?, reloadSection: Bool) {
-        return (nil, false)
+    func uiView(index: Int) -> UIView? {
+        return nil
     }
     
 }

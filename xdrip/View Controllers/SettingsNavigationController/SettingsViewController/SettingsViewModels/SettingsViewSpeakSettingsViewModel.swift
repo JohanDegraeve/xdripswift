@@ -13,6 +13,15 @@ fileprivate enum Setting:Int, CaseIterable {
 
 /// conforms to SettingsViewModelProtocol for all speak settings in the first sections screen
 class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
+    
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        return false
+    }
+    
+    func isEnabled(index: Int) -> Bool {
+        return true
+    }
+    
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
@@ -86,28 +95,28 @@ class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
         }
     }
     
-    func uiView(index: Int) -> (view: UIView?, reloadSection: Bool) {
+    func uiView(index: Int) -> UIView? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
             
         case .speakBgReadings:
-            return (UISwitch(isOn: UserDefaults.standard.speakReadings, action: {(isOn:Bool) in UserDefaults.standard.speakReadings = isOn
+            return UISwitch(isOn: UserDefaults.standard.speakReadings, action: {(isOn:Bool) in UserDefaults.standard.speakReadings = isOn
                 // if speakreadings is set to off, then also set speaktrend and speak delta to off
                 if !isOn {
                     UserDefaults.standard.speakTrend = false
                     UserDefaults.standard.speakDelta = false
                 }
-            }), true)
+            })
 
         case .speakTrend:
-            return (UISwitch(isOn: UserDefaults.standard.speakTrend, action: {(isOn:Bool) in UserDefaults.standard.speakTrend = isOn}), true)
+            return UISwitch(isOn: UserDefaults.standard.speakTrend, action: {(isOn:Bool) in UserDefaults.standard.speakTrend = isOn})
 
         case .speakDelta:
-            return (UISwitch(isOn: UserDefaults.standard.speakDelta, action: {(isOn:Bool) in UserDefaults.standard.speakDelta = isOn}), true)
+            return UISwitch(isOn: UserDefaults.standard.speakDelta, action: {(isOn:Bool) in UserDefaults.standard.speakDelta = isOn})
 
         case .speakInterval:
-            return (nil, false)
+            return nil
         }
     }
 }

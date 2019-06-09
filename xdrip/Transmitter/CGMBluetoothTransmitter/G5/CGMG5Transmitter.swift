@@ -287,12 +287,12 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                         }
                     case .authRequestRx:
                         if let authRequestRxMessage = AuthRequestRxMessage(data: value), let receiveAuthenticationCharacteristic = receiveAuthenticationCharacteristic {
-                            debuglogging("transmitterid = " + transmitterId)
+                            
                             guard let challengeHash = CGMG5Transmitter.computeHash(transmitterId, of: authRequestRxMessage.challenge) else {
                                 os_log("    failed to calculate challengeHash, no further processing", log: log, type: .error)
                                 return
                             }
-                            debuglogging("challengehash = " + challengeHash.hexEncodedString())
+                            
                             let authChallengeTxMessage = AuthChallengeTxMessage(challengeHash: challengeHash)
                             _ = writeDataToPeripheral(data: authChallengeTxMessage.data, characteristicToWriteTo: receiveAuthenticationCharacteristic, type: .withResponse)
                         } else {

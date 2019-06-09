@@ -123,7 +123,7 @@ final class CoreDataManager {
     // MARK: -
     
     public func saveChanges() {
-debuglogging("in savechanges")
+
         mainManagedObjectContext.performAndWait {
             do {
                 if self.mainManagedObjectContext.hasChanges {

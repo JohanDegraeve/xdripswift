@@ -3,6 +3,14 @@ import UIKit
 /// conforms to SettingsViewModelProtocol for all healthkit settings in the first sections screen
 class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
     
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        return false
+    }
+    
+    func isEnabled(index: Int) -> Bool {
+        return true
+    }
+    
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         return SettingsSelectedRowAction.nothing
     }
@@ -27,8 +35,12 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
         return nil
     }
     
-    func uiView(index:Int) -> (view: UIView?, reloadSection: Bool) {
-        return (UISwitch(isOn: UserDefaults.standard.storeReadingsInHealthkit, action: {(isOn:Bool) in UserDefaults.standard.storeReadingsInHealthkit = isOn}), true)
+    func uiView(index:Int) -> UIView? {
+        return UISwitch(isOn: UserDefaults.standard.storeReadingsInHealthkit, action: {
+            (isOn:Bool) in
+            UserDefaults.standard.storeReadingsInHealthkit = isOn
+            
+        })
     }
 }
 

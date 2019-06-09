@@ -16,6 +16,14 @@ fileprivate enum Setting:Int, CaseIterable {
 /// conforms to SettingsViewModelProtocol for all Dexcom settings in the first sections screen
 class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
     
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        return false
+    }
+    
+    func isEnabled(index: Int) -> Bool {
+        return true
+    }
+    
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
@@ -97,16 +105,16 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
         }
     }
     
-    func uiView(index:Int) -> (view: UIView?, reloadSection: Bool) {
+    func uiView(index:Int) -> UIView? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
         case .uploadReadingstoDexcomShare:
-            return (UISwitch(isOn: UserDefaults.standard.uploadReadingstoDexcomShare, action: {(isOn:Bool) in UserDefaults.standard.uploadReadingstoDexcomShare = isOn}), true)
+            return UISwitch(isOn: UserDefaults.standard.uploadReadingstoDexcomShare, action: {(isOn:Bool) in UserDefaults.standard.uploadReadingstoDexcomShare = isOn})
         case .useUSDexcomShareurl:
-            return (UISwitch(isOn: UserDefaults.standard.useUSDexcomShareurl, action: {(isOn:Bool) in UserDefaults.standard.useUSDexcomShareurl = isOn}), true)
+            return UISwitch(isOn: UserDefaults.standard.useUSDexcomShareurl, action: {(isOn:Bool) in UserDefaults.standard.useUSDexcomShareurl = isOn})
         case .dexcomShareAccountName,.dexcomSharePassword,.dexcomShareSerialNumber:
-            return (nil, false)
+            return nil
         }
     }
 }
