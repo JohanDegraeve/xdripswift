@@ -83,6 +83,9 @@ final class RootViewController: UIViewController {
     
     /// nightScoutFollowManager instance
     private var nightScoutFollowManager:NightScoutFollowManager?
+    
+    /// healthkit manager instance
+    private var healthKitManager:HealthKitManager?
 
     // reference to activeSensor
     private var activeSensor:Sensor?
@@ -216,6 +219,9 @@ final class RootViewController: UIViewController {
         // setup alertmanager
         alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
 
+        // setup healthkitmanager
+        healthKitManager = HealthKitManager(coreDataManager: coreDataManager)
+        
     }
     
     private func processNewCGMInfo(glucoseData: inout [RawGlucoseData], sensorState: SensorState?, firmware: String?, hardware: String?, transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
@@ -308,6 +314,11 @@ final class RootViewController: UIViewController {
                 if let alertManager = alertManager {
                     alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: Constants.Master.maximumBgReadingAgeForAlertsInSeconds)
                 }
+                
+                if let healthKitManager = healthKitManager {
+                    healthKitManager.storeBgReadings()
+                }
+                
             }
         }
         
@@ -1097,6 +1108,10 @@ extension RootViewController:NightScoutFollowerDelegate {
                 // check alerts
                 if let alertManager = alertManager {
                     alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: Constants.Follower.maximumBgReadingAgeForAlertsInSeconds)
+                }
+
+                if let healthKitManager = healthKitManager {
+                    healthKitManager.storeBgReadings()
                 }
 
             }

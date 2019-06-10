@@ -75,30 +75,34 @@ struct Constants {
         static let calibration = "Calibration"
         /// debuglogging
         static let debuglogging = "xdripdebuglogging"
-        // G5
+        /// G5
         static let categoryCGMG5 = "categoryCGMG5"
-        // GNSEntry
+        /// GNSEntry
         static let categoryCGMGNSEntry = "categoryCGMGNSEntry"
-        // core data manager
+        /// core data manager
         static let categoryCoreDataManager = "categoryCoreDataManager"
-        // application data bgreadings
+        /// application data bgreadings
         static let categoryApplicationDataBgReadings = "categoryApplicationDataBgReadings"
-        // application data calibrations
+        /// application data calibrations
         static let categoryApplicationDataCalibrations = "categoryApplicationDataCalibrations"
-        // application data sensors
+        /// application data sensors
         static let categoryApplicationDataSensors = "categoryApplicationDataSensors"
-        // application data alerttypes
+        /// application data alerttypes
         static let categoryApplicationDataAlertTypes = "categoryApplicationDataAlertTypes"
-        // application data alertentries
+        /// application data alertentries
         static let categoryApplicationDataAlertEntries = "categoryApplicationDataAlertEntries"
-        // nightscout uploader
+        /// nightscout uploader
         static let categoryNightScoutUploadManager = "categoryNightScoutUploadManager"
-        // nightscout follow
+        /// nightscout follow
         static let categoryNightScoutFollowManager = "categoryNightScoutFollowManager"
-        // alertmanager
+        /// alertmanager
         static let categoryAlertManager = "categoryAlertManager"
-        // playsound
+        /// playsound
         static let categoryPlaySound = "categoryPlaySound"
+        /// healthkit manager
+        static let categoryHealthKitManager = "categoryHealthKitManager"
+        /// SettingsViewHealthKitSettingsViewModel
+        static let categorySettingsViewHealthKitSettingsViewModel = "categorySettingsViewHealthKitSettingsViewModel"
     }
     
     enum Notifications {

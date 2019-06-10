@@ -80,12 +80,19 @@ extension UserDefaults {
         case lastdisConnectTimestamp = "lastdisConnectTimestamp"
         
         // Nightscout
-        /// timestamp lastest uploaded reading
+        /// timestamp lastest reading uploaded to NightScout
         case timeStampLatestNSUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
         
         // Transmitter
         /// Transmitter Battery Level
         case transmitterBatteryInfo = "transmitterbatteryinfo"
+        
+        // HealthKit
+        /// did user authorize the storage of readings in healthkit or not
+        case storeReadingsInHealthkitAuthorized = "storeReadingsInHealthkitAuthorized"
+        
+        /// timestamp of last bgreading that was stored in healthkit
+        case timeStampLatestHealthKitStoreBgReading = "timeStampLatestHealthKitStoreBgReading"
         
     }
     
@@ -316,6 +323,8 @@ extension UserDefaults {
     // MARK: Healthkit Settings
 
     /// should readings be stored in healthkit ? true or false
+    ///
+    /// This is just the user selection, it doesn't say if user has authorized storage of readings in Healthkit - for that use storeReadingsInHealthkitAuthorized
     @objc dynamic var storeReadingsInHealthkit: Bool {
         get {
             return bool(forKey: Key.storeReadingsInHealthkit.rawValue)
@@ -418,6 +427,7 @@ extension UserDefaults {
         }
     }
     
+    /// timestamp lastest reading uploaded to NightScout
     var timeStampLatestNightScoutUploadedBgReading:Date? {
         get {
             return object(forKey: Key.timeStampLatestNSUploadedBgReadingToNightScout.rawValue) as? Date
@@ -445,6 +455,27 @@ extension UserDefaults {
             }
         }
     }
+  
+    /// did user authorize the storage of readings in healthkit or not - this setting is actually only used to allow the HealthKitManager to listen for changes in the authorization status
+    var storeReadingsInHealthkitAuthorized:Bool {
+        get {
+            return bool(forKey: Key.storeReadingsInHealthkitAuthorized.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.storeReadingsInHealthkitAuthorized.rawValue)
+        }
+    }
+    
+    /// timestamp of last bgreading that was stored in healthkit
+    var timeStampLatestHealthKitStoreBgReading:Date? {
+        get {
+            return object(forKey: Key.timeStampLatestHealthKitStoreBgReading.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestHealthKitStoreBgReading.rawValue)
+        }
+    }
+    
 }
 
 

@@ -45,10 +45,10 @@ class NightScoutFollowManager:NSObject {
 
     // MARK: - initializer
     
-    /// init, to avoid creation
+    /// initializer
     public init(coreDataManager:CoreDataManager, nightScoutFollowerDelegate:NightScoutFollowerDelegate) {
         
-        // initialize nextFollowDownloadTimeStamp to now, which is at moment FollowManager is instantiated
+        // initialize nextFollowDownloadTimeStamp to now, which is at the moment FollowManager is instantiated
         nextFollowDownloadTimeStamp = Date()
         
         // initialize non optional private properties

@@ -117,7 +117,8 @@ public class NightScoutUploadManager:NSObject {
         
         os_log("in uploadBgReadingsToNightScout", log: self.log, type: .info)
 
-        let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        // get readings to upload, limit to 2016 = maximum 1 week - just to avoid a huge array is being returned here
+        let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: 2016, fromDate: UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         if bgReadingsToUpload.count > 0 {
             os_log("    number of readings to upload : %{public}@", log: self.log, type: .info, bgReadingsToUpload.count.description)
