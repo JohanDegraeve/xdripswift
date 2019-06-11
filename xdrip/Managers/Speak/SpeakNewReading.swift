@@ -37,6 +37,10 @@ class SpeakNewReading {
     
     public func speakNewReading() {
         
+        // get latest reading, ignore sensor, rawdata, timestamp - only 1
+        let bgReadingsToSpeak = bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+
+        
     }
     
     // MARK: - private functions
