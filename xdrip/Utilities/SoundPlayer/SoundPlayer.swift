@@ -13,7 +13,6 @@ class SoundPlayer {
     private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryPlaySound)
 
     /// audioplayer
-    
     private var audioPlayer:AVAudioPlayer?
     
     // MARK: - initializer
@@ -65,15 +64,4 @@ class SoundPlayer {
         }
     }
     
-    /// will speak the text, doesn't speak if player is playing some other sound
-    public func say(text:String, language:String?) {
-        if !isPlaying() {
-            let syn = AVSpeechSynthesizer.init()
-            let utterance = AVSpeechUtterance(string: text)
-            utterance.rate = 0.51
-            utterance.pitchMultiplier = 1
-            utterance.voice = AVSpeechSynthesisVoice(language: language)
-            syn.speak(utterance)
-        }
-    }
 }

@@ -21,7 +21,7 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func isEnabled(index: Int) -> Bool {
-        return true
+        return false
     }
     
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {

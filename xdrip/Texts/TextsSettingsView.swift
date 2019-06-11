@@ -145,7 +145,7 @@ class Texts_SettingsView {
     // MARK: - Section Speak
     
     static let sectionTitleSpeak: String = {
-        return NSLocalizedString("settingsviews_sectiontitlespeak", tableName: filename, bundle: Bundle.main, value: "Speak", comment: "speak settings, section title")
+        return NSLocalizedString("settingsviews_sectiontitlespeak", tableName: filename, bundle: Bundle.main, value: "Speak/NOT READY !", comment: "speak settings, section title")
     }()
 
     static let labelSpeakBgReadings = {

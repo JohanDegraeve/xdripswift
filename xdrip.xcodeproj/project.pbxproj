@@ -53,6 +53,7 @@
 		F821CF9022AB1068005C1E43 /* DatePickerViewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF8F22AB1068005C1E43 /* DatePickerViewData.swift */; };
 		F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF9422ADB0D7005C1E43 /* HealthKitManager.swift */; };
 		F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F821CF9622AE589E005C1E43 /* HealthKit.framework */; };
+		F821CF9D22AEF483005C1E43 /* SpeakNewReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF9C22AEF483005C1E43 /* SpeakNewReading.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
 		F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */; };
@@ -206,6 +207,7 @@
 		F821CF9422ADB0D7005C1E43 /* HealthKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		F821CF9622AE589E005C1E43 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		F821CF9822AE589E005C1E43 /* xdrip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = xdrip.entitlements; sourceTree = "<group>"; };
+		F821CF9C22AEF483005C1E43 /* SpeakNewReading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpeakNewReading.swift; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BgReading+CoreDataProperties.swift"; path = "../Extensions/BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Sensor+CoreDataProperties.swift"; path = "../Extensions/Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -507,6 +509,14 @@
 			path = HealthKit;
 			sourceTree = "<group>";
 		};
+		F821CF9922AEF2DF005C1E43 /* Speak */ = {
+			isa = PBXGroup;
+			children = (
+				F821CF9C22AEF483005C1E43 /* SpeakNewReading.swift */,
+			);
+			path = Speak;
+			sourceTree = "<group>";
+		};
 		F85DC29B21CFCEB800B9F74A /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -517,6 +527,7 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				F821CF9922AEF2DF005C1E43 /* Speak */,
 				F821CF9122ADB064005C1E43 /* HealthKit */,
 				F821CF48229BF43A005C1E43 /* Alerts */,
 				F821CF54229BF43A005C1E43 /* Application */,
@@ -1094,6 +1105,7 @@
 				F8025C1821DBC16400ECF0C0 /* CRC.swift in Sources */,
 				F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */,
 				F8B3A81D227DEC92004BA588 /* CalibrationsAccessor.swift in Sources */,
+				F821CF9D22AEF483005C1E43 /* SpeakNewReading.swift in Sources */,
 				F8B3A848227F090E004BA588 /* SettingsViewHealthKitSettingsViewModel.swift in Sources */,
 				F8025E5021EE746400ECF0C0 /* Calibrator.swift in Sources */,
 				F821CF59229BF43A005C1E43 /* AlertEntryUnit.swift in Sources */,
