@@ -48,7 +48,7 @@ public class NightScoutUploadManager:NSObject {
     /// synchronizes all NightScout related, if needed
     public func synchronize() {
         // check if NightScout upload is enabled
-        if UserDefaults.standard.nightScoutEnabled, let siteURL = UserDefaults.standard.nightScoutUrl, let apiKey = UserDefaults.standard.nightScoutAPIKey {
+        if UserDefaults.standard.nightScoutEnabled && UserDefaults.standard.isMaster, let siteURL = UserDefaults.standard.nightScoutUrl, let apiKey = UserDefaults.standard.nightScoutAPIKey {
             uploadBgReadingsToNightScout(siteURL: siteURL, apiKey: apiKey)
         }
     }
@@ -67,7 +67,8 @@ public class NightScoutUploadManager:NSObject {
                     
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
                         
-                        if let apiKey = UserDefaults.standard.nightScoutAPIKey, let siteUrl = UserDefaults.standard.nightScoutUrl {
+                        // if apiKey and siteURL are set and if master then test credentials
+                        if let apiKey = UserDefaults.standard.nightScoutAPIKey, let siteUrl = UserDefaults.standard.nightScoutUrl, UserDefaults.standard.isMaster {
                             
                             testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
                                 DispatchQueue.main.async {
@@ -89,7 +90,8 @@ public class NightScoutUploadManager:NSObject {
                         
                         if UserDefaults.standard.nightScoutEnabled {
                             
-                            if let apiKey = UserDefaults.standard.nightScoutAPIKey, let siteUrl = UserDefaults.standard.nightScoutUrl {
+                            // if apiKey and siteURL are set and if master then test credentials
+                            if let apiKey = UserDefaults.standard.nightScoutAPIKey, let siteUrl = UserDefaults.standard.nightScoutUrl, UserDefaults.standard.isMaster {
                                 
                                 testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
                                     DispatchQueue.main.async {

@@ -38,12 +38,12 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
         case .highMarkValue:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelHighValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.highMarkValueInUserChosenUnitRounded, placeHolder: Constants.BGGraphBuilder.defaultHighMmarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(highMarkValue:String) in UserDefaults.standard.highMarkValueInUserChosenUnitRounded = highMarkValue}, cancelHandler: nil)
         case .masterFollower:
+            
             return SettingsSelectedRowAction.callFunction(function: {
-                UserDefaults.standard.isMaster ? (UserDefaults.standard.isMaster) = false : (UserDefaults.standard.isMaster = true)
-
-                // if being set to follower then enable nightscout
-                if !UserDefaults.standard.isMaster {
-                    UserDefaults.standard.nightScoutEnabled = true
+                if UserDefaults.standard.isMaster {
+                    UserDefaults.standard.isMaster = false
+                } else {
+                    UserDefaults.standard.isMaster = true
                 }
 
             }

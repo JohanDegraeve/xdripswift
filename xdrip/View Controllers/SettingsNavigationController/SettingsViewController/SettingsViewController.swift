@@ -196,7 +196,7 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
         // Configure Cell
         if let viewModel = viewModel {
             
-            // setting not enabled, set color to grey, no accessory type to be added
+            // start setting textColor to black, could change to gray if setting is not enabled
             cell.textLabel?.textColor = UIColor.black
             cell.detailTextLabel?.textColor = UIColor.black
             
@@ -235,8 +235,12 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
                 cell.textLabel?.textColor = UIColor.gray
                 cell.detailTextLabel?.textColor = UIColor.gray
                 
-                // set accessory type to none, because no action is required when user clicks the row
+                // set accessory and selectionStyle to none, because no action is required when user clicks the row
                 cell.accessoryType = .none
+                cell.selectionStyle = .none
+                
+                // set accessoryView to nil
+                cell.accessoryView = nil
                 
             }
             
