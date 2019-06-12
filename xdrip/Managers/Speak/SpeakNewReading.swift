@@ -37,10 +37,34 @@ class SpeakNewReading {
     
     public func speakNewReading() {
         
-        // get latest reading, ignore sensor, rawdata, timestamp - only 1
-        let bgReadingsToSpeak = bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-
+        // if speak reading not enabled, then no further processing
+        if !UserDefaults.standard.speakReadings {
+            return
+        }
         
+        // get latest reading, ignore sensor, rawdata, timestamp - only 1
+        let lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+
+        // if there's no readings, then no further processing
+        if lastReadings.count == 0 {
+            return
+        }
+        
+        // assign bgReadingToSpeak
+        let bgReadingToSpeak = lastReadings[0]
+        
+        // if reading older dan 4.5 minutes, then no further processing
+        if Date().timeIntervalSince(bgReadingToSpeak.timeStamp) > 4.5 * 60 {
+            return
+        }
+        
+        // start creating the text that needs to be spoken
+        /*var currentBgReadingFormatted = bgReadingToSpeak.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        if (currentBgReadingFormatted == "HIGH") {
+            currentBgReadingFormatted = ". " + ModelLocator.resourceManagerInstance.getString('texttospeech','high');
+        } else if (currentBgReadingFormatted == "LOW") {
+            currentBgReadingFormatted = ". " + ModelLocator.resourceManagerInstance.getString('texttospeech','low');
+        }*/
     }
     
     // MARK: - private functions
@@ -58,4 +82,35 @@ class SpeakNewReading {
         }
     }
 
+    /// copied from Spike -
+    /// if number is a Double value, and if it has no "." then a "." is added - otherwise returns number
+    private func assertFractionalDigits(number:String) -> String {
+        
+        let newNumber = number.replacingOccurrences(of: " ", with: "")
+        
+        if Double(newNumber) != nil {
+            if !number.contains(find: ".") {
+               return number + ".0"
+            }
+        }
+        
+        return number
+        
+    }
+    
+    /// copied from Spike
+    /// - parameters:
+    ///     - languageCode : must be format oike en-EN
+    private func formatLocaleSpecific(number:String, languageCode:String) -> String {
+        
+        let newNumber = number.replacingOccurrences(of: " ", with: "")
+        
+        if Double(newNumber) != nil {
+            if languageCode.uppercased() == "DE-DE" {
+                return number.replacingOccurrences(of: ".", with: ",")
+            }
+        }
+        
+        return number
+    }
 }
