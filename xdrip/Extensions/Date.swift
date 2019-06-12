@@ -10,6 +10,15 @@ extension Date {
         return Double(self.timeIntervalSince1970 * 1000)
     }
     
+    /// returns Date in milliseconds as Int64
+    func toMillisecondsAsInt64() -> Int64 {
+        return Int64((self.timeIntervalSince1970 * 1000.0).rounded())
+    }
+    
+    func toSecondsAsInt64() -> Int64 {
+        return Int64((self.timeIntervalSince1970).rounded())
+    }
+    
     /// gives number of minutes since 00:00 local time
     func minutesSinceMidNightLocalTime() -> Int {
         let calendar = Calendar.current

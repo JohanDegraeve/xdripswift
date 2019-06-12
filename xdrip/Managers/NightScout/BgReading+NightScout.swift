@@ -3,10 +3,11 @@ import Foundation
 extension BgReading {
     /// dictionary representation for upload to NightScout
     public var dictionaryRepresentation: [String: Any] {
+        debuglogging("timestamp = " + timeStamp.description(with: .current))
         return  [
             "_id": id,
             "device": deviceName ?? "",
-            "date": Int((timeStamp.timeIntervalSince1970 * 1000)),
+            "date": timeStamp.toMillisecondsAsInt64(),
             "dateString": TimeFormat.timestampNightScoutFormatFromDate(timeStamp),
             "type": "sgv",
             "sgv": Int(calculatedValue.roundToDecimal(0)),
