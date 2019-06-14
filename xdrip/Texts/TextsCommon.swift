@@ -37,8 +37,12 @@ class Texts_Common {
         return NSLocalizedString("common_default", tableName: filename, bundle: Bundle.main, value: "Default", comment: "literally default, will be the name of default alerttypes that will be created during initial app launch")
     }()
 
-    static let highCapitals = {
-        return NSLocalizedString("common_highcapitals", tableName: filename, bundle: Bundle.main, value: "HIGH", comment: "the word HIGH, in capitals")
+    static let HIGH = {
+        return NSLocalizedString("common_high", tableName: filename, bundle: Bundle.main, value: "HIGH", comment: "the word HIGH, in capitals")
+    }()
+    
+    static let LOW = {
+        return NSLocalizedString("common_low", tableName: filename, bundle: Bundle.main, value: "LOW", comment: "the word LOW, in capitals")
     }()
     
     static let hour = {

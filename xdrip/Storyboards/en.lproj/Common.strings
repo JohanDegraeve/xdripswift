@@ -17,3 +17,4 @@
 "warning" ="Warning !";
 "update" = "Update";
 "add" = "Add";
+"settingsviews_speakIntervalMessage" = "Minimum interval between two readings, in minutes";

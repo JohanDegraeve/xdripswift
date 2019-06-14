@@ -118,11 +118,11 @@ public class BgReading: NSManagedObject {
     func unitizedString(unitIsMgDl:Bool) -> String {
         var returnValue:String
         if (calculatedValue >= 400) {
-            returnValue = "HIGH"
+            returnValue = Texts_Common.HIGH
         } else if (calculatedValue >= 40) {
             returnValue = calculatedValue.mgdlToMmolAndToString(mgdl: unitIsMgDl)
         } else if (calculatedValue > 12) {
-            returnValue = "LOW"
+            returnValue = Texts_Common.LOW
         } else {
             switch(calculatedValue) {
             case 0:
@@ -215,6 +215,31 @@ public class BgReading: NSManagedObject {
         return ((lastBgReading.calculatedValue - calculatedValue) / (lastBgReading.timeStamp.toMillisecondsAsDouble() - timeStamp.toMillisecondsAsDouble()), false)
     }
     
+    /// slopeName for upload to NightScout
+    public var slopeName:String {
+        let slope_by_minute:Double = calculatedValueSlope * 60000
+        var arrow = "NONE"
+        if (slope_by_minute <= (-3.5)) {
+            arrow = "DoubleDown"
+        } else if (slope_by_minute <= (-2)) {
+            arrow = "SingleDown"
+        } else if (slope_by_minute <= (-1)) {
+            arrow = "FortyFiveDown"
+        } else if (slope_by_minute <= (1)) {
+            arrow = "Flat"
+        } else if (slope_by_minute <= (2)) {
+            arrow = "FortyFiveUp"
+        } else if (slope_by_minute <= (3.5)) {
+            arrow = "SingleUp"
+        } else if (slope_by_minute <= (40)) {
+            arrow = "DoubleUp"
+        }
+        
+        if(hideSlope) {
+            arrow = "NOT COMPUTABLE"
+        }
+        return arrow
+    }
 
 
 }

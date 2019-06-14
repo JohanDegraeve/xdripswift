@@ -74,14 +74,11 @@ class NightScoutFollowManager:NSObject {
         super.init()
         
         // changing from follower to master or vice versa also requires ... attention
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new
-            , context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
         // setting nightscout url also does require action
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new
-            , context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new, context: nil)
         // change value of nightscout enabled
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutEnabled.rawValue, options: .new
-            , context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutEnabled.rawValue, options: .new, context: nil)
 
         verifyUserDefaultsAndStartOrStopFollowMode()
     }
@@ -155,8 +152,6 @@ class NightScoutFollowManager:NSObject {
             timeStampOfFirstBgReadingToDowload = max(latestBgReadings[0].timeStamp, timeStampOfFirstBgReadingToDowload)
         }
         
-        debuglogging("timeStampOfFirstBgReadingToDowload = " + timeStampOfFirstBgReadingToDowload.description(with: .current))
-        
         // calculate count, which is a parameter in the nightscout API - divide by 60, worst case NightScout has a reading every minute, this can be the case for MiaoMiao
         let count = Int(-timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow / 60 + 1)
         
@@ -184,7 +179,8 @@ class NightScoutFollowManager:NSObject {
                     if let nightScoutFollowerDelegate = self.nightScoutFollowerDelegate {
                         nightScoutFollowerDelegate.nightScoutFollowerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
                     }
-                    
+
+                    // schedule new download
                     self.scheduleNewDownload(followGlucoseDataArray: &followGlucoseDataArray)
 
                 }
@@ -215,8 +211,6 @@ class NightScoutFollowManager:NSObject {
                 nextFollowDownloadTimeStamp = Date(timeInterval: 5 * 60, since: nextFollowDownloadTimeStamp)
             }
         }
-        
-        debuglogging("nextFollowDownloadTimeStamp = " + nextFollowDownloadTimeStamp.description(with: .current))
         
         // schedule timer and assign it to a let property
         let downloadTimer = Timer.scheduledTimer(timeInterval: nextFollowDownloadTimeStamp.timeIntervalSince1970 - Date().timeIntervalSince1970, target: self, selector: #selector(self.download), userInfo: nil, repeats: false)
@@ -265,6 +259,7 @@ class NightScoutFollowManager:NSObject {
                             
                             // iterate through the entries and create glucoseData
                             for entry in array {
+
                                 if let entry = entry as? [String:Any] {
                                     if let followGlucoseData = FollowGlucoseData(json: entry) {
                                         

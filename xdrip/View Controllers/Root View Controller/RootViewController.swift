@@ -87,11 +87,14 @@ final class RootViewController: UIViewController {
     /// healthkit manager instance
     private var healthKitManager:HealthKitManager?
 
-    // reference to activeSensor
+    /// reference to activeSensor
     private var activeSensor:Sensor?
     
-    // if true, user manually started scanning for a device, when connection is made, we'll inform the user, see cgmTransmitterDidConnect
+    /// if true, user manually started scanning for a device, when connection is made, we'll inform the user, see cgmTransmitterDidConnect
     private var userDidInitiateScanning = false
+    
+    /// reference to bgReadingSpeaker
+    private var bgReadingSpeaker:BGReadingSpeaker?
     
     // MARK: - View Life Cycle
 
@@ -222,6 +225,8 @@ final class RootViewController: UIViewController {
         // setup healthkitmanager
         healthKitManager = HealthKitManager(coreDataManager: coreDataManager)
         
+        // setup bgReadingSpeaker
+        bgReadingSpeaker = BGReadingSpeaker(sharedSoundPlayer: soundPlayer, coreDataManager: coreDataManager)
     }
     
     private func processNewCGMInfo(glucoseData: inout [RawGlucoseData], sensorState: SensorState?, firmware: String?, hardware: String?, transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
@@ -317,6 +322,10 @@ final class RootViewController: UIViewController {
                 
                 if let healthKitManager = healthKitManager {
                     healthKitManager.storeBgReadings()
+                }
+                
+                if let bgReadingSpeaker = bgReadingSpeaker {
+                    bgReadingSpeaker.speakNewReading()
                 }
                 
             }
@@ -1081,15 +1090,12 @@ extension RootViewController:NightScoutFollowerDelegate {
             for (_, followGlucoseData) in followGlucoseDataArray.enumerated().reversed() {
                 
                 if followGlucoseData.timeStamp > timeStampLastBgReading {
-                    
+
                     // creata a new reading
                     _ = nightScoutFollowManager.createBgReading(followGlucoseData: followGlucoseData)
                     
                     // a new reading was created
                     newReadingCreated = true
-                    
-                    // save in core data
-                    coreDataManager.saveChanges()
                     
                     // set timeStampLastBgReading to new timestamp
                     timeStampLastBgReading = followGlucoseData.timeStamp
@@ -1099,6 +1105,9 @@ extension RootViewController:NightScoutFollowerDelegate {
             
             if newReadingCreated {
                 
+                // save in core data
+                coreDataManager.saveChanges()
+
                 // update notification
                 createBgReadingNotification()
                 
@@ -1112,6 +1121,10 @@ extension RootViewController:NightScoutFollowerDelegate {
 
                 if let healthKitManager = healthKitManager {
                     healthKitManager.storeBgReadings()
+                }
+                
+                if let bgReadingSpeaker = bgReadingSpeaker {
+                    bgReadingSpeaker.speakNewReading()
                 }
 
             }

@@ -145,11 +145,19 @@ class Texts_SettingsView {
     // MARK: - Section Speak
     
     static let sectionTitleSpeak: String = {
-        return NSLocalizedString("settingsviews_sectiontitlespeak", tableName: filename, bundle: Bundle.main, value: "Speak/NOT READY !", comment: "speak settings, section title")
+        return NSLocalizedString("settingsviews_sectiontitlespeak", tableName: filename, bundle: Bundle.main, value: "Speak", comment: "speak settings, section title")
     }()
 
     static let labelSpeakBgReadings = {
         return NSLocalizedString("settingsviews_speakBgReadings", tableName: filename, bundle: Bundle.main, value: "Speak BG Readings", comment: "speak settings, where user can enable or disable speak readings")
+    }()
+    
+    static let labelSpeakLanguage = {
+        return NSLocalizedString("settingsviews_speakBgReadingslanguage", tableName: filename, bundle: Bundle.main, value: "Language", comment: "speak settings, where user can select the language")
+    }()
+    
+    static let speakReadingLanguageSelection:String = {
+        return NSLocalizedString("settingsviews_speakreadingslanguageselection", tableName: filename, bundle: Bundle.main, value: "Select Language", comment: "speak reading settings, text in pop up where user can select the language")
     }()
     
     static let labelSpeakTrend = {
@@ -163,4 +171,16 @@ class Texts_SettingsView {
     static let labelSpeakInterval = {
         return NSLocalizedString("settingsviews_speakInterval", tableName: filename, bundle: Bundle.main, value: "Interval", comment: "speak settings, where user can set the speak interval, speak each reading, each two readings ...")
     }()
+    
+    static let speakIntervalMessage = {
+        return NSLocalizedString("settingsviews_speakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two readings, in minutes", comment: "When clicking the interval setting, a pop up asks for number of minutes between two spoken readings, this is the message displayed in the pop up")
+    }()
+    
+    static let labelSpeakRate = {
+        return NSLocalizedString("settingsviews_speakRate", tableName: filename, bundle: Bundle.main, value: "Speak Rate", comment: "speak settings, where user can set the speak rate")
+    }()
+    static let labelSpeakRateMessage = {
+        return NSLocalizedString("settingsviews_speakRateMessage", tableName: filename, bundle: Bundle.main, value: "Value between 0 and 1", comment: "When clicking the rate setting, a pop up asks for the rate, this is the message displayed in the pop up")
+    }()
+    
 }

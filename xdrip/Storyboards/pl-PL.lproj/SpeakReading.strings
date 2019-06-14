@@ -1,0 +1,14 @@
+"currentglucose" = "Bieżący poziom glukozy we krwi";
+"currenttrend" = "Trend";
+"currentdelta" = "Różnica od ostatniego odczytu";
+"trendnoncomputable" = "nie obliczalna";
+"trenddoubledown" = "znacznie w dół";
+"trendsingledown" = "zauważalnie w dół";
+"trendfortyfivedown" = "w dół";
+"trendflat" = "stały";
+"trendfortyfiveup" = "w górę";
+"trendsingleup" = "zauważalnie do góry";
+"trenddoubleup" = "znacznie do góry";
+"deltanoncomputable" = "nie obliczalna";
+"high" = "wysoki";
+"low" = "niski";

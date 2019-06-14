@@ -1,0 +1,16 @@
+"high" = "high";
+"low" = "low";
+"currentglucose" = "Current blood glucose is";
+"trendnoncomputable" = "non computable";
+"trenddoubledown" = "dramatically downward";
+"trendsingledown" = "significantly downward";
+"trendfortyfivedown" = "down";
+"trendflat" = "flat";
+"trendfortyfiveup" = "up";
+"trendsingleup" = "significantly upward";
+"trenddoubleup" = "dramatically upward";
+"currenttrend" = "It's trending";
+"deltanoncomputable" = "non computable";
+"currentdelta" = "Difference from last reading is";
+"settingsviews_speakRate" = "Speak Rate";
+"settingsviews_speakRateMessage" = "Value between 0 and 1";

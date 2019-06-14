@@ -54,12 +54,16 @@ extension UserDefaults {
         
         /// speak readings
         case speakReadings = "speakReadings"
+        /// speak reading language
+        case speakReadingLanguageCode = "speakReadingLanguageCode"
         /// speak delta
         case speakDelta = "speakDelta"
         /// speak trend
         case speakTrend = "speakTrend"
         /// speak interval
         case speakInterval = "speakInterval"
+        /// speak rate
+        case speakRate = "speakRate"
         
         // Settings that Keep track of alert and info messages shown to the user ======
         
@@ -346,6 +350,16 @@ extension UserDefaults {
         }
     }
 
+    /// speakReading languageCode, eg "en" or "en-US"
+    @objc dynamic var speakReadingLanguageCode: String? {
+        get {
+            return string(forKey: Key.speakReadingLanguageCode.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.speakReadingLanguageCode.rawValue)
+        }
+    }
+
     /// should trend be spoken or not
     @objc dynamic var speakTrend: Bool {
         get {
@@ -356,7 +370,7 @@ extension UserDefaults {
         }
     }
     
-    /// should trend be spoken or not
+    /// should delta be spoken or not
     @objc dynamic var speakDelta: Bool {
         get {
             return bool(forKey: Key.speakDelta.rawValue)
@@ -366,13 +380,23 @@ extension UserDefaults {
         }
     }
     
-    /// speak readings interval
+    /// speak readings interval in minutes
     @objc dynamic var speakInterval: Int {
         get {
             return integer(forKey: Key.speakInterval.rawValue)
         }
         set {
             set(newValue, forKey: Key.speakInterval.rawValue)
+        }
+    }
+    
+    /// speak readings interval in minutes, if nil then default value to be used
+    @objc dynamic var speakRate: Double {
+        get {
+            return double(forKey: Key.speakRate.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.speakRate.rawValue)
         }
     }
     

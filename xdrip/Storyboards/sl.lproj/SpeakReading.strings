@@ -1,0 +1,14 @@
+"currentglucose" = "Trenutna vrednost glukoze v krvi je";
+"currenttrend" = "Trend";
+"currentdelta" = "Razlika od zadnjega merjenja";
+"trendnoncomputable" = "ni mogoče izračunati";
+"trenddoubledown" = "dramatično navzdol";
+"trendsingledown" = "občutno navzdol";
+"trendfortyfivedown" = "navzdol";
+"trendflat" = "enakomerno";
+"trendfortyfiveup" = "navzgor";
+"trendsingleup" = "občutno navzgor";
+"trenddoubleup" = "dramatično navzgor";
+"deltanoncomputable" = "ni mogoče izračunati";
+"high" = "visoka";
+"low" = "nizka";

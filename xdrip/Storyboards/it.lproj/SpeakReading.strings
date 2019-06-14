@@ -1,0 +1,14 @@
+"currentglucose" = "Glicemia attuale";
+"currenttrend" = "Andamento glicemico attuale";
+"currentdelta" = "Differenza dall'ultimo valore";
+"trendnoncomputable" = "Andamento glicemico non misurabile";
+"trenddoubledown" = "Andamento glicemico in forte discesa";
+"trendsingledown" = "Andamento glicemico in discesa";
+"trendfortyfivedown" = "Modesta discesa";
+"trendflat" = "Stabile";
+"trendfortyfiveup" = "Modesta salita";
+"trendsingleup" = "Andamento glicemico in salita";
+"trenddoubleup" = "Andamento glicemico in forte salita";
+"deltanoncomputable" = "Differenza dall'ultimo valore glicemico non valutabile";
+"high" = "alta";
+"low" = "bassa";

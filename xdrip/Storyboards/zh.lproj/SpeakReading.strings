@@ -1,0 +1,14 @@
+"currentglucose" = "目前的血糖是";
+"currenttrend" = "它的趋势";
+"currentdelta" = "与上一次读数的区别是";
+"trendnoncomputable" = "不可计算";
+"trenddoubledown" = "急剧下降";
+"trendsingledown" = "显著下降";
+"trendfortyfivedown" = "向下";
+"trendflat" = "平";
+"trendfortyfiveup" = "向上";
+"trendsingleup" = "显著上升";
+"trenddoubleup" = "急剧上升";
+"deltanoncomputable" = "不可计算";
+"high" = "高";
+"low" = "低";
