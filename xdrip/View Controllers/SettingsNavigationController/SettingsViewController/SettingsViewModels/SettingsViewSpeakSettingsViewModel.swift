@@ -58,7 +58,7 @@ class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
                 if index != selectedRow {
                     UserDefaults.standard.speakReadingLanguageCode = Constants.SpeakReadingLanguages.allLanguageNamesAndCodes.codes[index]
                 }
-            }, cancelHandler: nil)
+            }, cancelHandler: nil, didSelectRowHandler: nil)
 
         case .speakRate:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelSpeakRate, message: Texts_SettingsView.labelSpeakRateMessage, keyboardType: .decimalPad, text: UserDefaults.standard.speakRate.description, placeHolder: UserDefaults.standard.speakRate.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(rateAsString:String) in

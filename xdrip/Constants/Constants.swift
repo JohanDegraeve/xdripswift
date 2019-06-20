@@ -183,26 +183,49 @@ struct Constants {
         case xdripalert = "xDrip Alert/xdripalert.aif"
         
         /// gets all sound names in array, ie part of the case before the /
-        static func allSoundsByName() -> [String] {
-            var returnValue = [String]()
+        static func allSoundsBySoundNameAndFileName() -> (soundNames:[String], fileNames:[String]) {
+            var soundNames = [String]()
+            var soundFileNames = [String]()
+
             soundloop: for sound in Constants.Sounds.allCases {
+                
                 // Constants.Sounds defines available sounds. Per case there a string which is the soundname as shown in the UI and the filename of the sound in the Resources folder, seperated by backslash
                 // get array of indexes, of location of "/"
                 let indexOfBackSlash = sound.rawValue.indexes(of: "/")
+                
                 // define range to get the soundname (as shown in UI)
                 let soundNameRange = sound.rawValue.startIndex..<indexOfBackSlash[0]
+                
                 // now get the soundName in a string
                 let soundName = String(sound.rawValue[soundNameRange])
+                
                 // add the soundName to the returnvalue
-                returnValue.append(soundName)
+                soundNames.append(soundName)
+                
+                // define range to get the soundFileName
+                let languageCodeRange = sound.rawValue.index(after: indexOfBackSlash[0])..<sound.rawValue.endIndex
+                
+                // now get the language in a string
+                let fileName = String(sound.rawValue[languageCodeRange])
+                // add the languageCode to the returnvalue
+                
+                soundFileNames.append(fileName)
+
             }
-            return returnValue
+            return (soundNames, soundFileNames)
         }
         
         /// gets the soundname for specific case
         static func getSoundName(forSound:Sounds) -> String {
             let indexOfBackSlash = forSound.rawValue.indexes(of: "/")
             let soundNameRange = forSound.rawValue.startIndex..<indexOfBackSlash[0]
+            return String(forSound.rawValue[soundNameRange])
+        }
+        
+        /// gets the soundFie for specific case
+        static func getSoundFile(forSound:Sounds) -> String {
+            let indexOfBackSlash = forSound.rawValue.indexes(of: "/")
+            let soundNameRange = forSound.rawValue.index(after: indexOfBackSlash[0])..<forSound.rawValue.endIndex
             return String(forSound.rawValue[soundNameRange])
         }
     }

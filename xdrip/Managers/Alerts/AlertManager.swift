@@ -279,7 +279,7 @@ public class AlertManager:NSObject {
                                 if let soundPlayer = self.soundPlayer {
                                     soundPlayer.stopPlaying()
                                 }
-        }
+        }, didSelectRowHandler: nil
         )
 
     }

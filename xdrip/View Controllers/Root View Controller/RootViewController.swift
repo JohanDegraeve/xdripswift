@@ -1011,7 +1011,7 @@ extension RootViewController: UITabBarControllerDelegate {
         
         // if user clicks the tab for settings, then configure it
         if let navigationController = viewController as? SettingsNavigationController {
-            navigationController.configure(coreDataManager: coreDataManager)
+            navigationController.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
         }
     }
 }

@@ -240,7 +240,7 @@ extension AlertSettingsViewControllerData {
                 tableView.reloadRows(at: [IndexPath(row: Setting.alertType.rawValue, section: 0)], with: .none)
                 // checkIfPropertiesChanged
                 self.checkIfPropertiesChanged()
-            }, onCancelClick: {})
+            }, onCancelClick: {}, didSelectRowHandler: nil)
             
             // create and present pickerviewcontroller
             PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: uIViewController)

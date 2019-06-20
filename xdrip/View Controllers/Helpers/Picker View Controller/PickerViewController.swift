@@ -28,6 +28,9 @@ final class PickerViewController : UIViewController {
     /// handler to execute when user clicks cancelHandler
     var cancelHandler:(() -> Void)?
     
+    /// will be called when user change selection before clicking ok or cancel button
+    var didSelectRowHandler:((Int) -> Void)?
+    
     /// priority to be applied
     private var priority:PickerViewPriority?
     
@@ -165,6 +168,7 @@ final class PickerViewController : UIViewController {
                 if let cancelHandler = pickerViewData.cancelHandler { cancelHandler() }
                 pickerViewController.dismiss(animated: true, completion: nil)
             }
+            pickerViewController.didSelectRowHandler = pickerViewData.didSelectRowHandler
             
             // present it
             parentController.present(pickerViewController, animated: true)
@@ -186,7 +190,14 @@ extension PickerViewController:UIPickerViewDelegate {
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        
+        // set selectedRow to row, value will be used when pickerview is closed
         selectedRow = row
+        
+        // call also didSelectRowHandler, if not nil, can be useful eg when pickerview contains list of sounds, sound can be played
+        if let didSelectRowHandler = didSelectRowHandler {
+            didSelectRowHandler(row)
+        }
     }
 }
 

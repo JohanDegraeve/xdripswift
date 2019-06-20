@@ -10,6 +10,7 @@ public class PickerViewData {
     var cancelTitle:String?
     var actionHandler: ((_ index: Int) -> Void)
     var cancelHandler: (() -> Void)?
+    var didSelectRowHandler:((Int) -> Void)?
     var priority:PickerViewPriority?
     
     /// initializes PickerViewData.
@@ -22,7 +23,8 @@ public class PickerViewData {
     ///     - cancelButtonText : text to show in the cancel button, eg "Cancel"
     ///     - onActionClick : closure to run when user clicks the actionButton
     ///     - onCancelClick : closure to run when user clicks the cancelButton
-    init(withMainTitle mainTitle:String?, withSubTitle subTitle:String?, withData data:[String], selectedRow:Int?, withPriority priority:PickerViewPriority?, actionButtonText actionTitle:String?, cancelButtonText cancelTitle:String?, onActionClick actionHandler: @escaping ((_ index: Int) -> Void), onCancelClick cancelHandler: (() -> Void)?) {
+    ///     - didSelectRowHandler  : closure to run when user selects a row, even before clicking ok or cancel. Can be useful eg to play a sound
+    init(withMainTitle mainTitle:String?, withSubTitle subTitle:String?, withData data:[String], selectedRow:Int?, withPriority priority:PickerViewPriority?, actionButtonText actionTitle:String?, cancelButtonText cancelTitle:String?, onActionClick actionHandler: @escaping ((_ index: Int) -> Void), onCancelClick cancelHandler: (() -> Void)?, didSelectRowHandler:((Int) -> Void)?) {
         self.mainTitle = mainTitle
         self.subTitle = subTitle
         self.data = data
@@ -31,6 +33,7 @@ public class PickerViewData {
         self.cancelTitle = cancelTitle
         self.actionHandler = actionHandler
         self.cancelHandler = cancelHandler
+        self.didSelectRowHandler = didSelectRowHandler
         self.priority = priority
     }
 }

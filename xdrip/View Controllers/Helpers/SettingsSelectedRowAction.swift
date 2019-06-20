@@ -42,8 +42,9 @@ enum SettingsSelectedRowAction {
     /// - cancelTitle: text in the button that allows the user to cancel the input (Example 'Cancel'), if nil then default value "Cancel" will be used
     /// - actionHandler: code to execute when user confirms input, with index of item that was selected by user, 0 = first element
     /// - cancelHandler: code to execute when user cancels input
+    /// - didSelectRowHandler: code to execute when user selects an item before clicking ok or cancel, can be useful eg to play a selected sound so that user hears how it sounds
     /// TODO: is it ok to define title, message optional ?
-    case selectFromList (title:String?, data:[String], selectedRow:Int?, actionTitle:String?, cancelTitle:String?, actionHandler: ((_ index: Int) -> Void), cancelHandler: (() -> Void)?)
+    case selectFromList (title:String?, data:[String], selectedRow:Int?, actionTitle:String?, cancelTitle:String?, actionHandler: ((_ index: Int) -> Void), cancelHandler: (() -> Void)?, didSelectRowHandler: ((_ index: Int) -> Void)?)
     
     /// performSegue with specified identifier to be done
     

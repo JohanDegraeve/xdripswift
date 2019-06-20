@@ -5,7 +5,7 @@ import UIKit
 /// to edit or delete an alert type, user needs to click a row
 final class AlertTypesSettingsViewController: UIViewController {
     
-    // MARK: - Properties
+    // MARK: - IBOutlet's and IBAction's
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -18,7 +18,13 @@ final class AlertTypesSettingsViewController: UIViewController {
         self.performSegue(withIdentifier:AlertTypeSettingsViewController.SegueIdentifiers.alertTypesToAlertTypeSettings.rawValue, sender: nil)
     }
     
+    // MARK: - Private Properties
+    
+    /// reference to coredatamanager
     private var coreDataManager:CoreDataManager?
+    
+    /// reference to soundPlayer
+    private var soundPlayer:SoundPlayer?
     
     private lazy var alertTypesAccessor:AlertTypesAccessor = {
             return AlertTypesAccessor(coreDataManager: getCoreDataManager())
@@ -26,8 +32,12 @@ final class AlertTypesSettingsViewController: UIViewController {
     
     // MARK:- public functions
     
-    public func configure(coreDataManager:CoreDataManager?) {
+    /// configure
+    public func configure(coreDataManager:CoreDataManager?, soundPlayer:SoundPlayer?) {
+        
         self.coreDataManager = coreDataManager
+        self.soundPlayer = soundPlayer
+        
     }
     // MARK: - View Life Cycle
     
@@ -53,11 +63,11 @@ final class AlertTypesSettingsViewController: UIViewController {
         switch segueIdentifierAsCase {
             
         case AlertTypeSettingsViewController.SegueIdentifiers.alertTypesToAlertTypeSettings:
-            guard let vc = segue.destination as? AlertTypeSettingsViewController, let coreDataManager = coreDataManager else {
-                fatalError("In AlertTypesSettingsViewController, prepare for segue, viewcontroller is not AlertTypeSettingsViewController or coreDataManager is nil" )
+            guard let vc = segue.destination as? AlertTypeSettingsViewController, let coreDataManager = coreDataManager, let soundPlayer = soundPlayer else {
+                fatalError("In AlertTypesSettingsViewController, prepare for segue, viewcontroller is not AlertTypeSettingsViewController or coreDataManager is nil or soundPlayer is nil" )
             }
 
-            vc.configure(alertType: sender as? AlertType, coreDataManager: coreDataManager)
+            vc.configure(alertType: sender as? AlertType, coreDataManager: coreDataManager, soundPlayer: soundPlayer)
         }
     }
 

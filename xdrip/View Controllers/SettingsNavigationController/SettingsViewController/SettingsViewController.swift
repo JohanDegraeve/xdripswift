@@ -3,7 +3,7 @@ import UIKit
 /// viewcontroller for first settings screen
 final class SettingsViewController: UIViewController {
 
-    // MARK: - Properties
+    // MARK: - IBOutlet's and IPAction's
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -22,12 +22,23 @@ final class SettingsViewController: UIViewController {
         viewController.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
         return viewController
     }()
+
+    // MARK: - Private Properties
     
+    /// reference to coreDataManager
     private var coreDataManager:CoreDataManager?
     
+    /// reference to soundPlayer
+    private var soundPlayer:SoundPlayer?
+    
     // MARK:- public functions
-    public func configure(coreDataManager:CoreDataManager?) {
+    
+    /// configure
+    public func configure(coreDataManager:CoreDataManager?, soundPlayer:SoundPlayer?) {
+        
         self.coreDataManager = coreDataManager
+        self.soundPlayer = soundPlayer
+        
     }
 
     // MARK: - View Life Cycle
@@ -55,7 +66,7 @@ final class SettingsViewController: UIViewController {
             
         case .settingsToAlertTypeSettings:
             let vc = segue.destination as! AlertTypesSettingsViewController
-            vc.configure(coreDataManager: coreDataManager)
+            vc.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
         case .settingsToAlertSettings:
             let vc = segue.destination as! AlertsSettingsViewController
             vc.configure(coreDataManager: coreDataManager)
@@ -312,7 +323,7 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
                     // check if refresh is needed, either complete settingsview or individual section
                     self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: indexPath.row, sectionIndex: indexPath.section)
 
-                case let .selectFromList(title, data, selectedRow, actionTitle, cancelTitle, actionHandler, cancelHandler):
+                case let .selectFromList(title, data, selectedRow, actionTitle, cancelTitle, actionHandler, cancelHandler, didSelectRowHandler):
                     
                     // configure pickerViewData
                     let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: title, withData: data, selectedRow: selectedRow, withPriority: nil, actionButtonText: actionTitle, cancelButtonText: cancelTitle, onActionClick: {(_ index: Int) in
@@ -323,6 +334,12 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
 
                     }, onCancelClick: {
                         if let cancelHandler = cancelHandler { cancelHandler() }
+                    }, didSelectRowHandler: {(_ index: Int) in
+                        
+                        if let didSelectRowHandler = didSelectRowHandler {
+                            didSelectRowHandler(index)
+                        }
+                        
                     })
                     
                     // create and present pickerviewcontroller

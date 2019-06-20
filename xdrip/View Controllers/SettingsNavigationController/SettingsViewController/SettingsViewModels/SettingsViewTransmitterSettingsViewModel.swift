@@ -60,7 +60,7 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
                 if index != selectedRow {
                     UserDefaults.standard.transmitterTypeAsString = data[index]
                 }
-            }, cancelHandler: nil)
+            }, cancelHandler: nil, didSelectRowHandler: nil)
         }
     }
     

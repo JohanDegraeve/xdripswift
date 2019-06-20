@@ -21,7 +21,7 @@ fileprivate enum Setting:Int, CaseIterable {
 /// edit or add an alert types,
 final class AlertTypeSettingsViewController: UIViewController {
     
-    // MARK: - Properties
+    // MARK: - IBOutlet's and IBAcction's
     
     /// a tableView is used to display all alerttype properties - not the nicest solution maybe, but the quickest right now
     @IBOutlet weak var tableView: UITableView!
@@ -51,6 +51,11 @@ final class AlertTypeSettingsViewController: UIViewController {
 
     @IBOutlet weak var trashButtonOutlet: UIBarButtonItem!
     
+    // MARK: - private properties
+    
+    /// reference to soundPlayer, needed to preplay sound when user is selecting one
+    private var soundPlayer:SoundPlayer?
+    
     /// the alerttype being edited - will only be used initially to initialize the temp properties used locally, and in the end to update the alerttype - if nil then it's about creating a new alertType
     private var alertTypeAsNSObject:AlertType?
 
@@ -60,7 +65,6 @@ final class AlertTypeSettingsViewController: UIViewController {
     // MARK:- alerttype temp properties
     
     // following properties are used to temporary store alertType attributes which can be modified. The actual update of the alertType being processed will be done only when the user clicks the done button
-    
     private var enabled = Constants.DefaultAlertTypeSettings.enabled
     private var name = Constants.DefaultAlertTypeSettings.name
     private var overrideMute = Constants.DefaultAlertTypeSettings.overrideMute
@@ -71,9 +75,11 @@ final class AlertTypeSettingsViewController: UIViewController {
     
     // MARK:- public functions
     
-    public func configure(alertType:AlertType?, coreDataManager:CoreDataManager) {
+    public func configure(alertType:AlertType?, coreDataManager:CoreDataManager, soundPlayer:SoundPlayer) {
+        
         self.alertTypeAsNSObject = alertType
         self.coreDataManager = coreDataManager
+        self.soundPlayer = soundPlayer
         
         // configure local temp alert type properties if alertType not nil - if alertType is nil then this viewcontroller is opened to create a ne alertType, in that case default values are used
         if let alertType = alertType {
@@ -163,6 +169,15 @@ final class AlertTypeSettingsViewController: UIViewController {
         
         // go back to alerttypes settings screen
         performSegue(withIdentifier: UnwindSegueIdentifiers.unwindToAlertTypesSettingsViewController.rawValue, sender: self)
+    }
+    
+    /// check if soundPlayer is playing and if yes stop it (might be that an alert sound is playing and that it will stop here althought it shouldn't - bad luck
+    private func stopSoundPlayerIfPlaying() {
+        if let soundPlayer = self.soundPlayer {
+            if soundPlayer.isPlaying() {
+                soundPlayer.stopPlaying()
+            }
+        }
     }
     
 }
@@ -283,13 +298,30 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
             self.present(alert, animated: true, completion: nil)
 
         case .soundName:
-            // create array of all sounds, inclusive default ios sound and also empty string, which is "no sound"
-            var sounds = Constants.Sounds.allSoundsByName()
-            sounds.insert(Texts_AlertTypeSettingsView.alertTypeDefaultIOSSound, at: 0)
-            sounds.insert(Texts_AlertTypeSettingsView.alertTypeNoSound, at: 0)
+            // create array of all sounds and sound filenames, inclusive default ios sound and also empty string, which is "no sound"
+            var sounds = Constants.Sounds.allSoundsBySoundNameAndFileName()
+            sounds.soundNames.insert(Texts_AlertTypeSettingsView.alertTypeDefaultIOSSound, at: 0)
+            sounds.soundNames.insert(Texts_AlertTypeSettingsView.alertTypeNoSound, at: 0)
+            
+            // find index of current soundName
+            var selectedRow = 0 // this corresponds to no sound
+            if soundName == nil {
+                selectedRow = 1// default ios sound is on position 1
+            } else {
+                for (index, soundNameInList) in sounds.soundNames.enumerated() {
+                    if soundNameInList == soundName {
+                        selectedRow = index
+                        break
+                    }
+                }
+            }
             
             // configure pickerViewData
-            let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: Texts_AlertTypeSettingsView.alertTypePickSoundName, withData: sounds, selectedRow: 0, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ index: Int) in
+            let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: Texts_AlertTypeSettingsView.alertTypePickSoundName, withData: sounds.soundNames, selectedRow: selectedRow, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ index: Int) in
+                
+                // soundPlayer might still be playing, stop  it now
+                self.stopSoundPlayerIfPlaying()
+                
                 if index == 1 {
                     // default iOS sound was selected, set to nil
                     self.soundName = nil
@@ -297,10 +329,31 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
                     // no sound to play
                     self.soundName = ""
                 } else {
-                    self.soundName = sounds[index]
+                    self.soundName = sounds.soundNames[index]
                 }
                 tableView.reloadRows(at: [IndexPath(row: Setting.soundName.rawValue, section: 0)], with: .none)
-            }, onCancelClick: {})
+                
+            }, onCancelClick: {
+
+                // soundPlayer might still be playing, stop  it now
+                self.stopSoundPlayerIfPlaying()
+
+            }, didSelectRowHandler: {(_ index: Int) in
+                
+                // user scrolling through the sounds, a sound is selected (but ok not pressed yet), play the sound
+                if index == 0 || index == 1 {
+                    // if no sound or default iOS selected, then no sound will not be played - but also stop playing sound
+                    self.stopSoundPlayerIfPlaying()
+                } else {
+                    // stop playing
+                    self.stopSoundPlayerIfPlaying()
+                    
+                    // play the selected sound
+                    if let soundPlayer = self.soundPlayer {
+                        soundPlayer.playSound(soundFileName: sounds.fileNames[index - 2], withVolume: nil)
+                    }
+                }
+            })
             
             // create and present pickerviewcontroller
             PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
