@@ -209,7 +209,9 @@ final class RootViewController: UIViewController {
         calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         
         // setup nightscout synchronizer
-        nightScoutUploadManager = NightScoutUploadManager(bgReadingsAccessor: bgReadingsAccessor)
+        nightScoutUploadManager = NightScoutUploadManager(bgReadingsAccessor: bgReadingsAccessor, errorMessageHandler: { (title:String, message:String) in
+            UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
+        })
         
         // setup SoundPlayer
         soundPlayer = SoundPlayer()

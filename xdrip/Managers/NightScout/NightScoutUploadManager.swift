@@ -27,11 +27,20 @@ public class NightScoutUploadManager:NSObject {
     /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
     private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper
     
+    /// in case errors occur like credential check error, then this closure will be called with title and message
+    private let errorMessageHandler:((String, String) -> Void)?
+    
     // MARK: - initializer
     
-    init(bgReadingsAccessor:BgReadingsAccessor) {
-        // init bgReadingsAccessor
+    /// initializer
+    /// - parameters:
+    ///     - bgReadingsAccessor : needed to get latest readings
+    ///     - errorMessageHandler : in case errors occur like credential check error, then this closure will be called with title and message
+    init(bgReadingsAccessor:BgReadingsAccessor, errorMessageHandler:((_ title:String, _ message:String) -> Void)?) {
+        
+        // init properties
         self.bgReadingsAccessor = bgReadingsAccessor
+        self.errorMessageHandler = errorMessageHandler
         
         // init own, non optional properties
         self.keyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
@@ -242,8 +251,10 @@ public class NightScoutUploadManager:NSObject {
             }
         }
 
-        // show alert with just info text and ok button
-        UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
+        // call errormessageHandler
+        if let errorMessageHandler = errorMessageHandler {
+            errorMessageHandler(title, message)
+        }
     }
     
 }
