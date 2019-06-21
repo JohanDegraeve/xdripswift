@@ -6,35 +6,41 @@ public class NightScoutUploadManager:NSObject {
     
     // MARK: - properties
     
-    /// for readings and calibrations
+    /// path for readings and calibrations
     private let nightScoutEntriesPath = "/api/v1/entries"
     
-    /// for treatments
+    /// path for treatments
     private let nightScoutTreatmentPath = "/api/v1/treatments"
     
-    /// for devicestatus
+    /// path for devicestatus
     private let nightScoutDeviceStatusPath = "/api/v1/devicestatus"
     
-    /// to test API Secret
+    /// path to test API Secret
     private let nightScoutAuthTestPath = "/api/v1/experiments/test"
 
     /// for logging
     private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryNightScoutUploadManager)
     
-    /// BgReadings instance
+    /// BgReadingsAccessor instance
     private let bgReadingsAccessor:BgReadingsAccessor
     
     /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
-    private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper
+    private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
+    
+    /// in case errors occur like credential check error, then this closure will be called with title and message
+    private let errorMessageHandler:((String, String) -> Void)?
     
     // MARK: - initializer
     
-    init(bgReadingsAccessor:BgReadingsAccessor) {
-        // init bgReadingsAccessor
-        self.bgReadingsAccessor = bgReadingsAccessor
+    /// initializer
+    /// - parameters:
+    ///     - bgReadingsAccessor : needed to get latest readings
+    ///     - errorMessageHandler : in case errors occur like credential check error, then this closure will be called with title and message
+    init(bgReadingsAccessor:BgReadingsAccessor, errorMessageHandler:((_ title:String, _ message:String) -> Void)?) {
         
-        // init own, non optional properties
-        self.keyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
+        // init properties
+        self.bgReadingsAccessor = bgReadingsAccessor
+        self.errorMessageHandler = errorMessageHandler
         
         super.init()
         
@@ -151,11 +157,6 @@ public class NightScoutUploadManager:NSObject {
                         
                         os_log("in uploadTask completionHandler", log: self.log, type: .info)
                         
-                        // log returned data
-                        if let data = data, let dataAsString = String(data: data, encoding: String.Encoding.utf8) {
-                            os_log("       %{public}@", log: self.log, type: .info, dataAsString)
-                        }
-                        
                         // error cases
                         if let error = error {
                             os_log("    failed to upload, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
@@ -242,8 +243,10 @@ public class NightScoutUploadManager:NSObject {
             }
         }
 
-        // show alert with just info text and ok button
-        UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
+        // call errormessageHandler
+        if let errorMessageHandler = errorMessageHandler {
+            errorMessageHandler(title, message)
+        }
     }
     
 }
