@@ -84,6 +84,9 @@ final class RootViewController: UIViewController {
     /// nightScoutFollowManager instance
     private var nightScoutFollowManager:NightScoutFollowManager?
     
+    /// dexcomShareUploadManager instance
+    private var dexcomShareUploadManager:DexcomShareUploadManager?
+    
     /// healthkit manager instance
     private var healthKitManager:HealthKitManager?
 
@@ -188,7 +191,7 @@ final class RootViewController: UIViewController {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager
     private func setupApplicationData() {
         
         // if coreDataManager is nil then there's no reason to continue
@@ -209,7 +212,7 @@ final class RootViewController: UIViewController {
         calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         
         // setup nightscout synchronizer
-        nightScoutUploadManager = NightScoutUploadManager(bgReadingsAccessor: bgReadingsAccessor, errorMessageHandler: { (title:String, message:String) in
+        nightScoutUploadManager = NightScoutUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
             UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
         })
         
@@ -229,6 +232,11 @@ final class RootViewController: UIViewController {
         
         // setup bgReadingSpeaker
         bgReadingSpeaker = BGReadingSpeaker(sharedSoundPlayer: soundPlayer, coreDataManager: coreDataManager)
+        
+        // setup dexcomShareUploadManager
+        dexcomShareUploadManager = DexcomShareUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
+            UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
+        })
     }
     
     private func processNewCGMInfo(glucoseData: inout [RawGlucoseData], sensorState: SensorState?, firmware: String?, hardware: String?, transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
@@ -315,7 +323,7 @@ final class RootViewController: UIViewController {
                 }
                 
                 if let nightScoutUploadManager = nightScoutUploadManager {
-                    nightScoutUploadManager.synchronize()
+                    nightScoutUploadManager.upload()
                 }
                 
                 if let alertManager = alertManager {
@@ -330,6 +338,9 @@ final class RootViewController: UIViewController {
                     bgReadingSpeaker.speakNewReading()
                 }
                 
+                if let dexcomShareUploadManager = dexcomShareUploadManager {
+                    dexcomShareUploadManager.upload()
+                }
             }
         }
         
@@ -483,9 +494,14 @@ final class RootViewController: UIViewController {
                                 
                                 // initiate upload to NightScout, if needed
                                 if let nightScoutUploadManager = self.nightScoutUploadManager {
-                                    nightScoutUploadManager.synchronize()
+                                    nightScoutUploadManager.upload()
                                 }
                                 
+                                // initiate upload to Dexcom Share, if needed
+                                if let dexcomShareUploadManager = self.dexcomShareUploadManager {
+                                    dexcomShareUploadManager.upload()
+                                }
+
                                 // check alerts
                                 if let alertManager = self.alertManager {
                                     alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: Constants.Master.maximumBgReadingAgeForAlertsInSeconds)

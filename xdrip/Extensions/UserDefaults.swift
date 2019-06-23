@@ -98,6 +98,9 @@ extension UserDefaults {
         /// timestamp of last bgreading that was stored in healthkit
         case timeStampLatestHealthKitStoreBgReading = "timeStampLatestHealthKitStoreBgReading"
         
+        /// timestamp of latest reading uploaded to Dexcom Share
+        case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
+        
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -500,6 +503,17 @@ extension UserDefaults {
         }
     }
     
+    /// timestamp lastest reading uploaded to Dexcom Share
+    var timeStampLatestDexcomShareUploadedBgReading:Date? {
+        get {
+            return object(forKey: Key.timeStampLatestDexcomShareUploadedBgReading.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestDexcomShareUploadedBgReading.rawValue)
+        }
+    }
+    
+
 }
 
 

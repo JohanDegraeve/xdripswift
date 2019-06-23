@@ -1,0 +1,11 @@
+"dexcomsharetestresult_verificationsuccessfulalerttitle" = "Verification Successful";
+"dexcomsharetestresult_verificationsuccessfulalertbody" = "Your dexcomshare account was verified successfully";
+"dexcomsharetestresult_verificationerroralerttitle" = "Verification Error";
+"dexcomsharetestresult_SSO_AuthenticateAccountNotFound" = "Account not found";
+"dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Maximum login attempts exceeded. Wait 10 minutes and then retry.";
+"dexcomsharetestresult_SSO_AuthenticatePasswordInvalid" = "Invalid Password";
+"dexcomsharetestresult_uploadErrorWarning" = "Dexcom Share Upload Error";
+"dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Dexcom Share Serial Number does not match the serial number for this account. Verify the Serial Number in the settings.";
+"dexcomsharetestresult_monitored_receiver_not_assigned_1" = "It seems the transmitter id or serial number";
+"dexcomsharetestresult_monitored_receiver_not_assigned_2" = "is not assigned to";
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Use the official Dexcom app to register the transmitter (G5) or Share receiver (G4)";

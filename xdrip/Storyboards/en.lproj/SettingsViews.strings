@@ -11,7 +11,7 @@
 "settingsviews_row_alert_types" = "Alert Types";
 "settingsviews_row_alerts" = "Alerts";
 "settingsviews_sectiontitlehealthkit" = "HealthKit";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share/NOT READY!";
+"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
 "settingsviews_uploadReadingstoDexcomShare" = "Dexcom Share Upload";
 "settingsviews_dexcomShareSerialNumber" = "Serial";
 "settingsviews_giveDexcomShareSerialNumber" = "Enter Dexcom Share Serial Number";

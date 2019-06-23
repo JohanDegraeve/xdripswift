@@ -30,16 +30,17 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
             
         case .transmitterId:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTransmitterId, message: Texts_SettingsView.labelGiveTransmitterId, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.transmitterId, placeHolder: "00000", actionTitle: nil, cancelTitle: nil, actionHandler: {(transmitterId:String) in
+                
                 // convert to uppercase
                 let transmitterIdUpper = transmitterId.uppercased()
                 
                 // if changed then store new value
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
                     if currentTransmitterId != transmitterIdUpper {
-                        UserDefaults.standard.transmitterId = transmitterIdUpper
+                        self.setTransmitterIdAndDexcomShareSerialNumber(id: transmitterIdUpper)
                     }
                 } else {
-                    UserDefaults.standard.transmitterId = transmitterIdUpper
+                    self.setTransmitterIdAndDexcomShareSerialNumber(id: transmitterIdUpper)
                 }
                 
             }, cancelHandler: nil)
@@ -107,4 +108,33 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
     func uiView(index: Int) -> UIView? {
         return nil
     }
+    
+    /// sets UserDefaults.standard.transmitterId with valud of id
+    ///
+    /// if transmitterType is G5 (or maybe later G6), then sets UserDefaults.standard.dexcomShareSerialNumber = UserDefaults.standard.transmitterId - otherwise dexcomShareSerialNumber is not changed
+    ///
+    /// - parameters:
+    ///     - id : new value for transmitterId and possibly also dexcomShareSerialNumber. If length is 0, then transmitterId gets value nil (and possibly also dexcomShareSerialNumber)
+    private func setTransmitterIdAndDexcomShareSerialNumber(id:String) {
+        
+        // if length of id 0 , then set transmitterId to nil
+        if id.count == 0 {
+            UserDefaults.standard.transmitterId = nil
+        } else {
+            UserDefaults.standard.transmitterId = id
+        }
+        
+        if let transmitterType = UserDefaults.standard.transmitterType {
+            
+            switch transmitterType {
+                
+            case .dexcomG4, .miaomiao, .GNSentry:
+                break
+            case .dexcomG5:
+                UserDefaults.standard.dexcomShareSerialNumber = UserDefaults.standard.transmitterId
+                
+            }
+        }
+    }
+    
 }

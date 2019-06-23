@@ -1,9 +1,10 @@
 import Foundation
 
 extension BgReading {
+    
     /// dictionary representation for upload to NightScout
-    public var dictionaryRepresentation: [String: Any] {
-        debuglogging("timestamp = " + timeStamp.description(with: .current))
+    public var dictionaryRepresentationForNightScoutUpload: [String: Any] {
+        
         return  [
             "_id": id,
             "device": deviceName ?? "",
@@ -17,6 +18,7 @@ extension BgReading {
             "noise": 1,
             "sysTime": TimeFormat.timestampNightScoutFormatFromDate(timeStamp)
         ]
+        
     }
 
     /// same function as defined in Calibrator

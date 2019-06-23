@@ -17,13 +17,31 @@ fileprivate enum Setting:Int, CaseIterable {
 class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
     
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
-        return false
+        return true
     }
     
     func isEnabled(index: Int) -> Bool {
-        return false
+        
+        // if it's a G5 (or maybe later G6) , then user doesn't need to set the serial number, because value of transmitterId is used in that case
+        if index == Setting.dexcomShareSerialNumber.rawValue {
+            
+            if let transmitterType = UserDefaults.standard.transmitterType  {
+                switch transmitterType {
+                    
+                case .dexcomG4, .miaomiao, .GNSentry:
+                    return true
+                case .dexcomG5:
+                    return false
+                }
+            } else {
+                return true
+            }
+            
+        } else {
+            return true
+        }
     }
-    
+
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
@@ -31,13 +49,27 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
         case .uploadReadingstoDexcomShare:
             return SettingsSelectedRowAction.nothing
         case .dexcomShareAccountName:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelDexcomShareAccountName, message: Texts_SettingsView.giveDexcomShareAccountName, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName}, cancelHandler: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelDexcomShareAccountName, message: Texts_SettingsView.giveDexcomShareAccountName, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName.toNilIfLength0()}, cancelHandler: nil)
         case .dexcomSharePassword:
-            return SettingsSelectedRowAction.askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, text: nil, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password}, cancelHandler: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password.toNilIfLength0()}, cancelHandler: nil)
         case .useUSDexcomShareurl:
             return SettingsSelectedRowAction.nothing
         case .dexcomShareSerialNumber:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelDexcomShareSerialNumber, message: Texts_SettingsView.giveDexcomShareSerialNumber, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareSerialNumber, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in UserDefaults.standard.dexcomShareSerialNumber = serialNumber}, cancelHandler: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelDexcomShareSerialNumber, message: Texts_SettingsView.giveDexcomShareSerialNumber, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareSerialNumber, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in
+                
+                // convert to uppercase
+                let serialNumberUpper = serialNumber.uppercased()
+                
+                // if changed then store new value
+                if let currentSerialNumber = UserDefaults.standard.dexcomShareSerialNumber {
+                    if currentSerialNumber != serialNumberUpper {
+                        UserDefaults.standard.dexcomShareSerialNumber = serialNumberUpper.toNilIfLength0()
+                    }
+                } else {
+                    UserDefaults.standard.dexcomShareSerialNumber = serialNumberUpper.toNilIfLength0()
+                }
+
+            }, cancelHandler: nil)
         }
     }
     

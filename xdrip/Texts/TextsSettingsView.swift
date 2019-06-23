@@ -85,7 +85,7 @@ class Texts_SettingsView {
     // MARK: - Section Dexcom Share
     
     static let sectionTitleDexcomShare: String = {
-        return NSLocalizedString("settingsviews_sectiontitledexcomshare", tableName: filename, bundle: Bundle.main, value: "Dexcom Share/NOT READY !", comment: "dexcom share settings, section title")
+        return NSLocalizedString("settingsviews_sectiontitledexcomshare", tableName: filename, bundle: Bundle.main, value: "Dexcom Share", comment: "dexcom share settings, section title")
     }()
     
     static let labelUploadReadingstoDexcomShare = {

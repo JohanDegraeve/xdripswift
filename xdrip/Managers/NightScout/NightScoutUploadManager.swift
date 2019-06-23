@@ -28,31 +28,31 @@ public class NightScoutUploadManager:NSObject {
     private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     
     /// in case errors occur like credential check error, then this closure will be called with title and message
-    private let errorMessageHandler:((String, String) -> Void)?
+    private let messageHandler:((String, String) -> Void)?
     
     // MARK: - initializer
     
     /// initializer
     /// - parameters:
     ///     - bgReadingsAccessor : needed to get latest readings
-    ///     - errorMessageHandler : in case errors occur like credential check error, then this closure will be called with title and message
-    init(bgReadingsAccessor:BgReadingsAccessor, errorMessageHandler:((_ title:String, _ message:String) -> Void)?) {
+    ///     - messageHandler : in case errors occur like credential check error, then this closure will be called with title and message
+    init(bgReadingsAccessor:BgReadingsAccessor, messageHandler:((_ title:String, _ message:String) -> Void)?) {
         
         // init properties
         self.bgReadingsAccessor = bgReadingsAccessor
-        self.errorMessageHandler = errorMessageHandler
+        self.messageHandler = messageHandler
         
         super.init()
         
-        // add observers for nightscout settings which may require testing and/or start synchronize
+        // add observers for nightscout settings which may require testing and/or start upload
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutAPIKey.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new, context: nil)
     }
     
     // MARK: - public functions
     
-    /// synchronizes all NightScout related, if needed
-    public func synchronize() {
+    /// uploads latest BgReadings to NightScout
+    public func upload() {
         // check if NightScout upload is enabled
         if UserDefaults.standard.nightScoutEnabled && UserDefaults.standard.isMaster, let siteURL = UserDefaults.standard.nightScoutUrl, let apiKey = UserDefaults.standard.nightScoutAPIKey {
             uploadBgReadingsToNightScout(siteURL: siteURL, apiKey: apiKey)
@@ -78,9 +78,9 @@ public class NightScoutUploadManager:NSObject {
                             
                             testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
                                 DispatchQueue.main.async {
-                                    self.presentNightScoutTestCredentialsResult(success: success, error: error)
+                                    self.callMessageHandler(withCredentialVerificationResult: success, error: error)
                                     if success {
-                                        self.synchronize()
+                                        self.upload()
                                     } else {
                                         os_log("in observeValue, NightScout credential check failed", log: self.log, type: .info)
                                     }
@@ -91,7 +91,7 @@ public class NightScoutUploadManager:NSObject {
                     
                 case UserDefaults.Key.nightScoutEnabled :
                     
-                    // if changing to enabled, then do a credentials test and if ok start synchronize, if fail don't give warning, that's the only difference with previous cases
+                    // if changing to enabled, then do a credentials test and if ok start upload, in case of failure don't give warning, that's the only difference with previous cases
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
                         
                         if UserDefaults.standard.nightScoutEnabled {
@@ -102,7 +102,7 @@ public class NightScoutUploadManager:NSObject {
                                 testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
                                     DispatchQueue.main.async {
                                         if success {
-                                            self.synchronize()
+                                            self.upload()
                                         } else {
                                             os_log("in observeValue, NightScout credential check failed", log: self.log, type: .info)
                                         }
@@ -132,7 +132,7 @@ public class NightScoutUploadManager:NSObject {
             os_log("    number of readings to upload : %{public}@", log: self.log, type: .info, bgReadingsToUpload.count.description)
 
             // map readings to dictionaryRepresentation
-            let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map({$0.dictionaryRepresentation})
+            let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map({$0.dictionaryRepresentationForNightScoutUpload})
             
             do {
                 // transform to json
@@ -142,7 +142,8 @@ public class NightScoutUploadManager:NSObject {
                 let sharedSession = URLSession.shared
                 
                 if let url = URL(string: siteURL) {
-                    // create upload url
+                    
+                    // create upload url, which includes the dexcomShareSessionId
                     let uploadURL = url.appendingPathComponent(nightScoutEntriesPath)
                     
                     // Create Request
@@ -226,7 +227,8 @@ public class NightScoutUploadManager:NSObject {
         }
     }
     
-    private func presentNightScoutTestCredentialsResult(success:Bool, error:Error?) {
+    private func callMessageHandler(withCredentialVerificationResult success:Bool, error:Error?) {
+        
         // define the title text
         var title = Texts_NightScoutTestResult.verificationSuccessFulAlertTitle
         if !success {
@@ -243,10 +245,11 @@ public class NightScoutUploadManager:NSObject {
             }
         }
 
-        // call errormessageHandler
-        if let errorMessageHandler = errorMessageHandler {
-            errorMessageHandler(title, message)
+        // call messageHandler
+        if let messageHandler = messageHandler {
+            messageHandler(title, message)
         }
+        
     }
     
 }

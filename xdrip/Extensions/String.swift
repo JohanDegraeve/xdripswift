@@ -103,3 +103,14 @@ extension String {
     }
 
 }
+
+extension String {
+    
+    /// checks if string length is > 0 and if so returns self, otherwise returns nil
+    ///
+    /// useful for instance to verify textfield input, if user lenters string of length 0, then better set it to nil
+    func toNilIfLength0() -> String? {
+        if self.count > 0 {return self}
+        return nil
+    }
+}

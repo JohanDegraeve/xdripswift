@@ -24,6 +24,10 @@
 		F8025E5721F4A60900ECF0C0 /* CGMTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E5621F4A60900ECF0C0 /* CGMTransmitter.swift */; };
 		F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */; };
 		F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */; };
+		F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */; };
+		F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */; };
+		F81D6D5022BFC7DC005EFAE2 /* DexcomShareTestResult.strings in Resources */ = {isa = PBXBuildFile; fileRef = F81D6D4F22BFC7DC005EFAE2 /* DexcomShareTestResult.strings */; };
+		F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D5122C27F18005EFAE2 /* BgReading+DexcomShare.swift */; };
 		F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */; };
 		F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */; };
 		F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FFF2289E4990028C70F /* AlertSettingsViewControllerData.swift */; };
@@ -180,6 +184,10 @@
 		F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIStoryboard.swift; sourceTree = "<group>"; };
 		F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionClosureable-extension.swift"; sourceTree = "<group>"; };
 		F81D6D4522B67F55005EFAE2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SpeakReading.strings; sourceTree = "<group>"; };
+		F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareUploadManager.swift; sourceTree = "<group>"; };
+		F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsDexcomShareTestResult.swift; sourceTree = "<group>"; };
+		F81D6D4F22BFC7DC005EFAE2 /* DexcomShareTestResult.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F81D6D5122C27F18005EFAE2 /* BgReading+DexcomShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgReading+DexcomShare.swift"; sourceTree = "<group>"; };
 		F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueObserverTimeKeeper.swift; sourceTree = "<group>"; };
 		F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAlertSettingsViewController.swift; sourceTree = "<group>"; };
 		F81F9FFF2289E4990028C70F /* AlertSettingsViewControllerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSettingsViewControllerData.swift; sourceTree = "<group>"; };
@@ -547,6 +555,15 @@
 			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		F81D6D4622BD5F43005EFAE2 /* DexcomShare */ = {
+			isa = PBXGroup;
+			children = (
+				F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */,
+				F81D6D5122C27F18005EFAE2 /* BgReading+DexcomShare.swift */,
+			);
+			path = DexcomShare;
+			sourceTree = "<group>";
+		};
 		F821CF48229BF43A005C1E43 /* Alerts */ = {
 			isa = PBXGroup;
 			children = (
@@ -632,6 +649,7 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				F81D6D4622BD5F43005EFAE2 /* DexcomShare */,
 				F821CF9922AEF2DF005C1E43 /* Speak */,
 				F821CF9122ADB064005C1E43 /* HealthKit */,
 				F821CF48229BF43A005C1E43 /* Alerts */,
@@ -657,6 +675,7 @@
 				F8AC426321ADEBD60078C348 /* Main.storyboard */,
 				F8B3A788225D4473004BA588 /* NightScoutTestResult.strings */,
 				F8BDD457221DEF22006EAB84 /* SettingsViews.strings */,
+				F81D6D4F22BFC7DC005EFAE2 /* DexcomShareTestResult.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -954,6 +973,7 @@
 				F81FA005228E09D40028C70F /* TextsCalibration.swift */,
 				F81FA009228F53680028C70F /* TextsHomeView.swift */,
 				F8B48A9322B2A705009BCC01 /* TextsSpeakReading.swift */,
+				F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -1109,6 +1129,7 @@
 				F8B3A80D227A3E98004BA588 /* AlertTypesSettingsView.strings in Resources */,
 				F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */,
 				F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */,
+				F81D6D5022BFC7DC005EFAE2 /* DexcomShareTestResult.strings in Resources */,
 				F8B3A7CF226CC0B7004BA588 /* shorthigh4.mp3 in Resources */,
 				F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 in Resources */,
 				F8B3A7CE226CC0B7004BA588 /* shorthigh2.mp3 in Resources */,
@@ -1177,6 +1198,7 @@
 			files = (
 				F8BDD450221CAA64006EAB84 /* TextsCommon.swift in Sources */,
 				F821CF5B229BF43A005C1E43 /* TimeFormat.swift in Sources */,
+				F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */,
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
 				F81FA006228E09D40028C70F /* TextsCalibration.swift in Sources */,
 				F8B3A84A227F090E004BA588 /* SettingsViewGeneralSettingsViewModel.swift in Sources */,
@@ -1206,6 +1228,7 @@
 				F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */,
 				F8025C1E21DBCF4A00ECF0C0 /* RawGlucoseData.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
+				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
 				F897AB352207725100CDDD10 /* TransmitterVersionRxMessage.swift in Sources */,
 				F8B3A7B2226A0878004BA588 /* TextsAlerts.swift in Sources */,
 				F897AB342207725100CDDD10 /* TransmitterVersionTxMessage.swift in Sources */,
@@ -1276,6 +1299,7 @@
 				F897AB1F22059EA000CDDD10 /* AuthRequestRxMessage.swift in Sources */,
 				F897AB2A220742E900CDDD10 /* AESCrypt.m in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
+				F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */,
 				F821CF66229EE68B005C1E43 /* NightScoutFollowManager.swift in Sources */,
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				F8B3A820227DEC92004BA588 /* AlertTypesAccessor.swift in Sources */,
