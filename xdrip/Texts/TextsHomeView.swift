@@ -107,4 +107,21 @@ enum Texts_HomeView {
     static let sensorNotDetected:String = {
         return NSLocalizedString("sensornotdetected", tableName: filename, bundle: Bundle.main, value: "Sensor not detected. Check if the MiaoMiao is well placed on the sensor.", comment: "for home view, miaomiao doesn't detect a sensor")
     }()
+    
+    static let transmitterNotPaired:String = {
+        return NSLocalizedString("transmitternotpaired", tableName: filename, bundle: Bundle.main, value: "Transmitter is not paired with this iOS device. Open the application.", comment: "If transmitter needs pairing, user needs to click the notification")
+    }()
+    
+    static let transmitterPairingTooLate:String = {
+        return NSLocalizedString("transmitterpairingtoolate", tableName: filename, bundle: Bundle.main, value: "Too late, the transmitter has disconnected now. You should get a new pairing request in a few minutes.", comment: "If transmitter needs pairing, a notification was fired, user clicked it more than 60 seconds later, which is too late")
+    }()
+
+    static let transmitterPairingSuccessful:String = {
+        return NSLocalizedString("transmitterpairingsuccessful", tableName: filename, bundle: Bundle.main, value: "Transmitter successfully paired.", comment: "To give info to user that the transmitter is successfully paired")
+    }()
+    
+    static let transmitterPairingAttemptTimeout:String = {
+        return NSLocalizedString("transmitterpairingattempttimeout", tableName: filename, bundle: Bundle.main, value: "Transmitter did not reply to pairing request.", comment: "To give info to user that the transmitter pairing requeset timed out")
+    }()
+    
 }

@@ -48,6 +48,9 @@ final class RootViewController: UIViewController {
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - updateLabels
     private let applicationManagerKeyUpdateLabels = "RootViewController-UpdateLabels"
+    
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initiate pairing
+    private let applicationManagerKeyInitiatePairing = "RootViewController-InitiatePairing"
 
     // MARK: - Properties - other private properties
     
@@ -86,6 +89,9 @@ final class RootViewController: UIViewController {
     
     /// dexcomShareUploadManager instance
     private var dexcomShareUploadManager:DexcomShareUploadManager?
+    
+    /// timer used when asking the transmitter to initiate pairing. The user is waiting for the response, if the response from the transmitter doesn't come within a few seconds, then we'll inform the user
+    private var transmitterPairingResponseTimer:Timer?
     
     /// healthkit manager instance
     private var healthKitManager:HealthKitManager?
@@ -400,6 +406,27 @@ final class RootViewController: UIViewController {
     }
     
     // MARK: - private helper functions
+    
+    // inform user that pairing request timed out
+    @objc private func informUserThatPairingTimedOut() {
+        UIAlertController(title: Texts_Common.warning, message: "time out", actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+    }
+    
+    /// will call cgmTransmitter.initiatePairing() - also sets timer, if no successful pairing within a few seconds, then info will be given to user asking to wait another few minutes
+    private func initiateTransmitterPairing() {
+        
+        // initiate the pairing
+        cgmTransmitter?.initiatePairing()
+        
+        // invalide the timer, if it exists
+        if let transmitterPairingResponseTimer = transmitterPairingResponseTimer {
+            transmitterPairingResponseTimer.invalidate()
+        }
+        
+        // create and schedule timer
+        transmitterPairingResponseTimer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(informUserThatPairingTimedOut), userInfo: nil, repeats: false)
+        
+    }
     
     /// launches timer that will do regular screen updates - and adds closure to ApplicationManager : when going to background, stop the timer, when coming to foreground, restart the timer
     ///
@@ -918,10 +945,29 @@ final class RootViewController: UIViewController {
 
 }
 
+// MARK: - conform to CGMTransmitter protocol
+
 /// conform to CGMTransmitterDelegate
 extension RootViewController:CGMTransmitterDelegate {
     
-    // MARK: - CGMTransmitter protocol functions
+    func pairingFailed() {
+        // this should be the consequence of the user not accepting the pairing request, there's no need to inform the user
+        // invalidate transmitterPairingResponseTimer
+        if let transmitterPairingResponseTimer = transmitterPairingResponseTimer {
+            transmitterPairingResponseTimer.invalidate()
+        }
+    }
+    
+    func successfullyPaired() {
+        
+        // invalidate transmitterPairingResponseTimer
+        if let transmitterPairingResponseTimer = transmitterPairingResponseTimer {
+            transmitterPairingResponseTimer.invalidate()
+        }
+        
+        // inform user
+        UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterPairingSuccessful, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+    }
     
     func cgmTransmitterDidConnect(address:String?, name:String?) {
         // store address and name, if this is the first connect to a specific device, then this address and name will be used in the future to reconnect to the same device, without having to scan
@@ -939,10 +985,8 @@ extension RootViewController:CGMTransmitterDelegate {
     }
     
     func cgmTransmitterDidDisconnect() {
-        
         // set disconnect timestamp
         UserDefaults.standard.lastdisConnectTimestamp = Date()
-        
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState) {
@@ -973,9 +1017,64 @@ extension RootViewController:CGMTransmitterDelegate {
         
     }
     
+    /// Transmitter is calling this delegate function to indicate that bluetooth pairing is needed. If the app is in the background, the user will be informed, after opening the app a pairing request will be initiated. if the app is in the foreground, the pairing request will be initiated immediately
     func cgmTransmitterNeedsPairing() {
-        //TODO: needs implementation
-        print("NEEDS IMPLEMENTATION")
+
+        os_log("transmitter needs pairing", log: log, type: .info)
+        
+        // Create Notification Content
+        let notificationContent = UNMutableNotificationContent()
+        
+        // Configure NnotificationContent title
+        notificationContent.title = Texts_Common.warning
+        
+        notificationContent.body = Texts_HomeView.transmitterNotPaired
+        
+        // add sound
+        notificationContent.sound = UNNotificationSound.init(named: UNNotificationSoundName.init(""))
+        
+        // Create Notification Request
+        let notificationRequest = UNNotificationRequest(identifier: Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing, content: notificationContent, trigger: nil)
+        
+        // Add Request to User Notification Center
+        UNUserNotificationCenter.current().add(notificationRequest) { (error) in
+            if let error = error {
+                os_log("Unable to transmitter needs pairing Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
+            }
+        }
+        
+        // vibrate
+        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+        
+        // add closure to ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground so that if user opens the app, the pairing request will be initiated. This can be done only if the app is opened within 60 seconds.
+        // If the app is already in the foreground, then userNotificationCenter willPresent will be called, in this function the closure will be removed immediately, and the pairing request will be called. As a result, if the app is in the foreground, the user will not see (or hear) any notification, but the pairing will be initiated
+        
+        // max timestamp when notification was fired - connection stays open for 1 minute, taking 1 second as d
+        let maxTimeUserCanOpenApp = Date(timeIntervalSinceNow: TimeInterval(Constants.DexcomG5.maxTimeToAcceptPairingInSeconds - 1))
+        
+        // we will not just count on it that the user will click the notification to open the app (assuming the app is in the background, if the app is in the foreground, then we come in another flow)
+        // we will
+        // whenever app comes from-back to freground, updateLabels needs to be called
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyInitiatePairing, closure: {
+            
+            // first of all reremove from application key manager
+            ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeyInitiatePairing)
+            
+            // first remove existing notification if any
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
+            
+            // if it was too long since notification was fired, then forget about it
+            if Date() > maxTimeUserCanOpenApp {
+                os_log("in cgmTransmitterNeedsPairing, user opened the app too late", log: self.log, type: .error)
+                UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.transmitterPairingTooLate, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+                return
+            }
+            
+            // initiate the pairing
+            self.cgmTransmitter?.initiatePairing()
+            
+        })
+        
     }
     
     // Only MioaMiao will call this
@@ -1010,6 +1109,7 @@ extension RootViewController:CGMTransmitterDelegate {
     /// - parameters:
     ///     - readings: first entry is the most recent
     func cgmTransmitterInfoReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: SensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?, serialNumber: String?, bootloader: String?) {
+        
         os_log("sensorstate %{public}@", log: log, type: .debug, sensorState?.description ?? "no sensor state found")
         os_log("firmware %{public}@", log: log, type: .debug, firmware ?? "no firmware version found")
         os_log("bootloader %{public}@", log: log, type: .debug, bootloader ?? "no bootloader  found")
@@ -1017,11 +1117,14 @@ extension RootViewController:CGMTransmitterDelegate {
         os_log("hardware %{public}@", log: log, type: .debug, hardware ?? "no hardware version found")
         os_log("transmitterBatteryInfo  %{public}@", log: log, type: .debug, transmitterBatteryInfo?.description ?? 0)
         os_log("sensor time in minutes  %{public}@", log: log, type: .debug, sensorTimeInMinutes?.description ?? "not received")
+        os_log("glucoseData size = %{public}@", log: log, type: .debug, glucoseData.count.description)
         
         processNewCGMInfo(glucoseData: &glucoseData, sensorState: sensorState, firmware: firmware, hardware: hardware, transmitterBatteryInfo: transmitterBatteryInfo, sensorTimeInMinutes: sensorTimeInMinutes)
     }
 
 }
+
+// MARK: - conform to UITabBarControllerDelegate protocol
 
 /// conform to UITabBarControllerDelegate, want to receive info when user clicks specific tabs
 extension RootViewController: UITabBarControllerDelegate {
@@ -1034,23 +1137,38 @@ extension RootViewController: UITabBarControllerDelegate {
     }
 }
 
+// MARK: - conform to UNUserNotificationCenterDelegate protocol
+
 /// conform to UNUserNotificationCenterDelegate, for notifications
 extension RootViewController:UNUserNotificationCenterDelegate {
     
-    //called when notification created while app is in foreground
+    // called when notification created while app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
         if notification.request.identifier == Constants.Notifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
+            
             // request calibration
             requestCalibration(userRequested: false)
             
-            // call completionhandler
+            // call completionhandler to avoid that notification is shown to the user
             completionHandler([])
+            
         } else if notification.request.identifier == Constants.Notifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
             
             // call completionhandler to show the notification even though the app is in the foreground, without sound
             completionHandler([.alert])
+            
+        } else if notification.request.identifier == Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
+            
+            // so actually the app was in the foreground, at the  moment the Transmitter Class called the cgmTransmitterNeedsPairing function, there's no need to show the notification, we can immediately call back the cgmTransmitter initiatePairing function
+            completionHandler([])
+            cgmTransmitter?.initiatePairing()
+            
+            /// remove applicationManagerKeyInitiatePairing from application key manager - there's no need to initiate the pairing via this closure
+            ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeyInitiatePairing)
+            
         } else {
+            
             // this will verify if it concerns an alert notification, if not pickerviewData will be nil
             if let pickerViewData = alertManager?.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler) {
                 
@@ -1062,23 +1180,35 @@ extension RootViewController:UNUserNotificationCenterDelegate {
     
     // called when user clicks a notification
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        
         os_log("userNotificationCenter didReceive", log: log, type: .info)
+
+        // call completionHandler when exiting function
+        defer {
+            // call completionhandler
+            completionHandler()
+        }
         
         if response.notification.request.identifier == Constants.Notifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
+            
             os_log("     userNotificationCenter didReceive, user pressed calibration notification to open the app", log: log, type: .info)
             // request calibration
             requestCalibration(userRequested: false)
             
-            // call completionhandler
-            completionHandler()
         } else if response.notification.request.identifier == Constants.Notifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
 
             // if user clicks notification "sensor not detected", then show uialert with title and body
             UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.sensorNotDetected, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+
+        } else if response.notification.request.identifier == Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
+            
+            // nothing required, the pairing function will be called as it's been added to ApplicationManager in function cgmTransmitterNeedsPairing
             
         } else {
+            
             // it's not an initial calibration request notification that the user clicked, by calling alertManager?.userNotificationCenter, we check if it was an alert notification that was clicked and if yes pickerViewData will have the list of alert snooze values
-            if let pickerViewData = alertManager?.userNotificationCenter(center, didReceive: response, withCompletionHandler: completionHandler) {
+            if let pickerViewData = alertManager?.userNotificationCenter(center, didReceive: response) {
+                
                 os_log("     userNotificationCenter didReceive, user pressed an alert notification to open the app", log: log, type: .info)
                 PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
                 
@@ -1088,6 +1218,8 @@ extension RootViewController:UNUserNotificationCenterDelegate {
         }
     }
 }
+
+// MARK: - conform to NightScoutFollowerDelegate protocol
 
 extension RootViewController:NightScoutFollowerDelegate {
     
@@ -1148,7 +1280,5 @@ extension RootViewController:NightScoutFollowerDelegate {
             }
         }
     }
-    
-    
 }
 

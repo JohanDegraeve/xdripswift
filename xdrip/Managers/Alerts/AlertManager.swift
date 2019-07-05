@@ -167,12 +167,12 @@ public class AlertManager:NSObject {
         }
     }
     
-    /// Function to be called that receives the notification actions. Will handle the response. completionHandler will not necessarily be called. Only if the identifier (response.notification.request.identifier) is one of the alert notification identifers, then it will handle the response and also call completionhandler.
+    /// Function to be called that receives the notification actions. Will handle the response.
     ///
     /// this function looks very similar to the UNUserNotificationCenterDelegate function, difference is that it returns an optional instance of PickerViewData. This will have the snooze data, ie title, actionHandler, cancelHandler, list of values, etc.  Goal is not to have UI related stuff in AlertManager class. it's the caller that needs to decide how to present the data
     /// - returns:
     ///     - PickerViewData : contains data that user needs to pick from, nil means nothing to pick from
-    public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) -> PickerViewData? {
+    public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) -> PickerViewData? {
         
         // declare returnValue
         var returnValue:PickerViewData?
@@ -212,10 +212,6 @@ public class AlertManager:NSObject {
                     os_log("in userNotificationCenter, received actionIdentifier : default", log: self.log, type: .info)
                     
                 }
-                
-                // it is possible to play the sound, show the content and/or set the badge counter as explained here https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions
-                // none of them seems useful here
-                completionHandler()
                 
                 break loop
             }

@@ -254,6 +254,14 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         }
     }
     
+    // MARK: CGMTransmitter protocol functions
+    
+    /// to ask pairing - empty function because G4 doesn't need pairing
+    ///
+    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
+    func initiatePairing() {
+    }
+    
     // MARK: CBCentralManager overriden functions
     
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {

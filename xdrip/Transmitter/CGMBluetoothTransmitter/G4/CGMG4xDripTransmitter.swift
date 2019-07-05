@@ -154,7 +154,15 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         }
     }
     
-     // MARK: helper functions
+    // MARK: CGMTransmitter protocol functions
+    
+    /// to ask pairing - empty function because G4 doesn't need pairing
+    ///
+    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
+    func initiatePairing() {
+    }
+
+    // MARK: helper functions
     
     private func processxBridgeDataPacket(value:Data) -> (glucoseData:RawGlucoseData?, batteryLevel:Int?, transmitterID:String?) {
         guard value.count >= 10 else {

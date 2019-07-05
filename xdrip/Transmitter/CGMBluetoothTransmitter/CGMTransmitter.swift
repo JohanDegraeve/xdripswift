@@ -1,7 +1,13 @@
 import Foundation
 import CoreBluetooth
 
+/// defines functions that every transmitter should implement, mainly used by rootviewcontroller to get transmitter address, name, deterine status etc.
+///
+/// Most of the functions are already defined by BlueToothTransmitter.swift - so most of these functions don't need re-implementation in CGMTransmitter classes that conform to this protocol.
+///
+/// An exception is for example initiatePairing, which is implemented in CGMG5Transmitter.swift, because that transmitter needs to send a message to the transmitter that will cause the app to request the user to accept the pairing
 protocol CGMTransmitter {
+    
     /// get device address, cgmtransmitters should also derive from BlueToothTransmitter, hence no need to implement this function
     func address() -> String?
     
@@ -15,10 +21,16 @@ protocol CGMTransmitter {
     
     /// get connection status, nil if peripheral not yet known, ie never connected or discovered the transmitter
     func getConnectionStatus() -> CBPeripheralState?
+    
+    /// to ask transmitter that it initiates pairing
+    ///
+    /// for transmitter types that don't need pairing, or that don't need pairing initiated by user/view controller, this will be an empty function. Only G5 (and in future maybe G6) will use it. The others can define an empty body
+    func initiatePairing()
 }
 
 /// cgm transmitter types
 enum CGMTransmitterType:String, CaseIterable {
+    
     /// dexcom G4 using xdrip, xbridge, ...
     case dexcomG4 = "Dexcom G4"
     /// dexcom G5

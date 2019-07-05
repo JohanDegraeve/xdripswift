@@ -11,7 +11,7 @@ import Foundation
 
 struct AuthChallengeRxMessage: TransmitterRxMessage {
     let authenticated: UInt8
-    let bonded: Bool
+    let paired: Bool
 
     init?(data: Data) {
         guard data.count >= 3 else {
@@ -23,6 +23,6 @@ struct AuthChallengeRxMessage: TransmitterRxMessage {
         }
 
         authenticated = data[1]
-        bonded = data[2] != 2
+        paired = data[2] != 2
     }
 }

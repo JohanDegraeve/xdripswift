@@ -7,15 +7,16 @@
 
 import Foundation
 
-enum Opcode: UInt8 {
+enum DexcomTransmitterOpCode: UInt8 {
     // Auth
     case authRequestTx = 0x01
 
     case authRequestRx = 0x03
     case authChallengeTx = 0x04
     case authChallengeRx = 0x05
-    case keepAlive = 0x06 // auth; setAdvertisementParametersTx for control
-    case bondRequest = 0x07
+    case keepAliveTx = 0x06 // auth; setAdvertisementParametersTx for control
+    case bondRequestTx = 0x07
+    case paireRequestRx = 0x08 // comes in after having accepted the bluetooth pairing request
     
     // Control
     case disconnectTx = 0x09
@@ -55,15 +56,17 @@ enum Opcode: UInt8 {
 
     case glucoseBackfillTx = 0x50
     case glucoseBackfillRx = 0x51
+    
+    case keepAliveRx = 0xFF // found during testing
 }
 
 
 extension Data {
-    init(for opcode: Opcode) {
+    init(for opcode: DexcomTransmitterOpCode) {
         self.init(bytes: [opcode.rawValue])
     }
 
-    func starts(with opcode: Opcode) -> Bool {
+    func starts(with opcode: DexcomTransmitterOpCode) -> Bool {
         guard count > 0 else {
             return false
         }
@@ -72,7 +75,7 @@ extension Data {
     }
 }
 
-extension Opcode: CustomStringConvertible {
+extension DexcomTransmitterOpCode: CustomStringConvertible {
     public var description: String {
         switch self {
         case .authRequestRx:

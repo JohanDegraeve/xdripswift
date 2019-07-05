@@ -36,6 +36,12 @@ protocol CGMTransmitterDelegate:AnyObject {
     
     /// transmitter needs bluetooth pairing
     func cgmTransmitterNeedsPairing()
+    
+    /// transmitter successfully paired
+    func successfullyPaired()
+    
+    /// transmitter pairing failed
+    func pairingFailed()
 }
 
 

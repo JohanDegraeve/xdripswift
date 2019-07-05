@@ -28,6 +28,9 @@
 		F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */; };
 		F81D6D5022BFC7DC005EFAE2 /* DexcomShareTestResult.strings in Resources */ = {isa = PBXBuildFile; fileRef = F81D6D4F22BFC7DC005EFAE2 /* DexcomShareTestResult.strings */; };
 		F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D5122C27F18005EFAE2 /* BgReading+DexcomShare.swift */; };
+		F81D6D5622CAB8AC005EFAE2 /* KeepAliveTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D5522CAB8AB005EFAE2 /* KeepAliveTxMessage.swift */; };
+		F81D6D5822CF487F005EFAE2 /* DexcomTransmitterOpCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D5722CF487F005EFAE2 /* DexcomTransmitterOpCode.swift */; };
+		F81D6D5A22CF947E005EFAE2 /* PairRequestTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D5922CF947E005EFAE2 /* PairRequestTxMessage.swift */; };
 		F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */; };
 		F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */; };
 		F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FFF2289E4990028C70F /* AlertSettingsViewControllerData.swift */; };
@@ -72,7 +75,6 @@
 		F897AB1F22059EA000CDDD10 /* AuthRequestRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB1922059E9F00CDDD10 /* AuthRequestRxMessage.swift */; };
 		F897AB2022059EA000CDDD10 /* SensorDataTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB1A22059EA000CDDD10 /* SensorDataTxMessage.swift */; };
 		F897AB2122059EA000CDDD10 /* AuthRequestTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB1B22059EA000CDDD10 /* AuthRequestTxMessage.swift */; };
-		F897AB2222059EA000CDDD10 /* Opcode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB1C22059EA000CDDD10 /* Opcode.swift */; };
 		F897AB242206585F00CDDD10 /* AuthChallengeRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB232206585F00CDDD10 /* AuthChallengeRxMessage.swift */; };
 		F897AB2622073C4B00CDDD10 /* AuthChallengeTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB2522073C4A00CDDD10 /* AuthChallengeTxMessage.swift */; };
 		F897AB2A220742E900CDDD10 /* AESCrypt.m in Sources */ = {isa = PBXBuildFile; fileRef = F897AB28220742E700CDDD10 /* AESCrypt.m */; };
@@ -188,6 +190,9 @@
 		F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsDexcomShareTestResult.swift; sourceTree = "<group>"; };
 		F81D6D4F22BFC7DC005EFAE2 /* DexcomShareTestResult.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = DexcomShareTestResult.strings; sourceTree = "<group>"; };
 		F81D6D5122C27F18005EFAE2 /* BgReading+DexcomShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgReading+DexcomShare.swift"; sourceTree = "<group>"; };
+		F81D6D5522CAB8AB005EFAE2 /* KeepAliveTxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeepAliveTxMessage.swift; sourceTree = "<group>"; };
+		F81D6D5722CF487F005EFAE2 /* DexcomTransmitterOpCode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DexcomTransmitterOpCode.swift; sourceTree = "<group>"; };
+		F81D6D5922CF947E005EFAE2 /* PairRequestTxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairRequestTxMessage.swift; sourceTree = "<group>"; };
 		F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueObserverTimeKeeper.swift; sourceTree = "<group>"; };
 		F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAlertSettingsViewController.swift; sourceTree = "<group>"; };
 		F81F9FFF2289E4990028C70F /* AlertSettingsViewControllerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSettingsViewControllerData.swift; sourceTree = "<group>"; };
@@ -233,7 +238,6 @@
 		F897AB1922059E9F00CDDD10 /* AuthRequestRxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthRequestRxMessage.swift; sourceTree = "<group>"; };
 		F897AB1A22059EA000CDDD10 /* SensorDataTxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorDataTxMessage.swift; sourceTree = "<group>"; };
 		F897AB1B22059EA000CDDD10 /* AuthRequestTxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthRequestTxMessage.swift; sourceTree = "<group>"; };
-		F897AB1C22059EA000CDDD10 /* Opcode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Opcode.swift; sourceTree = "<group>"; };
 		F897AB232206585F00CDDD10 /* AuthChallengeRxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthChallengeRxMessage.swift; sourceTree = "<group>"; };
 		F897AB2522073C4A00CDDD10 /* AuthChallengeTxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthChallengeTxMessage.swift; sourceTree = "<group>"; };
 		F897AB28220742E700CDDD10 /* AESCrypt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AESCrypt.m; sourceTree = "<group>"; };
@@ -745,6 +749,9 @@
 		F897AAFF22036D4300CDDD10 /* G5Messages */ = {
 			isa = PBXGroup;
 			children = (
+				F81D6D5922CF947E005EFAE2 /* PairRequestTxMessage.swift */,
+				F81D6D5722CF487F005EFAE2 /* DexcomTransmitterOpCode.swift */,
+				F81D6D5522CAB8AB005EFAE2 /* KeepAliveTxMessage.swift */,
 				F897AB29220742E800CDDD10 /* AESCrypt.h */,
 				F897AB28220742E700CDDD10 /* AESCrypt.m */,
 				F897AB232206585F00CDDD10 /* AuthChallengeRxMessage.swift */,
@@ -755,7 +762,6 @@
 				F897AB38220775B100CDDD10 /* BatteryStatusTxMessage.swift */,
 				F897AB302207716E00CDDD10 /* FirmwareVersionTxMessage.swift */,
 				F897AB1522059E8500CDDD10 /* NSData+CRC.swift */,
-				F897AB1C22059EA000CDDD10 /* Opcode.swift */,
 				F897AB3C220A243300CDDD10 /* ResetMessage.swift */,
 				F897AB2C220761F200CDDD10 /* SensorDataRxMessage.swift */,
 				F897AB1A22059EA000CDDD10 /* SensorDataTxMessage.swift */,
@@ -1239,6 +1245,7 @@
 				F897AB2D220761F200CDDD10 /* SensorDataRxMessage.swift in Sources */,
 				F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */,
 				F821CF57229BF43A005C1E43 /* SnoozeParameters.swift in Sources */,
+				F81D6D5822CF487F005EFAE2 /* DexcomTransmitterOpCode.swift in Sources */,
 				F8B3A79722635A25004BA588 /* AlertEntry+CoreDataProperties.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F897AB242206585F00CDDD10 /* AuthChallengeRxMessage.swift in Sources */,
@@ -1276,7 +1283,8 @@
 				F8B3A80A227A3D11004BA588 /* TextsAlertTypeSettings.swift in Sources */,
 				F8B3A850227F26F8004BA588 /* AlertTypesSettingsViewController.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* BluetoothTransmitter.swift in Sources */,
-				F897AB2222059EA000CDDD10 /* Opcode.swift in Sources */,
+				F81D6D5622CAB8AC005EFAE2 /* KeepAliveTxMessage.swift in Sources */,
+				F81D6D5A22CF947E005EFAE2 /* PairRequestTxMessage.swift in Sources */,
 				F8B3A808227A2933004BA588 /* SettingsSelectedRowAction.swift in Sources */,
 				F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */,
 				F8B3A78E22622954004BA588 /* AlertType+CoreDataClass.swift in Sources */,
