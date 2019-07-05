@@ -125,8 +125,12 @@ public class NightScoutUploadManager:NSObject {
         
         os_log("in uploadBgReadingsToNightScout", log: self.log, type: .info)
 
-        // get readings to upload, limit to 2016 = maximum 1 week - just to avoid a huge array is being returned here
-        let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: 2016, fromDate: UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        // get readings to upload, limit to 8 hours
+        var timeStamp = Date(timeIntervalSinceNow: -8*60*60)
+        if let timeStampLatestNightScoutUploadedBgReading = UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading {
+            timeStamp = timeStampLatestNightScoutUploadedBgReading
+        }
+        let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         if bgReadingsToUpload.count > 0 {
             os_log("    number of readings to upload : %{public}@", log: self.log, type: .info, bgReadingsToUpload.count.description)
@@ -158,6 +162,18 @@ public class NightScoutUploadManager:NSObject {
                         
                         os_log("in uploadTask completionHandler", log: self.log, type: .info)
                         
+                        // if ends without success then log the data
+                        var success = false
+                        defer {
+                            if !success {
+                                if let data = data {
+                                    if let dataAsString = String(bytes: data, encoding: .utf8) {
+                                        os_log("    data = %{public}@", log: self.log, type: .error, dataAsString)
+                                    }
+                                }
+                            }
+                        }
+                        
                         // error cases
                         if let error = error {
                             os_log("    failed to upload, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
@@ -168,23 +184,19 @@ public class NightScoutUploadManager:NSObject {
                         if let response = response as? HTTPURLResponse {
                             guard (200...299).contains(response.statusCode) else {
                                 os_log("    failed to upload, statuscode = %{public}@", log: self.log, type: .error, response.statusCode.description)
-                                
                                 return
                             }
                         } else {
                             os_log("    response is not HTTPURLResponse", log: self.log, type: .error)
                         }
                         
-                        // successful cases, change timeStampLatestNightScoutUploadedBgReading
+                        // successful cases,
+                        success = true
+                        
+                        // change timeStampLatestNightScoutUploadedBgReading
                         if let lastReading = bgReadingsToUpload.first {
                             os_log("    upload succeeded, setting timeStampLatestNightScoutUploadedBgReading to %{public}@", log: self.log, type: .info, lastReading.timeStamp.description(with: .current))
                             UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading = lastReading.timeStamp
-                        }
-                        
-                        // log the result from NightScout
-                        guard let data = data, !data.isEmpty else {
-                            os_log("    empty response received", log: self.log, type: .info)
-                            return
                         }
                         
                     })
