@@ -45,7 +45,7 @@ class Texts_DexcomShareTestResult {
     }()
     
     static let monitoredReceiverNotAssigned3: String = {
-        return NSLocalizedString("dexcomsharetestresult_monitored_receiver_not_assigned_3", tableName: filename, bundle: Bundle.main, value: "Use the official Dexcom app to register the transmitter (G5) or Share receiver (G4)", comment: "If serial number is not assigned to the account, this is the 3rd part in a series of 3 to form a complete sentence")
+        return NSLocalizedString("dexcomsharetestresult_monitored_receiver_not_assigned_3", tableName: filename, bundle: Bundle.main, value: "Use the official Dexcom app to register the transmitter (G5) or Share receiver (G4)\r\n\r\nPossibly you're just using the wrong url, verify the setting 'Use US url?'", comment: "If serial number is not assigned to the account, this is the 3rd part in a series of 3 to form a complete sentence")
     }()
     
 

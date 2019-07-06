@@ -8,4 +8,4 @@
 "dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Dexcom Share Serial Number does not match the serial number for this account. Verify the Serial Number in the settings.";
 "dexcomsharetestresult_monitored_receiver_not_assigned_1" = "It seems the transmitter id or serial number";
 "dexcomsharetestresult_monitored_receiver_not_assigned_2" = "is not assigned to";
-"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Use the official Dexcom app to register the transmitter (G5) or Share receiver (G4)";
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Use the official Dexcom app to register the transmitter (G5) or Share receiver (G4)\r\n\r\nPossibly you're just using the wrong url, verify the setting 'Use US url?'";

@@ -80,7 +80,7 @@ class DexcomShareUploadManager:NSObject {
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
                 
                 switch keyPathEnum {
-                case UserDefaults.Key.dexcomShareAccountName, UserDefaults.Key.dexcomSharePassword, UserDefaults.Key.useUSDexcomShareurl :
+                case UserDefaults.Key.dexcomShareAccountName, UserDefaults.Key.dexcomSharePassword :
                     
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
                         
@@ -107,7 +107,7 @@ class DexcomShareUploadManager:NSObject {
                         }
                     }
                     
-                case UserDefaults.Key.uploadReadingstoDexcomShare :
+                case UserDefaults.Key.uploadReadingstoDexcomShare, UserDefaults.Key.dexcomShareSerialNumber, UserDefaults.Key.useUSDexcomShareurl :
                     
                     // if changing to enabled, then do a credentials test and if ok start upload, if fail don't give warning, that's the only difference with previous cases
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
@@ -162,24 +162,49 @@ class DexcomShareUploadManager:NSObject {
             return
         }
         
-        // create url
-        let uploadURL = url.appendingPathComponent(startRemoteMonitoringSessionPath + "?sessionID=" + dexcomShareSessionId + "&serialNumber=" + dexcomShareSerialNumber)
+        let startRemoteMonitoringSessionUrl = url.appendingPathComponent(startRemoteMonitoringSessionPath)
+        
+        // create NSURLComponents instance with scheme, host, queryItems
+        guard let components = NSURLComponents(url: startRemoteMonitoringSessionUrl, resolvingAgainstBaseURL: false) else {
+            os_log("in startRemoteMonitoringSessionAndStartUpload, failed to create components", log: self.log, type: .error)
+            return
+        }
+        
+        components.scheme = startRemoteMonitoringSessionUrl.scheme
+        components.host = startRemoteMonitoringSessionUrl.host
+        components.queryItems = [URLQueryItem(name: "sessionId", value: dexcomShareSessionId), URLQueryItem(name: "serialNumber", value: dexcomShareSerialNumber)]
+        
+        guard let newUrl = components.url else {
+            os_log("in startRemoteMonitoringSessionAndStartUpload, failed to create newUrl", log: self.log, type: .error)
+            return
+        }
 
         // create the request
-        var request = URLRequest(url: uploadURL)
+        var request = URLRequest(url: newUrl)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField:"Content-Type")
-        request.setValue("application/json", forHTTPHeaderField:"Accept")
         request.setValue("Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0", forHTTPHeaderField: "User-Agent")
 
         // get shared URLSession
         let sharedSession = URLSession.shared
 
         // Create upload Task
-        let dataTask = sharedSession.uploadTask(with: request, from: nil, completionHandler: { (data, response, error) -> Void in
+        let dataTask = sharedSession.uploadTask(with: request, from: "".data(using: .utf8), completionHandler: { (data, response, error) -> Void in
             
             os_log("in startRemoteMonitoringSessionAndStartUpload, in uploadTask completionHandler", log: self.log, type: .info)
             
+            // if ends without success then log the data when existing the scope
+            var success = false
+            defer {
+                if !success {
+                    if let data = data {
+                        if let dataAsString = String(bytes: data, encoding: .utf8) {
+                            os_log("    data = %{public}@", log: self.log, type: .error, dataAsString)
+                        }
+                    }
+                }
+            }
+
             // error cases
             if let error = error {
                 os_log("    error = %{public}@", log: self.log, type: .error, error.localizedDescription)
@@ -218,7 +243,7 @@ class DexcomShareUploadManager:NSObject {
                             
                         } else if errorCode == "MonitoredReceiverNotAssigned" {
                             
-                            os_log("in uploadBgReadingsToDexcomShare, new login failed with error MonitoredReceiverNotAssigned", log: self.log, type: .error)
+                            os_log("    new login failed with error MonitoredReceiverNotAssigned", log: self.log, type: .error)
                             DispatchQueue.main.async {
                                 if let messageHandler = self.messageHandler {
                                     messageHandler(Texts_DexcomShareTestResult.uploadErrorWarning, self.createMonitoredReceiverNotAssignedMessage(acount: dexcomShareAccountName, serialNumber: dexcomShareSerialNumber))
@@ -458,9 +483,9 @@ class DexcomShareUploadManager:NSObject {
             
             dataTask.resume()
             
-            } catch let error {
-                os_log("     failed to upload, error = %{public}@", log: self.log, type: .info, error.localizedDescription)
-                return
+        } catch let error {
+            os_log("     failed to upload, error = %{public}@", log: self.log, type: .info, error.localizedDescription)
+            return
         }
 
     }
