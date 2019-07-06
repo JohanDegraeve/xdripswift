@@ -12,10 +12,10 @@ Current Status
 - Follower mode, with NightScout
 - Store readings in HealthKit
 - Speak readings
+- upload to Dexcom share servers
 
 Not yet supported
 - translations, English only
-- upload to Dexcom share servers
 - sidiary
 - graph on the homescreen
 
