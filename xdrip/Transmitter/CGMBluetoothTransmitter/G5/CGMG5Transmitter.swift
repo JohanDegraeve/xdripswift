@@ -187,9 +187,8 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         
         // if last reading was less than a minute ago, then no need to continue, otherwise continue with process by calling super.centralManager(central, didConnect: peripheral)
         if Date() < Date(timeInterval: 60, since: timeStampOfLastG5Reading) {
-            os_log("connected, but last reading was less than 1 minute ago, disconnecting", log: log, type: .info)
-            //TODO: is it not better to keep connection open till it times out ? should be tested with new device, see if battery drains, if it does, try with removing the disconnect - Spike also disconnects
-            disconnect()
+            os_log("connected, but last reading was less than 1 minute ago", log: log, type: .info)
+            // don't disconnect here, keep the connection open, the transmitter will disconnect in a few seconds, assumption is that this will increase battery life
         } else {
             super.centralManager(central, didConnect: peripheral)
         }
