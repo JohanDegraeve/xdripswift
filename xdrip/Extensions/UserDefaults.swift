@@ -8,7 +8,7 @@ extension UserDefaults {
         // General
         
         /// bloodglucose  unit
-        case bloodGlucoseUnit = "bloodGlucoseUnit"
+        case bloodGlucoseUnitIsMgDl = "bloodGlucoseUnit"
         /// low value
         case lowMarkValue = "lowMarkValue"
         /// high value
@@ -90,6 +90,8 @@ extension UserDefaults {
         // Transmitter
         /// Transmitter Battery Level
         case transmitterBatteryInfo = "transmitterbatteryinfo"
+        /// Dexcom transmitter reset required
+        case transmitterResetRequired = "transmitterResetRequired"
         
         // HealthKit
         /// did user authorize the storage of readings in healthkit or not
@@ -111,10 +113,10 @@ extension UserDefaults {
     @objc dynamic var bloodGlucoseUnitIsMgDl: Bool {
         //default value for bool in userdefaults is false, false is for mgdl, true is for mmol
         get {
-            return !bool(forKey: Key.bloodGlucoseUnit.rawValue)
+            return !bool(forKey: Key.bloodGlucoseUnitIsMgDl.rawValue)
         }
         set {
-            set(!newValue, forKey: Key.bloodGlucoseUnit.rawValue)
+            set(!newValue, forKey: Key.bloodGlucoseUnitIsMgDl.rawValue)
         }
     }
     
@@ -482,6 +484,18 @@ extension UserDefaults {
             }
         }
     }
+    
+    /// is transmitter reset required or not
+    @objc dynamic var transmitterResetRequired: Bool {
+        get {
+            return bool(forKey: Key.transmitterResetRequired.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.transmitterResetRequired.rawValue)
+        }
+    }
+    
+
   
     /// did user authorize the storage of readings in healthkit or not - this setting is actually only used to allow the HealthKitManager to listen for changes in the authorization status
     var storeReadingsInHealthkitAuthorized:Bool {

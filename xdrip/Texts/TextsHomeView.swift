@@ -124,4 +124,16 @@ enum Texts_HomeView {
         return NSLocalizedString("transmitterpairingattempttimeout", tableName: filename, bundle: Bundle.main, value: "Transmitter did not reply to pairing request.", comment: "To give info to user that the transmitter pairing requeset timed out")
     }()
     
+    static let transmitterResetResult:String = {
+        return NSLocalizedString("transmitterResultResult", tableName: filename, bundle: Bundle.main, value: "Transmitter reset result", comment: "To give result about transitter result in notification body")
+    }()
+    
+    static let success:String = {
+        return NSLocalizedString("success", tableName: filename, bundle: Bundle.main, value: "success", comment: "To give result about transitter result in notification body, successful")
+    }()
+    
+    static let failed:String = {
+        return NSLocalizedString("failed", tableName: filename, bundle: Bundle.main, value: "failed", comment: "To give result about transitter result in notification body, failed")
+    }()
+    
 }

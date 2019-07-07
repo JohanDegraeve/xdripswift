@@ -168,10 +168,6 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     // MARK: public functions
     
-    func doG5Reset() {
-        G5ResetRequested = true
-    }
-    
     // MARK: CBCentralManager overriden functions
     
     override func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
@@ -245,6 +241,11 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         sendPairingRequest()
     }
     
+    /// to ask transmitter reset
+    func reset(requested:Bool) {
+        G5ResetRequested = requested
+    }
+
     // MARK: BluetoothTransmitterDelegate functions
     
     func centralManagerDidConnect(address:String?, name:String?) {
@@ -297,6 +298,10 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                 if (G5ResetRequested) {
                     // send ResetTxMessage
                     sendG5Reset()
+                    
+                    //reset G5ResetRequested to false
+                    G5ResetRequested = false
+                    
                 } else {
                     // send SensorTxMessage to transmitter
                     getSensorData()
@@ -518,8 +523,13 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     private func processResetRxMessage(value:Data) {
         if let resetRxMessage = ResetRxMessage(data: value) {
-            os_log("resetRxMessage status is %{public}d", log: log, type: .info, resetRxMessage.status)
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: SensorState.G5Reset, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
+            if resetRxMessage.status == 0 {
+                os_log("resetRxMessage status is 0, considering reset successful", log: log, type: .info)
+                cgmTransmitterDelegate?.reset(successful: true)
+            } else {
+                os_log("resetRxMessage status is %{public}d, considering reset failed", log: log, type: .info, resetRxMessage.status)
+                cgmTransmitterDelegate?.reset(successful: false)
+            }
         } else {
             os_log("resetRxMessage is nil", log: log, type: .error)
         }

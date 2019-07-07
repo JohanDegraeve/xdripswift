@@ -205,8 +205,12 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     /// to ask pairing - empty function because G4 doesn't need pairing
     ///
     /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
-    func initiatePairing() {
-    }
+    func initiatePairing() {}
+    
+    /// to ask transmitter reset - empty function because MiaoMiao doesn't support reset
+    ///
+    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
+    func reset(requested:Bool) {}
     
     // MARK: - helpers
     

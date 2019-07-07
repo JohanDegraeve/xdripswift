@@ -1,10 +1,12 @@
 import UIKit
 
 fileprivate enum Setting:Int, CaseIterable {
-    //transmittertype
+    /// transmittertype
     case transmitterType = 0
-    //transmitterid
+    /// transmitterid
     case transmitterId = 1
+    /// is transmitter reset required or not (only applicable to Dexcom G5 and later also G6)
+    case resetRequired = 2
 }
 
 /// conforms to SettingsViewModelProtocol for all transmitter settings in the first sections screen
@@ -62,6 +64,10 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
                     UserDefaults.standard.transmitterTypeAsString = data[index]
                 }
             }, cancelHandler: nil, didSelectRowHandler: nil)
+            
+        case .resetRequired:
+            return SettingsSelectedRowAction.callFunction(function: {UserDefaults.standard.transmitterResetRequired ? (UserDefaults.standard.transmitterResetRequired) = false : (UserDefaults.standard.transmitterResetRequired = true)})
+
         }
     }
     
@@ -71,8 +77,17 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
 
     func numberOfRows() -> Int {
         if let transmitterType = UserDefaults.standard.transmitterType {
-            // if transmitter doesn't need transmitterid (like MiaoMiao) then the settings row that asks for transmitterid doesn't need to be shown. That rows is the second row.
-            return transmitterType.needsTransmitterId() ? 2:1
+            // if transmitter doesn't need transmitterid (like MiaoMiao) then the settings row that asks for transmitterid doesn't need to be shown. That row is the second row - also reset transmitter not necessary in that case
+            // if ever there would be a transmitter that doesn't need a transmitter id but that supports reset transmitter, then some recoding will be necessary here
+            if transmitterType.needsTransmitterId()  {
+                if transmitterType.resetPossible() {
+                    return 3
+                } else {
+                    return 2
+                }
+            } else {
+                return 1
+            }
         } else {
             // transmitterType nil, means this is initial setup, no need to show transmitter id field
             return 1
@@ -83,25 +98,46 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 
         switch (setting) {
+            
         case .transmitterId:
             return Texts_SettingsView.labelTransmitterId
+            
         case .transmitterType:
             return Texts_SettingsView.labelTransmitterType
+            
+        case .resetRequired:
+            return Texts_SettingsView.labelResetTransmitter
+            
         }
     }
     
     func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
-        return UITableViewCell.AccessoryType.disclosureIndicator
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+        
+        switch setting {
+            
+        case .transmitterType:
+            return UITableViewCell.AccessoryType.disclosureIndicator
+        case .transmitterId:
+            return UITableViewCell.AccessoryType.disclosureIndicator
+        case .resetRequired:
+            return UITableViewCell.AccessoryType.none
+        }
+
     }
     
     func detailedText(index: Int) -> String? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch (setting) {
+            
         case .transmitterId:
             return UserDefaults.standard.transmitterId
         case .transmitterType:
             return UserDefaults.standard.transmitterType?.rawValue
+        case .resetRequired:
+            return UserDefaults.standard.transmitterResetRequired ? Texts_Common.yes:Texts_Common.no
+
         }
     }
     

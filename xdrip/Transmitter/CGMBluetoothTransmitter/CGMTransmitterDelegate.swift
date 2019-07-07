@@ -42,6 +42,9 @@ protocol CGMTransmitterDelegate:AnyObject {
     
     /// transmitter pairing failed
     func pairingFailed()
+    
+    /// transmitter reset result
+    func reset(successful: Bool)
 }
 
 

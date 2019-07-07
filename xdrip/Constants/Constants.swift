@@ -170,6 +170,11 @@ struct Constants {
             /// transmitter needs pairing
             static let transmitterNeedsPairing = "transmitterNeedsPairing"
         }
+
+        enum NotificationIdentifierForResetResult {
+            /// transmitter reset result
+            static let transmitterResetResult = "transmitterResetResult"
+        }
     }
     
     /// defines name of the Soundfile and name of the sound shown to the user with an extra function - both are defined in one case, seperated by a backslash - to be used for alerts - all these sounds will be shown

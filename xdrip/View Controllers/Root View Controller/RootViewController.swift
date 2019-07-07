@@ -141,6 +141,8 @@ final class RootViewController: UIViewController {
         // changing from follower to master or vice versa also requires transmitter setup
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new
             , context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterResetRequired.rawValue, options: .new
+            , context: nil)
 
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -228,6 +230,7 @@ final class RootViewController: UIViewController {
         // setup FollowManager
         guard let soundPlayer = soundPlayer else { fatalError("In setupApplicationData, this looks very in appropriate, shame")}
         
+        // setup nightscoutmanager
         nightScoutFollowManager = NightScoutFollowManager(coreDataManager: coreDataManager, nightScoutFollowerDelegate: self)
 
         // setup alertmanager
@@ -358,7 +361,6 @@ final class RootViewController: UIViewController {
 
     // MARK:- observe function
     
-    // when user changes transmitter type or transmitter id, then new transmitter needs to be setup. That's why observer for these settings is required
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
 
         if let keyPath = keyPath {
@@ -386,6 +388,12 @@ final class RootViewController: UIViewController {
                         initializeCGMTransmitter()
                     }
                    
+                case UserDefaults.Key.transmitterResetRequired :
+                    
+                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
+                        cgmTransmitter?.reset(requested: UserDefaults.standard.transmitterResetRequired)
+                    }
+                    
                 default:
                     break
                 }
@@ -583,6 +591,9 @@ final class RootViewController: UIViewController {
             }
             
         }
+        
+        //reset UserDefaults.standard.transmitterResetRequired to false, might have been set to true.
+        UserDefaults.standard.transmitterResetRequired = false
     }
 
     /// for debug purposes
@@ -621,7 +632,7 @@ final class RootViewController: UIViewController {
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
             if let error = error {
-                os_log("Unable to Add Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
+                os_log("Unable to Add Notification Request : %{public}@", log: self.log, type: .error, error.localizedDescription)
             }
         }
     }
@@ -950,6 +961,31 @@ final class RootViewController: UIViewController {
 /// conform to CGMTransmitterDelegate
 extension RootViewController:CGMTransmitterDelegate {
     
+    func reset(successful: Bool) {
+
+        // reset setting to false
+        UserDefaults.standard.transmitterResetRequired = false
+        
+        // Create Notification Content to give info about reset result of reset attempt
+        let notificationContent = UNMutableNotificationContent()
+        
+        // Configure NnotificationContent title
+        notificationContent.title = successful ? Texts_HomeView.info : Texts_Common.warning
+        
+        notificationContent.body = Texts_HomeView.transmitterResetResult + " : " + (successful ? Texts_HomeView.success : Texts_HomeView.failed)
+        
+        // Create Notification Request
+        let notificationRequest = UNNotificationRequest(identifier: Constants.Notifications.NotificationIdentifierForResetResult.transmitterResetResult, content: notificationContent, trigger: nil)
+        
+        // Add Request to User Notification Center
+        UNUserNotificationCenter.current().add(notificationRequest) { (error) in
+            if let error = error {
+                os_log("Unable add notification request : transmitter reset result, error:  %{public}@", log: self.log, type: .error, error.localizedDescription)
+            }
+        }
+        
+    }
+    
     func pairingFailed() {
         // this should be the consequence of the user not accepting the pairing request, there's no need to inform the user
         // invalidate transmitterPairingResponseTimer
@@ -1039,7 +1075,7 @@ extension RootViewController:CGMTransmitterDelegate {
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
             if let error = error {
-                os_log("Unable to transmitter needs pairing Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
+                os_log("Unable add notification request : transmitter needs pairing Notification Request, error :  %{public}@", log: self.log, type: .error, error.localizedDescription)
             }
         }
         
@@ -1158,6 +1194,10 @@ extension RootViewController:UNUserNotificationCenterDelegate {
             // call completionhandler to show the notification even though the app is in the foreground, without sound
             completionHandler([.alert])
             
+        } else if notification.request.identifier == Constants.Notifications.NotificationIdentifierForResetResult.transmitterResetResult {
+            
+            completionHandler([.alert])
+            
         } else if notification.request.identifier == Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             
             // so actually the app was in the foreground, at the  moment the Transmitter Class called the cgmTransmitterNeedsPairing function, there's no need to show the notification, we can immediately call back the cgmTransmitter initiatePairing function
@@ -1203,9 +1243,13 @@ extension RootViewController:UNUserNotificationCenterDelegate {
         } else if response.notification.request.identifier == Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             
             // nothing required, the pairing function will be called as it's been added to ApplicationManager in function cgmTransmitterNeedsPairing
+
+        } else if response.notification.request.identifier == Constants.Notifications.NotificationIdentifierForResetResult.transmitterResetResult {
+            
+            // nothing required
             
         } else {
-            
+
             // it's not an initial calibration request notification that the user clicked, by calling alertManager?.userNotificationCenter, we check if it was an alert notification that was clicked and if yes pickerViewData will have the list of alert snooze values
             if let pickerViewData = alertManager?.userNotificationCenter(center, didReceive: response) {
                 

@@ -29,7 +29,6 @@ enum SensorState {
     case shutdown
     case failure
     case unknown
-    case G5Reset//TODO: should be done better, probably define other state enum for dexcom
     
     init(){
         self = .unknown

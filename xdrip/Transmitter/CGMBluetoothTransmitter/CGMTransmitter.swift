@@ -1,7 +1,7 @@
 import Foundation
 import CoreBluetooth
 
-/// defines functions that every transmitter should implement, mainly used by rootviewcontroller to get transmitter address, name, deterine status etc.
+/// defines functions that every cgm transmitter should conform to, mainly used by rootviewcontroller to get transmitter address, name, deterine status etc.
 ///
 /// Most of the functions are already defined by BlueToothTransmitter.swift - so most of these functions don't need re-implementation in CGMTransmitter classes that conform to this protocol.
 ///
@@ -26,6 +26,13 @@ protocol CGMTransmitter {
     ///
     /// for transmitter types that don't need pairing, or that don't need pairing initiated by user/view controller, this will be an empty function. Only G5 (and in future maybe G6) will use it. The others can define an empty body
     func initiatePairing()
+    
+    /// to reset the transmitter
+    /// - parameters:
+    ///     - requested : if true then transmitter must be reset
+    /// for transmitter types that don't support resetting, this will be an empty function. Only G5 (and in future maybe G6) will use it. The others can define an empty body
+    func reset(requested:Bool)
+    
 }
 
 /// cgm transmitter types
@@ -40,6 +47,9 @@ enum CGMTransmitterType:String, CaseIterable {
     /// GNSentry
     case GNSentry = "GNSentry"
     
+    /// does the transmitter need a transmitter id ?
+    ///
+    /// can be used in UI stuff, if reset not possible then there's no need to show that option in the settings UI
     func needsTransmitterId() -> Bool {
         switch self {
         case .dexcomG4:
@@ -69,7 +79,7 @@ enum CGMTransmitterType:String, CaseIterable {
         }
     }
     
-    /// returns nil if idtovalidate has expected length and type of characters etc.
+    /// returns nil if id to validate has expected length and type of characters etc.
     func validateTransimtterId(idtovalidate:String) -> String? {
         switch self {
         case .dexcomG5:
@@ -144,6 +154,23 @@ enum CGMTransmitterType:String, CaseIterable {
         case .GNSentry:
             // TODO:- check if GNSentry is indeed percentage
             return ""
+        }
+    }
+    
+    /// can a transmitter be reset ? For example Dexcom G5 (and G6) can be reset
+    ///
+    /// can be used in UI stuff, if reset not possible then there's no need to show that option in the settings UI
+    func resetPossible() -> Bool {
+        switch self {
+            
+        case .dexcomG4:
+            return false
+        case .dexcomG5:
+            return true
+        case .miaomiao:
+            return false
+        case .GNSentry:
+            return false
         }
     }
 }

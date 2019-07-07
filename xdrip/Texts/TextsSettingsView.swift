@@ -58,6 +58,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_givetransmitterid", tableName: filename, bundle: Bundle.main, value: "Enter Transmitter Id", comment: "transmitter settings, pop up that asks user to inter transmitter id")
     }()
     
+    static let labelResetTransmitter:String = {
+        return NSLocalizedString("settingsviews_resettransmitter", tableName: filename, bundle: Bundle.main, value: "Reset Transmitter", comment: "transmitter settings, to explain that settings is about resetting the transmitter")
+    }()
+    
     // MARK: - Section Alerts
     
     static let sectionTitleAlerting: String = {

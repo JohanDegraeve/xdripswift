@@ -81,4 +81,11 @@ class Texts_Common {
         return NSLocalizedString("add", tableName: filename, bundle: Bundle.main, value: "Add", comment: "literally add")
     }()
     
+    static let yes = {
+        return NSLocalizedString("yes", tableName: filename, bundle: Bundle.main, value: "yes", comment: "literally yes, without capital")
+    }()
+    
+    static let no = {
+        return NSLocalizedString("no", tableName: filename, bundle: Bundle.main, value: "no", comment: "literally no, without capital")
+    }()
 }
