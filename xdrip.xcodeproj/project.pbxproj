@@ -86,6 +86,7 @@
 		F897AB39220775B100CDDD10 /* BatteryStatusTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB38220775B100CDDD10 /* BatteryStatusTxMessage.swift */; };
 		F897AB3B2208DCE100CDDD10 /* TransmitterBatteryInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB3A2208DCE100CDDD10 /* TransmitterBatteryInfo.swift */; };
 		F897AB3D220A243300CDDD10 /* ResetMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AB3C220A243300CDDD10 /* ResetMessage.swift */; };
+		F8A54AAB22D3D4BF00934E7A /* CGMG6Transmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AAA22D3D4BF00934E7A /* CGMG6Transmitter.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
 		F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* RootViewController.swift */; };
 		F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426321ADEBD60078C348 /* Main.storyboard */; };
@@ -251,6 +252,7 @@
 		F897AB38220775B100CDDD10 /* BatteryStatusTxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryStatusTxMessage.swift; sourceTree = "<group>"; };
 		F897AB3A2208DCE100CDDD10 /* TransmitterBatteryInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmitterBatteryInfo.swift; sourceTree = "<group>"; };
 		F897AB3C220A243300CDDD10 /* ResetMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetMessage.swift; sourceTree = "<group>"; };
+		F8A54AAA22D3D4BF00934E7A /* CGMG6Transmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG6Transmitter.swift; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F8AC425F21ADEBD60078C348 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
@@ -522,12 +524,13 @@
 		F8025E5521F3418400ECF0C0 /* CGMBluetoothTransmitter */ = {
 			isa = PBXGroup;
 			children = (
-				F8025C0621D8DCE700ECF0C0 /* MiaoMiao */,
-				F88F269A223C21110090A9A6 /* GNSEntry */,
-				F8025C0E21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift */,
 				F8025E5621F4A60900ECF0C0 /* CGMTransmitter.swift */,
+				F8025C0E21D95EC200ECF0C0 /* CGMTransmitterDelegate.swift */,
 				F85DC2FE21D3E83100B9F74A /* G4 */,
 				F897AAFC2202575600CDDD10 /* G5 */,
+				F8A54AA922D3D4AB00934E7A /* G6 */,
+				F88F269A223C21110090A9A6 /* GNSEntry */,
+				F8025C0621D8DCE700ECF0C0 /* MiaoMiao */,
 				F8025C1D21DBCF4A00ECF0C0 /* RawGlucoseData.swift */,
 				F897AB3A2208DCE100CDDD10 /* TransmitterBatteryInfo.swift */,
 			);
@@ -771,6 +774,14 @@
 				F897AB2B22074E8000CDDD10 /* xdrip-Bridging-Header.h */,
 			);
 			path = G5Messages;
+			sourceTree = "<group>";
+		};
+		F8A54AA922D3D4AB00934E7A /* G6 */ = {
+			isa = PBXGroup;
+			children = (
+				F8A54AAA22D3D4BF00934E7A /* CGMG6Transmitter.swift */,
+			);
+			path = G6;
 			sourceTree = "<group>";
 		};
 		F8AC425121ADEBD60078C348 = {
@@ -1228,6 +1239,7 @@
 				F897AB312207716E00CDDD10 /* FirmwareVersionTxMessage.swift in Sources */,
 				F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */,
 				F821CF6F229FC280005C1E43 /* Endpoint+NightScout.swift in Sources */,
+				F8A54AAB22D3D4BF00934E7A /* CGMG6Transmitter.swift in Sources */,
 				F8025C0821D8DD1F00ECF0C0 /* CGMMiaoMiaoTransmitter.swift in Sources */,
 				F821CF5D229BF43A005C1E43 /* NSDateFormatter.swift in Sources */,
 				F8025E4C21E6618200ECF0C0 /* Log.swift in Sources */,

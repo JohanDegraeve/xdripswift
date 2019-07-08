@@ -6,6 +6,9 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     // MARK: - properties
     
+    /// scaling factor, for DexcomG5 this will be 1, for DexcomG6 it will be 34
+    var scalingFactor = 1.0
+    
     // MARK: UUID's
     
     // advertisement
@@ -419,8 +422,6 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                                 } else {
                                     os_log("    writeControlCharacteristic is nil, can not send TransmitterVersionTxMessage", log: log, type: .error)
                                 }
-                                //TODO: strictly speaking a disconnect should be done after having written the data
-                                
                             }
                             
                             //if reset was done recently, less than 5 minutes ago, then ignore the reading
@@ -434,7 +435,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                                     os_log("    last reading was less than 1 minute ago, ignoring", log: log, type: .info)
                                 } else {
                                     timeStampOfLastG5Reading = Date()
-                                    let glucoseData = RawGlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: sensorDataRxMessage.unfiltered, glucoseLevelFiltered: sensorDataRxMessage.filtered)
+                                    let glucoseData = RawGlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: sensorDataRxMessage.unfiltered * scalingFactor, glucoseLevelFiltered: sensorDataRxMessage.filtered * scalingFactor)
                                     var glucoseDataArray = [glucoseData]
                                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
                                 }

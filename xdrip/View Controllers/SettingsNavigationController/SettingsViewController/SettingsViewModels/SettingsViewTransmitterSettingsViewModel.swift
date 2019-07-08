@@ -147,7 +147,7 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
     
     /// sets UserDefaults.standard.transmitterId with valud of id
     ///
-    /// if transmitterType is G5 (or maybe later G6), then sets UserDefaults.standard.dexcomShareSerialNumber = UserDefaults.standard.transmitterId - otherwise dexcomShareSerialNumber is not changed
+    /// if transmitterType is G5 or G6, then sets UserDefaults.standard.dexcomShareSerialNumber = UserDefaults.standard.transmitterId - otherwise dexcomShareSerialNumber is not changed
     ///
     /// - parameters:
     ///     - id : new value for transmitterId and possibly also dexcomShareSerialNumber. If length is 0, then transmitterId gets value nil (and possibly also dexcomShareSerialNumber)
@@ -166,7 +166,8 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
                 
             case .dexcomG4, .miaomiao, .GNSentry:
                 break
-            case .dexcomG5:
+                
+            case .dexcomG5, .dexcomG6:
                 UserDefaults.standard.dexcomShareSerialNumber = UserDefaults.standard.transmitterId
                 
             }

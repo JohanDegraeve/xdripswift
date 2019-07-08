@@ -257,12 +257,9 @@ final class RootViewController: UIViewController {
 
         if activeSensor == nil {
             if let transmitterType = UserDefaults.standard.transmitterType {
-                switch transmitterType {
-                    
-                case .dexcomG4, .dexcomG5:
-                   break // sensor start needs to be initiated by user
+                
+                if !transmitterType.canDetectNewSensor() {
 
-                case .miaomiao, .GNSentry:
                     if let sensorTimeInMinutes = sensorTimeInMinutes {
                         activeSensor = Sensor(startDate: Date(timeInterval: -Double(sensorTimeInMinutes * 60), since: Date()),nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                         if let activeSensor = activeSensor {
@@ -271,6 +268,7 @@ final class RootViewController: UIViewController {
                             os_log("creation active sensor failed", log: self.log, type: .info)
                         }
                     }
+
                 }
                 
                 // save the newly created Sensor permenantly in coredata
@@ -581,6 +579,12 @@ final class RootViewController: UIViewController {
                     cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self)
                 }
                 
+            case .dexcomG6:
+                if let currentTransmitterId = UserDefaults.standard.transmitterId {
+                    calibrator = DexcomCalibrator()
+                    cgmTransmitter = CGMG6Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self)
+                }
+                
             case .miaomiao:
                 cgmTransmitter = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
                 calibrator = Libre1Calibrator()
@@ -588,6 +592,7 @@ final class RootViewController: UIViewController {
             case .GNSentry:
                 cgmTransmitter = CGMGNSEntryTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
                 calibrator = Libre1Calibrator()
+                
             }
             
         }

@@ -40,10 +40,16 @@ enum CGMTransmitterType:String, CaseIterable {
     
     /// dexcom G4 using xdrip, xbridge, ...
     case dexcomG4 = "Dexcom G4"
+    
     /// dexcom G5
     case dexcomG5 = "Dexcom G5"
+    
+    /// dexcom G6
+    case dexcomG6 = "Dexcom G6"
+    
     /// miaomiao
     case miaomiao = "MiaoMiao"
+    
     /// GNSentry
     case GNSentry = "GNSentry"
     
@@ -52,14 +58,19 @@ enum CGMTransmitterType:String, CaseIterable {
     /// can be used in UI stuff, if reset not possible then there's no need to show that option in the settings UI
     func needsTransmitterId() -> Bool {
         switch self {
+            
         case .dexcomG4:
             return true
-        case .dexcomG5:
+            
+        case .dexcomG5, .dexcomG6:
             return true
+            
         case .miaomiao:
             return false
+            
         case .GNSentry:
             return false
+            
         }
     }
     
@@ -67,22 +78,29 @@ enum CGMTransmitterType:String, CaseIterable {
     ///
     /// example MiaoMiao can detect new sensor, implementation should return true, Dexcom transmitter's can't
     func canDetectNewSensor() -> Bool {
+        
         switch self {
+            
         case .dexcomG4:
             return false
-        case .dexcomG5:
+            
+        case .dexcomG5, .dexcomG6:
             return false
+            
         case .miaomiao:
             return true
+            
         case .GNSentry:
             return false
+            
         }
     }
     
     /// returns nil if id to validate has expected length and type of characters etc.
     func validateTransimtterId(idtovalidate:String) -> String? {
         switch self {
-        case .dexcomG5:
+            
+        case .dexcomG5, .dexcomG6:
             //verify allowed chars
             let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
             if !idtovalidate.validate(withRegex: regex) {
@@ -92,6 +110,7 @@ enum CGMTransmitterType:String, CaseIterable {
                 return Texts_ErrorMessages.TransmitterIDShouldHaveLength6
             }
             return nil
+            
         case .dexcomG4:
             //verify allowed chars
             let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
@@ -102,8 +121,10 @@ enum CGMTransmitterType:String, CaseIterable {
                 return Texts_ErrorMessages.TransmitterIDShouldHaveLength5
             }
             return nil
+            
         case .miaomiao, .GNSentry:
             return nil
+            
         }
     }
     
@@ -113,12 +134,16 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .dexcomG4:
             return Constants.DefaultAlertLevels.defaultBatteryAlertLevelDexcomG4
-        case .dexcomG5:
+            
+        case .dexcomG5, .dexcomG6:
             return Constants.DefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
+            
         case .miaomiao:
             return Constants.DefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
+            
         case .GNSentry:
             return Constants.DefaultAlertLevels.defaultBatteryAlertLevelGNSEntry
+            
         }
     }
     
@@ -130,12 +155,16 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .dexcomG4:
             return false
-        case .dexcomG5:
+            
+        case .dexcomG5, .dexcomG6:
             return true
+            
         case .miaomiao:
             return false
+            
         case .GNSentry:
             return false
+            
         }
     }
     
@@ -147,13 +176,16 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .dexcomG4:
             return ""
-        case .dexcomG5:
+            
+        case .dexcomG5, .dexcomG6:
             return "voltA"
+            
         case .miaomiao:
             return "%"
+            
         case .GNSentry:
-            // TODO:- check if GNSentry is indeed percentage
             return ""
+            
         }
     }
     
@@ -165,12 +197,16 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .dexcomG4:
             return false
-        case .dexcomG5:
+            
+        case .dexcomG5, .dexcomG6:
             return true
+            
         case .miaomiao:
             return false
+            
         case .GNSentry:
             return false
+            
         }
     }
 }

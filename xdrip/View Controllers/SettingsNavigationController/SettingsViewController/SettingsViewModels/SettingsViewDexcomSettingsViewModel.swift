@@ -30,7 +30,8 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
                     
                 case .dexcomG4, .miaomiao, .GNSentry:
                     return true
-                case .dexcomG5:
+                    
+                case .dexcomG5, .dexcomG6:
                     return false
                 }
             } else {
