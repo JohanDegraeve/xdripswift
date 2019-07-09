@@ -4,7 +4,7 @@ If you want to participate to the testing, send an email to xdrip@proximus.be
 
 Current Status
 - Supported transmitters :
-    - G5 
+    - G5 and G6
     - MiaoMiao
     - G4 with xBridge
 - Alerting
