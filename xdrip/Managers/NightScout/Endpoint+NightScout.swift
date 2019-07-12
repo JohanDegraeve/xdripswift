@@ -24,7 +24,7 @@ extension Endpoint {
             path: "/api/v1/entries/sgv.json",
             queryItems: [
                 URLQueryItem(name: "count", value: count.description),
-                URLQueryItem(name: "find[dateString][$gte]", value: TimeFormat.timestampNightScoutFormatFromDate(timeStamp))
+                URLQueryItem(name: "find[dateString][$gte]", value: timeStamp.toNightScoutFormat())
             ]
         )
     }

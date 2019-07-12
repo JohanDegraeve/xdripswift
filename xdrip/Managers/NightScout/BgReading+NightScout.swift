@@ -9,14 +9,14 @@ extension BgReading {
             "_id": id,
             "device": deviceName ?? "",
             "date": timeStamp.toMillisecondsAsInt64(),
-            "dateString": TimeFormat.timestampNightScoutFormatFromDate(timeStamp),
+            "dateString": timeStamp.toNightScoutFormat(),
             "type": "sgv",
             "sgv": Int(calculatedValue.roundToDecimal(0)),
             "direction": slopeName,
             "filtered": round(ageAdjustedFiltered() * 1000),
             "unfiltered": round(ageAdjustedRawValue * 1000),
             "noise": 1,
-            "sysTime": TimeFormat.timestampNightScoutFormatFromDate(timeStamp)
+            "sysTime": timeStamp.toNightScoutFormat()
         ]
         
     }

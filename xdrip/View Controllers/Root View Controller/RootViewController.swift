@@ -248,7 +248,7 @@ final class RootViewController: UIViewController {
         })
     }
     
-    private func processNewCGMInfo(glucoseData: inout [RawGlucoseData], sensorState: SensorState?, firmware: String?, hardware: String?, transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
+    private func processNewCGMInfo(glucoseData: inout [RawGlucoseData], sensorState: LibreSensorState?, firmware: String?, hardware: String?, transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
         
         // check that calibrations and coredata manager is not nil
         guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager else {
@@ -1149,7 +1149,7 @@ extension RootViewController:CGMTransmitterDelegate {
     
     /// - parameters:
     ///     - readings: first entry is the most recent
-    func cgmTransmitterInfoReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: SensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?, serialNumber: String?, bootloader: String?) {
+    func cgmTransmitterInfoReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: LibreSensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?, serialNumber: String?, bootloader: String?) {
         
         os_log("sensorstate %{public}@", log: log, type: .debug, sensorState?.description ?? "no sensor state found")
         os_log("firmware %{public}@", log: log, type: .debug, firmware ?? "no firmware version found")
@@ -1272,7 +1272,7 @@ extension RootViewController:UNUserNotificationCenterDelegate {
 
 extension RootViewController:NightScoutFollowerDelegate {
     
-    func nightScoutFollowerInfoReceived(followGlucoseDataArray: inout [FollowGlucoseData]) {
+    func nightScoutFollowerInfoReceived(followGlucoseDataArray: inout [NightScoutBgReading]) {
         
         if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor, let nightScoutFollowManager = nightScoutFollowManager {
         

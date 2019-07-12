@@ -1,8 +1,8 @@
 import Foundation
 
 /// structure for bg reading data downloaded from NightScout
-struct FollowGlucoseData {
-    //TODO: move this class to other location ?
+struct NightScoutBgReading {
+    
     var timeStamp:Date
     var unfiltered:Double
     var filtered:Double
@@ -19,6 +19,7 @@ struct FollowGlucoseData {
     
     /// creates an instance with parameter a json array as received from NightScout
     init?(json:[String:Any]) {
+        
         guard let sgv = json["sgv"] as? Double, let date = json["date"] as? Double, let filtered = json["filtered"] as? Double, let unfiltered = json["unfiltered"] as? Double else {return nil}
         
         self.unfiltered = unfiltered

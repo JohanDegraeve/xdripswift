@@ -90,7 +90,7 @@ class NightScoutFollowManager:NSObject {
     ///     - followGlucoseData : glucose data from which new BgReading needs to be created
     /// - returns:
     ///     - BgReading : the new reading, not saved in the coredata
-    public func createBgReading(followGlucoseData:FollowGlucoseData) -> BgReading {
+    public func createBgReading(followGlucoseData:NightScoutBgReading) -> BgReading {
         // for dev : creation of BgReading is done in seperate static function. This allows to do the BgReading creation in other place, as is done also for readings received from a transmitter.
         
         // create new bgReading
@@ -167,7 +167,7 @@ class NightScoutFollowManager:NSObject {
             let downloadTask = sharedSession.dataTask(with: url, completionHandler: { data, response, error in
                 
                 // get array of FollowGlucoseData from json
-                var followGlucoseDataArray = [FollowGlucoseData]()
+                var followGlucoseDataArray = [NightScoutBgReading]()
                 self.processDownloadResponse(data: data, urlResponse: response, error: error, followGlucoseDataArray: &followGlucoseDataArray)
                 
                 os_log("    finished download", log: self.log, type: .info)
@@ -195,7 +195,7 @@ class NightScoutFollowManager:NSObject {
     /// wel schedule new download with timer, when timer expires download() will be called
     /// - parameters:
     ///     - followGlucoseDataArray : array of FollowGlucoseData, first element is the youngest, can be empty. This is the data downloaded during previous download. This parameter is just there to get the timestamp of the latest reading, in order to calculate the next download time
-    private func scheduleNewDownload(followGlucoseDataArray:inout [FollowGlucoseData]) {
+    private func scheduleNewDownload(followGlucoseDataArray:inout [NightScoutBgReading]) {
         
         os_log("in scheduleNewDownload", log: self.log, type: .info)
         
@@ -228,7 +228,7 @@ class NightScoutFollowManager:NSObject {
     ///     - error : error as result from dataTask
     ///     - followGlucoseData : array input by caller, result will be in that array. Can be empty array. Array must be initialized to empty array by caller
     /// - returns: FollowGlucoseData , possibly empty - first entry is the youngest
-    private func processDownloadResponse(data:Data?, urlResponse:URLResponse?, error:Error?, followGlucoseDataArray:inout [FollowGlucoseData] ) {
+    private func processDownloadResponse(data:Data?, urlResponse:URLResponse?, error:Error?, followGlucoseDataArray:inout [NightScoutBgReading] ) {
         
         // log info
         os_log("in processDownloadResponse", log: self.log, type: .info)
@@ -261,7 +261,7 @@ class NightScoutFollowManager:NSObject {
                             for entry in array {
 
                                 if let entry = entry as? [String:Any] {
-                                    if let followGlucoseData = FollowGlucoseData(json: entry) {
+                                    if let followGlucoseData = NightScoutBgReading(json: entry) {
                                         
                                         // insert entry chronologically sorted, first is the youngest
                                         if followGlucoseDataArray.count == 0 {

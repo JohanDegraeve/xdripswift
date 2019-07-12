@@ -239,7 +239,7 @@ extension UserDefaults {
     
     // MARK: Nightscout Share Settings
     
-    /// nightscout enabled ? this impats follower mode (download) and master mode (upload)
+    /// nightscout enabled ? this impacts follower mode (download) and master mode (upload)
     @objc dynamic var nightScoutEnabled: Bool {
         get {
             return bool(forKey: Key.nightScoutEnabled.rawValue)

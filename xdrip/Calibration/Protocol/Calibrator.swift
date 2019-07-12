@@ -187,7 +187,7 @@ extension Calibrator {
     ///     - calibrations: latest calibrations, timestamp large to small (ie young to old). There should be minimum 2 calibrations, if less then the function will not do anything.
     ///     - overwriteCalculatedValue: if true, then if calculatedValue of readingsToBeAdjusted will be overriden, if false, then only readingsToBeAdjusted with calculatedValue = 0.0 will be overwritten
     private func adjustRecentBgReadings(readingsToBeAdjusted:inout Array<BgReading>, calibrations:inout Array<Calibration>, overwriteCalculatedValue:Bool) {
-        //TODO: shouldn't this also add calibrations to those readings who don't have one yet ?
+        
         guard calibrations.count > 0 else {
            return
         }
@@ -232,9 +232,10 @@ extension Calibrator {
     ///     - firstCalibration : result of call to Calibrations.firstCalibrationForActiveSensor
     ///     - lastCalibration : result of call to Calibrations.lastCalibrationForActiveSensor
     private func rawValueOverride(for calibration:inout Calibration, rawValue:Double, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration, lastCalibration:Calibration) {
-        //TODO: - implement value override, there's no update of bgreading here ?, needs to be puublic ?
+        
         calibration.estimateRawAtTimeOfCalibration = rawValue
         calculateWLS(for: calibration, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibration, lastCalibration: lastCalibration)
+        
     }
     
     /// from xdripplus

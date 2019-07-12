@@ -76,6 +76,12 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
     }
 
     func numberOfRows() -> Int {
+        
+        if !UserDefaults.standard.isMaster {
+            // follower mode, no need to show all settings
+            return 1
+        }
+        
         if let transmitterType = UserDefaults.standard.transmitterType {
             // if transmitter doesn't need transmitterid (like MiaoMiao) then the settings row that asks for transmitterid doesn't need to be shown. That row is the second row - also reset transmitter not necessary in that case
             // if ever there would be a transmitter that doesn't need a transmitter id but that supports reset transmitter, then some recoding will be necessary here

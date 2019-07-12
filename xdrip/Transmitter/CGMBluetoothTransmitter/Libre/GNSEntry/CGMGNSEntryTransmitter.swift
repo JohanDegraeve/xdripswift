@@ -200,7 +200,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                     var timeStampLastAddedGlucoseDataInMinutes:Double = currentTimeInMinutes + 5.0
                     
                     // read sensor status
-                    let sensorStatus = SensorState(stateByte: UInt8(getIntAtPosition(numberOfBytes: 1, position: 5, data: &valueDecoded)))
+                    let sensorStatus = LibreSensorState(stateByte: UInt8(getIntAtPosition(numberOfBytes: 1, position: 5, data: &valueDecoded)))
                     
                     // initialize empty array of bgreadings
                     var readings:Array<RawGlucoseData> = []

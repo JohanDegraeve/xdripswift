@@ -29,10 +29,6 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
         }
     }
     
-    func getUIViewController(index: Int) -> UIViewController? {
-        return nil
-    }
-    
     func sectionTitle() -> String? {
         return Texts_SettingsView.sectionTitleAlerting
     }

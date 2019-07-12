@@ -36,4 +36,11 @@ extension Date {
         let timeInterval = TimeInterval(-(hour * 3600 + minute * 60 + seconds))
         return Date(timeIntervalSinceNow: timeInterval)
     }
+    
+    /// defines method to format date to "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+    func toNightScoutFormat() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        return formatter.string(from: self)
+    }
 }

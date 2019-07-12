@@ -3,8 +3,7 @@ import CoreBluetooth
 
 /// to be implemented for anyone who needs to receive information from a specific type of cgm transmitter
 protocol CGMTransmitterDelegate:AnyObject {
-    //TODO: is this the right approach ? see https://www.bobthedeveloper.io/blog/the-delegate-and-callbacks-in-ios and https://itnext.io/delegates-vs-closure-callbacks-f36f9029217d
-    
+     
     /// transmitter reaches final connection status
     ///
     /// needs to be called by deriving specific transmitter class, example in CGMG4xDripTransmitter, the function is called only when subscription to read characteristic has succeeded, whereas for other like MiaoMiao, the function is called as soon as real connection is made
@@ -32,7 +31,7 @@ protocol CGMTransmitterDelegate:AnyObject {
     ///     - hardware : only if transmitter can give that info, eg G5, otherwise nil
     ///     - serialNumber : only if transmitter can give that info, eg G5, otherwise nil
     ///     - bootloader : for the moment only used by GNSentry, otherwise nil
-    func cgmTransmitterInfoReceived(glucoseData:inout [RawGlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorState:SensorState?, sensorTimeInMinutes:Int?, firmware:String?, hardware:String?, serialNumber:String?, bootloader:String?)
+    func cgmTransmitterInfoReceived(glucoseData:inout [RawGlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorState:LibreSensorState?, sensorTimeInMinutes:Int?, firmware:String?, hardware:String?, serialNumber:String?, bootloader:String?)
     
     /// transmitter needs bluetooth pairing
     func cgmTransmitterNeedsPairing()

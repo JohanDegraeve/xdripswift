@@ -6,6 +6,7 @@ import UIKit
 ///
 /// in case isEnabled returns false, then the didSelectRow action will never be applied
 protocol SettingsViewModelProtocol {
+    
     /// what title should be shown in a section
     /// - returns:
     /// the section title, optional, for section

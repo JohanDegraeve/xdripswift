@@ -7,6 +7,7 @@ import UIKit
 /// - askText : text input is needed, eg to ask transmitter id
 /// - callFunction : call a specific function (a closure in other words)
 /// - selectFromList : select a value from a list, eg transmitter type
+/// - performSegue : to go to another viewcontroller
 ///
 /// the goal is to move away the presentation from the model, meaning the model defines what needs to be displayed and requested, but it's the viewcontroller that will decide how to request and display.
 ///
@@ -26,7 +27,6 @@ enum SettingsSelectedRowAction {
     /// - cancelTitle: text in the button that allows the user to cancel the input (Example 'Cancel'), if nil then default value "Cancel" will be used
     /// - actionHandler: code to execute when user confirms input, with text that was entered by user, text is not optional here
     /// - cancelHandler: code to execute when user cancels input
-    /// TODO: is it ok to define title, message optional ?
     case askText (title:String?, message:String?, keyboardType:UIKeyboardType?, text:String?, placeHolder:String?, actionTitle:String?, cancelTitle:String?, actionHandler: ((_ text: String) -> Void), cancelHandler: (() -> Void)?)
     
     /// when clicked, the function parameter needs to be called
@@ -43,11 +43,10 @@ enum SettingsSelectedRowAction {
     /// - actionHandler: code to execute when user confirms input, with index of item that was selected by user, 0 = first element
     /// - cancelHandler: code to execute when user cancels input
     /// - didSelectRowHandler: code to execute when user selects an item before clicking ok or cancel, can be useful eg to play a selected sound so that user hears how it sounds
-    /// TODO: is it ok to define title, message optional ?
     case selectFromList (title:String?, data:[String], selectedRow:Int?, actionTitle:String?, cancelTitle:String?, actionHandler: ((_ index: Int) -> Void), cancelHandler: (() -> Void)?, didSelectRowHandler: ((_ index: Int) -> Void)?)
     
-    /// performSegue with specified identifier to be done
-    
+    /// performSegue to be done with specified identifier
+    ///
     /// (it's not the right place to define this, not a clear split view/model)
     case performSegue(withIdentifier: String)
     

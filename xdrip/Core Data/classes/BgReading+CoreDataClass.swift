@@ -159,7 +159,6 @@ public class BgReading: NSManagedObject {
     
     /// creates string with difference from previous reading and also unit
     func unitizedDeltaString(previousBgReading:BgReading?, showUnit:Bool, highGranularity:Bool, mgdl:Bool) -> String {
-        // TODO: add unit as parameter in stead of fetching it from userdefalts ?
         
         guard let previousBgReading = previousBgReading else {
             return "???"
@@ -181,7 +180,7 @@ public class BgReading: NSManagedObject {
         var deltaSign:String = ""
         if (value > 0) { deltaSign = "+"; }
         
-        if (UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+        if (mgdl) {
             return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mgdl):"");
         } else {
             return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mmol):"");

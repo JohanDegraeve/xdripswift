@@ -9,17 +9,25 @@ import CoreBluetooth
 protocol CGMTransmitter {
     
     /// get device address, cgmtransmitters should also derive from BlueToothTransmitter, hence no need to implement this function
+    ///
+    /// this function is implemented in class BluetoothTransmitter.swift, it's not necessary for transmitter types to implement this function (as new transmitterType class conform to protocol CGMTransmitter but also extend the BluetoothTransmitter class
     func address() -> String?
     
     /// get device name, cgmtransmitters should also derive from BlueToothTransmitter, hence no need to implement this function
+    ///
+    /// this function is implemented in class BluetoothTransmitter.swift, it's not necessary for transmitter types to implement this function (as new transmitterType class conform to protocol CGMTransmitter but also extend the BluetoothTransmitter class
     func name() -> String?
     
     /// start scanning, cgmtransmitters should also derive from BlueToothTransmitter, hence no need to implement this function
     /// - returns:
     ///     the scanning result
+    ///
+    /// this function is implemented in class BluetoothTransmitter.swift, it's not necessary for transmitter types to implement this function (as new transmitterType class conform to protocol CGMTransmitter but also extend the BluetoothTransmitter class
     func startScanning() -> BluetoothTransmitter.startScanningResult
     
     /// get connection status, nil if peripheral not yet known, ie never connected or discovered the transmitter
+    ///
+    /// this function is implemented in class BluetoothTransmitter.swift, it's not necessary for transmitter types to implement this function (as new transmitterType class conform to protocol CGMTransmitter but also extend the BluetoothTransmitter class
     func getConnectionStatus() -> CBPeripheralState?
     
     /// to ask transmitter that it initiates pairing
