@@ -69,9 +69,6 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     /// for OS_log
     private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCGMGNSEntry)
     
-    /// actual device address
-    private var actualDeviceAddress:String?
-    
     /// used in parsing packet
     private var timeStampLastBgReadingInMinutes:Double
     
@@ -101,7 +98,6 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "GNSentry")
         if let address = address {
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address)
-            actualDeviceAddress = address
         }
         
         //initialize timeStampLastBgReading
