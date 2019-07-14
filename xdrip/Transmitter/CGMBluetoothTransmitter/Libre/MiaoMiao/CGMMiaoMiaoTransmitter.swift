@@ -96,17 +96,14 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     }
     
     func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
-        if characteristic.isNotifying {
+        if error == nil && characteristic.isNotifying {
             _ = sendStartReadingCommmand()
         }
     }
     
     func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
-        //os_log("in peripheral didUpdateValueFor", log: log, type: .debug)
+        
         if let value = characteristic.value {
-            //only for logging
-            //let data = value.hexEncodedString()
-            //os_log("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .debug, data)
             
             //check if buffer needs to be reset
             if (Date() > startDate.addingTimeInterval(CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds - 1)) {

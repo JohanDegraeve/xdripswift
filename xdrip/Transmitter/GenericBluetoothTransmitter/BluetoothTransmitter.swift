@@ -429,10 +429,12 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         timeStampLastStatusUpdate = Date()
         
         if let error = error {
-            os_log("didUpdateNotificationStateFor characteristic %{public}@, characteristic description %{public}@, error =  %{public}@, no further processing", log: log, type: .error, String(describing: characteristic.uuid), String(characteristic.debugDescription), error.localizedDescription)
-        } else {
-            bluetoothTransmitterDelegate?.peripheralDidUpdateNotificationStateFor(characteristic: characteristic, error: error)
+            os_log("didUpdateNotificationStateFor characteristic %{public}@, characteristic description %{public}@, error =  %{public}@", log: log, type: .error, String(describing: characteristic.uuid), String(characteristic.debugDescription), error.localizedDescription)
         }
+        
+        // call delegate
+        bluetoothTransmitterDelegate?.peripheralDidUpdateNotificationStateFor(characteristic: characteristic, error: error)
+        
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
