@@ -170,11 +170,11 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
             
             switch transmitterType {
                 
-            case .dexcomG4, .miaomiao, .GNSentry:
-                break
-                
             case .dexcomG5, .dexcomG6:
                 UserDefaults.standard.dexcomShareSerialNumber = UserDefaults.standard.transmitterId
+
+            default:
+                break
                 
             }
         }

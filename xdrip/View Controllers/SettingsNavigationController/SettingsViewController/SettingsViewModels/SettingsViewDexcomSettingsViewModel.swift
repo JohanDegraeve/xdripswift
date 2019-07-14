@@ -28,7 +28,7 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
             if let transmitterType = UserDefaults.standard.transmitterType  {
                 switch transmitterType {
                     
-                case .dexcomG4, .miaomiao, .GNSentry:
+                case .dexcomG4, .miaomiao, .GNSentry, .Blucon:
                     return true
                     
                 case .dexcomG5, .dexcomG6:

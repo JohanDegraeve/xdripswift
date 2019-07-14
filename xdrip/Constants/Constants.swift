@@ -39,6 +39,7 @@ struct Constants {
         static let defaultBatteryAlertLevelDexcomG4 = 210
         static let defaultBatteryAlertLevelMiaoMiao = 20
         static let defaultBatteryAlertLevelGNSEntry = 20
+        static let defaultBatteryAlertLevelBlucon = 20
         
         // blood glucose level alert values in mgdl
         static let veryHigh = 250
@@ -82,6 +83,8 @@ struct Constants {
         static let categoryCGMG5 = "categoryCGMG5"
         /// GNSEntry
         static let categoryCGMGNSEntry = "categoryCGMGNSEntry"
+        /// Blucon
+        static let categoryBlucon = "categoryBlucon"
         /// core data manager
         static let categoryCoreDataManager = "categoryCoreDataManager"
         /// application data bgreadings
@@ -379,4 +382,11 @@ struct Constants {
         
     }
     
+    /// constants related to Bluetooth pairing
+    enum BluetoothPairing {
+        
+        /// minimum time in seconds between two pairing notifications
+        static let minimumTimeBetweenTwoPairingNotificationsInSeconds = 30
+        
+    }
 }

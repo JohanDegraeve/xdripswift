@@ -61,6 +61,9 @@ enum CGMTransmitterType:String, CaseIterable {
     /// GNSentry
     case GNSentry = "GNSentry"
     
+    /// Blucon
+    case Blucon = "Blucon"
+    
     /// does the transmitter need a transmitter id ?
     ///
     /// can be used in UI stuff, if reset not possible then there's no need to show that option in the settings UI
@@ -79,6 +82,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .GNSentry:
             return false
             
+        case .Blucon:
+            return true
         }
     }
     
@@ -101,6 +106,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .GNSentry:
             return false
             
+        case .Blucon:
+            return false
         }
     }
     
@@ -133,6 +140,9 @@ enum CGMTransmitterType:String, CaseIterable {
         case .miaomiao, .GNSentry:
             return nil
             
+        case .Blucon:
+            // todo: validate transmitter id for blucon
+            return nil
         }
     }
     
@@ -151,6 +161,9 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .GNSentry:
             return Constants.DefaultAlertLevels.defaultBatteryAlertLevelGNSEntry
+            
+        case .Blucon:
+            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelBlucon
             
         }
     }
@@ -173,6 +186,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .GNSentry:
             return false
             
+        case .Blucon:
+            return true
         }
     }
     
@@ -194,6 +209,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .GNSentry:
             return ""
             
+        case .Blucon:
+            return "%"
         }
     }
     
@@ -215,6 +232,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .GNSentry:
             return false
             
+        case .Blucon:
+            return false
         }
     }
 }

@@ -105,6 +105,9 @@ final class RootViewController: UIViewController {
     /// reference to bgReadingSpeaker
     private var bgReadingSpeaker:BGReadingSpeaker?
     
+    /// timestamp of last notification for pairing
+    private var timeStampLastNotificationForPairing:Date?
+    
     // MARK: - View Life Cycle
 
     override func viewWillAppear(_ animated: Bool) {
@@ -593,6 +596,12 @@ final class RootViewController: UIViewController {
                 cgmTransmitter = CGMGNSEntryTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
                 calibrator = Libre1Calibrator()
                 
+            case .Blucon:
+                if let currentTransmitterId = UserDefaults.standard.transmitterId {
+                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
+                    calibrator = Libre1Calibrator()
+                }
+
             }
             
         }
@@ -1001,6 +1010,9 @@ extension RootViewController:CGMTransmitterDelegate {
     
     func successfullyPaired() {
         
+        // remove existing notification if any
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
+
         // invalidate transmitterPairingResponseTimer
         if let transmitterPairingResponseTimer = transmitterPairingResponseTimer {
             transmitterPairingResponseTimer.invalidate()
@@ -1063,6 +1075,20 @@ extension RootViewController:CGMTransmitterDelegate {
 
         os_log("transmitter needs pairing", log: log, type: .info)
         
+        if let timeStampLastNotificationForPairing = timeStampLastNotificationForPairing {
+            
+            // check timestamp of last notification, if too soon then return
+            if Int(abs(timeStampLastNotificationForPairing.timeIntervalSinceNow)) < Constants.BluetoothPairing.minimumTimeBetweenTwoPairingNotificationsInSeconds {
+                return
+            }
+        }
+        
+        // set timeStampLastNotificationForPairing
+        timeStampLastNotificationForPairing = Date()
+        
+        // remove existing notification if any
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
+
         // Create Notification Content
         let notificationContent = UNMutableNotificationContent()
         

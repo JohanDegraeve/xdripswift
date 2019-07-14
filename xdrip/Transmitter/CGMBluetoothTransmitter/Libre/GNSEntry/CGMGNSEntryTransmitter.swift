@@ -138,7 +138,8 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     }
     
     func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
-        // log the receivec characteristic value
+        
+        // log the received characteristic value
         os_log("in peripheralDidUpdateValueFor with characteristic UUID = %{public}@, matches characteristic name %{public}@", log: log, type: .info, characteristic.uuid.uuidString, receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString)?.description ?? "not available")
         
         if let error = error {
@@ -323,6 +324,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         }
     }
     
+    /// creates readable representation of characteristicUUID, for logging only
     private func receivedCharacteristicUUIDToCharacteristic(characteristicUUID:String) -> CBUUID_Characteristic_UUID? {
         if CBUUID_Characteristic_UUID.CBUUID_BatteryLevel.rawValue.containsIgnoringCase(find: characteristicUUID) {
             return CBUUID_Characteristic_UUID.CBUUID_BatteryLevel
