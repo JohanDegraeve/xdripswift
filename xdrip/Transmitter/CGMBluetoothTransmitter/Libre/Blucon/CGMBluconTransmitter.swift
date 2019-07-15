@@ -155,8 +155,39 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
         }
         
         if let value = characteristic.value {
-            let data = value.hexEncodedString()
-            os_log("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .debug, data)
+            
+            // convert to string and log the value
+            let valueAsString = value.hexEncodedString()
+            
+            os_log("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .info, valueAsString)
+            
+            // get Opcode
+            if let opCode = BluconTransmitterOpCode(withOpCodeValue: valueAsString) {
+                
+                os_log("    opcode = %{public}@", log: log, type: .info, opCode.description)
+                
+                switch opCode {
+                    
+                case .wakeUp:
+                    // send getPatchInfo command
+                    _ = writeDataToPeripheral(data: Data(hexadecimalString: BluconTransmitterOpCode.getPatchInfoRequest.rawValue)!, type: .withResponse)
+                
+                case .getPatchInfoRequest:
+                    // shouldn't receive this ?
+                    return
+                    
+                case .error14:
+                    // Blucon didn't receive the next command it was waiting for, need to wait 5 minutes
+                    os_log("    Timeout received, need to  wait 5 minutes or push button to restart!", log: log, type: .error)
+                    
+                case .sensorNotDetected:
+                    // Blucon didn't detected sensor, call delegate
+                    cgmTransmitterDelegate?.sensorNotDetected()
+                    
+                case .getPatchInfoResponse:
+                    return
+                }
+            }
 
         } else {
             os_log("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)

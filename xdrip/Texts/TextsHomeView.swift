@@ -105,7 +105,7 @@ enum Texts_HomeView {
     }()
     
     static let sensorNotDetected:String = {
-        return NSLocalizedString("sensornotdetected", tableName: filename, bundle: Bundle.main, value: "Sensor not detected. Check if the MiaoMiao is well placed on the sensor.", comment: "for home view, miaomiao doesn't detect a sensor")
+        return NSLocalizedString("sensornotdetected", tableName: filename, bundle: Bundle.main, value: "Sensor not detected. Check if the Transmitter is well placed on the sensor.", comment: "for home view, miaomiao doesn't detect a sensor")
     }()
     
     static let transmitterNotPaired:String = {

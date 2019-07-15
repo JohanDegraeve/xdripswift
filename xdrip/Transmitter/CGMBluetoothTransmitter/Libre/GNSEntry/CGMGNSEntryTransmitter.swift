@@ -152,6 +152,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 
             case .CBUUID_SerialNumber:
                 actualSerialNumber = String(data: value, encoding: String.Encoding.utf8)
+                // TODO : is this the serial number of the sensor ? if yes we can use this to detect new sensor ? as with blucon ?
                 if let actualSerialNumber = actualSerialNumber {
                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: actualSerialNumber, bootloader: nil)
                 }

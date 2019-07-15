@@ -88,6 +88,8 @@
 		F8A54B0022D9179100934E7A /* ParseLibreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AFD22D9179100934E7A /* ParseLibreData.swift */; };
 		F8A54B0122D9179100934E7A /* SensorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AFE22D9179100934E7A /* SensorState.swift */; };
 		F8A7406E22D9C0E700967CFC /* CGMBluconTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A7406D22D9C0E700967CFC /* CGMBluconTransmitter.swift */; };
+		F8A7407022DBB24800967CFC /* BluconTransmitterOpCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A7406F22DBB24800967CFC /* BluconTransmitterOpCode.swift */; };
+		F8A7407222DCDA3E00967CFC /* BluconUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A7407122DCDA3E00967CFC /* BluconUtilities.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
 		F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* RootViewController.swift */; };
 		F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426321ADEBD60078C348 /* Main.storyboard */; };
@@ -254,6 +256,8 @@
 		F8A54AFE22D9179100934E7A /* SensorState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorState.swift; sourceTree = "<group>"; };
 		F8A54B0A22D9215500934E7A /* xdrip-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "xdrip-Bridging-Header.h"; sourceTree = "<group>"; };
 		F8A7406D22D9C0E700967CFC /* CGMBluconTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMBluconTransmitter.swift; sourceTree = "<group>"; };
+		F8A7406F22DBB24800967CFC /* BluconTransmitterOpCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluconTransmitterOpCode.swift; sourceTree = "<group>"; };
+		F8A7407122DCDA3E00967CFC /* BluconUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluconUtilities.swift; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F8AC425F21ADEBD60078C348 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
@@ -801,6 +805,8 @@
 			isa = PBXGroup;
 			children = (
 				F8A7406D22D9C0E700967CFC /* CGMBluconTransmitter.swift */,
+				F8A7406F22DBB24800967CFC /* BluconTransmitterOpCode.swift */,
+				F8A7407122DCDA3E00967CFC /* BluconUtilities.swift */,
 			);
 			path = Blucon;
 			sourceTree = "<group>";
@@ -1328,6 +1334,7 @@
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
 				F8B3A80A227A3D11004BA588 /* TextsAlertTypeSettings.swift in Sources */,
 				F8B3A850227F26F8004BA588 /* AlertTypesSettingsViewController.swift in Sources */,
+				F8A7407022DBB24800967CFC /* BluconTransmitterOpCode.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* BluetoothTransmitter.swift in Sources */,
 				F8B3A808227A2933004BA588 /* SettingsSelectedRowAction.swift in Sources */,
 				F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */,
@@ -1337,6 +1344,7 @@
 				F821CF7B22A1D359005C1E43 /* NightScoutFollowerDelegate.swift in Sources */,
 				F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */,
 				F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */,
+				F8A7407222DCDA3E00967CFC /* BluconUtilities.swift in Sources */,
 				F8B48A9422B2A705009BCC01 /* TextsSpeakReading.swift in Sources */,
 				F8A54AE222D911BA00934E7A /* ResetMessage.swift in Sources */,
 				F821CF5F229BF43A005C1E43 /* ApplicationManager.swift in Sources */,

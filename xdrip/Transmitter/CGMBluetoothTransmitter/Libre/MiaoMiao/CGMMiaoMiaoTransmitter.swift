@@ -162,12 +162,13 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                     case .newSensor:
                         os_log("in peripheral didUpdateValueFor, new sensor detected", log: log, type: .info)
                         cgmTransmitterDelegate?.newSensorDetected()
+                        
                         // send 0xD3 and 0x01 to confirm sensor change as defined in MiaoMiao protocol documentation
-                        // after that send start reading command, each with delay of 200 milliseconds
-                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(200)) {
+                        // after that send start reading command, each with delay of 500 milliseconds
+                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
                             if self.writeDataToPeripheral(data: Data.init(bytes: [0xD3, 0x01]), type: .withoutResponse) {
                                 os_log("in peripheralDidUpdateValueFor, successfully sent 0xD3 and 0x01, confirm sensor change to MiaoMiao", log: self.log, type: .info)
-                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(200)) {
+                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
                                     if !self.sendStartReadingCommmand() {
                                         os_log("in peripheralDidUpdateValueFor, sendStartReadingCommmand failed", log: self.log, type: .error)
                                     } else {
