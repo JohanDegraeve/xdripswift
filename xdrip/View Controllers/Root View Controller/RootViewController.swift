@@ -261,7 +261,7 @@ final class RootViewController: UIViewController {
         if activeSensor == nil {
             if let transmitterType = UserDefaults.standard.transmitterType {
                 
-                if !transmitterType.canDetectNewSensor() {
+                if transmitterType.canDetectNewSensor() {
 
                     if let sensorTimeInMinutes = sensorTimeInMinutes {
                         activeSensor = Sensor(startDate: Date(timeInterval: -Double(sensorTimeInMinutes * 60), since: Date()),nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
