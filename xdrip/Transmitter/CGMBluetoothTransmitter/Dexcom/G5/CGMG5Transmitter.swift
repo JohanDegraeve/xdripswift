@@ -165,7 +165,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         let testdata = RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: testAmount, glucoseLevelFiltered: testAmount)
         debuglogging("timestamp testdata = " + testdata.timeStamp.description + ", with amount = " + testAmount.description)
         var testdataasarray = [testdata]
-        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &testdataasarray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
+        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &testdataasarray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
         testAmount = testAmount + 1
     }
     
@@ -437,7 +437,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                                     timeStampOfLastG5Reading = Date()
                                     let glucoseData = RawGlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: sensorDataRxMessage.unfiltered * scalingFactor, glucoseLevelFiltered: sensorDataRxMessage.filtered * scalingFactor)
                                     var glucoseDataArray = [glucoseData]
-                                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
+                                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
                                 }
                             }
                             
@@ -538,7 +538,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     private func processBatteryStatusRxMessage(value:Data) {
         if let batteryStatusRxMessage = BatteryStatusRxMessage(data: value) {
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
         } else {
             os_log("batteryStatusRxMessage is nil", log: log, type: .error)
         }
@@ -546,7 +546,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     private func processTransmitterVersionRxMessage(value:Data) {
         if let transmitterVersionRxMessage = TransmitterVersionRxMessage(data: value) {
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: transmitterVersionRxMessage.firmwareVersion.hexEncodedString(), hardware: nil, serialNumber: nil, bootloader: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: transmitterVersionRxMessage.firmwareVersion.hexEncodedString(), hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
             // assign transmitterVersion
             transmitterVersion = transmitterVersionRxMessage.firmwareVersion.hexEncodedString()
         } else {

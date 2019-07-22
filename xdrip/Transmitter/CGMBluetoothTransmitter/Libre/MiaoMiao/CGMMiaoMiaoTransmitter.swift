@@ -31,7 +31,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     private var resendPacketCounter:Int = 0
     
     /// used when processing MiaoMiao data packet
-    private var startDate:Date
+    private var timestampFirstPacketReception:Date
     // receive buffer for miaomiao packets
     private var rxBuffer:Data
     // how long to wait for next packet before sending startreadingcommand
@@ -56,7 +56,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         
         // initialize rxbuffer
         rxBuffer = Data()
-        startDate = Date()
+        timestampFirstPacketReception = Date()
         
         //initialize timeStampLastBgReading
         self.timeStampLastBgReading = timeStampLastBgReading
@@ -106,7 +106,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         if let value = characteristic.value {
             
             //check if buffer needs to be reset
-            if (Date() > startDate.addingTimeInterval(CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds - 1)) {
+            if (Date() > timestampFirstPacketReception.addingTimeInterval(CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds - 1)) {
                 os_log("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds)
                 resetRxBuffer()
             }
@@ -129,11 +129,11 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                                 let firmware = String(describing: rxBuffer[14...15].hexEncodedString())
                                 let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
                                 let batteryPercentage = Int(rxBuffer[13])
-                                
+
                                 //get readings from buffer and send to delegate
                                 var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: miaoMiaoHeaderLength)
                                 //TODO: sort glucosedata before calling newReadingsReceived
-                                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: firmware, hardware: hardware, serialNumber: nil, bootloader: nil)
+                                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
                                 
                                 //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
                                 if result.glucoseData.count > 0 {
@@ -212,10 +212,10 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     
     // MARK: - helpers
     
-    /// reset rxBuffer, reset startDate, stop packetRxMonitorTimer, set resendPacketCounter to 0
+    /// reset rxBuffer, reset startDate, set resendPacketCounter to 0
     private func resetRxBuffer() {
         rxBuffer = Data()
-        startDate = Date()
+        timestampFirstPacketReception = Date()
         resendPacketCounter = 0
     }
     

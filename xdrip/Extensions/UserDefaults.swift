@@ -100,9 +100,13 @@ extension UserDefaults {
         /// timestamp of last bgreading that was stored in healthkit
         case timeStampLatestHealthKitStoreBgReading = "timeStampLatestHealthKitStoreBgReading"
         
+        // Dexcom Share
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
         
+        // Sensor
+        /// sensor Serial Number, for now only applicable to Libre
+        case sensorSerialNumber = "sensorSerialNumber"
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -527,6 +531,15 @@ extension UserDefaults {
         }
     }
     
+    /// sensor serial number, for now only useful for Libre sensor
+    var sensorSerialNumber:String? {
+        get {
+            return string(forKey: Key.sensorSerialNumber.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.sensorSerialNumber.rawValue)
+        }
+    }
 
 }
 

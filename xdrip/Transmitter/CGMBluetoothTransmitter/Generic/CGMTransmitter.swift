@@ -90,6 +90,8 @@ enum CGMTransmitterType:String, CaseIterable {
     /// if true, then a class conforming to the protocol CGMTransmitterDelegate will call newSensorDetected if it detects a new sensor is placed. Means there's no need to let the user start and stop a sensor
     ///
     /// example MiaoMiao can detect new sensor, implementation should return true, Dexcom transmitter's can't
+    ///
+    /// if true, then transmitterType must also be able to give the sensor age, ie sensorTimeInMinutes
     func canDetectNewSensor() -> Bool {
         
         switch self {
@@ -107,7 +109,7 @@ enum CGMTransmitterType:String, CaseIterable {
             return false
             
         case .Blucon:
-            return false
+            return true
         }
     }
     

@@ -116,7 +116,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
                 if let level = result.batteryLevel {
                     transmitterBatteryInfo = TransmitterBatteryInfo.DexcomG4(level: level)
                 }
-                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
             }
         case .beaconPacket?:
             os_log("    in peripheral didUpdateValueFor, received beaconPacket", log: log, type: .info)
@@ -149,7 +149,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
                 if let batteryLevel = result.batteryLevel {
                     transmitterBatteryInfo = TransmitterBatteryInfo.DexcomG4(level: batteryLevel)
                 }
-                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
             }
         }
     }

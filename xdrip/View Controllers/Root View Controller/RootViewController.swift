@@ -52,6 +52,9 @@ final class RootViewController: UIViewController {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initiate pairing
     private let applicationManagerKeyInitiatePairing = "RootViewController-InitiatePairing"
 
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initial calibration
+    private let applicationManagerKeyInitialCalibration = "RootViewController-InitialCalibration"
+    
     // MARK: - Properties - other private properties
     
     /// a reference to the CGMTransmitter currently in use - nil means there's none, because user hasn't selected yet all required settings
@@ -251,7 +254,11 @@ final class RootViewController: UIViewController {
         })
     }
     
-    private func processNewCGMInfo(glucoseData: inout [RawGlucoseData], sensorState: LibreSensorState?, firmware: String?, hardware: String?, transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
+    /// process new glucose data received from transmitter.
+    /// - parameters:
+    ///     - glucoseData : array with new readings
+    ///     - sensorTimeInMinutes : should be present only if it's the first reading(s) being processed for a specific sensor and is needed if it's a transmitterType that returns true to the function canDetectNewSensor
+    private func processNewGlucoseData(glucoseData: inout [RawGlucoseData], sensorTimeInMinutes: Int?) {
         
         // check that calibrations and coredata manager is not nil
         guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager else {
@@ -354,10 +361,6 @@ final class RootViewController: UIViewController {
             }
         }
         
-        // check transmitterBatteryInfo and if available store in settings
-        if let transmitterBatteryInfo = transmitterBatteryInfo {
-            UserDefaults.standard.transmitterBatteryInfo = transmitterBatteryInfo
-        }
     }
 
     // MARK:- observe function
@@ -598,7 +601,7 @@ final class RootViewController: UIViewController {
                 
             case .Blucon:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
+                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber)
                     calibrator = Libre1Calibrator()
                 }
 
@@ -622,7 +625,7 @@ final class RootViewController: UIViewController {
         }
     }
     
-    // creates initial calibration request notification
+    /// creates initial calibration request notification
     private func createInitialCalibrationRequest() {
         
         // first remove existing notification if any
@@ -649,9 +652,25 @@ final class RootViewController: UIViewController {
                 os_log("Unable to Add Notification Request : %{public}@", log: self.log, type: .error, error.localizedDescription)
             }
         }
+        
+        // we will not just count on it that the user will click the notification to open the app (assuming the app is in the background, if the app is in the foreground, then we come in another flow)
+        // whenever app comes from-back to foreground, requestCalibration needs to be called
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyInitialCalibration, closure: {
+            
+            // first of all reremove from application key manager
+            ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeyInitialCalibration)
+            
+            // remove existing notification if any
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifiersForCalibration.initialCalibrationRequest])
+            
+            // request the calibration
+            self.requestCalibration(userRequested: false)
+            
+        })
+
     }
     
-    // creates bgreading notification
+    /// creates bgreading notification
     private func createBgReadingNotification() {
         
         // bgReadingsAccessor should not be nil at all, but let's not create a fatal error for that, there's already enough checks for it
@@ -921,16 +940,21 @@ final class RootViewController: UIViewController {
 
     }
     
-    // stop the active sensor
+    // stops the active sensor and sets sensorSerialNumber in UserDefaults to nil
     private func stopSensor() {
+        
         if let activeSensor = activeSensor, let coreDataManager = coreDataManager {
             activeSensor.endDate = Date()
             coreDataManager.saveChanges()
         }
-        activeSensor = nil
-        
         // save the changes
         coreDataManager?.saveChanges()
+
+        activeSensor = nil
+
+        // reset also serialNubmer to nil
+        UserDefaults.standard.sensorSerialNumber = nil
+        
     }
     
     // start a new sensor, ask user for starttime
@@ -1120,8 +1144,7 @@ extension RootViewController:CGMTransmitterDelegate {
         let maxTimeUserCanOpenApp = Date(timeIntervalSinceNow: TimeInterval(Constants.DexcomG5.maxTimeToAcceptPairingInSeconds - 1))
         
         // we will not just count on it that the user will click the notification to open the app (assuming the app is in the background, if the app is in the foreground, then we come in another flow)
-        // we will
-        // whenever app comes from-back to freground, updateLabels needs to be called
+        // whenever app comes from-back to foreground, updateLabels needs to be called
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyInitiatePairing, closure: {
             
             // first of all reremove from application key manager
@@ -1175,18 +1198,32 @@ extension RootViewController:CGMTransmitterDelegate {
     
     /// - parameters:
     ///     - readings: first entry is the most recent
-    func cgmTransmitterInfoReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: LibreSensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?, serialNumber: String?, bootloader: String?) {
+    func cgmTransmitterInfoReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: LibreSensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?, hardwareSerialNumber: String?, bootloader: String?, sensorSerialNumber:String?) {
         
         os_log("sensorstate %{public}@", log: log, type: .debug, sensorState?.description ?? "no sensor state found")
         os_log("firmware %{public}@", log: log, type: .debug, firmware ?? "no firmware version found")
         os_log("bootloader %{public}@", log: log, type: .debug, bootloader ?? "no bootloader  found")
-        os_log("serialNumber %{public}@", log: log, type: .debug, serialNumber ?? "no serialNumber  found")
+        os_log("hardwareSerialNumber %{public}@", log: log, type: .debug, hardwareSerialNumber ?? "no serialNumber  found")
+        os_log("sensorSerialNumber %{public}@", log: log, type: .debug, sensorSerialNumber ?? "no sensorSerialNumber  found")
         os_log("hardware %{public}@", log: log, type: .debug, hardware ?? "no hardware version found")
         os_log("transmitterBatteryInfo  %{public}@", log: log, type: .debug, transmitterBatteryInfo?.description ?? 0)
         os_log("sensor time in minutes  %{public}@", log: log, type: .debug, sensorTimeInMinutes?.description ?? "not received")
         os_log("glucoseData size = %{public}@", log: log, type: .debug, glucoseData.count.description)
+
+        // if received sensorSerialNumber not nil, and if value different from currently stored value, then store it
+        if let sensorSerialNumber = sensorSerialNumber {
+            if sensorSerialNumber != UserDefaults.standard.sensorSerialNumber {
+                UserDefaults.standard.sensorSerialNumber = sensorSerialNumber
+            }
+        }
         
-        processNewCGMInfo(glucoseData: &glucoseData, sensorState: sensorState, firmware: firmware, hardware: hardware, transmitterBatteryInfo: transmitterBatteryInfo, sensorTimeInMinutes: sensorTimeInMinutes)
+        // if received transmitterBatteryInfo not nil, then store it
+        if let transmitterBatteryInfo = transmitterBatteryInfo {
+            UserDefaults.standard.transmitterBatteryInfo = transmitterBatteryInfo
+        }
+        
+        // process new readings
+        processNewGlucoseData(glucoseData: &glucoseData, sensorTimeInMinutes: sensorTimeInMinutes)
     }
 
 }
@@ -1217,6 +1254,9 @@ extension RootViewController:UNUserNotificationCenterDelegate {
             // request calibration
             requestCalibration(userRequested: false)
             
+            /// remove applicationManagerKeyInitialCalibration from application key manager - there's no need to initiate the calibration via this closure
+            ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeyInitialCalibration)
+
             // call completionhandler to avoid that notification is shown to the user
             completionHandler([])
             
@@ -1262,9 +1302,8 @@ extension RootViewController:UNUserNotificationCenterDelegate {
         
         if response.notification.request.identifier == Constants.Notifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
             
-            os_log("     userNotificationCenter didReceive, user pressed calibration notification to open the app", log: log, type: .info)
-            // request calibration
-            requestCalibration(userRequested: false)
+            // nothing required, the requestCalibration function will be called as it's been added to ApplicationManager
+            os_log("     userNotificationCenter didReceive, user pressed calibration notification to open the app, requestCalibration should be called because closure is added in ApplicationManager.shared", log: log, type: .info)
             
         } else if response.notification.request.identifier == Constants.Notifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
 
