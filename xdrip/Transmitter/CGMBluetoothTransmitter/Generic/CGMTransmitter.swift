@@ -62,7 +62,7 @@ enum CGMTransmitterType:String, CaseIterable {
     case GNSentry = "GNSentry"
     
     /// Blucon
-    case Blucon = "Blucon NOT READY !"
+    case Blucon = "Blucon"
     
     /// does the transmitter need a transmitter id ?
     ///
