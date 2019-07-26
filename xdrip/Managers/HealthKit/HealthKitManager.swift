@@ -86,6 +86,8 @@ public class HealthKitManager:NSObject {
             return false
         case .sharingAuthorized:
             break
+        @unknown default:
+            os_log("unknown authorizationstatus for healthkit - HealthKitManager.swift", log: self.log, type: .error)
         }
         
         // all checks ok , return true

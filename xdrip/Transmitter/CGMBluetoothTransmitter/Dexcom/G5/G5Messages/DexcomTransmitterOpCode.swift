@@ -63,7 +63,7 @@ enum DexcomTransmitterOpCode: UInt8 {
 
 extension Data {
     init(for opcode: DexcomTransmitterOpCode) {
-        self.init(bytes: [opcode.rawValue])
+        self.init([opcode.rawValue])
     }
 
     func starts(with opcode: DexcomTransmitterOpCode) -> Bool {

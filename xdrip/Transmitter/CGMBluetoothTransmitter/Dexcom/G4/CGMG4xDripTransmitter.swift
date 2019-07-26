@@ -108,7 +108,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
             }
             
             // Data packet Acknowledgement, to put wixel to sleep
-            _ = writeDataToPeripheral(data: Data(bytes: [0x02,0xF0]), type: .withoutResponse)
+            _ = writeDataToPeripheral(data: Data([0x02,0xF0]), type: .withoutResponse)
             
             if let glucoseData = result.glucoseData {
                 var glucoseDataArray = [glucoseData]

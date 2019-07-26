@@ -226,6 +226,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
                     cell.selectionStyle = .gray
                 case .none:
                     cell.selectionStyle = .none
+                @unknown default:
+                    cell.selectionStyle = .none
                 }
                 
                 cell.accessoryView = viewModel.uiView(index: indexPath.row)

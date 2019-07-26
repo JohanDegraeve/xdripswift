@@ -56,7 +56,7 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
             //find index for transmitter type currently stored in userdefaults
             var selectedRow:Int?
             if let transmitterType = UserDefaults.standard.transmitterType?.rawValue {
-                selectedRow = data.index(of:transmitterType)
+                selectedRow = data.firstIndex(of:transmitterType)
             }
             
             return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelTransmitterId, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in

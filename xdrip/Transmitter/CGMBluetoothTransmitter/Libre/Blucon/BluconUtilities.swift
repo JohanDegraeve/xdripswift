@@ -12,7 +12,7 @@ class BluconUtilities {
     /// decodes serial number, copied forp xdripplus , commit 2b25bfdf6a563aea16de63053aec5e0e3be16e5f
     public static func decodeSerialNumber(input: Data) -> String {
         
-        var uuidShort = Data(bytes: [0, 0, 0, 0, 0, 0, 0, 0])
+        var uuidShort = Data([0, 0, 0, 0, 0, 0, 0, 0])
         
         for i in 2..<8 {
             uuidShort[i - 2] = input[(2 + 8) - i]

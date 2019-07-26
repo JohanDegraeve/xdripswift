@@ -75,6 +75,8 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
                         os_log("user removed authorization to store bgreadings in healthkit", log: self.log, type: .error)
                     case .sharingAuthorized:
                         break
+                    @unknown default:
+                        os_log("unknown authorizationstatus for healthkit - SettingsViewHealthKitSettingsViewModel", log: self.log, type: .error)
                     }
                 } else {
                     os_log("User enabled HealthKit however failed to create bloodGlucoseType", log: self.log, type: .error)

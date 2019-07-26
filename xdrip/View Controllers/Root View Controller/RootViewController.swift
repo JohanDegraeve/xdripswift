@@ -1090,6 +1090,8 @@ extension RootViewController:CGMTransmitterDelegate {
                 _ = cgmTransmitter.startScanning()
             }
 
+        @unknown default:
+            break
         }
         
     }

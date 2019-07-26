@@ -70,7 +70,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     // MARK: - public functions
     
     func sendStartReadingCommmand() -> Bool {
-        if writeDataToPeripheral(data: Data.init(bytes: [0xF0]), type: .withoutResponse) {
+        if writeDataToPeripheral(data: Data.init([0xF0]), type: .withoutResponse) {
             return true
         } else {
             os_log("in sendStartReadingCommmand, write failed", log: log, type: .error)
@@ -166,7 +166,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                         // send 0xD3 and 0x01 to confirm sensor change as defined in MiaoMiao protocol documentation
                         // after that send start reading command, each with delay of 500 milliseconds
                         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
-                            if self.writeDataToPeripheral(data: Data.init(bytes: [0xD3, 0x01]), type: .withoutResponse) {
+                            if self.writeDataToPeripheral(data: Data.init([0xD3, 0x01]), type: .withoutResponse) {
                                 os_log("in peripheralDidUpdateValueFor, successfully sent 0xD3 and 0x01, confirm sensor change to MiaoMiao", log: self.log, type: .info)
                                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
                                     if !self.sendStartReadingCommmand() {

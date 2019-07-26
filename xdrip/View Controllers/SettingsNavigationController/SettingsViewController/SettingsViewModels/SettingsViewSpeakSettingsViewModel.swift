@@ -49,9 +49,9 @@ class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
             //find index for languageCode type currently stored in userdefaults
             var selectedRow:Int?
             if let languageCode = UserDefaults.standard.speakReadingLanguageCode {
-                selectedRow = Constants.SpeakReadingLanguages.allLanguageNamesAndCodes.codes.index(of:languageCode)
+                selectedRow = Constants.SpeakReadingLanguages.allLanguageNamesAndCodes.codes.firstIndex(of:languageCode)
             } else {
-                selectedRow = Constants.SpeakReadingLanguages.allLanguageNamesAndCodes.codes.index(of:Texts_SpeakReading.defaultLanguageCode)
+                selectedRow = Constants.SpeakReadingLanguages.allLanguageNamesAndCodes.codes.firstIndex(of:Texts_SpeakReading.defaultLanguageCode)
             }
             
             return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.speakReadingLanguageSelection, data: Constants.SpeakReadingLanguages.allLanguageNamesAndCodes.names, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
