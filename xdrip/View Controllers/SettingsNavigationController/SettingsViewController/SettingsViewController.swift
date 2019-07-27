@@ -14,6 +14,7 @@ final class SettingsViewController: UIViewController {
     fileprivate var healthKitSettingsViewModel = SettingsViewHealthKitSettingsViewModel()
     fileprivate var alarmsSettingsViewModel = SettingsViewAlertSettingsViewModel()
     fileprivate var speakSettingsViewModel = SettingsViewSpeakSettingsViewModel()
+    fileprivate var developmentSettingsViewModel = SettingsViewDevelopmentSettingsViewModel()
     
     private lazy var pickerViewController: PickerViewController = {
         // Instantiate View Controller
@@ -132,6 +133,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
         case healthkit
         /// store bg values in healthkit
         case speak
+        /// developper settings
+        case developer
     }
     
     // MARK: - UITableViewDataSource protocol Methods
@@ -153,6 +156,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             return alarmsSettingsViewModel.sectionTitle()
         case .speak:
             return speakSettingsViewModel.sectionTitle()
+        case .developer:
+            return developmentSettingsViewModel.sectionTitle()
         }
     }
     
@@ -177,6 +182,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             return alarmsSettingsViewModel.numberOfRows()
         case .speak:
             return speakSettingsViewModel.numberOfRows()
+        case .developer:
+            return developmentSettingsViewModel.numberOfRows()
         }
     }
     
@@ -201,6 +208,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             viewModel = alarmsSettingsViewModel
         case .speak:
             viewModel = speakSettingsViewModel
+        case .developer:
+            viewModel = developmentSettingsViewModel
         }
 
         
@@ -289,6 +298,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             viewModel = alarmsSettingsViewModel
         case .speak:
             viewModel = speakSettingsViewModel
+        case .developer:
+            viewModel = developmentSettingsViewModel
         }
         
         if let viewModel = viewModel {

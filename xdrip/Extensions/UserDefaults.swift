@@ -107,6 +107,14 @@ extension UserDefaults {
         // Sensor
         /// sensor Serial Number, for now only applicable to Libre
         case sensorSerialNumber = "sensorSerialNumber"
+        
+        // development settings to test G6 scaling
+        /// G6 factor1 - for testing G6 scaling
+        case G6v2ScalingFactor1 = "G6v2ScalingFactor1"
+
+        /// G6 factor2 - for testing G6 scaling
+        case G6v2ScalingFactor2 = "G6v2ScalingFactor2"
+
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -540,6 +548,29 @@ extension UserDefaults {
             set(newValue, forKey: Key.sensorSerialNumber.rawValue)
         }
     }
+    
+    // MARK: - =====  technical settings for testing ======
+    
+    /// G6 factor 1
+    @objc dynamic var G6v2ScalingFactor1:String? {
+        get {
+            return string(forKey: Key.G6v2ScalingFactor1.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.G6v2ScalingFactor1.rawValue)
+        }
+    }
+    
+    /// G6 factor 2
+    @objc dynamic var G6v2ScalingFactor2:String? {
+        get {
+            return string(forKey: Key.G6v2ScalingFactor2.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.G6v2ScalingFactor2.rawValue)
+        }
+    }
+    
 
 }
 
