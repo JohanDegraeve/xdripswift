@@ -15,6 +15,7 @@ final class SettingsViewController: UIViewController {
     fileprivate var alarmsSettingsViewModel = SettingsViewAlertSettingsViewModel()
     fileprivate var speakSettingsViewModel = SettingsViewSpeakSettingsViewModel()
     fileprivate var developmentSettingsViewModel = SettingsViewDevelopmentSettingsViewModel()
+    fileprivate var infoSettingsViewModel = SettingsViewInfoViewModel()
     
     private lazy var pickerViewController: PickerViewController = {
         // Instantiate View Controller
@@ -133,6 +134,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
         case healthkit
         /// store bg values in healthkit
         case speak
+        /// info
+        case info
         /// developper settings
         case developer
     }
@@ -158,6 +161,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             return speakSettingsViewModel.sectionTitle()
         case .developer:
             return developmentSettingsViewModel.sectionTitle()
+        case .info:
+            return infoSettingsViewModel.sectionTitle()
         }
     }
     
@@ -184,6 +189,9 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             return speakSettingsViewModel.numberOfRows()
         case .developer:
             return developmentSettingsViewModel.numberOfRows()
+        case .info:
+            return infoSettingsViewModel.numberOfRows()
+            
         }
     }
     
@@ -210,6 +218,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             viewModel = speakSettingsViewModel
         case .developer:
             viewModel = developmentSettingsViewModel
+        case .info:
+            viewModel = infoSettingsViewModel
         }
 
         
@@ -300,6 +310,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             viewModel = speakSettingsViewModel
         case .developer:
             viewModel = developmentSettingsViewModel
+        case .info:
+            viewModel = infoSettingsViewModel
         }
         
         if let viewModel = viewModel {
@@ -362,6 +374,11 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
                     
                 case .performSegue(let withIdentifier):
                     self.performSegue(withIdentifier: withIdentifier, sender: nil)
+
+                case let .showInfoText(title, message):
+                    
+                    UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+                    
                 }
 
             } else {

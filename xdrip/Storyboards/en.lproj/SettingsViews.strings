@@ -36,3 +36,5 @@
 "settingsviews_speakreadingslanguageselection" = "Select Language";
 "settingsviews_speakBgReadingslanguage" = "Language";
 "settingsviews_resettransmitter" = "Reset Transmitter";
+"settingsviews_Version" = "Version";
+"settingsviews_license" = "License";

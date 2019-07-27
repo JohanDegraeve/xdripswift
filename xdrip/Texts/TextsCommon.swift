@@ -88,4 +88,5 @@ class Texts_Common {
     static let no = {
         return NSLocalizedString("no", tableName: filename, bundle: Bundle.main, value: "no", comment: "literally no, without capital")
     }()
+    
 }

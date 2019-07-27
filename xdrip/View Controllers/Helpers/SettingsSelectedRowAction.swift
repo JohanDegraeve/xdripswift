@@ -50,6 +50,11 @@ enum SettingsSelectedRowAction {
     /// (it's not the right place to define this, not a clear split view/model)
     case performSegue(withIdentifier: String)
     
+    /// to show Info to user, eg licenseInfo, with a title and a message
+    ///
+    /// typical a pop up with a title and the message
+    case showInfoText(title: String, message: String)
+    
 }
 
 /* explanation UITableViewCell.AccessoryType
