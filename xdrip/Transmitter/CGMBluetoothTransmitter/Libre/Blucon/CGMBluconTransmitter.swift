@@ -22,7 +22,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     private let unknownCommand2BatteryLowIndicator = "8bda02"
     
     /// for OS_log
-    private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryBlucon)
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBlucon)
     
     // actual device address
     private var actualDeviceAddress:String?
@@ -226,7 +226,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         let rawGlucose = Double((UInt16(value2 & 0x0F)<<8) | UInt16(value1 & 0xFF))
         
         // rescale for Libre
-        let curGluc = rawGlucose * Constants.BloodGlucose.libreMultiplier
+        let curGluc = rawGlucose * ConstantsBloodGlucose.libreMultiplier
         
         return(curGluc)
     }

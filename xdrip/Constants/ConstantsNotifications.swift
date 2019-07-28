@@ -1,0 +1,66 @@
+enum ConstantsNotifications {
+    
+    /// identifiers for alert categories
+    enum CategoryIdentifiersForAlerts {
+        /// for initial calibration
+        static let initialCalibrationRequest = "InititalCalibrationRequest"
+        /// subsequent calibration request
+        static let subsequentCalibrationRequest = "SubsequentCalibrationRequest"
+        /// high alert
+        static let highAlert = "highAlert"
+        /// low alert
+        static let lowAlert = "lowAlert"
+        /// very high alert
+        static let veryHighAlert = "veryHighAlert"
+        /// very low alert
+        static let veryLowAlert = "veryLowAlert"
+        /// missed reading alert
+        static let missedReadingAlert = "missedReadingAlert"
+        /// battery low
+        static let batteryLow = "batteryLow"
+    }
+    
+    /// identifiers for alert notifications
+    enum NotificationIdentifiersForAlerts {
+        /// high alert
+        static let highAlert = "highAlert"
+        /// low alert
+        static let lowAlert = "lowAlert"
+        /// very high alert
+        static let veryHighAlert = "veryHighAlert"
+        /// very low alert
+        static let veryLowAlert = "veryLowAlert"
+        /// missed reading alert
+        static let missedReadingAlert = "missedReadingAlert"
+        /// battery low
+        static let batteryLow = "batteryLow"
+    }
+    
+    /// identifiers for calibration requests
+    enum NotificationIdentifiersForCalibration {
+        /// for initial calibration
+        static let initialCalibrationRequest = "initialCalibrationRequest"
+        /// subsequent calibration request
+        static let subsequentCalibrationRequest = "subsequentCalibrationRequest"
+    }
+    
+    enum NotificationIdentifierForBgReading {
+        /// bgreading notification
+        static let bgReadingNotificationRequest = "bgReadingNotificationRequest"
+    }
+    
+    enum NotificationIdentifierForSensorNotDetected {
+        /// sensor not detected notification
+        static let sensorNotDetected = "sensorNotDetected"
+    }
+    
+    enum NotificationIdentifierForTransmitterNeedsPairing {
+        /// transmitter needs pairing
+        static let transmitterNeedsPairing = "transmitterNeedsPairing"
+    }
+    
+    enum NotificationIdentifierForResetResult {
+        /// transmitter reset result
+        static let transmitterResetResult = "transmitterResetResult"
+    }
+}

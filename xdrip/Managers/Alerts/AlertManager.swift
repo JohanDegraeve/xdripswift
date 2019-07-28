@@ -18,7 +18,7 @@ public class AlertManager:NSObject {
     private let snoozeCategoryIdentifier = "snoozeCategoryIdentifier"
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryAlertManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryAlertManager)
     
     /// BgReadings instance
     private let bgReadingsAccessor:BgReadingsAccessor
@@ -345,11 +345,11 @@ public class AlertManager:NSObject {
                     soundToSet = ""
                 } else {
                     // a sound name has been found in the alertType different from empty string (ie a sound must be played and it's not the default iOS sound)
-                    // need to find the corresponding sound file name in Constants.Sounds
+                    // need to find the corresponding sound file name in ConstantsSounds
                     // start by setting it to to xdripalert, because the soundname found in the alert type might not be found in the list of sounds stored in the resources (although that shouldn't happen)
                     soundToSet = "xdripalert.aif"
-                    soundloop: for sound in Constants.Sounds.allCases {
-                        // Constants.Sounds defines available sounds. Per case there a string which is the soundname as shown in the UI and the filename of the sound in the Resources folder, seperated by backslash
+                    soundloop: for sound in ConstantsSounds.allCases {
+                        // ConstantsSounds defines available sounds. Per case there a string which is the soundname as shown in the UI and the filename of the sound in the Resources folder, seperated by backslash
                         // get array of indexes, of location of "/"
                         let indexOfBackSlash = sound.rawValue.indexes(of: "/")
                         // define range to get the soundname (as shown in UI)

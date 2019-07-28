@@ -164,7 +164,7 @@ public class BgReading: NSManagedObject {
             return "???"
         }
         
-        if timeStamp.timeIntervalSince(previousBgReading.timeStamp) > Double(Constants.BGGraphBuilder.maxSlopeInMinutes * 60) {
+        if timeStamp.timeIntervalSince(previousBgReading.timeStamp) > Double(ConstantsBGGraphBuilder.maxSlopeInMinutes * 60) {
             // don't show delta if there are not enough values or the values are more than 20 mintes apart
             return "???";
         }
@@ -208,7 +208,7 @@ public class BgReading: NSManagedObject {
     func calculateSlope(lastBgReading:BgReading) -> (Double, Bool) {
         if timeStamp == lastBgReading.timeStamp
             ||
-            timeStamp.toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble() > Double(Constants.BGGraphBuilder.maxSlopeInMinutes * 60 * 1000) {
+            timeStamp.toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble() > Double(ConstantsBGGraphBuilder.maxSlopeInMinutes * 60 * 1000) {
             return (0,true)
         }
         return ((lastBgReading.calculatedValue - calculatedValue) / (lastBgReading.timeStamp.toMillisecondsAsDouble() - timeStamp.toMillisecondsAsDouble()), false)

@@ -7,7 +7,7 @@ class BgReadingsAccessor {
     // MARK: - Properties
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryApplicationDataBgReadings)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataBgReadings)
     
     /// CoreDataManager to use
     private let coreDataManager:CoreDataManager

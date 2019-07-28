@@ -19,7 +19,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
     /// for OS_log
-    private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCGMxDripG4)
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMxDripG4)
     
     /// transmitterId
     private let transmitterId:String

@@ -90,7 +90,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             
         case .licenseInfo:
             
-            return SettingsSelectedRowAction.showInfoText(title: Constants.HomeView.applicationName, message: Texts_HomeView.licenseInfo + Constants.HomeView.infoEmailAddress)
+            return SettingsSelectedRowAction.showInfoText(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress)
 
         }
     }

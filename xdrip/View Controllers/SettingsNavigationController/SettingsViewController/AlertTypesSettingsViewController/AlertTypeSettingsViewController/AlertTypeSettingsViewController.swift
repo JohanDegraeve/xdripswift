@@ -65,13 +65,13 @@ final class AlertTypeSettingsViewController: UIViewController {
     // MARK:- alerttype temp properties
     
     // following properties are used to temporary store alertType attributes which can be modified. The actual update of the alertType being processed will be done only when the user clicks the done button
-    private var enabled = Constants.DefaultAlertTypeSettings.enabled
-    private var name = Constants.DefaultAlertTypeSettings.name
-    private var overrideMute = Constants.DefaultAlertTypeSettings.overrideMute
-    private var snooze = Constants.DefaultAlertTypeSettings.snooze
-    private var snoozePeriod = Constants.DefaultAlertTypeSettings.snoozePeriod
-    private var vibrate = Constants.DefaultAlertTypeSettings.vibrate
-    private var soundName = Constants.DefaultAlertTypeSettings.soundName
+    private var enabled = ConstantsDefaultAlertTypeSettings.enabled
+    private var name = ConstantsDefaultAlertTypeSettings.name
+    private var overrideMute = ConstantsDefaultAlertTypeSettings.overrideMute
+    private var snooze = ConstantsDefaultAlertTypeSettings.snooze
+    private var snoozePeriod = ConstantsDefaultAlertTypeSettings.snoozePeriod
+    private var vibrate = ConstantsDefaultAlertTypeSettings.vibrate
+    private var soundName = ConstantsDefaultAlertTypeSettings.soundName
     
     // MARK:- public functions
     
@@ -299,7 +299,7 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
 
         case .soundName:
             // create array of all sounds and sound filenames, inclusive default ios sound and also empty string, which is "no sound"
-            var sounds = Constants.Sounds.allSoundsBySoundNameAndFileName()
+            var sounds = ConstantsSounds.allSoundsBySoundNameAndFileName()
             sounds.soundNames.insert(Texts_AlertTypeSettingsView.alertTypeDefaultIOSSound, at: 0)
             sounds.soundNames.insert(Texts_AlertTypeSettingsView.alertTypeNoSound, at: 0)
             

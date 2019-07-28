@@ -67,7 +67,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
     /// for OS_log
-    private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCGMGNSEntry)
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMGNSEntry)
     
     /// used in parsing packet
     private var timeStampLastBgReadingInMinutes:Double
@@ -227,7 +227,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                             // sometimes 0 values are received, skip those
                             if readingValueInMgDl > 0 {
                                 if readingTimeStampInMinutes * 60 * 1000 < timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) {
-                                    let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * Constants.BloodGlucose.libreMultiplier)
+                                    let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * ConstantsBloodGlucose.libreMultiplier)
                                     readings.append(glucoseData)
                                     timeStampLastAddedGlucoseDataInMinutes = readingTimeStampInMinutes
                                 }

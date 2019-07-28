@@ -153,19 +153,19 @@ enum CGMTransmitterType:String, CaseIterable {
         switch self {
             
         case .dexcomG4:
-            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelDexcomG4
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG4
             
         case .dexcomG5, .dexcomG6:
-            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
             
         case .miaomiao:
-            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
             
         case .GNSentry:
-            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelGNSEntry
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelGNSEntry
             
         case .Blucon:
-            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelBlucon
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelBlucon
             
         }
     }

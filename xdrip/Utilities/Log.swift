@@ -2,7 +2,7 @@ import Foundation
 import os
 
 fileprivate var log:OSLog = {
-    let log:OSLog = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.debuglogging)
+    let log:OSLog = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.debuglogging)
     return log
 }()
 

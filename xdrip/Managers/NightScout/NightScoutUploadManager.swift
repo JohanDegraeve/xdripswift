@@ -19,7 +19,7 @@ public class NightScoutUploadManager:NSObject {
     private let nightScoutAuthTestPath = "/api/v1/experiments/test"
 
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryNightScoutUploadManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryNightScoutUploadManager)
     
     /// BgReadingsAccessor instance
     private let bgReadingsAccessor:BgReadingsAccessor

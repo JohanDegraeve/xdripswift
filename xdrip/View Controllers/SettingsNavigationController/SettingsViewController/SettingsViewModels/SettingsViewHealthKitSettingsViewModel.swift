@@ -8,7 +8,7 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
     // MARK: - private properties
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryHealthKitManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHealthKitManager)
 
     // MARK: - functions in protocol SettingsViewModelProtocol
     

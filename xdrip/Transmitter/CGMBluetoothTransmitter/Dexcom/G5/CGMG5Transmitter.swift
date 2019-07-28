@@ -80,7 +80,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
     /// for OS_log
-    private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCGMG5)
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMG5)
     
     /// is G5 reset necessary or not
     private var G5ResetRequested:Bool
@@ -417,7 +417,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                             if firmwareVersion != nil {
                                 
                                 // transmitterversion was already recceived, let's see if we need to get the batterystatus
-                                if Date() > Date(timeInterval: Constants.DexcomG5.batteryReadPeriodInHours * 60 * 60, since: timeStampOfLastBatteryReading) {
+                                if Date() > Date(timeInterval: ConstantsDexcomG5.batteryReadPeriodInHours * 60 * 60, since: timeStampOfLastBatteryReading) {
                                     os_log("    last battery reading was long time ago, requesting now", log: log, type: .info)
                                     if let writeControlCharacteristic = writeControlCharacteristic {
                                         _ = writeDataToPeripheral(data: BatteryStatusTxMessage().data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
@@ -615,7 +615,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         if let receiveAuthenticationCharacteristic = receiveAuthenticationCharacteristic {
             
             // to make sure the Dexcom doesn't disconnect the next 60 seconds, this gives the user sufficient time to accept the pairing request, which will come next
-            _ = writeDataToPeripheral(data: KeepAliveTxMessage(time: UInt8(Constants.DexcomG5.maxTimeToAcceptPairingInSeconds)).data, characteristicToWriteTo: receiveAuthenticationCharacteristic, type: .withResponse)
+            _ = writeDataToPeripheral(data: KeepAliveTxMessage(time: UInt8(ConstantsDexcomG5.maxTimeToAcceptPairingInSeconds)).data, characteristicToWriteTo: receiveAuthenticationCharacteristic, type: .withResponse)
             
         } else {
             os_log("    in sendKeepAliveMessage, receiveAuthenticationCharacteristic is nil, can not send KeepAliveTxMessage", log: log, type: .error)

@@ -7,7 +7,7 @@ class AlertEntriesAccessor {
     // MARK: - Properties
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryApplicationDataAlertEntries)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataAlertEntries)
     
     /// CoreDataManager to use
     private let coreDataManager:CoreDataManager

@@ -42,22 +42,22 @@ public enum AlertKind:Int, CaseIterable {
         switch self {
             
         case .low:
-            return Constants.DefaultAlertLevels.low
+            return ConstantsDefaultAlertLevels.low
         case .high:
-            return Constants.DefaultAlertLevels.high
+            return ConstantsDefaultAlertLevels.high
         case .verylow:
-            return Constants.DefaultAlertLevels.veryLow
+            return ConstantsDefaultAlertLevels.veryLow
         case .veryhigh:
-            return Constants.DefaultAlertLevels.veryHigh
+            return ConstantsDefaultAlertLevels.veryHigh
         case .missedreading:
-            return Constants.DefaultAlertLevels.missedReading
+            return ConstantsDefaultAlertLevels.missedReading
         case .calibration:
-            return Constants.DefaultAlertLevels.calibration
+            return ConstantsDefaultAlertLevels.calibration
         case .batterylow:
             if let transmitterType = UserDefaults.standard.transmitterType {
                 return transmitterType.defaultBatteryAlertLevel()
             } else {
-                return Constants.DefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
+                return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
             }
         }
     }
@@ -253,19 +253,19 @@ public enum AlertKind:Int, CaseIterable {
         switch self {
             
         case .low:
-            return Constants.Notifications.NotificationIdentifiersForAlerts.lowAlert
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.lowAlert
         case .high:
-            return Constants.Notifications.NotificationIdentifiersForAlerts.highAlert
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.highAlert
         case .verylow:
-            return Constants.Notifications.NotificationIdentifiersForAlerts.veryLowAlert
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.veryLowAlert
         case .veryhigh:
-            return Constants.Notifications.NotificationIdentifiersForAlerts.veryHighAlert
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.veryHighAlert
         case .missedreading:
-            return Constants.Notifications.NotificationIdentifiersForAlerts.missedReadingAlert
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.missedReadingAlert
         case .calibration:
-            return Constants.Notifications.NotificationIdentifiersForCalibration.subsequentCalibrationRequest
+            return ConstantsNotifications.NotificationIdentifiersForCalibration.subsequentCalibrationRequest
         case .batterylow:
-            return Constants.Notifications.NotificationIdentifiersForAlerts.batteryLow
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.batteryLow
         }
     }
     

@@ -3,7 +3,7 @@ import Foundation
 extension Double {
     /// converts mgdl to mmol
     func mgdlToMmol() -> Double {
-        return self * Constants.BloodGlucose.mgDlToMmoll
+        return self * ConstantsBloodGlucose.mgDlToMmoll
     }
     
     /// converts mgdl to mmol if parameter mgdl = false. If mgdl = true then just returns self
@@ -11,7 +11,7 @@ extension Double {
         if mgdl {
             return self
         } else {
-            return self * Constants.BloodGlucose.mgDlToMmoll
+            return self * ConstantsBloodGlucose.mgDlToMmoll
         }
     }
     
@@ -26,7 +26,7 @@ extension Double {
     
     /// converts mmol to mgdl
     func mmolToMgdl() -> Double {
-        return self * Constants.BloodGlucose.mmollToMgdl
+        return self * ConstantsBloodGlucose.mmollToMgdl
     }
     
     /// returns the value rounded to fractionDigits

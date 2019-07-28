@@ -11,7 +11,7 @@ public class HealthKitManager:NSObject {
     private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryHealthKitManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHealthKitManager)
     
     /// reference to coredatamanager
     private var coreDataManager:CoreDataManager

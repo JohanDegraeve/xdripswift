@@ -10,7 +10,7 @@ class SoundPlayer {
     // MARK: - properties
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryPlaySound)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryPlaySound)
 
     /// audioplayer
     private var audioPlayer:AVAudioPlayer?

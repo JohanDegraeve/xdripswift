@@ -13,13 +13,13 @@ enum Texts_SpeakReading {
 
     /// the language for speak reading texts, default en
     ///
-    /// Must be a valid language code, example "en-EN" or "en-US" but also "en" is allowed - should be a language code that exists in Constants.SpeakReadingLanguages - and the corresponding strings file must exist. Example there's only "en" for the moment, not en-GB or en-US
+    /// Must be a valid language code, example "en-EN" or "en-US" but also "en" is allowed - should be a language code that exists in ConstantsSpeakReadingLanguages - and the corresponding strings file must exist. Example there's only "en" for the moment, not en-GB or en-US
     ///
     /// if there's no folder languageCode.lproj (example fr.lproj if languageCode would be assigned to "fr") then the default language will be used ie en
     private(set) static var languageCode = defaultLanguageCode
     
-    /// name of currently selected language, should be matching value currently stored in user defaults - it can be used for performance reasons, to avoid that when needed the whole enum in Constants.SpeakReadingLanguages needs to be iterated through each time again
-    private(set) static var languageName = Constants.SpeakReadingLanguages.languageName(forLanguageCode: languageCode)
+    /// name of currently selected language, should be matching value currently stored in user defaults - it can be used for performance reasons, to avoid that when needed the whole enum in ConstantsSpeakReadingLanguages needs to be iterated through each time again
+    private(set) static var languageName = ConstantsSpeakReadingLanguages.languageName(forLanguageCode: languageCode)
 
     /// bundle to use, will be reassigned if user changes language for speak reading texts
     private static var bundle = Bundle(path: Bundle.main.path(forResource: defaultLanguageCode, ofType: "lproj")!)
@@ -33,7 +33,7 @@ enum Texts_SpeakReading {
     
     /// set the language for speak reading texts, default en
     ///
-    /// Must be a valid language code, example "en-EN" or "en-US" but also "en" is allowed - should be a language code that exists in Constants.SpeakReadingLanguages - and the corresponding strings file must exist. Example there's only "en" for the moment
+    /// Must be a valid language code, example "en-EN" or "en-US" but also "en" is allowed - should be a language code that exists in ConstantsSpeakReadingLanguages - and the corresponding strings file must exist. Example there's only "en" for the moment
     ///
     /// if there's no folder languageCode.lproj (example fr.lproj if languageCode would be assigned to "fr") then the default language will be used ie en
 public static func setLanguageCode(code:String?) {
@@ -47,7 +47,7 @@ public static func setLanguageCode(code:String?) {
             bundle = Bundle(path: path)
         } else {
             // full languageCode doesn't work, try now to split by - and use the first part only
-            // should never be in this branch if Constants.SpeakReadingLanguages is aligned with actual .lproj folders
+            // should never be in this branch if ConstantsSpeakReadingLanguages is aligned with actual .lproj folders
             if languageCode.contains(find: "-") {
                 let indexOfHyphen = languageCode.indexes(of: "-")
                 let languageRange =  languageCode.startIndex..<indexOfHyphen[0]
@@ -64,7 +64,7 @@ public static func setLanguageCode(code:String?) {
         }
     
     // set languageName
-    languageName = Constants.SpeakReadingLanguages.languageName(forLanguageCode: languageCode)
+    languageName = ConstantsSpeakReadingLanguages.languageName(forLanguageCode: languageCode)
 
     }
     

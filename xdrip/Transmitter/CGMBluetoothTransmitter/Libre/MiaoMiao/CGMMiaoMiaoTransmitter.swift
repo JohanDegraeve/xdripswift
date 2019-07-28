@@ -22,7 +22,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     let maxPacketResendRequests = 3;
     
     /// for OS_log
-    private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCGMMiaoMiao)
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMMiaoMiao)
     
     // used in parsing packet
     private var timeStampLastBgReading:Date

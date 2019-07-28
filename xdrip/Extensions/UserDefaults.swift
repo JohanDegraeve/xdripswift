@@ -139,7 +139,7 @@ extension UserDefaults {
             var returnValue = double(forKey: Key.lowMarkValue.rawValue)
             // if 0 set to defaultvalue
             if returnValue == 0.0 {
-                returnValue = Constants.BGGraphBuilder.defaultLowMarkInMgdl
+                returnValue = ConstantsBGGraphBuilder.defaultLowMarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
                 returnValue = returnValue.mgdlToMmol()
@@ -159,7 +159,7 @@ extension UserDefaults {
             var returnValue = double(forKey: Key.highMarkValue.rawValue)
             // if 0 set to defaultvalue
             if returnValue == 0.0 {
-                returnValue = Constants.BGGraphBuilder.defaultHighMmarkInMgdl
+                returnValue = ConstantsBGGraphBuilder.defaultHighMmarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
                 returnValue = returnValue.mgdlToMmol()
