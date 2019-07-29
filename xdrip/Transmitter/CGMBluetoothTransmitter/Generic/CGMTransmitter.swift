@@ -64,6 +64,9 @@ enum CGMTransmitterType:String, CaseIterable {
     /// Blucon
     case Blucon = "Blucon"
     
+    /// Bubble
+    case Bubble = "Bubble"
+    
     /// does the transmitter need a transmitter id ?
     ///
     /// can be used in UI stuff, if reset not possible then there's no need to show that option in the settings UI
@@ -76,7 +79,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG5, .dexcomG6:
             return true
             
-        case .miaomiao:
+        case .miaomiao, .Bubble:
             return false
             
         case .GNSentry:
@@ -102,7 +105,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG5, .dexcomG6:
             return false
             
-        case .miaomiao:
+        case .miaomiao, .Bubble:
             return true
             
         case .GNSentry:
@@ -139,7 +142,7 @@ enum CGMTransmitterType:String, CaseIterable {
             }
             return nil
             
-        case .miaomiao, .GNSentry:
+        case .miaomiao, .GNSentry, .Bubble:
             return nil
             
         case .Blucon:
@@ -160,6 +163,9 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .miaomiao:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
+            
+        case .Bubble:
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelBubble
             
         case .GNSentry:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelGNSEntry
@@ -182,7 +188,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG5, .dexcomG6:
             return true
             
-        case .miaomiao:
+        case .miaomiao, .Bubble:
             return false
             
         case .GNSentry:
@@ -205,7 +211,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG5, .dexcomG6:
             return "voltA"
             
-        case .miaomiao:
+        case .miaomiao, .Bubble:
             return "%"
             
         case .GNSentry:
@@ -228,7 +234,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG5, .dexcomG6:
             return true
             
-        case .miaomiao:
+        case .miaomiao, .Bubble:
             return false
             
         case .GNSentry:

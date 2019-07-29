@@ -3,11 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		A48D2DE552F4A356AA32746A /* Pods_xdrip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */; };
+		EE9947E822EEDD2E00DCB876 /* CGMBubbleTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE9947E722EEDD2E00DCB876 /* CGMBubbleTransmitter.swift */; };
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
 		F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */; };
 		F8025C1321DA683400ECF0C0 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1221DA683400ECF0C0 /* Data.swift */; };
@@ -190,6 +191,7 @@
 		148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.debug.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.debug.xcconfig"; sourceTree = "<group>"; };
 		662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2648F65F347D56D7DFFFAB7 /* Pods-xdrip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.release.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.release.xcconfig"; sourceTree = "<group>"; };
+		EE9947E722EEDD2E00DCB876 /* CGMBubbleTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMBubbleTransmitter.swift; sourceTree = "<group>"; };
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
 		F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothTransmitterDelegate.swift; sourceTree = "<group>"; };
 		F8025C1221DA683400ECF0C0 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
@@ -515,6 +517,14 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		EE9947E622EEDD0700DCB876 /* Bubble */ = {
+			isa = PBXGroup;
+			children = (
+				EE9947E722EEDD2E00DCB876 /* CGMBubbleTransmitter.swift */,
+			);
+			path = Bubble;
+			sourceTree = "<group>";
+		};
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -813,6 +823,7 @@
 		F8A54AEC22D9156600934E7A /* Libre */ = {
 			isa = PBXGroup;
 			children = (
+				EE9947E622EEDD0700DCB876 /* Bubble */,
 				F8A54AFB22D9179100934E7A /* Utilities */,
 				F8A54AED22D9156600934E7A /* GNSEntry */,
 				F8A54AEF22D9156600934E7A /* MiaoMiao */,
@@ -1282,16 +1293,11 @@
 			files = (
 			);
 			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-xdrip/Pods-xdrip-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/ActionClosurable/ActionClosurable.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-xdrip/Pods-xdrip-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ActionClosurable.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-xdrip/Pods-xdrip-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1379,6 +1385,7 @@
 				F8A54AB822D9111900934E7A /* TransmitterBatteryInfo.swift in Sources */,
 				F8B3A82D227F07D6004BA588 /* SettingsNavigationController.swift in Sources */,
 				F8A54AB722D9111900934E7A /* CGMTransmitter.swift in Sources */,
+				EE9947E822EEDD2E00DCB876 /* CGMBubbleTransmitter.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,
 				F8B3A81C227DEC92004BA588 /* AlertEntriesAccessor.swift in Sources */,

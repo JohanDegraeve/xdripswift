@@ -6,6 +6,8 @@ enum ConstantsLog {
     static let categoryBlueTooth = "bluetooth"
     /// for use in cgm transmitter miaomiao
     static let categoryCGMMiaoMiao = "cgmmiaomiao"
+    /// for use in cgm transmitter bubble
+    static let categoryCGMBubble = "cgmbubble"
     /// for use in cgm xdripg4
     static let categoryCGMxDripG4 = "cgmxdripg4"
     /// for use in firstview
