@@ -8,6 +8,7 @@ Current Status
     - MiaoMiao
     - G4 with xBridge
     - Blucon
+    - Bubble
 - Alerting
 - Upload to Nightscout
 - Follower mode, with NightScout
