@@ -1179,7 +1179,7 @@ extension RootViewController:CGMTransmitterDelegate {
         stopSensor()
     }
     
-    // MioaMiao and Bubble will call this
+    // MioaMiao and Bubble will call this (and Blucon, maybe others in the future)
     func sensorNotDetected() {
         os_log("sensor not detected", log: log, type: .info)
         
