@@ -62,7 +62,7 @@ enum CGMTransmitterType:String, CaseIterable {
     case GNSentry = "GNSentry"
     
     /// Blucon
-    case Blucon = "Blucon NOT READY !"
+    case Blucon = "Blucon"
     
     /// does the transmitter need a transmitter id ?
     ///
@@ -90,6 +90,8 @@ enum CGMTransmitterType:String, CaseIterable {
     /// if true, then a class conforming to the protocol CGMTransmitterDelegate will call newSensorDetected if it detects a new sensor is placed. Means there's no need to let the user start and stop a sensor
     ///
     /// example MiaoMiao can detect new sensor, implementation should return true, Dexcom transmitter's can't
+    ///
+    /// if true, then transmitterType must also be able to give the sensor age, ie sensorTimeInMinutes
     func canDetectNewSensor() -> Bool {
         
         switch self {
@@ -107,7 +109,7 @@ enum CGMTransmitterType:String, CaseIterable {
             return false
             
         case .Blucon:
-            return false
+            return true
         }
     }
     
@@ -151,19 +153,19 @@ enum CGMTransmitterType:String, CaseIterable {
         switch self {
             
         case .dexcomG4:
-            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelDexcomG4
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG4
             
         case .dexcomG5, .dexcomG6:
-            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
             
         case .miaomiao:
-            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
             
         case .GNSentry:
-            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelGNSEntry
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelGNSEntry
             
         case .Blucon:
-            return Constants.DefaultAlertLevels.defaultBatteryAlertLevelBlucon
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelBlucon
             
         }
     }

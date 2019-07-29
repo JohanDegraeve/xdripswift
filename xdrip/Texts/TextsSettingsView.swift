@@ -187,4 +187,14 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_speakRateMessage", tableName: filename, bundle: Bundle.main, value: "Value between 0 and 1", comment: "When clicking the rate setting, a pop up asks for the rate, this is the message displayed in the pop up")
     }()
     
+    // MARK: - Section Info
+    
+    static let version = {
+        return NSLocalizedString("settingsviews_Version", tableName: filename, bundle: Bundle.main, value: "Version", comment: "used in settings, section Info, title of the version setting")
+    }()
+
+    static let license = {
+        return NSLocalizedString("settingsviews_license", tableName: filename, bundle: Bundle.main, value: "License", comment: "used in settings, section Info, title of the license setting")
+    }()
+    
 }

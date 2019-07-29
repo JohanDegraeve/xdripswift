@@ -24,14 +24,14 @@ class DexcomShareUploadManager:NSObject {
     private let messageHandler:((String, String) -> Void)?
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryDexcomShareUploadManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryDexcomShareUploadManager)
 
     /// dexcom share url to use, calculated property
     private var dexcomShareUrl:String {
         if UserDefaults.standard.useUSDexcomShareurl {
-            return Constants.DexcomShare.usBaseShareUrl
+            return ConstantsDexcomShare.usBaseShareUrl
         } else {
-            return Constants.DexcomShare.nonUsBaseShareUrl
+            return ConstantsDexcomShare.nonUsBaseShareUrl
         }
     }
     
@@ -521,7 +521,7 @@ class DexcomShareUploadManager:NSObject {
             let uploadData = try JSONSerialization.data(withJSONObject: [
                 "accountName": dexcomShareAccountName,
                 "password": dexcomSharePassword,
-                "applicationId": Constants.DexcomShare.applicationId
+                "applicationId": ConstantsDexcomShare.applicationId
                 ], options: [])
             
             // get shared URLSession

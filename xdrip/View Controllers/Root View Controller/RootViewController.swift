@@ -52,13 +52,16 @@ final class RootViewController: UIViewController {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initiate pairing
     private let applicationManagerKeyInitiatePairing = "RootViewController-InitiatePairing"
 
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initial calibration
+    private let applicationManagerKeyInitialCalibration = "RootViewController-InitialCalibration"
+    
     // MARK: - Properties - other private properties
     
     /// a reference to the CGMTransmitter currently in use - nil means there's none, because user hasn't selected yet all required settings
     private var cgmTransmitter:CGMTransmitter?
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryFirstView)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryFirstView)
     
     /// coreDataManager to be used throughout the project
     private var coreDataManager:CoreDataManager?
@@ -123,7 +126,7 @@ final class RootViewController: UIViewController {
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
         // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like setting up the transmitter, start scanning
         // In the exceptional case that the transmitter would give a new reading before the DataManager is set up, then this new reading will be ignored
-        coreDataManager = CoreDataManager(modelName: Constants.CoreData.modelName, completion: {
+        coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
             
             self.setupApplicationData()
             
@@ -172,7 +175,7 @@ final class RootViewController: UIViewController {
         
         // if licenseinfo not yet accepted, show license info with only ok button
         if !UserDefaults.standard.licenseInfoAccepted {
-            UIAlertController(title: Constants.HomeView.applicationName, message: Texts_HomeView.licenseInfo + Constants.HomeView.infoEmailAddress, actionHandler: {
+            UIAlertController(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress, actionHandler: {
                 
                 // set licenseInfoAccepted to true
                 UserDefaults.standard.licenseInfoAccepted = true
@@ -251,7 +254,11 @@ final class RootViewController: UIViewController {
         })
     }
     
-    private func processNewCGMInfo(glucoseData: inout [RawGlucoseData], sensorState: LibreSensorState?, firmware: String?, hardware: String?, transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
+    /// process new glucose data received from transmitter.
+    /// - parameters:
+    ///     - glucoseData : array with new readings
+    ///     - sensorTimeInMinutes : should be present only if it's the first reading(s) being processed for a specific sensor and is needed if it's a transmitterType that returns true to the function canDetectNewSensor
+    private func processNewGlucoseData(glucoseData: inout [RawGlucoseData], sensorTimeInMinutes: Int?) {
         
         // check that calibrations and coredata manager is not nil
         guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager else {
@@ -337,7 +344,7 @@ final class RootViewController: UIViewController {
                 }
                 
                 if let alertManager = alertManager {
-                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: Constants.Master.maximumBgReadingAgeForAlertsInSeconds)
+                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
                 }
                 
                 if let healthKitManager = healthKitManager {
@@ -354,10 +361,6 @@ final class RootViewController: UIViewController {
             }
         }
         
-        // check transmitterBatteryInfo and if available store in settings
-        if let transmitterBatteryInfo = transmitterBatteryInfo {
-            UserDefaults.standard.transmitterBatteryInfo = transmitterBatteryInfo
-        }
     }
 
     // MARK:- observe function
@@ -457,7 +460,7 @@ final class RootViewController: UIViewController {
             // check if timer already exists, if so invalidate it
             invalidateUpdateLabelsTimer()
             // now recreate, schedule and return
-            return Timer.scheduledTimer(timeInterval: Constants.HomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabels), userInfo: nil, repeats: true)
+            return Timer.scheduledTimer(timeInterval: ConstantsHomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabels), userInfo: nil, repeats: true)
         }
         
         // call scheduleUpdateLabelsTimer function now - as the function setupUpdateLabelsTimer is called from viewdidload, it will be called immediately after app launch
@@ -540,7 +543,7 @@ final class RootViewController: UIViewController {
 
                                 // check alerts
                                 if let alertManager = self.alertManager {
-                                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: Constants.Master.maximumBgReadingAgeForAlertsInSeconds)
+                                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
                                 }
 
                                 // update labels
@@ -598,7 +601,7 @@ final class RootViewController: UIViewController {
                 
             case .Blucon:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
+                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber)
                     calibrator = Libre1Calibrator()
                 }
 
@@ -622,11 +625,11 @@ final class RootViewController: UIViewController {
         }
     }
     
-    // creates initial calibration request notification
+    /// creates initial calibration request notification
     private func createInitialCalibrationRequest() {
         
         // first remove existing notification if any
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifiersForCalibration.initialCalibrationRequest])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest])
         
         // Create Notification Content
         let notificationContent = UNMutableNotificationContent()
@@ -641,7 +644,7 @@ final class RootViewController: UIViewController {
         notificationContent.sound = UNNotificationSound.init(named: UNNotificationSoundName.init(""))
         
         // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: Constants.Notifications.NotificationIdentifiersForCalibration.initialCalibrationRequest, content: notificationContent, trigger: nil)
+        let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest, content: notificationContent, trigger: nil)
         
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
@@ -649,9 +652,25 @@ final class RootViewController: UIViewController {
                 os_log("Unable to Add Notification Request : %{public}@", log: self.log, type: .error, error.localizedDescription)
             }
         }
+        
+        // we will not just count on it that the user will click the notification to open the app (assuming the app is in the background, if the app is in the foreground, then we come in another flow)
+        // whenever app comes from-back to foreground, requestCalibration needs to be called
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyInitialCalibration, closure: {
+            
+            // first of all reremove from application key manager
+            ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeyInitialCalibration)
+            
+            // remove existing notification if any
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest])
+            
+            // request the calibration
+            self.requestCalibration(userRequested: false)
+            
+        })
+
     }
     
-    // creates bgreading notification
+    /// creates bgreading notification
     private func createBgReadingNotification() {
         
         // bgReadingsAccessor should not be nil at all, but let's not create a fatal error for that, there's already enough checks for it
@@ -673,10 +692,10 @@ final class RootViewController: UIViewController {
         }
         
         // remove existing notification if any
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest])
         
         // also remove the sensor not detected notification, if any
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected])
         
         // Create Notification Content
         let notificationContent = UNMutableNotificationContent()
@@ -695,7 +714,7 @@ final class RootViewController: UIViewController {
         notificationContent.body = " "
 
         // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: Constants.Notifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest, content: notificationContent, trigger: nil)
+        let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest, content: notificationContent, trigger: nil)
         
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
@@ -921,16 +940,21 @@ final class RootViewController: UIViewController {
 
     }
     
-    // stop the active sensor
+    // stops the active sensor and sets sensorSerialNumber in UserDefaults to nil
     private func stopSensor() {
+        
         if let activeSensor = activeSensor, let coreDataManager = coreDataManager {
             activeSensor.endDate = Date()
             coreDataManager.saveChanges()
         }
-        activeSensor = nil
-        
         // save the changes
         coreDataManager?.saveChanges()
+
+        activeSensor = nil
+
+        // reset also serialNubmer to nil
+        UserDefaults.standard.sensorSerialNumber = nil
+        
     }
     
     // start a new sensor, ask user for starttime
@@ -989,7 +1013,7 @@ extension RootViewController:CGMTransmitterDelegate {
         notificationContent.body = Texts_HomeView.transmitterResetResult + " : " + (successful ? Texts_HomeView.success : Texts_HomeView.failed)
         
         // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: Constants.Notifications.NotificationIdentifierForResetResult.transmitterResetResult, content: notificationContent, trigger: nil)
+        let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifierForResetResult.transmitterResetResult, content: notificationContent, trigger: nil)
         
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
@@ -1011,7 +1035,7 @@ extension RootViewController:CGMTransmitterDelegate {
     func successfullyPaired() {
         
         // remove existing notification if any
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
 
         // invalidate transmitterPairingResponseTimer
         if let transmitterPairingResponseTimer = transmitterPairingResponseTimer {
@@ -1066,6 +1090,8 @@ extension RootViewController:CGMTransmitterDelegate {
                 _ = cgmTransmitter.startScanning()
             }
 
+        @unknown default:
+            break
         }
         
     }
@@ -1078,7 +1104,7 @@ extension RootViewController:CGMTransmitterDelegate {
         if let timeStampLastNotificationForPairing = timeStampLastNotificationForPairing {
             
             // check timestamp of last notification, if too soon then return
-            if Int(abs(timeStampLastNotificationForPairing.timeIntervalSinceNow)) < Constants.BluetoothPairing.minimumTimeBetweenTwoPairingNotificationsInSeconds {
+            if Int(abs(timeStampLastNotificationForPairing.timeIntervalSinceNow)) < ConstantsBluetoothPairing.minimumTimeBetweenTwoPairingNotificationsInSeconds {
                 return
             }
         }
@@ -1087,7 +1113,7 @@ extension RootViewController:CGMTransmitterDelegate {
         timeStampLastNotificationForPairing = Date()
         
         // remove existing notification if any
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
 
         // Create Notification Content
         let notificationContent = UNMutableNotificationContent()
@@ -1101,7 +1127,7 @@ extension RootViewController:CGMTransmitterDelegate {
         notificationContent.sound = UNNotificationSound.init(named: UNNotificationSoundName.init(""))
         
         // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing, content: notificationContent, trigger: nil)
+        let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing, content: notificationContent, trigger: nil)
         
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
@@ -1117,18 +1143,17 @@ extension RootViewController:CGMTransmitterDelegate {
         // If the app is already in the foreground, then userNotificationCenter willPresent will be called, in this function the closure will be removed immediately, and the pairing request will be called. As a result, if the app is in the foreground, the user will not see (or hear) any notification, but the pairing will be initiated
         
         // max timestamp when notification was fired - connection stays open for 1 minute, taking 1 second as d
-        let maxTimeUserCanOpenApp = Date(timeIntervalSinceNow: TimeInterval(Constants.DexcomG5.maxTimeToAcceptPairingInSeconds - 1))
+        let maxTimeUserCanOpenApp = Date(timeIntervalSinceNow: TimeInterval(ConstantsDexcomG5.maxTimeToAcceptPairingInSeconds - 1))
         
         // we will not just count on it that the user will click the notification to open the app (assuming the app is in the background, if the app is in the foreground, then we come in another flow)
-        // we will
-        // whenever app comes from-back to freground, updateLabels needs to be called
+        // whenever app comes from-back to foreground, updateLabels needs to be called
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyInitiatePairing, closure: {
             
             // first of all reremove from application key manager
             ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeyInitiatePairing)
             
             // first remove existing notification if any
-            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
             
             // if it was too long since notification was fired, then forget about it
             if Date() > maxTimeUserCanOpenApp {
@@ -1163,7 +1188,7 @@ extension RootViewController:CGMTransmitterDelegate {
         notificationContent.body = Texts_HomeView.sensorNotDetected
         
         // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: Constants.Notifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected, content: notificationContent, trigger: nil)
+        let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected, content: notificationContent, trigger: nil)
 
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
@@ -1175,18 +1200,32 @@ extension RootViewController:CGMTransmitterDelegate {
     
     /// - parameters:
     ///     - readings: first entry is the most recent
-    func cgmTransmitterInfoReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: LibreSensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?, serialNumber: String?, bootloader: String?) {
+    func cgmTransmitterInfoReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: LibreSensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?, hardwareSerialNumber: String?, bootloader: String?, sensorSerialNumber:String?) {
         
         os_log("sensorstate %{public}@", log: log, type: .debug, sensorState?.description ?? "no sensor state found")
         os_log("firmware %{public}@", log: log, type: .debug, firmware ?? "no firmware version found")
         os_log("bootloader %{public}@", log: log, type: .debug, bootloader ?? "no bootloader  found")
-        os_log("serialNumber %{public}@", log: log, type: .debug, serialNumber ?? "no serialNumber  found")
+        os_log("hardwareSerialNumber %{public}@", log: log, type: .debug, hardwareSerialNumber ?? "no serialNumber  found")
+        os_log("sensorSerialNumber %{public}@", log: log, type: .debug, sensorSerialNumber ?? "no sensorSerialNumber  found")
         os_log("hardware %{public}@", log: log, type: .debug, hardware ?? "no hardware version found")
         os_log("transmitterBatteryInfo  %{public}@", log: log, type: .debug, transmitterBatteryInfo?.description ?? 0)
         os_log("sensor time in minutes  %{public}@", log: log, type: .debug, sensorTimeInMinutes?.description ?? "not received")
         os_log("glucoseData size = %{public}@", log: log, type: .debug, glucoseData.count.description)
+
+        // if received sensorSerialNumber not nil, and if value different from currently stored value, then store it
+        if let sensorSerialNumber = sensorSerialNumber {
+            if sensorSerialNumber != UserDefaults.standard.sensorSerialNumber {
+                UserDefaults.standard.sensorSerialNumber = sensorSerialNumber
+            }
+        }
         
-        processNewCGMInfo(glucoseData: &glucoseData, sensorState: sensorState, firmware: firmware, hardware: hardware, transmitterBatteryInfo: transmitterBatteryInfo, sensorTimeInMinutes: sensorTimeInMinutes)
+        // if received transmitterBatteryInfo not nil, then store it
+        if let transmitterBatteryInfo = transmitterBatteryInfo {
+            UserDefaults.standard.transmitterBatteryInfo = transmitterBatteryInfo
+        }
+        
+        // process new readings
+        processNewGlucoseData(glucoseData: &glucoseData, sensorTimeInMinutes: sensorTimeInMinutes)
     }
 
 }
@@ -1212,24 +1251,27 @@ extension RootViewController:UNUserNotificationCenterDelegate {
     // called when notification created while app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
-        if notification.request.identifier == Constants.Notifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
+        if notification.request.identifier == ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
             
             // request calibration
             requestCalibration(userRequested: false)
             
+            /// remove applicationManagerKeyInitialCalibration from application key manager - there's no need to initiate the calibration via this closure
+            ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeyInitialCalibration)
+
             // call completionhandler to avoid that notification is shown to the user
             completionHandler([])
             
-        } else if notification.request.identifier == Constants.Notifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
+        } else if notification.request.identifier == ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
             
             // call completionhandler to show the notification even though the app is in the foreground, without sound
             completionHandler([.alert])
             
-        } else if notification.request.identifier == Constants.Notifications.NotificationIdentifierForResetResult.transmitterResetResult {
+        } else if notification.request.identifier == ConstantsNotifications.NotificationIdentifierForResetResult.transmitterResetResult {
             
             completionHandler([.alert])
             
-        } else if notification.request.identifier == Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
+        } else if notification.request.identifier == ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             
             // so actually the app was in the foreground, at the  moment the Transmitter Class called the cgmTransmitterNeedsPairing function, there's no need to show the notification, we can immediately call back the cgmTransmitter initiatePairing function
             completionHandler([])
@@ -1260,22 +1302,21 @@ extension RootViewController:UNUserNotificationCenterDelegate {
             completionHandler()
         }
         
-        if response.notification.request.identifier == Constants.Notifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
+        if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
             
-            os_log("     userNotificationCenter didReceive, user pressed calibration notification to open the app", log: log, type: .info)
-            // request calibration
-            requestCalibration(userRequested: false)
+            // nothing required, the requestCalibration function will be called as it's been added to ApplicationManager
+            os_log("     userNotificationCenter didReceive, user pressed calibration notification to open the app, requestCalibration should be called because closure is added in ApplicationManager.shared", log: log, type: .info)
             
-        } else if response.notification.request.identifier == Constants.Notifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
+        } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
 
             // if user clicks notification "sensor not detected", then show uialert with title and body
             UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.sensorNotDetected, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
 
-        } else if response.notification.request.identifier == Constants.Notifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
+        } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             
             // nothing required, the pairing function will be called as it's been added to ApplicationManager in function cgmTransmitterNeedsPairing
 
-        } else if response.notification.request.identifier == Constants.Notifications.NotificationIdentifierForResetResult.transmitterResetResult {
+        } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForResetResult.transmitterResetResult {
             
             // nothing required
             
@@ -1341,7 +1382,7 @@ extension RootViewController:NightScoutFollowerDelegate {
 
                 // check alerts
                 if let alertManager = alertManager {
-                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: Constants.Follower.maximumBgReadingAgeForAlertsInSeconds)
+                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds)
                 }
 
                 if let healthKitManager = healthKitManager {

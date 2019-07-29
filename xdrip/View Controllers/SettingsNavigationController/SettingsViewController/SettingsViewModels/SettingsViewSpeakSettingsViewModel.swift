@@ -49,14 +49,14 @@ class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
             //find index for languageCode type currently stored in userdefaults
             var selectedRow:Int?
             if let languageCode = UserDefaults.standard.speakReadingLanguageCode {
-                selectedRow = Constants.SpeakReadingLanguages.allLanguageNamesAndCodes.codes.index(of:languageCode)
+                selectedRow = ConstantsSpeakReadingLanguages.allLanguageNamesAndCodes.codes.firstIndex(of:languageCode)
             } else {
-                selectedRow = Constants.SpeakReadingLanguages.allLanguageNamesAndCodes.codes.index(of:Texts_SpeakReading.defaultLanguageCode)
+                selectedRow = ConstantsSpeakReadingLanguages.allLanguageNamesAndCodes.codes.firstIndex(of:Texts_SpeakReading.defaultLanguageCode)
             }
             
-            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.speakReadingLanguageSelection, data: Constants.SpeakReadingLanguages.allLanguageNamesAndCodes.names, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.speakReadingLanguageSelection, data: ConstantsSpeakReadingLanguages.allLanguageNamesAndCodes.names, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
                 if index != selectedRow {
-                    UserDefaults.standard.speakReadingLanguageCode = Constants.SpeakReadingLanguages.allLanguageNamesAndCodes.codes[index]
+                    UserDefaults.standard.speakReadingLanguageCode = ConstantsSpeakReadingLanguages.allLanguageNamesAndCodes.codes[index]
                 }
             }, cancelHandler: nil, didSelectRowHandler: nil)
 

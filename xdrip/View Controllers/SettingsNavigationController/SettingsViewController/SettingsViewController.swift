@@ -14,6 +14,8 @@ final class SettingsViewController: UIViewController {
     fileprivate var healthKitSettingsViewModel = SettingsViewHealthKitSettingsViewModel()
     fileprivate var alarmsSettingsViewModel = SettingsViewAlertSettingsViewModel()
     fileprivate var speakSettingsViewModel = SettingsViewSpeakSettingsViewModel()
+    fileprivate var developmentSettingsViewModel = SettingsViewDevelopmentSettingsViewModel()
+    fileprivate var infoSettingsViewModel = SettingsViewInfoViewModel()
     
     private lazy var pickerViewController: PickerViewController = {
         // Instantiate View Controller
@@ -132,6 +134,10 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
         case healthkit
         /// store bg values in healthkit
         case speak
+        /// info
+        case info
+        /// developper settings
+        case developer
     }
     
     // MARK: - UITableViewDataSource protocol Methods
@@ -153,6 +159,10 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             return alarmsSettingsViewModel.sectionTitle()
         case .speak:
             return speakSettingsViewModel.sectionTitle()
+        case .developer:
+            return developmentSettingsViewModel.sectionTitle()
+        case .info:
+            return infoSettingsViewModel.sectionTitle()
         }
     }
     
@@ -177,6 +187,11 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             return alarmsSettingsViewModel.numberOfRows()
         case .speak:
             return speakSettingsViewModel.numberOfRows()
+        case .developer:
+            return developmentSettingsViewModel.numberOfRows()
+        case .info:
+            return infoSettingsViewModel.numberOfRows()
+            
         }
     }
     
@@ -201,6 +216,10 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             viewModel = alarmsSettingsViewModel
         case .speak:
             viewModel = speakSettingsViewModel
+        case .developer:
+            viewModel = developmentSettingsViewModel
+        case .info:
+            viewModel = infoSettingsViewModel
         }
 
         
@@ -225,6 +244,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
                 case .checkmark, .detailButton, .detailDisclosureButton, .disclosureIndicator:
                     cell.selectionStyle = .gray
                 case .none:
+                    cell.selectionStyle = .none
+                @unknown default:
                     cell.selectionStyle = .none
                 }
                 
@@ -287,6 +308,10 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             viewModel = alarmsSettingsViewModel
         case .speak:
             viewModel = speakSettingsViewModel
+        case .developer:
+            viewModel = developmentSettingsViewModel
+        case .info:
+            viewModel = infoSettingsViewModel
         }
         
         if let viewModel = viewModel {
@@ -349,12 +374,25 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
                     
                 case .performSegue(let withIdentifier):
                     self.performSegue(withIdentifier: withIdentifier, sender: nil)
+
+                case let .showInfoText(title, message):
+                    
+                    UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+                    
                 }
 
             } else {
                 // setting not enabled, nothing to do
             }
         }
+    }
+    
+    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        
+        // apple doc says : Use this method to respond to taps in the detail button accessory view of a row. The table view does not call this method for other types of accessory views.
+        // when user clicks on of the detail buttons, then consider this as row selected, for now - as it's only license that is using this button for now
+        self.tableView(tableView, didSelectRowAt: indexPath)
+        
     }
 }
 

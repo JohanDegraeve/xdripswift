@@ -67,7 +67,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
     /// for OS_log
-    private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCGMGNSEntry)
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMGNSEntry)
     
     /// used in parsing packet
     private var timeStampLastBgReadingInMinutes:Double
@@ -154,22 +154,22 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 actualSerialNumber = String(data: value, encoding: String.Encoding.utf8)
                 // TODO : is this the serial number of the sensor ? if yes we can use this to detect new sensor ? as with blucon ?
                 if let actualSerialNumber = actualSerialNumber {
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: actualSerialNumber, bootloader: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: actualSerialNumber, bootloader: nil, sensorSerialNumber: nil)
                 }
             case .CBUUID_Firmware:
                 actualFirmWareVersion = String(data: value, encoding: String.Encoding.utf8)
                 if let actualFirmWareVersion = actualFirmWareVersion {
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: actualFirmWareVersion, hardware: nil, serialNumber: nil, bootloader: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: actualFirmWareVersion, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
                 }
             case .CBUUID_Bootloader:
                 actualBootLoader = String(data: value, encoding: String.Encoding.utf8)
                 if let actualBootLoader = actualBootLoader {
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: actualBootLoader)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: actualBootLoader, sensorSerialNumber: nil)
                 }
             case .CBUUID_BatteryLevel:
                 let dataAsString = value.hexEncodedString()
                 if let batteryLevel = Int(dataAsString, radix: 16) {
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryLevel), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, serialNumber: nil, bootloader: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryLevel), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
                 } else {
                     os_log("   in peripheralDidUpdateValueFor, could not read batterylevel, received hex value = %{public}@", log: log, type: .error , dataAsString)
                 }
@@ -227,7 +227,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                             // sometimes 0 values are received, skip those
                             if readingValueInMgDl > 0 {
                                 if readingTimeStampInMinutes * 60 * 1000 < timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) {
-                                    let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * Constants.BloodGlucose.libreMultiplier)
+                                    let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * ConstantsBloodGlucose.libreMultiplier)
                                     readings.append(glucoseData)
                                     timeStampLastAddedGlucoseDataInMinutes = readingTimeStampInMinutes
                                 }
@@ -241,7 +241,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                         i = i + 1
                     }
                     
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &readings, transmitterBatteryInfo: nil, sensorState: sensorStatus, sensorTimeInMinutes: Int(sensorElapsedTimeInMinutes), firmware: actualFirmWareVersion, hardware: nil, serialNumber: actualSerialNumber, bootloader: actualBootLoader)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &readings, transmitterBatteryInfo: nil, sensorState: sensorStatus, sensorTimeInMinutes: Int(sensorElapsedTimeInMinutes), firmware: actualFirmWareVersion, hardware: nil, hardwareSerialNumber: actualSerialNumber, bootloader: actualBootLoader, sensorSerialNumber: nil)
                     
                     //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
                     if readings.count > 0 {

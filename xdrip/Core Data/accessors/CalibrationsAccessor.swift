@@ -7,7 +7,7 @@ class CalibrationsAccessor {
     // MARK: - Properties
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryApplicationDataCalibrations)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataCalibrations)
     
     /// CoreDataManager to use
     private let coreDataManager:CoreDataManager

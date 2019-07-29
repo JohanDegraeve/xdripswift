@@ -14,7 +14,7 @@ class NightScoutFollowManager:NSObject {
     private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryNightScoutFollowManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryNightScoutFollowManager)
     
     /// when to do next download
     private var nextFollowDownloadTimeStamp:Date
@@ -59,7 +59,7 @@ class NightScoutFollowManager:NSObject {
         // creat audioplayer
         do {
             // set up url to create audioplayer
-            let soundFileName = Constants.SuspensionPrevention.soundFileName
+            let soundFileName = ConstantsSuspensionPrevention.soundFileName
             if let url = Bundle.main.url(forResource: soundFileName, withExtension: "")  {
 
                 try audioPlayer = AVAudioPlayer(contentsOf: url)
@@ -144,7 +144,7 @@ class NightScoutFollowManager:NSObject {
         guard let nightScoutUrl = UserDefaults.standard.nightScoutUrl else {return}
         
         // maximum timeStamp to download initially set to 1 day back
-        var timeStampOfFirstBgReadingToDowload = Date(timeIntervalSinceNow: TimeInterval(-Constants.Follower.maxiumDaysOfReadingsToDownload * 24 * 3600))
+        var timeStampOfFirstBgReadingToDowload = Date(timeIntervalSinceNow: TimeInterval(-ConstantsFollower.maxiumDaysOfReadingsToDownload * 24 * 3600))
         
         // check timestamp of lastest stored bgreading with calculated value, if more recent then use this as timeStampOfFirstBgReadingToDowload
         let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
@@ -325,7 +325,7 @@ class NightScoutFollowManager:NSObject {
     private func enableSuspensionPrevention() {
         
         // create playSoundTimer
-        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Constants.SuspensionPrevention.interval), eventHandler: {
+        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(ConstantsSuspensionPrevention.interval), eventHandler: {
                 // play the sound
                 if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
                     audioPlayer.play()

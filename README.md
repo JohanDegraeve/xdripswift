@@ -7,6 +7,7 @@ Current Status
     - G5 and G6
     - MiaoMiao
     - G4 with xBridge
+    - Blucon
 - Alerting
 - Upload to Nightscout
 - Follower mode, with NightScout
@@ -18,8 +19,5 @@ Not yet supported
 - translations, English only
 - sidiary
 - graph on the homescreen
-
-Other restrictions
-- sensor change detection not fully working, you might have to restart the app after placing the new sensor, maybe two times. I need more testing for this (next sensor replacement)
 
 For developers : please go to the Wiki : https://github.com/JohanDegraeve/xdripswift/wiki

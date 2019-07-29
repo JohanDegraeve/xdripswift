@@ -11,7 +11,7 @@ public class HealthKitManager:NSObject {
     private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryHealthKitManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHealthKitManager)
     
     /// reference to coredatamanager
     private var coreDataManager:CoreDataManager
@@ -86,6 +86,8 @@ public class HealthKitManager:NSObject {
             return false
         case .sharingAuthorized:
             break
+        @unknown default:
+            os_log("unknown authorizationstatus for healthkit - HealthKitManager.swift", log: self.log, type: .error)
         }
         
         // all checks ok , return true

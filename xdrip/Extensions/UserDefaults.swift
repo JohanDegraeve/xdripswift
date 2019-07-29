@@ -100,9 +100,21 @@ extension UserDefaults {
         /// timestamp of last bgreading that was stored in healthkit
         case timeStampLatestHealthKitStoreBgReading = "timeStampLatestHealthKitStoreBgReading"
         
+        // Dexcom Share
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
         
+        // Sensor
+        /// sensor Serial Number, for now only applicable to Libre
+        case sensorSerialNumber = "sensorSerialNumber"
+        
+        // development settings to test G6 scaling
+        /// G6 factor1 - for testing G6 scaling
+        case G6v2ScalingFactor1 = "G6v2ScalingFactor1"
+
+        /// G6 factor2 - for testing G6 scaling
+        case G6v2ScalingFactor2 = "G6v2ScalingFactor2"
+
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -127,7 +139,7 @@ extension UserDefaults {
             var returnValue = double(forKey: Key.lowMarkValue.rawValue)
             // if 0 set to defaultvalue
             if returnValue == 0.0 {
-                returnValue = Constants.BGGraphBuilder.defaultLowMarkInMgdl
+                returnValue = ConstantsBGGraphBuilder.defaultLowMarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
                 returnValue = returnValue.mgdlToMmol()
@@ -147,7 +159,7 @@ extension UserDefaults {
             var returnValue = double(forKey: Key.highMarkValue.rawValue)
             // if 0 set to defaultvalue
             if returnValue == 0.0 {
-                returnValue = Constants.BGGraphBuilder.defaultHighMmarkInMgdl
+                returnValue = ConstantsBGGraphBuilder.defaultHighMmarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
                 returnValue = returnValue.mgdlToMmol()
@@ -524,6 +536,38 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.timeStampLatestDexcomShareUploadedBgReading.rawValue)
+        }
+    }
+    
+    /// sensor serial number, for now only useful for Libre sensor
+    var sensorSerialNumber:String? {
+        get {
+            return string(forKey: Key.sensorSerialNumber.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.sensorSerialNumber.rawValue)
+        }
+    }
+    
+    // MARK: - =====  technical settings for testing ======
+    
+    /// G6 factor 1
+    @objc dynamic var G6v2ScalingFactor1:String? {
+        get {
+            return string(forKey: Key.G6v2ScalingFactor1.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.G6v2ScalingFactor1.rawValue)
+        }
+    }
+    
+    /// G6 factor 2
+    @objc dynamic var G6v2ScalingFactor2:String? {
+        get {
+            return string(forKey: Key.G6v2ScalingFactor2.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.G6v2ScalingFactor2.rawValue)
         }
     }
     

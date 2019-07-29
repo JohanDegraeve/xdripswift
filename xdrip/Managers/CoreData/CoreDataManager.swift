@@ -13,7 +13,7 @@ final class CoreDataManager {
     
     private let modelName: String
     
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryCoreDataManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCoreDataManager)
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillTerminate
     private let applicationManagerKeySaveChanges = "coredatamanagersavechanges"

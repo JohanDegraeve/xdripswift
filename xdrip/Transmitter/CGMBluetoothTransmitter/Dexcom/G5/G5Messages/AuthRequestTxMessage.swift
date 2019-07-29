@@ -16,7 +16,7 @@ struct AuthRequestTxMessage: TransmitterTxMessage {
     init() {
         let uuid = UUID().uuid
 
-        singleUseToken = Data(bytes: [uuid.0, uuid.1, uuid.2, uuid.3,
+        singleUseToken = Data([uuid.0, uuid.1, uuid.2, uuid.3,
                                       uuid.4, uuid.5, uuid.6, uuid.7])
     }
 

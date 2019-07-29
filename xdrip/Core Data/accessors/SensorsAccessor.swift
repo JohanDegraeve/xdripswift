@@ -7,7 +7,7 @@ class SensorsAccessor {
     // MARK: - Properties
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryApplicationDataSensors)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataSensors)
     
     /// CoreDataManager to use
     private let coreDataManager:CoreDataManager

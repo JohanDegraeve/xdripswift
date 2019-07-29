@@ -7,7 +7,7 @@ class AlertTypesAccessor {
     // MARK: - Properties
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryApplicationDataAlertTypes)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataAlertTypes)
     
     /// CoreDataManager to use
     private let coreDataManager:CoreDataManager
@@ -48,7 +48,7 @@ class AlertTypesAccessor {
         if let alertType = alertTypes.first {
             return alertType
         } else {
-            let defaultAlertType =  AlertType(enabled: Constants.DefaultAlertTypeSettings.enabled, name: Texts_Common.default0, overrideMute: Constants.DefaultAlertTypeSettings.overrideMute, snooze: Constants.DefaultAlertTypeSettings.snooze, snoozePeriod: Int(Constants.DefaultAlertTypeSettings.snoozePeriod), vibrate: Constants.DefaultAlertTypeSettings.vibrate, soundName: Constants.Sounds.getSoundName(forSound: .xdripalert), alertEntries: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+            let defaultAlertType =  AlertType(enabled: ConstantsDefaultAlertTypeSettings.enabled, name: Texts_Common.default0, overrideMute: ConstantsDefaultAlertTypeSettings.overrideMute, snooze: ConstantsDefaultAlertTypeSettings.snooze, snoozePeriod: Int(ConstantsDefaultAlertTypeSettings.snoozePeriod), vibrate: ConstantsDefaultAlertTypeSettings.vibrate, soundName: ConstantsSounds.getSoundName(forSound: .xdripalert), alertEntries: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
             coreDataManager.saveChanges()
             return defaultAlertType
         }

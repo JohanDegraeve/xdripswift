@@ -8,7 +8,7 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
     // MARK: - private properties
     
     /// for logging
-    private var log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryHealthKitManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHealthKitManager)
 
     // MARK: - functions in protocol SettingsViewModelProtocol
     
@@ -75,6 +75,8 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
                         os_log("user removed authorization to store bgreadings in healthkit", log: self.log, type: .error)
                     case .sharingAuthorized:
                         break
+                    @unknown default:
+                        os_log("unknown authorizationstatus for healthkit - SettingsViewHealthKitSettingsViewModel", log: self.log, type: .error)
                     }
                 } else {
                     os_log("User enabled HealthKit however failed to create bloodGlucoseType", log: self.log, type: .error)

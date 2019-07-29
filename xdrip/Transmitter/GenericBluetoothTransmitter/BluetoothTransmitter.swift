@@ -35,7 +35,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     private let startScanningAfterInit:Bool
 
     // for OS_log,
-    private let log = OSLog(subsystem: Constants.Log.subSystem, category: Constants.Log.categoryBlueTooth)
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBlueTooth)
 
     /// centralManager
     private var centralManager: CBCentralManager?
