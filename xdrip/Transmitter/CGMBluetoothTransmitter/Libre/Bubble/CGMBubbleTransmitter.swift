@@ -18,9 +18,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
     
-    // maximum times resend request due to crc error
-    let maxPacketResendRequests = 3;
-    
     /// for OS_log
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMBubble)
     
@@ -38,6 +35,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     private static let maxWaitForpacketInSeconds = 60.0
     // length of header added by Bubble in front of data dat is received from Libre sensor
     private let BubbleHeaderLength = 8
+    
+    /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
+    var emptyArray: [RawGlucoseData] = []
     
     // MARK: - Initialization
     /// - parameters:
@@ -100,9 +100,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
         }
     }
     
-    var hardware = ""
-    var firmware = ""
-    var batteryPercentage = 0
     func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
         
         if let value = characteristic.value {
@@ -117,11 +114,18 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                 if let bubbleResponseState = BubbleResponseType(rawValue: firstByte) {
                     switch bubbleResponseState {
                     case .dataInfo:
-                        hardware = value[2].description + ".0"
-                        firmware = value[1].description + ".0"
-                        batteryPercentage = Int(value[4])
                         
-                        let _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
+                        // get hardware, firmware and batteryPercentage
+                        let hardware = value[2].description + ".0"
+                        let firmware = value[1].description + ".0"
+                        let batteryPercentage = Int(value[4])
+
+                        // send hardware, firmware and batteryPercentage to delegate
+                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: nil, sensorTimeInMinutes: nil, firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+
+                        // confirm receipt
+                        _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
+                        
                     case .dataPacket:
                         rxBuffer.append(value.suffix(from: 4))
                         if rxBuffer.count >= 352 {
@@ -129,7 +133,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                                 //get readings from buffer and send to delegate
                                 var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: BubbleHeaderLength)
                                 //TODO: sort glucosedata before calling newReadingsReceived
-                                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
                                 
                                 //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
                                 if result.glucoseData.count > 0 {
