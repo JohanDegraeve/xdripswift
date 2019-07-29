@@ -114,37 +114,34 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
             }
             
             if let firstByte = value.first {
-                if firstByte == 192 {
-                    rxBuffer.append(value.subdata(in: 2..<10))
-                    return
-                }
-                
-                if firstByte == 128 {
-                    hardware = value[2].description + ".0"
-                    firmware = value[1].description + ".0"
-                    batteryPercentage = Int(value[4])
-                    
-                    let _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
-                }
-                
-                if firstByte == 130 {
-                    rxBuffer.append(value.suffix(from: 4))
-                }
-                
-                if rxBuffer.count >= 352 {
-                    if (Crc.LibreCrc(data: &rxBuffer, headerOffset: BubbleHeaderLength)) {
-                        //get readings from buffer and send to delegate
-                        var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: BubbleHeaderLength)
-                        //TODO: sort glucosedata before calling newReadingsReceived
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                if let bubbleResponseState = BubbleResponseType(rawValue: firstByte) {
+                    switch bubbleResponseState {
+                    case .dataInfo:
+                        hardware = value[2].description + ".0"
+                        firmware = value[1].description + ".0"
+                        batteryPercentage = Int(value[4])
                         
-                        //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
-                        if result.glucoseData.count > 0 {
-                            timeStampLastBgReading = result.glucoseData[0].timeStamp
+                        let _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
+                    case .dataPacket:
+                        rxBuffer.append(value.suffix(from: 4))
+                        if rxBuffer.count >= 352 {
+                            if (Crc.LibreCrc(data: &rxBuffer, headerOffset: BubbleHeaderLength)) {
+                                //get readings from buffer and send to delegate
+                                var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: BubbleHeaderLength)
+                                //TODO: sort glucosedata before calling newReadingsReceived
+                                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                                
+                                //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
+                                if result.glucoseData.count > 0 {
+                                    timeStampLastBgReading = result.glucoseData[0].timeStamp
+                                }
+                                
+                                //reset the buffer
+                                resetRxBuffer()
+                            }
                         }
-                        
-                        //reset the buffer
-                        resetRxBuffer()
+                    case .noSensor:
+                        cgmTransmitterDelegate?.sensorNotDetected()
                     }
                 }
             }
@@ -172,5 +169,24 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
         rxBuffer = Data()
         startDate = Date()
         resendPacketCounter = 0
+    }
+}
+
+fileprivate enum BubbleResponseType: UInt8 {
+    case dataPacket = 130
+    case dataInfo = 128
+    case noSensor = 191
+}
+
+extension BubbleResponseType: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .dataPacket:
+            return "Data packet received"
+        case .noSensor:
+            return "No sensor detected"
+        case .dataInfo:
+            return "Data info received"
+        }
     }
 }
