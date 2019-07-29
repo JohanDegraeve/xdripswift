@@ -4,6 +4,7 @@ enum ConstantsDefaultAlertLevels {
     static let defaultBatteryAlertLevelDexcomG5 = 300
     static let defaultBatteryAlertLevelDexcomG4 = 210
     static let defaultBatteryAlertLevelMiaoMiao = 20
+    static let defaultBatteryAlertLevelBubble = 20
     static let defaultBatteryAlertLevelGNSEntry = 20
     static let defaultBatteryAlertLevelBlucon = 20
     

@@ -595,6 +595,10 @@ final class RootViewController: UIViewController {
                 cgmTransmitter = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
                 calibrator = Libre1Calibrator()
                 
+            case .Bubble:
+                cgmTransmitter = CGMBubbleTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
+                calibrator = Libre1Calibrator()
+                
             case .GNSentry:
                 cgmTransmitter = CGMGNSEntryTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
                 calibrator = Libre1Calibrator()
