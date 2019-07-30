@@ -392,7 +392,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         timeStampLastStatusUpdate = Date()
         
-        os_log("didDiscoverCharacteristicsFor", log: log, type: .info)
+        os_log("didDiscoverCharacteristicsFor for service with uuid %{public}@", log: log, type: .info, String(describing:service.uuid))
+        
         if let error = error {
             os_log("    didDiscoverCharacteristicsFor error: %{public}@", log: log, type: .error , error.localizedDescription)
         }
