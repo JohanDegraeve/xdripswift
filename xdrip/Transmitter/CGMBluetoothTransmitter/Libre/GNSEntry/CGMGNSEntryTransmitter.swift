@@ -88,7 +88,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
     var emptyArray: [RawGlucoseData] = []
     
-    // MARK: - functions
+    // MARK: - public functions
     
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
@@ -325,7 +325,9 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         }
     }
     
-    /// creates readable representation of characteristicUUID, for logging only
+    // MARK: - private helper functions
+    
+    /// creates CBUUID_Characteristic_UUID for the characteristicUUID
     private func receivedCharacteristicUUIDToCharacteristic(characteristicUUID:String) -> CBUUID_Characteristic_UUID? {
         if CBUUID_Characteristic_UUID.CBUUID_BatteryLevel.rawValue.containsIgnoringCase(find: characteristicUUID) {
             return CBUUID_Characteristic_UUID.CBUUID_BatteryLevel

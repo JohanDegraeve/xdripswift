@@ -130,6 +130,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                                 let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
                                 let batteryPercentage = Int(rxBuffer[13])
 
+                                let serialNumber = SensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)))?.serialNumber ?? "-"
+                                debuglogging("serialNumber = " + serialNumber)
+                                
                                 //get readings from buffer and send to delegate
                                 var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: miaoMiaoHeaderLength)
                                 //TODO: sort glucosedata before calling newReadingsReceived
