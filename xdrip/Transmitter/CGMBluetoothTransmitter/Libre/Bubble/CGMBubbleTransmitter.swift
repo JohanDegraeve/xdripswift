@@ -131,13 +131,14 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
 
                         // confirm receipt
                         _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
-                        
+                    case .serialNumber:
+                        rxBuffer.append(value.subdata(in: 2..<10))
                     case .dataPacket:
                         rxBuffer.append(value.suffix(from: 4))
                         if rxBuffer.count >= 352 {
                             if (Crc.LibreCrc(data: &rxBuffer, headerOffset: BubbleHeaderLength)) {
                                 
-                                if let sensorSerialNumberData = SensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
+                                if let sensorSerialNumberData = SensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8))) {
                                     let newSerialNumber = sensorSerialNumberData.serialNumber
                                     
                                     // verify serial number and if changed inform delegate
@@ -210,6 +211,7 @@ fileprivate enum BubbleResponseType: UInt8 {
     case dataPacket = 130
     case dataInfo = 128
     case noSensor = 191
+    case serialNumber = 192
 }
 
 extension BubbleResponseType: CustomStringConvertible {
@@ -221,6 +223,8 @@ extension BubbleResponseType: CustomStringConvertible {
             return "No sensor detected"
         case .dataInfo:
             return "Data info received"
+        case .serialNumber:
+            return "serial number received"
         }
     }
 }
