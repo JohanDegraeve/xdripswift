@@ -39,10 +39,13 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
     var emptyArray: [RawGlucoseData] = []
     
+    // current sensor serial number, if nil then it's not known yet
+    private var sensorSerialNumber:String?
+    
     // MARK: - Initialization
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
-    init(address:String?, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date) {
+    init(address:String?, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, sensorSerialNumber:String?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameBubble)
@@ -50,6 +53,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address)
         }
         
+        // initialize sensorSerialNumber
+        self.sensorSerialNumber = sensorSerialNumber
+
         // assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate
         
@@ -130,6 +136,30 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                         rxBuffer.append(value.suffix(from: 4))
                         if rxBuffer.count >= 352 {
                             if (Crc.LibreCrc(data: &rxBuffer, headerOffset: BubbleHeaderLength)) {
+                                
+                                if let sensorSerialNumberData = SensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
+                                    let newSerialNumber = sensorSerialNumberData.serialNumber
+                                    
+                                    // verify serial number and if changed inform delegate
+                                    if newSerialNumber != sensorSerialNumber {
+                                        
+                                        os_log("    new sensor detected :  %{public}@", log: log, type: .info, newSerialNumber)
+                                        
+                                        sensorSerialNumber = newSerialNumber
+                                        
+                                        // inform delegate about new sensor detected
+                                        cgmTransmitterDelegate?.newSensorDetected()
+                                        
+                                        // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
+                                        timeStampLastBgReading = Date(timeIntervalSince1970: 0)
+                                        
+                                        // inform delegate about sensorSerialNumber
+                                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: sensorSerialNumber)
+
+                                    }
+
+                                }
+
                                 //get readings from buffer and send to delegate
                                 var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: BubbleHeaderLength)
                                 //TODO: sort glucosedata before calling newReadingsReceived
@@ -156,7 +186,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     
     // MARK: CGMTransmitter protocol functions
     
-    /// to ask pairing - empty function because G4 doesn't need pairing
+    /// to ask pairing - empty function because Bubble doesn't need pairing
     ///
     /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
     func initiatePairing() {}
