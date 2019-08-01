@@ -18,7 +18,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
     
-    /// for OS_log
+    /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMBubble)
     
     // used in parsing packet
@@ -78,7 +78,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
         if writeDataToPeripheral(data: Data([0x00, 0x00, 0x5]), type: .withoutResponse) {
             return true
         } else {
-            os_log("in sendStartReadingCommmand, write failed", log: log, type: .error)
+            trace("in sendStartReadingCommmand, write failed", log: log, type: .error)
             return false
         }
     }
@@ -112,7 +112,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
             
             //check if buffer needs to be reset
             if (Date() > startDate.addingTimeInterval(CGMBubbleTransmitter.maxWaitForpacketInSeconds - 1)) {
-                os_log("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMBubbleTransmitter.maxWaitForpacketInSeconds)
+                trace("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMBubbleTransmitter.maxWaitForpacketInSeconds)
                 resetRxBuffer()
             }
             
@@ -143,7 +143,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                                     // verify serial number and if changed inform delegate
                                     if newSerialNumber != sensorSerialNumber {
                                         
-                                        os_log("    new sensor detected :  %{public}@", log: log, type: .info, newSerialNumber)
+                                        trace("    new sensor detected :  %{public}@", log: log, type: .info, newSerialNumber)
                                         
                                         sensorSerialNumber = newSerialNumber
                                         
@@ -180,7 +180,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                 }
             }
         } else {
-            os_log("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
+            trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
         }
     }
     

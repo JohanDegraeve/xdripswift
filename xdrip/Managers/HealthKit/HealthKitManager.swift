@@ -87,7 +87,7 @@ public class HealthKitManager:NSObject {
         case .sharingAuthorized:
             break
         @unknown default:
-            os_log("unknown authorizationstatus for healthkit - HealthKitManager.swift", log: self.log, type: .error)
+            trace("unknown authorizationstatus for healthkit - HealthKitManager.swift", log: self.log, type: .error)
         }
         
         // all checks ok , return true
@@ -121,7 +121,7 @@ public class HealthKitManager:NSObject {
                         UserDefaults.standard.timeStampLatestHealthKitStoreBgReading = bgReading.timeStamp
                     } else {
                         if let error = error {
-                            os_log("failed store reading in healthkit, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+                            trace("failed store reading in healthkit, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
                         }
                     }
                 })

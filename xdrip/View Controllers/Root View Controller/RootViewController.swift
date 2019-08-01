@@ -159,7 +159,7 @@ final class RootViewController: UIViewController {
             case .notDetermined, .denied:
                 UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (success, error) in
                     if let error = error {
-                        os_log("Request Notification Authorization Failed : %{public}@", log: self.log, type: .error, error.localizedDescription)
+                        trace("Request Notification Authorization Failed : %{public}@", log: self.log, type: .error, error.localizedDescription)
                     }
                 }
             default:
@@ -201,7 +201,7 @@ final class RootViewController: UIViewController {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
             try AVAudioSession.sharedInstance().setActive(true)
         } catch let error {
-            os_log("in init, could not set AVAudioSession category to playback and mixwithOthers, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+            trace("in init, could not set AVAudioSession category to playback and mixwithOthers, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
         }
     }
     
@@ -273,9 +273,9 @@ final class RootViewController: UIViewController {
                     if let sensorTimeInMinutes = sensorTimeInMinutes {
                         activeSensor = Sensor(startDate: Date(timeInterval: -Double(sensorTimeInMinutes * 60), since: Date()),nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                         if let activeSensor = activeSensor {
-                            os_log("created sensor with id : %{public}@ and startdate  %{public}@", log: self.log, type: .info, activeSensor.id, activeSensor.startDate.description)
+                            trace("created sensor with id : %{public}@ and startdate  %{public}@", log: self.log, type: .info, activeSensor.id, activeSensor.startDate.description)
                         } else {
-                            os_log("creation active sensor failed", log: self.log, type: .info)
+                            trace("creation active sensor failed", log: self.log, type: .info)
                         }
                     }
 
@@ -623,7 +623,7 @@ final class RootViewController: UIViewController {
             let readings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: true)
             for (index,reading) in readings.enumerated() {
                 if reading.sensor?.id == activeSensor?.id {
-                    os_log("readings %{public}d timestamp = %{public}@, calculatedValue = %{public}f", log: log, type: .info, index, reading.timeStamp.description, reading.calculatedValue)
+                    trace("readings %{public}d timestamp = %{public}@, calculatedValue = %{public}f", log: log, type: .info, index, reading.timeStamp.description, reading.calculatedValue)
                 }
             }
         }
@@ -653,7 +653,7 @@ final class RootViewController: UIViewController {
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
             if let error = error {
-                os_log("Unable to Add Notification Request : %{public}@", log: self.log, type: .error, error.localizedDescription)
+                trace("Unable to Add Notification Request : %{public}@", log: self.log, type: .error, error.localizedDescription)
             }
         }
         
@@ -723,7 +723,7 @@ final class RootViewController: UIViewController {
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
             if let error = error {
-                os_log("Unable to Add bg reading Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
+                trace("Unable to Add bg reading Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
             }
         }
     }
@@ -892,7 +892,7 @@ final class RootViewController: UIViewController {
         
         // start the scanning, result of the startscanning will be in startScanningResult - this is not the result of the scanning itself. Scanning may have started successfully but maybe the peripheral is not yet connected, maybe it is
         if let startScanningResult = cgmTransmitter?.startScanning() {
-            os_log("in userInitiatesStartScanning, startScanningResult = %{public}@", log: log, type: .info, startScanningResult.description())
+            trace("in userInitiatesStartScanning, startScanningResult = %{public}@", log: log, type: .info, startScanningResult.description())
             switch startScanningResult {
             case .success:
                 // success : could be useful to display that scanning has started, however in most cases the connection will immediately happen, causing a second pop up to say that the transmitter is connected, let's not create to many pop ups
@@ -1022,7 +1022,7 @@ extension RootViewController:CGMTransmitterDelegate {
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
             if let error = error {
-                os_log("Unable add notification request : transmitter reset result, error:  %{public}@", log: self.log, type: .error, error.localizedDescription)
+                trace("Unable add notification request : transmitter reset result, error:  %{public}@", log: self.log, type: .error, error.localizedDescription)
             }
         }
         
@@ -1103,7 +1103,7 @@ extension RootViewController:CGMTransmitterDelegate {
     /// Transmitter is calling this delegate function to indicate that bluetooth pairing is needed. If the app is in the background, the user will be informed, after opening the app a pairing request will be initiated. if the app is in the foreground, the pairing request will be initiated immediately
     func cgmTransmitterNeedsPairing() {
 
-        os_log("transmitter needs pairing", log: log, type: .info)
+        trace("transmitter needs pairing", log: log, type: .info)
         
         if let timeStampLastNotificationForPairing = timeStampLastNotificationForPairing {
             
@@ -1136,7 +1136,7 @@ extension RootViewController:CGMTransmitterDelegate {
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
             if let error = error {
-                os_log("Unable add notification request : transmitter needs pairing Notification Request, error :  %{public}@", log: self.log, type: .error, error.localizedDescription)
+                trace("Unable add notification request : transmitter needs pairing Notification Request, error :  %{public}@", log: self.log, type: .error, error.localizedDescription)
             }
         }
         
@@ -1161,7 +1161,7 @@ extension RootViewController:CGMTransmitterDelegate {
             
             // if it was too long since notification was fired, then forget about it
             if Date() > maxTimeUserCanOpenApp {
-                os_log("in cgmTransmitterNeedsPairing, user opened the app too late", log: self.log, type: .error)
+                trace("in cgmTransmitterNeedsPairing, user opened the app too late", log: self.log, type: .error)
                 UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.transmitterPairingTooLate, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
                 return
             }
@@ -1175,13 +1175,13 @@ extension RootViewController:CGMTransmitterDelegate {
     
     // Only MioaMiao will call this
     func newSensorDetected() {
-        os_log("new sensor detected", log: log, type: .info)
+        trace("new sensor detected", log: log, type: .info)
         stopSensor()
     }
     
     // MioaMiao and Bubble will call this (and Blucon, maybe others in the future)
     func sensorNotDetected() {
-        os_log("sensor not detected", log: log, type: .info)
+        trace("sensor not detected", log: log, type: .info)
         
         // Create Notification Content
         let notificationContent = UNMutableNotificationContent()
@@ -1197,7 +1197,7 @@ extension RootViewController:CGMTransmitterDelegate {
         // Add Request to User Notification Center
         UNUserNotificationCenter.current().add(notificationRequest) { (error) in
             if let error = error {
-                os_log("Unable to Add sensor not detected Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
+                trace("Unable to Add sensor not detected Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
             }
         }
     }
@@ -1206,15 +1206,15 @@ extension RootViewController:CGMTransmitterDelegate {
     ///     - readings: first entry is the most recent
     func cgmTransmitterInfoReceived(glucoseData: inout [RawGlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: LibreSensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?, hardwareSerialNumber: String?, bootloader: String?, sensorSerialNumber:String?) {
         
-        os_log("sensorstate %{public}@", log: log, type: .debug, sensorState?.description ?? "no sensor state found")
-        os_log("firmware %{public}@", log: log, type: .debug, firmware ?? "no firmware version found")
-        os_log("bootloader %{public}@", log: log, type: .debug, bootloader ?? "no bootloader  found")
-        os_log("hardwareSerialNumber %{public}@", log: log, type: .debug, hardwareSerialNumber ?? "no serialNumber  found")
-        os_log("sensorSerialNumber %{public}@", log: log, type: .debug, sensorSerialNumber ?? "no sensorSerialNumber  found")
-        os_log("hardware %{public}@", log: log, type: .debug, hardware ?? "no hardware version found")
-        os_log("transmitterBatteryInfo  %{public}@", log: log, type: .debug, transmitterBatteryInfo?.description ?? 0)
-        os_log("sensor time in minutes  %{public}@", log: log, type: .debug, sensorTimeInMinutes?.description ?? "not received")
-        os_log("glucoseData size = %{public}@", log: log, type: .debug, glucoseData.count.description)
+        trace("sensorstate %{public}@", log: log, type: .debug, sensorState?.description ?? "no sensor state found")
+        trace("firmware %{public}@", log: log, type: .debug, firmware ?? "no firmware version found")
+        trace("bootloader %{public}@", log: log, type: .debug, bootloader ?? "no bootloader  found")
+        trace("hardwareSerialNumber %{public}@", log: log, type: .debug, hardwareSerialNumber ?? "no serialNumber  found")
+        trace("sensorSerialNumber %{public}@", log: log, type: .debug, sensorSerialNumber ?? "no sensorSerialNumber  found")
+        trace("hardware %{public}@", log: log, type: .debug, hardware ?? "no hardware version found")
+        trace("transmitterBatteryInfo  %{public}@", log: log, type: .debug, transmitterBatteryInfo?.description ?? 0)
+        trace("sensor time in minutes  %{public}@", log: log, type: .debug, sensorTimeInMinutes?.description ?? "not received")
+        trace("glucoseData size = %{public}@", log: log, type: .debug, glucoseData.count.description)
 
         // if received sensorSerialNumber not nil, and if value different from currently stored value, then store it
         if let sensorSerialNumber = sensorSerialNumber {
@@ -1298,7 +1298,7 @@ extension RootViewController:UNUserNotificationCenterDelegate {
     // called when user clicks a notification
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
-        os_log("userNotificationCenter didReceive", log: log, type: .info)
+        trace("userNotificationCenter didReceive", log: log, type: .info)
 
         // call completionHandler when exiting function
         defer {
@@ -1309,7 +1309,7 @@ extension RootViewController:UNUserNotificationCenterDelegate {
         if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
             
             // nothing required, the requestCalibration function will be called as it's been added to ApplicationManager
-            os_log("     userNotificationCenter didReceive, user pressed calibration notification to open the app, requestCalibration should be called because closure is added in ApplicationManager.shared", log: log, type: .info)
+            trace("     userNotificationCenter didReceive, user pressed calibration notification to open the app, requestCalibration should be called because closure is added in ApplicationManager.shared", log: log, type: .info)
             
         } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
 
@@ -1329,7 +1329,7 @@ extension RootViewController:UNUserNotificationCenterDelegate {
             // it's not an initial calibration request notification that the user clicked, by calling alertManager?.userNotificationCenter, we check if it was an alert notification that was clicked and if yes pickerViewData will have the list of alert snooze values
             if let pickerViewData = alertManager?.userNotificationCenter(center, didReceive: response) {
                 
-                os_log("     userNotificationCenter didReceive, user pressed an alert notification to open the app", log: log, type: .info)
+                trace("     userNotificationCenter didReceive, user pressed an alert notification to open the app", log: log, type: .info)
                 PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
                 
             } else {

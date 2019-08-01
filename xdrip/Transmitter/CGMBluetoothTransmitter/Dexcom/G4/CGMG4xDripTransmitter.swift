@@ -18,7 +18,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
-    /// for OS_log
+    /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMxDripG4)
     
     /// transmitterId
@@ -68,32 +68,32 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     }
     
     func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
-        os_log("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
+        trace("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
     }
     
     func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
         //check if value is not nil
         guard let value = characteristic.value else {
-            os_log("in peripheral didUpdateValueFor, characteristic.value is nil", log: log, type: .info)
+            trace("in peripheral didUpdateValueFor, characteristic.value is nil", log: log, type: .info)
             return
         }
         
         //for xdrip G4, first byte is the packet length
         guard let packetLength = value.first else {
-            os_log("in peripheral didUpdateValueFor, packetLength is nil", log: log, type: .info)
+            trace("in peripheral didUpdateValueFor, packetLength is nil", log: log, type: .info)
             return
         }
         
         //value length should be minimum 2
         guard value.count >= 2 else {
             //value length should be minimum 2
-            os_log("in peripheral didUpdateValueFor, value length is less than 2, no further processing", log: log, type: .info)
+            trace("in peripheral didUpdateValueFor, value length is less than 2, no further processing", log: log, type: .info)
             return
         }
         
         //only for logging
         let data = value.hexEncodedString()
-        os_log("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .debug, data)
+        trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .debug, data)
 
         switch XdripResponseType(rawValue: value[1]) {
         case .dataPacket?:
@@ -102,7 +102,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
                 
             // check transmitterid, if not correct write correct value and return
             if let data = checkTransmitterId(receivedTransmitterId: result.transmitterID, expectedTransmitterId: self.transmitterId, log: log) {
-                os_log("    in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, type: .info, self.transmitterId)
+                trace("    in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, type: .info, self.transmitterId)
                 _ = writeDataToPeripheral(data: data, type: .withoutResponse)//no need to log the result, this is already logged in BluetoothTransmitter.swift
                 return
             }
@@ -119,27 +119,27 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
                 cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
             }
         case .beaconPacket?:
-            os_log("    in peripheral didUpdateValueFor, received beaconPacket", log: log, type: .info)
+            trace("    in peripheral didUpdateValueFor, received beaconPacket", log: log, type: .info)
             
             //packet length should be 7
             guard packetLength == 7 else {
-                os_log("    in peripheral didUpdateValueFor, packet length is not 7,  no further processing", log: log, type: .info)
+                trace("    in peripheral didUpdateValueFor, packet length is not 7,  no further processing", log: log, type: .info)
                 return
             }
 
             //read txid
             let receivedTransmitterId = decodeTxID(TxID: value.uint32(position: 2))
-            os_log("    in peripheral didUpdateValueFor, received beaconPacket with txid %{public}@", log: log, type: .info, receivedTransmitterId)
+            trace("    in peripheral didUpdateValueFor, received beaconPacket with txid %{public}@", log: log, type: .info, receivedTransmitterId)
             
             // check transmitterid, if not correct write correct value
             if let data = checkTransmitterId(receivedTransmitterId: receivedTransmitterId, expectedTransmitterId: self.transmitterId, log: log) {
-                os_log("    in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, type: .info, self.transmitterId)
+                trace("    in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, type: .info, self.transmitterId)
                 _ = writeDataToPeripheral(data: data, type: .withoutResponse)//no need to log the result, this is already logged in BluetoothTransmitter.swift
                 return
             }
         default:
             //value doesn't start with a known xdripresponsetype
-            os_log("    unknown packet type, looks like an xdrip with old wxl code which starts with the raw_data encoded.", log: log, type: .info)
+            trace("    unknown packet type, looks like an xdrip with old wxl code which starts with the raw_data encoded.", log: log, type: .info)
             
             //process value and get result, send it to delegate
             let result = processBasicXdripDataPacket(value: value)
@@ -170,7 +170,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     
     private func processxBridgeDataPacket(value:Data) -> (glucoseData:RawGlucoseData?, batteryLevel:Int?, transmitterID:String?) {
         guard value.count >= 10 else {
-            os_log("processxBridgeDataPacket, value.count = %{public}d, expecting minimum 10 so that we can find at least rawdata and filtereddata", log: log, type: .info, value.count)
+            trace("processxBridgeDataPacket, value.count = %{public}d, expecting minimum 10 so that we can find at least rawdata and filtereddata", log: log, type: .info, value.count)
             return (nil, nil, nil)
         }
         
@@ -228,13 +228,13 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
             }
             //create glucoseData
             if let rawData = rawData {
-                os_log("in peripheral didUpdateValueFor, dataPacket received with rawData = %{public}d and batteryInfo =  %{public}d", log: log, type: .info, rawData, batteryLevel ?? 0)
+                trace("in peripheral didUpdateValueFor, dataPacket received with rawData = %{public}d and batteryInfo =  %{public}d", log: log, type: .info, rawData, batteryLevel ?? 0)
                 glucoseData = RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: Double(rawData))
             } else {
-                os_log("in peripheral didUpdateValueFor, no rawdata", log: log, type: .info)
+                trace("in peripheral didUpdateValueFor, no rawdata", log: log, type: .info)
             }
         } else {
-            os_log("value could not be converted to string", log: log, type: .info)
+            trace("value could not be converted to string", log: log, type: .info)
         }
         
         return (glucoseData, batteryLevel)

@@ -21,7 +21,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     // maximum times resend request due to crc error
     let maxPacketResendRequests = 3;
     
-    /// for OS_log
+    /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMMiaoMiao)
     
     // used in parsing packet
@@ -73,7 +73,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         if writeDataToPeripheral(data: Data.init([0xF0]), type: .withoutResponse) {
             return true
         } else {
-            os_log("in sendStartReadingCommmand, write failed", log: log, type: .error)
+            trace("in sendStartReadingCommmand, write failed", log: log, type: .error)
             return false
         }
     }
@@ -107,7 +107,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
             
             //check if buffer needs to be reset
             if (Date() > timestampFirstPacketReception.addingTimeInterval(CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds - 1)) {
-                os_log("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds)
+                trace("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds)
                 resetRxBuffer()
             }
             
@@ -122,7 +122,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                     case .dataPacket:
                         //if buffer complete, then start processing
                         if rxBuffer.count >= 363  {
-                            os_log("in peripheral didUpdateValueFor, Buffer complete", log: log, type: .info)
+                            trace("in peripheral didUpdateValueFor, Buffer complete", log: log, type: .info)
                             
                             if (Crc.LibreCrc(data: &rxBuffer, headerOffset: miaoMiaoHeaderLength)) {
                                 //get MiaoMiao info from MiaoMiao header
@@ -150,41 +150,41 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                                 resetRxBuffer()
                                 resendPacketCounter = temp + 1
                                 if resendPacketCounter < maxPacketResendRequests {
-                                    os_log("in peripheral didUpdateValueFor, crc error encountered. New attempt launched", log: log, type: .info)
+                                    trace("in peripheral didUpdateValueFor, crc error encountered. New attempt launched", log: log, type: .info)
                                     _ = sendStartReadingCommmand()
                                 } else {
-                                    os_log("in peripheral didUpdateValueFor, crc error encountered. Maximum nr of attempts reached", log: log, type: .info)
+                                    trace("in peripheral didUpdateValueFor, crc error encountered. Maximum nr of attempts reached", log: log, type: .info)
                                     resendPacketCounter = 0
                                 }
                             }
                         }
                         
                     case .frequencyChangedResponse:
-                        os_log("in peripheral didUpdateValueFor, frequencyChangedResponse received, shound't happen ?", log: log, type: .error)
+                        trace("in peripheral didUpdateValueFor, frequencyChangedResponse received, shound't happen ?", log: log, type: .error)
                         
                     case .newSensor:
-                        os_log("in peripheral didUpdateValueFor, new sensor detected", log: log, type: .info)
+                        trace("in peripheral didUpdateValueFor, new sensor detected", log: log, type: .info)
                         cgmTransmitterDelegate?.newSensorDetected()
                         
                         // send 0xD3 and 0x01 to confirm sensor change as defined in MiaoMiao protocol documentation
                         // after that send start reading command, each with delay of 500 milliseconds
                         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
                             if self.writeDataToPeripheral(data: Data.init([0xD3, 0x01]), type: .withoutResponse) {
-                                os_log("in peripheralDidUpdateValueFor, successfully sent 0xD3 and 0x01, confirm sensor change to MiaoMiao", log: self.log, type: .info)
+                                trace("in peripheralDidUpdateValueFor, successfully sent 0xD3 and 0x01, confirm sensor change to MiaoMiao", log: self.log, type: .info)
                                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
                                     if !self.sendStartReadingCommmand() {
-                                        os_log("in peripheralDidUpdateValueFor, sendStartReadingCommmand failed", log: self.log, type: .error)
+                                        trace("in peripheralDidUpdateValueFor, sendStartReadingCommmand failed", log: self.log, type: .error)
                                     } else {
-                                        os_log("in peripheralDidUpdateValueFor, successfully sent startReadingCommand to MiaoMiao", log: self.log, type: .info)
+                                        trace("in peripheralDidUpdateValueFor, successfully sent startReadingCommand to MiaoMiao", log: self.log, type: .info)
                                     }
                                 }
                             } else {
-                                os_log("in peripheralDidUpdateValueFor, write D301 failed", log: self.log, type: .error)
+                                trace("in peripheralDidUpdateValueFor, write D301 failed", log: self.log, type: .error)
                             }
                         }
                         
                     case .noSensor:
-                        os_log("in peripheral didUpdateValueFor, sensor not detected", log: log, type: .info)
+                        trace("in peripheral didUpdateValueFor, sensor not detected", log: log, type: .info)
                         // call to delegate
                         cgmTransmitterDelegate?.sensorNotDetected()
                         
@@ -192,12 +192,12 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 } else {
                     //rxbuffer doesn't start with a known miaomiaoresponse
                     //reset the buffer and send start reading command
-                    os_log("in peripheral didUpdateValueFor, rx buffer doesn't start with a known miaomiaoresponse, reset the buffer", log: log, type: .error)
+                    trace("in peripheral didUpdateValueFor, rx buffer doesn't start with a known miaomiaoresponse, reset the buffer", log: log, type: .error)
                     resetRxBuffer()
                 }
             }
         } else {
-            os_log("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
+            trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
         }
     }
     
