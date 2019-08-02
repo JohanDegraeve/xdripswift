@@ -609,6 +609,10 @@ final class RootViewController: UIViewController {
                     calibrator = Libre1Calibrator()
                 }
 
+            case .Droplet1:
+                cgmTransmitter = CGMDroplet1Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self)
+                calibrator = Libre1Calibrator()
+
             }
             
         }

@@ -3,6 +3,7 @@ import CoreBluetooth
 import os
 
 class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
+    
     // MARK: - properties
     
     /// service to be discovered

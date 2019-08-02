@@ -181,6 +181,7 @@
 		F8BDD455221DEF22006EAB84 /* SettingsViews.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD457221DEF22006EAB84 /* SettingsViews.strings */; };
 		F8C5EBE522F297F000563B5F /* SensorSerialNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE422F297EF00563B5F /* SensorSerialNumber.swift */; };
 		F8C5EBE722F38F0E00563B5F /* Trace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE622F38F0E00563B5F /* Trace.swift */; };
+		F8C5EBEA22F49AC700563B5F /* CGMDroplet1Transmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE922F49AC700563B5F /* CGMDroplet1Transmitter.swift */; };
 		F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */; };
 		F8E3C3AD21FE551C00907A04 /* DexcomCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */; };
 		F8EA6C8221B723BC0082976B /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C8121B723BC0082976B /* Date.swift */; };
@@ -481,6 +482,7 @@
 		F8BDD458221DEF24006EAB84 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F8C5EBE422F297EF00563B5F /* SensorSerialNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorSerialNumber.swift; sourceTree = "<group>"; };
 		F8C5EBE622F38F0E00563B5F /* Trace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Trace.swift; sourceTree = "<group>"; };
+		F8C5EBE922F49AC700563B5F /* CGMDroplet1Transmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMDroplet1Transmitter.swift; sourceTree = "<group>"; };
 		F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
 		F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomCalibrator.swift; sourceTree = "<group>"; };
 		F8EA6C8121B723BC0082976B /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
@@ -825,6 +827,7 @@
 		F8A54AEC22D9156600934E7A /* Libre */ = {
 			isa = PBXGroup;
 			children = (
+				F8C5EBE822F49AB300563B5F /* Droplet */,
 				EE9947E622EEDD0700DCB876 /* Bubble */,
 				F8A54AFB22D9179100934E7A /* Utilities */,
 				F8A54AED22D9156600934E7A /* GNSEntry */,
@@ -1083,6 +1086,14 @@
 				F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */,
 			);
 			path = Texts;
+			sourceTree = "<group>";
+		};
+		F8C5EBE822F49AB300563B5F /* Droplet */ = {
+			isa = PBXGroup;
+			children = (
+				F8C5EBE922F49AC700563B5F /* CGMDroplet1Transmitter.swift */,
+			);
+			path = Droplet;
 			sourceTree = "<group>";
 		};
 		F8EA6C7D21B70DEA0082976B /* Constants */ = {
@@ -1355,6 +1366,7 @@
 				F8B3A7FA2278E0E8004BA588 /* SettingsViewModelProtocol.swift in Sources */,
 				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
 				F8A54AEA22D911BA00934E7A /* PairRequestTxMessage.swift in Sources */,
+				F8C5EBEA22F49AC700563B5F /* CGMDroplet1Transmitter.swift in Sources */,
 				F821CF56229BF43A005C1E43 /* AlertKind.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
 				F8A54AE422D911BA00934E7A /* NSData+CRC.swift in Sources */,

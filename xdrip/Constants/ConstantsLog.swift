@@ -48,5 +48,7 @@ enum ConstantsLog {
     static let categorySettingsViewHealthKitSettingsViewModel = "categorySettingsViewHealthKitSettingsViewModel"
     /// dexcom share upload manager
     static let categoryDexcomShareUploadManager = "categoryDexcomShareUploadManager"
+    /// droplet 1
+    static let categoryCGMDroplet1 = "categoryCGMDroplet1"
 }
 

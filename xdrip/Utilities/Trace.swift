@@ -18,6 +18,10 @@ func debuglogging(_ logtext:String) {
 /// - args : optional list of parameters that will be used. MAXIMUM 10 !
 func trace(_ message: StaticString, log:OSLog, type:OSLogType, _ args: CVarArg...) {
     
+    /*let message1 = message.description.replacingOccurrences(of: "{public}", with: "%").replacingOccurrences(of: "{private}", with: "%")
+    let toprint = String(format: message1, "test")
+    debuglogging("toprint = " + toprint)*/
+    
     switch args.count {
         
     case 0:
