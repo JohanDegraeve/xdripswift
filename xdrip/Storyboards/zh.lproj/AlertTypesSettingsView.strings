@@ -1,15 +1,45 @@
-"alerttypessettingsview_screentitle" = "Alert Types";
-"alerttypesettingsview_screentitle" = "Edit Alert Type";
-"alerttypesettingsview_name" = "Name";
-"alerttypesettingsview_enabled" = "Enabled";
-"alerttypesettingsview_vibrate" = "Vibrate";
-"alerttypesettingsview_snoozevianotification" = "Snooze Via Notification";
-"alerttypesettingsview_defaultsnoozeperiod" = "Default Snooze period (min)";
-"alerttypesettingsview_overridemute" = "Override mute";
-"alerttypesettingsview_soundname" = "Sound";
+
+
+"alerttypenamealreadyexistsmessages" = "test";
+
+
 "alerttypesettingsview_defaultiossound" = "iOS Sound";
+
+
+"alerttypesettingsview_defaultsnoozeperiod" = "Default Snooze period (min)";
+
+
+"alerttypesettingsview_enabled" = "Enabled";
+
+
 "alerttypesettingsview_givename" = "Give a name";
+
+
 "alerttypesettingsview_givesnoozeperiod" = "Give Snooze Period in minutes";
+
+
+"alerttypesettingsview_name" = "Name";
+
+
+"alerttypesettingsview_overridemute" = "Override mute";
+
+
 "alerttypesettingsview_picksoundname" = "Pick Sound Name";
-"alerttypenamealreadyexistsmessages" = "An Alert Type with this name already exists. Change the name";
+
+
+"alerttypesettingsview_screentitle" = "Edit Alert Type";
+
+
+"alerttypesettingsview_snoozevianotification" = "Snooze Via Notification";
+
+
+"alerttypesettingsview_soundname" = "Sound";
+
+
+"alerttypesettingsview_vibrate" = "Vibrate";
+
+
+"alerttypessettingsview_screentitle" = "Alert Types";
+
+
 "confirmdeletionalerttype" = "Do you want to delete Alert Type with name ";
