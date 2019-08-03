@@ -35,7 +35,6 @@
 "settingsviews_follower" = "Follower";
 "settingsviews_speakreadingslanguageselection" = "Select Language";
 "settingsviews_speakBgReadingslanguage" = "Language";
-"settingsviews_speakIntervalMessage" = "Minimum interval between two readings, in minutes";
 "settingsviews_resettransmitter" = "Reset Transmitter";
 "settingsviews_Version" = "Version";
 "settingsviews_license" = "License";

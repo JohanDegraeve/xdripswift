@@ -483,8 +483,6 @@
 		F8C5EBE422F297EF00563B5F /* SensorSerialNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorSerialNumber.swift; sourceTree = "<group>"; };
 		F8C5EBE622F38F0E00563B5F /* Trace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Trace.swift; sourceTree = "<group>"; };
 		F8C5EBE922F49AC700563B5F /* CGMDroplet1Transmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMDroplet1Transmitter.swift; sourceTree = "<group>"; };
-		F8C5EBEB22F59AD600563B5F /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Common.strings"; sourceTree = "<group>"; };
-		F8C5EBEC22F59ADA00563B5F /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Common.strings; sourceTree = "<group>"; };
 		F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
 		F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomCalibrator.swift; sourceTree = "<group>"; };
 		F8EA6C8121B723BC0082976B /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
@@ -1667,8 +1665,6 @@
 				F8B48AF622B37C5C009BCC01 /* it */,
 				F8B48B0222B37C67009BCC01 /* fr */,
 				F8B48B0E22B37C84009BCC01 /* zh */,
-				F8C5EBEB22F59AD600563B5F /* pt-BR */,
-				F8C5EBEC22F59ADA00563B5F /* pt */,
 			);
 			name = Common.strings;
 			sourceTree = "<group>";
