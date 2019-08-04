@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2CE6FBB722F6BB680063712B /* CRC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AFC22D9179100934E7A /* CRC.swift */; };
+		2CE6FBB822F6BBD60063712B /* SensorSerialNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE422F297EF00563B5F /* SensorSerialNumber.swift */; };
+		2CE6FBB922F6BBD80063712B /* SensorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AFE22D9179100934E7A /* SensorState.swift */; };
+		2CE6FBBB22F6BC090063712B /* LibreOOPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE6FBBA22F6BC090063712B /* LibreOOPClient.swift */; };
+		2CE6FBBD22F6BC540063712B /* LibreOOPResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE6FBBC22F6BC540063712B /* LibreOOPResponse.swift */; };
+		2CE6FBBF22F6BC9B0063712B /* LibreOOPWebExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE6FBBE22F6BC9B0063712B /* LibreOOPWebExtensions.swift */; };
+		2CE6FBC122F6BCAB0063712B /* DerivedAlgorithmRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE6FBC022F6BCAB0063712B /* DerivedAlgorithmRunner.swift */; };
+		2CE6FBC322F6BCC20063712B /* LibreOOPDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE6FBC222F6BCC20063712B /* LibreOOPDefaults.swift */; };
+		2CE6FBC522F6C2AE0063712B /* Measurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE6FBC422F6C2AE0063712B /* Measurement.swift */; };
+		2CE6FBC722F6C4DF0063712B /* GlucoseSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE6FBC622F6C4DF0063712B /* GlucoseSmoothing.swift */; };
 		A48D2DE552F4A356AA32746A /* Pods_xdrip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */; };
 		EE9947E822EEDD2E00DCB876 /* CGMBubbleTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE9947E722EEDD2E00DCB876 /* CGMBubbleTransmitter.swift */; };
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
@@ -104,9 +114,7 @@
 		F8A54AEB22D911BA00934E7A /* CGMG4xDripTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AD622D911BA00934E7A /* CGMG4xDripTransmitter.swift */; };
 		F8A54AF622D9156600934E7A /* CGMGNSEntryTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AEE22D9156600934E7A /* CGMGNSEntryTransmitter.swift */; };
 		F8A54AFA22D9156600934E7A /* CGMMiaoMiaoTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AF422D9156600934E7A /* CGMMiaoMiaoTransmitter.swift */; };
-		F8A54AFF22D9179100934E7A /* CRC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AFC22D9179100934E7A /* CRC.swift */; };
 		F8A54B0022D9179100934E7A /* ParseLibreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AFD22D9179100934E7A /* ParseLibreData.swift */; };
-		F8A54B0122D9179100934E7A /* SensorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AFE22D9179100934E7A /* SensorState.swift */; };
 		F8A7406E22D9C0E700967CFC /* CGMBluconTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A7406D22D9C0E700967CFC /* CGMBluconTransmitter.swift */; };
 		F8A7407022DBB24800967CFC /* BluconTransmitterOpCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A7406F22DBB24800967CFC /* BluconTransmitterOpCode.swift */; };
 		F8A7407222DCDA3E00967CFC /* BluconUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A7407122DCDA3E00967CFC /* BluconUtilities.swift */; };
@@ -189,6 +197,13 @@
 
 /* Begin PBXFileReference section */
 		148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.debug.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.debug.xcconfig"; sourceTree = "<group>"; };
+		2CE6FBBA22F6BC090063712B /* LibreOOPClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreOOPClient.swift; sourceTree = "<group>"; };
+		2CE6FBBC22F6BC540063712B /* LibreOOPResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreOOPResponse.swift; sourceTree = "<group>"; };
+		2CE6FBBE22F6BC9B0063712B /* LibreOOPWebExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreOOPWebExtensions.swift; sourceTree = "<group>"; };
+		2CE6FBC022F6BCAB0063712B /* DerivedAlgorithmRunner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DerivedAlgorithmRunner.swift; sourceTree = "<group>"; };
+		2CE6FBC222F6BCC20063712B /* LibreOOPDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreOOPDefaults.swift; sourceTree = "<group>"; };
+		2CE6FBC422F6C2AE0063712B /* Measurement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Measurement.swift; sourceTree = "<group>"; };
+		2CE6FBC622F6C4DF0063712B /* GlucoseSmoothing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlucoseSmoothing.swift; sourceTree = "<group>"; };
 		662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2648F65F347D56D7DFFFAB7 /* Pods-xdrip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.release.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.release.xcconfig"; sourceTree = "<group>"; };
 		EE9947E722EEDD2E00DCB876 /* CGMBubbleTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMBubbleTransmitter.swift; sourceTree = "<group>"; };
@@ -479,6 +494,7 @@
 		F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsSettingsView.swift; sourceTree = "<group>"; };
 		F8BDD456221DEF22006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F8BDD458221DEF24006EAB84 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SettingsViews.strings; sourceTree = "<group>"; };
+		F8C5EBE422F297EF00563B5F /* SensorSerialNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorSerialNumber.swift; sourceTree = "<group>"; };
 		F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
 		F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomCalibrator.swift; sourceTree = "<group>"; };
 		F8EA6C8121B723BC0082976B /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
@@ -861,7 +877,15 @@
 		F8A54AFB22D9179100934E7A /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				F8C5EBE422F297EF00563B5F /* SensorSerialNumber.swift */,
 				F8A54AFC22D9179100934E7A /* CRC.swift */,
+				2CE6FBC222F6BCC20063712B /* LibreOOPDefaults.swift */,
+				2CE6FBBA22F6BC090063712B /* LibreOOPClient.swift */,
+				2CE6FBBC22F6BC540063712B /* LibreOOPResponse.swift */,
+				2CE6FBBE22F6BC9B0063712B /* LibreOOPWebExtensions.swift */,
+				2CE6FBC422F6C2AE0063712B /* Measurement.swift */,
+				2CE6FBC622F6C4DF0063712B /* GlucoseSmoothing.swift */,
+				2CE6FBC022F6BCAB0063712B /* DerivedAlgorithmRunner.swift */,
 				F8A54AFD22D9179100934E7A /* ParseLibreData.swift */,
 				F8A54AFE22D9179100934E7A /* SensorState.swift */,
 			);
@@ -1160,6 +1184,7 @@
 				F8AC425721ADEBD60078C348 /* Frameworks */,
 				F8AC425821ADEBD60078C348 /* Resources */,
 				F5EEC1C2586E9EA94DC6DBC7 /* [CP] Embed Pods Frameworks */,
+				F84F2BEC22EF80B300313474 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1304,6 +1329,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-xdrip/Pods-xdrip-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		F84F2BEC22EF80B300313474 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1311,11 +1353,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2CE6FBC322F6BCC20063712B /* LibreOOPDefaults.swift in Sources */,
 				F8BDD450221CAA64006EAB84 /* TextsCommon.swift in Sources */,
 				F8A54ADF22D911BA00934E7A /* DexcomTransmitterOpCode.swift in Sources */,
 				F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */,
 				F8A54AE922D911BA00934E7A /* AuthChallengeRxMessage.swift in Sources */,
-				F8A54B0122D9179100934E7A /* SensorState.swift in Sources */,
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
 				F8A54AE622D911BA00934E7A /* KeepAliveTxMessage.swift in Sources */,
 				F81FA006228E09D40028C70F /* TextsCalibration.swift in Sources */,
@@ -1334,8 +1376,10 @@
 				F8B3A7FA2278E0E8004BA588 /* SettingsViewModelProtocol.swift in Sources */,
 				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
 				F8A54AEA22D911BA00934E7A /* PairRequestTxMessage.swift in Sources */,
+				2CE6FBBF22F6BC9B0063712B /* LibreOOPWebExtensions.swift in Sources */,
 				F821CF56229BF43A005C1E43 /* AlertKind.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
+				2CE6FBBD22F6BC540063712B /* LibreOOPResponse.swift in Sources */,
 				F8A54AE422D911BA00934E7A /* NSData+CRC.swift in Sources */,
 				F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */,
 				F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */,
@@ -1343,6 +1387,7 @@
 				F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */,
 				F821CF6F229FC280005C1E43 /* Endpoint+NightScout.swift in Sources */,
 				F821CF5D229BF43A005C1E43 /* NSDateFormatter.swift in Sources */,
+				2CE6FBC122F6BCAB0063712B /* DerivedAlgorithmRunner.swift in Sources */,
 				F8025E4C21E6618200ECF0C0 /* Log.swift in Sources */,
 				F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */,
 				F8A54ADB22D911BA00934E7A /* AuthRequestTxMessage.swift in Sources */,
@@ -1355,16 +1400,17 @@
 				F8A54B0022D9179100934E7A /* ParseLibreData.swift in Sources */,
 				F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */,
 				F81FA00A228F53680028C70F /* TextsHomeView.swift in Sources */,
+				2CE6FBB922F6BBD80063712B /* SensorState.swift in Sources */,
 				F8E3C3AD21FE551C00907A04 /* DexcomCalibrator.swift in Sources */,
 				F821CF61229BF4A2005C1E43 /* NightScoutUploadManager.swift in Sources */,
 				F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */,
 				F8A54ADD22D911BA00934E7A /* BatteryStatusTxMessage.swift in Sources */,
 				F8A1585522EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift in Sources */,
 				F8A54ADA22D911BA00934E7A /* TransmitterMessage.swift in Sources */,
+				2CE6FBB722F6BB680063712B /* CRC.swift in Sources */,
 				F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */,
 				F8A54AE522D911BA00934E7A /* TransmitterVersionRxMessage.swift in Sources */,
 				F821CF57229BF43A005C1E43 /* SnoozeParameters.swift in Sources */,
-				F8A54AFF22D9179100934E7A /* CRC.swift in Sources */,
 				F8B3A79722635A25004BA588 /* AlertEntry+CoreDataProperties.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
@@ -1381,6 +1427,7 @@
 				F8A54AD822D911BA00934E7A /* CGMG5Transmitter.swift in Sources */,
 				F8A1586322EDB86E007F5B5D /* ConstantsSounds.swift in Sources */,
 				F8A1587322EDC893007F5B5D /* ConstantsDexcomShare.swift in Sources */,
+				2CE6FBC522F6C2AE0063712B /* Measurement.swift in Sources */,
 				F8A1586F22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift in Sources */,
 				F8A54AB822D9111900934E7A /* TransmitterBatteryInfo.swift in Sources */,
 				F8B3A82D227F07D6004BA588 /* SettingsNavigationController.swift in Sources */,
@@ -1402,6 +1449,7 @@
 				F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */,
 				F8B3A858227F6971004BA588 /* UISwitch.swift in Sources */,
 				F8A1586722EDB8BF007F5B5D /* ConstantsHomeView.swift in Sources */,
+				2CE6FBC722F6C4DF0063712B /* GlucoseSmoothing.swift in Sources */,
 				F8A1585922EDB7C6007F5B5D /* ConstantsDefaultAlertLevels.swift in Sources */,
 				F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */,
 				F8B3A783225D37F2004BA588 /* TextsNightScoutTestResult.swift in Sources */,
@@ -1415,6 +1463,7 @@
 				F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */,
 				F8B3A78E22622954004BA588 /* AlertType+CoreDataClass.swift in Sources */,
 				F821CF5A229BF43A005C1E43 /* CoreDataManager.swift in Sources */,
+				2CE6FBB822F6BBD60063712B /* SensorSerialNumber.swift in Sources */,
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
 				F821CF7B22A1D359005C1E43 /* NightScoutFollowerDelegate.swift in Sources */,
 				F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */,
@@ -1431,6 +1480,7 @@
 				F8B3A78B225D473D004BA588 /* UIAlertController.swift in Sources */,
 				F8A54AEB22D911BA00934E7A /* CGMG4xDripTransmitter.swift in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
+				2CE6FBBB22F6BC090063712B /* LibreOOPClient.swift in Sources */,
 				F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */,
 				F821CF66229EE68B005C1E43 /* NightScoutFollowManager.swift in Sources */,
 				F8A54AF622D9156600934E7A /* CGMGNSEntryTransmitter.swift in Sources */,
@@ -1798,14 +1848,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8DKSZ5HNLB;
+				DEVELOPMENT_TEAM = EG7BNV2CC4;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.yan.iosxdripreader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1822,14 +1872,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8DKSZ5HNLB;
+				DEVELOPMENT_TEAM = EG7BNV2CC4;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.yan.iosxdripreader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
