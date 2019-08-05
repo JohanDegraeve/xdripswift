@@ -167,17 +167,14 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                                         [weak self] (result) in
                                         if let res = result {
                                             self?.handleGlucoseData(result: res)
+                                        } else {
+                                            /// failed, use parseLibreData
+                                            self?.parse()
                                         }
                                     }
                                 } else {
-                                    //get readings from buffer and send to delegate
-                                    let result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: BubbleHeaderLength)
-                                    //TODO: sort glucosedata before calling newReadingsReceived
-                                    handleGlucoseData(result: result)
+                                    self.parse()
                                 }
-                                
-                                //reset the buffer
-                                resetRxBuffer()
                             }
                         }
                     case .noSensor:
@@ -190,6 +187,13 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
         }
     }
     
+    func parse() {
+        //get readings from buffer and send to delegate
+        let result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: BubbleHeaderLength)
+        //TODO: sort glucosedata before calling newReadingsReceived
+        handleGlucoseData(result: result)
+    }
+    
     func handleGlucoseData(result: (glucoseData:[RawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int)) {
         var result = result
         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
@@ -198,6 +202,8 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
         if result.glucoseData.count > 0 {
             timeStampLastBgReading = result.glucoseData[0].timeStamp
         }
+        //reset the buffer
+        resetRxBuffer()
     }
     
     // MARK: CGMTransmitter protocol functions
