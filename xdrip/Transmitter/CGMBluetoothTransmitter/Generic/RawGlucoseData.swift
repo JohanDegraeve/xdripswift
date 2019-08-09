@@ -1,8 +1,8 @@
 import Foundation
 
 /// raw glucose as received from transmitter
-struct RawGlucoseData {
-    //TODO: move this class to other location ?
+public class RawGlucoseData {
+    
     var timeStamp:Date
     var glucoseLevelRaw:Double
     var glucoseLevelFiltered:Double
@@ -13,9 +13,12 @@ struct RawGlucoseData {
         self.glucoseLevelFiltered = glucoseLevelFiltered
     }
 
-    init(timeStamp:Date, glucoseLevelRaw:Double) {
+    convenience init(timeStamp:Date, glucoseLevelRaw:Double) {
         self.init(timeStamp: timeStamp, glucoseLevelRaw: glucoseLevelRaw, glucoseLevelFiltered: glucoseLevelRaw)
     }
-
+    
+    convenience init(timeStamp:Date) {
+        self.init(timeStamp: timeStamp, glucoseLevelRaw: 0.0, glucoseLevelFiltered: 0.0)
+    }
 }
 

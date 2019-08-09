@@ -88,3 +88,78 @@ fileprivate func getGlucoseRaw(bytes:Data) -> Int {
     return ((256 * (getByteAt(buffer: bytes, position: 0) & 0xFF) + (getByteAt(buffer: bytes, position: 1) & 0xFF)) & 0x1FFF)
 }
 
+/// calls web service to get calibrated reading
+func handleLibreReading(bytes: [UInt8], serialNumber: String, _ callback: @escaping ((glucoseData: [RawGlucoseData], sensorState: LibreSensorState, sensorTimeInMinutes: Int)?) -> Void) {
+    //only care about the once per minute readings here, historical data will not be considered
+    let sensorState = LibreSensorState(stateByte: bytes[4])
+    LibreOOPClient.calibrateSensor(bytes: bytes, serialNumber: serialNumber) {
+        (calibrationparams)  in
+        guard let params = calibrationparams else {
+            NSLog("dabear:: could not calibrate sensor, check libreoopweb permissions and internet connection")
+            callback(nil)
+            return
+        }
+        //here we assume success, data is not changed,
+        //and we trust that the remote endpoint returns correct data for the sensor
+        let last16 = trendMeasurements(bytes: bytes, date: Date(), LibreDerivedAlgorithmParameterSet: params)
+        if let glucoseData = trendToLibreGlucose(last16) {
+            callback((glucoseData, sensorState, 0))
+        }
+    }
+}
+
+fileprivate func trendMeasurements(bytes: [UInt8], date: Date, _ offset: Double = 0.0, slope: Double = 0.1, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameters?) -> [LibreMeasurement] {
+    
+//    let headerRange =   0..<24   //  24 bytes, i.e.  3 blocks a 8 bytes
+    let bodyRange   =  24..<320  // 296 bytes, i.e. 37 blocks a 8 bytes
+//    let footerRange = 320..<344  //  24 bytes, i.e.  3 blocks a 8 bytes
+    
+    let body   = Array(bytes[bodyRange])
+    let nextTrendBlock = Int(body[2])
+    
+    var measurements = [LibreMeasurement]()
+    // Trend data is stored in body from byte 4 to byte 4+96=100 in units of 6 bytes. Index on data such that most recent block is first.
+    for blockIndex in 0...15 {
+        var index = 4 + (nextTrendBlock - 1 - blockIndex) * 6 // runs backwards
+        if index < 4 {
+            index = index + 96 // if end of ring buffer is reached shift to beginning of ring buffer
+        }
+        let range = index..<index+6
+        let measurementBytes = Array(body[range])
+        let measurementDate = date.addingTimeInterval(Double(-60 * blockIndex))
+        let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
+        measurements.append(measurement)
+    }
+    return measurements
+}
+
+
+fileprivate func trendToLibreGlucose(_ measurements: [LibreMeasurement]) -> [LibreRawGlucoseData]?{
+    var origarr = [LibreRawGlucoseData]()
+    
+    //whether or not to return all the 16 latest trends or just every fifth element
+    let returnAllTrends = true
+    
+    for trend in measurements {
+        let glucose = LibreRawGlucoseData.init(timeStamp: trend.date, unsmoothedGlucose: trend.temperatureAlgorithmGlucose)
+        origarr.append(glucose)
+    }
+    //NSLog("dabear:: glucose samples before smoothing: \(String(describing: origarr))")
+    var arr : [LibreRawGlucoseData]
+    arr = LibreGlucoseSmoothing.CalculateSmothedData5Points(origtrends: origarr)
+    
+    
+    
+    for i in 0 ..< arr.count {
+        var trend = arr[i]
+        //we know that the array "always" (almost) will contain 16 entries
+        //the last five entries will get a trend arrow of flat, because it's not computable when we don't have
+        //more entries in the array to base it on
+    }
+    
+    if returnAllTrends {
+        return arr
+    }
+    
+    return arr
+}

@@ -132,14 +132,16 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
 
                         // confirm receipt
                         _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
-                        
+                    case .serialNumber:
+                        rxBuffer.append(value.subdata(in: 2..<10))
                     case .dataPacket:
                         rxBuffer.append(value.suffix(from: 4))
                         if rxBuffer.count >= 352 {
                             if (Crc.LibreCrc(data: &rxBuffer, headerOffset: BubbleHeaderLength)) {
                                 
-                                if let sensorSerialNumberData = SensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
-                                    let newSerialNumber = sensorSerialNumberData.serialNumber
+                                var newSerialNumber = ""
+                                if let sensorSerialNumberData = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8))) {
+                                    newSerialNumber = sensorSerialNumberData.serialNumber
                                     
                                     // verify serial number and if changed inform delegate
                                     if newSerialNumber != sensorSerialNumber {
@@ -160,19 +162,21 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                                     }
 
                                 }
-
-                                //get readings from buffer and send to delegate
-                                var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: BubbleHeaderLength)
-                                //TODO: sort glucosedata before calling newReadingsReceived
-                                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
                                 
-                                //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
-                                if result.glucoseData.count > 0 {
-                                    timeStampLastBgReading = result.glucoseData[0].timeStamp
+                                if let sensorSerialNumber = sensorSerialNumber, UserDefaults.standard.webOOPEnabled {
+                                    handleLibreReading(bytes: [UInt8](rxBuffer.subdata(in: 8..<352)), serialNumber: sensorSerialNumber) {
+                                        [weak self] (result) in
+                                        if let res = result {
+                                            self?.handleGlucoseData(result: res)
+                                        } else {
+                                            /// failed, use parseLibreData
+                                            self?.parse()
+                                        }
+                                    }
+                                } else {
+                                    // use local parser
+                                    self.parse()
                                 }
-                                
-                                //reset the buffer
-                                resetRxBuffer()
                             }
                         }
                     case .noSensor:
@@ -205,12 +209,34 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
         startDate = Date()
         resendPacketCounter = 0
     }
+    
+    /// get readings from rxBuffer and send to delegate
+    private func parse() {
+        //get readings from buffer and send to delegate
+        let result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: BubbleHeaderLength)
+        //TODO: sort glucosedata before calling newReadingsReceived
+        handleGlucoseData(result: result)
+    }
+    
+    private func handleGlucoseData(result: (glucoseData:[RawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int)) {
+        var result = result
+        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+        
+        //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
+        if result.glucoseData.count > 0 {
+            timeStampLastBgReading = result.glucoseData[0].timeStamp
+        }
+        //reset the buffer
+        resetRxBuffer()
+    }
+
 }
 
 fileprivate enum BubbleResponseType: UInt8 {
     case dataPacket = 130
     case dataInfo = 128
     case noSensor = 191
+    case serialNumber = 192
 }
 
 extension BubbleResponseType: CustomStringConvertible {
@@ -222,6 +248,8 @@ extension BubbleResponseType: CustomStringConvertible {
             return "No sensor detected"
         case .dataInfo:
             return "Data info received"
+        case .serialNumber:
+            return "serial number received"
         }
     }
 }
