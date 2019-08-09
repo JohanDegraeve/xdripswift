@@ -1,5 +1,4 @@
-"common_Ok" = "确认";
-"common_cancel" = "取消";
+ "common_Ok" = "确认"; "common_cancel" = "取消";
 "common_mgdl" = "mg/dL";
 "common_mmol" = "mmol/l";
 "common_bloodglucoseunit" = "血糖值单位";
