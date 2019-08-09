@@ -1,3 +1,3 @@
-"error_message_Dexcom_transmitter_id_invalid_characters" = "发射器id包括字母 a-z, A-Z,数字 0-9";
-"error_message_transmitter_id_should_have_length_6" = "发射器id为6位";
-"error_message_transmitter_id_should_have_length_5" = "发射器id为5位";
+"error_message_Dexcom_transmitter_id_invalid_characters" = "发射器id包括字母 a-z, A-Z,数字 0-9"; 
+"error_message_transmitter_id_should_have_length_6" = "发射器id应该为6位"; 
+"error_message_transmitter_id_should_have_length_5" = "发射器id应该为5位";   
