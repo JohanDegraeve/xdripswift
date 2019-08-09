@@ -114,7 +114,9 @@ extension UserDefaults {
 
         /// G6 factor2 - for testing G6 scaling
         case G6v2ScalingFactor2 = "G6v2ScalingFactor2"
-
+        
+        /// Bubble web oop
+        case webOOPEnabled = "webOOPEnabled"
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -571,7 +573,16 @@ extension UserDefaults {
         }
     }
     
-
+    
+    /// web oop enabled
+    @objc dynamic var webOOPEnabled: Bool {
+        get {
+            return bool(forKey: Key.webOOPEnabled.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.webOOPEnabled.rawValue)
+        }
+    }
 }
 
 

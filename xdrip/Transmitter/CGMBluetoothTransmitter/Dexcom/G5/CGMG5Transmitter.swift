@@ -108,14 +108,14 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
             trace("transmitterID length not 6, init CGMG5Transmitter fails", log: log, type: .error)
             return nil
         }
-        
+
         //verify allowed chars
         let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
         guard transmitterID.validate(withRegex: regex) else {
             trace("transmitterID has non-allowed characters a-zA-Z0-9", log: log, type: .error)
             return nil
         }
-        
+
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DEXCOM" + transmitterID[transmitterID.index(transmitterID.startIndex, offsetBy: 4)..<transmitterID.endIndex])
         if let address = address {

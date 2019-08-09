@@ -7,6 +7,8 @@ fileprivate enum Setting:Int, CaseIterable {
     case transmitterId = 1
     /// is transmitter reset required or not (only applicable to Dexcom G5 and later also G6)
     case resetRequired = 2
+    /// is webOOP enabled or not
+    case webOOP = 3
 }
 
 /// conforms to SettingsViewModelProtocol for all transmitter settings in the first sections screen
@@ -26,7 +28,7 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Setting in SettingsViewTransmitterSettingsViewModel onRowSelect") }
+        guard let setting = Setting(rawValue: fixWebOOPIndex(index)) else { fatalError("Unexpected Setting in SettingsViewTransmitterSettingsViewModel onRowSelect") }
         
         switch setting {
             
@@ -68,6 +70,8 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
         case .resetRequired:
             return SettingsSelectedRowAction.callFunction(function: {UserDefaults.standard.transmitterResetRequired ? (UserDefaults.standard.transmitterResetRequired) = false : (UserDefaults.standard.transmitterResetRequired = true)})
 
+        case .webOOP:
+            return SettingsSelectedRowAction.nothing
         }
     }
     
@@ -85,15 +89,25 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
         if let transmitterType = UserDefaults.standard.transmitterType {
             // if transmitter doesn't need transmitterid (like MiaoMiao) then the settings row that asks for transmitterid doesn't need to be shown. That row is the second row - also reset transmitter not necessary in that case
             // if ever there would be a transmitter that doesn't need a transmitter id but that supports reset transmitter, then some recoding will be necessary here
+            var count = 0
             if transmitterType.needsTransmitterId()  {
                 if transmitterType.resetPossible() {
-                    return 3
+                    count = 3
                 } else {
-                    return 2
+                    count = 2
                 }
             } else {
-                return 1
+                count = 1
             }
+            
+            // for now WebOOP is only for transmitters that don't need transmitterId and no reset possible.
+            // So for those transmitters, if canWebOOP, then amount of rows = 2
+            // Needs adaptation in case we would enable webOOP for transmitters with transmitterId, like Blucon
+            if transmitterType.canWebOOP() {
+                count = 2
+            }
+            
+            return count
         } else {
             // transmitterType nil, means this is initial setup, no need to show transmitter id field
             return 1
@@ -101,7 +115,7 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
     }
 
     func settingsRowText(index: Int) -> String {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+        guard let setting = Setting(rawValue: fixWebOOPIndex(index)) else { fatalError("Unexpected Section") }
 
         switch (setting) {
             
@@ -114,11 +128,13 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
         case .resetRequired:
             return Texts_SettingsView.labelResetTransmitter
             
+        case .webOOP:
+            return Texts_SettingsView.labelWebOOPTransmitter
         }
     }
     
     func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+        guard let setting = Setting(rawValue: fixWebOOPIndex(index)) else { fatalError("Unexpected Section") }
         
         switch setting {
             
@@ -128,12 +144,14 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
             return UITableViewCell.AccessoryType.disclosureIndicator
         case .resetRequired:
             return UITableViewCell.AccessoryType.none
+        case .webOOP:
+            return UITableViewCell.AccessoryType.none
         }
 
     }
     
     func detailedText(index: Int) -> String? {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+        guard let setting = Setting(rawValue: fixWebOOPIndex(index)) else { fatalError("Unexpected Section") }
         
         switch (setting) {
             
@@ -143,12 +161,36 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
             return UserDefaults.standard.transmitterType?.rawValue
         case .resetRequired:
             return UserDefaults.standard.transmitterResetRequired ? Texts_Common.yes:Texts_Common.no
-
+        case .webOOP:
+            return nil
         }
     }
     
     func uiView(index: Int) -> UIView? {
-        return nil
+        guard let setting = Setting(rawValue: fixWebOOPIndex(index)) else { fatalError("Unexpected Section") }
+        
+        switch setting {
+        case .webOOP:
+            return UISwitch(isOn: UserDefaults.standard.webOOPEnabled, action: {(isOn:Bool) in UserDefaults.standard.webOOPEnabled = isOn})
+        default:
+            return nil
+        }
+    }
+    
+    // MARK: - private helper functions
+    
+    /// if it's a transmitterType that canWebOOP, then when user clicks second row (ie index = 1), then fix to 3 is done
+    private func fixWebOOPIndex(_ index: Int) -> Int {
+        
+        var index = index
+        
+        if let transmitterType = UserDefaults.standard.transmitterType {
+            if transmitterType.canWebOOP() && index == 1 {
+                index = 3
+            }
+        }
+        
+        return index
     }
     
     /// sets UserDefaults.standard.transmitterId with valud of id
