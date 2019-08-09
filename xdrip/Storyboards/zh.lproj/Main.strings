@@ -1,9 +1,9 @@
 
 /* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "0oo-Gz-k2G"; */
-"0oo-Gz-k2G.normalTitle" = "Cancel";
+"0oo-Gz-k2G.normalTitle" = "取消";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "2fU-HY-PwD"; */
-"2fU-HY-PwD.text" = "Detail";
+"2fU-HY-PwD.text" = "详细信息";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "7NI-o7-nWK"; */
 "7NI-o7-nWK.text" = "Label";
@@ -30,7 +30,7 @@
 "S45-Yf-BHe.text" = "Title";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "SQk-hK-fHN"; */
-"SQk-hK-fHN.text" = "Detail";
+"SQk-hK-fHN.text" = "详细信息";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "WNo-rU-sXx"; */
 "WNo-rU-sXx.text" = "Title";
@@ -42,7 +42,7 @@
 "YQZ-eK-OoJ.title" = "Title";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "Z96-ov-isg"; */
-"Z96-ov-isg.text" = "Detail";
+"Z96-ov-isg.text" = "详细信息";
 
 /* Class = "UIButton"; normalTitle = "Button"; ObjectID = "b1J-rJ-H3K"; */
 "b1J-rJ-H3K.normalTitle" = "Button";
@@ -75,13 +75,13 @@
 "lBP-cK-gbT.title" = "Title";
 
 /* Class = "UIButton"; normalTitle = "Calibrate"; ObjectID = "mSJ-jy-nHJ"; */
-"mSJ-jy-nHJ.normalTitle" = "Calibrate";
+"mSJ-jy-nHJ.normalTitle" = "校准";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "sBg-yb-0Iy"; */
-"sBg-yb-0Iy.text" = "Detail";
+"sBg-yb-0Iy.text" = "详细信息";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "skm-we-lQ3"; */
-"skm-we-lQ3.text" = "Detail";
+"skm-we-lQ3.text" = "详细信息";
 
 /* Class = "UIButton"; normalTitle = "Ok"; ObjectID = "uqL-UP-KZF"; */
 "uqL-UP-KZF.normalTitle" = "Ok";
@@ -93,4 +93,4 @@
 "wi3-X0-YuZ.title" = "Title";
 
 /* Class = "UIButton"; normalTitle = "Transmitter"; ObjectID = "zWo-AR-qJE"; */
-"zWo-AR-qJE.normalTitle" = "Transmitter";
+"zWo-AR-qJE.normalTitle" = "发射器";
