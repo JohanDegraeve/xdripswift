@@ -11,7 +11,7 @@
 "bluetoothisnoton" = "Bluetooth is not on. \r\n\r\nSwitch on Bluetooth first then try again.\r\n\r\nDo not connect to your device from your device settings. Scanning and connecting happens here in the app.";
 "bluetoothdeviceconnectedinfo" = "Connected to Transmitter. Device details are stored. Future connection attempts will only use this transmitter.\r\n\r\nTo use another transmitter, select first 'Forget Transmitter'";
 "sensorstart" = "Sensor Start";
-"notstarted" = "not started";
+"notstarted" = "niet gestart";
 "notknown" = "not known";
 "lastconnection" = "Last connection";
 "transmitterbatterylevel" = "Transmitter Battery Level";

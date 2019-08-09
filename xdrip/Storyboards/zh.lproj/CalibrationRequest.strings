@@ -1,4 +1,4 @@
-"enter_calibration_value" = "Enter Calibration Value";
-"calibration_title" = "Calibration";
-"calibration_notification_title" = "Calibration";
-"calibration_notification_body" = "Click the notification to calibrate";
+"enter_calibration_value" = "请输入校准值";
+"calibration_title" = "校准";
+"calibration_notification_title" = "校准";
+"calibration_notification_body" = "点击通知，然后校准";
