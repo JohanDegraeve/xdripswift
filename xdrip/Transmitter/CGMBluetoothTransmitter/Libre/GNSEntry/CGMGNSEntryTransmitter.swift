@@ -86,7 +86,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     var actualBootLoader:String?
     
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
-    var emptyArray: [RawGlucoseData] = []
+    var emptyArray: [GlucoseData] = []
     
     // MARK: - public functions
     
@@ -201,7 +201,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                     let sensorStatus = LibreSensorState(stateByte: UInt8(getIntAtPosition(numberOfBytes: 1, position: 5, data: &valueDecoded)))
                     
                     // initialize empty array of bgreadings
-                    var readings:Array<RawGlucoseData> = []
+                    var readings:Array<GlucoseData> = []
                     
                     // amountofReadingsPerMinute = how many readings per minute - see example code GNSEntry, if only one packet of 20 bytes transmitted, then only 5 readings 1 minute seperated
                     var amountOfPerMinuteReadings:Double = 5.0
@@ -227,7 +227,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                             // sometimes 0 values are received, skip those
                             if readingValueInMgDl > 0 {
                                 if readingTimeStampInMinutes * 60 * 1000 < timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) {
-                                    let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * ConstantsBloodGlucose.libreMultiplier)
+                                    let glucoseData = GlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * ConstantsBloodGlucose.libreMultiplier)
                                     readings.append(glucoseData)
                                     timeStampLastAddedGlucoseDataInMinutes = readingTimeStampInMinutes
                                 }
@@ -263,6 +263,9 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     ///
     /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
     func reset(requested:Bool) {}
+    
+    func setWebOOPEnabled(enabled: Bool) {
+    }
     
     // MARK: CBCentralManager overriden functions
     

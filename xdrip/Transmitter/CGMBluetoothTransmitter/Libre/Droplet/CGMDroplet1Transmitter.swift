@@ -22,7 +22,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMDroplet1)
     
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
-    var emptyArray: [RawGlucoseData] = []
+    var emptyArray: [GlucoseData] = []
     
     // MARK: - Initialization
     /// - parameters:
@@ -120,7 +120,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
             }
 
             // send to delegate
-            var glucoseDataArray = [RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: rawValueAsDouble)]
+            var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawValueAsDouble)]
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: nil, sensorTimeInMinutes: sensorTimeInMinutes * 10, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
             
         } else {
@@ -140,4 +140,8 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
     func reset(requested:Bool) {}
     
+    /// this transmitter does not support oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+    }
+
 }

@@ -50,5 +50,7 @@ enum ConstantsLog {
     static let categoryDexcomShareUploadManager = "categoryDexcomShareUploadManager"
     /// droplet 1
     static let categoryCGMDroplet1 = "categoryCGMDroplet1"
+    /// LibreOOPClient
+    static let categoryLibreOOPClient = "LibreOOPClient"
 }
 

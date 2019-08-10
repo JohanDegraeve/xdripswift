@@ -89,7 +89,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     private var actualDeviceAddress:String?
     
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
-    var emptyArray: [RawGlucoseData] = []
+    var emptyArray: [GlucoseData] = []
     
     // for creating testreadings
     private var testAmount:Double = 150000.0
@@ -161,7 +161,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     /// for testing, used by temptesting
     @objc private func createTestReading() {
-        let testdata = RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: testAmount, glucoseLevelFiltered: testAmount)
+        let testdata = GlucoseData(timeStamp: Date(), glucoseLevelRaw: testAmount, glucoseLevelFiltered: testAmount)
         debuglogging("timestamp testdata = " + testdata.timeStamp.description + ", with amount = " + testAmount.description)
         var testdataasarray = [testdata]
         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &testdataasarray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
@@ -261,7 +261,11 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     func reset(requested:Bool) {
         G5ResetRequested = requested
     }
-
+    
+    /// this transmitter does not support oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+    }
+    
     // MARK: BluetoothTransmitterDelegate functions
     
     func centralManagerDidConnect(address:String?, name:String?) {
@@ -449,7 +453,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                                 } else {
                                     timeStampOfLastG5Reading = Date()
                                     
-                                    let glucoseData = RawGlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: scaleRawValue(firmwareVersion: firmwareVersion, rawValue: sensorDataRxMessage.unfiltered), glucoseLevelFiltered: scaleRawValue(firmwareVersion: firmwareVersion, rawValue: sensorDataRxMessage.unfiltered))
+                                    let glucoseData = GlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: scaleRawValue(firmwareVersion: firmwareVersion, rawValue: sensorDataRxMessage.unfiltered), glucoseLevelFiltered: scaleRawValue(firmwareVersion: firmwareVersion, rawValue: sensorDataRxMessage.unfiltered))
                                     
                                     var glucoseDataArray = [glucoseData]
                                     

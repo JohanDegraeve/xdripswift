@@ -166,16 +166,20 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
     func reset(requested:Bool) {}
 
+    /// this transmitter does not support oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+    }
+    
     // MARK: helper functions
     
-    private func processxBridgeDataPacket(value:Data) -> (glucoseData:RawGlucoseData?, batteryLevel:Int?, transmitterID:String?) {
+    private func processxBridgeDataPacket(value:Data) -> (glucoseData:GlucoseData?, batteryLevel:Int?, transmitterID:String?) {
         guard value.count >= 10 else {
             trace("processxBridgeDataPacket, value.count = %{public}d, expecting minimum 10 so that we can find at least rawdata and filtereddata", log: log, type: .info, value.count)
             return (nil, nil, nil)
         }
         
         //initialize returnvalues
-        var glucoseData:RawGlucoseData?
+        var glucoseData:GlucoseData?
         var batteryLevel:Int?
         var transmitterID:String?
         
@@ -196,7 +200,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         }
         
         //create glucosedata
-        glucoseData = RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: Double(rawData), glucoseLevelFiltered: Double(filteredData))
+        glucoseData = GlucoseData(timeStamp: Date(), glucoseLevelRaw: Double(rawData), glucoseLevelFiltered: Double(filteredData))
 
         return (glucoseData, batteryLevel, transmitterID)
     }
@@ -208,9 +212,9 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
     ///Example 123632 218 0
     ///
     ///Those packets don't start with a fixed packet length and packet type, as they start with representation of an Integer
-    private func processBasicXdripDataPacket(value:Data) -> (glucoseData:RawGlucoseData?, batteryLevel:Int?) {
+    private func processBasicXdripDataPacket(value:Data) -> (glucoseData:GlucoseData?, batteryLevel:Int?) {
         //initialize returnvalues
-        var glucoseData:RawGlucoseData?
+        var glucoseData:GlucoseData?
         var batteryLevel:Int?
         
         //convert value to string
@@ -229,7 +233,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
             //create glucoseData
             if let rawData = rawData {
                 trace("in peripheral didUpdateValueFor, dataPacket received with rawData = %{public}d and batteryInfo =  %{public}d", log: log, type: .info, rawData, batteryLevel ?? 0)
-                glucoseData = RawGlucoseData(timeStamp: Date(), glucoseLevelRaw: Double(rawData))
+                glucoseData = GlucoseData(timeStamp: Date(), glucoseLevelRaw: Double(rawData))
             } else {
                 trace("in peripheral didUpdateValueFor, no rawdata", log: log, type: .info)
             }

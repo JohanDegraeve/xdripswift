@@ -1,7 +1,7 @@
 import Foundation
 
 /// extends RawGlucoseData and adds property unsmoothedGlucose, because this is only used for Libre
-class LibreRawGlucoseData: RawGlucoseData {
+class LibreRawGlucoseData: GlucoseData {
     
     var unsmoothedGlucose: Double
 

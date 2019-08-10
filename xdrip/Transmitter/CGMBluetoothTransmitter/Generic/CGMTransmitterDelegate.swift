@@ -32,7 +32,7 @@ protocol CGMTransmitterDelegate:AnyObject {
     ///     - serialNumber : transmitter serial number, only if transmitter can give that info, eg G5, otherwise nil
     ///     - bootloader : for the moment only used by GNSentry, otherwise nil
     ///     - sensorSerialNumber : serial number of the sensor, only applicable for Libre transmitters (MiaoMiao, Blucon, ...)
-    func cgmTransmitterInfoReceived(glucoseData:inout [RawGlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorState:LibreSensorState?, sensorTimeInMinutes:Int?, firmware:String?, hardware:String?, hardwareSerialNumber:String?, bootloader:String?, sensorSerialNumber:String?)
+    func cgmTransmitterInfoReceived(glucoseData:inout [GlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorState:LibreSensorState?, sensorTimeInMinutes:Int?, firmware:String?, hardware:String?, hardwareSerialNumber:String?, bootloader:String?, sensorSerialNumber:String?)
     
     /// transmitter needs bluetooth pairing
     func cgmTransmitterNeedsPairing()

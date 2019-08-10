@@ -40,7 +40,13 @@ protocol CGMTransmitter {
     ///     - requested : if true then transmitter must be reset
     /// for transmitter types that don't support resetting, this will be an empty function. Only G5 (and in future maybe G6) will use it. The others can define an empty body
     func reset(requested:Bool)
-    
+
+    /// to set webOOPEnabled - called when user change the setting
+    ///
+    /// for transmitters who don't support webOOP, there's no need to implemented this function<br>
+    /// ---  for transmitters who support webOOP (Bubble, MiaoMiao, ..) this should be implemented
+    func setWebOOPEnabled(enabled:Bool)
+
 }
 
 /// cgm transmitter types
@@ -129,7 +135,9 @@ enum CGMTransmitterType:String, CaseIterable {
     
     func canWebOOP() -> Bool {
         
-        switch self {
+        return false
+        
+        /*switch self {
             
         case .dexcomG4:
             return false
@@ -138,10 +146,10 @@ enum CGMTransmitterType:String, CaseIterable {
             return false
             
         case .miaomiao:
-            return false
+            return true
             
         case .Bubble:
-            return true
+            return false
             
         case .GNSentry:
             return false
@@ -152,7 +160,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .Droplet1:
             return false
             
-        }
+        }*/
     }
     
     /// returns nil if id to validate has expected length and type of characters etc.

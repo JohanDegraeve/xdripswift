@@ -19,7 +19,6 @@
 		F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */; };
 		F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */; };
 		F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */; };
-		F81D6D5022BFC7DC005EFAE2 /* DexcomShareTestResult.strings in Resources */ = {isa = PBXBuildFile; fileRef = F81D6D4F22BFC7DC005EFAE2 /* DexcomShareTestResult.strings */; };
 		F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D5122C27F18005EFAE2 /* BgReading+DexcomShare.swift */; };
 		F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */; };
 		F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */; };
@@ -79,7 +78,7 @@
 		F8A54AB722D9111900934E7A /* CGMTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AB322D9111900934E7A /* CGMTransmitter.swift */; };
 		F8A54AB822D9111900934E7A /* TransmitterBatteryInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AB422D9111900934E7A /* TransmitterBatteryInfo.swift */; };
 		F8A54AB922D9111900934E7A /* CGMTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AB522D9111900934E7A /* CGMTransmitterDelegate.swift */; };
-		F8A54ABA22D9111900934E7A /* RawGlucoseData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AB622D9111900934E7A /* RawGlucoseData.swift */; };
+		F8A54ABA22D9111900934E7A /* GlucoseData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AB622D9111900934E7A /* GlucoseData.swift */; };
 		F8A54AD722D911BA00934E7A /* CGMG6Transmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54ABD22D911BA00934E7A /* CGMG6Transmitter.swift */; };
 		F8A54AD822D911BA00934E7A /* CGMG5Transmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54ABF22D911BA00934E7A /* CGMG5Transmitter.swift */; };
 		F8A54AD922D911BA00934E7A /* TransmitterVersionTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AC122D911BA00934E7A /* TransmitterVersionTxMessage.swift */; };
@@ -104,7 +103,7 @@
 		F8A54AF622D9156600934E7A /* CGMGNSEntryTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AEE22D9156600934E7A /* CGMGNSEntryTransmitter.swift */; };
 		F8A54AFA22D9156600934E7A /* CGMMiaoMiaoTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AF422D9156600934E7A /* CGMMiaoMiaoTransmitter.swift */; };
 		F8A54AFF22D9179100934E7A /* CRC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AFC22D9179100934E7A /* CRC.swift */; };
-		F8A54B0022D9179100934E7A /* ParseLibreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AFD22D9179100934E7A /* ParseLibreData.swift */; };
+		F8A54B0022D9179100934E7A /* LibreDataParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AFD22D9179100934E7A /* LibreDataParser.swift */; };
 		F8A54B0122D9179100934E7A /* LibreSensorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AFE22D9179100934E7A /* LibreSensorState.swift */; };
 		F8A7406E22D9C0E700967CFC /* CGMBluconTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A7406D22D9C0E700967CFC /* CGMBluconTransmitter.swift */; };
 		F8A7407022DBB24800967CFC /* BluconTransmitterOpCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A7406F22DBB24800967CFC /* BluconTransmitterOpCode.swift */; };
@@ -190,11 +189,13 @@
 		F8EEDD4422FD80A600D2D610 /* LibreOOPResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD3D22FD80A500D2D610 /* LibreOOPResponse.swift */; };
 		F8EEDD4522FD80A600D2D610 /* LibreOOPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD3E22FD80A600D2D610 /* LibreOOPClient.swift */; };
 		F8EEDD4622FD80A600D2D610 /* LibreMeasurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD3F22FD80A600D2D610 /* LibreMeasurement.swift */; };
-		F8EEDD4722FD80A600D2D610 /* LibreOOPWebExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD4022FD80A600D2D610 /* LibreOOPWebExtensions.swift */; };
-		F8EEDD4922FD80A600D2D610 /* LibreOOPDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD4222FD80A600D2D610 /* LibreOOPDefaults.swift */; };
 		F8EEDD4C22FE224B00D2D610 /* LibreRawGlucoseData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD4B22FE224B00D2D610 /* LibreRawGlucoseData.swift */; };
 		F8EEDD4E22FE259D00D2D610 /* LibreDerivedAlgorithmRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD4D22FE259D00D2D610 /* LibreDerivedAlgorithmRunner.swift */; };
 		F8EEDD5022FE25D400D2D610 /* LibreGlucoseSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD4F22FE25D400D2D610 /* LibreGlucoseSmoothing.swift */; };
+		F8EEDD5222FECE3800D2D610 /* ConstantsLibreOOP.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD5122FECE3800D2D610 /* ConstantsLibreOOP.swift */; };
+		F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD5322FF685400D2D610 /* NSMutableURLRequest.swift */; };
+		F8EEDD552300136F00D2D610 /* DexcomShareTestResult.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8EEDD572300136F00D2D610 /* DexcomShareTestResult.strings */; };
+		F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -213,7 +214,6 @@
 		F81D6D4522B67F55005EFAE2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareUploadManager.swift; sourceTree = "<group>"; };
 		F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsDexcomShareTestResult.swift; sourceTree = "<group>"; };
-		F81D6D4F22BFC7DC005EFAE2 /* DexcomShareTestResult.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = DexcomShareTestResult.strings; sourceTree = "<group>"; };
 		F81D6D5122C27F18005EFAE2 /* BgReading+DexcomShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgReading+DexcomShare.swift"; sourceTree = "<group>"; };
 		F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueObserverTimeKeeper.swift; sourceTree = "<group>"; };
 		F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAlertSettingsViewController.swift; sourceTree = "<group>"; };
@@ -274,7 +274,7 @@
 		F8A54AB322D9111900934E7A /* CGMTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMTransmitter.swift; sourceTree = "<group>"; };
 		F8A54AB422D9111900934E7A /* TransmitterBatteryInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransmitterBatteryInfo.swift; sourceTree = "<group>"; };
 		F8A54AB522D9111900934E7A /* CGMTransmitterDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMTransmitterDelegate.swift; sourceTree = "<group>"; };
-		F8A54AB622D9111900934E7A /* RawGlucoseData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RawGlucoseData.swift; sourceTree = "<group>"; };
+		F8A54AB622D9111900934E7A /* GlucoseData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlucoseData.swift; sourceTree = "<group>"; };
 		F8A54ABD22D911BA00934E7A /* CGMG6Transmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMG6Transmitter.swift; sourceTree = "<group>"; };
 		F8A54ABF22D911BA00934E7A /* CGMG5Transmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMG5Transmitter.swift; sourceTree = "<group>"; };
 		F8A54AC122D911BA00934E7A /* TransmitterVersionTxMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransmitterVersionTxMessage.swift; sourceTree = "<group>"; };
@@ -300,7 +300,7 @@
 		F8A54AEE22D9156600934E7A /* CGMGNSEntryTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMGNSEntryTransmitter.swift; sourceTree = "<group>"; };
 		F8A54AF422D9156600934E7A /* CGMMiaoMiaoTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMMiaoMiaoTransmitter.swift; sourceTree = "<group>"; };
 		F8A54AFC22D9179100934E7A /* CRC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRC.swift; sourceTree = "<group>"; };
-		F8A54AFD22D9179100934E7A /* ParseLibreData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParseLibreData.swift; sourceTree = "<group>"; };
+		F8A54AFD22D9179100934E7A /* LibreDataParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreDataParser.swift; sourceTree = "<group>"; };
 		F8A54AFE22D9179100934E7A /* LibreSensorState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreSensorState.swift; sourceTree = "<group>"; };
 		F8A54B0A22D9215500934E7A /* xdrip-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "xdrip-Bridging-Header.h"; sourceTree = "<group>"; };
 		F8A7406D22D9C0E700967CFC /* CGMBluconTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMBluconTransmitter.swift; sourceTree = "<group>"; };
@@ -501,11 +501,24 @@
 		F8EEDD3D22FD80A500D2D610 /* LibreOOPResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreOOPResponse.swift; sourceTree = "<group>"; };
 		F8EEDD3E22FD80A600D2D610 /* LibreOOPClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreOOPClient.swift; sourceTree = "<group>"; };
 		F8EEDD3F22FD80A600D2D610 /* LibreMeasurement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreMeasurement.swift; sourceTree = "<group>"; };
-		F8EEDD4022FD80A600D2D610 /* LibreOOPWebExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreOOPWebExtensions.swift; sourceTree = "<group>"; };
-		F8EEDD4222FD80A600D2D610 /* LibreOOPDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreOOPDefaults.swift; sourceTree = "<group>"; };
 		F8EEDD4B22FE224B00D2D610 /* LibreRawGlucoseData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreRawGlucoseData.swift; sourceTree = "<group>"; };
 		F8EEDD4D22FE259D00D2D610 /* LibreDerivedAlgorithmRunner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreDerivedAlgorithmRunner.swift; sourceTree = "<group>"; };
 		F8EEDD4F22FE25D400D2D610 /* LibreGlucoseSmoothing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreGlucoseSmoothing.swift; sourceTree = "<group>"; };
+		F8EEDD5122FECE3800D2D610 /* ConstantsLibreOOP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsLibreOOP.swift; sourceTree = "<group>"; };
+		F8EEDD5322FF685400D2D610 /* NSMutableURLRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSMutableURLRequest.swift; sourceTree = "<group>"; };
+		F8EEDD562300136F00D2D610 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F8EEDD582300138500D2D610 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F8EEDD592300138700D2D610 /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/DexcomShareTestResult.strings"; sourceTree = "<group>"; };
+		F8EEDD5A2300139000D2D610 /* es-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-ES"; path = "es-ES.lproj/DexcomShareTestResult.strings"; sourceTree = "<group>"; };
+		F8EEDD5B2300139200D2D610 /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F8EEDD5C2300139300D2D610 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F8EEDD5D2300139500D2D610 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/DexcomShareTestResult.strings"; sourceTree = "<group>"; };
+		F8EEDD5E2300139500D2D610 /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/DexcomShareTestResult.strings"; sourceTree = "<group>"; };
+		F8EEDD5F2300139600D2D610 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F8EEDD602300139700D2D610 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F8EEDD612300139800D2D610 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F8EEDD622300139A00D2D610 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCalibrator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -563,6 +576,7 @@
 				F8B3A78A225D473D004BA588 /* UIAlertController.swift */,
 				F8B3A857227F6971004BA588 /* UISwitch.swift */,
 				F8B3A85C22821BB6004BA588 /* Int.swift */,
+				F8EEDD5322FF685400D2D610 /* NSMutableURLRequest.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -729,7 +743,7 @@
 				F8AC426321ADEBD60078C348 /* Main.storyboard */,
 				F8B3A788225D4473004BA588 /* NightScoutTestResult.strings */,
 				F8BDD457221DEF22006EAB84 /* SettingsViews.strings */,
-				F81D6D4F22BFC7DC005EFAE2 /* DexcomShareTestResult.strings */,
+				F8EEDD572300136F00D2D610 /* DexcomShareTestResult.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -776,7 +790,7 @@
 				F8A54AB322D9111900934E7A /* CGMTransmitter.swift */,
 				F8A54AB422D9111900934E7A /* TransmitterBatteryInfo.swift */,
 				F8A54AB522D9111900934E7A /* CGMTransmitterDelegate.swift */,
-				F8A54AB622D9111900934E7A /* RawGlucoseData.swift */,
+				F8A54AB622D9111900934E7A /* GlucoseData.swift */,
 			);
 			path = Generic;
 			sourceTree = "<group>";
@@ -887,13 +901,11 @@
 				F8EEDD4F22FE25D400D2D610 /* LibreGlucoseSmoothing.swift */,
 				F8EEDD4D22FE259D00D2D610 /* LibreDerivedAlgorithmRunner.swift */,
 				F8EEDD3E22FD80A600D2D610 /* LibreOOPClient.swift */,
-				F8EEDD4222FD80A600D2D610 /* LibreOOPDefaults.swift */,
 				F8EEDD3D22FD80A500D2D610 /* LibreOOPResponse.swift */,
-				F8EEDD4022FD80A600D2D610 /* LibreOOPWebExtensions.swift */,
 				F8EEDD3F22FD80A600D2D610 /* LibreMeasurement.swift */,
 				F8C5EBE422F297EF00563B5F /* LibreSensorSerialNumber.swift */,
 				F8A54AFC22D9179100934E7A /* CRC.swift */,
-				F8A54AFD22D9179100934E7A /* ParseLibreData.swift */,
+				F8A54AFD22D9179100934E7A /* LibreDataParser.swift */,
 				F8A54AFE22D9179100934E7A /* LibreSensorState.swift */,
 				F8EEDD4B22FE224B00D2D610 /* LibreRawGlucoseData.swift */,
 			);
@@ -1142,6 +1154,7 @@
 				F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */,
 				F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */,
 				F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */,
+				F8EEDD5122FECE3800D2D610 /* ConstantsLibreOOP.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -1180,10 +1193,11 @@
 		F8EA6CA521BAD5AD0082976B /* Calibration */ = {
 			isa = PBXGroup;
 			children = (
-				F8A54AAC22D6859200934E7A /* SlopeParameters.swift */,
-				F8025E5221EE8CE500ECF0C0 /* Protocol */,
-				F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */,
 				F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */,
+				F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */,
+				F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */,
+				F8025E5221EE8CE500ECF0C0 /* Protocol */,
+				F8A54AAC22D6859200934E7A /* SlopeParameters.swift */,
 			);
 			path = Calibration;
 			sourceTree = "<group>";
@@ -1290,7 +1304,7 @@
 				F8B3A80D227A3E98004BA588 /* AlertTypesSettingsView.strings in Resources */,
 				F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */,
 				F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */,
-				F81D6D5022BFC7DC005EFAE2 /* DexcomShareTestResult.strings in Resources */,
+				F8EEDD552300136F00D2D610 /* DexcomShareTestResult.strings in Resources */,
 				F8B3A7CF226CC0B7004BA588 /* shorthigh4.mp3 in Resources */,
 				F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 in Resources */,
 				F8B3A7CE226CC0B7004BA588 /* shorthigh2.mp3 in Resources */,
@@ -1378,8 +1392,7 @@
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
 				F8A54AE622D911BA00934E7A /* KeepAliveTxMessage.swift in Sources */,
 				F81FA006228E09D40028C70F /* TextsCalibration.swift in Sources */,
-				F8EEDD4922FD80A600D2D610 /* LibreOOPDefaults.swift in Sources */,
-				F8A54ABA22D9111900934E7A /* RawGlucoseData.swift in Sources */,
+				F8A54ABA22D9111900934E7A /* GlucoseData.swift in Sources */,
 				F8B3A84A227F090E004BA588 /* SettingsViewGeneralSettingsViewModel.swift in Sources */,
 				F8B3A85B2280CCD1004BA588 /* AlertSettingsViewController.swift in Sources */,
 				F8B3A81B227DEC92004BA588 /* SensorsAccessor.swift in Sources */,
@@ -1413,13 +1426,12 @@
 				F8A7406E22D9C0E700967CFC /* CGMBluconTransmitter.swift in Sources */,
 				F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */,
 				F8B3A7B2226A0878004BA588 /* TextsAlerts.swift in Sources */,
-				F8A54B0022D9179100934E7A /* ParseLibreData.swift in Sources */,
+				F8A54B0022D9179100934E7A /* LibreDataParser.swift in Sources */,
 				F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */,
 				F81FA00A228F53680028C70F /* TextsHomeView.swift in Sources */,
 				F8E3C3AD21FE551C00907A04 /* DexcomCalibrator.swift in Sources */,
 				F821CF61229BF4A2005C1E43 /* NightScoutUploadManager.swift in Sources */,
 				F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */,
-				F8EEDD4722FD80A600D2D610 /* LibreOOPWebExtensions.swift in Sources */,
 				F8A54ADD22D911BA00934E7A /* BatteryStatusTxMessage.swift in Sources */,
 				F8EEDD5022FE25D400D2D610 /* LibreGlucoseSmoothing.swift in Sources */,
 				F8A1585522EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift in Sources */,
@@ -1456,6 +1468,8 @@
 				F8B3A81C227DEC92004BA588 /* AlertEntriesAccessor.swift in Sources */,
 				F8A1585B22EDB7EA007F5B5D /* ConstantsDexcomG5.swift in Sources */,
 				F8BDD452221DEAB2006EAB84 /* TextsSettingsView.swift in Sources */,
+				F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */,
+				F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
 				F8B3A847227F090E004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,
 				F8B3A79622635A25004BA588 /* AlertEntry+CoreDataClass.swift in Sources */,
@@ -1493,6 +1507,7 @@
 				F8B3A834227F08AC004BA588 /* PickerViewData.swift in Sources */,
 				F8B3A79522635A25004BA588 /* AlertType+CoreDataProperties.swift in Sources */,
 				F8B3A84C227F090E004BA588 /* SettingsViewController.swift in Sources */,
+				F8EEDD5222FECE3800D2D610 /* ConstantsLibreOOP.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */,
 				F8B3A78B225D473D004BA588 /* UIAlertController.swift in Sources */,
 				F8A54AEB22D911BA00934E7A /* CGMG4xDripTransmitter.swift in Sources */,
@@ -1737,6 +1752,25 @@
 				F8B48B1222B37C84009BCC01 /* zh */,
 			);
 			name = SettingsViews.strings;
+			sourceTree = "<group>";
+		};
+		F8EEDD572300136F00D2D610 /* DexcomShareTestResult.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F8EEDD562300136F00D2D610 /* en */,
+				F8EEDD582300138500D2D610 /* nl */,
+				F8EEDD592300138700D2D610 /* es-MX */,
+				F8EEDD5A2300139000D2D610 /* es-ES */,
+				F8EEDD5B2300139200D2D610 /* sl */,
+				F8EEDD5C2300139300D2D610 /* ru */,
+				F8EEDD5D2300139500D2D610 /* pt-BR */,
+				F8EEDD5E2300139500D2D610 /* pl-PL */,
+				F8EEDD5F2300139600D2D610 /* it */,
+				F8EEDD602300139700D2D610 /* fr */,
+				F8EEDD612300139800D2D610 /* zh */,
+				F8EEDD622300139A00D2D610 /* pt */,
+			);
+			name = DexcomShareTestResult.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

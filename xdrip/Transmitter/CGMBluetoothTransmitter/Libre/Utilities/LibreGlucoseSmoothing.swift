@@ -5,7 +5,7 @@
 //  Created by Bjørn Inge Berg on 25/03/2019.
 //  Copyright © 2019 Mark Wilson. All rights reserved.
 //
-
+// adapted by Johan Degraeve for xdrip ios
 import Foundation
 
 class LibreGlucoseSmoothing {

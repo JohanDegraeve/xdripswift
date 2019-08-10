@@ -30,3 +30,4 @@
 "transmitterResultResult" = "Transmitter reset result";
 "success" = "success";
 "failed" = "failed";
+"calibrationNotNecessary" = "With Web OOP enabled, calibration is not necessary for the selected type of transmitter";

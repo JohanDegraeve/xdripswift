@@ -37,7 +37,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     private var sensorSerialNumber:String?
     
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
-    private var emptyArray: [RawGlucoseData] = []
+    private var emptyArray: [GlucoseData] = []
     
     /// timestamp when wakeUpResponse was sent to Blucon
     private var timeStampLastWakeUpResponse:Date?
@@ -170,7 +170,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             }
 
             //get readings from buffer and send to delegate
-            var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: 0)
+            var result = LibreDataParser.parse(libreData: rxBuffer, timeStampLastBgReading: timeStampLastBgReading)
             
             //TODO: sort glucosedata before calling newReadingsReceived
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
@@ -247,6 +247,10 @@ extension CGMBluconTransmitter: CGMTransmitter {
         return
     }
     
+    /// this transmitter does not support oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+    }
+
 }
 
 extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
@@ -510,7 +514,7 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                             // get glucoseValue from value
                             let glucoseValue = nowGetGlucoseValue(input: value)
                             
-                            let glucoseData = RawGlucoseData(timeStamp: timeStampLastBgReading, glucoseLevelRaw: glucoseValue, glucoseLevelFiltered: glucoseValue)
+                            let glucoseData = GlucoseData(timeStamp: timeStampLastBgReading, glucoseLevelRaw: glucoseValue, glucoseLevelFiltered: glucoseValue)
                             var glucoseDataArray = [glucoseData]
                             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
 

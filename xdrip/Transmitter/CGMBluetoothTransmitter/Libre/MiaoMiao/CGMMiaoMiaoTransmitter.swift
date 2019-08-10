@@ -3,6 +3,7 @@ import CoreBluetooth
 import os
 
 class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
+    
     // MARK: - properties
     
     /// service to be discovered
@@ -27,23 +28,31 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     // used in parsing packet
     private var timeStampLastBgReading:Date
     
-    // counts number of times resend was requested due to crc error
+    /// counts number of times resend was requested due to crc error
     private var resendPacketCounter:Int = 0
     
     /// used when processing MiaoMiao data packet
     private var timestampFirstPacketReception:Date
-    // receive buffer for miaomiao packets
+    
+    /// receive buffer for miaomiao packets
     private var rxBuffer:Data
-    // how long to wait for next packet before sending startreadingcommand
+    
+    /// how long to wait for next packet before sending startreadingcommand
     private static let maxWaitForpacketInSeconds = 60.0
-    // length of header added by MiaoMiao in front of data dat is received from Libre sensor
+    
+    /// length of header added by MiaoMiao in front of data dat is received from Libre sensor
     private let miaoMiaoHeaderLength = 18
     
+    /// is the transmitter oop web enabled or not
+    private var webOOPEnabled: Bool
     
     // MARK: - Initialization
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
-    init(address:String?, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date) {
+    ///     - delegate : CGMTransmitterDelegate intance
+    ///     - timeStampLastBgReading : timestamp of last bgReading
+    ///     - webOOPEnabled : enabled or not
+    init(address:String?, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, webOOPEnabled: Bool) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameMiaoMiao)
@@ -61,6 +70,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         //initialize timeStampLastBgReading
         self.timeStampLastBgReading = timeStampLastBgReading
         
+        // initialize webOOPEnabled
+        self.webOOPEnabled = webOOPEnabled
+
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, startScanningAfterInit: CGMTransmitterType.miaomiao.startScanningAfterInit())
         
         // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
@@ -130,21 +142,14 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                                 let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
                                 let batteryPercentage = Int(rxBuffer[13])
 
-                                let serialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)))?.serialNumber ?? "-"
-                                debuglogging("serialNumber = " + serialNumber)
-                                
-                                //get readings from buffer and send to delegate
-                                var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: miaoMiaoHeaderLength)
-                                //TODO: sort glucosedata before calling newReadingsReceived
-                                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
-                                
-                                //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
-                                if result.glucoseData.count > 0 {
-                                    timeStampLastBgReading = result.glucoseData[0].timeStamp
-                                }
+                                LibreDataParser.libreDataProcessor(sensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)))?.serialNumber, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
+                                    self.timeStampLastBgReading = timeStampLastBgReading
+                                    
+                                })
                                 
                                 //reset the buffer
                                 resetRxBuffer()
+                                
                             } else {
                                 let temp = resendPacketCounter
                                 resetRxBuffer()
@@ -222,6 +227,15 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         resendPacketCounter = 0
     }
     
+    /// this transmitter supports oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+        webOOPEnabled = enabled
+        
+        // immediately request a new reading
+        // there's no check here to see if peripheral, characteristic, connection, etc.. exists, but that's no issue. If anything's missing, write will simply fail,
+        _ = sendStartReadingCommmand()
+    }
+
 }
 
 fileprivate enum MiaoMiaoResponseType: UInt8 {
