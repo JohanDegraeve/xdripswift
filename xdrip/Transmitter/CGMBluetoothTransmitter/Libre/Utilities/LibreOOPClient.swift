@@ -196,16 +196,16 @@ class LibreOOPClient {
         
         for trend in measurements {
             let glucose = LibreRawGlucoseData(timeStamp: trend.date, unsmoothedGlucose: trend.temperatureAlgorithmGlucose)
-            debuglogging("in trendToLibreGlucose before CalculateSmothedData5Points, glucose.glucoseLevelRaw = " + glucose.glucoseLevelRaw.description + ", glucose.unsmoothedGlucose = " + glucose.unsmoothedGlucose.description)
+            //debuglogging("in trendToLibreGlucose before CalculateSmothedData5Points, glucose.glucoseLevelRaw = " + glucose.glucoseLevelRaw.description + ", glucose.unsmoothedGlucose = " + glucose.unsmoothedGlucose.description)
             origarr.append(glucose)
         }
         
         var arr : [LibreRawGlucoseData]
         arr = LibreGlucoseSmoothing.CalculateSmothedData5Points(origtrends: origarr)
 
-        for glucose in arr {
+        /*for glucose in arr {
             debuglogging("in trendToLibreGlucose after CalculateSmothedData5Points, glucose.glucoseLevelRaw = " + glucose.glucoseLevelRaw.description + ", glucose.unsmoothedGlucose = " + glucose.unsmoothedGlucose.description)
-        }
+        }*/
 
         return arr
     }

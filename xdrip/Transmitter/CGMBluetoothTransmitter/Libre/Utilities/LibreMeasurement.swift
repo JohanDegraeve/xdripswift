@@ -77,7 +77,7 @@ struct LibreMeasurement {
             self.temperatureAlgorithmGlucose = 0
         }
         
-        print(self.description)
+        //print(self.description)
     }
     
     

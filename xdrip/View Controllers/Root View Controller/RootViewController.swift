@@ -268,9 +268,9 @@ final class RootViewController: UIViewController {
     ///     - sensorTimeInMinutes : should be present only if it's the first reading(s) being processed for a specific sensor and is needed if it's a transmitterType that returns true to the function canDetectNewSensor
     private func processNewGlucoseData(glucoseData: inout [GlucoseData], sensorTimeInMinutes: Int?) {
         
-        for glucose in glucoseData {
+        /*for glucose in glucoseData {
             debuglogging(glucose.description)
-        }
+        }*/
         
         // check that calibrations and coredata manager is not nil
         guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager else {
