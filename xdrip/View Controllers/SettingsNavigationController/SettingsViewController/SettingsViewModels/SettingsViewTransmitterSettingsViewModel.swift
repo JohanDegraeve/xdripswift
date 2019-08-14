@@ -7,6 +7,7 @@ fileprivate enum Setting:Int, CaseIterable {
     case transmitterId = 1
     /// is transmitter reset required or not (only applicable to Dexcom G5 and later also G6)
     case resetRequired = 2
+    /// is webOOP enabled or not
     case webOOP = 3
 }
 
@@ -98,9 +99,14 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
             } else {
                 count = 1
             }
+            
+            // for now WebOOP is only for transmitters that don't need transmitterId and no reset possible.
+            // So for those transmitters, if canWebOOP, then amount of rows = 2
+            // Needs adaptation in case we would enable webOOP for transmitters with transmitterId, like Blucon
             if transmitterType.canWebOOP() {
-                count += 1
+                count = 2
             }
+            
             return count
         } else {
             // transmitterType nil, means this is initial setup, no need to show transmitter id field
@@ -171,13 +177,19 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
         }
     }
     
+    // MARK: - private helper functions
+    
+    /// if it's a transmitterType that canWebOOP, then when user clicks second row (ie index = 1), then fix to 3 is done
     private func fixWebOOPIndex(_ index: Int) -> Int {
+        
         var index = index
+        
         if let transmitterType = UserDefaults.standard.transmitterType {
             if transmitterType.canWebOOP() && index == 1 {
-                index += 2
+                index = 3
             }
         }
+        
         return index
     }
     

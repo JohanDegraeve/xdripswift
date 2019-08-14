@@ -126,7 +126,7 @@ class BgReadingsAccessor {
                 bgReadings = try fetchRequest.execute()
             } catch {
                 let fetchError = error as NSError
-                os_log("in fetchBgReadings, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+                trace("in fetchBgReadings, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
             }
         }
         

@@ -66,7 +66,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
-    /// for OS_log
+    /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMGNSEntry)
     
     /// used in parsing packet
@@ -86,7 +86,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     var actualBootLoader:String?
     
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
-    var emptyArray: [RawGlucoseData] = []
+    var emptyArray: [GlucoseData] = []
     
     // MARK: - public functions
     
@@ -116,12 +116,12 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     // MARK: BluetoothTransmitterDelegate functions
     
     func centralManagerDidConnect(address:String?, name:String?) {
-        os_log("in centralManagerDidConnect", log: log, type: .info)
+        trace("in centralManagerDidConnect", log: log, type: .info)
         cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
     }
     
     func centralManagerDidFailToConnect(error: Error?) {
-        os_log("in centralManagerDidFailToConnect", log: log, type: .info)
+        trace("in centralManagerDidFailToConnect", log: log, type: .info)
     }
     
     func centralManagerDidUpdateState(state: CBManagerState) {
@@ -129,21 +129,21 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     }
     
     func centralManagerDidDisconnectPeripheral(error: Error?) {
-        os_log("in centralManagerDidDisconnectPeripheral", log: log, type: .info)
+        trace("in centralManagerDidDisconnectPeripheral", log: log, type: .info)
         cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
     }
     
     func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
-        os_log("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
+        trace("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
     }
     
     func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
         
         // log the received characteristic value
-        os_log("in peripheralDidUpdateValueFor with characteristic UUID = %{public}@, matches characteristic name %{public}@", log: log, type: .info, characteristic.uuid.uuidString, receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString)?.description ?? "not available")
+        trace("in peripheralDidUpdateValueFor with characteristic UUID = %{public}@, matches characteristic name %{public}@", log: log, type: .info, characteristic.uuid.uuidString, receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString)?.description ?? "not available")
         
         if let error = error {
-            os_log("   error: %{public}@", log: log, type: .error , error.localizedDescription)
+            trace("   error: %{public}@", log: log, type: .error , error.localizedDescription)
         }
         
         if let receivedCharacteristic = receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString), let value = characteristic.value {
@@ -171,7 +171,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 if let batteryLevel = Int(dataAsString, radix: 16) {
                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryLevel), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
                 } else {
-                    os_log("   in peripheralDidUpdateValueFor, could not read batterylevel, received hex value = %{public}@", log: log, type: .error , dataAsString)
+                    trace("   in peripheralDidUpdateValueFor, could not read batterylevel, received hex value = %{public}@", log: log, type: .error , dataAsString)
                 }
             case .CBUUID_GNW_Write:
                 break
@@ -180,13 +180,13 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 var valueDecoded = XORENC(inD: [UInt8](value))
                 
                 let valueDecodedAsHexString = Data(valueDecoded).hexEncodedString()
-                 os_log("   in peripheralDidUpdateValueFor, GNW Notify with hex value = %{public}@", log: log, type: .info , valueDecodedAsHexString)
+                 trace("   in peripheralDidUpdateValueFor, GNW Notify with hex value = %{public}@", log: log, type: .info , valueDecodedAsHexString)
                 
                 // reading status, as per GNSEntry documentation
                 let readingStatus = getIntAtPosition(numberOfBytes: 1, position: 0, data: &valueDecoded)
                 
                 if readingStatus == GNW_BAND_NFC_HW_ERROR || readingStatus == GNW_BAND_NFC_READING_ERROR {
-                    os_log("   in peripheralDidUpdateValueFor, readingStatus is not OK", log: log, type: .error)
+                    trace("   in peripheralDidUpdateValueFor, readingStatus is not OK", log: log, type: .error)
                     // TODO: what to do here ?
                 } else {
                     
@@ -201,7 +201,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                     let sensorStatus = LibreSensorState(stateByte: UInt8(getIntAtPosition(numberOfBytes: 1, position: 5, data: &valueDecoded)))
                     
                     // initialize empty array of bgreadings
-                    var readings:Array<RawGlucoseData> = []
+                    var readings:Array<GlucoseData> = []
                     
                     // amountofReadingsPerMinute = how many readings per minute - see example code GNSEntry, if only one packet of 20 bytes transmitted, then only 5 readings 1 minute seperated
                     var amountOfPerMinuteReadings:Double = 5.0
@@ -227,7 +227,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                             // sometimes 0 values are received, skip those
                             if readingValueInMgDl > 0 {
                                 if readingTimeStampInMinutes * 60 * 1000 < timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) {
-                                    let glucoseData = RawGlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * ConstantsBloodGlucose.libreMultiplier)
+                                    let glucoseData = GlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * ConstantsBloodGlucose.libreMultiplier)
                                     readings.append(glucoseData)
                                     timeStampLastAddedGlucoseDataInMinutes = readingTimeStampInMinutes
                                 }
@@ -264,64 +264,67 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
     func reset(requested:Bool) {}
     
+    func setWebOOPEnabled(enabled: Bool) {
+    }
+    
     // MARK: CBCentralManager overriden functions
     
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        os_log("didDiscoverCharacteristicsFor", log: log, type: .info)
+        trace("didDiscoverCharacteristicsFor", log: log, type: .info)
         
         // log error if any
         if let error = error {
-            os_log("    error: %{public}@", log: log, type: .error , error.localizedDescription)
+            trace("    error: %{public}@", log: log, type: .error , error.localizedDescription)
         }
         
         if let characteristics = service.characteristics {
             for characteristic in characteristics {
                 let ASCIIstring = characteristic.uuid.uuidString
-                os_log("characteristic uuid: %{public}@", log: log, type: .info, ASCIIstring)
+                trace("characteristic uuid: %{public}@", log: log, type: .info, ASCIIstring)
                 
                 if let receivedCharacteristic = receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString) {
                     switch receivedCharacteristic {
                         
                     case .CBUUID_SerialNumber:
-                        os_log("    found serialNumberCharacteristic", log: log, type: .info)
+                        trace("    found serialNumberCharacteristic", log: log, type: .info)
                         serialNumberCharacteristic = characteristic
                         if actualSerialNumber == nil {
                             peripheral.setNotifyValue(true, for: characteristic)
                             peripheral.readValue(for: characteristic)
                         }
                     case .CBUUID_Firmware:
-                        os_log("    found firmwareCharacteristic", log: log, type: .info)
+                        trace("    found firmwareCharacteristic", log: log, type: .info)
                         firmwareCharacteristic = characteristic
                         if actualFirmWareVersion == nil {
                             peripheral.setNotifyValue(true, for: characteristic)
                             peripheral.readValue(for: characteristic)
                         }
                     case .CBUUID_Bootloader:
-                        os_log("    found bootLoaderCharacteristic", log: log, type: .info)
+                        trace("    found bootLoaderCharacteristic", log: log, type: .info)
                         bootLoaderCharacteristic = characteristic
                         if actualBootLoader == nil {
                             peripheral.setNotifyValue(true, for: characteristic)
                             peripheral.readValue(for: characteristic)
                         }
                     case .CBUUID_BatteryLevel:
-                        os_log("    found batteryLevelCharacteristic", log: log, type: .info)
+                        trace("    found batteryLevelCharacteristic", log: log, type: .info)
                         batteryLevelCharacteristic = characteristic
                         peripheral.setNotifyValue(true, for: characteristic)
                         peripheral.readValue(for: characteristic)
                     case .CBUUID_GNW_Write:
-                        os_log("    found GNWWriteCharacteristic", log: log, type: .info)
+                        trace("    found GNWWriteCharacteristic", log: log, type: .info)
                         GNWWriteCharacteristic = characteristic
                     case .CBUUID_GNW_Notify:
-                        os_log("    found GNWNotifyCharacteristic", log: log, type: .info)
+                        trace("    found GNWNotifyCharacteristic", log: log, type: .info)
                         GNWNotifyCharacteristic = characteristic
                         peripheral.setNotifyValue(true, for: characteristic)
                     }
                 } else {
-                    os_log("    characteristic UUID unknown", log: log, type: .error)
+                    trace("    characteristic UUID unknown", log: log, type: .error)
                 }
             }
         } else {
-            os_log("characteristics is nil. There must be some error.", log: log, type: .error)
+            trace("characteristics is nil. There must be some error.", log: log, type: .error)
         }
     }
     

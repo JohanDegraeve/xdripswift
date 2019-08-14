@@ -21,7 +21,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     /// if value starts with this string, then it's assume that a battery low indication is sent by the Blucon
     private let unknownCommand2BatteryLowIndicator = "8bda02"
     
-    /// for OS_log
+    /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBlucon)
     
     // actual device address
@@ -37,7 +37,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     private var sensorSerialNumber:String?
     
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
-    private var emptyArray: [RawGlucoseData] = []
+    private var emptyArray: [GlucoseData] = []
     
     /// timestamp when wakeUpResponse was sent to Blucon
     private var timeStampLastWakeUpResponse:Date?
@@ -126,7 +126,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     /// writes command to blucon, withResponse, and also logs the command
     private func sendCommandToBlucon(opcode:BluconTransmitterOpCode) {
 
-        os_log("    send opcode %{public}@ to Blucon", log: log, type: .info, opcode.description)
+        trace("    send opcode %{public}@ to Blucon", log: log, type: .info, opcode.description)
         _ = writeDataToPeripheral(data: Data(hexadecimalString: opcode.rawValue)!, type: .withResponse)
 
     }
@@ -146,7 +146,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         //check if buffer needs to be reset
         if let timestampFirstPacketReception = timestampFirstPacketReception {
             if (Date() > timestampFirstPacketReception.addingTimeInterval(maxWaitForHistoricDataInSeconds - 1)) {
-                os_log("in handleNewHistoricData, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info,maxWaitForHistoricDataInSeconds)
+                trace("in handleNewHistoricData, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info,maxWaitForHistoricDataInSeconds)
                 resetRxBuffer()
             }
         }
@@ -157,12 +157,12 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         // if rxBuffer has reached minimum lenght, then start processing
         if rxBuffer.count >= 344 {
             
-            os_log("in handleNewHistoricData, reached minimum length, processing data", log: log, type: .info)
+            trace("in handleNewHistoricData, reached minimum length, processing data", log: log, type: .info)
             
             // crc check
             guard Crc.LibreCrc(data: &rxBuffer, headerOffset: 0) else {
                 
-                os_log("    crc check failed, no further processing", log: log, type: .error)
+                trace("    crc check failed, no further processing", log: log, type: .error)
                 
                 // transmitter can go to sleep
                 return true
@@ -170,7 +170,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             }
 
             //get readings from buffer and send to delegate
-            var result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: 0)
+            var result = LibreDataParser.parse(libreData: rxBuffer, timeStampLastBgReading: timeStampLastBgReading)
             
             //TODO: sort glucosedata before calling newReadingsReceived
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
@@ -247,17 +247,21 @@ extension CGMBluconTransmitter: CGMTransmitter {
         return
     }
     
+    /// this transmitter does not support oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+    }
+
 }
 
 extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
     
     func centralManagerDidConnect(address: String?, name: String?) {
-        os_log("in centralManagerDidConnect", log: log, type: .info)
+        trace("in centralManagerDidConnect", log: log, type: .info)
         cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
     }
     
     func centralManagerDidFailToConnect(error: Error?) {
-        os_log("in centralManagerDidFailToConnect", log: log, type: .error)
+        trace("in centralManagerDidFailToConnect", log: log, type: .error)
     }
     
     func centralManagerDidUpdateState(state: CBManagerState) {
@@ -265,12 +269,12 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
     }
     
     func centralManagerDidDisconnectPeripheral(error: Error?) {
-        os_log("in centralManagerDidDisconnectPeripheral", log: log, type: .info)
+        trace("in centralManagerDidDisconnectPeripheral", log: log, type: .info)
         cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
     }
     
     func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
-        os_log("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
+        trace("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
         
         // check if error occurred
         if let error = error {
@@ -295,7 +299,7 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
     func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
         
         // log the received characteristic value
-        os_log("in peripheralDidUpdateValueFor with characteristic UUID = %{public}@", log: log, type: .info, characteristic.uuid.uuidString)
+        trace("in peripheralDidUpdateValueFor with characteristic UUID = %{public}@", log: log, type: .info, characteristic.uuid.uuidString)
 
         // this is only applicable the very first time that blucon connects and pairing is done
         if waitingSuccessfulPairing {
@@ -305,7 +309,7 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
 
         // check if error occured
         if let error = error {
-            os_log("   error: %{public}@", log: log, type: .error , error.localizedDescription)
+            trace("   error: %{public}@", log: log, type: .error , error.localizedDescription)
         }
         
         if let value = characteristic.value {
@@ -313,12 +317,12 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
             // convert to string and log the value
             let valueAsString = value.hexEncodedString()
             
-            os_log("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .info, valueAsString)
+            trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .info, valueAsString)
             
             // get Opcode
             if let opCode = BluconTransmitterOpCode(withOpCodeValue: valueAsString) {
                 
-                os_log("    received opcode = %{public}@ from Blucon", log: log, type: .info, opCode.description)
+                trace("    received opcode = %{public}@ from Blucon", log: log, type: .info, opCode.description)
                 
                 switch opCode {
                     
@@ -341,7 +345,7 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                 case .error14:
                     
                     // Blucon didn't receive the next command it was waiting for, need to wait 5 minutes
-                    os_log("    Timeout received, need to  wait 5 minutes or push button to restart!", log: log, type: .error)
+                    trace("    Timeout received, need to  wait 5 minutes or push button to restart!", log: log, type: .error)
 
                     // and send Blucon to sleep
                     sendCommandToBlucon(opcode: .sleep)
@@ -362,7 +366,7 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                     // verify serial number and if changed inform delegate
                     if newSerialNumber != sensorSerialNumber {
                         
-                        os_log("    new sensor detected :  %{public}@", log: log, type: .info, newSerialNumber)
+                        trace("    new sensor detected :  %{public}@", log: log, type: .info, newSerialNumber)
                         
                         sensorSerialNumber = newSerialNumber
                         
@@ -387,7 +391,7 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                         
                     } else {
                         
-                        os_log("    sensorState =  %{public}@", log: log, type: .info, sensorState.description)
+                        trace("    sensorState =  %{public}@", log: log, type: .info, sensorState.description)
 
                         sendCommandToBlucon(opcode: BluconTransmitterOpCode.sleep)
 
@@ -415,7 +419,7 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                             
                     } else {
                         
-                        os_log("    no further processing, Blucon is sleeping now and should send a new reading in 5 minutes", log: log, type: .info)
+                        trace("    no further processing, Blucon is sleeping now and should send a new reading in 5 minutes", log: log, type: .info)
                         
                     }
                     
@@ -467,14 +471,14 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                         // convert command to hexstring, might fail if blockNumberForNowGlucoseData returned an invalid value
                         if let commandToSendAsData = Data(hexadecimalString: commandToSend) {
                             
-                            os_log("    send %{public}@ to Blucon", log: log, type: .info, commandToSend)
+                            trace("    send %{public}@ to Blucon", log: log, type: .info, commandToSend)
                             _ = writeDataToPeripheral(data: commandToSendAsData, type: .withResponse)
                             
                             waitingForGlucoseData = true
                             
                         } else {
                             
-                            os_log("    failed to convert commandToSend to Data", log: log, type: .error)
+                            trace("    failed to convert commandToSend to Data", log: log, type: .error)
                         }
 
                     }  else {
@@ -487,7 +491,7 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                             // should be a matter of milliseconds, so take 2 seconds
                             if abs(timeStampOfSendingSingleBlockInfoPrefix.timeIntervalSinceNow) > 2 {
                                 
-                                os_log("    time since sending SingleBlockInfoPrefix is more than 2 seconds, ignoring this reading", log: log, type: .error)
+                                trace("    time since sending SingleBlockInfoPrefix is more than 2 seconds, ignoring this reading", log: log, type: .error)
                                 
                                 // send sleep command
                                 sendCommandToBlucon(opcode: .sleep)
@@ -499,10 +503,10 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                         
                         // checking now timestamp of last reading, if less than 30 seconds old, then reading will be ignored, seems a bit late to do that check, but after a few tests it seems to be the best to continue up to here to make sure the Blucon stays in a consistent state.
                         if abs(timeStampLastBgReading.timeIntervalSinceNow) < 30 {
-                            os_log("    last reading less than 30 seconds old, ignoring this one", log: log, type: .info)
+                            trace("    last reading less than 30 seconds old, ignoring this one", log: log, type: .info)
                         } else {
 
-                            os_log("    creating glucoseValue", log: log, type: .info)
+                            trace("    creating glucoseValue", log: log, type: .info)
                             
                             // create glucose reading with timestamp now
                             timeStampLastBgReading = Date()
@@ -510,7 +514,7 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                             // get glucoseValue from value
                             let glucoseValue = nowGetGlucoseValue(input: value)
                             
-                            let glucoseData = RawGlucoseData(timeStamp: timeStampLastBgReading, glucoseLevelRaw: glucoseValue, glucoseLevelFiltered: glucoseValue)
+                            let glucoseData = GlucoseData(timeStamp: timeStampLastBgReading, glucoseLevelRaw: glucoseValue, glucoseLevelFiltered: glucoseValue)
                             var glucoseDataArray = [glucoseData]
                             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
 
@@ -535,7 +539,7 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
             }
 
         } else {
-            os_log("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
+            trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
         }
         
     }

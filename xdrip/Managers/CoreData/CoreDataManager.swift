@@ -130,7 +130,7 @@ final class CoreDataManager {
                     try self.mainManagedObjectContext.save()
                 }
             } catch {
-                os_log("in savechanges,  Unable to Save Changes of Main Managed Object Context, error.localizedDescription  = %{public}@", log: log, type: .info, error.localizedDescription)
+                trace("in savechanges,  Unable to Save Changes of Main Managed Object Context, error.localizedDescription  = %{public}@", log: log, type: .info, error.localizedDescription)
             }
         }
         
@@ -140,7 +140,7 @@ final class CoreDataManager {
                     try self.privateManagedObjectContext.save()
                 }
             } catch {
-                os_log("in savechanges,  Unable to Save Changes of Private Managed Object Context, error.localizedDescription  = %{public}@", log: self.log, type: .info, error.localizedDescription)
+                trace("in savechanges,  Unable to Save Changes of Private Managed Object Context, error.localizedDescription  = %{public}@", log: self.log, type: .info, error.localizedDescription)
             }
         }
     }
@@ -154,7 +154,7 @@ final class CoreDataManager {
                     try self.mainManagedObjectContext.save()
                 }
             } catch {
-                os_log("in saveChangesAtTermination,  Unable to Save Changes of Main Managed Object Context, error.localizedDescription  = %{public}@", log: log, type: .info, error.localizedDescription)
+                trace("in saveChangesAtTermination,  Unable to Save Changes of Main Managed Object Context, error.localizedDescription  = %{public}@", log: log, type: .info, error.localizedDescription)
             }
         }
         
@@ -164,7 +164,7 @@ final class CoreDataManager {
                     try self.privateManagedObjectContext.save()
                 }
             } catch {
-                os_log("in saveChangesAtTermination,  Unable to Save Changes of Private Managed Object Context, error.localizedDescription  = %{public}@", log: self.log, type: .info, error.localizedDescription)
+                trace("in saveChangesAtTermination,  Unable to Save Changes of Private Managed Object Context, error.localizedDescription  = %{public}@", log: self.log, type: .info, error.localizedDescription)
             }
         }
     }

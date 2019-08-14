@@ -24,7 +24,7 @@ class SoundPlayer {
     public func playSound(soundFileName:String, withVolume volume:Float?) {
         
         guard let url = Bundle.main.url(forResource: soundFileName, withExtension: "") else {
-            os_log("in playSound, could not create url with sound %{public}@", log: self.log, type: .error, soundFileName)
+            trace("in playSound, could not create url with sound %{public}@", log: self.log, type: .error, soundFileName)
             return
         }
         
@@ -40,10 +40,10 @@ class SoundPlayer {
                 }
                 audioPlayer.play()
             } else {
-                os_log("in playSound, could not create url with sound %{public}@", log: self.log, type: .error, soundFileName)
+                trace("in playSound, could not create url with sound %{public}@", log: self.log, type: .error, soundFileName)
             }
         } catch let error {
-            os_log("in playSound, exception while trying to play sound %{public}@, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+            trace("in playSound, exception while trying to play sound %{public}@, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
         }
     }
     

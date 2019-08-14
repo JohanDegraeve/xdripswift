@@ -3,6 +3,7 @@ import CoreBluetooth
 import os
 
 class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
+    
     // MARK: - properties
     
     /// service to be discovered
@@ -18,7 +19,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
     
-    /// for OS_log
+    /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMBubble)
     
     // used in parsing packet
@@ -34,18 +35,25 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     // how long to wait for next packet before sending startreadingcommand
     private static let maxWaitForpacketInSeconds = 60.0
     // length of header added by Bubble in front of data dat is received from Libre sensor
-    private let BubbleHeaderLength = 8
+    private let bubbleHeaderLength = 8
+   
+    /// is the transmitter oop web enabled or not
+    private var webOOPEnabled: Bool
     
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
-    var emptyArray: [RawGlucoseData] = []
+    var emptyArray: [GlucoseData] = []
     
     // current sensor serial number, if nil then it's not known yet
     private var sensorSerialNumber:String?
     
     // MARK: - Initialization
+    
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
-    init(address:String?, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, sensorSerialNumber:String?) {
+    ///     - delegate : CGMTransmitterDelegate intance
+    ///     - timeStampLastBgReading : timestamp of last bgReading
+    ///     - webOOPEnabled : enabled or not
+    init(address:String?, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, sensorSerialNumber:String?, webOOPEnabled: Bool) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameBubble)
@@ -66,6 +74,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
         //initialize timeStampLastBgReading
         self.timeStampLastBgReading = timeStampLastBgReading
         
+        // initialize webOOPEnabled
+        self.webOOPEnabled = webOOPEnabled
+        
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Bubble)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Bubble, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Bubble, startScanningAfterInit: CGMTransmitterType.Bubble.startScanningAfterInit())
         
         // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
@@ -78,7 +89,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
         if writeDataToPeripheral(data: Data([0x00, 0x00, 0x5]), type: .withoutResponse) {
             return true
         } else {
-            os_log("in sendStartReadingCommmand, write failed", log: log, type: .error)
+            trace("in sendStartReadingCommmand, write failed", log: log, type: .error)
             return false
         }
     }
@@ -112,7 +123,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
             
             //check if buffer needs to be reset
             if (Date() > startDate.addingTimeInterval(CGMBubbleTransmitter.maxWaitForpacketInSeconds - 1)) {
-                os_log("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMBubbleTransmitter.maxWaitForpacketInSeconds)
+                trace("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMBubbleTransmitter.maxWaitForpacketInSeconds)
                 resetRxBuffer()
             }
             
@@ -131,23 +142,26 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
 
                         // confirm receipt
                         _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
+                        
                     case .serialNumber:
+                        
                         rxBuffer.append(value.subdata(in: 2..<10))
+                        
                     case .dataPacket:
+                        
                         rxBuffer.append(value.suffix(from: 4))
                         if rxBuffer.count >= 352 {
-                            if (Crc.LibreCrc(data: &rxBuffer, headerOffset: BubbleHeaderLength)) {
+                            if (Crc.LibreCrc(data: &rxBuffer, headerOffset: bubbleHeaderLength)) {
                                 
-                                var newSerialNumber = ""
-                                if let sensorSerialNumberData = SensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8))) {
-                                    newSerialNumber = sensorSerialNumberData.serialNumber
+                                if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8))) {
+
                                     
                                     // verify serial number and if changed inform delegate
-                                    if newSerialNumber != sensorSerialNumber {
+                                    if libreSensorSerialNumber.serialNumber != sensorSerialNumber {
                                         
-                                        os_log("    new sensor detected :  %{public}@", log: log, type: .info, newSerialNumber)
+                                        sensorSerialNumber = libreSensorSerialNumber.serialNumber
                                         
-                                        sensorSerialNumber = newSerialNumber
+                                        trace("    new sensor detected :  %{public}@", log: log, type: .info, libreSensorSerialNumber.serialNumber)
                                         
                                         // inform delegate about new sensor detected
                                         cgmTransmitterDelegate?.newSensorDetected()
@@ -155,26 +169,21 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                                         // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
                                         timeStampLastBgReading = Date(timeIntervalSince1970: 0)
                                         
-                                        // inform delegate about sensorSerialNumber
+                                        // inform delegate about new sensorSerialNumber
                                         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: sensorSerialNumber)
 
                                     }
 
                                 }
                                 
-                                if UserDefaults.standard.webOOPEnabled {
-                                    handleGoodReading(bytes: [UInt8](rxBuffer.subdata(in: 8..<352)), serialNumber: newSerialNumber) {
-                                        [weak self] (result) in
-                                        if let res = result {
-                                            self?.handleGlucoseData(result: res)
-                                        } else {
-                                            /// failed, use parseLibreData
-                                            self?.parse()
-                                        }
-                                    }
-                                } else {
-                                    self.parse()
-                                }
+                                LibreDataParser.libreDataProcessor(sensorSerialNumber: sensorSerialNumber, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
+                                    self.timeStampLastBgReading = timeStampLastBgReading
+                                    
+                                })
+
+                                //reset the buffer
+                                resetRxBuffer()
+                                
                             }
                         }
                     case .noSensor:
@@ -183,27 +192,8 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                 }
             }
         } else {
-            os_log("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
+            trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
         }
-    }
-    
-    func parse() {
-        //get readings from buffer and send to delegate
-        let result = parseLibreData(data: &rxBuffer, timeStampLastBgReadingStoredInDatabase: timeStampLastBgReading, headerOffset: BubbleHeaderLength)
-        //TODO: sort glucosedata before calling newReadingsReceived
-        handleGlucoseData(result: result)
-    }
-    
-    func handleGlucoseData(result: (glucoseData:[RawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int)) {
-        var result = result
-        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
-        
-        //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
-        if result.glucoseData.count > 0 {
-            timeStampLastBgReading = result.glucoseData[0].timeStamp
-        }
-        //reset the buffer
-        resetRxBuffer()
     }
     
     // MARK: CGMTransmitter protocol functions
@@ -226,6 +216,12 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
         startDate = Date()
         resendPacketCounter = 0
     }
+    
+    /// this transmitter supports oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+        webOOPEnabled = enabled
+    }
+    
 }
 
 fileprivate enum BubbleResponseType: UInt8 {

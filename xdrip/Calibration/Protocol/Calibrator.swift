@@ -570,7 +570,7 @@ extension Calibrator {
     /// - parameters:
     ///     - bgReading : reading that will be updated
     ///     - last2Readings result of call to BgReadings.getLatestBgReadings(2, sensor) ignoreRawData and ignoreCalculatedValue false - inout parameter to improve performance
-    private func findSlope(for bgReading: BgReading, last2Readings:inout Array<BgReading>) {
+    public func findSlope(for bgReading: BgReading, last2Readings:inout Array<BgReading>) {
         bgReading.hideSlope = true;
         if (last2Readings.count >= 2) {
             let (slope, hide) = bgReading.calculateSlope(lastBgReading:last2Readings[1]);
