@@ -48,7 +48,29 @@ class LibreOOPClient {
             //and we trust that the remote endpoint returns correct data for the sensor
             let last16 = trendMeasurements(bytes: libreData, date: Date(), timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: params)
             if let glucoseData = trendToLibreGlucose(last16) {
-                callback((glucoseData, sensorState, 0))
+                
+                // return only readings that are at least 5 minutes away from each other, except the first, same approach as in LibreDataParser.parse
+
+                var finalResult:[GlucoseData] = []
+ 
+                // we will add the most recent readings, but then we'll only add the readings that are at least 5 minutes apart (giving 10 seconds spare)
+                // for that variable timeStampLastAddedGlucoseData is used. It's initially set to now + 5 minutes
+                var timeStampLastAddedGlucoseData = Date().toMillisecondsAsDouble() + 5 * 60 * 1000
+                
+                for glucose in glucoseData {
+                    
+                    let timeStampOfNewGlucoseData = glucose.timeStamp
+                    if timeStampOfNewGlucoseData.toMillisecondsAsDouble() > (timeStampLastBgReading.toMillisecondsAsDouble() + 30000.0) {
+                        if timeStampOfNewGlucoseData.toMillisecondsAsDouble() < timeStampLastAddedGlucoseData - (5 * 60 * 1000 - 10000) {
+                            timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData.toMillisecondsAsDouble()
+                            finalResult.append(glucose)
+                        }
+                    } else {
+                        break
+                    }
+                }
+                
+                callback((finalResult, sensorState, 0))
             }
         }
     }
