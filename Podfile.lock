@@ -1,8 +1,16 @@
 PODS:
   - ActionClosurable (1.2.0)
+  - Charts (3.3.0):
+    - Charts/Core (= 3.3.0)
+  - Charts/Core (3.3.0)
 
 DEPENDENCIES:
   - ActionClosurable (from `https://github.com/takasek/ActionClosurable.git`)
+  - Charts
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Charts
 
 EXTERNAL SOURCES:
   ActionClosurable:
@@ -15,7 +23,8 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   ActionClosurable: ff826688551b031c6bd936cb4928ebf63571893a
+  Charts: ec1f57f9340054155691e84d4544a1d239d382c5
 
-PODFILE CHECKSUM: 347a5d9f3343257452289e61c10025c2eed103bb
+PODFILE CHECKSUM: 5e2e07d6fbc9d04440c2ddf774f5c5a5f8b0f97f
 
-COCOAPODS: 1.7.5
+COCOAPODS: 1.7.0
