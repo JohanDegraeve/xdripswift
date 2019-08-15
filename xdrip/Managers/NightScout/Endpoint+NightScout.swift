@@ -21,10 +21,11 @@ extension Endpoint {
         return Endpoint(
             host:host,
             scheme:scheme!,
-            path: "/api/v1/entries/sgv.json",
+//            path: "/api/v1/entries/sgv.json",
+            path: "/api/v1/entries.json",
             queryItems: [
                 URLQueryItem(name: "count", value: count.description),
-                URLQueryItem(name: "find[dateString][$gte]", value: timeStamp.ISOStringFromDate())
+//                URLQueryItem(name: "find[dateString][$gte]", value: timeStamp.ISOStringFromDate())
             ]
         )
     }

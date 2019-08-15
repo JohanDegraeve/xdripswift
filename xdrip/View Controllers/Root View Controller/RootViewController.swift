@@ -852,12 +852,19 @@ final class RootViewController: UIViewController {
         var lastButOneReading:BgReading?
         
         // assign latestReading if it exists
-        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: 1, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
-        if latestReadings.count > 0 {
-            lastReading = latestReadings[0]
+//        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: 1, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
+//        if latestReadings.count > 0 {
+//            lastReading = latestReadings[0]
+//        }
+//        if latestReadings.count > 1 {
+//            lastButOneReading = latestReadings[1]
+//        }
+        
+        if latestSixHoursReadings.count > 0 {
+            lastReading = latestSixHoursReadings[0]
         }
-        if latestReadings.count > 1 {
-            lastButOneReading = latestReadings[1]
+        if latestSixHoursReadings.count > 1 {
+            lastButOneReading = latestSixHoursReadings[1]
         }
         
         // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's no going to be a latestReading

@@ -162,7 +162,7 @@ class NightScoutFollowManager:NSObject {
         let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightScoutUrl, count: count, olderThan: timeStampOfFirstBgReadingToDowload)
         
         // create downloadTask and start download
-        if let url = latestEntriesEndpoint.url {
+        if let url = URL.init(string: latestEntriesEndpoint.url?.absoluteString.removingPercentEncoding ?? "") {
             
             let downloadTask = sharedSession.dataTask(with: url, completionHandler: { data, response, error in
                 
