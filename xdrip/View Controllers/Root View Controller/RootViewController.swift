@@ -801,7 +801,7 @@ final class RootViewController: UIViewController {
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabels is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
-        let latestSixHoursReadings = bgReadingsAccessor.getLatestBgReadings(limit: 360, howOld: 6 / 24, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
+        let latestSixHoursReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 6.0 / 24.0, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
         
 //        let latestSixHoursReadings = []
         
