@@ -144,7 +144,7 @@ final class RootViewController: UIViewController {
         leftAxis.labelFont = UIFont.systemFont(ofSize: 10)
         leftAxis.labelPosition = .outsideChart
         leftAxis.gridColor = .clear
-        leftAxis.axisMaximum = 150
+        leftAxis.axisMaximum = 16
         leftAxis.axisMinimum = 0
         leftAxis.labelCount = 11
         
@@ -805,25 +805,27 @@ final class RootViewController: UIViewController {
         
 //        let latestSixHoursReadings = []
         
+        
+        let calendar = Calendar.current
+        let comp = calendar.dateComponents([.hour], from: Date())
+        var hour = (comp.hour ?? 0) + 1
+        if hour < 6 {
+            hour = 6
+        }
+        
         // points
         var dataEntries = [ChartDataEntry]()
         let oneHour = TimeInterval(60 * 60) // seconds
         let latestSixHoursTs = Date().addingTimeInterval(TimeInterval.init(-oneHour * 6)).timeIntervalSince1970
+        var max = 16
         for reading in latestSixHoursReadings {
-            let x = (reading.timeStamp.timeIntervalSince1970 - latestSixHoursTs) / oneHour
+            let x = (reading.timeStamp.timeIntervalSince1970 - latestSixHoursTs) / oneHour + Double(hour - 7)
             let entry = ChartDataEntry.init(x: Double(x), y: reading.calculatedValue)
-            dataEntries.append(entry)
+            dataEntries.insert(entry, at: 0)
+            if Int(reading.calculatedValue) > max {
+                max = Int(reading.calculatedValue)
+            }
         }
-        
-//        var max: Double = 150
-//        for i in 0 ..< 360 {
-//            let timeStamp = Date().addingTimeInterval(TimeInterval(i * 60))
-//            let x = (timeStamp.timeIntervalSince1970 - latestSixHoursTs) / (60 * 60)
-//            let y = Double.random(in: 0 ... 300)
-//            let entry = ChartDataEntry.init(x: Double(x), y: y)
-//            dataEntries.append(entry)
-//            max = max > y ? max : y
-//        }
         
         let chartDataSet = LineChartDataSet(entries: dataEntries, label: "")
         chartDataSet.mode = .cubicBezier
@@ -833,16 +835,9 @@ final class RootViewController: UIViewController {
         chartDataSet.drawCircleHoleEnabled = false
         chartDataSet.colors = [.clear]
         
-        var max = latestSixHoursReadings.max(by: { $0.calculatedValue < $1.calculatedValue })?.calculatedValue ?? 100
-        max = max - Double(Int(max) % 50) + 50
-        lineChartViewOutlet.leftAxis.axisMaximum = max
+        max = Int(max - (Int(max) % 4) + 4)
+        lineChartViewOutlet.leftAxis.axisMaximum = Double(max)
         
-        let calendar = Calendar.current
-        let comp = calendar.dateComponents([.hour], from: Date())
-        var hour = (comp.hour ?? 0) + 1
-        if hour < 6 {
-            hour = 6
-        }
         lineChartViewOutlet.xAxis.axisMaximum = Double(hour)
         lineChartViewOutlet.xAxis.axisMinimum = Double(hour - 6)
         lineChartViewOutlet.data = LineChartData(dataSets: [chartDataSet])
