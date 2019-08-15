@@ -266,6 +266,9 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     func setWebOOPEnabled(enabled: Bool) {
     }
     
+    /// this transmitter does not support oop web
+    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
+    
     // MARK: BluetoothTransmitterDelegate functions
     
     func centralManagerDidConnect(address:String?, name:String?) {

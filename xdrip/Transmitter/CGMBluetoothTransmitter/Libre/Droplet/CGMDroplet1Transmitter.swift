@@ -144,4 +144,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     func setWebOOPEnabled(enabled: Bool) {
     }
 
+    /// this transmitter does not support oop web
+    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
+
 }

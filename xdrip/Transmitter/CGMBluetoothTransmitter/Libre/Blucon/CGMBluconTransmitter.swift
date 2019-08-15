@@ -231,7 +231,8 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         return(curGluc)
     }
 
-
+    /// this transmitter does not support oop web
+    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
 
 }
 

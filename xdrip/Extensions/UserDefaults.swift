@@ -22,7 +22,13 @@ extension UserDefaults {
         case transmitterTypeAsString = "transmitterTypeAsString"
         /// transmitterid
         case transmitterId = "transmitterId"
-        
+        /// is web OOP enabled or not
+        case webOOPEnabled = "webOOPEnabled"
+        /// if webOOP enabled, what site to use
+        case webOOPsite = "webOOPsite"
+        /// if webOOP enabled, value of the token
+        case webOOPtoken = "webOOPtoken"
+
         // Nightscout
         
         /// should readings be uploaded to nightscout
@@ -115,8 +121,6 @@ extension UserDefaults {
         /// G6 factor2 - for testing G6 scaling
         case G6v2ScalingFactor2 = "G6v2ScalingFactor2"
         
-        /// Bubble web oop
-        case webOOPEnabled = "webOOPEnabled"
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -248,6 +252,42 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.transmitterId.rawValue)
+        }
+    }
+    
+    /// web oop enabled
+    @objc dynamic var webOOPEnabled: Bool {
+        get {
+            return bool(forKey: Key.webOOPEnabled.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.webOOPEnabled.rawValue)
+        }
+    }
+    
+    /// web oop site
+    @objc dynamic var webOOPSite:String? {
+        get {
+            return string(forKey: Key.webOOPsite.rawValue)
+        }
+        set {
+            var value = newValue
+            if let newValue = newValue {
+                if !newValue.startsWith("http") {
+                    value = "https://" + newValue
+                }
+            }
+            set(value, forKey: Key.webOOPsite.rawValue)
+        }
+    }
+
+    /// web oop token
+    @objc dynamic var webOOPtoken:String? {
+        get {
+            return string(forKey: Key.webOOPtoken.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.webOOPtoken.rawValue)
         }
     }
     
@@ -574,15 +614,7 @@ extension UserDefaults {
     }
     
     
-    /// web oop enabled
-    @objc dynamic var webOOPEnabled: Bool {
-        get {
-            return bool(forKey: Key.webOOPEnabled.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.webOOPEnabled.rawValue)
-        }
-    }
+    
 }
 
 
