@@ -60,7 +60,7 @@
 "etA-fM-tGh.title" = "Title";
 
 /* Class = "UIButton"; normalTitle = "Presnooze"; ObjectID = "fSY-nc-amN"; */
-"fSY-nc-amN.normalTitle" = "Presnooze";
+"fSY-nc-amN.normalTitle" = "延后报警";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "hfQ-Tt-xNH"; */
 "hfQ-Tt-xNH.text" = "Title";
