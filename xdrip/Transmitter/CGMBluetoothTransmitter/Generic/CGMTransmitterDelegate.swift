@@ -45,6 +45,9 @@ protocol CGMTransmitterDelegate:AnyObject {
     
     /// transmitter reset result
     func reset(successful: Bool)
+    
+    /// to pass some text error message, delegate can decide to show to user, log, ...
+    func error(message: String)
 }
 
 

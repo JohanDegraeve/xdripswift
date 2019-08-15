@@ -16,13 +16,13 @@ public struct LibreDerivedAlgorithmParameters: Codable, CustomStringConvertible 
     public var isValidForFooterWithReverseCRCs: Int
     public var extraSlope : Double = 1
     public var extraOffset: Double = 0
-    public var serialNumber: String?
+    public var serialNumber: String
     
     public var description: String {
         return "LibreDerivedAlgorithmParameters:: slopeslope: \(slope_slope), slopeoffset: \(slope_offset), offsetoffset: \(offset_offset), offsetSlope: \(offset_slope), extraSlope: \(extraSlope), extraOffset: \(extraOffset), isValidForFooterWithReverseCRCs: \(isValidForFooterWithReverseCRCs)"
     }
     
-    public init(slope_slope: Double, slope_offset:Double, offset_slope: Double, offset_offset: Double, isValidForFooterWithReverseCRCs: Int, extraSlope: Double, extraOffset: Double) {
+    public init(slope_slope: Double, slope_offset:Double, offset_slope: Double, offset_offset: Double, isValidForFooterWithReverseCRCs: Int, extraSlope: Double, extraOffset: Double, sensorSerialNumber:String) {
         self.slope_slope = slope_slope
         self.slope_offset = slope_offset
         self.offset_slope = offset_slope
@@ -30,6 +30,7 @@ public struct LibreDerivedAlgorithmParameters: Codable, CustomStringConvertible 
         self.isValidForFooterWithReverseCRCs = isValidForFooterWithReverseCRCs
         self.extraSlope = extraSlope
         self.extraOffset = extraOffset
+        self.serialNumber = sensorSerialNumber
     }
 }
 

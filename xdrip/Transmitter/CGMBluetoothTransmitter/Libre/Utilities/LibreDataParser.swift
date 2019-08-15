@@ -5,9 +5,9 @@ class LibreDataParser {
     /// parses libre block
     /// - parameters:
     ///     - libreData: the 344 bytes block from Libre
-    ///     - timeStampLastBgReadingStoredInDatabase: this is of the timestamp of the latest reading we already received during previous session
+    ///     - timeStampLastBgReading: this is of the timestamp of the latest reading we already received during previous session
     /// - returns:
-    ///     - array of GlucoseData, first is the most recent, LibreSensorState. Only returns recent readings, ie not the ones that are older than timeStampLastBgReadingStoredInDatabase. 30 seconds are added here, meaning, new reading should be at least 30 seconds more recent than timeStampLastBgReadingStoredInDatabase
+    ///     - array of GlucoseData, first is the most recent. Only returns recent readings, ie not the ones that are older than timeStampLastBgReading. 30 seconds are added here, meaning, new reading should be at least 30 seconds more recent than timeStampLastBgReading
     ///     - sensorState: status of the sensor
     ///     - sensorTimeInMinutes: age of sensor in minutes
     public static func parse(libreData: Data, timeStampLastBgReading:Date) -> (glucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int) {
@@ -34,7 +34,7 @@ class LibreDataParser {
             if i < 0 {i += 16}
             timeInMinutes = max(0, (Double)(sensorTimeInMinutes - index))
             let timeStampOfNewGlucoseData = sensorStartTimeInMilliseconds + timeInMinutes * 60 * 1000
-            //new reading should be at least 30 seconds younger than timeStampLastBgReadingStoredInDatabase
+            //new reading should be at least 30 seconds younger than timeStampLastBgReading
             if timeStampOfNewGlucoseData > (timeStampLastBgReading.toMillisecondsAsDouble() + 30000.0)
             {
                 if timeStampOfNewGlucoseData < timeStampLastAddedGlucoseData - (5 * 60 * 1000 - 10000) {
@@ -59,7 +59,7 @@ class LibreDataParser {
             if i < 0 {i += 32}
             timeInMinutes = max(0,(Double)(abs(sensorTimeInMinutes - 3)/15)*15 - (Double)(index*15))
             let timeStampOfNewGlucoseData = sensorStartTimeInMilliseconds + timeInMinutes * 60 * 1000
-            //new reading should be at least 30 seconds younger than timeStampLastBgReadingStoredInDatabase
+            //new reading should be at least 30 seconds younger than timeStampLastBgReading
             if timeStampOfNewGlucoseData > (timeStampLastBgReading.toMillisecondsAsDouble() + 30000.0)
             {
                 if timeStampOfNewGlucoseData < timeStampLastAddedGlucoseData - (5 * 60 * 1000 - 10000) {
@@ -87,23 +87,24 @@ class LibreDataParser {
     ///     - libreData : the 344 bytes from Libre sensor
     ///     - timeStampLastBgReading : timestamp of last reading, older readings will be ignored
     ///     - webOOPEnabled : is webOOP enabled or not, if not enabled, local parsing is used
+    ///     - oopWebSite : the site url to use if oop web would be enabled
+    ///     - oopWebToken : the token to use if oop web would be enabled
     ///     - cgmTransmitterDelegate : the cgmTransmitterDelegate
-    ///     - completionHandler : will be called when glucose data is read with as parameter the timestamp of the last reading. Goal is that caller an set timeStampLastBgReading to the new value
     ///     - transmitterBatteryInfo : not mandatory, if nil then delegate will simply not receive it, possibly the delegate already received it before, and if not
     ///     - firmware : not mandatory, if nil then delegate will simply not receive it, possibly the delegate already received it before, and if not or maybe it doesn't exist for the specific type of transmitter
     ///     - hardware : not mandatory, if nil then delegate will simply not receive it, possibly the delegate already received it before, and if not or maybe it doesn't exist for the specific type of transmitter
     ///     - hardwareSerialNumber : not mandatory, if nil then delegate will simply not receive it, possibly the delegate already received it before, and if not or maybe it doesn't exist for the specific type of transmitter
     ///     - bootloader : not mandatory, if nil then delegate will simply not receive it, possibly the delegate already received it before, and if not or maybe it doesn't exist for the specific type of transmitter
+    ///     - completionHandler : will be called when glucose data is read with as parameter the timestamp of the last reading. Goal is that caller an set timeStampLastBgReading to the new value
     ///
     /// parameter values that are not known, simply ignore them, if they are not known then they are probably not important, or they've already been passed to the delegate before. 
-    public static func libreDataProcessor(sensorSerialNumber: String?, webOOPEnabled: Bool, libreData: Data, cgmTransmitterDelegate : CGMTransmitterDelegate?, transmitterBatteryInfo:TransmitterBatteryInfo?, firmware: String?, hardware: String?, hardwareSerialNumber: String?, bootloader:String?, timeStampLastBgReading: Date, completionHandler:@escaping ((_ timeStampLastBgReading: Date) -> ())) {
+    public static func libreDataProcessor(sensorSerialNumber: String?, webOOPEnabled: Bool, oopWebSite: String, oopWebToken: String, libreData: Data, cgmTransmitterDelegate : CGMTransmitterDelegate?, transmitterBatteryInfo:TransmitterBatteryInfo?, firmware: String?, hardware: String?, hardwareSerialNumber: String?, bootloader:String?, timeStampLastBgReading: Date, completionHandler:@escaping ((_ timeStampLastBgReading: Date) -> ())) {
 
         if let sensorSerialNumber = sensorSerialNumber, webOOPEnabled {
-            LibreOOPClient.handleLibreData(libreData: [UInt8](libreData), timeStampLastBgReading: timeStampLastBgReading, serialNumber: sensorSerialNumber) {
+            LibreOOPClient.handleLibreData(libreData: libreData, timeStampLastBgReading: timeStampLastBgReading, serialNumber: sensorSerialNumber, oopWebSite: oopWebSite, oopWebToken: oopWebToken) {
                 (result) in
-                if let res = result {
-                    handleGlucoseData(result: res, cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: transmitterBatteryInfo, firmware: firmware, hardware: hardware, hardwareSerialNumber: hardwareSerialNumber, bootloader: bootloader, sensorSerialNumber: sensorSerialNumber, completionHandler: completionHandler)
-                }
+                    handleGlucoseData(result: result, cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: transmitterBatteryInfo, firmware: firmware, hardware: hardware, hardwareSerialNumber: hardwareSerialNumber, bootloader: bootloader, sensorSerialNumber: sensorSerialNumber, completionHandler: completionHandler)
+
             }
         } else if !webOOPEnabled {
             // use local parser
@@ -127,21 +128,31 @@ fileprivate func getGlucoseRaw(bytes:Data) -> Int {
 /// calls LibreDataParser.parse - calls handleGlucoseData
 fileprivate func process(libreData: Data, timeStampLastBgReading: Date, cgmTransmitterDelegate : CGMTransmitterDelegate?, transmitterBatteryInfo:TransmitterBatteryInfo?, firmware: String?, hardware: String?, hardwareSerialNumber: String?, bootloader:String?, sensorSerialNumber:String?, completionHandler:((_ timeStampLastBgReading: Date) -> ())) {
     
-    //get readings from buffer and send to delegate
+    //get readings from buffer
     let result = LibreDataParser.parse(libreData: libreData, timeStampLastBgReading: timeStampLastBgReading)
     
-    handleGlucoseData(result: result, cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: transmitterBatteryInfo, firmware: firmware, hardware: hardware, hardwareSerialNumber: hardwareSerialNumber, bootloader: bootloader, sensorSerialNumber: sensorSerialNumber, completionHandler: completionHandler)
+    // add errordescription nil, needed by handleGlucoseData
+    let resultWithErrorDescription: ([GlucoseData], LibreSensorState, Int, String?) = (result.glucoseData, result.sensorState, result.sensorTimeInMinutes, nil)
+    
+    handleGlucoseData(result: resultWithErrorDescription, cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: transmitterBatteryInfo, firmware: firmware, hardware: hardware, hardwareSerialNumber: hardwareSerialNumber, bootloader: bootloader, sensorSerialNumber: sensorSerialNumber, completionHandler: completionHandler)
 }
 
-/// calls delegate with parameters from result, will change value of timeStampLastBgReading
-fileprivate func handleGlucoseData(result: (glucoseData:[GlucoseData], sensorState: LibreSensorState, sensorTimeInMinutes:Int), cgmTransmitterDelegate : CGMTransmitterDelegate?, transmitterBatteryInfo:TransmitterBatteryInfo?, firmware:String?, hardware:String?, hardwareSerialNumber:String?, bootloader:String?, sensorSerialNumber:String?, completionHandler:((_ timeStampLastBgReading: Date) -> ())) {
+/// calls delegate with parameters from result
+///
+/// if result.errorDescription not nil, then delegate function error will be called
+fileprivate func handleGlucoseData(result: (glucoseData:[GlucoseData], sensorState: LibreSensorState, sensorTimeInMinutes:Int, errorDescription: String?), cgmTransmitterDelegate : CGMTransmitterDelegate?, transmitterBatteryInfo:TransmitterBatteryInfo?, firmware:String?, hardware:String?, hardwareSerialNumber:String?, bootloader:String?, sensorSerialNumber:String?, completionHandler:((_ timeStampLastBgReading: Date) -> ())) {
     
-    var result = result
-    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: firmware, hardware: hardware, hardwareSerialNumber: hardwareSerialNumber, bootloader: bootloader, sensorSerialNumber: sensorSerialNumber)
-    
-    //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
-    if result.glucoseData.count > 0 {
-        completionHandler(result.glucoseData[0].timeStamp)
+    if let errorDescription = result.errorDescription {
+        cgmTransmitterDelegate?.error(message: "Web OOP : " + errorDescription)
+    } else {
+        var result = result
+        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: firmware, hardware: hardware, hardwareSerialNumber: hardwareSerialNumber, bootloader: bootloader, sensorSerialNumber: sensorSerialNumber)
+        
+        //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
+        if result.glucoseData.count > 0 {
+            completionHandler(result.glucoseData[0].timeStamp)
+        }
     }
+        
 }
 

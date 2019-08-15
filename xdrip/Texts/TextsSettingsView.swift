@@ -63,7 +63,27 @@ class Texts_SettingsView {
     }()
     
     static let labelWebOOPTransmitter:String = {
-        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Web OOP Enabled", comment: "transmitter settings, to explain that settings is about resetting the transmitter")
+        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Web OOP Enabled", comment: "transmitter settings, to enable or didsable web oop")
+    }()
+    
+    static let labelWebOOPSite:String = {
+        return NSLocalizedString("settingsviews_labelWebOOPSite", tableName: filename, bundle: Bundle.main, value: "Web OOP site", comment: "transmitter settings, the web oop site url")
+    }()
+    
+    static let labelWebOOPtoken:String = {
+        return NSLocalizedString("settingsviews_labelWebOOPtoken", tableName: filename, bundle: Bundle.main, value: "Web OOP token", comment: "transmitter settings, the web oop token")
+    }()
+    
+    static let labelWebOOPSiteExplainingText:String = {
+        return NSLocalizedString("settingsviews_labelWebOOPSiteExplainingText", tableName: filename, bundle: Bundle.main, value: "Web OOP site (leave empty to use default value)", comment: "transmitter settings, the web oop site url, explaining text in dialog")
+    }()
+    
+    static let labelWebOOPtokenExplainingText:String = {
+        return NSLocalizedString("settingsviews_labelWebOOPtokenExplainingText", tableName: filename, bundle: Bundle.main, value: "Web OOP token (leave empty to use default value)", comment: "transmitter settings, the web oop token, explaining text in dialog")
+    }()
+    
+    static let labelWebOOP:String = {
+        return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "Web OOP", comment: "transmitter settings, title of the dialogs where site and token are asked")
     }()
     
     // MARK: - Section Alerts
