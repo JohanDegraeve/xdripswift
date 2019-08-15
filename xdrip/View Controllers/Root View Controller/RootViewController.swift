@@ -157,7 +157,11 @@ final class RootViewController: UIViewController {
             , context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPEnabled.rawValue, options: .new
             , context: nil)
-        
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPtoken.rawValue, options: .new
+            , context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPsite.rawValue, options: .new
+            , context: nil)
+
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
         
@@ -268,9 +272,9 @@ final class RootViewController: UIViewController {
     ///     - sensorTimeInMinutes : should be present only if it's the first reading(s) being processed for a specific sensor and is needed if it's a transmitterType that returns true to the function canDetectNewSensor
     private func processNewGlucoseData(glucoseData: inout [GlucoseData], sensorTimeInMinutes: Int?) {
         
-        /*for glucose in glucoseData {
+        for glucose in glucoseData {
             debuglogging(glucose.description)
-        }*/
+        }
         
         // check that calibrations and coredata manager is not nil
         guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager else {
@@ -422,6 +426,9 @@ final class RootViewController: UIViewController {
                             calibrator = RootViewController.getCalibrator(transmitterType: selectedTransmitterType, webOOPEnabled: UserDefaults.standard.webOOPEnabled)
                         }
                     }
+                    
+                case UserDefaults.Key.webOOPtoken, UserDefaults.Key.webOOPsite:
+                    cgmTransmitter?.setWebOOPSiteAndToken(oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
                     
                 default:
                     break
@@ -613,10 +620,10 @@ final class RootViewController: UIViewController {
                 }
                 
             case .miaomiao:
-                cgmTransmitter = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), webOOPEnabled: UserDefaults.standard.webOOPEnabled)
+                cgmTransmitter = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
                 
             case .Bubble:
-                cgmTransmitter = CGMBubbleTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber, webOOPEnabled: UserDefaults.standard.webOOPEnabled)
+                cgmTransmitter = CGMBubbleTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber, webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
                 
             case .GNSentry:
                 cgmTransmitter = CGMGNSEntryTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
@@ -1044,6 +1051,10 @@ final class RootViewController: UIViewController {
 
 /// conform to CGMTransmitterDelegate
 extension RootViewController:CGMTransmitterDelegate {
+    
+    func error(message: String) {
+        UIAlertController(title: Texts_Common.warning, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+    }
     
     func reset(successful: Bool) {
         

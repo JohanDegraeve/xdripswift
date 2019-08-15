@@ -267,6 +267,9 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     func setWebOOPEnabled(enabled: Bool) {
     }
     
+    /// this transmitter does not support oop web
+    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
+
     // MARK: CBCentralManager overriden functions
     
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {

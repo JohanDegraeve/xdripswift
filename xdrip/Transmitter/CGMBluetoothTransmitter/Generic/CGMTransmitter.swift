@@ -1,7 +1,7 @@
 import Foundation
 import CoreBluetooth
 
-/// defines functions that every cgm transmitter should conform to, mainly used by rootviewcontroller to get transmitter address, name, deterine status etc.
+/// defines functions that every cgm transmitter should conform to, mainly used by rootviewcontroller
 ///
 /// Most of the functions are already defined by BlueToothTransmitter.swift - so most of these functions don't need re-implementation in CGMTransmitter classes that conform to this protocol.
 ///
@@ -46,6 +46,12 @@ protocol CGMTransmitter {
     /// for transmitters who don't support webOOP, there's no need to implemented this function<br>
     /// ---  for transmitters who support webOOP (Bubble, MiaoMiao, ..) this should be implemented
     func setWebOOPEnabled(enabled:Bool)
+    
+    /// to set oopWebSite and oopWebToken - called when user change the setting
+    ///
+    /// for transmitters who don't support webOOP, there's no need to implemented this function<br>
+    /// ---  for transmitters who support webOOP (Bubble, MiaoMiao, ..) this should be implemented
+    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String)
 
 }
 
@@ -135,9 +141,9 @@ enum CGMTransmitterType:String, CaseIterable {
     
     func canWebOOP() -> Bool {
         
-        return false
+        //return false
         
-        /*switch self {
+        switch self {
             
         case .dexcomG4:
             return false
@@ -160,7 +166,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .Droplet1:
             return false
             
-        }*/
+        }
     }
     
     /// returns nil if id to validate has expected length and type of characters etc.
