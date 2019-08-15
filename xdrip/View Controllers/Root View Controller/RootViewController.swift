@@ -820,13 +820,17 @@ final class RootViewController: UIViewController {
         var max = 16
         for reading in latestSixHoursReadings {
             let x = (reading.timeStamp.timeIntervalSince1970 - latestSixHoursTs) / oneHour + Double(hour - 7)
-            let entry = ChartDataEntry.init(x: Double(x), y: reading.calculatedValue)
+            var y = Double(reading.calculatedValue.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)) ?? 0
+            if y.isNaN {
+                y = 0
+            }
+            let entry = ChartDataEntry.init(x: Double(x), y: y)
             dataEntries.insert(entry, at: 0)
-            if Int(reading.calculatedValue) > max {
-                max = Int(reading.calculatedValue)
+            if Int(y) > max {
+                max = Int(y)
             }
         }
-        
+
         let chartDataSet = LineChartDataSet(entries: dataEntries, label: "")
         chartDataSet.mode = .cubicBezier
         chartDataSet.circleColors = [.red]
@@ -834,10 +838,10 @@ final class RootViewController: UIViewController {
         chartDataSet.drawValuesEnabled = false
         chartDataSet.drawCircleHoleEnabled = false
         chartDataSet.colors = [.clear]
-        
+
         max = Int(max - (Int(max) % 4) + 4)
         lineChartViewOutlet.leftAxis.axisMaximum = Double(max)
-        
+
         lineChartViewOutlet.xAxis.axisMaximum = Double(hour)
         lineChartViewOutlet.xAxis.axisMinimum = Double(hour - 6)
         lineChartViewOutlet.data = LineChartData(dataSets: [chartDataSet])
