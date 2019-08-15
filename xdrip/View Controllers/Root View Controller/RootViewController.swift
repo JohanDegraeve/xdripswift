@@ -136,6 +136,7 @@ final class RootViewController: UIViewController {
         // In the exceptional case that the transmitter would give a new reading before the DataManager is set up, then this new reading will be ignored
         //y
         lineChartViewOutlet.rightAxis.enabled = false
+        lineChartViewOutlet.highlightPerTapEnabled = false
         let leftAxis = lineChartViewOutlet.leftAxis
         leftAxis.labelCount = 10
         leftAxis.forceLabelsEnabled = false
@@ -147,6 +148,18 @@ final class RootViewController: UIViewController {
         leftAxis.axisMaximum = 16
         leftAxis.axisMinimum = 0
         leftAxis.labelCount = 11
+        
+        let limitLine3 = ChartLimitLine.init(limit: 3, label: "")
+        limitLine3.lineColor = .green
+        limitLine3.lineWidth = 1
+        limitLine3.lineDashLengths = [5.0, 5.0]
+        leftAxis.addLimitLine(limitLine3)
+        
+        let limitLine9 = ChartLimitLine.init(limit: 9, label: "")
+        limitLine9.lineColor = .green
+        limitLine9.lineWidth = 1
+        limitLine9.lineDashLengths = [5.0, 5.0]
+        leftAxis.addLimitLine(limitLine9)
         
         //x
         let xAxis = lineChartViewOutlet.xAxis
@@ -801,30 +814,35 @@ final class RootViewController: UIViewController {
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabels is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
-        let latestSixHoursReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 6.0 / 24.0, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
+        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 1, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
         
-//        let latestSixHoursReadings = []
-        
-        
-        let calendar = Calendar.current
-        let comp = calendar.dateComponents([.hour], from: Date())
-        var hour = (comp.hour ?? 0) + 1
-        if hour < 6 {
-            hour = 6
-        }
         
         // points
+        var colors = [UIColor]()
         var dataEntries = [ChartDataEntry]()
         let oneHour = TimeInterval(60 * 60) // seconds
-        let latestSixHoursTs = Date().addingTimeInterval(TimeInterval.init(-oneHour * 6)).timeIntervalSince1970
+        let calendar = Calendar.current
+        let com = calendar.dateComponents([.hour, .minute, .second], from: Date())
+        var oneDayAgo = Date().timeIntervalSince1970 - TimeInterval(com.hour ?? 0) * oneHour
+        oneDayAgo -= TimeInterval(com.minute ?? 0) * 60
+        oneDayAgo -= TimeInterval(com.second ?? 0)
         var max = 16
-        for reading in latestSixHoursReadings {
-            let x = (reading.timeStamp.timeIntervalSince1970 - latestSixHoursTs) / oneHour + Double(hour - 7)
+        for reading in latestReadings {
+            let x = (reading.timeStamp.timeIntervalSince1970 - oneDayAgo) / oneHour
             var y = Double(reading.calculatedValue.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)) ?? 0
             if y.isNaN {
                 y = 0
             }
             let entry = ChartDataEntry.init(x: Double(x), y: y)
+            
+            if y < 3 {
+                colors.insert(.black, at: 0)
+            } else if y > 9 {
+                colors.insert(.red, at: 0)
+            } else {
+                colors.insert(.green, at: 0)
+            }
+            
             dataEntries.insert(entry, at: 0)
             if Int(y) > max {
                 max = Int(y)
@@ -833,17 +851,16 @@ final class RootViewController: UIViewController {
 
         let chartDataSet = LineChartDataSet(entries: dataEntries, label: "")
         chartDataSet.mode = .cubicBezier
-        chartDataSet.circleColors = [.red]
+        chartDataSet.circleColors = colors
         chartDataSet.circleRadius = 2
         chartDataSet.drawValuesEnabled = false
         chartDataSet.drawCircleHoleEnabled = false
         chartDataSet.colors = [.clear]
 
-        max = Int(max - (Int(max) % 4) + 4)
+        max = max < 16 ? 16 : max
         lineChartViewOutlet.leftAxis.axisMaximum = Double(max)
-
-        lineChartViewOutlet.xAxis.axisMaximum = Double(hour)
-        lineChartViewOutlet.xAxis.axisMinimum = Double(hour - 6)
+        lineChartViewOutlet.xAxis.axisMaximum = 24
+        lineChartViewOutlet.xAxis.axisMinimum = 0
         lineChartViewOutlet.data = LineChartData(dataSets: [chartDataSet])
         
         
@@ -853,19 +870,13 @@ final class RootViewController: UIViewController {
         
         // assign latestReading if it exists
 //        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: 1, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
-//        if latestReadings.count > 0 {
-//            lastReading = latestReadings[0]
-//        }
-//        if latestReadings.count > 1 {
-//            lastButOneReading = latestReadings[1]
-//        }
+        if latestReadings.count > 0 {
+            lastReading = latestReadings[0]
+        }
+        if latestReadings.count > 1 {
+            lastButOneReading = latestReadings[1]
+        }
         
-        if latestSixHoursReadings.count > 0 {
-            lastReading = latestSixHoursReadings[0]
-        }
-        if latestSixHoursReadings.count > 1 {
-            lastButOneReading = latestSixHoursReadings[1]
-        }
         
         // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's no going to be a latestReading
         if let lastReading = lastReading {
