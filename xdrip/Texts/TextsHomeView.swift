@@ -136,4 +136,8 @@ enum Texts_HomeView {
         return NSLocalizedString("failed", tableName: filename, bundle: Bundle.main, value: "failed", comment: "To give result about transitter result in notification body, failed")
     }()
     
+    static let calibrationNotNecessary:String = {
+        return NSLocalizedString("calibrationNotNecessary", tableName: filename, bundle: Bundle.main, value: "With Web OOP enabled, calibration is not necessary for the selected type of transmitter", comment: "if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible")
+    }()
+    
 }

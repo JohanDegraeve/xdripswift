@@ -62,6 +62,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_resettransmitter", tableName: filename, bundle: Bundle.main, value: "Reset Transmitter", comment: "transmitter settings, to explain that settings is about resetting the transmitter")
     }()
     
+    static let labelWebOOPTransmitter:String = {
+        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Web OOP Enabled", comment: "transmitter settings, to explain that settings is about resetting the transmitter")
+    }()
+    
     // MARK: - Section Alerts
     
     static let sectionTitleAlerting: String = {

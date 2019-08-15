@@ -67,7 +67,7 @@ class NightScoutFollowManager:NSObject {
             }
             
         } catch let error {
-            os_log("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+            trace("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
         }
 
         // call super.init
@@ -138,7 +138,7 @@ class NightScoutFollowManager:NSObject {
     /// download recent readings from nightScout, send result to delegate, and schedule new download
     @objc private func download() {
         
-        os_log("in download", log: self.log, type: .info)
+        trace("in download", log: self.log, type: .info)
 
         // nightscout URl must be non-nil - could be that url is not valid, this is not checked here, the app will just retry every x minutes
         guard let nightScoutUrl = UserDefaults.standard.nightScoutUrl else {return}
@@ -170,7 +170,7 @@ class NightScoutFollowManager:NSObject {
                 var followGlucoseDataArray = [NightScoutBgReading]()
                 self.processDownloadResponse(data: data, urlResponse: response, error: error, followGlucoseDataArray: &followGlucoseDataArray)
                 
-                os_log("    finished download", log: self.log, type: .info)
+                trace("    finished download", log: self.log, type: .info)
                 
                 // call to delegate and rescheduling the timer must be done in main thread;
                 DispatchQueue.main.sync {
@@ -197,7 +197,7 @@ class NightScoutFollowManager:NSObject {
     ///     - followGlucoseDataArray : array of FollowGlucoseData, first element is the youngest, can be empty. This is the data downloaded during previous download. This parameter is just there to get the timestamp of the latest reading, in order to calculate the next download time
     private func scheduleNewDownload(followGlucoseDataArray:inout [NightScoutBgReading]) {
         
-        os_log("in scheduleNewDownload", log: self.log, type: .info)
+        trace("in scheduleNewDownload", log: self.log, type: .info)
         
         // start with timestamp now + 5 minutes and 10 seconds
         var nextFollowDownloadTimeStamp = Date(timeIntervalSinceNow: 5 * 60 + 10)
@@ -231,11 +231,11 @@ class NightScoutFollowManager:NSObject {
     private func processDownloadResponse(data:Data?, urlResponse:URLResponse?, error:Error?, followGlucoseDataArray:inout [NightScoutBgReading] ) {
         
         // log info
-        os_log("in processDownloadResponse", log: self.log, type: .info)
+        trace("in processDownloadResponse", log: self.log, type: .info)
         
         // if error log an error
         if let error = error {
-            os_log("    failed to download, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+            trace("    failed to download, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
             return
         }
         
@@ -281,27 +281,27 @@ class NightScoutFollowManager:NSObject {
                                         }
 
                                     } else {
-                                        os_log("     failed to create glucoseData, entry = %{public}@", log: self.log, type: .error, entry.description)
+                                        trace("     failed to create glucoseData, entry = %{public}@", log: self.log, type: .error, entry.description)
                                     }
                                 }
                             }
                             
                         } else {
-                            os_log("     json deserialization failed, result is not a json array, data received = %{public}@", log: self.log, type: .error, dataAsString)
+                            trace("     json deserialization failed, result is not a json array, data received = %{public}@", log: self.log, type: .error, dataAsString)
                         }
                         
                     } else {
-                        os_log("     json deserialization failed, data received = %{public}@", log: self.log, type: .error, dataAsString)
+                        trace("     json deserialization failed, data received = %{public}@", log: self.log, type: .error, dataAsString)
                     }
                     
                 } else {
-                    os_log("     urlResponse.statusCode  is not 200 value = %{public}@", log: self.log, type: .error, urlResponse.statusCode.description)
+                    trace("     urlResponse.statusCode  is not 200 value = %{public}@", log: self.log, type: .error, urlResponse.statusCode.description)
                 }
             } else {
-                os_log("    data is nil", log: self.log, type: .error)
+                trace("    data is nil", log: self.log, type: .error)
             }
         } else {
-            os_log("    urlResponse is not HTTPURLResponse", log: self.log, type: .error)
+            trace("    urlResponse is not HTTPURLResponse", log: self.log, type: .error)
         }
     }
     

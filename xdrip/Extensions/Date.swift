@@ -37,10 +37,13 @@ extension Date {
         return Date(timeIntervalSinceNow: timeInterval)
     }
     
-    /// defines method to format date to "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-    func toNightScoutFormat() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        return formatter.string(from: self)
+    func ISOStringFromDate() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+        
+        return dateFormatter.string(from: self).appending("Z")
     }
+    
 }

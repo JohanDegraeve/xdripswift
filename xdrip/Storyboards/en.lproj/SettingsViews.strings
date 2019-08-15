@@ -38,3 +38,5 @@
 "settingsviews_resettransmitter" = "Reset Transmitter";
 "settingsviews_Version" = "Version";
 "settingsviews_license" = "License";
+"settingsviews_speakIntervalMessage" = "Minimum interval between two readings, in minutes";
+

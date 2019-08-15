@@ -40,7 +40,13 @@ protocol CGMTransmitter {
     ///     - requested : if true then transmitter must be reset
     /// for transmitter types that don't support resetting, this will be an empty function. Only G5 (and in future maybe G6) will use it. The others can define an empty body
     func reset(requested:Bool)
-    
+
+    /// to set webOOPEnabled - called when user change the setting
+    ///
+    /// for transmitters who don't support webOOP, there's no need to implemented this function<br>
+    /// ---  for transmitters who support webOOP (Bubble, MiaoMiao, ..) this should be implemented
+    func setWebOOPEnabled(enabled:Bool)
+
 }
 
 /// cgm transmitter types
@@ -67,6 +73,9 @@ enum CGMTransmitterType:String, CaseIterable {
     /// Bubble
     case Bubble = "Bubble"
     
+    /// Droplet
+    case Droplet1 = "Droplet-1"
+    
     /// does the transmitter need a transmitter id ?
     ///
     /// can be used in UI stuff, if reset not possible then there's no need to show that option in the settings UI
@@ -87,6 +96,10 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .Blucon:
             return true
+            
+        case .Droplet1:
+            return false
+            
         }
     }
     
@@ -113,7 +126,41 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .Blucon:
             return true
+            
+        case .Droplet1:
+            return false
+            
         }
+    }
+    
+    func canWebOOP() -> Bool {
+        
+        return false
+        
+        /*switch self {
+            
+        case .dexcomG4:
+            return false
+            
+        case .dexcomG5, .dexcomG6:
+            return false
+            
+        case .miaomiao:
+            return true
+            
+        case .Bubble:
+            return false
+            
+        case .GNSentry:
+            return false
+            
+        case .Blucon:
+            return false
+            
+        case .Droplet1:
+            return false
+            
+        }*/
     }
     
     /// returns nil if id to validate has expected length and type of characters etc.
@@ -142,12 +189,13 @@ enum CGMTransmitterType:String, CaseIterable {
             }
             return nil
             
-        case .miaomiao, .GNSentry, .Bubble:
+        case .miaomiao, .GNSentry, .Bubble, .Droplet1:
             return nil
             
         case .Blucon:
             // todo: validate transmitter id for blucon
             return nil
+            
         }
     }
     
@@ -173,6 +221,9 @@ enum CGMTransmitterType:String, CaseIterable {
         case .Blucon:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelBlucon
             
+        case .Droplet1:
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDroplet
+            
         }
     }
     
@@ -180,6 +231,7 @@ enum CGMTransmitterType:String, CaseIterable {
     ///
     /// for this type of devices, there's no need to give an option in the UI to manually start scanning.
     func startScanningAfterInit() -> Bool {
+        
         switch self {
             
         case .dexcomG4:
@@ -196,6 +248,10 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .Blucon:
             return true
+            
+        case .Droplet1:
+            return false
+            
         }
     }
     
@@ -203,6 +259,7 @@ enum CGMTransmitterType:String, CaseIterable {
     ///
     /// to be used for UI stuff
     func batteryUnit() -> String {
+        
         switch self {
             
         case .dexcomG4:
@@ -211,7 +268,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG5, .dexcomG6:
             return "voltA"
             
-        case .miaomiao, .Bubble:
+        case .miaomiao, .Bubble, .Droplet1:
             return "%"
             
         case .GNSentry:
@@ -226,6 +283,7 @@ enum CGMTransmitterType:String, CaseIterable {
     ///
     /// can be used in UI stuff, if reset not possible then there's no need to show that option in the settings UI
     func resetPossible() -> Bool {
+        
         switch self {
             
         case .dexcomG4:
@@ -234,7 +292,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG5, .dexcomG6:
             return true
             
-        case .miaomiao, .Bubble:
+        case .miaomiao, .Bubble, .Droplet1:
             return false
             
         case .GNSentry:

@@ -7,5 +7,5 @@ target 'xdrip' do
 
   # Pods for xdrip
   pod "ActionClosurable", :git => 'https://github.com/takasek/ActionClosurable.git'
-
+  pod 'Charts'
 end
