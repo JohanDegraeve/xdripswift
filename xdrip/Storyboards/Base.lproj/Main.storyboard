@@ -50,12 +50,18 @@
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uyn-2k-K74">
                                 <rect key="frame" x="10" y="71" width="176" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="jlP-Xy-bfe"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="26"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Wo-wd-80o">
                                 <rect key="frame" x="10" y="118" width="176" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="2As-N6-iec"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="26"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -86,7 +92,6 @@
                             <constraint firstItem="I0Z-fN-kif" firstAttribute="top" secondItem="We3-bN-ffR" secondAttribute="bottom" constant="30" id="b8G-bX-Gme"/>
                             <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="uyn-2k-K74" secondAttribute="trailing" constant="189" id="cEh-1U-bEY"/>
                             <constraint firstItem="uyn-2k-K74" firstAttribute="top" secondItem="tsR-hK-woN" secondAttribute="top" constant="71" id="dNq-IN-f0e"/>
-                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="bottom" secondItem="7Wo-wd-80o" secondAttribute="bottom" constant="468" id="kTc-62-p53"/>
                             <constraint firstItem="PQr-Ze-W5v" firstAttribute="bottom" secondItem="I0Z-fN-kif" secondAttribute="bottom" constant="65" id="xY0-s9-2mt"/>
                             <constraint firstItem="We3-bN-ffR" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="36" id="y4n-cs-cRb"/>
                         </constraints>
