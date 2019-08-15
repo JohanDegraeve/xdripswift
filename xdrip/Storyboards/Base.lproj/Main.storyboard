@@ -43,41 +43,52 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="---" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="We3-bN-ffR">
-                                <rect key="frame" x="0.0" y="274" width="375" height="119.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="100"/>
+                                <rect key="frame" x="194" y="56" width="154" height="94"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="60"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uyn-2k-K74">
-                                <rect key="frame" x="10" y="69" width="365" height="31.5"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uyn-2k-K74">
+                                <rect key="frame" x="10" y="71" width="176" height="32"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="26"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Wo-wd-80o">
-                                <rect key="frame" x="10" y="110.5" width="365" height="31.5"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Wo-wd-80o">
+                                <rect key="frame" x="10" y="118" width="176" height="32"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="26"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="I0Z-fN-kif" customClass="LineChartView" customModule="Charts">
+                                <rect key="frame" x="11" y="180" width="356" height="373"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="zWo-AR-qJE" firstAttribute="leading" secondItem="fSY-nc-amN" secondAttribute="trailing" constant="10" id="25g-Is-au8" userLabel="Transmitter Button Outlet.leading = Pre Snooze Button Outlet.trailing + 20"/>
-                            <constraint firstItem="7Wo-wd-80o" firstAttribute="top" secondItem="uyn-2k-K74" secondAttribute="bottom" constant="10" id="ARe-Dm-DA6"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="We3-bN-ffR" secondAttribute="trailing" constant="27" id="9Wc-ds-q5N"/>
+                            <constraint firstItem="7Wo-wd-80o" firstAttribute="top" secondItem="uyn-2k-K74" secondAttribute="bottom" constant="15" id="AG7-2o-g8F"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="I0Z-fN-kif" secondAttribute="trailing" constant="8" id="F4l-2u-4Zd"/>
+                            <constraint firstItem="uyn-2k-K74" firstAttribute="trailing" secondItem="7Wo-wd-80o" secondAttribute="trailing" id="FFL-dK-Ehx"/>
                             <constraint firstItem="fSY-nc-amN" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" id="Gsa-fG-7Wh"/>
-                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="7Wo-wd-80o" secondAttribute="trailing" id="IfY-7D-TKe"/>
-                            <constraint firstItem="We3-bN-ffR" firstAttribute="centerY" secondItem="tsR-hK-woN" secondAttribute="centerY" id="Ihy-GJ-OoS"/>
+                            <constraint firstItem="7Wo-wd-80o" firstAttribute="bottom" secondItem="We3-bN-ffR" secondAttribute="bottom" id="JJs-OX-oCw"/>
+                            <constraint firstItem="I0Z-fN-kif" firstAttribute="centerX" secondItem="tsR-hK-woN" secondAttribute="centerX" constant="1.5" id="JvE-uE-Tru"/>
+                            <constraint firstItem="I0Z-fN-kif" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="11" id="PLS-kX-IK9"/>
+                            <constraint firstItem="uyn-2k-K74" firstAttribute="leading" secondItem="7Wo-wd-80o" secondAttribute="leading" id="RFF-RL-3tf"/>
                             <constraint firstItem="fSY-nc-amN" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="20" id="TFc-gV-Hzd"/>
+                            <constraint firstItem="We3-bN-ffR" firstAttribute="leading" secondItem="uyn-2k-K74" secondAttribute="leading" constant="184" id="TNa-D7-lv9"/>
+                            <constraint firstItem="uyn-2k-K74" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="10" id="VmM-9I-Vii"/>
                             <constraint firstItem="zWo-AR-qJE" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" id="WMb-YS-LdS"/>
                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="leading" secondItem="zWo-AR-qJE" secondAttribute="trailing" constant="10" id="YZw-LD-39g" userLabel="Calibrate Button Outlet.leading = Transmitter Button Outlet.trailing + 20"/>
                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" id="Ydd-ev-OLz"/>
-                            <constraint firstItem="We3-bN-ffR" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" id="Z2H-jd-XOW"/>
-                            <constraint firstItem="uyn-2k-K74" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="10" id="fmo-f7-DDl"/>
-                            <constraint firstItem="We3-bN-ffR" firstAttribute="centerX" secondItem="tsR-hK-woN" secondAttribute="centerX" id="fz5-iV-QmC"/>
-                            <constraint firstItem="uyn-2k-K74" firstAttribute="top" secondItem="fSY-nc-amN" secondAttribute="bottom" constant="10" id="pqR-9I-Dpv"/>
-                            <constraint firstItem="7Wo-wd-80o" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="10" id="rno-l9-zuR"/>
-                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="uyn-2k-K74" secondAttribute="trailing" id="wJB-tH-Hp0"/>
+                            <constraint firstItem="I0Z-fN-kif" firstAttribute="top" secondItem="We3-bN-ffR" secondAttribute="bottom" constant="30" id="b8G-bX-Gme"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="uyn-2k-K74" secondAttribute="trailing" constant="189" id="cEh-1U-bEY"/>
+                            <constraint firstItem="uyn-2k-K74" firstAttribute="top" secondItem="tsR-hK-woN" secondAttribute="top" constant="71" id="dNq-IN-f0e"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="bottom" secondItem="7Wo-wd-80o" secondAttribute="bottom" constant="468" id="kTc-62-p53"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="bottom" secondItem="I0Z-fN-kif" secondAttribute="bottom" constant="65" id="xY0-s9-2mt"/>
+                            <constraint firstItem="We3-bN-ffR" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="36" id="y4n-cs-cRb"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="PQr-Ze-W5v"/>
                     </view>
@@ -87,6 +98,7 @@
                     <connections>
                         <outlet property="calibrateButtonOutlet" destination="mSJ-jy-nHJ" id="XSS-W3-gbX"/>
                         <outlet property="diffLabelOutlet" destination="7Wo-wd-80o" id="nnn-w9-1sX"/>
+                        <outlet property="lineChartViewOutlet" destination="I0Z-fN-kif" id="oW1-j1-2x3"/>
                         <outlet property="minutesLabelOutlet" destination="uyn-2k-K74" id="XXm-rq-Suy"/>
                         <outlet property="preSnoozeButtonOutlet" destination="fSY-nc-amN" id="T25-Z1-3Ad"/>
                         <outlet property="transmitterButtonOutlet" destination="zWo-AR-qJE" id="uuB-WI-JKe"/>

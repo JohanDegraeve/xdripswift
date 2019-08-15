@@ -5,6 +5,7 @@ import CoreBluetooth
 import UserNotifications
 import AVFoundation
 import AudioToolbox
+import Charts
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController {
@@ -34,7 +35,8 @@ final class RootViewController: UIViewController {
     @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
         UIAlertController(title: "Info", message: "Unfortuantely, presnooze functionality is not yet implemented", actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
     }
-    
+    /// outlet for chart that shows reading
+    @IBOutlet weak var lineChartViewOutlet: LineChartView!
     /// outlet for label that shows how many minutes ago and so on
     @IBOutlet weak var minutesLabelOutlet: UILabel!
     
@@ -132,6 +134,29 @@ final class RootViewController: UIViewController {
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
         // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like setting up the transmitter, start scanning
         // In the exceptional case that the transmitter would give a new reading before the DataManager is set up, then this new reading will be ignored
+        //y
+        lineChartViewOutlet.rightAxis.enabled = false
+        let leftAxis = lineChartViewOutlet.leftAxis
+        leftAxis.labelCount = 10
+        leftAxis.forceLabelsEnabled = false
+        leftAxis.axisLineColor = UIColor.black
+        leftAxis.labelTextColor = UIColor.black
+        leftAxis.labelFont = UIFont.systemFont(ofSize: 10)
+        leftAxis.labelPosition = .outsideChart
+        leftAxis.gridColor = .clear
+        leftAxis.axisMaximum = 150
+        leftAxis.axisMinimum = 0
+        leftAxis.labelCount = 11
+        
+        //x
+        let xAxis = lineChartViewOutlet.xAxis
+        xAxis.granularityEnabled = true
+        xAxis.labelTextColor = UIColor.black
+        xAxis.labelFont = UIFont.systemFont(ofSize: 10.0)
+        xAxis.labelPosition = .bottom
+        xAxis.gridColor = .clear
+        xAxis.axisLineColor = UIColor.black
+        
         coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
             
             self.setupApplicationData()
@@ -774,8 +799,54 @@ final class RootViewController: UIViewController {
     @objc private func updateLabels() {
         
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabels is called from viewDidload at app launch
-        
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
+        
+        let latestSixHoursReadings = bgReadingsAccessor.getLatestBgReadings(limit: 360, howOld: 6 / 24, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
+        
+//        let latestSixHoursReadings = []
+        
+        // points
+        var dataEntries = [ChartDataEntry]()
+        let oneHour = TimeInterval(60 * 60) // seconds
+        let latestSixHoursTs = Date().addingTimeInterval(TimeInterval.init(-oneHour * 6)).timeIntervalSince1970
+        for reading in latestSixHoursReadings {
+            let x = (reading.timeStamp.timeIntervalSince1970 - latestSixHoursTs) / oneHour
+            let entry = ChartDataEntry.init(x: Double(x), y: reading.calculatedValue)
+            dataEntries.append(entry)
+        }
+        
+//        var max: Double = 150
+//        for i in 0 ..< 360 {
+//            let timeStamp = Date().addingTimeInterval(TimeInterval(i * 60))
+//            let x = (timeStamp.timeIntervalSince1970 - latestSixHoursTs) / (60 * 60)
+//            let y = Double.random(in: 0 ... 300)
+//            let entry = ChartDataEntry.init(x: Double(x), y: y)
+//            dataEntries.append(entry)
+//            max = max > y ? max : y
+//        }
+        
+        let chartDataSet = LineChartDataSet(entries: dataEntries, label: "")
+        chartDataSet.mode = .cubicBezier
+        chartDataSet.circleColors = [.red]
+        chartDataSet.circleRadius = 2
+        chartDataSet.drawValuesEnabled = false
+        chartDataSet.drawCircleHoleEnabled = false
+        chartDataSet.colors = [.clear]
+        
+        var max = latestSixHoursReadings.max(by: { $0.calculatedValue < $1.calculatedValue })?.calculatedValue ?? 100
+        max = max - Double(Int(max) % 50) + 50
+        lineChartViewOutlet.leftAxis.axisMaximum = max
+        
+        let calendar = Calendar.current
+        let comp = calendar.dateComponents([.hour], from: Date())
+        var hour = (comp.hour ?? 0) + 1
+        if hour < 6 {
+            hour = 6
+        }
+        lineChartViewOutlet.xAxis.axisMaximum = Double(hour)
+        lineChartViewOutlet.xAxis.axisMinimum = Double(hour - 6)
+        lineChartViewOutlet.data = LineChartData(dataSets: [chartDataSet])
+        
         
         // last reading and lateButOneReading variable definition - optional
         var lastReading:BgReading?

@@ -30,7 +30,7 @@ class BgReadingsAccessor {
     ///     - if ignoreCalculatedValue = true, then value of calculatedValue will be ignored
     /// - returns: an array with readings, can be empty array.
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
-    func getLatestBgReadings(limit:Int?, howOld maximumDays:Int?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> [BgReading] {
+    func getLatestBgReadings(limit:Int?, howOld maximumDays:Float?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> [BgReading] {
         
         // if maximum age specified then create fromdate
         var fromDate:Date?
