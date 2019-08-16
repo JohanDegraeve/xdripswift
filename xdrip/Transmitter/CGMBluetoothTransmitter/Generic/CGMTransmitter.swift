@@ -135,32 +135,32 @@ enum CGMTransmitterType:String, CaseIterable {
     
     func canWebOOP() -> Bool {
         
-        return false
+//        return false
         
-        /*switch self {
-            
+        switch self {
+         
         case .dexcomG4:
             return false
-            
+         
         case .dexcomG5, .dexcomG6:
             return false
-            
+         
         case .miaomiao:
             return true
-            
+         
         case .Bubble:
-            return false
-            
+            return true
+         
         case .GNSentry:
             return false
-            
+         
         case .Blucon:
             return false
-            
+         
         case .Droplet1:
             return false
-            
-        }*/
+         
+        }
     }
     
     /// returns nil if id to validate has expected length and type of characters etc.
