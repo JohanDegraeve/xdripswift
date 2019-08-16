@@ -56,7 +56,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="jlP-Xy-bfe"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -65,7 +65,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="2As-N6-iec"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
