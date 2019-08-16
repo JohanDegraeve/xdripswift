@@ -137,6 +137,7 @@ final class RootViewController: UIViewController {
         //y
         lineChartViewOutlet.rightAxis.enabled = false
         lineChartViewOutlet.highlightPerTapEnabled = false
+        lineChartViewOutlet.scaleYEnabled = false
         let leftAxis = lineChartViewOutlet.leftAxis
         leftAxis.labelCount = 10
         leftAxis.forceLabelsEnabled = false
@@ -148,18 +149,6 @@ final class RootViewController: UIViewController {
         leftAxis.axisMaximum = 16
         leftAxis.axisMinimum = 0
         leftAxis.labelCount = 11
-        
-        let limitLine3 = ChartLimitLine.init(limit: 3, label: "")
-        limitLine3.lineColor = .green
-        limitLine3.lineWidth = 1
-        limitLine3.lineDashLengths = [5.0, 5.0]
-        leftAxis.addLimitLine(limitLine3)
-        
-        let limitLine9 = ChartLimitLine.init(limit: 9, label: "")
-        limitLine9.lineColor = .green
-        limitLine9.lineWidth = 1
-        limitLine9.lineDashLengths = [5.0, 5.0]
-        leftAxis.addLimitLine(limitLine9)
         
         //x
         let xAxis = lineChartViewOutlet.xAxis
@@ -827,6 +816,9 @@ final class RootViewController: UIViewController {
         oneDayAgo -= TimeInterval(com.minute ?? 0) * 60
         oneDayAgo -= TimeInterval(com.second ?? 0)
         var max = 16
+        if UserDefaults.standard.bloodGlucoseUnitIsMgDl {
+            max = 200
+        }
         for reading in latestReadings {
             let x = (reading.timeStamp.timeIntervalSince1970 - oneDayAgo) / oneHour
             var y = Double(reading.calculatedValue.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)) ?? 0
@@ -835,9 +827,7 @@ final class RootViewController: UIViewController {
             }
             let entry = ChartDataEntry.init(x: Double(x), y: y)
             
-            if y < 3 {
-                colors.insert(.black, at: 0)
-            } else if y > 9 {
+            if y < UserDefaults.standard.lowMarkValueInUserChosenUnit || y > UserDefaults.standard.highMarkValueInUserChosenUnit {
                 colors.insert(.red, at: 0)
             } else {
                 colors.insert(.green, at: 0)
@@ -848,6 +838,19 @@ final class RootViewController: UIViewController {
                 max = Int(y)
             }
         }
+        
+        lineChartViewOutlet.leftAxis.removeAllLimitLines()
+        let limitLine3 = ChartLimitLine.init(limit: UserDefaults.standard.lowMarkValueInUserChosenUnit, label: "")
+        limitLine3.lineColor = .green
+        limitLine3.lineWidth = 1
+        limitLine3.lineDashLengths = [5.0, 5.0]
+        lineChartViewOutlet.leftAxis.addLimitLine(limitLine3)
+        
+        let limitLine9 = ChartLimitLine.init(limit: UserDefaults.standard.highMarkValueInUserChosenUnit, label: "")
+        limitLine9.lineColor = .green
+        limitLine9.lineWidth = 1
+        limitLine9.lineDashLengths = [5.0, 5.0]
+        lineChartViewOutlet.leftAxis.addLimitLine(limitLine9)
 
         let chartDataSet = LineChartDataSet(entries: dataEntries, label: "")
         chartDataSet.mode = .cubicBezier
@@ -857,7 +860,11 @@ final class RootViewController: UIViewController {
         chartDataSet.drawCircleHoleEnabled = false
         chartDataSet.colors = [.clear]
 
-        max = max < 16 ? 16 : max
+        if UserDefaults.standard.bloodGlucoseUnitIsMgDl {
+            max = max < 200 ? 200 : max
+        } else {
+            max = max < 16 ? 16 : max
+        }
         lineChartViewOutlet.leftAxis.axisMaximum = Double(max)
         lineChartViewOutlet.xAxis.axisMaximum = 24
         lineChartViewOutlet.xAxis.axisMinimum = 0
@@ -904,15 +911,18 @@ final class RootViewController: UIViewController {
                 valueLabelOutlet.textColor = UIColor.red
             } else if lastReading.calculatedValue >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
                 valueLabelOutlet.textColor = "#a0b002".hexStringToUIColor()
+                valueLabelOutlet.textColor = UIColor.red
             } else {
-                valueLabelOutlet.textColor = UIColor.black
+                valueLabelOutlet.textColor = UIColor.green
             }
             
             // get minutes ago and create text for minutes ago label
             let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
             let minutesAgoText = minutesAgo.description + " " + (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) + " " + Texts_HomeView.ago
             
-            minutesLabelOutlet.text = minutesAgoText
+            let format = DateFormatter.init()
+            format.dateFormat = "H:mm"
+            minutesLabelOutlet.text = format.string(from: lastReading.timeStamp)
             
             // create delta text
             diffLabelOutlet.text = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
