@@ -42,7 +42,6 @@ final class SettingsViewController: UIViewController {
         self.soundPlayer = soundPlayer
         
     }
-
     // MARK: - View Life Cycle
     
     override func viewDidLoad() {
