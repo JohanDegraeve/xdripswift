@@ -840,14 +840,16 @@ final class RootViewController: UIViewController {
         }
         
         lineChartViewOutlet.leftAxis.removeAllLimitLines()
-        let limitLine3 = ChartLimitLine.init(limit: UserDefaults.standard.lowMarkValueInUserChosenUnit, label: "")
+        let limitLine3 = ChartLimitLine.init(limit: UserDefaults.standard.lowMarkValueInUserChosenUnit, label: String.init(format: "%.1f", UserDefaults.standard.lowMarkValueInUserChosenUnit))
         limitLine3.lineColor = .green
+        limitLine3.valueTextColor = .green
         limitLine3.lineWidth = 1
         limitLine3.lineDashLengths = [5.0, 5.0]
         lineChartViewOutlet.leftAxis.addLimitLine(limitLine3)
         
-        let limitLine9 = ChartLimitLine.init(limit: UserDefaults.standard.highMarkValueInUserChosenUnit, label: "")
+        let limitLine9 = ChartLimitLine.init(limit: UserDefaults.standard.highMarkValueInUserChosenUnit, label: String.init(format: "%.1f", UserDefaults.standard.highMarkValueInUserChosenUnit))
         limitLine9.lineColor = .green
+        limitLine9.valueTextColor = .green
         limitLine9.lineWidth = 1
         limitLine9.lineDashLengths = [5.0, 5.0]
         lineChartViewOutlet.leftAxis.addLimitLine(limitLine9)
@@ -866,6 +868,7 @@ final class RootViewController: UIViewController {
             max = max < 16 ? 16 : max
         }
         lineChartViewOutlet.leftAxis.axisMaximum = Double(max)
+        lineChartViewOutlet.leftAxis.labelCount = 5
         lineChartViewOutlet.xAxis.axisMaximum = 24
         lineChartViewOutlet.xAxis.axisMinimum = 0
         lineChartViewOutlet.data = LineChartData(dataSets: [chartDataSet])
