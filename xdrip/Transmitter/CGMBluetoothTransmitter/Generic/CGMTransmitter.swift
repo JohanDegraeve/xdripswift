@@ -155,7 +155,7 @@ enum CGMTransmitterType:String, CaseIterable {
             return true
             
         case .Bubble:
-            return false
+            return true
             
         case .GNSentry:
             return false
