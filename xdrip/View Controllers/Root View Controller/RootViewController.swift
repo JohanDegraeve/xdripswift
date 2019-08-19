@@ -172,7 +172,7 @@ final class RootViewController: UIViewController {
         leftAxis.gridColor = .clear
         leftAxis.axisMaximum = 16
         leftAxis.axisMinimum = 0
-        leftAxis.labelCount = 11
+        leftAxis.labelCount = 5
         
         //x
         let xAxis = lineChartViewOutlet.xAxis
@@ -182,6 +182,10 @@ final class RootViewController: UIViewController {
         xAxis.labelPosition = .bottom
         xAxis.gridColor = .clear
         xAxis.axisLineColor = UIColor.black
+        xAxis.axisMaximum = 24
+        xAxis.axisMinimum = 0
+        lineChartViewOutlet.zoom(scaleX: 4, scaleY: 1, x: 0, y:0)
+        
         
         coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
             
@@ -892,11 +896,12 @@ final class RootViewController: UIViewController {
             max = max < 16 ? 16 : max
         }
         lineChartViewOutlet.leftAxis.axisMaximum = Double(max)
-        lineChartViewOutlet.leftAxis.labelCount = 5
-        lineChartViewOutlet.xAxis.axisMaximum = 24
-        lineChartViewOutlet.xAxis.axisMinimum = 0
         lineChartViewOutlet.data = LineChartData(dataSets: [chartDataSet])
-        
+        if let entry = dataEntries.last, lineChartViewOutlet.scaleX == 4 {
+            var x = entry.x - 3
+            x = x > 0 ? x : 0
+            lineChartViewOutlet.moveViewToX(x)
+        }
         
         // last reading and lateButOneReading variable definition - optional
         var lastReading:BgReading?
