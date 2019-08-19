@@ -44,6 +44,7 @@ class LibreOOPClient {
                 return
                 
             }
+            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: calibrationparams)
             //here we assume success, data is not changed,
             //and we trust that the remote endpoint returns correct data for the sensor
             let last16 = trendMeasurements(bytes: libreData, date: Date(), timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: params)

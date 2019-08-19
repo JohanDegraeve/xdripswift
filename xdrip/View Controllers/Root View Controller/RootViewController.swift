@@ -24,6 +24,8 @@ final class RootViewController: UIViewController {
         
     }
     
+    @IBOutlet weak var logTextView: UITextView!
+    
     @IBOutlet weak var transmitterButtonOutlet: UIButton!
     
     @IBAction func transmitterButtonAction(_ sender: UIButton) {
@@ -35,6 +37,8 @@ final class RootViewController: UIViewController {
     @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
         UIAlertController(title: "Info", message: "Unfortuantely, presnooze functionality is not yet implemented", actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
     }
+    
+    
     /// outlet for chart that shows reading
     @IBOutlet weak var lineChartViewOutlet: LineChartView!
     /// outlet for label that shows how many minutes ago and so on
@@ -128,12 +132,20 @@ final class RootViewController: UIViewController {
         updateLabels()
     }
     
+    @objc private func webOOPLog(info: Notification) {
+        if let result = info.object {
+          logTextView.text = "\(result)"
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
         // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like setting up the transmitter, start scanning
         // In the exceptional case that the transmitter would give a new reading before the DataManager is set up, then this new reading will be ignored
+        NotificationCenter.default.addObserver(self, selector: #selector(webOOPLog(info:)), name: Notification.Name.init(rawValue: "webOOPLog"), object: nil)
+        
         //y
         lineChartViewOutlet.rightAxis.enabled = false
         lineChartViewOutlet.highlightPerTapEnabled = false
