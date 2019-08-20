@@ -38,12 +38,10 @@ class LibreOOPClient {
         LibreOOPClient.calibrateSensor(bytes: libreData, serialNumber: serialNumber) {
             (calibrationparams)  in
             guard let params = calibrationparams else {
-                
                 callback(nil)
-                
                 return
-                
             }
+            
             NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: calibrationparams)
             //here we assume success, data is not changed,
             //and we trust that the remote endpoint returns correct data for the sensor
@@ -91,8 +89,11 @@ class LibreOOPClient {
                 } else {
                     trace("in calibrateSensor, failed to decode", log: log, type: .error)
                     callback(nil)
+                    let error = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                    NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: error)
                 }
             } catch {
+                NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: error)
                 trace("in calibrateSensor, got error trying to decode GetCalibrationStatus", log: log, type: .error)
                 callback(nil)
             }
@@ -116,7 +117,7 @@ class LibreOOPClient {
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
             
             let task = URLSession.shared.dataTask(with: request as URLRequest) {
-                data, response, _ in
+                data, response, error in
                 
                 guard let data = data else {
                     
@@ -125,7 +126,6 @@ class LibreOOPClient {
                     DispatchQueue.main.sync {
                         completion("network error".data(using: .utf8)!, "network error", false)
                     }
-                        
                     return
 
                 }

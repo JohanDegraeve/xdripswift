@@ -41,16 +41,6 @@
                                     <action selector="preSnoozeButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="nuJ-Sh-3Xy"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="---" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="We3-bN-ffR">
-                                <rect key="frame" x="127.5" y="110" width="120" height="50"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="120" id="RuD-tk-Hzi"/>
-                                    <constraint firstAttribute="height" constant="50" id="nRp-GX-EF5"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="38"/>
-                                <color key="textColor" red="0.0" green="0.97680455450000003" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uyn-2k-K74">
                                 <rect key="frame" x="7" y="119" width="130" height="32"/>
                                 <constraints>
@@ -70,10 +60,10 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="I0Z-fN-kif" customClass="LineChartView" customModule="Charts">
-                                <rect key="frame" x="8" y="224" width="356" height="277"/>
+                                <rect key="frame" x="8" y="190" width="356" height="240"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="277" id="pba-HA-7vJ"/>
+                                    <constraint firstAttribute="height" constant="240" id="pba-HA-7vJ"/>
                                 </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mSJ-jy-nHJ">
@@ -88,11 +78,21 @@
                                 </connections>
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="12p-uL-blc">
-                                <rect key="frame" x="0.0" y="509" width="375" height="109"/>
+                                <rect key="frame" x="0.0" y="438" width="375" height="180"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="---" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="We3-bN-ffR">
+                                <rect key="frame" x="127.5" y="110" width="120" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="120" id="RuD-tk-Hzi"/>
+                                    <constraint firstAttribute="height" constant="50" id="nRp-GX-EF5"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="38"/>
+                                <color key="textColor" red="0.0" green="0.97680455450000003" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -115,9 +115,9 @@
                             <constraint firstItem="zWo-AR-qJE" firstAttribute="leading" secondItem="fSY-nc-amN" secondAttribute="trailing" id="WWP-lu-hPn"/>
                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="leading" secondItem="zWo-AR-qJE" secondAttribute="trailing" id="YZw-LD-39g" userLabel="Calibrate Button Outlet.leading = Transmitter Button Outlet.trailing + 20"/>
                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="10" id="Ydd-ev-OLz"/>
+                            <constraint firstItem="I0Z-fN-kif" firstAttribute="top" secondItem="We3-bN-ffR" secondAttribute="bottom" constant="30" id="cBA-nX-tfw"/>
                             <constraint firstItem="uyn-2k-K74" firstAttribute="centerY" secondItem="We3-bN-ffR" secondAttribute="centerY" id="inp-s6-zvq"/>
                             <constraint firstItem="12p-uL-blc" firstAttribute="top" secondItem="I0Z-fN-kif" secondAttribute="bottom" constant="8" symbolic="YES" id="kdF-eH-rSh"/>
-                            <constraint firstItem="We3-bN-ffR" firstAttribute="bottom" secondItem="I0Z-fN-kif" secondAttribute="top" constant="-64" id="xY0-s9-2mt"/>
                             <constraint firstItem="We3-bN-ffR" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="90" id="y4n-cs-cRb"/>
                             <constraint firstItem="12p-uL-blc" firstAttribute="trailing" secondItem="mSJ-jy-nHJ" secondAttribute="trailing" id="yDQ-FV-fvA"/>
                         </constraints>
