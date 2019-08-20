@@ -171,7 +171,10 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
         case .webOOP:
-            return UISwitch(isOn: UserDefaults.standard.webOOPEnabled, action: {(isOn:Bool) in UserDefaults.standard.webOOPEnabled = isOn})
+            UserDefaults.standard.webOOPEnabled = true
+            let switchButton = UISwitch(isOn: UserDefaults.standard.webOOPEnabled, action: {(isOn:Bool) in UserDefaults.standard.webOOPEnabled = isOn})
+            switchButton.isUserInteractionEnabled = false
+            return switchButton
         default:
             return nil
         }

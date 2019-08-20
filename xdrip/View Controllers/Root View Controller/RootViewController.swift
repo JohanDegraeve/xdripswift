@@ -149,9 +149,12 @@ final class RootViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         #if DEBUG
-        defer {
-//            test()
-        }
+//        DispatchQueue.global().async {
+//            sleep(3)
+//            DispatchQueue.main.async {
+//                self.test()
+//            }
+//        }
         #endif
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
         // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like setting up the transmitter, start scanning

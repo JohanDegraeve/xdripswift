@@ -89,7 +89,7 @@
                                     <constraint firstAttribute="width" constant="120" id="RuD-tk-Hzi"/>
                                     <constraint firstAttribute="height" constant="50" id="nRp-GX-EF5"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="38"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="35"/>
                                 <color key="textColor" red="0.0" green="0.97680455450000003" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
