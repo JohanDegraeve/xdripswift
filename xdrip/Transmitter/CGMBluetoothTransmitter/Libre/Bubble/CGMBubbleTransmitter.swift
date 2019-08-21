@@ -148,7 +148,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                         rxBuffer.append(value.subdata(in: 2..<10))
                         
                     case .dataPacket:
-                        
+                        guard rxBuffer.count >= 8 else { return }
                         rxBuffer.append(value.suffix(from: 4))
                         if rxBuffer.count >= 352 {
                             if (Crc.LibreCrc(data: &rxBuffer, headerOffset: bubbleHeaderLength)) {

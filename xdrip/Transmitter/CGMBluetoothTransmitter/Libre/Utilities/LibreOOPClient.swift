@@ -89,7 +89,7 @@ class LibreOOPClient {
                 } else {
                     trace("in calibrateSensor, failed to decode", log: log, type: .error)
                     callback(nil)
-                    let error = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                    let error = String.init(data: data, encoding: .utf8)
                     NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: error)
                 }
             } catch {
