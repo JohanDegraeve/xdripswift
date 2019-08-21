@@ -144,8 +144,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                         _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
                         
                     case .serialNumber:
-                        // maybe dataPacket append data after `resetRxBuffer()`
-                        resetRxBuffer()
+                        
                         rxBuffer.append(value.subdata(in: 2..<10))
                         
                     case .dataPacket:
@@ -184,6 +183,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
 
                                 //reset the buffer
                                 resetRxBuffer()
+                                
                             }
                         }
                     case .noSensor:
