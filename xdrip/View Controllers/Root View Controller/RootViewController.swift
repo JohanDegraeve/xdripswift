@@ -900,8 +900,8 @@ final class RootViewController: UIViewController {
         }
         lineChartViewOutlet.leftAxis.axisMaximum = Double(max)
         lineChartViewOutlet.data = LineChartData(dataSets: [chartDataSet])
-        if let entry = dataEntries.last, lineChartViewOutlet.scaleX == 4 {
-            var x = entry.x - 3
+        if let entry = dataEntries.last {
+            var x = entry.x - (24 / Double(lineChartViewOutlet.scaleX)) / 2
             x = x > 0 ? x : 0
             lineChartViewOutlet.moveViewToX(x)
         }
