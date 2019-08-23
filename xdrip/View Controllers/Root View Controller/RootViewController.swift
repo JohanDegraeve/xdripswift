@@ -24,8 +24,6 @@ final class RootViewController: UIViewController {
         
     }
     
-    @IBOutlet weak var logTextView: UITextView!
-    
     @IBOutlet weak var transmitterButtonOutlet: UIButton!
     
     @IBAction func transmitterButtonAction(_ sender: UIButton) {
@@ -134,7 +132,7 @@ final class RootViewController: UIViewController {
     
     @objc private func webOOPLog(info: Notification) {
         if let result = info.object {
-          logTextView.text = "\(result)"
+          
         }
     }
     
@@ -158,21 +156,25 @@ final class RootViewController: UIViewController {
         // In the exceptional case that the transmitter would give a new reading before the DataManager is set up, then this new reading will be ignored
         NotificationCenter.default.addObserver(self, selector: #selector(webOOPLog(info:)), name: Notification.Name.init(rawValue: "webOOPLog"), object: nil)
         
-        //y
+        
         lineChartViewOutlet.rightAxis.enabled = false
         lineChartViewOutlet.highlightPerTapEnabled = false
         lineChartViewOutlet.scaleYEnabled = false
+        lineChartViewOutlet.legend.form = .none
+        //y
         let leftAxis = lineChartViewOutlet.leftAxis
-        leftAxis.labelCount = 10
         leftAxis.forceLabelsEnabled = false
         leftAxis.axisLineColor = UIColor.black
         leftAxis.labelTextColor = UIColor.black
         leftAxis.labelFont = UIFont.systemFont(ofSize: 10)
-        leftAxis.labelPosition = .outsideChart
         leftAxis.gridColor = .clear
         leftAxis.axisMaximum = 16
         leftAxis.axisMinimum = 0
         leftAxis.labelCount = 5
+        leftAxis.labelPosition = .insideChart
+        let noZeroFormatter = NumberFormatter()
+        noZeroFormatter.zeroSymbol = ""
+        leftAxis.valueFormatter = DefaultAxisValueFormatter.init(formatter: noZeroFormatter)
         
         //x
         let xAxis = lineChartViewOutlet.xAxis

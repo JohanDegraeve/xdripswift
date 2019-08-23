@@ -2,11 +2,21 @@ import Foundation
 
 extension UserDefaults {
     /// keys for settings and user defaults. For reading and writing settings, the keys should not be used, the specific functions kan be used.
+    func setDefalutValue() {
+        if !defaultValueInit {
+            bloodGlucoseUnitIsMgDl = false
+            
+            defaultValueInit = true
+        }
+    }
+    
     public enum Key: String {
         // User configurable Settings
         
         // General
         
+        /// set userDefault default value at app first launch
+        case defaultValueInit = "defaultValueInit"
         /// bloodglucose  unit
         case bloodGlucoseUnitIsMgDl = "bloodGlucoseUnit"
         /// low value
@@ -117,6 +127,16 @@ extension UserDefaults {
         
         /// Bubble web oop
         case webOOPEnabled = "webOOPEnabled"
+    }
+    
+    /// true is setted defalut value
+    var defaultValueInit: Bool {
+        get {
+            return bool(forKey: Key.defaultValueInit.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.defaultValueInit.rawValue)
+        }
     }
     
     // MARK: - =====  User Configurable Settings ======

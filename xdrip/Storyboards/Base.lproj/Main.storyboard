@@ -60,10 +60,10 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="I0Z-fN-kif" customClass="LineChartView" customModule="Charts">
-                                <rect key="frame" x="8" y="190" width="356" height="240"/>
+                                <rect key="frame" x="1" y="190" width="373" height="280"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="240" id="pba-HA-7vJ"/>
+                                    <constraint firstAttribute="height" constant="280" id="pba-HA-7vJ"/>
                                 </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mSJ-jy-nHJ">
@@ -77,12 +77,6 @@
                                     <action selector="calibrateButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="JB2-Sk-Tge"/>
                                 </connections>
                             </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="12p-uL-blc">
-                                <rect key="frame" x="0.0" y="438" width="375" height="180"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="---" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="We3-bN-ffR">
                                 <rect key="frame" x="127.5" y="110" width="120" height="50"/>
                                 <constraints>
@@ -102,13 +96,11 @@
                             <constraint firstAttribute="centerX" secondItem="We3-bN-ffR" secondAttribute="centerX" id="9Wc-ds-q5N"/>
                             <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="mSJ-jy-nHJ" secondAttribute="trailing" id="9qE-Cr-5PK"/>
                             <constraint firstItem="7Wo-wd-80o" firstAttribute="trailing" secondItem="tsR-hK-woN" secondAttribute="trailing" constant="-12" id="BXx-sv-OW5"/>
-                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="I0Z-fN-kif" secondAttribute="trailing" constant="11" id="F4l-2u-4Zd"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="I0Z-fN-kif" secondAttribute="trailing" constant="1" id="F4l-2u-4Zd"/>
                             <constraint firstItem="7Wo-wd-80o" firstAttribute="centerY" secondItem="We3-bN-ffR" secondAttribute="centerY" id="FLM-P3-4ez"/>
                             <constraint firstItem="fSY-nc-amN" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="10" id="Gsa-fG-7Wh"/>
-                            <constraint firstItem="12p-uL-blc" firstAttribute="bottom" secondItem="PQr-Ze-W5v" secondAttribute="bottom" id="HWp-CH-XQz"/>
-                            <constraint firstItem="I0Z-fN-kif" firstAttribute="centerX" secondItem="tsR-hK-woN" secondAttribute="centerX" constant="-1.5" id="JvE-uE-Tru"/>
-                            <constraint firstItem="I0Z-fN-kif" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="8" id="PLS-kX-IK9"/>
-                            <constraint firstItem="12p-uL-blc" firstAttribute="leading" secondItem="fSY-nc-amN" secondAttribute="leading" id="PfB-9B-ly3"/>
+                            <constraint firstItem="I0Z-fN-kif" firstAttribute="centerX" secondItem="tsR-hK-woN" secondAttribute="centerX" id="JvE-uE-Tru"/>
+                            <constraint firstItem="I0Z-fN-kif" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="1" id="PLS-kX-IK9"/>
                             <constraint firstItem="fSY-nc-amN" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" id="TFc-gV-Hzd"/>
                             <constraint firstItem="uyn-2k-K74" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="7" id="VmM-9I-Vii"/>
                             <constraint firstItem="zWo-AR-qJE" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="10" id="WMb-YS-LdS"/>
@@ -117,9 +109,7 @@
                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="10" id="Ydd-ev-OLz"/>
                             <constraint firstItem="I0Z-fN-kif" firstAttribute="top" secondItem="We3-bN-ffR" secondAttribute="bottom" constant="30" id="cBA-nX-tfw"/>
                             <constraint firstItem="uyn-2k-K74" firstAttribute="centerY" secondItem="We3-bN-ffR" secondAttribute="centerY" id="inp-s6-zvq"/>
-                            <constraint firstItem="12p-uL-blc" firstAttribute="top" secondItem="I0Z-fN-kif" secondAttribute="bottom" constant="8" symbolic="YES" id="kdF-eH-rSh"/>
                             <constraint firstItem="We3-bN-ffR" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="90" id="y4n-cs-cRb"/>
-                            <constraint firstItem="12p-uL-blc" firstAttribute="trailing" secondItem="mSJ-jy-nHJ" secondAttribute="trailing" id="yDQ-FV-fvA"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="PQr-Ze-W5v"/>
                     </view>
@@ -130,7 +120,6 @@
                         <outlet property="calibrateButtonOutlet" destination="mSJ-jy-nHJ" id="XSS-W3-gbX"/>
                         <outlet property="diffLabelOutlet" destination="7Wo-wd-80o" id="nnn-w9-1sX"/>
                         <outlet property="lineChartViewOutlet" destination="I0Z-fN-kif" id="oW1-j1-2x3"/>
-                        <outlet property="logTextView" destination="12p-uL-blc" id="xer-tR-Uv8"/>
                         <outlet property="minutesLabelOutlet" destination="uyn-2k-K74" id="XXm-rq-Suy"/>
                         <outlet property="preSnoozeButtonOutlet" destination="fSY-nc-amN" id="T25-Z1-3Ad"/>
                         <outlet property="transmitterButtonOutlet" destination="zWo-AR-qJE" id="uuB-WI-JKe"/>
