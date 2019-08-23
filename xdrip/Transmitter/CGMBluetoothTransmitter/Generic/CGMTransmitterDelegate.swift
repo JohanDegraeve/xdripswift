@@ -45,6 +45,8 @@ protocol CGMTransmitterDelegate:AnyObject {
     
     /// transmitter reset result
     func reset(successful: Bool)
+    
+    func list(list: [BluetoothPeripheral])
 }
 
 

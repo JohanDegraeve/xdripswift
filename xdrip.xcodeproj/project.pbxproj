@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A48D2DE552F4A356AA32746A /* Pods_xdrip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */; };
+		EE2A2A71230FB8FD007F76AE /* BubbleClientSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2A2A70230FB8FD007F76AE /* BubbleClientSearchViewController.swift */; };
 		EE72B088230D4A7E00D67B8F /* TrendArrowCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE72B087230D4A7E00D67B8F /* TrendArrowCalculations.swift */; };
 		EE72B08A230D4C3700D67B8F /* Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE72B089230D4C3700D67B8F /* Collection.swift */; };
 		EE9947E822EEDD2E00DCB876 /* CGMBubbleTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE9947E722EEDD2E00DCB876 /* CGMBubbleTransmitter.swift */; };
@@ -204,6 +205,7 @@
 		148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.debug.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.debug.xcconfig"; sourceTree = "<group>"; };
 		662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2648F65F347D56D7DFFFAB7 /* Pods-xdrip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.release.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.release.xcconfig"; sourceTree = "<group>"; };
+		EE2A2A70230FB8FD007F76AE /* BubbleClientSearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BubbleClientSearchViewController.swift; sourceTree = "<group>"; };
 		EE72B087230D4A7E00D67B8F /* TrendArrowCalculations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrendArrowCalculations.swift; sourceTree = "<group>"; };
 		EE72B089230D4C3700D67B8F /* Collection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
 		EE9947E722EEDD2E00DCB876 /* CGMBubbleTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMBubbleTransmitter.swift; sourceTree = "<group>"; };
@@ -608,6 +610,7 @@
 			isa = PBXGroup;
 			children = (
 				F8AC425F21ADEBD60078C348 /* RootViewController.swift */,
+				EE2A2A70230FB8FD007F76AE /* BubbleClientSearchViewController.swift */,
 			);
 			path = "Root View Controller";
 			sourceTree = "<group>";
@@ -1427,6 +1430,7 @@
 				F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */,
 				F8A54ADB22D911BA00934E7A /* AuthRequestTxMessage.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
+				EE2A2A71230FB8FD007F76AE /* BubbleClientSearchViewController.swift in Sources */,
 				F8A1585122EDB597007F5B5D /* ConstantsBGGraphBuilder.swift in Sources */,
 				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
 				F8A7406E22D9C0E700967CFC /* CGMBluconTransmitter.swift in Sources */,

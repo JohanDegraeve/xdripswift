@@ -2,6 +2,11 @@ import Foundation
 import CoreBluetooth
 import os
 
+class BluetoothPeripheral: NSObject {
+    var mac: String?
+    var peripheral: CBPeripheral?
+}
+
 /// generic bluetoothtransmitter class that handles scanning, connect, discover services, discover characteristics, subscribe to receive characteristic, reconnect.
 ///
 /// The class assumes that the transmitter has a receive and transmit characterisitc (which is mostly the case)
@@ -214,6 +219,10 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
     }
     
+    func connect(to peripheral: CBPeripheral) {
+        stopScanAndconnect(to: peripheral)
+    }
+    
     // MARK: - fileprivate functions
     
     /// stops scanning and connects. To be called after didiscover
@@ -271,37 +280,55 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         
         timeStampLastStatusUpdate = Date()
-        
-        // devicename needed unwrapped for logging
-        var deviceName = "unknown"
-        if let temp = peripheral.name {
-            deviceName = temp
-        }
-        trace("Did discover peripheral with name: %{public}@", log: log, type: .info, String(describing: deviceName))
-        
-        // check if stored address not nil, in which case we already connected before and we expect a full match with the already known device name
-        if let deviceAddress = deviceAddress {
-            if peripheral.identifier.uuidString == deviceAddress {
-                trace("    stored address matches peripheral address, will try to connect", log: log, type: .info)
-                stopScanAndconnect(to: peripheral)
+        /// for bubble
+        if expectedName == "Bubble" {
+            if peripheral.name == expectedName {
+                if let data = advertisementData["kCBAdvDataManufacturerData"] as? Data {
+                    var mac = ""
+                    for i in 0 ..< 6 {
+                        mac += data.subdata(in: (7 - i)..<(8 - i)).hexEncodedString().uppercased()
+                        if i != 5 {
+                            mac += ":"
+                        }
+                    }
+                    let bubblePeripheral = BluetoothPeripheral()
+                    bubblePeripheral.mac = mac
+                    bubblePeripheral.peripheral = peripheral
+                    bluetoothTransmitterDelegate?.centralManagerDidDiscover(peripheral: bubblePeripheral)
+                }
             }
         } else {
-            //the app never connected before to our device
-            // do we expect a specific device name ?
-            if let expectedName = expectedName {
-                // so it's a new device, we need to see if it matches the specifically expected device name
-                if (peripheral.name?.range(of: expectedName, options: .caseInsensitive)) != nil {
-                    // peripheral.name is not nil and contains expectedName
-                    trace("    new peripheral has expected device name, will try to connect", log: log, type: .info)
+            // devicename needed unwrapped for logging
+            var deviceName = "unknown"
+            if let temp = peripheral.name {
+                deviceName = temp
+            }
+            trace("Did discover peripheral with name: %{public}@", log: log, type: .info, String(describing: deviceName))
+            
+            // check if stored address not nil, in which case we already connected before and we expect a full match with the already known device name
+            if let deviceAddress = deviceAddress {
+                if peripheral.identifier.uuidString == deviceAddress {
+                    trace("    stored address matches peripheral address, will try to connect", log: log, type: .info)
                     stopScanAndconnect(to: peripheral)
-                } else {
-                    // peripheral.name is nil or does not contain expectedName
-                    trace("    new peripheral doesn't have device name as expected, ignoring", log: log, type: .info)
                 }
             } else {
-                // we don't expect any specific device name, so let's connect
-                trace("    new peripheral, will try to connect", log: log, type: .info)
-                stopScanAndconnect(to: peripheral)
+                //the app never connected before to our device
+                // do we expect a specific device name ?
+                if let expectedName = expectedName {
+                    // so it's a new device, we need to see if it matches the specifically expected device name
+                    if (peripheral.name?.range(of: expectedName, options: .caseInsensitive)) != nil {
+                        // peripheral.name is not nil and contains expectedName
+                        trace("    new peripheral has expected device name, will try to connect", log: log, type: .info)
+                        stopScanAndconnect(to: peripheral)
+                    } else {
+                        // peripheral.name is nil or does not contain expectedName
+                        trace("    new peripheral doesn't have device name as expected, ignoring", log: log, type: .info)
+                    }
+                } else {
+                    // we don't expect any specific device name, so let's connect
+                    trace("    new peripheral, will try to connect", log: log, type: .info)
+                    stopScanAndconnect(to: peripheral)
+                }
             }
         }
     }

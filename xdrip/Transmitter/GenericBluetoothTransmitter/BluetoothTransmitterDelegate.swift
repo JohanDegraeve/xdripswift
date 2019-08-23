@@ -9,6 +9,9 @@ import CoreBluetooth
 ///
 /// Most delegates will only implement just a very fiew of the methods
 protocol BluetoothTransmitterDelegate:AnyObject {
+    /// didDiscover peripheral
+    func centralManagerDidDiscover(peripheral: BluetoothPeripheral)
+    
     /// called when centralManager didConnect was called in BlueToothTransmitter class
     /// the BlueToothTransmitter class handles the reconnect but the delegate class can for instance show the connection status to the user
     /// - parameters:
@@ -37,4 +40,10 @@ protocol BluetoothTransmitterDelegate:AnyObject {
     /// called when peripheral didUpdateValueFor was called in BlueToothTransmitter class
     /// the BlueToothTransmitter class will not do anything just call the delegate function
     func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?)
+}
+
+extension BluetoothTransmitterDelegate {
+    func centralManagerDidDiscover(peripheral: BluetoothPeripheral) {
+        
+    }
 }

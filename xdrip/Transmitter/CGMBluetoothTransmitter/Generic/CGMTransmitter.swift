@@ -46,7 +46,8 @@ protocol CGMTransmitter {
     /// for transmitters who don't support webOOP, there's no need to implemented this function<br>
     /// ---  for transmitters who support webOOP (Bubble, MiaoMiao, ..) this should be implemented
     func setWebOOPEnabled(enabled:Bool)
-
+    
+    func connect(to peripheral: CBPeripheral)
 }
 
 /// cgm transmitter types

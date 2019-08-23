@@ -121,6 +121,8 @@ final class RootViewController: UIViewController {
     /// timestamp of last notification for pairing
     private var timeStampLastNotificationForPairing:Date?
     
+    private weak var searchVC: BubbleClientSearchViewController?
+    
     // MARK: - View Life Cycle
     
     override func viewWillAppear(_ animated: Bool) {
@@ -148,7 +150,7 @@ final class RootViewController: UIViewController {
         super.viewDidLoad()
         #if DEBUG
         Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: {_ in
-            self.test()
+//            self.test()
         })
         #endif
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
@@ -1064,6 +1066,14 @@ final class RootViewController: UIViewController {
     private func userInitiatesStartScanning() {
         
         // start the scanning, result of the startscanning will be in startScanningResult - this is not the result of the scanning itself. Scanning may have started successfully but maybe the peripheral is not yet connected, maybe it is
+        if let selectedTransmitterType = UserDefaults.standard.transmitterType {
+            if selectedTransmitterType == .Bubble {
+                let vc = BubbleClientSearchViewController()
+                searchVC = vc
+                let nav = UINavigationController.init(rootViewController: vc)
+                present(nav, animated: true, completion: nil)
+            }
+        }
         if let startScanningResult = cgmTransmitter?.startScanning() {
             trace("in userInitiatesStartScanning, startScanningResult = %{public}@", log: log, type: .info, startScanningResult.description())
             switch startScanningResult {
@@ -1175,6 +1185,10 @@ final class RootViewController: UIViewController {
 
 /// conform to CGMTransmitterDelegate
 extension RootViewController:CGMTransmitterDelegate {
+    
+    func list(list: [BluetoothPeripheral]) {
+        searchVC?.list = list
+    }
     
     func reset(successful: Bool) {
         

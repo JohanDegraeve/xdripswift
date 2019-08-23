@@ -46,6 +46,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     // current sensor serial number, if nil then it's not known yet
     private var sensorSerialNumber:String?
     
+    /// Bubble Peripheral list
+    private var list = [BluetoothPeripheral]()
+    
     // MARK: - Initialization
     
     /// - parameters:
@@ -94,7 +97,29 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
         }
     }
     
+    override func startScanning() -> BluetoothTransmitter.startScanningResult {
+        list = []
+        return super.startScanning()
+    }
+    
     // MARK: - BluetoothTransmitterDelegate functions
+    
+    func centralManagerDidDiscover(peripheral: BluetoothPeripheral) {
+        var insert = true
+        if let mac = peripheral.mac {
+            for temp in list{
+                if temp.mac == mac {
+                    insert = false
+                    break
+                }
+            }
+            
+            if insert {
+                list.append(peripheral)
+            }
+            cgmTransmitterDelegate?.list(list: list)
+        }
+    }
     
     func centralManagerDidConnect(address:String?, name:String?) {
         cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
