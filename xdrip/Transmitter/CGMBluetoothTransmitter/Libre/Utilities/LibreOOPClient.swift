@@ -46,7 +46,11 @@ class LibreOOPClient {
             //here we assume success, data is not changed,
             //and we trust that the remote endpoint returns correct data for the sensor
             let last16 = trendMeasurements(bytes: libreData, date: Date(), timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: params)
-            if let glucoseData = trendToLibreGlucose(last16) {
+            if var glucoseData = trendToLibreGlucose(last16) {
+                if let first = glucoseData.last?.timeStamp {
+                    let last32 = historyMeasurements(bytes: libreData, date: first, LibreDerivedAlgorithmParameterSet: params)
+                    glucoseData += trendToLibreGlucose(last32) ?? []
+                }
                 callback((glucoseData, sensorState, 0))
             }
         }
@@ -188,6 +192,51 @@ class LibreOOPClient {
             
         }
         return measurements
+    }
+    
+    private static func historyMeasurements(bytes: [UInt8], date: Date, _ offset: Double = 0.0, slope: Double = 0.1, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameters?) -> [LibreMeasurement] {
+        //    let headerRange =   0..<24   //  24 bytes, i.e.  3 blocks a 8 bytes
+        let bodyRange   =  24..<320  // 296 bytes, i.e. 37 blocks a 8 bytes
+        //    let footerRange = 320..<344  //  24 bytes, i.e.  3 blocks a 8 bytes
+        
+        let body   = Array(bytes[bodyRange])
+        let nextHistoryBlock = Int(body[3])
+        let minutesSinceStart = Int(body[293]) << 8 + Int(body[292])
+        var measurements = [LibreMeasurement]()
+        // History data is stored in body from byte 100 to byte 100+192-1=291 in units of 6 bytes. Index on data such that most recent block is first.
+        for blockIndex in 0..<32 {
+            
+            var index = 100 + (nextHistoryBlock - 1 - blockIndex) * 6 // runs backwards
+            if index < 100 {
+                index = index + 192 // if end of ring buffer is reached shift to beginning of ring buffer
+            }
+            
+            let range = index..<index+6
+            let measurementBytes = Array(body[range])
+            //            let measurementDate = dateOfMostRecentHistoryValue().addingTimeInterval(Double(-900 * blockIndex)) // 900 = 60 * 15
+            //            let measurement = Measurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate)
+            let (date, counter) = dateOfMostRecentHistoryValue(minutesSinceStart: minutesSinceStart, nextHistoryBlock: nextHistoryBlock, date: date)
+            
+            let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, counter: counter - blockIndex * 15, date: date.addingTimeInterval(Double(-900 * blockIndex)), LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
+            measurements.append(measurement)
+        }
+        return measurements
+    }
+    
+    private static func dateOfMostRecentHistoryValue(minutesSinceStart: Int, nextHistoryBlock: Int, date: Date) -> (date: Date, counter: Int) {
+        // Calculate correct date for the most recent history value.
+        //        date.addingTimeInterval( 60.0 * -Double( (minutesSinceStart - 3) % 15 + 3 ) )
+        let nextHistoryIndexCalculatedFromMinutesCounter = ( (minutesSinceStart - 3) / 15 ) % 32
+        let delay = (minutesSinceStart - 3) % 15 + 3 // in minutes
+        if nextHistoryIndexCalculatedFromMinutesCounter == nextHistoryBlock {
+            // Case when history index is incremented togehter with minutesSinceStart (in sync)
+            //            print("delay: \(delay), minutesSinceStart: \(minutesSinceStart), result: \(minutesSinceStart-delay)")
+            return (date: date.addingTimeInterval( 60.0 * -Double(delay) ), counter: minutesSinceStart - delay)
+        } else {
+            // Case when history index is incremented before minutesSinceStart (and they are async)
+            //            print("delay: \(delay), minutesSinceStart: \(minutesSinceStart), result: \(minutesSinceStart-delay-15)")
+            return (date: date.addingTimeInterval( 60.0 * -Double(delay - 15)), counter: minutesSinceStart - delay)
+        }
     }
     
     

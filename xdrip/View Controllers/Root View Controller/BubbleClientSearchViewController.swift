@@ -9,7 +9,11 @@ import UIKit
 import CoreBluetooth
 
 class BubbleClientSearchViewController: UITableViewController {
-    var list = [BluetoothPeripheral]()
+    var list = [BluetoothPeripheral]() {
+        didSet {
+            tableView.reloadData()
+        }
+    }
     var cgmTransmitter: CGMTransmitter?
     override public func viewDidLoad() {
         super.viewDidLoad()

@@ -120,6 +120,14 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         return peripheral?.state
     }
     
+    func stopScanning() {
+        if let centralManager = centralManager {
+            if centralManager.isScanning {
+                centralManager.stopScan()
+            }
+        }
+    }
+    
     func disconnect() {
         if let peripheral = peripheral {
             if let centralManager = centralManager {

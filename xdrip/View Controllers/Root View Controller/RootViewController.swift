@@ -150,7 +150,7 @@ final class RootViewController: UIViewController {
         super.viewDidLoad()
         #if DEBUG
         Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: {_ in
-//            self.test()
+            self.test()
         })
         #endif
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously

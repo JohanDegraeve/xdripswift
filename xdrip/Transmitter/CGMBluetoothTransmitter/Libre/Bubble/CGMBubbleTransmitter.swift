@@ -99,6 +99,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     
     override func startScanning() -> BluetoothTransmitter.startScanningResult {
         list = []
+        stopScanning()
         return super.startScanning()
     }
     
