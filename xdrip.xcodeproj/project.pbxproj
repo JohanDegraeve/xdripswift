@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C21F6C723112C8F001BD269 /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C21F6C623112C8F001BD269 /* SpriteKit.framework */; };
 		A48D2DE552F4A356AA32746A /* Pods_xdrip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */; };
 		EE2A2A71230FB8FD007F76AE /* BubbleClientSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2A2A70230FB8FD007F76AE /* BubbleClientSearchViewController.swift */; };
 		EE72B088230D4A7E00D67B8F /* TrendArrowCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE72B087230D4A7E00D67B8F /* TrendArrowCalculations.swift */; };
@@ -203,6 +204,7 @@
 
 /* Begin PBXFileReference section */
 		148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.debug.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.debug.xcconfig"; sourceTree = "<group>"; };
+		2C21F6C623112C8F001BD269 /* SpriteKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpriteKit.framework; path = System/Library/Frameworks/SpriteKit.framework; sourceTree = SDKROOT; };
 		662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2648F65F347D56D7DFFFAB7 /* Pods-xdrip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.release.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.release.xcconfig"; sourceTree = "<group>"; };
 		EE2A2A70230FB8FD007F76AE /* BubbleClientSearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BubbleClientSearchViewController.swift; sourceTree = "<group>"; };
@@ -532,6 +534,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C21F6C723112C8F001BD269 /* SpriteKit.framework in Frameworks */,
 				A48D2DE552F4A356AA32746A /* Pods_xdrip.framework in Frameworks */,
 				F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */,
 			);
@@ -543,6 +546,7 @@
 		48C0E851274A3BB6D42C6F20 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2C21F6C623112C8F001BD269 /* SpriteKit.framework */,
 				F821CF9622AE589E005C1E43 /* HealthKit.framework */,
 				662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */,
 			);

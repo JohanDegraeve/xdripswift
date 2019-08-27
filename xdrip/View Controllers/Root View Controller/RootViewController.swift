@@ -149,7 +149,7 @@ final class RootViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         #if DEBUG
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: {_ in
+        Timer.scheduledTimer(withTimeInterval: 60, repeats: false, block: {_ in
             self.test()
         })
         #endif
@@ -367,11 +367,11 @@ final class RootViewController: UIViewController {
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
             if let lastReading = bgReadingsAccessor.last(forSensor: activeSensor) {
-                timeStampLastBgReading = lastReading.timeStamp
+                timeStampLastBgReading = lastReading.timeStamp.addingTimeInterval(60 * 4)
             }
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
-            for (_, glucose) in glucoseData.enumerated().reversed() {
+            for glucose in glucoseData {
                 if glucose.timeStamp > timeStampLastBgReading {
                     _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName:UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
@@ -382,7 +382,7 @@ final class RootViewController: UIViewController {
                     newReadingCreated = true
                     
                     // set timeStampLastBgReading to new timestamp
-                    timeStampLastBgReading = glucose.timeStamp
+                    timeStampLastBgReading = glucose.timeStamp.addingTimeInterval(60 * 4)
                 }
             }
             
@@ -1070,6 +1070,7 @@ final class RootViewController: UIViewController {
             if selectedTransmitterType == .Bubble {
                 let vc = BubbleClientSearchViewController()
                 searchVC = vc
+                vc.cgmTransmitter = cgmTransmitter
                 let nav = UINavigationController.init(rootViewController: vc)
                 present(nav, animated: true, completion: nil)
             }

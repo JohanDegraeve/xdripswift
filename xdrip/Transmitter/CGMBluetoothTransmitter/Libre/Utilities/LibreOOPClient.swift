@@ -17,6 +17,7 @@
 // adapted by Johan Degraeve for xdrip ios
 import Foundation
 import os
+import SpriteKit
 
 class LibreOOPClient {
     
@@ -46,15 +47,45 @@ class LibreOOPClient {
             //here we assume success, data is not changed,
             //and we trust that the remote endpoint returns correct data for the sensor
             let last16 = trendMeasurements(bytes: libreData, date: Date(), timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: params)
-            if var glucoseData = trendToLibreGlucose(last16) {
-                if let first = glucoseData.last?.timeStamp {
-                    let last32 = historyMeasurements(bytes: libreData, date: first, LibreDerivedAlgorithmParameterSet: params)
-                    glucoseData += trendToLibreGlucose(last32) ?? []
-                }
+            if var glucoseData = trendToLibreGlucose(last16), let first = glucoseData.first {
+                glucoseData = [first]
+                let last32 = historyMeasurements(bytes: libreData, date: first.timeStamp, LibreDerivedAlgorithmParameterSet: params)
+                let glucose32 = trendToLibreGlucose(last32) ?? []
+                let last96 = split(current: first, glucoseData: glucose32)
+                glucoseData = last96
                 callback((glucoseData, sensorState, 0))
             }
         }
     }
+    
+    private static func split(current: LibreRawGlucoseData ,glucoseData: [LibreRawGlucoseData]) -> [LibreRawGlucoseData] {
+        var x = [Double]()
+        var y = [Double]()
+        let timeInterval = current.timeStamp.timeIntervalSince1970 * 1000
+        x.append(timeInterval)
+        y.append(current.glucoseLevelRaw)
+        for glucose in glucoseData {
+            let time = glucose.timeStamp.timeIntervalSince1970 * 1000
+            x.insert(time, at: 0)
+            y.insert(glucose.glucoseLevelRaw, at: 0)
+        }
+        
+        let startTime = x.first ?? 0
+        let endTime = x.last ?? 0
+        
+        let frameS = SKKeyframeSequence.init(keyframeValues: y, times: x as [NSNumber])
+        frameS.interpolationMode = .spline
+        var items = [LibreRawGlucoseData]()
+        var ptime = startTime
+        while ptime < endTime {
+            ptime += 300000
+            let value = (frameS.sample(atTime: CGFloat(ptime)) as? Double) ?? 0
+            let item = LibreRawGlucoseData.init(timeStamp: Date.init(timeIntervalSince1970: ptime / 1000), glucoseLevelRaw: value)
+            items.append(item)
+        }
+        return items
+    }
+    
 
     private static func calibrateSensor(bytes: [UInt8], serialNumber: String,  callback: @escaping (LibreDerivedAlgorithmParameters?) -> Void) {
         let url = URL.init(fileURLWithPath: filePath)
@@ -217,7 +248,8 @@ class LibreOOPClient {
             //            let measurement = Measurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate)
             let (date, counter) = dateOfMostRecentHistoryValue(minutesSinceStart: minutesSinceStart, nextHistoryBlock: nextHistoryBlock, date: date)
             
-            let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, counter: counter - blockIndex * 15, date: date.addingTimeInterval(Double(-900 * blockIndex)), LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
+            let final = date.addingTimeInterval(Double(-900 * blockIndex))
+            let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, counter: counter - blockIndex * 15, date: final, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
             measurements.append(measurement)
         }
         return measurements
