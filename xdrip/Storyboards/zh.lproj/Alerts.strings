@@ -9,7 +9,7 @@
 "alerts_missedreadingalerttitle" = "数据读取缺失";
 "alerts_calibrationneeded" = "需要校准";
 "alerts_batterylow" = "电池电量低";
-"alertstart" = "Applicable as of";
+"alertstart" = "警报启用开始时间";
 "alertvalue" = "值";
 "alerttype" = "警报类型";
 "changealertvalue" = "改变警报阈值";

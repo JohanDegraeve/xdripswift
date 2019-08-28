@@ -301,7 +301,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                         }
                     }
                     let bubblePeripheral = BluetoothPeripheral()
-                    bubblePeripheral.mac = "Bubble: " + mac
+                    bubblePeripheral.mac = "Bubble:" + mac
                     bubblePeripheral.peripheral = peripheral
                     bluetoothTransmitterDelegate?.centralManagerDidDiscover(peripheral: bubblePeripheral)
                 }

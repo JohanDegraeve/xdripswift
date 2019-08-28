@@ -141,7 +141,7 @@ class NightScoutFollowManager:NSObject {
         trace("in download", log: self.log, type: .info)
 
         // nightscout URl must be non-nil - could be that url is not valid, this is not checked here, the app will just retry every x minutes
-        guard let nightScoutUrl = UserDefaults.standard.nightScoutUrl else {return}
+        guard var nightScoutUrl = UserDefaults.standard.nightScoutUrl else {return}
         
         // maximum timeStamp to download initially set to 1 day back
         var timeStampOfFirstBgReadingToDowload = Date(timeIntervalSinceNow: TimeInterval(-ConstantsFollower.maxiumDaysOfReadingsToDownload * 24 * 3600))
@@ -159,6 +159,9 @@ class NightScoutFollowManager:NSObject {
         let sharedSession = URLSession.shared
         
         // ceate endpoint to get latest entries
+        if nightScoutUrl.last == "/" {
+            nightScoutUrl.removeLast()
+        }
         let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightScoutUrl, count: count, olderThan: timeStampOfFirstBgReadingToDowload)
         
         // create downloadTask and start download
