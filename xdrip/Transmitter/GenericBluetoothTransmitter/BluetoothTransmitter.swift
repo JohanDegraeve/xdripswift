@@ -228,6 +228,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func connect(to peripheral: CBPeripheral) {
+        disconnect()
         stopScanAndconnect(to: peripheral)
     }
     

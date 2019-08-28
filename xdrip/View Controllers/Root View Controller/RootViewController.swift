@@ -150,7 +150,7 @@ final class RootViewController: UIViewController {
         super.viewDidLoad()
         #if DEBUG
         Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: {_ in
-            self.test()
+//            self.test()
         })
         #endif
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
@@ -834,8 +834,8 @@ final class RootViewController: UIViewController {
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabels is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
-        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 1, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
-        
+        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+
         
         // points
         var colors = [UIColor]()
@@ -1070,6 +1070,7 @@ final class RootViewController: UIViewController {
             if selectedTransmitterType == .Bubble {
                 let vc = BubbleClientSearchViewController()
                 searchVC = vc
+                vc.cgmTransmitter = cgmTransmitter
                 let nav = UINavigationController.init(rootViewController: vc)
                 present(nav, animated: true, completion: nil)
             }
