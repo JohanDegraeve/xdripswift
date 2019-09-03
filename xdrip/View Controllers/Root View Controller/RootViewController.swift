@@ -149,8 +149,8 @@ final class RootViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         #if DEBUG
-        Timer.scheduledTimer(withTimeInterval: 60, repeats: false, block: {_ in
-//            self.test()
+        Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: {_ in
+            self.test()
         })
         #endif
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
@@ -364,15 +364,9 @@ final class RootViewController: UIViewController {
             // was a new reading created or not
             var newReadingCreated = false
             
-            // assign value of timeStampLastBgReading
-            var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-            if let lastReading = bgReadingsAccessor.last(forSensor: activeSensor) {
-                timeStampLastBgReading = lastReading.timeStamp.addingTimeInterval(60 * 4)
-            }
-            
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for glucose in glucoseData {
-                if glucose.timeStamp > timeStampLastBgReading {
+                if !bgReadingsAccessor.judgeReading(fromDate: glucose.timeStamp.addingTimeInterval(-60 * 4), toDate: glucose.timeStamp.addingTimeInterval(60 * 4), sensor: activeSensor) {
                     _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName:UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
                     // save the newly created bgreading permenantly in coredata
@@ -380,9 +374,6 @@ final class RootViewController: UIViewController {
                     
                     // a new reading was created
                     newReadingCreated = true
-                    
-                    // set timeStampLastBgReading to new timestamp
-                    timeStampLastBgReading = glucose.timeStamp.addingTimeInterval(60 * 4)
                 }
             }
             
