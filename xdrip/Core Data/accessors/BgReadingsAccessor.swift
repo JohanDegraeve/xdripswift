@@ -43,7 +43,8 @@ class BgReadingsAccessor {
     }
     
     func judgeReading(fromDate: Date, toDate: Date?, sensor:Sensor?) -> Bool {
-        return getLatestBgReadings(limit: 1, fromDate: fromDate, toDate: toDate, forSensor: sensor, ignoreRawData: true, ignoreCalculatedValue: true).count > 0
+        let bgReadings = fetchBgReadings(limit: 1, fromDate: fromDate, toDate: toDate)
+        return bgReadings.count > 0
     }
     
     /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil, with timestamp higher than fromDate
@@ -115,7 +116,7 @@ class BgReadingsAccessor {
         if let fromDate = fromDate {
             var predicate = NSPredicate(format: "timeStamp >= %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970))
             if let toDate = toDate {
-                predicate = NSPredicate(format: "timeStamp >= %@ and timeStamp <= %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970), NSDate(timeIntervalSince1970: toDate.timeIntervalSince1970))
+                predicate = NSPredicate(format: "timeStamp >= %@ && timeStamp <= %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970), NSDate(timeIntervalSince1970: toDate.timeIntervalSince1970))
             }
             fetchRequest.predicate = predicate
         }

@@ -12,6 +12,7 @@
 		EE2A2A71230FB8FD007F76AE /* BubbleClientSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2A2A70230FB8FD007F76AE /* BubbleClientSearchViewController.swift */; };
 		EE72B088230D4A7E00D67B8F /* TrendArrowCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE72B087230D4A7E00D67B8F /* TrendArrowCalculations.swift */; };
 		EE72B08A230D4C3700D67B8F /* Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE72B089230D4C3700D67B8F /* Collection.swift */; };
+		EE7B5988231F56D9002A0C0E /* data.csv in Resources */ = {isa = PBXBuildFile; fileRef = EE7B5987231F56D9002A0C0E /* data.csv */; };
 		EE9947E822EEDD2E00DCB876 /* CGMBubbleTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE9947E722EEDD2E00DCB876 /* CGMBubbleTransmitter.swift */; };
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
 		F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */; };
@@ -210,6 +211,7 @@
 		EE2A2A70230FB8FD007F76AE /* BubbleClientSearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BubbleClientSearchViewController.swift; sourceTree = "<group>"; };
 		EE72B087230D4A7E00D67B8F /* TrendArrowCalculations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrendArrowCalculations.swift; sourceTree = "<group>"; };
 		EE72B089230D4C3700D67B8F /* Collection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
+		EE7B5987231F56D9002A0C0E /* data.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = data.csv; sourceTree = "<group>"; };
 		EE9947E722EEDD2E00DCB876 /* CGMBubbleTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMBubbleTransmitter.swift; sourceTree = "<group>"; };
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
 		F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothTransmitterDelegate.swift; sourceTree = "<group>"; };
@@ -947,6 +949,7 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
+				EE7B5987231F56D9002A0C0E /* data.csv */,
 				F821CF9822AE589E005C1E43 /* xdrip.entitlements */,
 				F85DC2FB21D2CD7000B9F74A /* Application Delegate */,
 				F8EA6CA521BAD5AD0082976B /* Calibration */,
@@ -1324,6 +1327,7 @@
 				F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */,
 				F8B3A7CC226CC0B7004BA588 /* shorthigh1.mp3 in Resources */,
 				F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */,
+				EE7B5988231F56D9002A0C0E /* data.csv in Resources */,
 				F8B48AA422B2FA9B009BCC01 /* CalibrationRequest.strings in Resources */,
 				F8B3A7B5226A0A71004BA588 /* Alerts.strings in Resources */,
 				F8B3A7D2226CC0B7004BA588 /* spaceship.mp3 in Resources */,

@@ -48,7 +48,6 @@ class LibreOOPClient {
             //and we trust that the remote endpoint returns correct data for the sensor
             let last16 = trendMeasurements(bytes: libreData, date: Date(), timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: params)
             if var glucoseData = trendToLibreGlucose(last16), let first = glucoseData.first {
-                glucoseData = [first]
                 let last32 = historyMeasurements(bytes: libreData, date: first.timeStamp, LibreDerivedAlgorithmParameterSet: params)
                 let glucose32 = trendToLibreGlucose(last32) ?? []
                 let last96 = split(current: first, glucoseData: glucose32)
