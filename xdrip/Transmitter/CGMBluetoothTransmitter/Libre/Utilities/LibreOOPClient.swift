@@ -76,7 +76,7 @@ class LibreOOPClient {
         frameS.interpolationMode = .spline
         var items = [LibreRawGlucoseData]()
         var ptime = startTime
-        while ptime < endTime {
+        while ptime + 300000 < endTime {
             ptime += 300000
             let value = (frameS.sample(atTime: CGFloat(ptime)) as? Double) ?? 0
             let item = LibreRawGlucoseData.init(timeStamp: Date.init(timeIntervalSince1970: ptime / 1000), glucoseLevelRaw: value)
