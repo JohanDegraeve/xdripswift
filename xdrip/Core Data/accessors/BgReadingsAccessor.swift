@@ -42,8 +42,9 @@ class BgReadingsAccessor {
         
     }
     
-    func judgeReading(fromDate: Date, toDate: Date?, sensor:Sensor?) -> Bool {
+    func judgeReading(fromDate: Date, toDate: Date, sensor:Sensor?) -> Bool {
         let bgReadings = fetchBgReadings(limit: 1, fromDate: fromDate, toDate: toDate)
+        print("from: \(fromDate), to: \(toDate), date: \(bgReadings.first?.timeStamp)")
         return bgReadings.count > 0
     }
     
@@ -61,31 +62,32 @@ class BgReadingsAccessor {
         
         var returnValue:[BgReading] = []
         
-        let ignoreSensorId = sensor == nil ? true:false
+//        let ignoreSensorId = sensor == nil ? true:false
         
         let bgReadings = fetchBgReadings(limit: limit, fromDate: fromDate, toDate: toDate)
-        
-        loop: for (_,bgReading) in bgReadings.enumerated() {
-            if ignoreSensorId {
-                if (bgReading.calculatedValue != 0.0 || ignoreCalculatedValue) && (bgReading.rawData != 0.0 || ignoreRawData) {
-                    returnValue.append(bgReading)
-                }
-            } else {
-                if let readingsensor = bgReading.sensor {
-                    if readingsensor.id == sensor!.id {
-                        if (bgReading.calculatedValue != 0.0 || ignoreCalculatedValue) && (bgReading.rawData != 0.0 || ignoreRawData) {
-                            returnValue.append(bgReading)
-                        }
-                    }
-                }
-            }
-            
-            if let limit = limit {
-                if returnValue.count == limit {
-                    break loop
-                }
-            }
-        }
+        returnValue = bgReadings
+        // why? ? ? ?
+//        loop: for (_,bgReading) in bgReadings.enumerated() {
+//            if ignoreSensorId {
+//                if (bgReading.calculatedValue != 0.0 || ignoreCalculatedValue) && (bgReading.rawData != 0.0 || ignoreRawData) {
+//                    returnValue.append(bgReading)
+//                }
+//            } else {
+//                if let readingsensor = bgReading.sensor {
+//                    if readingsensor.id == sensor!.id {
+//                        if (bgReading.calculatedValue != 0.0 || ignoreCalculatedValue) && (bgReading.rawData != 0.0 || ignoreRawData) {
+//                            returnValue.append(bgReading)
+//                        }
+//                    }
+//                }
+//            }
+//
+//            if let limit = limit {
+//                if returnValue.count == limit {
+//                    break loop
+//                }
+//            }
+//        }
         
         return returnValue
     }

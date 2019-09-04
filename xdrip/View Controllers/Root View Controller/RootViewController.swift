@@ -139,6 +139,7 @@ final class RootViewController: UIViewController {
     var datas = [String]()
     var index = 0
     func test() {
+        guard UserDefaults.standard.isMaster else { return }
         defer {
             index += 1
         }
@@ -165,7 +166,7 @@ final class RootViewController: UIViewController {
         super.viewDidLoad()
         #if DEBUG
         createDatas()
-        let timer = Timer.scheduledTimer(withTimeInterval: 60 * 5, repeats: true, block: {_ in
+        let timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true, block: {_ in
             self.test()
         })
         RunLoop.current.add(timer, forMode: .common)
@@ -380,26 +381,21 @@ final class RootViewController: UIViewController {
             
             // was a new reading created or not
             var newReadingCreated = false
-            
-            var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-            if let lastReading = bgReadingsAccessor.last(forSensor: activeSensor) {
-                timeStampLastBgReading = lastReading.timeStamp.addingTimeInterval(60 * 4)
+            // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
+            var glucoseData = glucoseData
+            if let last = bgReadingsAccessor.last(forSensor: activeSensor) {
+                glucoseData = glucoseData.filter({ $0.timeStamp > last.timeStamp })
             }
             
-            // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for glucose in glucoseData {
-                if !bgReadingsAccessor.judgeReading(fromDate: glucose.timeStamp.addingTimeInterval(-60 * 4), toDate: glucose.timeStamp.addingTimeInterval(60 * 4), sensor: activeSensor) || timeStampLastBgReading < glucose.timeStamp {
+                if !bgReadingsAccessor.judgeReading(fromDate: glucose.timeStamp.addingTimeInterval(-60 * 4), toDate: glucose.timeStamp.addingTimeInterval(60 * 4), sensor: activeSensor) {
                     _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName:UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                    
+                    print("date: \(glucose.timeStamp), value: \(glucose.glucoseLevelRaw)")
                     // save the newly created bgreading permenantly in coredata
                     coreDataManager.saveChanges()
                     
                     // a new reading was created
                     newReadingCreated = true
-                    
-                    if timeStampLastBgReading < glucose.timeStamp {
-                        timeStampLastBgReading = glucose.timeStamp.addingTimeInterval(60 * 4)
-                    }
                 }
             }
             
@@ -1555,7 +1551,7 @@ extension RootViewController:NightScoutFollowerDelegate {
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
             if let lastReading = bgReadingsAccessor.last(forSensor: activeSensor) {
-                timeStampLastBgReading = lastReading.timeStamp
+                timeStampLastBgReading = lastReading.timeStamp.addingTimeInterval(60 * 4)
             }
             
             // was a new reading created or not

@@ -46,7 +46,11 @@ class LibreOOPClient {
             NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: calibrationparams)
             //here we assume success, data is not changed,
             //and we trust that the remote endpoint returns correct data for the sensor
-            let last16 = trendMeasurements(bytes: libreData, date: Date(), timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: params)
+            var date = Date()
+            #if DEBUG
+//            date = date.addingTimeInterval(-60 * 60 * 8)
+            #endif
+            let last16 = trendMeasurements(bytes: libreData, date: date, timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: params)
             if var glucoseData = trendToLibreGlucose(last16), let first = glucoseData.first {
                 let last32 = historyMeasurements(bytes: libreData, date: first.timeStamp, LibreDerivedAlgorithmParameterSet: params)
                 let glucose32 = trendToLibreGlucose(last32) ?? []
@@ -260,12 +264,8 @@ class LibreOOPClient {
         let nextHistoryIndexCalculatedFromMinutesCounter = ( (minutesSinceStart - 3) / 15 ) % 32
         let delay = (minutesSinceStart - 3) % 15 + 3 // in minutes
         if nextHistoryIndexCalculatedFromMinutesCounter == nextHistoryBlock {
-            // Case when history index is incremented togehter with minutesSinceStart (in sync)
-            //            print("delay: \(delay), minutesSinceStart: \(minutesSinceStart), result: \(minutesSinceStart-delay)")
             return (date: date.addingTimeInterval( 60.0 * -Double(delay) ), counter: minutesSinceStart - delay)
         } else {
-            // Case when history index is incremented before minutesSinceStart (and they are async)
-            //            print("delay: \(delay), minutesSinceStart: \(minutesSinceStart), result: \(minutesSinceStart-delay-15)")
             return (date: date.addingTimeInterval( 60.0 * -Double(delay - 15)), counter: minutesSinceStart - delay)
         }
     }

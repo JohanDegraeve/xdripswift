@@ -106,7 +106,7 @@ public class HealthKitManager:NSObject {
         guard let bloodGlucoseType = bloodGlucoseType else {return}
         
           // get readings to store, limit to 2016 = maximum 1 week - just to avoid a huge array is being returned here
-        let bgReadingsToStore = bgReadingsAccessor.getLatestBgReadings(limit: 2016, fromDate: UserDefaults.standard.timeStampLatestHealthKitStoreBgReading, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let bgReadingsToStore = bgReadingsAccessor.getLatestBgReadings(limit: 2016, fromDate: UserDefaults.standard.timeStampLatestHealthKitStoreBgReading?.addingTimeInterval(1), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         let bloodGlucoseUnit = HKUnit.init(from: "mg/dL")
         
