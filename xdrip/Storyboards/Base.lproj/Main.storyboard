@@ -87,6 +87,12 @@
                                 <color key="textColor" red="0.0" green="0.97680455450000003" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="eT6-fc-tlc">
+                                <rect key="frame" x="23" y="478" width="329" height="128"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -99,15 +105,19 @@
                             <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="I0Z-fN-kif" secondAttribute="trailing" constant="1" id="F4l-2u-4Zd"/>
                             <constraint firstItem="7Wo-wd-80o" firstAttribute="centerY" secondItem="We3-bN-ffR" secondAttribute="centerY" id="FLM-P3-4ez"/>
                             <constraint firstItem="fSY-nc-amN" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="10" id="Gsa-fG-7Wh"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="bottom" secondItem="eT6-fc-tlc" secondAttribute="bottom" constant="12" id="J6s-nh-d24"/>
                             <constraint firstItem="I0Z-fN-kif" firstAttribute="centerX" secondItem="tsR-hK-woN" secondAttribute="centerX" id="JvE-uE-Tru"/>
+                            <constraint firstItem="eT6-fc-tlc" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="23" id="LER-Rk-S0v"/>
                             <constraint firstItem="I0Z-fN-kif" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="1" id="PLS-kX-IK9"/>
                             <constraint firstItem="fSY-nc-amN" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" id="TFc-gV-Hzd"/>
                             <constraint firstItem="uyn-2k-K74" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="7" id="VmM-9I-Vii"/>
+                            <constraint firstItem="eT6-fc-tlc" firstAttribute="top" secondItem="I0Z-fN-kif" secondAttribute="bottom" constant="8" symbolic="YES" id="WCV-Nv-SRh"/>
                             <constraint firstItem="zWo-AR-qJE" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="10" id="WMb-YS-LdS"/>
                             <constraint firstItem="zWo-AR-qJE" firstAttribute="leading" secondItem="fSY-nc-amN" secondAttribute="trailing" id="WWP-lu-hPn"/>
                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="leading" secondItem="zWo-AR-qJE" secondAttribute="trailing" id="YZw-LD-39g" userLabel="Calibrate Button Outlet.leading = Transmitter Button Outlet.trailing + 20"/>
                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="10" id="Ydd-ev-OLz"/>
                             <constraint firstItem="I0Z-fN-kif" firstAttribute="top" secondItem="We3-bN-ffR" secondAttribute="bottom" constant="30" id="cBA-nX-tfw"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="eT6-fc-tlc" secondAttribute="trailing" constant="23" id="grZ-Ut-QPf"/>
                             <constraint firstItem="uyn-2k-K74" firstAttribute="centerY" secondItem="We3-bN-ffR" secondAttribute="centerY" id="inp-s6-zvq"/>
                             <constraint firstItem="We3-bN-ffR" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" constant="90" id="y4n-cs-cRb"/>
                         </constraints>
@@ -122,6 +132,7 @@
                         <outlet property="lineChartViewOutlet" destination="I0Z-fN-kif" id="oW1-j1-2x3"/>
                         <outlet property="minutesLabelOutlet" destination="uyn-2k-K74" id="XXm-rq-Suy"/>
                         <outlet property="preSnoozeButtonOutlet" destination="fSY-nc-amN" id="T25-Z1-3Ad"/>
+                        <outlet property="textViewOutlet" destination="eT6-fc-tlc" id="3fc-JN-FPI"/>
                         <outlet property="transmitterButtonOutlet" destination="zWo-AR-qJE" id="uuB-WI-JKe"/>
                         <outlet property="valueLabelOutlet" destination="We3-bN-ffR" id="wtY-sZ-mev"/>
                     </connections>

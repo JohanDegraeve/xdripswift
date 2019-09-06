@@ -204,7 +204,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                                 
                                 LibreDataParser.libreDataProcessor(sensorSerialNumber: sensorSerialNumber, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
                                     self.timeStampLastBgReading = timeStampLastBgReading
-                                    
                                 })
 
                                 //reset the buffer

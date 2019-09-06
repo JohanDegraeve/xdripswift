@@ -127,6 +127,35 @@ extension UserDefaults {
         
         /// Bubble web oop
         case webOOPEnabled = "webOOPEnabled"
+        
+        /// for test
+        case lastDate = "lastDate"
+        
+        /// for test
+        case lastIndex = "lastIndex"
+    }
+    
+    var lastDate: Date {
+        get {
+            if let date = value(forKey: Key.lastDate.rawValue) as? Date {
+                return date
+            }
+            let date = Date()
+            self.lastDate = date
+            return date
+        }
+        set {
+            set(newValue, forKey: Key.lastDate.rawValue)
+        }
+    }
+    
+    var lastIndex: Int {
+        get {
+            return integer(forKey: Key.lastIndex.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.lastIndex.rawValue)
+        }
     }
     
     /// true is setted defalut value

@@ -6,9 +6,10 @@ import UserNotifications
 import AVFoundation
 import AudioToolbox
 import Charts
+import MessageUI
 
 /// viewcontroller for the home screen
-final class RootViewController: UIViewController {
+final class RootViewController: UIViewController, MFMailComposeViewControllerDelegate {
     
     // MARK: - Properties - Outlets and Actions for buttons and labels in home screen
     
@@ -42,6 +43,7 @@ final class RootViewController: UIViewController {
     /// outlet for label that shows how many minutes ago and so on
     @IBOutlet weak var minutesLabelOutlet: UILabel!
     
+    @IBOutlet weak var textViewOutlet: UITextView!
     /// outlet for label that shows difference with previous reading
     @IBOutlet weak var diffLabelOutlet: UILabel!
     
@@ -133,16 +135,29 @@ final class RootViewController: UIViewController {
     }
     
     @objc private func webOOPLog(info: Notification) {
+        let path: String = NSHomeDirectory() + "/Documents/log"
+        var str = ""
+        if FileManager.default.fileExists(atPath: path) {
+            if let s = try? String.init(contentsOfFile: path) {
+                str = s
+            }
+        }
         
+        if let new = info.object as? String {
+            str += "\n\(new)"
+        }
+        textViewOutlet.text = str
+        if let data = str.data(using: .utf8) {
+            try? data.write(to: URL.init(fileURLWithPath: path))
+        }
     }
     
     var datas = [String]()
-    var index = 0
     func test() {
         guard UserDefaults.standard.isMaster else { return }
-        defer {
-            index += 1
-        }
+        let date = Date()
+        let index = Int((date.timeIntervalSince1970 - UserDefaults.standard.lastDate.timeIntervalSince1970) / 300)
+        guard UserDefaults.standard.lastIndex < index || index == 0 else { return }
         guard datas.count > index else { return }
         var data = datas[index].hexadecimal ?? Data()
         data = data.subdata(in: 0..<344)
@@ -151,6 +166,7 @@ final class RootViewController: UIViewController {
             timeStampLastBgReading = lastReading.timeStamp
         }
         LibreDataParser.libreDataProcessor(sensorSerialNumber: "asdfasdf", webOOPEnabled: true, libreData: data, cgmTransmitterDelegate: self, transmitterBatteryInfo: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
+            UserDefaults.standard.lastIndex = index
         })
     }
     
@@ -162,11 +178,50 @@ final class RootViewController: UIViewController {
         }
     }
     
+    func mailComposeController(_ controller: MFMailComposeViewController,
+                               didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true, completion: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        let path: String = NSHomeDirectory() + "/Documents/log"
+        if FileManager.default.fileExists(atPath: path) {
+            if let s = try? String.init(contentsOfFile: path) {
+                textViewOutlet.text = s
+            }
+        }
+        
+        let long = UILongPressGestureRecognizer.init(closure: {
+            _ in
+            if MFMailComposeViewController.canSendMail() {
+                let path: String = NSHomeDirectory() + "/Documents/log"
+                let url = URL.init(fileURLWithPath: path)
+                if let data = try? Data.init(contentsOf: url) {
+                    let mailComposeVC = MFMailComposeViewController()
+                    mailComposeVC.mailComposeDelegate = self
+                    mailComposeVC.setToRecipients(["junshuaiw@qq.com"])
+                    mailComposeVC.setSubject("text")
+                    mailComposeVC.addAttachmentData(data, mimeType: "txt", fileName: "data.txt")
+                    
+                    self.present(mailComposeVC, animated: true, completion: nil)
+                }
+            }
+        })
+        long.minimumPressDuration = 1;
+        view.addGestureRecognizer(long)
+        
         #if DEBUG
         createDatas()
-        let timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true, block: {_ in
+        
+        DispatchQueue.global().async {
+            sleep(1)
+            DispatchQueue.main.async {
+                self.test()
+            }
+        }
+        
+        let timer = Timer.scheduledTimer(withTimeInterval: 60 * 5, repeats: true, block: {_ in
             self.test()
         })
         RunLoop.current.add(timer, forMode: .common)
@@ -387,6 +442,7 @@ final class RootViewController: UIViewController {
                 glucoseData = glucoseData.filter({ $0.timeStamp > last.timeStamp })
             }
             
+            var params = "\n["
             for glucose in glucoseData {
                 if !bgReadingsAccessor.judgeReading(fromDate: glucose.timeStamp.addingTimeInterval(-60 * 4), toDate: glucose.timeStamp.addingTimeInterval(60 * 4), sensor: activeSensor) {
                     _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName:UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
@@ -396,7 +452,17 @@ final class RootViewController: UIViewController {
                     
                     // a new reading was created
                     newReadingCreated = true
+                    
+                    params +=
+                    """
+                    {"ts": \(glucose.timeStamp), "glucose": \(glucose.glucoseLevelRaw)},\n
+                    """
                 }
+            }
+            
+            params += "]"
+            if params.count > 4 {
+                NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: params)
             }
             
             // if a new reading is created, created either initial calibration request or bgreading notification - upload to nightscout and check alerts
@@ -1558,6 +1624,7 @@ extension RootViewController:NightScoutFollowerDelegate {
             var newReadingCreated = false
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
+            var params = "\n["
             for (_, followGlucoseData) in followGlucoseDataArray.enumerated().reversed() {
                 
                 if followGlucoseData.timeStamp > timeStampLastBgReading {
@@ -1572,6 +1639,14 @@ extension RootViewController:NightScoutFollowerDelegate {
                     timeStampLastBgReading = followGlucoseData.timeStamp
                     
                 }
+                params +=
+                """
+                {"ts": \(followGlucoseData.timeStamp), "glucose": \(followGlucoseData.sgv)},\n
+                """
+            }
+            params += "]"
+            if params.count > 4 {
+                NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: params)
             }
             
             if newReadingCreated {

@@ -43,7 +43,7 @@ class LibreOOPClient {
                 return
             }
             
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: calibrationparams)
+//            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: calibrationparams)
             //here we assume success, data is not changed,
             //and we trust that the remote endpoint returns correct data for the sensor
             var date = Date()
@@ -115,6 +115,7 @@ class LibreOOPClient {
                 if let slope = response.slope {
                     var para = LibreDerivedAlgorithmParameters.init(slope_slope: slope.slopeSlope ?? 0, slope_offset: slope.slopeOffset ?? 0, offset_slope: slope.offsetSlope ?? 0, offset_offset: slope.offsetOffset ?? 0, isValidForFooterWithReverseCRCs: Int(slope.isValidForFooterWithReverseCRCs ?? 1), extraSlope: 1.0, extraOffset: 0.0)
                     para.serialNumber = serialNumber
+                    print(para)
                     do {
                         let data = try JSONEncoder().encode(para)
                         save(data: data)
@@ -127,11 +128,11 @@ class LibreOOPClient {
                 } else {
                     trace("in calibrateSensor, failed to decode", log: log, type: .error)
                     callback(nil)
-                    let error = String.init(data: data, encoding: .utf8)
-                    NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: error)
+//                    let error = String.init(data: data, encoding: .utf8)
+//                    NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: error)
                 }
             } catch {
-                NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: error)
+//                NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: error)
                 trace("in calibrateSensor, got error trying to decode GetCalibrationStatus", log: log, type: .error)
                 callback(nil)
             }
@@ -152,6 +153,8 @@ class LibreOOPClient {
             request.httpMethod = "POST"
             
             request.setBodyContent(contentMap: json)
+//            guard let data = try? JSONSerialization.data(withJSONObject: json, options: []) else { return }
+//            request.httpBody = data
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
             
             let task = URLSession.shared.dataTask(with: request as URLRequest) {
@@ -219,10 +222,10 @@ class LibreOOPClient {
             let measurementBytes = Array(body[range])
             let measurementDate = date.addingTimeInterval(Double(-60 * blockIndex))
             
-            if measurementDate > timeStampLastBgReading {
-                let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
-                measurements.append(measurement)
-            }
+//            if measurementDate > timeStampLastBgReading {
+            let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
+            measurements.append(measurement)
+//            }
             
         }
         return measurements
@@ -277,7 +280,7 @@ class LibreOOPClient {
         
         for trend in measurements {
             let glucose = LibreRawGlucoseData(timeStamp: trend.date, unsmoothedGlucose: trend.temperatureAlgorithmGlucose)
-            debuglogging("in trendToLibreGlucose before CalculateSmothedData5Points, glucose.glucoseLevelRaw = " + glucose.glucoseLevelRaw.description + ", glucose.unsmoothedGlucose = " + glucose.unsmoothedGlucose.description)
+//            debuglogging("in trendToLibreGlucose before CalculateSmothedData5Points, glucose.glucoseLevelRaw = " + glucose.glucoseLevelRaw.description + ", glucose.unsmoothedGlucose = " + glucose.unsmoothedGlucose.description)
             origarr.append(glucose)
         }
         
