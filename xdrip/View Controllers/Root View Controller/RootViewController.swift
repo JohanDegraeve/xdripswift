@@ -200,7 +200,7 @@ final class RootViewController: UIViewController, MFMailComposeViewControllerDel
                 if let data = try? Data.init(contentsOf: url) {
                     let mailComposeVC = MFMailComposeViewController()
                     mailComposeVC.mailComposeDelegate = self
-                    mailComposeVC.setToRecipients(["junshuaiw@qq.com"])
+                    mailComposeVC.setToRecipients(["bubble_devteam@outlook.com"])
                     mailComposeVC.setSubject("text")
                     mailComposeVC.addAttachmentData(data, mimeType: "txt", fileName: "data.txt")
                     
@@ -444,6 +444,7 @@ final class RootViewController: UIViewController, MFMailComposeViewControllerDel
             
             var params = "\n["
             for glucose in glucoseData {
+                guard glucose.timeStamp.timeIntervalSince1970 < Date().timeIntervalSince1970 else { continue }
                 if !bgReadingsAccessor.judgeReading(fromDate: glucose.timeStamp.addingTimeInterval(-60 * 4), toDate: glucose.timeStamp.addingTimeInterval(60 * 4), sensor: activeSensor) {
                     _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName:UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     print("date: \(glucose.timeStamp), value: \(glucose.glucoseLevelRaw)")
