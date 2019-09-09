@@ -217,7 +217,7 @@ class NightScoutFollowManager:NSObject {
         
         // schedule timer and assign it to a let property
         let downloadTimer = Timer.scheduledTimer(timeInterval: nextFollowDownloadTimeStamp.timeIntervalSince1970 - Date().timeIntervalSince1970, target: self, selector: #selector(self.download), userInfo: nil, repeats: false)
-        
+        RunLoop.current.add(downloadTimer, forMode: .common)
         // assign invalidateDownLoadTimerClosure to a closure that will invalidate the downloadTimer
         invalidateDownLoadTimerClosure = {
             downloadTimer.invalidate()
