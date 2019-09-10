@@ -54,6 +54,10 @@ class LibreOOPClient {
             if var glucoseData = trendToLibreGlucose(last16), let first = glucoseData.first {
                 let last32 = historyMeasurements(bytes: libreData, date: first.timeStamp, LibreDerivedAlgorithmParameterSet: params)
                 let glucose32 = trendToLibreGlucose(last32) ?? []
+                var result = ""
+                for g in last32 {
+                    result += "\(g.temperatureAlgorithmGlucose), \(g.date)\n"
+                }
                 let last96 = split(current: first, glucoseData: glucose32)
                 glucoseData = last96
                 callback((glucoseData, sensorState, 0))
@@ -79,12 +83,12 @@ class LibreOOPClient {
         let frameS = SKKeyframeSequence.init(keyframeValues: y, times: x as [NSNumber])
         frameS.interpolationMode = .spline
         var items = [LibreRawGlucoseData]()
-        var ptime = startTime
-        while ptime < endTime {
+        var ptime = endTime
+        while ptime >= startTime {
             let value = (frameS.sample(atTime: CGFloat(ptime)) as? Double) ?? 0
             let item = LibreRawGlucoseData.init(timeStamp: Date.init(timeIntervalSince1970: ptime / 1000), glucoseLevelRaw: value)
             items.append(item)
-            ptime += 300000
+            ptime -= 300000
         }
         return items
     }
@@ -222,10 +226,10 @@ class LibreOOPClient {
             let measurementBytes = Array(body[range])
             let measurementDate = date.addingTimeInterval(Double(-60 * blockIndex))
             
-//            if measurementDate > timeStampLastBgReading {
-            let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
-            measurements.append(measurement)
-//            }
+            if measurementDate > timeStampLastBgReading {
+                let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
+                measurements.append(measurement)
+            }
             
         }
         return measurements

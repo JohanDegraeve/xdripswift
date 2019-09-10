@@ -125,6 +125,8 @@ final class RootViewController: UIViewController, MFMailComposeViewControllerDel
     
     private weak var searchVC: BubbleClientSearchViewController?
     
+    /// log path
+    let path: String = NSHomeDirectory() + "/Documents/log"
     // MARK: - View Life Cycle
     
     override func viewWillAppear(_ animated: Bool) {
@@ -135,7 +137,7 @@ final class RootViewController: UIViewController, MFMailComposeViewControllerDel
     }
     
     @objc private func webOOPLog(info: Notification) {
-        let path: String = NSHomeDirectory() + "/Documents/log"
+        resetLog()
         var str = ""
         if FileManager.default.fileExists(atPath: path) {
             if let s = try? String.init(contentsOfFile: path) {
@@ -152,21 +154,41 @@ final class RootViewController: UIViewController, MFMailComposeViewControllerDel
         }
     }
     
+    private func resetLog() {
+        let format = DateFormatter()
+        format.dateFormat = "yyyy-MM-dd"
+        let s1 = format.string(from: Date())
+        let s2 = format.string(from: UserDefaults.standard.lastDate)
+        if s1 != s2 {
+            UserDefaults.standard.lastDate = Date()
+            try? Data().write(to: URL.init(fileURLWithPath: path))
+        }
+    }
+    
     var datas = [String]()
-    func test() {
-        guard UserDefaults.standard.isMaster else { return }
-        let date = Date()
-        let index = Int((date.timeIntervalSince1970 - UserDefaults.standard.lastDate.timeIntervalSince1970) / 300)
-        guard UserDefaults.standard.lastIndex < index || index == 0 else { return }
-        guard datas.count > index else { return }
-        var data = datas[index].hexadecimal ?? Data()
+    func test(_ tString: String? = nil) {
+        var data = Data()
+        if let t = tString {
+            data = t.hexadecimal ?? Data()
+            print(data.base64EncodedString())
+        } else {
+            guard UserDefaults.standard.isMaster else { return }
+            let date = Date()
+            let index = Int((date.timeIntervalSince1970 - UserDefaults.standard.lastDate.timeIntervalSince1970) / 300)
+            guard datas.count > index else {
+                resetLog()
+                test()
+                return
+            }
+            data = datas[index].hexadecimal ?? Data()
+        }
         data = data.subdata(in: 0..<344)
         var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
         if let lastReading = bgReadingsAccessor?.last(forSensor: activeSensor) {
             timeStampLastBgReading = lastReading.timeStamp
         }
-        LibreDataParser.libreDataProcessor(sensorSerialNumber: "asdfasdf", webOOPEnabled: true, libreData: data, cgmTransmitterDelegate: self, transmitterBatteryInfo: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
-            UserDefaults.standard.lastIndex = index
+        LibreDataParser.libreDataProcessor(sensorSerialNumber: "asdf", webOOPEnabled: true, libreData: data, cgmTransmitterDelegate: self, transmitterBatteryInfo: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
+            
         })
     }
     
@@ -181,11 +203,17 @@ final class RootViewController: UIViewController, MFMailComposeViewControllerDel
     func mailComposeController(_ controller: MFMailComposeViewController,
                                didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true, completion: nil)
+        switch result {
+        case .sent, .saved:
+            resetLog()
+        default:
+            break
+        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let path: String = NSHomeDirectory() + "/Documents/log"
+        resetLog()
         if FileManager.default.fileExists(atPath: path) {
             if let s = try? String.init(contentsOfFile: path) {
                 textViewOutlet.text = s
@@ -215,9 +243,9 @@ final class RootViewController: UIViewController, MFMailComposeViewControllerDel
         createDatas()
         
         DispatchQueue.global().async {
-            sleep(1)
+            sleep(10)
             DispatchQueue.main.async {
-                self.test()
+                self.test("1808b012030000000000000000000000000000000000000092210c0cce04c8ec9a00da04c8ec9a00e004c8e09a00ed04c8e89a000405c8e05a001905c8e09a002305c8dc9a003405c8e09a004005c8ec5a004305c8e49a004c05c8d45a005805c8c45a00ac04c8b85a00c004c8d49a00c704c8dc5a00c904c8e09a00fd06c89099009606c8785a002606c8c45a00d305c8885a005d05c8245a00b504c8ac99005b04c8085a00b703c8d859000603c8349a00ce02c88c9a000004c8dc5a00f404c8e89a008005c8f09900b305c8e898000306c81099000406c84859001406c83859004406c85059002c06c86499001506c8cc98001d06c8a89900bb05c88c99003d05c8ac5a00ca04c8345a009d04c86059005d04c8549800b803c85859002704c88459006105c8e499003c06c8505a000c07c8005a004907c85c5900bc4b0000828600084508ef50140796805a00eda610801ac8040e696b")
             }
         }
         
