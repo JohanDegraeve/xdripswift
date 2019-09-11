@@ -7,6 +7,7 @@ import AVFoundation
 import AudioToolbox
 import Charts
 import MessageUI
+import Social
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController, MFMailComposeViewControllerDelegate {
@@ -126,7 +127,7 @@ final class RootViewController: UIViewController, MFMailComposeViewControllerDel
     private weak var searchVC: BubbleClientSearchViewController?
     
     /// log path
-    let path: String = NSHomeDirectory() + "/Documents/log"
+    let path: String = NSHomeDirectory() + "/Documents/log.txt"
     // MARK: - View Life Cycle
     
     override func viewWillAppear(_ animated: Bool) {
@@ -222,19 +223,9 @@ final class RootViewController: UIViewController, MFMailComposeViewControllerDel
         
         let long = UILongPressGestureRecognizer.init(closure: {
             _ in
-            if MFMailComposeViewController.canSendMail() {
-                let path: String = NSHomeDirectory() + "/Documents/log"
-                let url = URL.init(fileURLWithPath: path)
-                if let data = try? Data.init(contentsOf: url) {
-                    let mailComposeVC = MFMailComposeViewController()
-                    mailComposeVC.mailComposeDelegate = self
-                    mailComposeVC.setToRecipients(["bubble_devteam@outlook.com"])
-                    mailComposeVC.setSubject("text")
-                    mailComposeVC.addAttachmentData(data, mimeType: "txt", fileName: "data.txt")
-                    
-                    self.present(mailComposeVC, animated: true, completion: nil)
-                }
-            }
+            let url = URL.init(fileURLWithPath: self.path)
+            let vc = UIActivityViewController.init(activityItems: [url], applicationActivities: nil)
+            self.present(vc, animated: true, completion: nil)
         })
         long.minimumPressDuration = 1;
         view.addGestureRecognizer(long)
