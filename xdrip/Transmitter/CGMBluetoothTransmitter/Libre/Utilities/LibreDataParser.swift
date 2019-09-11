@@ -105,7 +105,7 @@ class LibreDataParser {
                     handleGlucoseData(result: res, cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: transmitterBatteryInfo, firmware: firmware, hardware: hardware, hardwareSerialNumber: hardwareSerialNumber, bootloader: bootloader, sensorSerialNumber: sensorSerialNumber, completionHandler: completionHandler)
                     
                     
-                    let params = "\n\(libreData.hexEncodedString())"
+                    let params = libreData.hexEncodedString()
                     NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: params)
                 }
             }

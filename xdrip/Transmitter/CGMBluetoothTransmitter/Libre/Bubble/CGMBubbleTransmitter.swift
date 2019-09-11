@@ -124,6 +124,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     
     func centralManagerDidConnect(address:String?, name:String?) {
         cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
+        NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: "did connected")
     }
     
     func centralManagerDidFailToConnect(error: Error?) {
@@ -135,6 +136,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     
     func centralManagerDidDisconnectPeripheral(error: Error?) {
         cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
+        NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: "did disconnected")
     }
     
     func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
@@ -177,6 +179,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                         guard rxBuffer.count >= 8 else { return }
                         rxBuffer.append(value.suffix(from: 4))
                         if rxBuffer.count >= 352 {
+                            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: "did received data")
                             if (Crc.LibreCrc(data: &rxBuffer, headerOffset: bubbleHeaderLength)) {
                                 
                                 if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8))) {
