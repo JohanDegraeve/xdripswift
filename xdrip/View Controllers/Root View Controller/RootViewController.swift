@@ -1670,11 +1670,11 @@ extension RootViewController:NightScoutFollowerDelegate {
                     // set timeStampLastBgReading to new timestamp
                     timeStampLastBgReading = followGlucoseData.timeStamp
                     
+                    params +=
+                    """
+                    {"ts": \(followGlucoseData.timeStamp), "glucose": \(followGlucoseData.sgv)},\n
+                    """
                 }
-                params +=
-                """
-                {"ts": \(followGlucoseData.timeStamp), "glucose": \(followGlucoseData.sgv)},\n
-                """
             }
             params += "]"
             if params.count > 4 {

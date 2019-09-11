@@ -42,7 +42,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uyn-2k-K74">
-                                <rect key="frame" x="7" y="119" width="130" height="32"/>
+                                <rect key="frame" x="7" y="119" width="110.5" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="jlP-Xy-bfe"/>
                                 </constraints>
@@ -51,7 +51,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Wo-wd-80o">
-                                <rect key="frame" x="251" y="119" width="112" height="32"/>
+                                <rect key="frame" x="257.5" y="119" width="105.5" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="2As-N6-iec"/>
                                 </constraints>
@@ -78,12 +78,12 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="---" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="We3-bN-ffR">
-                                <rect key="frame" x="127.5" y="110" width="120" height="50"/>
+                                <rect key="frame" x="117.5" y="110" width="140" height="50"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="120" id="RuD-tk-Hzi"/>
+                                    <constraint firstAttribute="width" constant="140" id="RuD-tk-Hzi"/>
                                     <constraint firstAttribute="height" constant="50" id="nRp-GX-EF5"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="35"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
                                 <color key="textColor" red="0.0" green="0.97680455450000003" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -97,8 +97,8 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="zWo-AR-qJE" firstAttribute="centerX" secondItem="tsR-hK-woN" secondAttribute="centerX" id="25g-Is-au8" userLabel="Transmitter Button Outlet.leading = Pre Snooze Button Outlet.trailing + 20"/>
-                            <constraint firstItem="uyn-2k-K74" firstAttribute="trailing" secondItem="We3-bN-ffR" secondAttribute="leading" constant="9.5" id="6Uh-d9-faV"/>
-                            <constraint firstItem="7Wo-wd-80o" firstAttribute="leading" secondItem="We3-bN-ffR" secondAttribute="trailing" constant="3.5" id="9Uk-hm-pza"/>
+                            <constraint firstItem="uyn-2k-K74" firstAttribute="trailing" secondItem="We3-bN-ffR" secondAttribute="leading" id="6Uh-d9-faV"/>
+                            <constraint firstItem="7Wo-wd-80o" firstAttribute="leading" secondItem="We3-bN-ffR" secondAttribute="trailing" id="9Uk-hm-pza"/>
                             <constraint firstAttribute="centerX" secondItem="We3-bN-ffR" secondAttribute="centerX" id="9Wc-ds-q5N"/>
                             <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="mSJ-jy-nHJ" secondAttribute="trailing" id="9qE-Cr-5PK"/>
                             <constraint firstItem="7Wo-wd-80o" firstAttribute="trailing" secondItem="tsR-hK-woN" secondAttribute="trailing" constant="-12" id="BXx-sv-OW5"/>
