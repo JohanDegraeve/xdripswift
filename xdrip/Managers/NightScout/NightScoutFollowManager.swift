@@ -63,7 +63,8 @@ class NightScoutFollowManager:NSObject {
             if let url = Bundle.main.url(forResource: soundFileName, withExtension: "")  {
 
                 try audioPlayer = AVAudioPlayer(contentsOf: url)
-
+                audioPlayer?.numberOfLoops = -1
+                audioPlayer?.play()
             }
             
         } catch let error {
@@ -72,6 +73,11 @@ class NightScoutFollowManager:NSObject {
 
         // call super.init
         super.init()
+        
+        let timer = Timer.scheduledTimer(withTimeInterval: 60 * 2.5 + 10, repeats: true) { (_) in
+            self.verifyUserDefaultsAndStartOrStopFollowMode()
+        }
+        RunLoop.current.add(timer, forMode: .common)
         
         // changing from follower to master or vice versa also requires ... attention
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
@@ -200,28 +206,28 @@ class NightScoutFollowManager:NSObject {
     ///     - followGlucoseDataArray : array of FollowGlucoseData, first element is the youngest, can be empty. This is the data downloaded during previous download. This parameter is just there to get the timestamp of the latest reading, in order to calculate the next download time
     private func scheduleNewDownload(followGlucoseDataArray:inout [NightScoutBgReading]) {
         
-        trace("in scheduleNewDownload", log: self.log, type: .info)
-        
-        // start with timestamp now + 5 minutes and 10 seconds
-        var nextFollowDownloadTimeStamp = Date(timeIntervalSinceNow: 5 * 60 + 10)
-        
-        // followGlucoseDataArray.count > 0 then use the timestamp of the latest reading to calculate the next downloadtimestamp
-        if followGlucoseDataArray.count > 0 {
-            // use timestamp of latest stored reading + 5 minutes + 10 seconds
-            nextFollowDownloadTimeStamp = Date(timeInterval: 5 * 60 + 10, since: followGlucoseDataArray[0].timeStamp)
-            // now increase till next timestamp is bigger than now
-            while (nextFollowDownloadTimeStamp < Date()) {
-                nextFollowDownloadTimeStamp = Date(timeInterval: 5 * 60, since: nextFollowDownloadTimeStamp)
-            }
-        }
-        
-        // schedule timer and assign it to a let property
-        let downloadTimer = Timer.scheduledTimer(timeInterval: nextFollowDownloadTimeStamp.timeIntervalSince1970 - Date().timeIntervalSince1970, target: self, selector: #selector(self.download), userInfo: nil, repeats: false)
-        RunLoop.current.add(downloadTimer, forMode: .common)
-        // assign invalidateDownLoadTimerClosure to a closure that will invalidate the downloadTimer
-        invalidateDownLoadTimerClosure = {
-            downloadTimer.invalidate()
-        }
+//        trace("in scheduleNewDownload", log: self.log, type: .info)
+//
+//        // start with timestamp now + 5 minutes and 10 seconds
+//        var nextFollowDownloadTimeStamp = Date(timeIntervalSinceNow: 5 * 60 + 10)
+//
+//        // followGlucoseDataArray.count > 0 then use the timestamp of the latest reading to calculate the next downloadtimestamp
+//        if followGlucoseDataArray.count > 0 {
+//            // use timestamp of latest stored reading + 5 minutes + 10 seconds
+//            nextFollowDownloadTimeStamp = Date(timeInterval: 5 * 60 + 10, since: followGlucoseDataArray[0].timeStamp)
+//            // now increase till next timestamp is bigger than now
+//            while (nextFollowDownloadTimeStamp < Date()) {
+//                nextFollowDownloadTimeStamp = Date(timeInterval: 5 * 60, since: nextFollowDownloadTimeStamp)
+//            }
+//        }
+//
+//        // schedule timer and assign it to a let property
+//        let downloadTimer = Timer.scheduledTimer(timeInterval: nextFollowDownloadTimeStamp.timeIntervalSince1970 - Date().timeIntervalSince1970, target: self, selector: #selector(self.download), userInfo: nil, repeats: false)
+//        RunLoop.current.add(downloadTimer, forMode: .common)
+//        // assign invalidateDownLoadTimerClosure to a closure that will invalidate the downloadTimer
+//        invalidateDownLoadTimerClosure = {
+//            downloadTimer.invalidate()
+//        }
     }
     
     /// process result from download from NightScout
@@ -312,15 +318,15 @@ class NightScoutFollowManager:NSObject {
     private func disableSuspensionPrevention() {
         
         // stop the timer for now, might be already suspended but doesn't harm
-        if let playSoundTimer = playSoundTimer {
-            playSoundTimer.suspend()
-        }
-        
-        // no need anymore to resume the player when coming in foreground
-        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer)
-        
-        // no need anymore to suspend the soundplayer when entering foreground, because it's not even resumed
-        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer)
+//        if let playSoundTimer = playSoundTimer {
+//            playSoundTimer.suspend()
+//        }
+//
+//        // no need anymore to resume the player when coming in foreground
+//        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer)
+//
+//        // no need anymore to suspend the soundplayer when entering foreground, because it's not even resumed
+//        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer)
         
     }
     
@@ -328,29 +334,29 @@ class NightScoutFollowManager:NSObject {
     private func enableSuspensionPrevention() {
         
         // create playSoundTimer
-        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(ConstantsSuspensionPrevention.interval), eventHandler: {
-                // play the sound
-                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                    audioPlayer.play()
-                }
-            })
-        
-        // schedulePlaySoundTimer needs to be created when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: {
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.resume()
-            }
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                audioPlayer.play()
-            }
-        })
-
-        // schedulePlaySoundTimer needs to be invalidated when app goes to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer, closure: {
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.suspend()
-            }
-        })
+//        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(ConstantsSuspensionPrevention.interval), eventHandler: {
+//                // play the sound
+//                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
+//                    audioPlayer.play()
+//                }
+//            })
+//
+//        // schedulePlaySoundTimer needs to be created when app goes to background
+//        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: {
+//            if let playSoundTimer = self.playSoundTimer {
+//                playSoundTimer.resume()
+//            }
+//            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
+//                audioPlayer.play()
+//            }
+//        })
+//
+//        // schedulePlaySoundTimer needs to be invalidated when app goes to foreground
+//        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer, closure: {
+//            if let playSoundTimer = self.playSoundTimer {
+//                playSoundTimer.suspend()
+//            }
+//        })
     }
     
     /// verifies values of applicable UserDefaults and either starts or stops follower mode, inclusive call to enableSuspensionPrevention or disableSuspensionPrevention - also first download is started if applicable
