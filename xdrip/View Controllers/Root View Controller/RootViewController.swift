@@ -234,7 +234,7 @@ final class RootViewController: UIViewController, MFMailComposeViewControllerDel
         createDatas()
         
         DispatchQueue.global().async {
-            sleep(10)
+            sleep(15)
             DispatchQueue.main.async { self.test("1808b012030000000000000000000000000000000000000092210c0cce04c8ec9a00da04c8ec9a00e004c8e09a00ed04c8e89a000405c8e05a001905c8e09a002305c8dc9a003405c8e09a004005c8ec5a004305c8e49a004c05c8d45a005805c8c45a00ac04c8b85a00c004c8d49a00c704c8dc5a00c904c8e09a00fd06c89099009606c8785a002606c8c45a00d305c8885a005d05c8245a00b504c8ac99005b04c8085a00b703c8d859000603c8349a00ce02c88c9a000004c8dc5a00f404c8e89a008005c8f09900b305c8e898000306c81099000406c84859001406c83859004406c85059002c06c86499001506c8cc98001d06c8a89900bb05c88c99003d05c8ac5a00ca04c8345a009d04c86059005d04c8549800b803c85859002704c88459006105c8e499003c06c8505a000c07c8005a004907c85c5900bc4b0000828600084508ef50140796805a00eda610801ac8040e696b")
             }
         }
@@ -475,6 +475,7 @@ final class RootViewController: UIViewController, MFMailComposeViewControllerDel
                     
                     // a new reading was created
                     newReadingCreated = true
+                    
                     
                     params +=
                     """
@@ -1661,14 +1662,21 @@ extension RootViewController:NightScoutFollowerDelegate {
                     // set timeStampLastBgReading to new timestamp
                     timeStampLastBgReading = followGlucoseData.timeStamp
                     
-                    params +=
-                    """
-                    {"ts": \(followGlucoseData.timeStamp), "glucose": \(followGlucoseData.sgv)},\n
-                    """
+                    let format = DateFormatter()
+                    format.dateFormat = "yyyy-MM-dd"
+                    let s1 = format.string(from: Date())
+                    let s2 = format.string(from: followGlucoseData.timeStamp)
+                    
+                    if s1 == s2 {
+                        params +=
+                        """
+                        {"ts": \(followGlucoseData.timeStamp), "glucose": \(followGlucoseData.sgv)},\n
+                        """
+                    }
                 }
             }
             params += "]"
-            if params.count > 4 {
+            if params.count > 2 {
                 NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: params)
             }
             

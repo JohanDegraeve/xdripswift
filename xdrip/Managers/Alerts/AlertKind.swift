@@ -106,7 +106,6 @@ public enum AlertKind:Int, CaseIterable {
         switch self {
             
         case .low,.verylow:
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: ".low,.verylow")
                 // if alertEntry not enabled, return false
                 if !currentAlertEntry.alertType.enabled {return (false, nil, nil, nil)}
                 
@@ -120,7 +119,6 @@ public enum AlertKind:Int, CaseIterable {
                 } else {return (false, nil, nil, nil)}
             
         case .high,.veryhigh:
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: ".high,.veryhigh")
                 // if alertEntry not enabled, return false
                 if !currentAlertEntry.alertType.enabled {return (false, nil, nil, nil)}
                 
@@ -134,7 +132,6 @@ public enum AlertKind:Int, CaseIterable {
                 } else {return (false, nil, nil, nil)}
             
         case .missedreading:
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: "missedreading")
             // if no valid lastbgreading then there's definitely no need to plan an alert
             guard let lastBgReading = lastBgReading else {return (false, nil, nil, nil)}
             
@@ -215,7 +212,6 @@ public enum AlertKind:Int, CaseIterable {
             }
 
         case .calibration:
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: "calibration")
                 // if alertEntry not enabled, return false
                 if !currentAlertEntry.alertType.enabled || lastCalibration == nil {return (false, nil, nil, nil)}
                                 
@@ -226,7 +222,6 @@ public enum AlertKind:Int, CaseIterable {
                 return (false, nil, nil, nil)
             
         case .batterylow:
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: "batterylow")
                 // if alertEntry not enabled, return false
                 if !currentAlertEntry.alertType.enabled {return (false, nil, nil, nil)}
                 

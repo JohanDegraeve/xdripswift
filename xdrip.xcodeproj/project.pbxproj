@@ -215,6 +215,7 @@
 		EE72B089230D4C3700D67B8F /* Collection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
 		EE7B5987231F56D9002A0C0E /* data.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = data.csv; sourceTree = "<group>"; };
 		EE9947E722EEDD2E00DCB876 /* CGMBubbleTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMBubbleTransmitter.swift; sourceTree = "<group>"; };
+		EEEA68DB232A2C8B000AC33D /* UMMobClick.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UMMobClick.framework; path = "Pods/UMengAnalytics-NO-IDFA/umsdk_IOS_analyics_no-idfa_v4.2.5/UMMobClick.framework"; sourceTree = "<group>"; };
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
 		F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothTransmitterDelegate.swift; sourceTree = "<group>"; };
 		F8025C1221DA683400ECF0C0 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
@@ -551,6 +552,7 @@
 		48C0E851274A3BB6D42C6F20 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EEEA68DB232A2C8B000AC33D /* UMMobClick.framework */,
 				EE1E88662322397000858D4F /* MessageUI.framework */,
 				2C21F6C623112C8F001BD269 /* SpriteKit.framework */,
 				F821CF9622AE589E005C1E43 /* HealthKit.framework */,
@@ -1927,6 +1929,10 @@
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = T4JY56P443;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/UMengAnalytics-NO-IDFA/umsdk_IOS_analyics_no-idfa_v4.2.5",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1951,6 +1957,10 @@
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = T4JY56P443;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/UMengAnalytics-NO-IDFA/umsdk_IOS_analyics_no-idfa_v4.2.5",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (

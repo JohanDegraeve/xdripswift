@@ -31,46 +31,94 @@ class LibreOOPClient {
     // MARK: - public functions
     
     public static func handleLibreData(libreData: [UInt8], timeStampLastBgReading: Date, serialNumber: String, _ callback: @escaping ((glucoseData: [GlucoseData], sensorState: LibreSensorState, sensorTimeInMinutes: Int)?) -> Void) {
-        
         //only care about the once per minute readings here, historical data will not be considered
         
         let sensorState = LibreSensorState(stateByte: libreData[4])
-
-        LibreOOPClient.calibrateSensor(bytes: libreData, serialNumber: serialNumber) {
-            (calibrationparams)  in
-            guard let params = calibrationparams else {
-                callback(nil)
-                return
-            }
+        
+        let bytesAsData = Data(bytes: libreData, count: libreData.count)
+        let item = URLQueryItem(name: "accesstoken", value: "bubble-201907")
+        let item1 = URLQueryItem(name: "patchUid", value: "C341320000A407E0")
+        let item2 = URLQueryItem(name: "patchInfo", value: "9D0830011938")
+        let item3 = URLQueryItem(name: "content", value: bytesAsData.hexEncodedString())
+        var urlComponents = URLComponents(string: "http://www.glucose.space/libreoop2")!
+        urlComponents.queryItems = [item, item1, item2, item3]
+        if let uploadURL = URL.init(string: urlComponents.url?.absoluteString.removingPercentEncoding ?? ""){
             
-//            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: calibrationparams)
-            //here we assume success, data is not changed,
-            //and we trust that the remote endpoint returns correct data for the sensor
-            var date = Date()
-            #if DEBUG
-//            date = date.addingTimeInterval(-60 * 60 * 8)
-            #endif
-            let last16 = trendMeasurements(bytes: libreData, date: date, timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: params)
-            if var glucoseData = trendToLibreGlucose(last16), let first = glucoseData.first {
-                let last32 = historyMeasurements(bytes: libreData, date: first.timeStamp, LibreDerivedAlgorithmParameterSet: params)
-                let glucose32 = trendToLibreGlucose(last32) ?? []
-                var result = ""
-                for g in last32 {
-                    result += "\(g.temperatureAlgorithmGlucose), \(g.date)\n"
+            let request = NSMutableURLRequest(url: uploadURL)
+            request.httpMethod = "GET"
+            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            
+            let task = URLSession.shared.dataTask(with: request as URLRequest) {
+                data, response, error in
+                
+                guard let data = data else {
+                    trace("in post, network error", log: log, type: .error)
+                    return
                 }
-                let last96 = split(current: first, glucoseData: glucose32)
-                glucoseData = last96
-                callback((glucoseData, sensorState, 0))
+                
+                if let response = String(data: data, encoding: String.Encoding.utf8) {
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: response)
+                        print(response)
+                    }
+                }
+                
+                let decoder = JSONDecoder.init()
+                if let oopValue = try? decoder.decode(LibreRawGlucoseOOPData.self, from: data) {
+                    trace("in post, successful", log: log, type: .info)
+                    let value = oopValue.glucoseData(date: Date())
+                    let last96 = split(current: value.0, glucoseData: value.1)
+                    DispatchQueue.main.async {
+                        callback((last96, sensorState, 0))
+                    }
+                    return
+                }
+                
+                trace("in post, response error", log: log, type: .error)
+                
             }
+            task.resume()
         }
+        
+
+//        LibreOOPClient.calibrateSensor(bytes: libreData, serialNumber: serialNumber) {
+//            (calibrationparams)  in
+//            guard let params = calibrationparams else {
+//                callback(nil)
+//                return
+//            }
+//            
+//            //here we assume success, data is not changed,
+//            //and we trust that the remote endpoint returns correct data for the sensor
+//            var date = Date()
+//            #if DEBUG
+////            date = date.addingTimeInterval(-60 * 60 * 8)
+//            #endif
+//            let last16 = trendMeasurements(bytes: libreData, date: date, timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: params)
+//            if var glucoseData = trendToLibreGlucose(last16), let first = glucoseData.first {
+//                let last32 = historyMeasurements(bytes: libreData, date: first.timeStamp, LibreDerivedAlgorithmParameterSet: params)
+//                let glucose32 = trendToLibreGlucose(last32) ?? []
+//                var result = ""
+//                for g in last32 {
+//                    result += "\(g.temperatureAlgorithmGlucose), \(g.date)\n"
+//                }
+//                let last96 = split(current: first, glucoseData: glucose32)
+//                glucoseData = last96
+//                callback((glucoseData, sensorState, 0))
+//            }
+//        }
     }
     
-    private static func split(current: LibreRawGlucoseData ,glucoseData: [LibreRawGlucoseData]) -> [LibreRawGlucoseData] {
+    private static func split(current: LibreRawGlucoseData?, glucoseData: [LibreRawGlucoseData]) -> [LibreRawGlucoseData] {
         var x = [Double]()
         var y = [Double]()
-        let timeInterval = current.timeStamp.timeIntervalSince1970 * 1000
-        x.append(timeInterval)
-        y.append(current.glucoseLevelRaw)
+        
+        if let current = current {
+            let timeInterval = current.timeStamp.timeIntervalSince1970 * 1000
+            x.append(timeInterval)
+            y.append(current.glucoseLevelRaw)
+        }
+        
         for glucose in glucoseData {
             let time = glucose.timeStamp.timeIntervalSince1970 * 1000
             x.insert(time, at: 0)
@@ -132,11 +180,8 @@ class LibreOOPClient {
                 } else {
                     trace("in calibrateSensor, failed to decode", log: log, type: .error)
                     callback(nil)
-//                    let error = String.init(data: data, encoding: .utf8)
-//                    NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: error)
                 }
             } catch {
-//                NotificationCenter.default.post(name: Notification.Name.init(rawValue: "webOOPLog"), object: error)
                 trace("in calibrateSensor, got error trying to decode GetCalibrationStatus", log: log, type: .error)
                 callback(nil)
             }

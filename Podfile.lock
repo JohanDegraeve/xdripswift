@@ -1,16 +1,23 @@
 PODS:
-  - ActionClosurable (1.2.0)
+  - ActionClosurable (2.0.0)
   - Charts (3.3.0):
     - Charts/Core (= 3.3.0)
   - Charts/Core (3.3.0)
+  - UMCAnalytics (6.0.5):
+    - UMCCommon
+  - UMCCommon (2.1.1)
 
 DEPENDENCIES:
   - ActionClosurable (from `https://github.com/takasek/ActionClosurable.git`)
   - Charts
+  - UMCAnalytics
+  - UMCCommon
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  trunk:
     - Charts
+    - UMCAnalytics
+    - UMCCommon
 
 EXTERNAL SOURCES:
   ActionClosurable:
@@ -18,13 +25,15 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   ActionClosurable:
-    :commit: 918fbedcfe9f5d916c53d7195a6db889aece9022
+    :commit: a1a589cd4189768c0ac7a49da7296d95a7f4f914
     :git: https://github.com/takasek/ActionClosurable.git
 
 SPEC CHECKSUMS:
-  ActionClosurable: ff826688551b031c6bd936cb4928ebf63571893a
+  ActionClosurable: 92729a0f0bb4b38d2744319ea8282a3ce8fb1e0a
   Charts: e0dd4cd8f257bccf98407b58183ddca8e8d5b578
+  UMCAnalytics: 045be2cd1ec05aa95ad62405a850757f932e2d59
+  UMCCommon: 971f324a5a99c9d662ae040a815e7e3d7ef8b2a8
 
-PODFILE CHECKSUM: 5e2e07d6fbc9d04440c2ddf774f5c5a5f8b0f97f
+PODFILE CHECKSUM: be692b5a5cf43fe898206fea5e07f83cb697821a
 
 COCOAPODS: 1.8.0.beta.1
