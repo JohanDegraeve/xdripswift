@@ -19,7 +19,7 @@ final class AlertsSettingsViewController: UIViewController {
     }
 
     // reference to coreDataManager
-    public var coreDataManager:CoreDataManager?
+    private var coreDataManager:CoreDataManager?
     
     /// to read alertEntries from coredata manager
     private lazy var alertEntriesAccessor:AlertEntriesAccessor = {

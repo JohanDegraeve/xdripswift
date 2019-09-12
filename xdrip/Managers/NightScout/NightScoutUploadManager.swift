@@ -125,11 +125,15 @@ public class NightScoutUploadManager:NSObject {
         
         trace("in uploadBgReadingsToNightScout", log: self.log, type: .info)
 
-        // get readings to upload, limit to 8 hours
-        var timeStamp = Date(timeIntervalSinceNow: -8*60*60)
+        // get readings to upload, limit to x days, x = ConstantsNightScout.maxDaysToUpload
+        var timeStamp = Date(timeIntervalSinceNow: TimeInterval(-ConstantsNightScout.maxDaysToUpload*24*60*60))
+
         if let timeStampLatestNightScoutUploadedBgReading = UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading {
-            timeStamp = timeStampLatestNightScoutUploadedBgReading
+            if timeStampLatestNightScoutUploadedBgReading > timeStamp {
+                timeStamp = timeStampLatestNightScoutUploadedBgReading
+            }
         }
+
         let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         if bgReadingsToUpload.count > 0 {

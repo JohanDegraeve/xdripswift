@@ -59,3 +59,9 @@ protocol SettingsViewModelProtocol {
     
 }
 
+protocol SettingsProtocol {
+    
+    /// returns a SettingsViewModelProtocol
+    func viewModel() -> SettingsViewModelProtocol
+    
+}

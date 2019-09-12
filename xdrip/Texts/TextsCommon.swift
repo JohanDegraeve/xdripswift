@@ -89,4 +89,28 @@ class Texts_Common {
         return NSLocalizedString("no", tableName: filename, bundle: Bundle.main, value: "no", comment: "literally no, without capital")
     }()
     
+    static let red = {
+        return NSLocalizedString("red", tableName: filename, bundle: Bundle.main, value: "red", comment: "red")
+    }()
+    
+    static let green = {
+        return NSLocalizedString("green", tableName: filename, bundle: Bundle.main, value: "green", comment: "green")
+    }()
+    
+    static let white = {
+        return NSLocalizedString("white", tableName: filename, bundle: Bundle.main, value: "white", comment: "white")
+    }()
+    
+    static let yellow = {
+        return NSLocalizedString("yellow", tableName: filename, bundle: Bundle.main, value: "yellow", comment: "yellow")
+    }()
+    
+    static let name = {
+        return NSLocalizedString("Name", tableName: filename, bundle: Bundle.main, value: "name", comment: "name")
+    }()
+    
+    static let WiFi = {
+        return NSLocalizedString("WiFi", tableName: filename, bundle: Bundle.main, value: "WiFi", comment: "WiFi")
+    }()
+    
 }

@@ -319,7 +319,7 @@ final class RootViewController: UIViewController {
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 if glucose.timeStamp > timeStampLastBgReading {
                     
-                    _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
                     // save the newly created bgreading permenantly in coredata
                     coreDataManager.saveChanges()
@@ -555,12 +555,12 @@ final class RootViewController: UIViewController {
                             if let calibrator = self.calibrator {
                                 if latestCalibrations.count == 0 {
                                     // calling initialCalibration will create two calibrations, they are returned also but we don't need them
-                                    _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                                    _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                                 } else {
                                     // it's not the first calibration
                                     if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
                                         // calling createNewCalibration will create a new  calibrations, it is returned but we don't need it
-                                        _ = calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                                        _ = calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                                     }
                                 }
                                 
@@ -610,35 +610,35 @@ final class RootViewController: UIViewController {
                 
             case .dexcomG4:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG4xDripTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, transmitterID: currentTransmitterId, delegate:self)
+                    cgmTransmitter = CGMG4xDripTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, delegate:self)
                 }
                 
             case .dexcomG5:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, transmitterID: currentTransmitterId, delegate: self)
+                    cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, delegate: self)
                 }
                 
             case .dexcomG6:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG6Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, transmitterID: currentTransmitterId, delegate: self)
+                    cgmTransmitter = CGMG6Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, delegate: self)
                 }
                 
             case .miaomiao:
-                cgmTransmitter = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
+                cgmTransmitter = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
                 
             case .Bubble:
-                cgmTransmitter = CGMBubbleTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber, webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
+                cgmTransmitter = CGMBubbleTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber, webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
                 
             case .GNSentry:
-                cgmTransmitter = CGMGNSEntryTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
+                cgmTransmitter = CGMGNSEntryTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
                 
             case .Blucon:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, transmitterID: currentTransmitterId, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber)
+                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber)
                 }
                 
             case .Droplet1:
-                cgmTransmitter = CGMDroplet1Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, delegate: self)
+                cgmTransmitter = CGMDroplet1Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self)
                 
             }
             
@@ -863,7 +863,7 @@ final class RootViewController: UIViewController {
                 if !transmitterType.startScanningAfterInit() {
                     // it's a transmitter for which user needs to initiate the scanning
                     // see if bluetoothDeviceAddress is known, results determines next action to add
-                    if UserDefaults.standard.bluetoothDeviceAddress == nil {
+                    if UserDefaults.standard.cgmTransmitterDeviceAddress == nil {
                         listOfActions[Texts_HomeView.scanBluetoothDeviceActionTitle] = {(UIAlertAction) in self.userInitiatesStartScanning()}
                     } else {
                         listOfActions[Texts_HomeView.forgetBluetoothDeviceActionTitle] = {(UIAlertAction) in self.forgetDevice()}
@@ -914,7 +914,7 @@ final class RootViewController: UIViewController {
         // add transmitter info
         // first the name
         textToShow += Texts_HomeView.transmitter + " : "
-        if let deviceName = UserDefaults.standard.bluetoothDeviceName {
+        if let deviceName = UserDefaults.standard.cgmTransmitterDeviceName {
             textToShow += deviceName
         } else {
             textToShow += Texts_HomeView.notKnown
@@ -987,8 +987,8 @@ final class RootViewController: UIViewController {
     private func forgetDevice() {
         
         // set device address and name to nil in userdefaults
-        UserDefaults.standard.bluetoothDeviceAddress = nil
-        UserDefaults.standard.bluetoothDeviceName =  nil
+        UserDefaults.standard.cgmTransmitterDeviceAddress = nil
+        UserDefaults.standard.cgmTransmitterDeviceName =  nil
         
         // setting cgmTransmitter to nil,  the deinit function of the currently used cgmTransmitter will be called, which will disconnect the device
         // set cgmTransmitter to nil, this will call the deinit function which will disconnect first
@@ -1118,8 +1118,8 @@ extension RootViewController:CGMTransmitterDelegate {
     func cgmTransmitterDidConnect(address:String?, name:String?) {
         // store address and name, if this is the first connect to a specific device, then this address and name will be used in the future to reconnect to the same device, without having to scan
         if let address = address, let name = name {
-            UserDefaults.standard.bluetoothDeviceAddress = address
-            UserDefaults.standard.bluetoothDeviceName =  name
+            UserDefaults.standard.cgmTransmitterDeviceAddress = address
+            UserDefaults.standard.cgmTransmitterDeviceName =  name
         }
         
         // if the connect is a result of a user initiated start scanning, then display message that connection was successful
@@ -1152,7 +1152,7 @@ extension RootViewController:CGMTransmitterDelegate {
         case .poweredOn:
             // user changes device bluetooth status to on
             debuglogging("in deviceDidUpdateBluetoothState, status = poweredon")
-            if UserDefaults.standard.bluetoothDeviceAddress == nil, let cgmTransmitter = cgmTransmitter, let transmitterType  = UserDefaults.standard.transmitterType, transmitterType.startScanningAfterInit() {
+            if UserDefaults.standard.cgmTransmitterDeviceAddress == nil, let cgmTransmitter = cgmTransmitter, let transmitterType  = UserDefaults.standard.transmitterType, transmitterType.startScanningAfterInit() {
                 // bluetoothDeviceAddress = nil, means app hasn't connected before to the transmitter
                 // cgmTransmitter != nil, means user has configured transmitter type and transmitterid
                 // transmitterType.startScanningAfterInit() gives true, means it's ok to start the scanning

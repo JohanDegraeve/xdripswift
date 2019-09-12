@@ -19,3 +19,9 @@
 "add" = "Add";
 "yes" = "yes";
 "no" = "no";
+"red" = "red";
+"green" = "green";
+"white" = "white";
+"yellow" = "yellow";
+"name" = "Name";
+"WiFi" = "WiFi";
