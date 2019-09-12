@@ -73,6 +73,14 @@
 		F8A1586F22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */; };
 		F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */; };
 		F8A1587322EDC893007F5B5D /* ConstantsDexcomShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */; };
+		F8A389BA2315DC060010F405 /* M5StackBluetoothTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389B92315DC060010F405 /* M5StackBluetoothTransmitter.swift */; };
+		F8A389BC231713580010F405 /* M5StackTransmitterOpCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389BB231713580010F405 /* M5StackTransmitterOpCode.swift */; };
+		F8A389BF231DC8790010F405 /* M5StackAuthenticateTXMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389BE231DC8790010F405 /* M5StackAuthenticateTXMessage.swift */; };
+		F8A389C3231F1A4B0010F405 /* M5StackReadBlePassWordTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389C2231F1A4B0010F405 /* M5StackReadBlePassWordTxMessage.swift */; };
+		F8A389C6231FBA110010F405 /* M5StackPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389C5231FBA110010F405 /* M5StackPacket.swift */; };
+		F8A389C823203E3E0010F405 /* ConstantsM5Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */; };
+		F8A389CA232118E80010F405 /* M5StackDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389C9232118E80010F405 /* M5StackDelegate.swift */; };
+		F8A389CC232191280010F405 /* M5StackUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389CB232191280010F405 /* M5StackUtilities.swift */; };
 		F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AAC22D6859200934E7A /* SlopeParameters.swift */; };
 		F8A54AAF22D686CD00934E7A /* NightScoutBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */; };
 		F8A54AB722D9111900934E7A /* CGMTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AB322D9111900934E7A /* CGMTransmitter.swift */; };
@@ -271,6 +279,14 @@
 		F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSuspensionPrevention.swift; sourceTree = "<group>"; };
 		F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSpeakReadingLanguages.swift; sourceTree = "<group>"; };
 		F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsDexcomShare.swift; sourceTree = "<group>"; };
+		F8A389B92315DC060010F405 /* M5StackBluetoothTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackBluetoothTransmitter.swift; sourceTree = "<group>"; };
+		F8A389BB231713580010F405 /* M5StackTransmitterOpCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackTransmitterOpCode.swift; sourceTree = "<group>"; };
+		F8A389BE231DC8790010F405 /* M5StackAuthenticateTXMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackAuthenticateTXMessage.swift; sourceTree = "<group>"; };
+		F8A389C2231F1A4B0010F405 /* M5StackReadBlePassWordTxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackReadBlePassWordTxMessage.swift; sourceTree = "<group>"; };
+		F8A389C5231FBA110010F405 /* M5StackPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackPacket.swift; sourceTree = "<group>"; };
+		F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsM5Stack.swift; sourceTree = "<group>"; };
+		F8A389C9232118E80010F405 /* M5StackDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackDelegate.swift; sourceTree = "<group>"; };
+		F8A389CB232191280010F405 /* M5StackUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackUtilities.swift; sourceTree = "<group>"; };
 		F8A54AAC22D6859200934E7A /* SlopeParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlopeParameters.swift; sourceTree = "<group>"; };
 		F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightScoutBgReading.swift; sourceTree = "<group>"; };
 		F8A54AB322D9111900934E7A /* CGMTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMTransmitter.swift; sourceTree = "<group>"; };
@@ -771,6 +787,7 @@
 		F85DC2FC21D3E83100B9F74A /* Transmitter */ = {
 			isa = PBXGroup;
 			children = (
+				F8A389B82315DB080010F405 /* M5Stack */,
 				F8025E5521F3418400ECF0C0 /* CGMBluetoothTransmitter */,
 				F85DC2FF21D3E83100B9F74A /* GenericBluetoothTransmitter */,
 			);
@@ -784,6 +801,36 @@
 				F8025C1021DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift */,
 			);
 			path = GenericBluetoothTransmitter;
+			sourceTree = "<group>";
+		};
+		F8A389B82315DB080010F405 /* M5Stack */ = {
+			isa = PBXGroup;
+			children = (
+				F8A389C4231FB9B30010F405 /* Utilities */,
+				F8A389BD231DC7DC0010F405 /* M5StackMessages */,
+				F8A389B92315DC060010F405 /* M5StackBluetoothTransmitter.swift */,
+				F8A389BB231713580010F405 /* M5StackTransmitterOpCode.swift */,
+			);
+			path = M5Stack;
+			sourceTree = "<group>";
+		};
+		F8A389BD231DC7DC0010F405 /* M5StackMessages */ = {
+			isa = PBXGroup;
+			children = (
+				F8A389BE231DC8790010F405 /* M5StackAuthenticateTXMessage.swift */,
+				F8A389C2231F1A4B0010F405 /* M5StackReadBlePassWordTxMessage.swift */,
+			);
+			path = M5StackMessages;
+			sourceTree = "<group>";
+		};
+		F8A389C4231FB9B30010F405 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				F8A389C5231FBA110010F405 /* M5StackPacket.swift */,
+				F8A389C9232118E80010F405 /* M5StackDelegate.swift */,
+				F8A389CB232191280010F405 /* M5StackUtilities.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 		F8A54AB222D9111900934E7A /* Generic */ = {
@@ -1157,6 +1204,7 @@
 				F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */,
 				F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */,
 				F8EEDD5122FECE3800D2D610 /* ConstantsLibreOOP.swift */,
+				F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -1390,6 +1438,7 @@
 				F8A54ADF22D911BA00934E7A /* DexcomTransmitterOpCode.swift in Sources */,
 				F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */,
 				F8A54AE922D911BA00934E7A /* AuthChallengeRxMessage.swift in Sources */,
+				F8A389BA2315DC060010F405 /* M5StackBluetoothTransmitter.swift in Sources */,
 				F8A54B0122D9179100934E7A /* LibreSensorState.swift in Sources */,
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
 				F8A54AE622D911BA00934E7A /* KeepAliveTxMessage.swift in Sources */,
@@ -1427,6 +1476,7 @@
 				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
 				F8A7406E22D9C0E700967CFC /* CGMBluconTransmitter.swift in Sources */,
 				F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */,
+				F8A389C3231F1A4B0010F405 /* M5StackReadBlePassWordTxMessage.swift in Sources */,
 				F8B3A7B2226A0878004BA588 /* TextsAlerts.swift in Sources */,
 				F8A54B0022D9179100934E7A /* LibreDataParser.swift in Sources */,
 				F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */,
@@ -1470,14 +1520,17 @@
 				F8B3A81C227DEC92004BA588 /* AlertEntriesAccessor.swift in Sources */,
 				F8A1585B22EDB7EA007F5B5D /* ConstantsDexcomG5.swift in Sources */,
 				F8BDD452221DEAB2006EAB84 /* TextsSettingsView.swift in Sources */,
+				F8A389BF231DC8790010F405 /* M5StackAuthenticateTXMessage.swift in Sources */,
 				F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */,
 				F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
+				F8A389CA232118E80010F405 /* M5StackDelegate.swift in Sources */,
 				F8B3A847227F090E004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,
 				F8B3A79622635A25004BA588 /* AlertEntry+CoreDataClass.swift in Sources */,
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
 				F821CF8E22AB090C005C1E43 /* DatePickerViewController.swift in Sources */,
 				F8A1585322EDB602007F5B5D /* ConstantsBloodGlucose.swift in Sources */,
+				F8A389C823203E3E0010F405 /* ConstantsM5Stack.swift in Sources */,
 				F8A54AE322D911BA00934E7A /* AuthRequestRxMessage.swift in Sources */,
 				F8A54AD722D911BA00934E7A /* CGMG6Transmitter.swift in Sources */,
 				F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */,
@@ -1508,6 +1561,7 @@
 				F821CF5F229BF43A005C1E43 /* ApplicationManager.swift in Sources */,
 				F8B3A834227F08AC004BA588 /* PickerViewData.swift in Sources */,
 				F8B3A79522635A25004BA588 /* AlertType+CoreDataProperties.swift in Sources */,
+				F8A389BC231713580010F405 /* M5StackTransmitterOpCode.swift in Sources */,
 				F8B3A84C227F090E004BA588 /* SettingsViewController.swift in Sources */,
 				F8EEDD5222FECE3800D2D610 /* ConstantsLibreOOP.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */,
@@ -1520,9 +1574,11 @@
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				F8B3A820227DEC92004BA588 /* AlertTypesAccessor.swift in Sources */,
 				F8B3A81E227DEC92004BA588 /* BgReadingsAccessor.swift in Sources */,
+				F8A389C6231FBA110010F405 /* M5StackPacket.swift in Sources */,
 				F8B3A846227F090E004BA588 /* SettingsViewTransmitterSettingsViewModel.swift in Sources */,
 				F821CF6B229FC22D005C1E43 /* Endpoint.swift in Sources */,
 				F821CF58229BF43A005C1E43 /* AlertManager.swift in Sources */,
+				F8A389CC232191280010F405 /* M5StackUtilities.swift in Sources */,
 				F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */,
 				F8A54AD922D911BA00934E7A /* TransmitterVersionTxMessage.swift in Sources */,
 				F821CF5E229BF43A005C1E43 /* BgReading+NightScout.swift in Sources */,

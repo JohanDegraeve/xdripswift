@@ -44,6 +44,9 @@ final class RootViewController: UIViewController {
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
     
+    /// M5StackBluetoothTransmitter for testing
+    var m5StackBluetoothTransmitter:M5StackBluetoothTransmitter?
+    
     // MARK: - Constants for ApplicationManager usage
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updatelabelstimer
@@ -130,8 +133,7 @@ final class RootViewController: UIViewController {
         super.viewDidLoad()
         
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
-        // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like setting up the transmitter, start scanning
-        // In the exceptional case that the transmitter would give a new reading before the DataManager is set up, then this new reading will be ignored
+        // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like initializing the views
         coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
             
             self.setupApplicationData()
@@ -142,6 +144,8 @@ final class RootViewController: UIViewController {
             // create transmitter based on UserDefaults
             self.initializeCGMTransmitter()
             
+            self.m5StackBluetoothTransmitter = M5StackBluetoothTransmitter(address: nil, name: "M5_NightscoutMon", delegate: self, blePassword: nil)
+
         })
         
         // Setup View
@@ -272,10 +276,6 @@ final class RootViewController: UIViewController {
     ///     - sensorTimeInMinutes : should be present only if it's the first reading(s) being processed for a specific sensor and is needed if it's a transmitterType that returns true to the function canDetectNewSensor
     private func processNewGlucoseData(glucoseData: inout [GlucoseData], sensorTimeInMinutes: Int?) {
         
-        for glucose in glucoseData {
-            debuglogging(glucose.description)
-        }
-        
         // check that calibrations and coredata manager is not nil
         guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager else {
             fatalError("in processNewCGMInfo, calibrations or coreDataManager is nil")
@@ -319,7 +319,7 @@ final class RootViewController: UIViewController {
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 if glucose.timeStamp > timeStampLastBgReading {
                     
-                    _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName:UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
                     // save the newly created bgreading permenantly in coredata
                     coreDataManager.saveChanges()
@@ -351,25 +351,29 @@ final class RootViewController: UIViewController {
                     updateLabels()
                 }
                 
-                if let nightScoutUploadManager = nightScoutUploadManager {
-                    nightScoutUploadManager.upload()
-                }
+                nightScoutUploadManager?.upload()
                 
-                if let alertManager = alertManager {
-                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
-                }
+                alertManager?.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
                 
-                if let healthKitManager = healthKitManager {
-                    healthKitManager.storeBgReadings()
-                }
+                healthKitManager?.storeBgReadings()
+
+                bgReadingSpeaker?.speakNewReading()
                 
-                if let bgReadingSpeaker = bgReadingSpeaker {
-                    bgReadingSpeaker.speakNewReading()
-                }
+                dexcomShareUploadManager?.upload()
                 
-                if let dexcomShareUploadManager = dexcomShareUploadManager {
-                    dexcomShareUploadManager.upload()
+                //// temporary code
+                // get latest reading, ignore sensor, rawdata, timestamp - only 1
+                let lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, fromDate: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                
+                // if there's no readings, then no further processing
+                if lastReadings.count > 0 {
+                    let lastReading = lastReadings[0]
+                    // if reading older dan 4.5 minutes, then no further processing
+                    if Date().timeIntervalSince(lastReading.timeStamp) < 4.5 * 60 {
+                        m5StackBluetoothTransmitter?.writeBgReadingInfo(bgReading: lastReading)
+                    }
                 }
+
             }
         }
         
@@ -551,12 +555,12 @@ final class RootViewController: UIViewController {
                             if let calibrator = self.calibrator {
                                 if latestCalibrations.count == 0 {
                                     // calling initialCalibration will create two calibrations, they are returned also but we don't need them
-                                    _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName:UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                                    _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                                 } else {
                                     // it's not the first calibration
                                     if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
                                         // calling createNewCalibration will create a new  calibrations, it is returned but we don't need it
-                                        _ = calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName:UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                                        _ = calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: UserDefaults.standard.bluetoothDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                                     }
                                 }
                                 
@@ -606,35 +610,35 @@ final class RootViewController: UIViewController {
                 
             case .dexcomG4:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG4xDripTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate:self)
+                    cgmTransmitter = CGMG4xDripTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, transmitterID: currentTransmitterId, delegate:self)
                 }
                 
             case .dexcomG5:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self)
+                    cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, transmitterID: currentTransmitterId, delegate: self)
                 }
                 
             case .dexcomG6:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG6Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self)
+                    cgmTransmitter = CGMG6Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, transmitterID: currentTransmitterId, delegate: self)
                 }
                 
             case .miaomiao:
-                cgmTransmitter = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
+                cgmTransmitter = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
                 
             case .Bubble:
-                cgmTransmitter = CGMBubbleTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber, webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
+                cgmTransmitter = CGMBubbleTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber, webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
                 
             case .GNSentry:
-                cgmTransmitter = CGMGNSEntryTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
+                cgmTransmitter = CGMGNSEntryTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
                 
             case .Blucon:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, transmitterID: currentTransmitterId, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber)
+                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, transmitterID: currentTransmitterId, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber)
                 }
                 
             case .Droplet1:
-                cgmTransmitter = CGMDroplet1Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, delegate: self)
+                cgmTransmitter = CGMDroplet1Transmitter(address: UserDefaults.standard.bluetoothDeviceAddress, name: UserDefaults.standard.bluetoothDeviceName, delegate: self)
                 
             }
             
@@ -868,6 +872,14 @@ final class RootViewController: UIViewController {
             }
         }
         
+        // add action to start scanning for m5stack
+        listOfActions["M5Stack"] = {(UIAlertAction) in
+            
+            debuglogging("calling m5StackBluetoothTransmitter")
+            self.m5StackBluetoothTransmitter?.startScanning()
+
+        }
+
         // next action is to start or stop the sensor, can also be omitted depending on type of device - also not applicable for follower mode
         if let transmitterType = UserDefaults.standard.transmitterType {
             if !transmitterType.canDetectNewSensor() && UserDefaults.standard.isMaster {
@@ -1139,6 +1151,7 @@ extension RootViewController:CGMTransmitterDelegate {
             UserDefaults.standard.lastdisConnectTimestamp = Date()
         case .poweredOn:
             // user changes device bluetooth status to on
+            debuglogging("in deviceDidUpdateBluetoothState, status = poweredon")
             if UserDefaults.standard.bluetoothDeviceAddress == nil, let cgmTransmitter = cgmTransmitter, let transmitterType  = UserDefaults.standard.transmitterType, transmitterType.startScanningAfterInit() {
                 // bluetoothDeviceAddress = nil, means app hasn't connected before to the transmitter
                 // cgmTransmitter != nil, means user has configured transmitter type and transmitterid
@@ -1146,7 +1159,7 @@ extension RootViewController:CGMTransmitterDelegate {
                 // possibly scanning is already running, but that's ok if we call the startScanning function again
                 _ = cgmTransmitter.startScanning()
             }
-            
+
         @unknown default:
             break
         }
@@ -1455,4 +1468,24 @@ extension RootViewController:NightScoutFollowerDelegate {
     }
 }
 
+extension RootViewController: M5StackDelegate {
+    
+    func newBlePassWord(newBlePassword: String) {
+        UserDefaults.standard.m5StackBlePassword = newBlePassword
+    }
+    
+    func authentication(success: Bool) {
+        debuglogging("successfully authenticated towards M5Stack")
+    }
+    
+    func blePasswordMissingInSettings() {
+        debuglogging("ble password missing in settings")
+    }
+    
+    func m5StackResetRequired() {
+        debuglogging("M5 Stack reset required")
+    }
+    
+    
+}
 

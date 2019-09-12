@@ -79,6 +79,11 @@ extension UserDefaults {
         /// license info accepted by user yes or no
         case licenseInfoAccepted = "licenseInfoAccepted"
         
+        // M5Stack
+        
+        /// M5Stack blepassword, needed for authenticating App to M5Stack
+        case M5StackBlePassword = "M5StackBlePassword"
+        
         // Other Settings (not user configurable)
         
         // Bluetooth
@@ -459,7 +464,7 @@ extension UserDefaults {
         }
     }
     
-    // MARK: - =====  Keep track of alert and info messages shown to the user ======
+    // MARK: - Keep track of alert and info messages shown to the user
     
     /// message shown when user starts a sensor, which tells that timing should be exact, was it already shown or not
     var startSensorTimeInfoGiven:Bool {
@@ -478,6 +483,18 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.licenseInfoAccepted.rawValue)
+        }
+    }
+    
+    // MARK: M5Stack
+
+    /// M5StackBlePassword, used for authenticating xdrip app towards M5Stack
+    var m5StackBlePassword: String? {
+        get {
+            return string(forKey: Key.M5StackBlePassword.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.M5StackBlePassword.rawValue)
         }
     }
     

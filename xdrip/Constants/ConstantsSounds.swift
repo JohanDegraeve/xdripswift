@@ -58,7 +58,7 @@ enum ConstantsSounds: String, CaseIterable {
         return String(forSound.rawValue[soundNameRange])
     }
     
-    /// gets the soundFie for specific case
+    /// gets the soundFile for specific case
     static func getSoundFile(forSound:ConstantsSounds) -> String {
         let indexOfBackSlash = forSound.rawValue.indexes(of: "/")
         let soundNameRange = forSound.rawValue.index(after: indexOfBackSlash[0])..<forSound.rawValue.endIndex

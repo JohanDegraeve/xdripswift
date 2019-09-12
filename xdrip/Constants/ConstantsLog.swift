@@ -51,6 +51,9 @@ enum ConstantsLog {
     /// droplet 1
     static let categoryCGMDroplet1 = "categoryCGMDroplet1"
     /// LibreOOPClient
-    static let categoryLibreOOPClient = "LibreOOPClient"
+    static let categoryLibreOOPClient = "categoryLibreOOPClient"
+    /// for use in M5Stack
+    static let categoryM5StackBluetoothTransmitter = "categoryM5StackBluetoothTransmitter"
+
 }
 

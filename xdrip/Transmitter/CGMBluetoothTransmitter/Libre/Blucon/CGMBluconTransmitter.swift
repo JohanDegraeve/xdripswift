@@ -24,9 +24,6 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBlucon)
     
-    // actual device address
-    private var actualDeviceAddress:String?
-    
     // used in parsing packet
     private var timeStampLastBgReading:Date
     
@@ -70,18 +67,18 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
+    ///     - name: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - transmitterID: expected transmitterID
     ///     - delegate : CGMTransmitterDelegate
     ///     - sensorSerialNumber : is needed to allow detection of a new sensor.
-    init?(address:String?, transmitterID:String, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, sensorSerialNumber:String?) {
+    init?(address:String?, name: String?, transmitterID:String, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, sensorSerialNumber:String?) {
         
         // assign addressname and name or expected devicename
         // start by using expected device name
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: CGMBluconTransmitter.createExpectedDeviceName(transmitterIdSetByUser: transmitterID))
         if let address = address {
             // address not nil, means it already connected before, use that address
-            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address)
-            actualDeviceAddress = address
+            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
         }
         
         // initialize timeStampLastBgReading

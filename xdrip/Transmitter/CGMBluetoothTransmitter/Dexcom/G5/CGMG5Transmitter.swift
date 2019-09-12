@@ -85,9 +85,6 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     /// is G5 reset necessary or not
     private var G5ResetRequested:Bool
     
-    // actual device address
-    private var actualDeviceAddress:String?
-    
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
     var emptyArray: [GlucoseData] = []
     
@@ -101,8 +98,9 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
+    ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - transmitterID: expected transmitterID, 6 characters
-    init?(address:String?, transmitterID:String, delegate:CGMTransmitterDelegate) {
+    init?(address:String?, name: String?, transmitterID:String, delegate:CGMTransmitterDelegate) {
         //verify if transmitterid is 6 chars and allowed chars
         guard transmitterID.count == 6 else {
             trace("transmitterID length not 6, init CGMG5Transmitter fails", log: log, type: .error)
@@ -119,8 +117,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DEXCOM" + transmitterID[transmitterID.index(transmitterID.startIndex, offsetBy: 4)..<transmitterID.endIndex])
         if let address = address {
-            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address)
-            actualDeviceAddress = address
+            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
         }
         
         // set timestampoflastg5reading to 0
@@ -282,7 +279,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         // if status changed to poweredon, and if address = nil then superclass will not start the scanning
         // but for DexcomG5 we can start scanning
         if state == .poweredOn {
-            if (actualDeviceAddress == nil) {
+            if (address() == nil) {
                     _ = startScanning()
             }
         }

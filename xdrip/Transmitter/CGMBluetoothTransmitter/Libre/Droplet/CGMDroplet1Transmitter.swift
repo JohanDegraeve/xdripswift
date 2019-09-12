@@ -27,12 +27,13 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
     // MARK: - Initialization
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
-    init(address:String?, delegate:CGMTransmitterDelegate) {
+    ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
+    init(address:String?, name: String?, delegate:CGMTransmitterDelegate) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "limitter")
         if let address = address {
-            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address)
+            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
         }
         
         // assign CGMTransmitterDelegate
