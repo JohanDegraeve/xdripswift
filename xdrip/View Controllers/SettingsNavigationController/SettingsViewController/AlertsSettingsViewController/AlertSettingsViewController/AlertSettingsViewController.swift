@@ -14,7 +14,7 @@ final class AlertSettingsViewController: UIViewController {
     
     @IBOutlet weak var topLabelOutlet: UILabel!
     
-    // done button, to confirm changes
+    /// done button, to confirm changes
     @IBAction func doneButtonAction(_ sender: UIBarButtonItem) {
         
         alertEntryAsNSObject.alertkind = alertSettingsViewControllerData.alertKind
@@ -31,7 +31,7 @@ final class AlertSettingsViewController: UIViewController {
     
     @IBOutlet weak var doneButtonOutlet: UIBarButtonItem!
     
-    // to delete the alertentry
+    /// to delete the alertentry
     @IBAction func trashButtonAction(_ sender: UIBarButtonItem) {
         // delete the alertentry
         if let alertEntry = alertEntryAsNSObject {

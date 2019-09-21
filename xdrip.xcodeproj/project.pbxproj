@@ -47,6 +47,10 @@
 		F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F821CF9622AE589E005C1E43 /* HealthKit.framework */; };
 		F821CF9D22AEF483005C1E43 /* BGReadingSpeaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF9C22AEF483005C1E43 /* BGReadingSpeaker.swift */; };
 		F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */; };
+		F85C4A962336C5E100D6A86F /* M5Stack+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85C4A952336C5E100D6A86F /* M5Stack+CoreDataClass.swift */; };
+		F85C4A972336C5E100D6A86F /* M5Stack+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85C4A942336C5E100D6A86F /* M5Stack+CoreDataProperties.swift */; };
+		F85C4A9A2336CE8E00D6A86F /* M5StacksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85C4A992336CE8E00D6A86F /* M5StacksViewController.swift */; };
+		F85C4A9D2336D05100D6A86F /* M5StackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85C4A9C2336D05100D6A86F /* M5StackViewController.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
 		F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */; };
@@ -264,6 +268,10 @@
 		F846CDD623046BAE00DCF016 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBluetoothPairing.swift; sourceTree = "<group>"; };
 		F85C4A93233632EC00D6A86F /* xdrip v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v2.xcdatamodel"; sourceTree = "<group>"; };
+		F85C4A942336C5E100D6A86F /* M5Stack+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "M5Stack+CoreDataProperties.swift"; path = "/Users/johandegraeve/OneDrive/Xcode Projects/xdrip/xdrip/Core Data/classes/M5Stack+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		F85C4A952336C5E100D6A86F /* M5Stack+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "M5Stack+CoreDataClass.swift"; path = "/Users/johandegraeve/OneDrive/Xcode Projects/xdrip/xdrip/Core Data/classes/M5Stack+CoreDataClass.swift"; sourceTree = "<absolute>"; };
+		F85C4A992336CE8E00D6A86F /* M5StacksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StacksViewController.swift; sourceTree = "<group>"; };
+		F85C4A9C2336D05100D6A86F /* M5StackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackViewController.swift; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BgReading+CoreDataProperties.swift"; path = "../Extensions/BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Sensor+CoreDataProperties.swift"; path = "../Extensions/Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -746,6 +754,23 @@
 			path = Speak;
 			sourceTree = "<group>";
 		};
+		F85C4A982336CE0400D6A86F /* M5StacksViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F85C4A9B2336D03D00D6A86F /* M5StackViewController */,
+				F85C4A992336CE8E00D6A86F /* M5StacksViewController.swift */,
+			);
+			path = M5StacksViewController;
+			sourceTree = "<group>";
+		};
+		F85C4A9B2336D03D00D6A86F /* M5StackViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F85C4A9C2336D05100D6A86F /* M5StackViewController.swift */,
+			);
+			path = M5StackViewController;
+			sourceTree = "<group>";
+		};
 		F85DC29B21CFCEB800B9F74A /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -870,6 +895,7 @@
 		F8A389EE2335751D0010F405 /* M5StackNavigationController */ = {
 			isa = PBXGroup;
 			children = (
+				F85C4A982336CE0400D6A86F /* M5StacksViewController */,
 				F8A389EF233575DD0010F405 /* M5StackNavigationController.swift */,
 			);
 			path = M5StackNavigationController;
@@ -1281,6 +1307,8 @@
 				F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */,
 				F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */,
 				F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */,
+				F85C4A952336C5E100D6A86F /* M5Stack+CoreDataClass.swift */,
+				F85C4A942336C5E100D6A86F /* M5Stack+CoreDataProperties.swift */,
 				F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */,
 				F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */,
 			);
@@ -1546,6 +1574,7 @@
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
 				F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */,
+				F85C4A9A2336CE8E00D6A86F /* M5StacksViewController.swift in Sources */,
 				F8B3A81D227DEC92004BA588 /* CalibrationsAccessor.swift in Sources */,
 				F8A54AE122D911BA00934E7A /* SensorDataTxMessage.swift in Sources */,
 				F821CF9D22AEF483005C1E43 /* BGReadingSpeaker.swift in Sources */,
@@ -1593,6 +1622,7 @@
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
 				F8B3A80A227A3D11004BA588 /* TextsAlertTypeSettings.swift in Sources */,
 				F8A1586D22EDB9BE007F5B5D /* ConstantsDexcomFollower.swift in Sources */,
+				F85C4A962336C5E100D6A86F /* M5Stack+CoreDataClass.swift in Sources */,
 				F8B3A850227F26F8004BA588 /* AlertTypesSettingsViewController.swift in Sources */,
 				F8A7407022DBB24800967CFC /* BluconTransmitterOpCode.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* BluetoothTransmitter.swift in Sources */,
@@ -1637,6 +1667,8 @@
 				F8A389CF232AE2EA0010F405 /* M5StackSettingsViewController.swift in Sources */,
 				F821CF5E229BF43A005C1E43 /* BgReading+NightScout.swift in Sources */,
 				F8A389EB233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift in Sources */,
+				F85C4A9D2336D05100D6A86F /* M5StackViewController.swift in Sources */,
+				F85C4A972336C5E100D6A86F /* M5Stack+CoreDataProperties.swift in Sources */,
 				F8A54ADE22D911BA00934E7A /* AESCrypt.m in Sources */,
 				F8A54ADC22D911BA00934E7A /* AuthChallengeTxMessage.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,

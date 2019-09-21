@@ -12,14 +12,14 @@ fileprivate enum Setting:Int, CaseIterable {
     case value = 2
 }
 
-/// AlertSettingsViewController and NewAlertSettingsViewController have similar functionality, ie the first is about updating an existing alertEntry, the other is about creatiing a new one.
+/// AlertSettingsViewController and NewAlertSettingsViewController have similar functionality, ie the first is about updating an existing alertEntry, the other is about creating a new one.
 ///
 /// AlertSettingsViewController is doing a performsegue towards NewAlertSettingsViewController. That only works with different UIViewControllers (that's why it's two), but the functionality in it is 90% the same.
 ///
 /// to avoid code duplication, all relevant code is writtein in the class AlertSettingsViewControllerData, which conforms to the protocols UITableViewDataSource, UITableViewDelegate
 ///
-/// the classes AlertSettingsViewController and NewAlertSettingsViewController  will have a property of type AlertSettingsViewControllerData, and the tableView in each of them will use that property as delegate and datasource
-class AlertSettingsViewControllerData:NSObject, UITableViewDataSource, UITableViewDelegate  {
+/// the classes AlertSettingsViewController and NewAlertSettingsViewController have a property of type AlertSettingsViewControllerData, and the tableView in each of them uses that property as delegate and datasource
+class AlertSettingsViewControllerData: NSObject, UITableViewDataSource, UITableViewDelegate  {
     
     // MARK:- properties
     
@@ -31,21 +31,25 @@ class AlertSettingsViewControllerData:NSObject, UITableViewDataSource, UITableVi
     
     /// value of alertEntry being modified
     public var value:Int16
+    
     /// will be used to compare original value to changed value, to detect changes on the screen
     private let tempValue:Int16
     
     /// alertKind of alertEntry being modified
     public var alertKind:Int16
+    
     /// will be used to compare original value to changed value, to detect changes on the screen
     private let tempAlertKind:Int16
     
     /// alertType of alertEntry being modified, default nil because it can't be initialized
     public var alertType:AlertType
+    
     /// will be used to compare original value to changed value, to detect changes on the screen
     private let tempAlertType:AlertType
     
     /// when modifying the start value, this is the minimum value
     public var minimumStart:Int16
+    
     /// when modifying the start value , this is the maximum value
     public var maximumStart:Int16 = Int16(24 * 60 - 1) // default one minute before midnight
     
