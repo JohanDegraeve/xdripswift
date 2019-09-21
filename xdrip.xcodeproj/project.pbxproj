@@ -263,6 +263,7 @@
 		F846CDD523046BAC00DCF016 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SettingsViews.strings"; sourceTree = "<group>"; };
 		F846CDD623046BAE00DCF016 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBluetoothPairing.swift; sourceTree = "<group>"; };
+		F85C4A93233632EC00D6A86F /* xdrip v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v2.xcdatamodel"; sourceTree = "<group>"; };
 		F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BgReading+CoreDataProperties.swift"; path = "../Extensions/BgReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Sensor+CoreDataProperties.swift"; path = "../Extensions/Sensor+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -2084,9 +2085,10 @@
 		F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				F85C4A93233632EC00D6A86F /* xdrip v2.xcdatamodel */,
 				F8AC42A021B31F160078C348 /* xdrip.xcdatamodel */,
 			);
-			currentVersion = F8AC42A021B31F160078C348 /* xdrip.xcdatamodel */;
+			currentVersion = F85C4A93233632EC00D6A86F /* xdrip v2.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
