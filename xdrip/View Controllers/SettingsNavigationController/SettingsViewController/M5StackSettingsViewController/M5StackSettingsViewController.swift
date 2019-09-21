@@ -43,8 +43,10 @@ extension M5StackSettingsViewController {
         ///General settings, display color
         case general
         
+        /// wifi settings
         case wifi
         
+        /// bluetooth settings
         case bluetooth
         
         func viewModel() -> SettingsViewModelProtocol {

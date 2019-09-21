@@ -95,7 +95,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="749.60000000000002" y="-320.68965517241384"/>
+            <point key="canvasLocation" x="748" y="-466"/>
         </scene>
         <!--Picker View Controller-->
         <scene sceneID="6RW-Ef-2Hm">
@@ -177,7 +177,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HPe-YM-BbI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="0.0" y="878"/>
+            <point key="canvasLocation" x="-45" y="1423"/>
         </scene>
         <!--Date Picker View Controller-->
         <scene sceneID="OeI-t1-GDw">
@@ -256,7 +256,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="y9l-yM-uDB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="750" y="1098"/>
+            <point key="canvasLocation" x="704" y="1443"/>
         </scene>
         <!--Settings View Controller-->
         <scene sceneID="wg7-f3-ORb">
@@ -323,7 +323,23 @@
                     <textInputTraits key="textInputTraits"/>
                 </textField>
             </objects>
-            <point key="canvasLocation" x="1648" y="359"/>
+            <point key="canvasLocation" x="1599" y="566"/>
+        </scene>
+        <!--M5Stack Navigation Controller-->
+        <scene sceneID="H1e-vw-iaX">
+            <objects>
+                <navigationController id="FwD-2z-GTm" userLabel="M5Stack Navigation Controller" customClass="M5StackNavigationController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="" image="M5Stack" selectedImage="M5Stack" id="sgT-p5-hUt">
+                        <color key="badgeColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBarItem>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="mye-hD-w2u">
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="jbk-qM-hX3" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1598" y="-134"/>
         </scene>
         <!--Alerts Settings View Controller-->
         <scene sceneID="cJz-P0-7kQ">
@@ -380,7 +396,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Dml-kg-jX5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2649" y="0.0"/>
+            <point key="canvasLocation" x="2582" y="565"/>
         </scene>
         <!--Alert Settings View Controller-->
         <scene sceneID="sgW-JX-gdP">
@@ -471,7 +487,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eam-fl-lJ1" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="P9I-jc-MVs" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="3534" y="0.0"/>
+            <point key="canvasLocation" x="3582" y="564"/>
         </scene>
         <!--Alert Types Settings View Controller-->
         <scene sceneID="WGX-kN-ymM">
@@ -535,7 +551,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dYA-gi-6hk" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2647.5" y="945"/>
+            <point key="canvasLocation" x="2582" y="1290"/>
         </scene>
         <!--M5 Stack Settings View Controller-->
         <scene sceneID="JqQ-sm-rzU">
@@ -592,7 +608,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="e3H-sf-1GP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1647" y="1290"/>
+            <point key="canvasLocation" x="1489" y="1290"/>
         </scene>
         <!--Alert Type Settings View Controller-->
         <scene sceneID="kSd-PL-jff">
@@ -665,7 +681,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Km2-nL-eDG" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="VsQ-Ou-3lJ" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="3535" y="945"/>
+            <point key="canvasLocation" x="3582" y="1290"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="yl2-sM-qoP">
@@ -684,12 +700,13 @@
                     </userDefinedRuntimeAttributes>
                     <connections>
                         <segue destination="9pv-A4-QxB" kind="relationship" relationship="viewControllers" id="u7Y-xg-7CH"/>
+                        <segue destination="FwD-2z-GTm" kind="relationship" relationship="viewControllers" id="aWk-QN-f3h"/>
                         <segue destination="dyf-bd-1WE" kind="relationship" relationship="viewControllers" id="lzU-1b-eKA"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HuB-VB-40B" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="0.0" y="0.0"/>
+            <point key="canvasLocation" x="-18" y="-14"/>
         </scene>
         <!--Settings Navigation Controller-->
         <scene sceneID="jbr-kK-p6W">
@@ -710,7 +727,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mfi-aF-Sbl" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="748.125" y="358.75"/>
+            <point key="canvasLocation" x="748" y="581"/>
         </scene>
         <!--New Alert Settings View Controller-->
         <scene sceneID="nz0-xh-MjX">
@@ -786,11 +803,12 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="v67-Yu-ufU" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="Puh-fD-4cg" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="4351" y="0.0"/>
+            <point key="canvasLocation" x="4524" y="564"/>
         </scene>
     </scenes>
     <resources>
         <image name="Home" width="48" height="48"/>
+        <image name="M5Stack" width="48" height="48"/>
         <image name="Settings" width="48" height="48"/>
     </resources>
 </document>
