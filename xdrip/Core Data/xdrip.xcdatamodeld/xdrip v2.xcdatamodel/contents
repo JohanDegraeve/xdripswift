@@ -59,6 +59,11 @@
         <attribute name="address" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="blepassword" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="m5StackName" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="M5StackName" syncable="YES"/>
+    </entity>
+    <entity name="M5StackName" representedClassName=".M5StackName" syncable="YES">
+        <attribute name="address" attributeType="String" syncable="YES"/>
+        <attribute name="userDefinedName" attributeType="String" minValueString="1" syncable="YES"/>
     </entity>
     <entity name="Sensor" representedClassName=".Sensor" syncable="YES">
         <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
@@ -72,7 +77,8 @@
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
-        <element name="M5Stack" positionX="-657" positionY="180" width="128" height="90"/>
+        <element name="M5Stack" positionX="-657" positionY="180" width="128" height="105"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="120"/>
+        <element name="M5StackName" positionX="-657" positionY="180" width="128" height="75"/>
     </elements>
 </model>

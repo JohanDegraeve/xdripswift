@@ -18,6 +18,8 @@
 		F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */; };
 		F804870C2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */; };
 		F804870D2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */; };
+		F80487102337B3D400EBDDB7 /* M5StackName+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870F2337B3D400EBDDB7 /* M5StackName+CoreDataClass.swift */; };
+		F80487112337B3D400EBDDB7 /* M5StackName+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870E2337B3D300EBDDB7 /* M5StackName+CoreDataProperties.swift */; };
 		F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */; };
 		F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */; };
 		F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */; };
@@ -234,6 +236,8 @@
 		F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIStoryboard.swift; sourceTree = "<group>"; };
 		F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5Stack+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5Stack+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		F804870E2337B3D300EBDDB7 /* M5StackName+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "M5StackName+CoreDataProperties.swift"; path = "/Users/johandegraeve/OneDrive/Xcode Projects/xdrip/xdrip/Core Data/classes/M5StackName+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		F804870F2337B3D400EBDDB7 /* M5StackName+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "M5StackName+CoreDataClass.swift"; path = "/Users/johandegraeve/OneDrive/Xcode Projects/xdrip/xdrip/Core Data/classes/M5StackName+CoreDataClass.swift"; sourceTree = "<absolute>"; };
 		F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionClosureable-extension.swift"; sourceTree = "<group>"; };
 		F81D6D4522B67F55005EFAE2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareUploadManager.swift; sourceTree = "<group>"; };
@@ -1299,6 +1303,8 @@
 		F8EA6CA421B9A25B0082976B /* classes */ = {
 			isa = PBXGroup;
 			children = (
+				F804870F2337B3D400EBDDB7 /* M5StackName+CoreDataClass.swift */,
+				F804870E2337B3D300EBDDB7 /* M5StackName+CoreDataProperties.swift */,
 				F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */,
 				F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */,
 				F8B3A79122635A25004BA588 /* AlertEntry+CoreDataClass.swift */,
@@ -1570,6 +1576,7 @@
 				F8A54AE522D911BA00934E7A /* TransmitterVersionRxMessage.swift in Sources */,
 				F821CF57229BF43A005C1E43 /* SnoozeParameters.swift in Sources */,
 				F8A54AFF22D9179100934E7A /* CRC.swift in Sources */,
+				F80487102337B3D400EBDDB7 /* M5StackName+CoreDataClass.swift in Sources */,
 				F8B3A79722635A25004BA588 /* AlertEntry+CoreDataProperties.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
@@ -1682,6 +1689,7 @@
 				F8EEDD4522FD80A600D2D610 /* LibreOOPClient.swift in Sources */,
 				F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */,
 				F8C5EBE522F297F000563B5F /* LibreSensorSerialNumber.swift in Sources */,
+				F80487112337B3D400EBDDB7 /* M5StackName+CoreDataProperties.swift in Sources */,
 				F8A389E1232D3E070010F405 /* SettingsViewM5StackWiFiSettingsViewModel.swift in Sources */,
 				F8B3A845227F090E004BA588 /* SettingsViewDexcomSettingsViewModel.swift in Sources */,
 				F8A1585F22EDB81E007F5B5D /* ConstantsLog.swift in Sources */,
