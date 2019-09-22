@@ -264,6 +264,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                     } else {
                         trace("     peripheral is nil", log: log, type: .info)
                     }
+                } else {
+                    trace("    uuid is not nil, but central.retrievePeripherals returns 0 peripherals", log: log, type: .error)
                 }
             } else {
                 trace("    uuid is nil", log: log, type: .info)
@@ -290,6 +292,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             if peripheral.identifier.uuidString == deviceAddress {
                 trace("    stored address matches peripheral address, will try to connect", log: log, type: .info)
                 stopScanAndconnect(to: peripheral)
+            } else {
+                trace("    stored address does not match peripheral address, ignoring this device", log: log, type: .info)
             }
         } else {
             //the app never connected before to our device
@@ -302,7 +306,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                     stopScanAndconnect(to: peripheral)
                 } else {
                     // peripheral.name is nil or does not contain expectedName
-                    trace("    new peripheral doesn't have device name as expected, ignoring", log: log, type: .info)
+                    trace("    new peripheral doesn't have device name as expected, ignoring this device", log: log, type: .info)
                 }
             } else {
                 // we don't expect any specific device name, so let's connect

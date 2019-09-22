@@ -7,6 +7,8 @@ public class M5Stack: NSManagedObject {
     /// create M5Stack
     init(address: String, name: String, nsManagedObjectContext:NSManagedObjectContext) {
        
+        let entity = NSEntityDescription.entity(forEntityName: "M5Stack", in: nsManagedObjectContext)!
+        
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         
         self.address = address

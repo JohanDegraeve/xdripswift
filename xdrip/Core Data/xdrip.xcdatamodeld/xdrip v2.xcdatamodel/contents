@@ -55,7 +55,7 @@
         <relationship name="bgreadings" toMany="YES" deletionRule="Deny" destinationEntity="BgReading" inverseName="calibration" inverseEntity="BgReading" syncable="YES"/>
         <relationship name="sensor" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" inverseName="calibrations" inverseEntity="Sensor" syncable="YES"/>
     </entity>
-    <entity name="M5Stack" representedClassName=".M5Stack" syncable="YES" codeGenerationType="class">
+    <entity name="M5Stack" representedClassName=".M5Stack" syncable="YES">
         <attribute name="address" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="blepassword" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
@@ -72,7 +72,7 @@
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
-        <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="120"/>
         <element name="M5Stack" positionX="-657" positionY="180" width="128" height="90"/>
+        <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="120"/>
     </elements>
 </model>
