@@ -1,8 +1,9 @@
 //
 //  M5Stack+CoreDataProperties.swift
-//  
+//  xdrip
 //
-//  Created by Johan Degraeve on 21/09/2019.
+//  Created by Johan Degraeve on 23/09/2019.
+//  Copyright © 2019 Johan Degraeve. All rights reserved.
 //
 //
 
@@ -16,8 +17,10 @@ extension M5Stack {
         return NSFetchRequest<M5Stack>(entityName: "M5Stack")
     }
 
-    @NSManaged public var address: String?
-    @NSManaged public var name: String?
+    @NSManaged public var address: String
     @NSManaged public var blepassword: String?
+    @NSManaged public var name: String
+    @NSManaged public var shouldconnect: Bool
+    @NSManaged public var m5StackName: M5StackName?
 
 }

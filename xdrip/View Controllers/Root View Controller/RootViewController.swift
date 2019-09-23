@@ -44,9 +44,6 @@ final class RootViewController: UIViewController {
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
     
-    /// M5StackBluetoothTransmitter for testing
-    var m5StackBluetoothTransmitter:M5StackBluetoothTransmitter?
-    
     // MARK: - Constants for ApplicationManager usage
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updatelabelstimer
@@ -81,10 +78,10 @@ final class RootViewController: UIViewController {
     /// calibrator to be used for calibration, value will depend on transmitter type
     private var calibrator:Calibrator?
     
-    /// BgReadings instance
+    /// BgReadingsAccessor instance
     private var bgReadingsAccessor:BgReadingsAccessor?
     
-    /// Calibrations instance
+    /// CalibrationsAccessor instance
     private var calibrationsAccessor:CalibrationsAccessor?
     
     /// NightScoutUploadManager instance
@@ -120,6 +117,8 @@ final class RootViewController: UIViewController {
     /// timestamp of last notification for pairing
     private var timeStampLastNotificationForPairing:Date?
     
+    private var m5StackManager: M5StackManager?
+    
     // MARK: - View Life Cycle
     
     override func viewWillAppear(_ animated: Bool) {
@@ -144,8 +143,6 @@ final class RootViewController: UIViewController {
             // create transmitter based on UserDefaults
             self.initializeCGMTransmitter()
             
-            self.m5StackBluetoothTransmitter = M5StackBluetoothTransmitter(address: nil, name: "M5_NightscoutMon", delegate: self, blePassword: nil)
-
         })
         
         // Setup View
@@ -268,6 +265,9 @@ final class RootViewController: UIViewController {
         dexcomShareUploadManager = DexcomShareUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
             UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
         })
+        
+        // setup m5StackManager
+        m5StackManager = M5StackManager(coreDataManager: coreDataManager)
     }
     
     /// process new glucose data received from transmitter.
@@ -361,19 +361,6 @@ final class RootViewController: UIViewController {
                 
                 dexcomShareUploadManager?.upload()
                 
-                //// temporary code
-                // get latest reading, ignore sensor, rawdata, timestamp - only 1
-                let lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, fromDate: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-                
-                // if there's no readings, then no further processing
-                if lastReadings.count > 0 {
-                    let lastReading = lastReadings[0]
-                    // if reading older dan 4.5 minutes, then no further processing
-                    if Date().timeIntervalSince(lastReading.timeStamp) < 4.5 * 60 {
-                        m5StackBluetoothTransmitter?.writeBgReadingInfo(bgReading: lastReading)
-                    }
-                }
-
             }
         }
         
@@ -872,14 +859,6 @@ final class RootViewController: UIViewController {
             }
         }
         
-        // add action to start scanning for m5stack
-        listOfActions["M5Stack"] = {(UIAlertAction) in
-            
-            debuglogging("calling m5StackBluetoothTransmitter")
-            self.m5StackBluetoothTransmitter?.startScanning()
-
-        }
-
         // next action is to start or stop the sensor, can also be omitted depending on type of device - also not applicable for follower mode
         if let transmitterType = UserDefaults.standard.transmitterType {
             if !transmitterType.canDetectNewSensor() && UserDefaults.standard.isMaster {
@@ -1304,13 +1283,21 @@ extension RootViewController:CGMTransmitterDelegate {
 
 /// conform to UITabBarControllerDelegate, want to receive info when user clicks specific tabs
 extension RootViewController: UITabBarControllerDelegate {
+    
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
         
-        // if user clicks the tab for settings, then configure it
-        if let navigationController = viewController as? SettingsNavigationController {
+        // check which tab is being clicked
+        if let navigationController = viewController as? SettingsNavigationController, let coreDataManager = coreDataManager, let soundPlayer = soundPlayer {
+            
             navigationController.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
+            
+        } else if let navigationController = viewController as? M5StackNavigationController, let m5StackManager = m5StackManager, let coreDataManager = coreDataManager {
+
+            navigationController.configure(coreDataManager: coreDataManager, m5StackManager: m5StackManager)
+            
         }
     }
+    
 }
 
 // MARK: - conform to UNUserNotificationCenterDelegate protocol
@@ -1467,25 +1454,3 @@ extension RootViewController:NightScoutFollowerDelegate {
         }
     }
 }
-
-extension RootViewController: M5StackDelegate {
-    
-    func newBlePassWord(newBlePassword: String) {
-        UserDefaults.standard.m5StackBlePassword = newBlePassword
-    }
-    
-    func authentication(success: Bool) {
-        debuglogging("successfully authenticated towards M5Stack")
-    }
-    
-    func blePasswordMissingInSettings() {
-        debuglogging("ble password missing in settings")
-    }
-    
-    func m5StackResetRequired() {
-        debuglogging("M5 Stack reset required")
-    }
-    
-    
-}
-

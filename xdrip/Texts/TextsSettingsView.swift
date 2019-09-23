@@ -221,4 +221,22 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_license", tableName: filename, bundle: Bundle.main, value: "License", comment: "used in settings, section Info, title of the license setting")
     }()
     
+    // MARK: - Section M5Stack
+    
+    static let m5StackSettingsViewScreenTitle: String = {
+        return NSLocalizedString("m5stack_settingsviews_settingstitle", tableName: filename, bundle: Bundle.main, value: "M5 Stack Settings", comment: "shown on top of the first settings screen")
+    }()
+    
+    static let m5StackTextColor: String = {
+        return NSLocalizedString("m5stack_settingsviews_textColor", tableName: filename, bundle: Bundle.main, value: "Text Color", comment: "name of setting for text color")
+    }()
+    
+    static let m5StackSectionTitleBluetooth: String = {
+        return NSLocalizedString("m5stack_settingsviews_sectiontitlebluetooth", tableName: filename, bundle: Bundle.main, value: "Bluetooth", comment: "bluetooth settings, section title")
+    }()
+    
+    static let giveBlueToothPassword: String = {
+        return NSLocalizedString("m5stack_settingsviews_giveBluetoothPassword", tableName: filename, bundle: Bundle.main, value: "Enter Bluetooth password", comment: "M5 stack bluetooth  settings, pop up that asks user to enter the password")
+    }()
+
 }

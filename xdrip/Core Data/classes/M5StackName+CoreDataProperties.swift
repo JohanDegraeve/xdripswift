@@ -16,7 +16,7 @@ extension M5StackName {
         return NSFetchRequest<M5StackName>(entityName: "M5StackName")
     }
 
-    @NSManaged public var address: String?
-    @NSManaged public var userDefinedName: String?
+    @NSManaged public var address: String
+    @NSManaged public var userDefinedName: String
 
 }

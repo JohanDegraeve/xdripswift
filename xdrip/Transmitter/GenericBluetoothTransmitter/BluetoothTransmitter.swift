@@ -116,18 +116,41 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     // MARK: - public functions
     
-    // gets peripheral connection status, nil if peripheral not existing yet
+    /// will try to connect to the device, first by calling retrievePeripherals, if peripheral not known, then by calling startScanning
+    func connect() {
+        
+        reconnectAfterDisconnect = true
+        
+        if let centralManager = centralManager, !retrievePeripherals(centralManager) {
+            _ = startScanning()
+        }
+
+    }
+    
+    /// gets peripheral connection status, nil if peripheral not existing yet
     func getConnectionStatus() -> CBPeripheralState? {
         return peripheral?.state
     }
     
-    func disconnect() {
+    /// disconnect the device
+    /// - parameters:
+    ///     - reconnectAfterDisconnect : internal variable reconnectAfterDisconnect will be assigned this value. When didDisconnect is called, and reconnectAfterDisconnect = false, then no reconnect will occur
+    func disconnect(reconnectAfterDisconnect: Bool = true) {
+        
+        self.reconnectAfterDisconnect = reconnectAfterDisconnect
+        
         if let peripheral = peripheral {
             if let centralManager = centralManager {
-                trace("disconnect, disconnecting, for peripheral with name %{public}@", log: log, type: .info, deviceName ?? "'unknown'")
+                trace("in disconnect, disconnecting, for peripheral with name %{public}@", log: log, type: .info, deviceName ?? "'unknown'")
                 centralManager.cancelPeripheralConnection(peripheral)
             }
         }
+        
+    }
+    
+    /// stops scanning
+    func stopScanning() {
+        self.centralManager?.stopScan()
     }
     
     /// start bluetooth scanning for device
@@ -223,7 +246,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     // MARK: - fileprivate functions
     
-    /// stops scanning and connects. To be called after didiscover
+    /// stops scanning and connect. To be called after diddiscover
     fileprivate func stopScanAndconnect(to peripheral: CBPeripheral) {
         
         self.centralManager?.stopScan()
@@ -360,25 +383,32 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         timeStampLastStatusUpdate = Date()
         
+        trace("    didDisconnect peripheral with name %{public}@", log: log, type: .info , deviceName ?? "'unknown'")
+
         if let error = error {
-            trace("Did disconnect peripheral with name %{public}@, with error: %{public}@", log: log, type: .error , deviceName ?? "'unknown'", error.localizedDescription)
-        }
-        
-        // check if automatic reconnect is needed or not
-        if !reconnectAfterDisconnect {
-            trace("    reconnectAfterDisconnect is false, will not try to reconnect", log: log, type: .info)
-        }
-        
-        // if self.peripheral == nil, then a manual disconnect or something like that has occured, no need to reconnect
-        // otherwise disconnect occurred because of other (like out of range), so let's try to reconnect
-        if let ownPeripheral = self.peripheral {
-            trace("    Will try to connect", log: log, type: .info)
-            centralManager?.connect(ownPeripheral, options: nil)
-        } else {
-            trace("    peripheral is nil, will not try to connect", log: log, type: .info)
+            trace("    error: %{public}@", log: log, type: .error , error.localizedDescription)
         }
         
         bluetoothTransmitterDelegate?.centralManagerDidDisconnectPeripheral(error: error)
+        
+        // check if automatic reconnect is needed or not
+        if !reconnectAfterDisconnect {
+            
+            trace("    reconnectAfterDisconnect is false, will not try to reconnect", log: log, type: .info)
+            
+        } else {
+
+            // if self.peripheral == nil, then a manual disconnect or something like that has occured, no need to reconnect
+            // otherwise disconnect occurred because of other (like out of range), so let's try to reconnect
+            if let ownPeripheral = self.peripheral {
+                trace("    Will try to reconnect", log: log, type: .info)
+                centralManager?.connect(ownPeripheral, options: nil)
+            } else {
+                trace("    peripheral is nil, will not try to reconnect", log: log, type: .info)
+            }
+
+        }
+        
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {

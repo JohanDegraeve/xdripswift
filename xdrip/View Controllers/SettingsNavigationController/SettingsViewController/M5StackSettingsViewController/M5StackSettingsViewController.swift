@@ -14,7 +14,7 @@ final class M5StackSettingsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = Texts_M5Stack_SettingsView.screenTitle
+        title = Texts_SettingsView.m5StackSettingsViewScreenTitle
         
         setupView()
     }

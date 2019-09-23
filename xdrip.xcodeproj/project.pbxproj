@@ -61,6 +61,9 @@
 		F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */; };
 		F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */; };
 		F897AAFB2201018800CDDD10 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAFA2201018800CDDD10 /* String.swift */; };
+		F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDE9233F53BF00BFB79B /* UIButton.swift */; };
+		F898EDEC233F549100BFB79B /* UIBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDEB233F549100BFB79B /* UIBarButtonItem.swift */; };
+		F898EDEE233F852200BFB79B /* M5StackNameAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDED233F852200BFB79B /* M5StackNameAccessor.swift */; };
 		F8A1584D22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */; };
 		F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */; };
 		F8A1585122EDB597007F5B5D /* ConstantsBGGraphBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */; };
@@ -85,11 +88,9 @@
 		F8A389C3231F1A4B0010F405 /* M5StackReadBlePassWordTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389C2231F1A4B0010F405 /* M5StackReadBlePassWordTxMessage.swift */; };
 		F8A389C6231FBA110010F405 /* M5StackPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389C5231FBA110010F405 /* M5StackPacket.swift */; };
 		F8A389C823203E3E0010F405 /* ConstantsM5Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */; };
-		F8A389CA232118E80010F405 /* M5StackDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389C9232118E80010F405 /* M5StackDelegate.swift */; };
+		F8A389CA232118E80010F405 /* M5StackBluetoothDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389C9232118E80010F405 /* M5StackBluetoothDelegate.swift */; };
 		F8A389CC232191280010F405 /* M5StackUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389CB232191280010F405 /* M5StackUtilities.swift */; };
 		F8A389CF232AE2EA0010F405 /* M5StackSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389CE232AE2E90010F405 /* M5StackSettingsViewController.swift */; };
-		F8A389D1232BAB9F0010F405 /* TextsM5StackSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389D0232BAB9F0010F405 /* TextsM5StackSettingsView.swift */; };
-		F8A389D3232BAD240010F405 /* M5StackSettingsView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8A389D2232BAD240010F405 /* M5StackSettingsView.strings */; };
 		F8A389E1232D3E070010F405 /* SettingsViewM5StackWiFiSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389DE232D3E070010F405 /* SettingsViewM5StackWiFiSettingsViewModel.swift */; };
 		F8A389E2232D3E070010F405 /* SettingsViewM5StackBluetoothSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389DF232D3E070010F405 /* SettingsViewM5StackBluetoothSettingsViewModel.swift */; };
 		F8A389E3232D3E070010F405 /* SettingsViewM5StackGeneralSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389E0232D3E070010F405 /* SettingsViewM5StackGeneralSettingsViewModel.swift */; };
@@ -220,6 +221,13 @@
 		F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD5322FF685400D2D610 /* NSMutableURLRequest.swift */; };
 		F8EEDD552300136F00D2D610 /* DexcomShareTestResult.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8EEDD572300136F00D2D610 /* DexcomShareTestResult.strings */; };
 		F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */; };
+		F8F6226C233A85CE00BE8796 /* M5StackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F6226B233A85CE00BE8796 /* M5StackManager.swift */; };
+		F8F6226E233A86EA00BE8796 /* M5StackManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F6226D233A86EA00BE8796 /* M5StackManaging.swift */; };
+		F8F62270233AA3B200BE8796 /* M5StackAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F6226F233AA3B200BE8796 /* M5StackAccessor.swift */; };
+		F8F62276233D1CE600BE8796 /* TextsM5StacksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F62275233D1CE600BE8796 /* TextsM5StacksView.swift */; };
+		F8F62278233D1CED00BE8796 /* TextsM5StackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F62277233D1CED00BE8796 /* TextsM5StackView.swift */; };
+		F8F6227A233D1CF700BE8796 /* M5StackView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8F62279233D1CF700BE8796 /* M5StackView.strings */; };
+		F8F6227C233D1CFE00BE8796 /* M5StacksView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8F6227B233D1CFE00BE8796 /* M5StacksView.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -284,6 +292,9 @@
 		F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Calibration+CoreDataProperties.swift"; path = "xdrip/Core Data/extensions/Calibration+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
 		F897AAFA2201018800CDDD10 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		F898EDE9233F53BF00BFB79B /* UIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIButton.swift; sourceTree = "<group>"; };
+		F898EDEB233F549100BFB79B /* UIBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBarButtonItem.swift; sourceTree = "<group>"; };
+		F898EDED233F852200BFB79B /* M5StackNameAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackNameAccessor.swift; sourceTree = "<group>"; };
 		F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewDevelopmentSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewInfoViewModel.swift; sourceTree = "<group>"; };
 		F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBGGraphBuilder.swift; sourceTree = "<group>"; };
@@ -308,11 +319,9 @@
 		F8A389C2231F1A4B0010F405 /* M5StackReadBlePassWordTxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackReadBlePassWordTxMessage.swift; sourceTree = "<group>"; };
 		F8A389C5231FBA110010F405 /* M5StackPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackPacket.swift; sourceTree = "<group>"; };
 		F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsM5Stack.swift; sourceTree = "<group>"; };
-		F8A389C9232118E80010F405 /* M5StackDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackDelegate.swift; sourceTree = "<group>"; };
+		F8A389C9232118E80010F405 /* M5StackBluetoothDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackBluetoothDelegate.swift; sourceTree = "<group>"; };
 		F8A389CB232191280010F405 /* M5StackUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackUtilities.swift; sourceTree = "<group>"; };
 		F8A389CE232AE2E90010F405 /* M5StackSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackSettingsViewController.swift; sourceTree = "<group>"; };
-		F8A389D0232BAB9F0010F405 /* TextsM5StackSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsM5StackSettingsView.swift; sourceTree = "<group>"; };
-		F8A389D2232BAD240010F405 /* M5StackSettingsView.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = M5StackSettingsView.strings; sourceTree = "<group>"; };
 		F8A389DE232D3E070010F405 /* SettingsViewM5StackWiFiSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackWiFiSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8A389DF232D3E070010F405 /* SettingsViewM5StackBluetoothSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackBluetoothSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8A389E0232D3E070010F405 /* SettingsViewM5StackGeneralSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackGeneralSettingsViewModel.swift; sourceTree = "<group>"; };
@@ -570,6 +579,13 @@
 		F8EEDD612300139800D2D610 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
 		F8EEDD622300139A00D2D610 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
 		F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCalibrator.swift; sourceTree = "<group>"; };
+		F8F6226B233A85CE00BE8796 /* M5StackManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackManager.swift; sourceTree = "<group>"; };
+		F8F6226D233A86EA00BE8796 /* M5StackManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackManaging.swift; sourceTree = "<group>"; };
+		F8F6226F233AA3B200BE8796 /* M5StackAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackAccessor.swift; sourceTree = "<group>"; };
+		F8F62275233D1CE600BE8796 /* TextsM5StacksView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextsM5StacksView.swift; sourceTree = "<group>"; };
+		F8F62277233D1CED00BE8796 /* TextsM5StackView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextsM5StackView.swift; sourceTree = "<group>"; };
+		F8F62279233D1CF700BE8796 /* M5StackView.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = M5StackView.strings; sourceTree = "<group>"; };
+		F8F6227B233D1CFE00BE8796 /* M5StacksView.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = M5StacksView.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -628,6 +644,8 @@
 				F8B3A857227F6971004BA588 /* UISwitch.swift */,
 				F8B3A85C22821BB6004BA588 /* Int.swift */,
 				F8EEDD5322FF685400D2D610 /* NSMutableURLRequest.swift */,
+				F898EDE9233F53BF00BFB79B /* UIButton.swift */,
+				F898EDEB233F549100BFB79B /* UIBarButtonItem.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -785,6 +803,7 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				F8F6226A233A85A700BE8796 /* M5Stack */,
 				F81D6D4622BD5F43005EFAE2 /* DexcomShare */,
 				F821CF9922AEF2DF005C1E43 /* Speak */,
 				F821CF9122ADB064005C1E43 /* HealthKit */,
@@ -799,20 +818,21 @@
 		F85DC2F921D2CCC000B9F74A /* Storyboards */ = {
 			isa = PBXGroup;
 			children = (
-				F8B48AA222B2FA9A009BCC01 /* CalibrationRequest.strings */,
-				F8B48A9E22B2FA7B009BCC01 /* HomeView.strings */,
-				F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */,
 				F8B3A7B3226A0A71004BA588 /* Alerts.strings */,
 				F8B3A80B227A3E97004BA588 /* AlertTypesSettingsView.strings */,
+				F8B48AA222B2FA9A009BCC01 /* CalibrationRequest.strings */,
 				F8BDD444221C9D0D006EAB84 /* Common.strings */,
+				F8EEDD572300136F00D2D610 /* DexcomShareTestResult.strings */,
 				F8BDD44A221C9D70006EAB84 /* ErrorMessages.strings */,
+				F8B48A9E22B2FA7B009BCC01 /* HomeView.strings */,
 				F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */,
 				F8BDD436221A0349006EAB84 /* Localizable.strings */,
+				F8F6227B233D1CFE00BE8796 /* M5StacksView.strings */,
+				F8F62279233D1CF700BE8796 /* M5StackView.strings */,
 				F8AC426321ADEBD60078C348 /* Main.storyboard */,
 				F8B3A788225D4473004BA588 /* NightScoutTestResult.strings */,
 				F8BDD457221DEF22006EAB84 /* SettingsViews.strings */,
-				F8EEDD572300136F00D2D610 /* DexcomShareTestResult.strings */,
-				F8A389D2232BAD240010F405 /* M5StackSettingsView.strings */,
+				F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -879,7 +899,7 @@
 			isa = PBXGroup;
 			children = (
 				F8A389C5231FBA110010F405 /* M5StackPacket.swift */,
-				F8A389C9232118E80010F405 /* M5StackDelegate.swift */,
+				F8A389C9232118E80010F405 /* M5StackBluetoothDelegate.swift */,
 				F8A389CB232191280010F405 /* M5StackUtilities.swift */,
 			);
 			path = Utilities;
@@ -1137,6 +1157,8 @@
 				F8B3A817227DEC91004BA588 /* CalibrationsAccessor.swift */,
 				F8B3A819227DEC92004BA588 /* README.md */,
 				F8B3A815227DEC91004BA588 /* SensorsAccessor.swift */,
+				F8F6226F233AA3B200BE8796 /* M5StackAccessor.swift */,
+				F898EDED233F852200BFB79B /* M5StackNameAccessor.swift */,
 			);
 			path = accessors;
 			sourceTree = "<group>";
@@ -1236,17 +1258,18 @@
 		F8BDD44C221CAA26006EAB84 /* Texts */ = {
 			isa = PBXGroup;
 			children = (
-				F8BDD43E221B5BAF006EAB84 /* TextsErrorMessages.swift */,
-				F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */,
-				F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */,
-				F8B3A782225D37F2004BA588 /* TextsNightScoutTestResult.swift */,
 				F8B3A7B1226A0878004BA588 /* TextsAlerts.swift */,
 				F8B3A809227A3D11004BA588 /* TextsAlertTypeSettings.swift */,
 				F81FA005228E09D40028C70F /* TextsCalibration.swift */,
-				F81FA009228F53680028C70F /* TextsHomeView.swift */,
-				F8B48A9322B2A705009BCC01 /* TextsSpeakReading.swift */,
+				F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */,
 				F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */,
-				F8A389D0232BAB9F0010F405 /* TextsM5StackSettingsView.swift */,
+				F8BDD43E221B5BAF006EAB84 /* TextsErrorMessages.swift */,
+				F81FA009228F53680028C70F /* TextsHomeView.swift */,
+				F8F62275233D1CE600BE8796 /* TextsM5StacksView.swift */,
+				F8F62277233D1CED00BE8796 /* TextsM5StackView.swift */,
+				F8B3A782225D37F2004BA588 /* TextsNightScoutTestResult.swift */,
+				F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */,
+				F8B48A9322B2A705009BCC01 /* TextsSpeakReading.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -1331,6 +1354,15 @@
 				F8A54AAC22D6859200934E7A /* SlopeParameters.swift */,
 			);
 			path = Calibration;
+			sourceTree = "<group>";
+		};
+		F8F6226A233A85A700BE8796 /* M5Stack */ = {
+			isa = PBXGroup;
+			children = (
+				F8F6226B233A85CE00BE8796 /* M5StackManager.swift */,
+				F8F6226D233A86EA00BE8796 /* M5StackManaging.swift */,
+			);
+			path = M5Stack;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1432,12 +1464,13 @@
 				F8B48A9C22B2FA66009BCC01 /* SpeakReading.strings in Resources */,
 				F8B3A7C7226CC0B7004BA588 /* shortlow3.mp3 in Resources */,
 				F8B3A7CB226CC0B7004BA588 /* shortlow4.mp3 in Resources */,
+				F8F6227A233D1CF700BE8796 /* M5StackView.strings in Resources */,
 				F8B3A80D227A3E98004BA588 /* AlertTypesSettingsView.strings in Resources */,
 				F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */,
+				F8F6227C233D1CFE00BE8796 /* M5StacksView.strings in Resources */,
 				F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */,
 				F8EEDD552300136F00D2D610 /* DexcomShareTestResult.strings in Resources */,
 				F8B3A7CF226CC0B7004BA588 /* shorthigh4.mp3 in Resources */,
-				F8A389D3232BAD240010F405 /* M5StackSettingsView.strings in Resources */,
 				F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 in Resources */,
 				F8B3A7CE226CC0B7004BA588 /* shorthigh2.mp3 in Resources */,
 				F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */,
@@ -1575,6 +1608,7 @@
 				F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */,
 				F8A54AE522D911BA00934E7A /* TransmitterVersionRxMessage.swift in Sources */,
 				F821CF57229BF43A005C1E43 /* SnoozeParameters.swift in Sources */,
+				F8F62278233D1CED00BE8796 /* TextsM5StackView.swift in Sources */,
 				F8A54AFF22D9179100934E7A /* CRC.swift in Sources */,
 				F80487102337B3D400EBDDB7 /* M5StackName+CoreDataClass.swift in Sources */,
 				F8B3A79722635A25004BA588 /* AlertEntry+CoreDataProperties.swift in Sources */,
@@ -1584,6 +1618,7 @@
 				F85C4A9A2336CE8E00D6A86F /* M5StacksViewController.swift in Sources */,
 				F8B3A81D227DEC92004BA588 /* CalibrationsAccessor.swift in Sources */,
 				F8A54AE122D911BA00934E7A /* SensorDataTxMessage.swift in Sources */,
+				F898EDEE233F852200BFB79B /* M5StackNameAccessor.swift in Sources */,
 				F821CF9D22AEF483005C1E43 /* BGReadingSpeaker.swift in Sources */,
 				F8EEDD4622FD80A600D2D610 /* LibreMeasurement.swift in Sources */,
 				F8B3A848227F090E004BA588 /* SettingsViewHealthKitSettingsViewModel.swift in Sources */,
@@ -1602,6 +1637,7 @@
 				F8A54AB722D9111900934E7A /* CGMTransmitter.swift in Sources */,
 				EE9947E822EEDD2E00DCB876 /* CGMBubbleTransmitter.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
+				F8F62270233AA3B200BE8796 /* M5StackAccessor.swift in Sources */,
 				F8A389E3232D3E070010F405 /* SettingsViewM5StackGeneralSettingsViewModel.swift in Sources */,
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,
 				F8B3A81C227DEC92004BA588 /* AlertEntriesAccessor.swift in Sources */,
@@ -1611,7 +1647,7 @@
 				F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */,
 				F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
-				F8A389CA232118E80010F405 /* M5StackDelegate.swift in Sources */,
+				F8A389CA232118E80010F405 /* M5StackBluetoothDelegate.swift in Sources */,
 				F8B3A847227F090E004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,
 				F8B3A79622635A25004BA588 /* AlertEntry+CoreDataClass.swift in Sources */,
 				F804870C2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift in Sources */,
@@ -1620,10 +1656,12 @@
 				F821CF8E22AB090C005C1E43 /* DatePickerViewController.swift in Sources */,
 				F8A1585322EDB602007F5B5D /* ConstantsBloodGlucose.swift in Sources */,
 				F8A389C823203E3E0010F405 /* ConstantsM5Stack.swift in Sources */,
+				F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */,
 				F8A54AE322D911BA00934E7A /* AuthRequestRxMessage.swift in Sources */,
 				F8A54AD722D911BA00934E7A /* CGMG6Transmitter.swift in Sources */,
 				F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */,
 				F8B3A858227F6971004BA588 /* UISwitch.swift in Sources */,
+				F8F62276233D1CE600BE8796 /* TextsM5StacksView.swift in Sources */,
 				F8A1586722EDB8BF007F5B5D /* ConstantsHomeView.swift in Sources */,
 				F8A1585922EDB7C6007F5B5D /* ConstantsDefaultAlertLevels.swift in Sources */,
 				F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */,
@@ -1652,6 +1690,7 @@
 				F8B3A79522635A25004BA588 /* AlertType+CoreDataProperties.swift in Sources */,
 				F8A389BC231713580010F405 /* M5StackTransmitterOpCode.swift in Sources */,
 				F8B3A84C227F090E004BA588 /* SettingsViewController.swift in Sources */,
+				F8F6226E233A86EA00BE8796 /* M5StackManaging.swift in Sources */,
 				F8EEDD5222FECE3800D2D610 /* ConstantsLibreOOP.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */,
 				F8B3A78B225D473D004BA588 /* UIAlertController.swift in Sources */,
@@ -1664,13 +1703,14 @@
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				F8B3A820227DEC92004BA588 /* AlertTypesAccessor.swift in Sources */,
 				F8B3A81E227DEC92004BA588 /* BgReadingsAccessor.swift in Sources */,
-				F8A389D1232BAB9F0010F405 /* TextsM5StackSettingsView.swift in Sources */,
+				F8F6226C233A85CE00BE8796 /* M5StackManager.swift in Sources */,
 				F8A389C6231FBA110010F405 /* M5StackPacket.swift in Sources */,
 				F8B3A846227F090E004BA588 /* SettingsViewTransmitterSettingsViewModel.swift in Sources */,
 				F821CF6B229FC22D005C1E43 /* Endpoint.swift in Sources */,
 				F821CF58229BF43A005C1E43 /* AlertManager.swift in Sources */,
 				F8A389CC232191280010F405 /* M5StackUtilities.swift in Sources */,
 				F8025C1121DA5E8F00ECF0C0 /* BluetoothTransmitterDelegate.swift in Sources */,
+				F898EDEC233F549100BFB79B /* UIBarButtonItem.swift in Sources */,
 				F8A54AD922D911BA00934E7A /* TransmitterVersionTxMessage.swift in Sources */,
 				F8A389CF232AE2EA0010F405 /* M5StackSettingsViewController.swift in Sources */,
 				F821CF5E229BF43A005C1E43 /* BgReading+NightScout.swift in Sources */,

@@ -18,7 +18,7 @@ struct SettingsViewM5StackGeneralSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
         case .textColor:
-            return Texts_M5Stack_SettingsView.textColor
+            return Texts_SettingsView.m5StackTextColor
         }
 
     }
@@ -76,7 +76,7 @@ struct SettingsViewM5StackGeneralSettingsViewModel: SettingsViewModelProtocol {
                 selectedRow = texts.firstIndex(of:textColor)
             }
             
-            return SettingsSelectedRowAction.selectFromList(title: Texts_M5Stack_SettingsView.textColor, data: texts, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.m5StackTextColor, data: texts, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
                 if index != selectedRow {
                     UserDefaults.standard.m5StackTextColor = colors[index]
                 }

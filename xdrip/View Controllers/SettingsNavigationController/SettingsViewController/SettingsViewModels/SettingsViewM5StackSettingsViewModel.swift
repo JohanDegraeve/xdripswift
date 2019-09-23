@@ -21,7 +21,7 @@ struct SettingsViewM5StackSettingsViewModel: SettingsViewModelProtocol {
             
         case .m5stack:
             
-            return Texts_M5Stack_SettingsView.screenTitle
+            return Texts_SettingsView.m5StackSettingsViewScreenTitle
             
         }
         

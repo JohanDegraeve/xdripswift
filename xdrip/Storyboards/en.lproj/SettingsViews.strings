@@ -44,3 +44,7 @@
 "settingsviews_labelWebOOPSiteExplainingText" = "Web OOP site (leave empty to use default value)";
 "settingsviews_labelWebOOPtokenExplainingText" = "Web OOP token (leave empty to use default value)";
 "settingsviews_labelWebOOP" = "Web OOP";
+"m5stack_settingsviews_settingstitle" = "M5 Stack Settings";
+"m5stack_settingsviews_textColor" = "Text Color";
+"m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
+"m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth password";

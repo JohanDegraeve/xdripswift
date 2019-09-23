@@ -4,7 +4,7 @@ import CoreData
 
 public class M5Stack: NSManagedObject {
 
-    /// create M5Stack
+    /// create M5Stack, shouldconnect default value = true
     init(address: String, name: String, nsManagedObjectContext:NSManagedObjectContext) {
        
         let entity = NSEntityDescription.entity(forEntityName: "M5Stack", in: nsManagedObjectContext)!
@@ -13,6 +13,7 @@ public class M5Stack: NSManagedObject {
         
         self.address = address
         self.name = name
+        self.shouldconnect = true
         
     }
     

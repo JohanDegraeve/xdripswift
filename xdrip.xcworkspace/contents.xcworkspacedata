@@ -2,12 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/johandegraeve/OneDrive/Xcode Projects/xdrip/xdrip/Core Data/classes/M5StackName+CoreDataClass.swift">
-   </FileRef>
-   <FileRef
-      location = "group:/Users/johandegraeve/OneDrive/Xcode Projects/xdrip/xdrip/Core Data/classes/M5StackName+CoreDataProperties.swift">
-   </FileRef>
-   <FileRef
       location = "group:xdrip.xcodeproj">
    </FileRef>
    <FileRef

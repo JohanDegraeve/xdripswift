@@ -21,7 +21,7 @@ fileprivate enum Setting:Int, CaseIterable {
 /// edit or add an alert types,
 final class AlertTypeSettingsViewController: UIViewController {
     
-    // MARK: - IBOutlet's and IBAcction's
+    // MARK: - IBOutlet's and IBAction's
     
     /// a tableView is used to display all alerttype properties - not the nicest solution maybe, but the quickest right now
     @IBOutlet weak var tableView: UITableView!
@@ -109,10 +109,10 @@ final class AlertTypeSettingsViewController: UIViewController {
         
         // if the alerttype still has alertEntries linked to it, or if it's about creating a new (yet unexisting) alerttype, then the trashbutton should be disabled
         if let alertEntries = alertTypeAsNSObject?.alertEntries, alertEntries.count > 0 {
-            trashButtonOutlet.isEnabled = false
+            trashButtonOutlet.disable()
         }
         if alertTypeAsNSObject == nil {
-            trashButtonOutlet.isEnabled = false
+            trashButtonOutlet.disable()
         }
         
         setupTableView()
@@ -140,6 +140,7 @@ final class AlertTypeSettingsViewController: UIViewController {
     
     /// to do when user cliks done button
     private func doneButtonAction() {
+        
         // first check if name is a unique name
         let alertTypesAccessor = AlertTypesAccessor(coreDataManager: getCoreDataManager())
         for alertTypeAlreadyStored in alertTypesAccessor.getAllAlertTypes() {

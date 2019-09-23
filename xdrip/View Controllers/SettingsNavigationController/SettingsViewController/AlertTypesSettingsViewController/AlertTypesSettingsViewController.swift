@@ -39,7 +39,8 @@ final class AlertTypesSettingsViewController: UIViewController {
         self.soundPlayer = soundPlayer
         
     }
-    // MARK: - View Life Cycle
+
+    // MARK: overriden
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,9 +50,8 @@ final class AlertTypesSettingsViewController: UIViewController {
         setupView()
     }
     
-    // MARK: - other overriden functions
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
         guard let segueIdentifier = segue.identifier else {
             fatalError("In AlertTypesSettingsViewController, prepare for segue, Segue had no identifier")
         }

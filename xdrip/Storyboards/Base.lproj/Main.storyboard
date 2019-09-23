@@ -413,7 +413,7 @@
                                 <rect key="frame" x="0.0" y="64" width="375" height="554"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SettingsCell" textLabel="0QS-QO-ffs" detailTextLabel="Mfz-72-6g0" style="IBUITableViewCellStyleValue1" id="FCD-AT-hwi">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SettingsCell" textLabel="0QS-QO-ffs" detailTextLabel="Mfz-72-6g0" style="IBUITableViewCellStyleValue1" id="FCD-AT-hwi" customClass="SettingsTableViewCell" customModule="xdrip" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="FCD-AT-hwi" id="FU1-LI-A2c">
@@ -449,35 +449,43 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="EvW-JA-i05"/>
                     </view>
-                    <navigationItem key="navigationItem" id="RIF-ql-JYW">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="r5a-yh-yig"/>
+                    <navigationItem key="navigationItem" id="IRh-fS-FQG">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="Vzx-sW-4v4">
+                            <connections>
+                                <action selector="addButtonAction:" destination="E45-Z1-hcE" id="FHj-U1-3eb"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <segue destination="FJ0-eY-Fv0" kind="show" id="BEa-Az-mem"/>
+                        <outlet property="tableView" destination="dMM-nl-Zfn" id="Z76-9m-jPM"/>
+                        <segue destination="FJ0-eY-Fv0" kind="show" identifier="M5StacksToM5StackSegueIdentifier" id="BEa-Az-mem"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ajO-AG-xfd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2582" y="-134"/>
         </scene>
-        <!--Title-->
+        <!--M5 Stack View Controller-->
         <scene sceneID="fw3-II-GI1">
             <objects>
-                <viewController id="FJ0-eY-Fv0" customClass="M5StackViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="FJ0-eY-Fv0" userLabel="M5 Stack View Controller" customClass="M5StackViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="0Ho-lg-UtI">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L9f-Ab-Egz">
-                                <rect key="frame" x="20" y="93" width="49" height="39"/>
+                                <rect key="frame" x="20" y="64" width="49" height="39"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <state key="normal" title="Scan"/>
+                                <connections>
+                                    <action selector="scanButtonAction:" destination="FJ0-eY-Fv0" eventType="touchUpInside" id="d3F-AM-pvG"/>
+                                </connections>
                             </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="82M-Ti-NV0">
-                                <rect key="frame" x="0.0" y="132" width="375" height="486"/>
+                                <rect key="frame" x="0.0" y="103" width="375" height="515"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SettingsCell" textLabel="vbi-WE-Mvc" detailTextLabel="N1U-VA-CRw" style="IBUITableViewCellStyleValue1" id="dpi-qU-2Va">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SettingsCell" textLabel="vbi-WE-Mvc" detailTextLabel="N1U-VA-CRw" style="IBUITableViewCellStyleValue1" id="dpi-qU-2Va" customClass="SettingsTableViewCell" customModule="xdrip" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="dpi-qU-2Va" id="QVR-WA-lkN">
@@ -503,42 +511,58 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1RS-D2-mWR">
-                                <rect key="frame" x="0.0" y="64" width="375" height="29"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WtR-0P-RyL">
-                                <rect key="frame" x="273" y="93" width="82" height="39"/>
+                                <rect key="frame" x="273" y="64" width="82" height="39"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <state key="normal" title="Connect"/>
+                                <connections>
+                                    <action selector="connectButtonAction:" destination="FJ0-eY-Fv0" eventType="touchUpInside" id="fQK-fo-hqh"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="1RS-D2-mWR" firstAttribute="top" secondItem="jHe-GP-4Jf" secondAttribute="top" id="3lK-sw-knt"/>
-                            <constraint firstItem="WtR-0P-RyL" firstAttribute="top" secondItem="1RS-D2-mWR" secondAttribute="bottom" id="4wk-hA-Vwa"/>
                             <constraint firstItem="L9f-Ab-Egz" firstAttribute="leading" secondItem="jHe-GP-4Jf" secondAttribute="leading" constant="20" id="8zf-zJ-HsA"/>
-                            <constraint firstItem="L9f-Ab-Egz" firstAttribute="top" secondItem="1RS-D2-mWR" secondAttribute="bottom" id="Ecq-df-Wdc"/>
-                            <constraint firstItem="jHe-GP-4Jf" firstAttribute="trailing" secondItem="1RS-D2-mWR" secondAttribute="trailing" id="OWt-LZ-NU6"/>
-                            <constraint firstItem="1RS-D2-mWR" firstAttribute="leading" secondItem="jHe-GP-4Jf" secondAttribute="leading" id="Vam-rI-i6T"/>
+                            <constraint firstItem="WtR-0P-RyL" firstAttribute="top" secondItem="jHe-GP-4Jf" secondAttribute="top" id="Ej3-HQ-w2L"/>
                             <constraint firstItem="jHe-GP-4Jf" firstAttribute="trailing" secondItem="WtR-0P-RyL" secondAttribute="trailing" constant="20" id="ed1-re-h1k"/>
                             <constraint firstItem="82M-Ti-NV0" firstAttribute="top" secondItem="L9f-Ab-Egz" secondAttribute="bottom" id="n9y-ia-TyG"/>
                             <constraint firstItem="jHe-GP-4Jf" firstAttribute="bottom" secondItem="82M-Ti-NV0" secondAttribute="bottom" id="qBc-5d-R7l"/>
+                            <constraint firstItem="L9f-Ab-Egz" firstAttribute="top" secondItem="jHe-GP-4Jf" secondAttribute="top" id="tyR-sY-DG3"/>
                             <constraint firstItem="jHe-GP-4Jf" firstAttribute="trailing" secondItem="82M-Ti-NV0" secondAttribute="trailing" id="w0B-Wn-iY0"/>
                             <constraint firstItem="82M-Ti-NV0" firstAttribute="leading" secondItem="jHe-GP-4Jf" secondAttribute="leading" id="yg8-ad-aLX"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="jHe-GP-4Jf"/>
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="1DE-2P-Qfh">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="yem-TU-Ica">
+                            <connections>
+                                <action selector="cancelButtonAction:" destination="FJ0-eY-Fv0" id="wJ5-NV-3TH"/>
+                            </connections>
+                        </barButtonItem>
                         <rightBarButtonItems>
-                            <barButtonItem style="done" systemItem="done" id="CUr-JD-RwV"/>
-                            <barButtonItem systemItem="trash" id="N7o-Nz-l8g"/>
+                            <barButtonItem style="done" systemItem="done" id="CUr-JD-RwV">
+                                <connections>
+                                    <action selector="doneButtonAction:" destination="FJ0-eY-Fv0" id="ac9-M9-bFg"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="trash" id="N7o-Nz-l8g">
+                                <connections>
+                                    <action selector="trashButtonAction:" destination="FJ0-eY-Fv0" id="trt-wt-QU4"/>
+                                </connections>
+                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
+                    <connections>
+                        <outlet property="connectButtonOutlet" destination="WtR-0P-RyL" id="Sbx-db-Atn"/>
+                        <outlet property="doneButtonOutlet" destination="CUr-JD-RwV" id="6OJ-L9-Nnf"/>
+                        <outlet property="scanButtonOutlet" destination="L9f-Ab-Egz" id="z68-tK-4ql"/>
+                        <outlet property="tableView" destination="82M-Ti-NV0" id="RQy-kH-bnc"/>
+                        <outlet property="trashButtonOutlet" destination="N7o-Nz-l8g" id="Sz3-nt-e7r"/>
+                        <segue destination="qbA-EA-RMD" kind="unwind" identifier="M5StackToM5StacksUnWindSegueIdentifier" unwindAction="unwindToM5StacksViewControllerWithSegue:" id="yPp-xT-8cB"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kwG-Zz-t1q" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="qbA-EA-RMD" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="3582" y="-134"/>
         </scene>

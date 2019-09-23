@@ -1,0 +1,14 @@
+"screenTitle" = "M5Stack";
+"address" = "Address";
+"status" = "Status";
+"connected" = "connected";
+"notConnected" = "not connected";
+"alwaysconnect" = "Always Connect";
+"donotconnect" = "Don't connect";
+"authenticationFailureWarning" = "Authentication to M5Stack Failed, either set the pre-configured password in the Settings, or, if the M5Stack does not have a preconfigured password then reset the M5Stack";
+"blePasswordMissingWarning" = "You need to set the password in the Settings";
+"m5StackResetRequiredWarning" = "M5Stack must be reset in order to generate a new temporary password";
+"m5StackAlias" = "Alias";
+"selectAliasText" = "Choose a name for this M5Stack, the name will be shown in the app and is easier for you to recognize";
+"userdefinedNameAlreadyExists" = "There is already an M5Stack with this name";
+"userdefinedNameAlreadyExists" = "Do you want to delete M5Stack with ";

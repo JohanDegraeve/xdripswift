@@ -37,9 +37,9 @@ final class NewAlertSettingsViewController:UIViewController {
         
         // initialize alertSettingsViewControllerData
         alertSettingsViewControllerData = AlertSettingsViewControllerData(start: minimumStart, value: Int16(alertKind.defaultAlertValue()), alertKind: Int16(alertKind.rawValue), alertType: AlertTypesAccessor(coreDataManager: coreDataManager).getDefaultAlertType(), minimumStart: minimumStart, maximumStart: maximumStart, uIViewController: self, toCallWhenUserResetsProperties: {
-            self.doneButtonOutlet.isEnabled = false
+            self.doneButtonOutlet.disable()
         }, toCallWhenUserChangesProperties: {
-            self.doneButtonOutlet.isEnabled = true
+            self.doneButtonOutlet.enable()
         }, coreDataManager: coreDataManager)
         
     }
