@@ -295,6 +295,7 @@
 		F898EDE9233F53BF00BFB79B /* UIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIButton.swift; sourceTree = "<group>"; };
 		F898EDEB233F549100BFB79B /* UIBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBarButtonItem.swift; sourceTree = "<group>"; };
 		F898EDED233F852200BFB79B /* M5StackNameAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackNameAccessor.swift; sourceTree = "<group>"; };
+		F898EDF0234A494C00BFB79B /* xdrip v3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v3.xcdatamodel"; sourceTree = "<group>"; };
 		F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewDevelopmentSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewInfoViewModel.swift; sourceTree = "<group>"; };
 		F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBGGraphBuilder.swift; sourceTree = "<group>"; };
@@ -2165,10 +2166,11 @@
 		F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				F898EDF0234A494C00BFB79B /* xdrip v3.xcdatamodel */,
 				F85C4A93233632EC00D6A86F /* xdrip v2.xcdatamodel */,
 				F8AC42A021B31F160078C348 /* xdrip.xcdatamodel */,
 			);
-			currentVersion = F85C4A93233632EC00D6A86F /* xdrip v2.xcdatamodel */;
+			currentVersion = F898EDF0234A494C00BFB79B /* xdrip v3.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
