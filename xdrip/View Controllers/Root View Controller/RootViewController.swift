@@ -361,6 +361,8 @@ final class RootViewController: UIViewController {
                 
                 dexcomShareUploadManager?.upload()
                 
+                m5StackManager?.sendLatestReading()
+                
             }
         }
         
@@ -1449,6 +1451,8 @@ extension RootViewController:NightScoutFollowerDelegate {
                 if let bgReadingSpeaker = bgReadingSpeaker {
                     bgReadingSpeaker.speakNewReading()
                 }
+                
+                m5StackManager?.sendLatestReading()
                 
             }
         }

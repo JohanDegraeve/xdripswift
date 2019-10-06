@@ -37,5 +37,8 @@ enum M5StackTextColor:UInt32, CaseIterable {
             return Texts_Common.yellow
         }
     }
-
+    
+    init?(forUInt32: UInt32) {
+        self.init(rawValue: forUInt32)
+    }
 }
