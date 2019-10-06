@@ -44,9 +44,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     /// - parameters:
     ///     - m5Stack : an instance of M5Stack, if nil then this instance is created to scan for a new M5Stack, address and name not yet known, so not possible yet to create an M5Stack instance
     ///     - delegate : there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : M5StackManager and UIViewControllers. There's only one instance of M5StackManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
-    ///     - blePassword : optional. If nil then xdrip will send a M5StackReadBlePassWordTxMessage to the M5Stack, so this would be a case where the M5Stack (all M5Stacks managed by xdrip) do not have a fixed blepassword
-    /// The blepassword in the M5Stack object gets priority over the blePassword in the parameter list
-    init(m5Stack: M5Stack?, delegateFixed: M5StackBluetoothDelegate, blePassword: String?) {
+    ///     - blePassword : only if set in userdefaults
+    init(m5Stack: M5Stack?, delegateFixed: M5StackBluetoothDelegate) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "M5Stack")
@@ -54,14 +53,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: m5Stack.address, name: m5Stack.name)
         }
         
-        if let m5Stack = m5Stack, let blePassword = m5Stack.blepassword {
-            // m5Stack object is not nil and does have a blePassword, use that value
-            self.blePassword = blePassword
-        } else {
-            // use blePassword that was in the parameter list, possibily nil value
-            self.blePassword = blePassword
-        }
-
+        self.blePassword = m5Stack?.blepassword
         self.m5Stack = m5Stack
         
         self.m5StackBluetoothTransmitterDelegateFixed = delegateFixed

@@ -318,7 +318,6 @@ final class M5StackViewController: UIViewController {
         if shouldConnect {
             
             // device should not automaticaly connect, which means, each time the app restarts, it will not try to connect to this M5Stack
-            // if user clicks cancel button (ie goes back to previous view controller without clicking done, then this value will not be saved
             shouldConnect = false
             
             // normally there should be a bluetoothTransmitter
@@ -332,7 +331,6 @@ final class M5StackViewController: UIViewController {
         } else {
             
             // device should automatically connect, this will be stored in coredata (only after clicking done button), which means, each time the app restarts, it will try to connect to this M5Stack
-            // if user clicks cancel button (ie goes back to previous view controller without clicking done, then this value will not be saved
             shouldConnect = true
             
             // connect,
