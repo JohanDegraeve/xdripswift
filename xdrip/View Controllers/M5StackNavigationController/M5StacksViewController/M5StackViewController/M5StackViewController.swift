@@ -19,6 +19,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// ble password
     case blePassword = 4
     
+    /// textColor
+    case textColor = 5
+    
 }
 
 /// UIViewController to show 
@@ -84,10 +87,19 @@ final class M5StackViewController: UIViewController {
     private weak var m5StackManager: M5StackManaging?
     
     /// name given by user as alias , to easier recognize different M5Stacks
+    ///
+    /// temp storage of value while user is editing the M5Stack attributes
     private var userDefinedName: String?
     
     /// should the app try to connect automatically to the M5Stack or not, setting to false because compiler needs to have a value. It's set to the correct value in configure
+    ///
+    /// temp storage of value while user is editing the M5Stack attributes
     private var shouldConnect: Bool = false
+    
+    /// textColor to be used in M5Stack
+    ///
+    /// temp storage of value while user is editing the M5Stack attributes
+    private var textColor: M5StackTextColor?
     
     /// M5StackNames accessor
     private var m5StackNameAccessor: M5StackNameAccessor?
@@ -112,6 +124,9 @@ final class M5StackViewController: UIViewController {
             
             // temporary store the value of shouldConnect, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
             shouldConnect = m5StackAsNSObject.shouldconnect
+            
+            // temporary store the value of textColor, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
+            textColor = M5StackTextColor(forUInt16: UInt16(m5StackAsNSObject.textcolor))
             
             // don't delete the M5Stack when going back to prevous viewcontroller
             deleteM5StackWhenClosingViewController = false
@@ -223,9 +238,13 @@ final class M5StackViewController: UIViewController {
                 m5StackAsNSObject.m5StackName = m5Stackname
             }
             
-            // shouldConnect to be stored
+            // store value of shouldconnect
             m5StackAsNSObject.shouldconnect = shouldConnect
-            debuglogging("shouldconnect = " + shouldConnect.description)
+            
+            // store value of textcolor
+            if let textColor = textColor {
+                m5StackAsNSObject.textcolor = Int32(textColor.rawValue)
+            }
             
             // save all changes now
             m5StackManager?.save()
@@ -255,6 +274,7 @@ final class M5StackViewController: UIViewController {
             // assign local variables
             self.shouldConnect = m5Stack.shouldconnect
             self.userDefinedName = m5Stack.m5StackName?.userDefinedName //should be nil anyway
+            self.textColor = M5StackTextColor(forUInt16: UInt16(m5Stack.textcolor))
             
             // reload the full section , all rows in the tableView
             self.tableView.reloadSections(IndexSet(integer: 0), with: .none)
@@ -428,6 +448,20 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
             cell.textLabel?.text = Texts_M5StackView.m5StackAlias
             cell.detailTextLabel?.text = userDefinedName
             cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            
+        case .textColor:
+            cell.textLabel?.text = Texts_SettingsView.m5StackTextColor
+            
+            if let textColor = textColor {
+                cell.detailTextLabel?.text = textColor.description
+            } else {
+                if let textColor = UserDefaults.standard.m5StackTextColor {
+                    cell.detailTextLabel?.text = textColor.description
+                } else {
+                    cell.detailTextLabel?.text = ConstantsM5Stack.defaultTextColor.description
+                }
+            }
+
         }
         
         return cell
@@ -490,7 +524,44 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
             
             // present the alert
             self.present(alert, animated: true, completion: nil)
+            
+        case .textColor:
+            var texts = [String]()
+            var colors = [M5StackTextColor]()
+            for textColor in M5StackTextColor.allCases {
+                texts.append(textColor.description)
+                colors.append(textColor)
+            }
+            
+            //find index for color stored in M5Stack or userdefaults
+            var selectedRow:Int?
+            if let textColor = textColor {
+                selectedRow = texts.firstIndex(of:textColor.description)
+            } else if let textColor = UserDefaults.standard.m5StackTextColor?.description {
+                selectedRow = texts.firstIndex(of:textColor)
+            }
+            
+            // configure PickerViewData
+            let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: Texts_SettingsView.m5StackTextColor, withData: texts, selectedRow: selectedRow, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ index: Int) in
 
+                if index != selectedRow {
+                    
+                    // set temp value textColor to new textColor
+                    self.textColor = colors[index]
+                    
+                    // reload table
+                    tableView.reloadRows(at: [IndexPath(row: Setting.textColor.rawValue, section: 0)], with: .none)
+                    
+                    // enable the done button
+                    self.doneButtonOutlet.enable()
+
+                }
+                
+            }, onCancelClick: nil, didSelectRowHandler: nil)
+            
+            // create and present PickerViewController
+            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+            
         }
     }
 

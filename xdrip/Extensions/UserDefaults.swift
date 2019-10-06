@@ -524,7 +524,7 @@ extension UserDefaults {
         get {
             let textColorAsInt = integer(forKey: Key.m5StackTextColor.rawValue)
             if textColorAsInt > 0 {
-                return M5StackTextColor(forUInt32: UInt32(textColorAsInt))
+                return M5StackTextColor(forUInt16: UInt16(textColorAsInt))
             } else {
                 return nil
             }

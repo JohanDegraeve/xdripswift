@@ -240,7 +240,7 @@ extension M5StackManager: M5StackBluetoothDelegate {
             bluetoothTransmitter.stopScanning()
             
             // create a new M5Stack with new peripheral's address and name
-            let newM5Stack = M5Stack(address: address, name: name, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+            let newM5Stack = M5Stack(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
             
             // add to list of m5StacksBlueToothTransmitters
             m5StacksBlueToothTransmitters[newM5Stack] = bluetoothTransmitter
