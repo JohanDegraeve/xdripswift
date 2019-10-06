@@ -18,6 +18,9 @@ class M5StackManager: NSObject {
     /// to access m5Stack entity in coredata
     private var m5StackAccessor: M5StackAccessor
     
+    /// reference to BgReadingsAccessor
+    private var bgReadingsAccessor: BgReadingsAccessor
+    
     /// if scan is called, and a connection is successfully made to a new device, then a new M5Stack must be created, and this function will be called. It is owned by the UIViewController that calls the scan function
     private var callBackAfterDiscoveringDevice: ((M5Stack) -> Void)?
     
@@ -31,6 +34,7 @@ class M5StackManager: NSObject {
         // initialize properties
         self.coreDataManager = coreDataManager
         self.m5StackAccessor = M5StackAccessor(coreDataManager: coreDataManager)
+        self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         
         super.init()
         
@@ -39,15 +43,56 @@ class M5StackManager: NSObject {
         for m5Stack in m5Stacks {
             if m5Stack.shouldconnect {
                 // create an instance of M5StackBluetoothTransmitter, M5StackBluetoothTransmitter will automatically try to connect to the M5Stack with the address that is stored in m5Stack
-                self.m5StacksBlueToothTransmitters[m5Stack] = M5StackBluetoothTransmitter(m5Stack: m5Stack, delegateFixed: self)
+                self.m5StacksBlueToothTransmitters[m5Stack] = M5StackBluetoothTransmitter(m5Stack: m5Stack, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
             } else {
                 // shouldn't connect, so don't create an instance of M5StackBluetoothTransmitter
                 self.m5StacksBlueToothTransmitters[m5Stack] = (M5StackBluetoothTransmitter?).none
             }
         }
+        
+        // when user changes M5Stack related settings, then the transmitter need to get that info
+        addObservers()
 
     }
+    
+    // MARK: - public helper functions
+    
+    /// will send latest reading to all M5Stacks, only if it's less than 5 minutes old
+    public func sendLatestReading() {
+        
+        // get reading of latest 5 minutes
+        let bgReadingToSend = bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: Date(timeIntervalSinceNow: -5 * 60), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        
+        // check that there's at least 1 reading available
+        guard bgReadingToSend.count >= 1 else {
+            trace("in sendLatestReading, there's no recent reading to send", log: self.log, type: .info)
+            return
+        }
+
+        // send the reading to all M5Stacks
+        for m5StackBlueToothTransmitter in m5StacksBlueToothTransmitters.values {
+            m5StackBlueToothTransmitter?.writeBgReadingInfo(bgReading: bgReadingToSend[0])
+        }
+    }
+    
+    // MARK: - private helper functions
+    
+    /// when user changes M5Stack related settings, then the transmitter need to get that info, add observers
+    private func addObservers() {
+        
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackWiFiName1.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackWiFiName2.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackWiFiName3.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackWiFiPassword1.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackWiFiPassword2.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackWiFiPassword3.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackBlePassword.rawValue, options: .new, context: nil)
+        
+    }
+    
 }
+
+// MARK: - conform to M5StackManaging
 
 extension M5StackManager: M5StackManaging {
     
@@ -57,7 +102,7 @@ extension M5StackManager: M5StackManaging {
         
         callBackAfterDiscoveringDevice = callback
         
-        tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack = M5StackBluetoothTransmitter(m5Stack: nil, delegateFixed: self)
+        tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack = M5StackBluetoothTransmitter(m5Stack: nil, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
         
         _ = tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack?.startScanning()
         
@@ -94,7 +139,7 @@ extension M5StackManager: M5StackManaging {
             } else {
                 
                 // this can be the case where initially shouldconnect was set to false, and user sets it to true via uiviewcontroller, uiviewcontroller calls this function, connect should automatially be initiated
-                let newBlueToothTransmitter = M5StackBluetoothTransmitter(m5Stack: m5Stack, delegateFixed: self)
+                let newBlueToothTransmitter = M5StackBluetoothTransmitter(m5Stack: m5Stack, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
                 
                 m5StacksBlueToothTransmitters[m5Stack] = newBlueToothTransmitter
 
@@ -103,7 +148,7 @@ extension M5StackManager: M5StackManaging {
         } else {
             
             // I don't think this code will be used, because value m5Stack should always be in m5StacksBlueToothTransmitters, anyway let's add it
-            let newBlueToothTransmitter = M5StackBluetoothTransmitter(m5Stack: m5Stack, delegateFixed: self)
+            let newBlueToothTransmitter = M5StackBluetoothTransmitter(m5Stack: m5Stack, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
             
             m5StacksBlueToothTransmitters[m5Stack] = newBlueToothTransmitter
             
@@ -133,7 +178,7 @@ extension M5StackManager: M5StackManaging {
         }
         
         if createANewOneIfNecesssary {
-            let newTransmitter = M5StackBluetoothTransmitter(m5Stack: m5Stack, delegateFixed: self)
+            let newTransmitter = M5StackBluetoothTransmitter(m5Stack: m5Stack, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
             m5StacksBlueToothTransmitters[m5Stack] = newTransmitter
             return newTransmitter
         }
@@ -163,6 +208,8 @@ extension M5StackManager: M5StackManaging {
     }
 }
 
+// MARK: - conform to M5StackBluetoothDelegate
+
 extension M5StackManager: M5StackBluetoothDelegate {
     
     func didConnect(forM5Stack m5Stack: M5Stack?, address: String?, name: String?, bluetoothTransmitter : M5StackBluetoothTransmitter) {
@@ -181,7 +228,7 @@ extension M5StackManager: M5StackBluetoothDelegate {
                     
                     // it's an already known m5Stack, not storing this, on the contrary disconnecting because maybe it's an m5stack already known for which user has preferred not to connect to
                     // If we're actually waiting for a new scan result, then there's an instance of M5StacksBlueToothTransmitter stored in tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack - but this one stopped scanning, so let's recreate an instance of M5StacksBlueToothTransmitter
-                    tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack = M5StackBluetoothTransmitter(m5Stack: nil, delegateFixed: self)
+                    tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack = M5StackBluetoothTransmitter(m5Stack: nil, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
                     _ = tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack?.startScanning()
 
                     return

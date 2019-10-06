@@ -60,6 +60,7 @@
         <attribute name="blepassword" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="name" attributeType="String" syncable="YES"/>
         <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="textcolor" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="m5StackName" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="M5StackName" syncable="YES"/>
     </entity>
     <entity name="M5StackName" representedClassName=".M5StackName" syncable="YES">
@@ -78,7 +79,7 @@
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
-        <element name="M5Stack" positionX="-657" positionY="180" width="128" height="120"/>
+        <element name="M5Stack" positionX="-657" positionY="180" width="128" height="135"/>
         <element name="M5StackName" positionX="-657" positionY="180" width="128" height="75"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="120"/>
     </elements>
