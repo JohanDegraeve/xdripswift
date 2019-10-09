@@ -39,11 +39,14 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     /// there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : M5StackManager and UIViewControllers. There's only one instance of M5StackManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
     private weak var m5StackBluetoothTransmitterDelegateFixed:M5StackBluetoothDelegate?
     
+    /// is the transmitter ready to receive data like parameter updates or reading values
+    private (set) var isReadyToReceiveData: Bool = false
+    
     // MARK: - initializer
 
     /// - parameters:
     ///     - m5Stack : an instance of M5Stack, if nil then this instance is created to scan for a new M5Stack, address and name not yet known, so not possible yet to create an M5Stack instance
-    ///     - delegate : there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : M5StackManager and UIViewControllers. There's only one instance of M5StackManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
+    ///     - delegateFixed : there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : M5StackManager and UIViewControllers. There's only one instance of M5StackManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
     ///     - blePassword : optional. If nil then xdrip will send a M5StackReadBlePassWordTxMessage to the M5Stack, so this would be a case where the M5Stack (all M5Stacks managed by xdrip) do not have a fixed blepassword
     /// The blepassword in the M5Stack object gets priority over the blePassword in the parameter list
     init(m5Stack: M5Stack?, delegateFixed: M5StackBluetoothDelegate, blePassword: String?) {
@@ -85,14 +88,20 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     /// - slopeName is literally copied -
     /// reading and timestamp are written in one packet to the M5stack, seperated by blanc, slopeName is written in seperate packet
     /// - parameters:
-    ///     - readingValue : the value in mgdl
-    ///     - timeStamp : timestamp of the reading
-    func writeBgReadingInfo(bgReading: BgReading) {
+    ///     - bgReading : the reading
+    /// - returns:
+    ///         true if successfully transmitted to M5Stack, doesn't mean M5Stack did receive it
+    func writeBgReadingInfo(bgReading: BgReading) -> Bool {
+        
+        guard getConnectionStatus() == CBPeripheralState.connected else {
+            trace("in writeBgReadingInfo, not connected ", log: log, type: .info)
+            return false
+        }
         
         // create packets to send slopeName
         guard let packetWithSlopeName = M5StackUtilities.splitTextInBLEPackets(text: bgReading.slopeName, maxBytesInOneBLEPacket: ConstantsM5Stack.maximumMBLEPacketsize, opCode: M5StackTransmitterOpCodeTx.writeSlopeNameTx.rawValue) else {
             trace("in writeBgReading, failed to create packets to send slopeName", log: log, type: .error)
-            return
+            return false
         }
         
         // send slopename
@@ -110,16 +119,55 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         // create packets to send reading and timestamp
         guard let packetsWithReadingAndTimestamp = M5StackUtilities.splitTextInBLEPackets(text: textToSend, maxBytesInOneBLEPacket: ConstantsM5Stack.maximumMBLEPacketsize, opCode: M5StackTransmitterOpCodeTx.bgReadingTx.rawValue) else {
             trace("in writeBgReading, failed to create packets to send reading and timestamp", log: log, type: .error)
-            return
+            return false
         }
         
         // send reading and timestamp
         for packet in packetsWithReadingAndTimestamp {
             if !writeDataToPeripheral(data: packet, type: .withoutResponse) {
                 trace("in writeBgReading, failed to send packet with reading and timestamp", log: log, type: .error)
+                return false
             } else {
-               trace("successfully written reading and timestamp to M5Stack", log: log, type: .error)
+               trace("successfully written reading and timestamp to M5Stack", log: log, type: .info)
+                return true
             }
+        }
+        
+        // if we're here then it means there was no packet in packetsWithReadingAndTimestamp
+        return false
+    }
+    
+    /// writes textColor to the M5Stack
+    /// - returns:
+    ///     true if successfully transmitted to M5Stack, doesn't mean M5Stack did receive it, but chance is high
+    func writeTextColor(textColor: M5StackTextColor) -> Bool {
+
+        guard getConnectionStatus() == CBPeripheralState.connected else {
+            trace("in writeTextColor, not connected ", log: log, type: .info)
+            return false
+        }
+        
+        guard let textColorAsData = textColor.data else {
+            trace("in writeTextColor, failed create textColor as data ", log: log, type: .error)// looks like a software error
+            return false
+        }
+        
+        // initialize dataToSend
+        var dataToSend = Data()
+        
+        // add opcode
+        dataToSend.append(M5StackTransmitterOpCodeTx.writeTextColorTx.rawValue.data)
+        
+        // add textcolor as uint16
+        dataToSend.append(textColorAsData)
+        
+        // send
+        if !writeDataToPeripheral(data: dataToSend, type: .withoutResponse) {
+            trace("in dataToSend, failed to send textcolor", log: log, type: .error)
+            return false
+        } else {
+            trace("successfully written textcolor to M5Stack", log: log, type: .error)
+            return true
         }
         
     }
@@ -150,10 +198,15 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     }
     
     func centralManagerDidDisconnectPeripheral(error: Error?) {
+        
+        // can not write data anymore to the device
+        isReadyToReceiveData = false
+        
         if let m5Stack = m5Stack {
             m5StackBluetoothTransmitterDelegateFixed?.didDisconnect(forM5Stack: m5Stack)
             m5StackBluetoothTransmitterDelegateVariable?.didDisconnect(forM5Stack: m5Stack)
         }
+        
     }
     
     func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
@@ -214,30 +267,53 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         switch opCode {
             
         case .readBlePassWordRx:
+            // received new password from M5Stack
+            
+            trace("    received new password, will store it", log: log, type: .error)
+            
+            guard let m5Stack = m5Stack else {return}// would be a software error if this happens
             
             blePasswordM5StackPacket.addNewPacket(value: value)
             
             if let newBlePassword = blePasswordM5StackPacket.getText() {
                 
                 self.blePassword = newBlePassword
-                if let m5Stack = m5Stack {
-                    m5StackBluetoothTransmitterDelegateFixed?.newBlePassWord(newBlePassword: newBlePassword, forM5Stack: m5Stack)
-                    m5StackBluetoothTransmitterDelegateVariable?.newBlePassWord(newBlePassword: newBlePassword, forM5Stack: m5Stack)
-                }
                 
-                sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
+                m5StackBluetoothTransmitterDelegateFixed?.newBlePassWord(newBlePassword: newBlePassword, forM5Stack: m5Stack)
+                m5StackBluetoothTransmitterDelegateVariable?.newBlePassWord(newBlePassword: newBlePassword, forM5Stack: m5Stack)
+                
             }
+
+            // this is usually a case where M5Stack has restarted, so it needs to get time and timeoffset
+            sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
+            
+            // this is the time when the M5stack is ready to receive readings or parameter updates
+            isReadyToReceiveData = true
+            m5StackBluetoothTransmitterDelegateFixed?.isReadyToReceiveData(m5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateVariable?.isReadyToReceiveData(m5Stack: m5Stack)
+            
             
         case .authenticateSuccessRx:
-            if let m5Stack = m5Stack {
-                m5StackBluetoothTransmitterDelegateFixed?.authentication(success: true, forM5Stack: m5Stack)
-                m5StackBluetoothTransmitterDelegateVariable?.authentication(success: true, forM5Stack: m5Stack)
-            }
+            // received from M5Stack, need to inform delegates, send timestamp to M5Stack, and also set isReadyToReceiveData to true
             
+            trace("    successfully authenticated", log: log, type: .error)
+            
+            guard let m5Stack = m5Stack else {return}// would be a software error if this happens
+            
+            // inform delegates
+            m5StackBluetoothTransmitterDelegateFixed?.authentication(success: true, forM5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateVariable?.authentication(success: true, forM5Stack: m5Stack)
+
             // even though not requested, and even if M5Stack may already have it, send the local time
             sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
             
+            // this is the time when the M5stack is ready to receive readings or parameter updates
+            isReadyToReceiveData = true
+            m5StackBluetoothTransmitterDelegateFixed?.isReadyToReceiveData(m5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateVariable?.isReadyToReceiveData(m5Stack: m5Stack)
+            
         case .authenticateFailureRx:
+            // received authentication failure, inform delegates
             if let m5Stack = m5Stack {
                 m5StackBluetoothTransmitterDelegateFixed?.authentication(success: false, forM5Stack: m5Stack)
                 m5StackBluetoothTransmitterDelegateVariable?.authentication(success: false, forM5Stack: m5Stack)
@@ -256,6 +332,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             }
             
         case .readTimeStampRx:
+            // M5Stack is requesting for password
             sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
             
         }

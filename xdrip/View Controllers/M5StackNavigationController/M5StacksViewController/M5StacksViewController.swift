@@ -185,6 +185,10 @@ extension M5StacksViewController: UITableViewDataSource, UITableViewDelegate {
 
 extension M5StacksViewController: M5StackBluetoothDelegate {
     
+    func isReadyToReceiveData(m5Stack: M5Stack) {
+        // viewcontroller doesn't use this
+    }
+    
     func newBlePassWord(newBlePassword: String, forM5Stack m5Stack: M5Stack) {
         
         // blePassword is also saved in M5StackManager, tant pis

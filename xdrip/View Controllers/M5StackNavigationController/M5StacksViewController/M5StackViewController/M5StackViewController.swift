@@ -89,17 +89,17 @@ final class M5StackViewController: UIViewController {
     /// name given by user as alias , to easier recognize different M5Stacks
     ///
     /// temp storage of value while user is editing the M5Stack attributes
-    private var userDefinedName: String?
+    private var userDefinedNameTemporaryValue: String?
     
     /// should the app try to connect automatically to the M5Stack or not, setting to false because compiler needs to have a value. It's set to the correct value in configure
     ///
     /// temp storage of value while user is editing the M5Stack attributes
-    private var shouldConnect: Bool = false
+    private var shouldConnectTemporaryValue: Bool = false
     
     /// textColor to be used in M5Stack
     ///
     /// temp storage of value while user is editing the M5Stack attributes
-    private var textColor: M5StackTextColor?
+    private var textColorTemporaryValue: M5StackTextColor?
     
     /// M5StackNames accessor
     private var m5StackNameAccessor: M5StackNameAccessor?
@@ -120,13 +120,13 @@ final class M5StackViewController: UIViewController {
             m5StackManager.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = self
             
             // temporary store the userDefinedName, user can change this name via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
-            userDefinedName = m5StackAsNSObject.m5StackName?.userDefinedName
+            userDefinedNameTemporaryValue = m5StackAsNSObject.m5StackName?.userDefinedName
             
             // temporary store the value of shouldConnect, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
-            shouldConnect = m5StackAsNSObject.shouldconnect
+            shouldConnectTemporaryValue = m5StackAsNSObject.shouldconnect
             
             // temporary store the value of textColor, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
-            textColor = M5StackTextColor(forUInt16: UInt16(m5StackAsNSObject.textcolor))
+            textColorTemporaryValue = M5StackTextColor(forUInt16: UInt16(m5StackAsNSObject.textcolor))
             
             // don't delete the M5Stack when going back to prevous viewcontroller
             deleteM5StackWhenClosingViewController = false
@@ -212,7 +212,7 @@ final class M5StackViewController: UIViewController {
         if let coreDataManager = coreDataManager {
             return coreDataManager
         } else {
-            fatalError("in AlertTypeSettingsViewController, coreDataManager is nil")
+            fatalError("in M5StackViewController, coreDataManager is nil")
         }
     }
     
@@ -226,23 +226,24 @@ final class M5StackViewController: UIViewController {
             
             // if user has set or changed a userDefinedName, stored it, or delete it if userDefinedName is set to nil
             if let m5StackName = m5StackAsNSObject.m5StackName {
-                if let userDefinedName = userDefinedName {
+                if let userDefinedName = userDefinedNameTemporaryValue {
                     m5StackName.userDefinedName = userDefinedName
                 } else {
                     // user has set the userDefinedName to nil, let's delete that m5stackname
                     m5StackNameAccessor.deleteM5StackName(m5StackName: m5StackName)
                 }
                 
-            } else if let userDefinedName = userDefinedName {
+            } else if let userDefinedName = userDefinedNameTemporaryValue {
                 let m5Stackname = M5StackName(address: m5StackAsNSObject.address, userDefinedName: userDefinedName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                 m5StackAsNSObject.m5StackName = m5Stackname
             }
             
             // store value of shouldconnect
-            m5StackAsNSObject.shouldconnect = shouldConnect
+            m5StackAsNSObject.shouldconnect = shouldConnectTemporaryValue
             
             // store value of textcolor
-            if let textColor = textColor {
+            if let textColor = textColorTemporaryValue {
+                
                 m5StackAsNSObject.textcolor = Int32(textColor.rawValue)
             }
             
@@ -272,9 +273,9 @@ final class M5StackViewController: UIViewController {
             self.m5StackAsNSObject = m5Stack
             
             // assign local variables
-            self.shouldConnect = m5Stack.shouldconnect
-            self.userDefinedName = m5Stack.m5StackName?.userDefinedName //should be nil anyway
-            self.textColor = M5StackTextColor(forUInt16: UInt16(m5Stack.textcolor))
+            self.shouldConnectTemporaryValue = m5Stack.shouldconnect
+            self.userDefinedNameTemporaryValue = m5Stack.m5StackName?.userDefinedName //should be nil anyway
+            self.textColorTemporaryValue = M5StackTextColor(forUInt16: UInt16(m5Stack.textcolor))
             
             // reload the full section , all rows in the tableView
             self.tableView.reloadSections(IndexSet(integer: 0), with: .none)
@@ -311,7 +312,7 @@ final class M5StackViewController: UIViewController {
 
         // textToAdd is either 'address' + the address, or 'alias' + the userDefinedName, depending if userDefinedName has a value
         var textToAdd = Texts_M5StackView.address + m5StackAsNSObject.address
-        if let userDefinedName = userDefinedName {
+        if let userDefinedName = userDefinedNameTemporaryValue {
             textToAdd = Texts_M5StackView.m5StackAlias + userDefinedName
         }
         
@@ -335,11 +336,11 @@ final class M5StackViewController: UIViewController {
         // let's first check if m5stack exists, it should because otherwise connectButton should be disabled
         guard let m5StackAsNSObject = m5StackAsNSObject else {return}
         
-        if shouldConnect {
+        if shouldConnectTemporaryValue {
             
             // device should not automaticaly connect, which means, each time the app restarts, it will not try to connect to this M5Stack
             // if user clicks cancel button (ie goes back to previous view controller without clicking done, then this value will not be saved
-            shouldConnect = false
+            shouldConnectTemporaryValue = false
             
             // normally there should be a bluetoothTransmitter
             if let bluetoothTransmitter = m5StackManager?.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: false) {
@@ -353,7 +354,7 @@ final class M5StackViewController: UIViewController {
             
             // device should automatically connect, this will be stored in coredata (only after clicking done button), which means, each time the app restarts, it will try to connect to this M5Stack
             // if user clicks cancel button (ie goes back to previous view controller without clicking done, then this value will not be saved
-            shouldConnect = true
+            shouldConnectTemporaryValue = true
             
             // connect,
             m5StackManager?.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: true)?.connect()
@@ -387,7 +388,7 @@ final class M5StackViewController: UIViewController {
             connectButtonOutlet.setTitle(Texts_M5StackView.alwaysConnect, for: .normal)
         } else {
             // set label of connect button, according to curren status
-            connectButtonOutlet.setTitle(shouldConnect ? Texts_M5StackView.donotconnect:Texts_M5StackView.alwaysConnect, for: .normal)
+            connectButtonOutlet.setTitle(shouldConnectTemporaryValue ? Texts_M5StackView.donotconnect:Texts_M5StackView.alwaysConnect, for: .normal)
         }
 
     }
@@ -446,13 +447,13 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
             
         case .userDefinedName:
             cell.textLabel?.text = Texts_M5StackView.m5StackAlias
-            cell.detailTextLabel?.text = userDefinedName
+            cell.detailTextLabel?.text = userDefinedNameTemporaryValue
             cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
             
         case .textColor:
             cell.textLabel?.text = Texts_SettingsView.m5StackTextColor
             
-            if let textColor = textColor {
+            if let textColor = textColorTemporaryValue {
                 cell.detailTextLabel?.text = textColor.description
             } else {
                 if let textColor = UserDefaults.standard.m5StackTextColor {
@@ -491,7 +492,7 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
             // first off al check that M5Stack already exists, otherwise makes no sense to change the name, check here also m5StackNameAccessor, although should not be nil, but it needs to happen
             guard let m5StackAsNSObject = m5StackAsNSObject, let m5StackNameAccessor = m5StackNameAccessor  else {return}
             
-            let alert = UIAlertController(title: Texts_M5StackView.m5StackAlias, message: Texts_M5StackView.selectAliasText, keyboardType: .default, text: userDefinedName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
+            let alert = UIAlertController(title: Texts_M5StackView.m5StackAlias, message: Texts_M5StackView.selectAliasText, keyboardType: .default, text: userDefinedNameTemporaryValue, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
                 
                 let newUserDefinedName = text.toNilIfLength0()
                 
@@ -512,7 +513,7 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
                 }
                 
                 // not returned during loop, means name is unique
-                self.userDefinedName = newUserDefinedName
+                self.userDefinedNameTemporaryValue = newUserDefinedName
                 
                 // reload the specific row in the table
                 tableView.reloadRows(at: [IndexPath(row: Setting.userDefinedName.rawValue, section: 0)], with: .none)
@@ -535,7 +536,7 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
             
             //find index for color stored in M5Stack or userdefaults
             var selectedRow:Int?
-            if let textColor = textColor {
+            if let textColor = textColorTemporaryValue {
                 selectedRow = texts.firstIndex(of:textColor.description)
             } else if let textColor = UserDefaults.standard.m5StackTextColor?.description {
                 selectedRow = texts.firstIndex(of:textColor)
@@ -547,7 +548,16 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
                 if index != selectedRow {
                     
                     // set temp value textColor to new textColor
-                    self.textColor = colors[index]
+                    self.textColorTemporaryValue = colors[index]
+                    
+                    // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
+                    if let m5Stack = self.m5StackAsNSObject, let m5StackManager = self.m5StackManager {
+                        if let textColor = self.textColorTemporaryValue, let blueToothTransmitter = m5StackManager.m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeTextColor(textColor: textColor) {
+                            // do nothing, textColor successfully written to m5Stack - although it's not yet 100% sure because 
+                        } else {
+                            m5StackManager.updateNeeded(forM5Stack: m5Stack)
+                        }
+                    }
                     
                     // reload table
                     tableView.reloadRows(at: [IndexPath(row: Setting.textColor.rawValue, section: 0)], with: .none)
@@ -568,6 +578,10 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
 }
 
 extension M5StackViewController: M5StackBluetoothDelegate {
+    
+    func isReadyToReceiveData(m5Stack: M5Stack) {
+        // viewcontroller doesn't use this
+    }
     
     func newBlePassWord(newBlePassword: String, forM5Stack m5Stack: M5Stack) {
         
@@ -616,7 +630,6 @@ extension M5StackViewController: M5StackBluetoothDelegate {
         UIAlertController(title: Texts_Common.warning, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
     }
     
-    
 }
 
 /// defines perform segue identifiers used within M5StackViewController
@@ -630,7 +643,7 @@ extension M5StackViewController {
     
     private enum UnwindSegueIdentifiers:String {
         
-        /// to go back from alerttype settings screen to alerttypes settings screen
+        /// to go back from M5StackViewController to M5StacksViewController
         case M5StackToM5StacksUnWindSegueIdentifier = "M5StackToM5StacksUnWindSegueIdentifier"
     }
 }

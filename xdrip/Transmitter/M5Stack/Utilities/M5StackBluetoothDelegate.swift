@@ -32,4 +32,7 @@ protocol M5StackBluetoothDelegate: AnyObject {
     /// to pass some text error message, delegate can decide to show to user, log, ...
     func error(message: String)
     
+    /// will be called if M5Stack is connected, and authentication was successful
+    func isReadyToReceiveData(m5Stack : M5Stack)
+
 }

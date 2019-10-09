@@ -58,6 +58,21 @@ enum M5StackTextColor:UInt16, CaseIterable {
         }
     }
     
+    /// returns textColor rawValue as Data
+    var data:Data? {
+        switch self {
+        case .red:
+            return Data(hexadecimalString: "F800")
+        case .green:
+            return Data(hexadecimalString: "07E0")
+        case .white:
+            return Data(hexadecimalString: "FFFF")
+        case .yellow:
+            return Data(hexadecimalString: "FFE0")
+            
+        }
+    }
+    
     init?(forUInt16: UInt16) {
         self.init(rawValue: forUInt16)
     }

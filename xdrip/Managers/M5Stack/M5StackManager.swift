@@ -15,6 +15,9 @@ class M5StackManager: NSObject {
     /// dictionary with key = an instance of M5Stack, and value an instance of M5StackBluetoothTransmitter. Value can be nil in which case we found an M5Stack in the coredata but shouldconnect == false so we don't instanstiate an M5StackBluetoothTransmitter
     private var m5StacksBlueToothTransmitters = [M5Stack : M5StackBluetoothTransmitter?]()
     
+    /// dictionary with key = an instance of M5Stack, and value a boolean
+    private var m5StacksParameterUpdateNeeded = [M5Stack : Bool]()
+    
     /// to access m5Stack entity in coredata
     private var m5StackAccessor: M5StackAccessor
     
@@ -48,6 +51,10 @@ class M5StackManager: NSObject {
                 // shouldn't connect, so don't create an instance of M5StackBluetoothTransmitter
                 self.m5StacksBlueToothTransmitters[m5Stack] = (M5StackBluetoothTransmitter?).none
             }
+            
+            // each time the app launches, we will send the parameter to all M5Stacks
+            m5StacksParameterUpdateNeeded[m5Stack] = true
+            
         }
         
         // when user changes M5Stack related settings, then the transmitter need to get that info
@@ -55,10 +62,12 @@ class M5StackManager: NSObject {
 
     }
     
-    // MARK: - public helper functions
+    // MARK: - public functions
     
     /// will send latest reading to all M5Stacks, only if it's less than 5 minutes old
-    public func sendLatestReading() {
+    /// - parameters:
+    ///     - forM5Stack : if nil then latest reading will be sent to all connected M5Stacks, otherwise only to the specified M5Stack
+    public func sendLatestReading(forM5Stack m5Stack: M5Stack? = nil) {
         
         // get reading of latest 5 minutes
         let bgReadingToSend = bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: Date(timeIntervalSinceNow: -5 * 60), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
@@ -69,9 +78,14 @@ class M5StackManager: NSObject {
             return
         }
 
-        // send the reading to all M5Stacks
-        for m5StackBlueToothTransmitter in m5StacksBlueToothTransmitters.values {
-            m5StackBlueToothTransmitter?.writeBgReadingInfo(bgReading: bgReadingToSend[0])
+        if let m5Stack = m5Stack {
+            // send bgReading to the single m5Stack
+            m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false)?.writeBgReadingInfo(bgReading: bgReadingToSend[0])
+        } else {
+            // send the reading to all M5Stacks
+            for m5StackBlueToothTransmitter in m5StacksBlueToothTransmitters.values {
+                m5StackBlueToothTransmitter?.writeBgReadingInfo(bgReading: bgReadingToSend[0])
+            }
         }
     }
     
@@ -90,12 +104,35 @@ class M5StackManager: NSObject {
         
     }
     
+    /// send all parameters to m5StackBluetoothTransmitter
+    /// - returns:
+    ///     successfully written all parameters or not
+    private func sendAllParameters(toM5Stack m5Stack : M5Stack) -> Bool {
+        
+        guard let m5StackBluetoothTransmitterValue = m5StacksBlueToothTransmitters[m5Stack], let m5StackBluetoothTransmitter = m5StackBluetoothTransmitterValue else {
+            trace("in sendAllParameters, there's no m5StackBluetoothTransmitter for the specified m5Stack", log: self.log, type: .info)
+            return false
+        }
+        
+        guard m5StackBluetoothTransmitter.isReadyToReceiveData else {
+            trace("in sendAllParameters, bluetoothTransmitter is not ready to receive data", log: self.log, type: .info)
+            return false
+        }
+        
+        // send textColor
+        if !m5StackBluetoothTransmitter.writeTextColor(textColor: M5StackTextColor(forUInt16: UInt16(m5Stack.textcolor)) ?? UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor) {
+            return false
+        }
+
+        // all parameters successfully sent
+        return true
+    }
+    
 }
 
 // MARK: - conform to M5StackManaging
 
 extension M5StackManager: M5StackManaging {
-    
     
     /// to scan for a new M5SStack - callback will be called when a new M5Stack is found and connected
     func startScanningForNewDevice(callback: @escaping (M5Stack) -> Void) {
@@ -194,6 +231,12 @@ extension M5StackManager: M5StackManaging {
             m5StacksBlueToothTransmitters.removeValue(forKey: m5Stack)
         }
         
+        // also remove from m5StacksParameterUpdateNeeded
+        if m5StacksParameterUpdateNeeded.keys.contains(m5Stack) {
+            m5StacksParameterUpdateNeeded[m5Stack] = (Bool?).none
+            m5StacksParameterUpdateNeeded.removeValue(forKey: m5Stack)
+        }
+
         // delete in coredataManager
         coreDataManager.mainManagedObjectContext.delete(m5Stack)
         
@@ -206,12 +249,36 @@ extension M5StackManager: M5StackManaging {
     func m5Stacks() -> [M5Stack] {
         return Array(m5StacksBlueToothTransmitters.keys)
     }
+    
+    /// sets flag m5StacksParameterUpdateNeeded for m5Stack to true
+    public func updateNeeded(forM5Stack m5Stack: M5Stack) {
+        m5StacksParameterUpdateNeeded[m5Stack] = true
+    }
+
 }
 
 // MARK: - conform to M5StackBluetoothDelegate
 
 extension M5StackManager: M5StackBluetoothDelegate {
     
+    /// will be called if M5Stack is connected, and authentication was successful, M5StackManager can start sending data like parameter updates or bgreadings
+    func isReadyToReceiveData(m5Stack : M5Stack) {
+        
+        // if the M5Stack needs new parameters, then send them
+        if let needsUpdate = m5StacksParameterUpdateNeeded[m5Stack], needsUpdate {
+            
+            // send all parameters
+            if sendAllParameters(toM5Stack: m5Stack) {
+                m5StacksParameterUpdateNeeded[m5Stack] = false
+            }
+            
+        }
+        
+        // send latest reading
+        sendLatestReading(forM5Stack: m5Stack)
+        
+    }
+
     func didConnect(forM5Stack m5Stack: M5Stack?, address: String?, name: String?, bluetoothTransmitter : M5StackBluetoothTransmitter) {
         
         guard tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack != nil else {
@@ -307,4 +374,3 @@ extension M5StackManager: M5StackBluetoothDelegate {
     }
 
 }
-

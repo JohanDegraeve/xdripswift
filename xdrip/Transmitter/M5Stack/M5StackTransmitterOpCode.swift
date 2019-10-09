@@ -46,6 +46,10 @@ enum M5StackTransmitterOpCodeTx: UInt8, CaseIterable {
     
     /// write offset, ie time difference in seconds between local time and utc time
     case writeTimeOffsetTx = 0x14
+    
+    /// write textColor to M5Stack
+    case writeTextColorTx = 0x15
+    
 }
 
 /// opcodes for message from M5stack to app

@@ -29,4 +29,8 @@ protocol M5StackManaging: AnyObject {
     
     /// - returns: the M5Stack's managed by this M5StackManager
     func m5Stacks() -> [M5Stack]
+    
+    /// sets flag m5StacksParameterUpdateNeeded for m5Stack to true
+    func updateNeeded(forM5Stack m5Stack: M5Stack)
+    
 }

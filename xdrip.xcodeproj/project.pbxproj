@@ -64,6 +64,9 @@
 		F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDE9233F53BF00BFB79B /* UIButton.swift */; };
 		F898EDEC233F549100BFB79B /* UIBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDEB233F549100BFB79B /* UIBarButtonItem.swift */; };
 		F898EDEE233F852200BFB79B /* M5StackNameAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDED233F852200BFB79B /* M5StackNameAccessor.swift */; };
+		F898EDF2234A8A0500BFB79B /* UInt8.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDF1234A8A0500BFB79B /* UInt8.swift */; };
+		F898EDF4234A8A3200BFB79B /* UInt16.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDF3234A8A3200BFB79B /* UInt16.swift */; };
+		F898EDF6234A8A5700BFB79B /* UInt32.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDF5234A8A5700BFB79B /* UInt32.swift */; };
 		F8A1584D22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */; };
 		F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */; };
 		F8A1585122EDB597007F5B5D /* ConstantsBGGraphBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */; };
@@ -296,6 +299,9 @@
 		F898EDEB233F549100BFB79B /* UIBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBarButtonItem.swift; sourceTree = "<group>"; };
 		F898EDED233F852200BFB79B /* M5StackNameAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackNameAccessor.swift; sourceTree = "<group>"; };
 		F898EDF0234A494C00BFB79B /* xdrip v3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v3.xcdatamodel"; sourceTree = "<group>"; };
+		F898EDF1234A8A0500BFB79B /* UInt8.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UInt8.swift; sourceTree = "<group>"; };
+		F898EDF3234A8A3200BFB79B /* UInt16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UInt16.swift; sourceTree = "<group>"; };
+		F898EDF5234A8A5700BFB79B /* UInt32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UInt32.swift; sourceTree = "<group>"; };
 		F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewDevelopmentSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewInfoViewModel.swift; sourceTree = "<group>"; };
 		F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBGGraphBuilder.swift; sourceTree = "<group>"; };
@@ -647,6 +653,9 @@
 				F8EEDD5322FF685400D2D610 /* NSMutableURLRequest.swift */,
 				F898EDE9233F53BF00BFB79B /* UIButton.swift */,
 				F898EDEB233F549100BFB79B /* UIBarButtonItem.swift */,
+				F898EDF1234A8A0500BFB79B /* UInt8.swift */,
+				F898EDF3234A8A3200BFB79B /* UInt16.swift */,
+				F898EDF5234A8A5700BFB79B /* UInt32.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1564,6 +1573,7 @@
 				F8B3A85B2280CCD1004BA588 /* AlertSettingsViewController.swift in Sources */,
 				F8B3A81B227DEC92004BA588 /* SensorsAccessor.swift in Sources */,
 				F8B3A85D22821BB6004BA588 /* Int.swift in Sources */,
+				F898EDF6234A8A5700BFB79B /* UInt32.swift in Sources */,
 				F8A54AAF22D686CD00934E7A /* NightScoutBgReading.swift in Sources */,
 				F8A1585722EDB754007F5B5D /* ConstantsCoreData.swift in Sources */,
 				F821CF9022AB1068005C1E43 /* DatePickerViewData.swift in Sources */,
@@ -1643,6 +1653,7 @@
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,
 				F8B3A81C227DEC92004BA588 /* AlertEntriesAccessor.swift in Sources */,
 				F8A1585B22EDB7EA007F5B5D /* ConstantsDexcomG5.swift in Sources */,
+				F898EDF4234A8A3200BFB79B /* UInt16.swift in Sources */,
 				F8BDD452221DEAB2006EAB84 /* TextsSettingsView.swift in Sources */,
 				F8A389BF231DC8790010F405 /* M5StackAuthenticateTXMessage.swift in Sources */,
 				F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */,
@@ -1680,6 +1691,7 @@
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
 				F821CF7B22A1D359005C1E43 /* NightScoutFollowerDelegate.swift in Sources */,
 				F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */,
+				F898EDF2234A8A0500BFB79B /* UInt8.swift in Sources */,
 				F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */,
 				F8A7407222DCDA3E00967CFC /* BluconUtilities.swift in Sources */,
 				F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */,

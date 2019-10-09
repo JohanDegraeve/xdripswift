@@ -66,11 +66,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - Initialization
     
     /// - parameters:
-    ///     -  addressAndName: if we never connected to a device, then we don't know it's address as the Device itself is going to send. We can only have an expectedName which is what needs to be added then in the argument
+    ///     -  addressAndName : if we never connected to a device, then we don't know it's address as the Device itself is going to send. We can only have an expectedName which is what needs to be added then in the argument
     ///         * example for G5, if transmitter id is ABCDEF, we expect as devicename DexcomEF.
     ///         * For an xDrip or xBridge, we don't expect a specific devicename, in which case the value stays nil
     ///         * If we already connected to a device before, then we know it's address
-    ///     - CBUUID_Advertisement: UUID to use for scanning, if nil  then app will scan for all devices. (Example Blucon, MiaoMiao, should be nil value. For G5 it should have a value. For xDrip it will probably work with or without. Main difference is that if no advertisement UUID is specified, then app is not allowed to scan will in background. For G5 this can create problem for first time connect, because G5 only transmits every 5 minutes, which means the app would need to stay in the foreground for at least 5 minutes.
+    ///     - CBUUID_Advertisement : UUID to use for scanning, if nil  then app will scan for all devices. (Example Blucon, MiaoMiao, should be nil value. For G5 it should have a value. For xDrip it will probably work with or without. Main difference is that if no advertisement UUID is specified, then app is not allowed to scan will in background. For G5 this can create problem for first time connect, because G5 only transmits every 5 minutes, which means the app would need to stay in the foreground for at least 5 minutes.
     ///     - servicesCBUUIDs: service uuid's
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
@@ -211,12 +211,12 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// will write to writeCharacteristic with UUID CBUUID_WriteCharacteristic
     /// - returns: true if writeValue was successfully called, doesn't necessarily mean data is successvully written to peripheral
     func writeDataToPeripheral(data:Data, type:CBCharacteristicWriteType)  -> Bool {
-        if let peripheral = peripheral, let writeCharacteristic = writeCharacteristic {
+        if let peripheral = peripheral, let writeCharacteristic = writeCharacteristic, getConnectionStatus() == CBPeripheralState.connected {
             trace("in writeDataToPeripheral, for peripheral with name %{public}@, characteristic = %{public}@, data = %{public}@", log: log, type: .info, deviceName ?? "'unknown'", writeCharacteristic.uuid.uuidString, data.hexEncodedString())
             peripheral.writeValue(data, for: writeCharacteristic, type: type)
             return true
         } else {
-            trace("in writeDataToPeripheral, for peripheral with name %{public}@, failed because either peripheral or writeCharacteristic is nil", log: log, type: .error, deviceName ?? "'unknown'")
+            trace("in writeDataToPeripheral, for peripheral with name %{public}@, failed because either peripheral or writeCharacteristic is nil or not connected", log: log, type: .error, deviceName ?? "'unknown'")
             return false
         }
     }
@@ -224,12 +224,12 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// will write to characteristicToWriteTo
     /// - returns: true if writeValue was successfully called, doesn't necessarily mean data is successvully written to peripheral
     func writeDataToPeripheral(data:Data, characteristicToWriteTo:CBCharacteristic, type:CBCharacteristicWriteType)  -> Bool {
-        if let peripheral = peripheral {
+        if let peripheral = peripheral, getConnectionStatus() == CBPeripheralState.connected {
             trace("in writeDataToPeripheral, for peripheral with name %{public}@, for characteristic %{public}@", log: log, type: .info, deviceName ?? "'unknown'", characteristicToWriteTo.uuid.description)
             peripheral.writeValue(data, for: characteristicToWriteTo, type: type)
             return true
         } else {
-            trace("in writeDataToPeripheral, for peripheral with name %{public}@, failed because either peripheral or characteristicToWriteTo is nil", log: log, type: .error, deviceName ?? "'unknown'")
+            trace("in writeDataToPeripheral, for peripheral with name %{public}@, failed because either peripheral or characteristicToWriteTo is nil or not connected", log: log, type: .error, deviceName ?? "'unknown'")
             return false
         }
     }
