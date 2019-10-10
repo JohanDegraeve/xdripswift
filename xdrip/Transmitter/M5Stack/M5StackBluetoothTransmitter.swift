@@ -142,13 +142,23 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     ///     true if successfully transmitted to M5Stack, doesn't mean M5Stack did receive it, but chance is high
     func writeTextColor(textColor: M5StackTextColor) -> Bool {
 
-        guard getConnectionStatus() == CBPeripheralState.connected else {
-            trace("in writeTextColor, not connected ", log: log, type: .info)
+        guard let textColorAsData = textColor.data else {
+            trace("in writeTextColor, failed to create textColor as data ", log: log, type: .error)// looks like a software error
             return false
         }
+
+        trace("in writeTextColor, attempting to send", log: log, type: .info)
+        return writeDataToPeripheral(data: textColorAsData, opCode: .writeTextColorTx)
         
-        guard let textColorAsData = textColor.data else {
-            trace("in writeTextColor, failed create textColor as data ", log: log, type: .error)// looks like a software error
+    }
+    
+    /// handles common functions when writing data to M5Stack :
+    /// - if no connection returns false
+    /// - calls writeDataToPeripheral(data: Data, type: CBCharacteristicWriteType) and returns the result
+    private func writeDataToPeripheral(data: Data, opCode : M5StackTransmitterOpCodeTx) -> Bool {
+        
+        guard getConnectionStatus() == CBPeripheralState.connected else {
+            trace("    not connected ", log: log, type: .info)
             return false
         }
         
@@ -156,20 +166,20 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         var dataToSend = Data()
         
         // add opcode
-        dataToSend.append(M5StackTransmitterOpCodeTx.writeTextColorTx.rawValue.data)
+        dataToSend.append(opCode.rawValue.data)
         
         // add textcolor as uint16
-        dataToSend.append(textColorAsData)
+        dataToSend.append(data)
         
         // send
         if !writeDataToPeripheral(data: dataToSend, type: .withoutResponse) {
-            trace("in dataToSend, failed to send textcolor", log: log, type: .error)
+            trace("    failed to send", log: log, type: .error)
             return false
         } else {
-            trace("successfully written textcolor to M5Stack", log: log, type: .error)
+            trace("    sent", log: log, type: .error)
             return true
         }
-        
+
     }
     
     // MARK: - BluetoothTransmitterDelegate functions
@@ -334,6 +344,14 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         case .readTimeStampRx:
             // M5Stack is requesting for password
             sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
+            
+        case .readAllParametersRx:
+            // M5Stack is asking for all parameters
+            
+            guard let m5Stack = m5Stack else {return}// would be a software error if this happens
+            
+            m5StackBluetoothTransmitterDelegateFixed?.isAskingForAllParameters(m5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateVariable?.isAskingForAllParameters(m5Stack: m5Stack)
             
         }
     }

@@ -74,6 +74,9 @@ enum M5StackTransmitterOpCodeRx: UInt8, CaseIterable {
     
     /// M5Stack requests timestamp in seconds, local time since 1.1.1970 !!
     case readTimeStampRx = 0x11
+    
+    // M5Stack requests all parameters (textcolor, wifi names and passwords,...), this is usually after an M5Stack restart
+    case readAllParametersRx = 0x16
 
 }
 
@@ -93,6 +96,8 @@ extension M5StackTransmitterOpCodeRx: CustomStringConvertible {
             return "readBlePassWordError2Rx"
         case .readTimeStampRx:
             return "readTimeStampRx"
+        case .readAllParametersRx:
+            return "readAllParametersRx"
         }
     }
 }

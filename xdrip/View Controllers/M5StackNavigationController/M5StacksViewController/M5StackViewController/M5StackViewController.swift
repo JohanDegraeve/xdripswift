@@ -579,6 +579,10 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
 
 extension M5StackViewController: M5StackBluetoothDelegate {
     
+    func isAskingForAllParameters(m5Stack: M5Stack) {
+        // viewcontroller doesn't use this
+    }
+    
     func isReadyToReceiveData(m5Stack: M5Stack) {
         // viewcontroller doesn't use this
     }

@@ -34,5 +34,7 @@ protocol M5StackBluetoothDelegate: AnyObject {
     
     /// will be called if M5Stack is connected, and authentication was successful
     func isReadyToReceiveData(m5Stack : M5Stack)
+    
+    func isAskingForAllParameters(m5Stack: M5Stack)
 
 }

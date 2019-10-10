@@ -290,6 +290,19 @@ extension M5StackManager: M5StackManaging {
 
 extension M5StackManager: M5StackBluetoothDelegate {
     
+    /// m5Stack is asking for an update of all parameters, send them
+    func isAskingForAllParameters(m5Stack: M5Stack) {
+        
+        // send all parameters, if successful,then for this m5Stack we can set m5StacksParameterUpdateNeeded to false
+        if sendAllParameters(toM5Stack: m5Stack) {
+            m5StacksParameterUpdateNeeded[m5Stack] = false
+        } else {
+            // failed, so we need to set m5StacksParameterUpdateNeeded to true, so that next time it connects we will send all parameters
+            m5StacksParameterUpdateNeeded[m5Stack] = true
+        }
+
+    }
+    
     /// will be called if M5Stack is connected, and authentication was successful, M5StackManager can start sending data like parameter updates or bgreadings
     func isReadyToReceiveData(m5Stack : M5Stack) {
         
