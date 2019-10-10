@@ -18,8 +18,6 @@
 		F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */; };
 		F804870C2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */; };
 		F804870D2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */; };
-		F80487102337B3D400EBDDB7 /* M5StackName+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870F2337B3D400EBDDB7 /* M5StackName+CoreDataClass.swift */; };
-		F80487112337B3D400EBDDB7 /* M5StackName+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870E2337B3D300EBDDB7 /* M5StackName+CoreDataProperties.swift */; };
 		F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */; };
 		F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */; };
 		F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */; };
@@ -67,6 +65,8 @@
 		F898EDF2234A8A0500BFB79B /* UInt8.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDF1234A8A0500BFB79B /* UInt8.swift */; };
 		F898EDF4234A8A3200BFB79B /* UInt16.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDF3234A8A3200BFB79B /* UInt16.swift */; };
 		F898EDF6234A8A5700BFB79B /* UInt32.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDF5234A8A5700BFB79B /* UInt32.swift */; };
+		F898EDF8234F8EDF00BFB79B /* M5StackName+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDF7234F8EDE00BFB79B /* M5StackName+CoreDataProperties.swift */; };
+		F898EDFA234F8EE500BFB79B /* M5StackName+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDF9234F8EE500BFB79B /* M5StackName+CoreDataClass.swift */; };
 		F8A1584D22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */; };
 		F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */; };
 		F8A1585122EDB597007F5B5D /* ConstantsBGGraphBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */; };
@@ -247,8 +247,6 @@
 		F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIStoryboard.swift; sourceTree = "<group>"; };
 		F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5Stack+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5Stack+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		F804870E2337B3D300EBDDB7 /* M5StackName+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "M5StackName+CoreDataProperties.swift"; path = "/Users/johandegraeve/OneDrive/Xcode Projects/xdrip/xdrip/Core Data/classes/M5StackName+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
-		F804870F2337B3D400EBDDB7 /* M5StackName+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "M5StackName+CoreDataClass.swift"; path = "/Users/johandegraeve/OneDrive/Xcode Projects/xdrip/xdrip/Core Data/classes/M5StackName+CoreDataClass.swift"; sourceTree = "<absolute>"; };
 		F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionClosureable-extension.swift"; sourceTree = "<group>"; };
 		F81D6D4522B67F55005EFAE2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareUploadManager.swift; sourceTree = "<group>"; };
@@ -302,6 +300,8 @@
 		F898EDF1234A8A0500BFB79B /* UInt8.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UInt8.swift; sourceTree = "<group>"; };
 		F898EDF3234A8A3200BFB79B /* UInt16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UInt16.swift; sourceTree = "<group>"; };
 		F898EDF5234A8A5700BFB79B /* UInt32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UInt32.swift; sourceTree = "<group>"; };
+		F898EDF7234F8EDE00BFB79B /* M5StackName+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5StackName+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		F898EDF9234F8EE500BFB79B /* M5StackName+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5StackName+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewDevelopmentSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewInfoViewModel.swift; sourceTree = "<group>"; };
 		F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBGGraphBuilder.swift; sourceTree = "<group>"; };
@@ -1336,8 +1336,8 @@
 		F8EA6CA421B9A25B0082976B /* classes */ = {
 			isa = PBXGroup;
 			children = (
-				F804870F2337B3D400EBDDB7 /* M5StackName+CoreDataClass.swift */,
-				F804870E2337B3D300EBDDB7 /* M5StackName+CoreDataProperties.swift */,
+				F898EDF9234F8EE500BFB79B /* M5StackName+CoreDataClass.swift */,
+				F898EDF7234F8EDE00BFB79B /* M5StackName+CoreDataProperties.swift */,
 				F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */,
 				F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */,
 				F8B3A79122635A25004BA588 /* AlertEntry+CoreDataClass.swift */,
@@ -1621,7 +1621,6 @@
 				F821CF57229BF43A005C1E43 /* SnoozeParameters.swift in Sources */,
 				F8F62278233D1CED00BE8796 /* TextsM5StackView.swift in Sources */,
 				F8A54AFF22D9179100934E7A /* CRC.swift in Sources */,
-				F80487102337B3D400EBDDB7 /* M5StackName+CoreDataClass.swift in Sources */,
 				F8B3A79722635A25004BA588 /* AlertEntry+CoreDataProperties.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
@@ -1666,6 +1665,7 @@
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
 				F804870D2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift in Sources */,
 				F821CF8E22AB090C005C1E43 /* DatePickerViewController.swift in Sources */,
+				F898EDF8234F8EDF00BFB79B /* M5StackName+CoreDataProperties.swift in Sources */,
 				F8A1585322EDB602007F5B5D /* ConstantsBloodGlucose.swift in Sources */,
 				F8A389C823203E3E0010F405 /* ConstantsM5Stack.swift in Sources */,
 				F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */,
@@ -1681,6 +1681,7 @@
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
 				F8B3A80A227A3D11004BA588 /* TextsAlertTypeSettings.swift in Sources */,
 				F8A1586D22EDB9BE007F5B5D /* ConstantsDexcomFollower.swift in Sources */,
+				F898EDFA234F8EE500BFB79B /* M5StackName+CoreDataClass.swift in Sources */,
 				F8B3A850227F26F8004BA588 /* AlertTypesSettingsViewController.swift in Sources */,
 				F8A7407022DBB24800967CFC /* BluconTransmitterOpCode.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* BluetoothTransmitter.swift in Sources */,
@@ -1742,7 +1743,6 @@
 				F8EEDD4522FD80A600D2D610 /* LibreOOPClient.swift in Sources */,
 				F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */,
 				F8C5EBE522F297F000563B5F /* LibreSensorSerialNumber.swift in Sources */,
-				F80487112337B3D400EBDDB7 /* M5StackName+CoreDataProperties.swift in Sources */,
 				F8A389E1232D3E070010F405 /* SettingsViewM5StackWiFiSettingsViewModel.swift in Sources */,
 				F8B3A845227F090E004BA588 /* SettingsViewDexcomSettingsViewModel.swift in Sources */,
 				F8A1585F22EDB81E007F5B5D /* ConstantsLog.swift in Sources */,
