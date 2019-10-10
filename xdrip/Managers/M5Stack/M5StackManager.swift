@@ -30,6 +30,9 @@ class M5StackManager: NSObject {
     /// if scan is called, an instance of M5StackBluetoothTransmitter is created with address and name. The new instance will be assigned to this variable, temporary, until a connection is made
     private var tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack: M5StackBluetoothTransmitter?
     
+    /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
+    private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
+
     // MARK: - initializer
     
     init(coreDataManager: CoreDataManager) {
@@ -80,11 +83,11 @@ class M5StackManager: NSObject {
 
         if let m5Stack = m5Stack {
             // send bgReading to the single m5Stack
-            m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false)?.writeBgReadingInfo(bgReading: bgReadingToSend[0])
+            _ = m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false)?.writeBgReadingInfo(bgReading: bgReadingToSend[0])
         } else {
             // send the reading to all M5Stacks
             for m5StackBlueToothTransmitter in m5StacksBlueToothTransmitters.values {
-                m5StackBlueToothTransmitter?.writeBgReadingInfo(bgReading: bgReadingToSend[0])
+                _ = m5StackBlueToothTransmitter?.writeBgReadingInfo(bgReading: bgReadingToSend[0])
             }
         }
     }
@@ -128,6 +131,32 @@ class M5StackManager: NSObject {
         return true
     }
     
+    // MARK:- override observe function
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if let keyPath = keyPath {
+            
+            if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
+                
+                switch keyPathEnum {
+                    
+                case UserDefaults.Key.m5StackWiFiName1 :
+                    
+                    // transmittertype change triggered by user, should not be done within 200 ms
+                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
+                       
+                        
+                    }
+
+                default:
+                    break
+                }
+            }
+        }
+    }
+    
+
 }
 
 // MARK: - conform to M5StackManaging
