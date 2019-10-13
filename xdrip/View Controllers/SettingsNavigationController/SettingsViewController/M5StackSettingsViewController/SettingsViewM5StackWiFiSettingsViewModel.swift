@@ -146,7 +146,7 @@ struct SettingsViewM5StackWiFiSettingsViewModel: SettingsViewModelProtocol {
             actionHandler = {(password:String) in UserDefaults.standard.m5StackWiFiPassword3 = password.toNilIfLength0()}
             titlePart = Texts_Common.password
         default:
-            // keep the default, just in case we add cases which are not processed here but which need processing
+            // keep the default even if it gives a warning, just in case we add cases which are not processed here but which need processing
             fatalError("createSettingsSelectedRowActionForWifiName, invalid wifiNumber")
         }
         

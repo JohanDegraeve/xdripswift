@@ -276,7 +276,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             trace("in retrievePeripherals, deviceaddress is %{public}@", log: log, type: .info, deviceAddress)
             if let uuid = UUID(uuidString: deviceAddress) {
                 trace("    uuid is not nil", log: log, type: .info)
-                var peripheralArr = central.retrievePeripherals(withIdentifiers: [uuid])
+                let peripheralArr = central.retrievePeripherals(withIdentifiers: [uuid])
                 if peripheralArr.count > 0 {
                     peripheral = peripheralArr[0]
                     if let peripheral = peripheral {

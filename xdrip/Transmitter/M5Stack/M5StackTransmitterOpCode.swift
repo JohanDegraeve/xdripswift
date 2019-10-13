@@ -7,7 +7,7 @@ enum M5StackTransmitterOpCodeTx: UInt8, CaseIterable {
     case writeNightScoutUrlTx = 0x01
     
     /// client writes nightScoutToken
-    case writeNightScoutTokenTx = 0x02
+    case writeNightScoutAPIKeyTx = 0x02
     
     /// client writes mgdl, value 0 means mmol is used, value 1 is mgdl
     case writemgdlTx = 0x03

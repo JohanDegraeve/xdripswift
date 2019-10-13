@@ -11,7 +11,10 @@ import CoreData
 /// - M5StackName : optional. A reference to a userdefined name
 public class M5Stack: NSManagedObject {
 
-    /// create M5Stack, shouldconnect default value = true
+    /// this property is not stored in coreData. It is used to keep track of parameter updates sent to the M5Stack. If value is true, then xdrip needs to send an update off all parameters to this M5Stack as soon as possible (ie when connected)
+    public var parameterUpdateNeeded = true
+    
+/// create M5Stack, shouldconnect default value = true
     init(address: String, name: String, textColor: M5StackTextColor, nsManagedObjectContext:NSManagedObjectContext) {
        
         let entity = NSEntityDescription.entity(forEntityName: "M5Stack", in: nsManagedObjectContext)!

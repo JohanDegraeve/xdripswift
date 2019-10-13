@@ -152,34 +152,85 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         
     }
     
-    /// handles common functions when writing data to M5Stack :
-    /// - if no connection returns false
-    /// - calls writeDataToPeripheral(data: Data, type: CBCharacteristicWriteType) and returns the result
-    private func writeDataToPeripheral(data: Data, opCode : M5StackTransmitterOpCodeTx) -> Bool {
+    /// writes a wifi name
+    /// - parameters:
+    ///     - name : the wifi name or ssid, if nil then nothing is sent
+    ///     - number : the wifi number (1 to 10)
+    /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
+   func writeWifiName(name: String?, number: UInt8) -> Bool {
         
-        guard getConnectionStatus() == CBPeripheralState.connected else {
-            trace("    not connected ", log: log, type: .info)
+        guard let stringAsData = name?.data(using: .utf8) else {
+            trace("    failed to create data from wifiname, value is probably nil, I'm not sending wifiName of zero length to the M5Stack", log: log, type: .info)
             return false
         }
-        
+
         // initialize dataToSend
         var dataToSend = Data()
         
-        // add opcode
-        dataToSend.append(opCode.rawValue.data)
+        // add wifi number
+        dataToSend.append(number.data)
         
-        // add textcolor as uint16
-        dataToSend.append(data)
+        // add wifi name
+        dataToSend.append(stringAsData)
+
+        // write the data
+        return writeDataToPeripheral(data: dataToSend, opCode: .writeWlanSSIDTx)
         
-        // send
-        if !writeDataToPeripheral(data: dataToSend, type: .withoutResponse) {
-            trace("    failed to send", log: log, type: .error)
+    }
+    
+    /// writes a wifi password
+    /// - parameters:
+    ///     - password : the wifi password, if nil then nothing is sent
+    ///     - number : the wifi number (1 to 10)
+    /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
+   func writeWifiPassword(password: String?, number: UInt8) -> Bool {
+        
+        guard let stringAsData = password?.data(using: .utf8) else {
+            trace("    failed to create data from password, value is probably nil, I'm not sending password of zero length to the M5Stack", log: log, type: .info)
             return false
-        } else {
-            trace("    sent", log: log, type: .error)
-            return true
         }
 
+        // initialize dataToSend
+        var dataToSend = Data()
+        
+        // add wifi number
+        dataToSend.append(number.data)
+        
+        // add wifi name
+        dataToSend.append(stringAsData)
+
+        // write the data
+        return writeDataToPeripheral(data: dataToSend, opCode: .writeWlanPassTx)
+        
+    }
+    
+    /// writes bloodglucose unit to M5Stack
+    /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
+    func writeBloodGlucoseUnit(isMgDl: Bool) -> Bool {
+        
+        return writeStringToPeripheral(string: isMgDl ? "true":"false", opCode: .writemgdlTx)
+    }
+    
+    /// writes nightscout url to M5Stack
+    /// - parameters:
+    ///     - url : the nightscout url, if nil then nothing is sent
+    /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
+    func writeNightScoutUrl(url: String?) -> Bool {
+        
+        if let url = url {
+            return writeStringToPeripheral(string: url, opCode: .writeNightScoutUrlTx)
+        } else {return false}
+    }
+    
+    /// writes nightscout apikey to M5Stack
+    /// - parameters:
+    ///     - apikey : the apikeyl, if nil then nothing is sent
+    /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
+    func writeNightScoutAPIKey(apiKey: String?) -> Bool {
+        
+        if let apiKey = apiKey {
+            return writeStringToPeripheral(string: apiKey, opCode: .writeNightScoutAPIKeyTx)
+        } else {return false}
     }
     
     // MARK: - BluetoothTransmitterDelegate functions
@@ -356,7 +407,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         }
     }
 
-    // MARK: helper functions
+    // MARK: private helper functions
     
     /// sends local time in seconds since 1.1.1970 and also timeoffset from UTC in seconds. to M5Stack
     ///
@@ -403,6 +454,46 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             }
         }
         
+    }
+    
+    /// handles common functions when writing data to M5Stack :
+    /// - if no connection returns false
+    /// - calls writeDataToPeripheral(data: Data, type: CBCharacteristicWriteType) and returns the result
+    private func writeDataToPeripheral(data: Data, opCode : M5StackTransmitterOpCodeTx) -> Bool {
+        
+        guard getConnectionStatus() == CBPeripheralState.connected else {
+            trace("    not connected ", log: log, type: .info)
+            return false
+        }
+        
+        // initialize dataToSend
+        var dataToSend = Data()
+        
+        // add opcode
+        dataToSend.append(opCode.rawValue.data)
+        
+        // add textcolor as uint16
+        dataToSend.append(data)
+        
+        // send
+        if !writeDataToPeripheral(data: dataToSend, type: .withoutResponse) {
+            trace("    failed to send", log: log, type: .error)
+            return false
+        } else {
+            trace("    sent", log: log, type: .error)
+            return true
+        }
+
+    }
+    
+    private func writeStringToPeripheral(string: String, opCode : M5StackTransmitterOpCodeTx) -> Bool {
+        
+        guard let stringAsData = string.data(using: .utf8) else {
+            trace("    failed to create data from string", log: log, type: .error)
+            return false
+        }
+        
+        return writeDataToPeripheral(data: stringAsData, opCode: opCode)
     }
     
 }

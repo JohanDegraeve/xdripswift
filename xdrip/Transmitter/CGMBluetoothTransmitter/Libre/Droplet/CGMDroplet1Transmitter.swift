@@ -81,7 +81,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
             trace("    value = %{public}@", log: log, type: .info, valueAsString)
             
             //find indexes of " "
-            var indexesOfSplitter = valueAsString.indexes(of: " ")
+            let indexesOfSplitter = valueAsString.indexes(of: " ")
             
             // length of indexesOfSplitter should be minimum 3 (there should be minimum 3 spaces)
             guard indexesOfSplitter.count >= 3 else {

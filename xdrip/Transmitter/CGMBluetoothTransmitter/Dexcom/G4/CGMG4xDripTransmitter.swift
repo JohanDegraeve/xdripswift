@@ -225,7 +225,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         //convert value to string
         if let bufferAsString = String(bytes: value, encoding: .utf8) {
             //find indexes of " " and store in array
-            var indexesOfSplitter = bufferAsString.indexes(of: " ")
+            let indexesOfSplitter = bufferAsString.indexes(of: " ")
             // start with finding rawData
             var range = bufferAsString.startIndex..<indexesOfSplitter[0]
             let rawData:Int? = Int(bufferAsString[range])

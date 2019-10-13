@@ -15,9 +15,6 @@ class M5StackManager: NSObject {
     /// dictionary with key = an instance of M5Stack, and value an instance of M5StackBluetoothTransmitter. Value can be nil in which case we found an M5Stack in the coredata but shouldconnect == false so we don't instanstiate an M5StackBluetoothTransmitter
     private var m5StacksBlueToothTransmitters = [M5Stack : M5StackBluetoothTransmitter?]()
     
-    /// dictionary with key = an instance of M5Stack, and value a boolean
-    private var m5StacksParameterUpdateNeeded = [M5Stack : Bool]()
-    
     /// to access m5Stack entity in coredata
     private var m5StackAccessor: M5StackAccessor
     
@@ -56,7 +53,7 @@ class M5StackManager: NSObject {
             }
             
             // each time the app launches, we will send the parameter to all M5Stacks
-            m5StacksParameterUpdateNeeded[m5Stack] = true
+            m5Stack.parameterUpdateNeeded = true
             
         }
         
@@ -87,7 +84,9 @@ class M5StackManager: NSObject {
         } else {
             // send the reading to all M5Stacks
             for m5StackBlueToothTransmitter in m5StacksBlueToothTransmitters.values {
-                _ = m5StackBlueToothTransmitter?.writeBgReadingInfo(bgReading: bgReadingToSend[0])
+                if let transmitter = m5StackBlueToothTransmitter {
+                    _ = transmitter.writeBgReadingInfo(bgReading: bgReadingToSend[0])
+                }
             }
         }
     }
@@ -104,7 +103,11 @@ class M5StackManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackWiFiPassword2.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackWiFiPassword3.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackBlePassword.rawValue, options: .new, context: nil)
-        
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutAPIKey.rawValue, options: .new, context: nil)
+
+
     }
     
     /// send all parameters to m5StackBluetoothTransmitter
@@ -122,13 +125,49 @@ class M5StackManager: NSObject {
             return false
         }
         
+        // initialise returnValue, result
+        var success = true
+        
+        // send bloodglucoseunit
+        if !m5StackBluetoothTransmitter.writeBloodGlucoseUnit(isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {success = false}
+
         // send textColor
-        if !m5StackBluetoothTransmitter.writeTextColor(textColor: M5StackTextColor(forUInt16: UInt16(m5Stack.textcolor)) ?? UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor) {
-            return false
+        if !m5StackBluetoothTransmitter.writeTextColor(textColor: M5StackTextColor(forUInt16: UInt16(m5Stack.textcolor)) ?? UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor) {success = false}
+        
+        // send WiFiSSID's
+        if let wifiName = UserDefaults.standard.m5StackWiFiName1 {
+            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 1) {success = false}
+        }
+        if let wifiName = UserDefaults.standard.m5StackWiFiName2 {
+            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 2) {success = false}
+        }
+        if let wifiName = UserDefaults.standard.m5StackWiFiName3 {
+            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 3) {success = false}
         }
 
-        // all parameters successfully sent
-        return true
+        // send WiFiPasswords
+        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword1 {
+            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 1) {success = false}
+        }
+        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword2 {
+            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 2) {success = false}
+        }
+        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword3 {
+            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 3) {success = false}
+        }
+        
+        // send nightscout url
+        if let url = UserDefaults.standard.nightScoutUrl {
+            if !m5StackBluetoothTransmitter.writeNightScoutUrl(url: url) {success = false}
+        }
+        
+        // send nightscout token
+        if let token = UserDefaults.standard.nightScoutAPIKey {
+            if !m5StackBluetoothTransmitter.writeNightScoutAPIKey(apiKey: token) {success = false}
+        }
+        
+        // return success
+        return success
     }
     
     // MARK:- override observe function
@@ -139,19 +178,76 @@ class M5StackManager: NSObject {
             
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
                 
+                // first check keyValueObserverTimeKeeper
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.m5StackWiFiName1 :
+                case UserDefaults.Key.m5StackWiFiName1, UserDefaults.Key.m5StackWiFiName2, UserDefaults.Key.m5StackWiFiName3, UserDefaults.Key.m5StackWiFiPassword1, UserDefaults.Key.m5StackWiFiPassword2, UserDefaults.Key.m5StackWiFiPassword3, UserDefaults.Key.nightScoutAPIKey, UserDefaults.Key.nightScoutUrl  :
                     
                     // transmittertype change triggered by user, should not be done within 200 ms
-                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
-                       
-                        
+                    if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
+                       return
                     }
 
                 default:
                     break
                 }
+                
+                // assuming it's a setting to be sent to all m5Stacks, loop through all M5Stacks
+                // only those settings that are to be handled by all M5Stacks need to be considered here
+                // loop through all m5StacksBlueToothTransmitters
+                for m5StackPair in m5StacksBlueToothTransmitters {
+                    if let bluetoothTransmitter = m5StackPair.value {
+
+                        // is value successfully written or not
+                        var success = false
+                        
+                        switch keyPathEnum {
+                            
+                        case UserDefaults.Key.m5StackWiFiName1:
+                            success = bluetoothTransmitter.writeWifiName(name: UserDefaults.standard.m5StackWiFiName1, number: 1)
+                            
+                        case UserDefaults.Key.m5StackWiFiName2:
+                            success = bluetoothTransmitter.writeWifiName(name: UserDefaults.standard.m5StackWiFiName2, number: 2)
+                            
+                        case UserDefaults.Key.m5StackWiFiName3:
+                            success = bluetoothTransmitter.writeWifiName(name: UserDefaults.standard.m5StackWiFiName3, number: 3)
+                            
+                        case UserDefaults.Key.m5StackWiFiPassword1:
+                            success = bluetoothTransmitter.writeWifiPassword(password: UserDefaults.standard.m5StackWiFiPassword1, number: 1)
+                            
+                        case UserDefaults.Key.m5StackWiFiPassword2:
+                            success = bluetoothTransmitter.writeWifiPassword(password: UserDefaults.standard.m5StackWiFiPassword2, number: 2)
+                            
+                        case UserDefaults.Key.m5StackWiFiPassword3:
+                            success = bluetoothTransmitter.writeWifiPassword(password: UserDefaults.standard.m5StackWiFiPassword3, number: 3)
+                            
+                        case UserDefaults.Key.m5StackBlePassword:
+                            // only if the password in the settings is not nil, and if the m5Stack doesn't have a password yet, then we will store it in the M5Stack.
+                            if let blePassword = UserDefaults.standard.m5StackBlePassword, m5StackPair.key.blepassword == nil {
+                                m5StackPair.key.blepassword = blePassword
+                            }
+
+                        case UserDefaults.Key.bloodGlucoseUnitIsMgDl:
+                            success = bluetoothTransmitter.writeBloodGlucoseUnit(isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                            
+                        case UserDefaults.Key.nightScoutAPIKey:
+                            success = bluetoothTransmitter.writeNightScoutAPIKey(apiKey: UserDefaults.standard.nightScoutAPIKey)
+                            
+                        case UserDefaults.Key.nightScoutUrl:
+                            success = bluetoothTransmitter.writeNightScoutUrl(url: UserDefaults.standard.nightScoutUrl)
+                            
+                        default:
+                            break
+                        }
+                        
+                        // if not successful then set needs parameter update to true for the m5Stack
+                        if !success {
+                            m5StackPair.key.parameterUpdateNeeded = true
+                        }
+
+                    }
+                }
+                
             }
         }
     }
@@ -260,12 +356,6 @@ extension M5StackManager: M5StackManaging {
             m5StacksBlueToothTransmitters.removeValue(forKey: m5Stack)
         }
         
-        // also remove from m5StacksParameterUpdateNeeded
-        if m5StacksParameterUpdateNeeded.keys.contains(m5Stack) {
-            m5StacksParameterUpdateNeeded[m5Stack] = (Bool?).none
-            m5StacksParameterUpdateNeeded.removeValue(forKey: m5Stack)
-        }
-
         // delete in coredataManager
         coreDataManager.mainManagedObjectContext.delete(m5Stack)
         
@@ -281,7 +371,7 @@ extension M5StackManager: M5StackManaging {
     
     /// sets flag m5StacksParameterUpdateNeeded for m5Stack to true
     public func updateNeeded(forM5Stack m5Stack: M5Stack) {
-        m5StacksParameterUpdateNeeded[m5Stack] = true
+        m5Stack.parameterUpdateNeeded = true
     }
 
 }
@@ -295,10 +385,10 @@ extension M5StackManager: M5StackBluetoothDelegate {
         
         // send all parameters, if successful,then for this m5Stack we can set m5StacksParameterUpdateNeeded to false
         if sendAllParameters(toM5Stack: m5Stack) {
-            m5StacksParameterUpdateNeeded[m5Stack] = false
+            m5Stack.parameterUpdateNeeded = false
         } else {
             // failed, so we need to set m5StacksParameterUpdateNeeded to true, so that next time it connects we will send all parameters
-            m5StacksParameterUpdateNeeded[m5Stack] = true
+            m5Stack.parameterUpdateNeeded = true
         }
 
     }
@@ -307,11 +397,11 @@ extension M5StackManager: M5StackBluetoothDelegate {
     func isReadyToReceiveData(m5Stack : M5Stack) {
         
         // if the M5Stack needs new parameters, then send them
-        if let needsUpdate = m5StacksParameterUpdateNeeded[m5Stack], needsUpdate {
+        if m5Stack.parameterUpdateNeeded {
             
             // send all parameters
             if sendAllParameters(toM5Stack: m5Stack) {
-                m5StacksParameterUpdateNeeded[m5Stack] = false
+                m5Stack.parameterUpdateNeeded = false
             }
             
         }
