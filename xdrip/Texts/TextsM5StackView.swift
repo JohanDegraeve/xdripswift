@@ -41,7 +41,7 @@ class Texts_M5StackView {
     }()
     
     static let m5StackResetRequiredWarning: String = {
-        return NSLocalizedString("m5StackResetRequiredWarning", tableName: filename, bundle: Bundle.main, value: "You need to reset the M5Stack in order to get a new temporary password", comment: "in case M5Stack authentication failed, and M5Stack is generating a random password")
+        return NSLocalizedString("m5StackResetRequiredWarning", tableName: filename, bundle: Bundle.main, value: "You need to reset the M5Stack in order to get a new temporary password. When done click'", comment: "in case M5Stack authentication failed, and M5Stack is generating a random password")
     }()
 
     static let m5StackAlias: String = {

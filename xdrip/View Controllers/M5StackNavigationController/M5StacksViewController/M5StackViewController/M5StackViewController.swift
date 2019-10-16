@@ -606,19 +606,37 @@ extension M5StackViewController: M5StackBluetoothDelegate {
                 // by the time user clicks 'ok', the M5stack will be disconnected by the M5StackManager (see authentication in M5StackManager)
                 self.shouldConnectTemporaryValue = m5Stack.shouldconnect
                 
+                self.setConnectButtonLabelText()
+                
             }).presentInOwnWindow(animated: true, completion: nil)
         }
     }
     
     func blePasswordMissing(forM5Stack m5Stack: M5Stack) {
         
-        UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+        // show warning, inform that user should set password or reset M5Stack
+        UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
+            
+            // by the time user clicks 'ok', the M5stack will be disconnected by the M5StackManager (see authentication in M5StackManager)
+            self.shouldConnectTemporaryValue = m5Stack.shouldconnect
+            
+            self.setConnectButtonLabelText()
+            
+        }).presentInOwnWindow(animated: true, completion: nil)
 
     }
     
     func m5StackResetRequired(forM5Stack m5Stack: M5Stack) {
 
-        UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.m5StackResetRequiredWarning, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+        // show warning, inform that user should set password or reset M5Stack
+        UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.m5StackResetRequiredWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
+            
+            // by the time user clicks 'ok', the M5stack will be disconnected by the M5StackManager (see authentication in M5StackManager)
+            self.shouldConnectTemporaryValue = m5Stack.shouldconnect
+            
+            self.setConnectButtonLabelText()
+            
+        }).presentInOwnWindow(animated: true, completion: nil)
 
     }
     

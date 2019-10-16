@@ -317,12 +317,18 @@ extension M5StackManager: M5StackManaging {
         }
     }
     
-    /// disconnect from M5Stack
+    /// disconnect from M5Stack - and don't reconnect - set shouldconnect to false
     func disconnect(fromM5stack m5Stack: M5Stack) {
+        
+        // device should not reconnect after disconnecting
+        m5Stack.shouldconnect = false
+        
+        // save in coredata
+        save()
         
         if let bluetoothTransmitter = m5StacksBlueToothTransmitters[m5Stack] {
             if let bluetoothTransmitter =  bluetoothTransmitter {
-                bluetoothTransmitter.disconnect()
+                bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
             }
         }
     }
@@ -480,7 +486,7 @@ extension M5StackManager: M5StackBluetoothDelegate {
         
     }
 
-    /// did the app successfully authenticate towards M5Stack
+    /// did the app successfully authenticate towards M5Stack, if no, then disconnect will be done
     ///
     func authentication(success: Bool, forM5Stack m5Stack:M5Stack) {
         trace("in authentication with success = %{public}@", log: self.log, type: .info, success.description)
@@ -489,28 +495,30 @@ extension M5StackManager: M5StackBluetoothDelegate {
         // disconnection is done because maybe another device is trying to connect to the M5Stack, need to make it free
         if !success {
             
-            // device should not reconnect after disconnecting
-            m5Stack.shouldconnect = false
-            
-            // save in coredata
-            save()
-            
             // disconnect
             disconnect(fromM5stack: m5Stack)
             
         }
     }
     
-    /// there's no ble password set, user should set it in the settings
+    /// there's no ble password set, user should set it in the settings - disconnect will be called
     func blePasswordMissing(forM5Stack m5Stack: M5Stack) {
-        // no further action, This is for UIViewcontroller's that also receive this info, means info can only be shown if this happens while user has one of the UIViewcontrollers open
+
         trace("in blePasswordMissing", log: self.log, type: .info)
+        
+        // disconnect
+        disconnect(fromM5stack: m5Stack)
+
     }
 
-    /// it's an M5Stack without password configired in the ini file. xdrip app has been requesting temp password to M5Stack but this was already done once. M5Stack needs to be reset
+    /// it's an M5Stack without password configured in the ini file. xdrip app has been requesting temp password to M5Stack but this was already done once. M5Stack needs to be reset. - disconnect will be called
     func m5StackResetRequired(forM5Stack m5Stack:M5Stack) {
-        // no further action, This is for UIViewcontroller's that also receive this info, means info can only be shown if this happens while user has one of the UIViewcontrollers open
+
         trace("in m5StackResetRequired", log: self.log, type: .info)
+        
+        // disconnect
+        disconnect(fromM5stack: m5Stack)
+
     }
 
     /// did disconnect from M5Stack
