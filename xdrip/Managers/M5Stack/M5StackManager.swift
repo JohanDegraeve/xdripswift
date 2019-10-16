@@ -482,9 +482,23 @@ extension M5StackManager: M5StackBluetoothDelegate {
 
     /// did the app successfully authenticate towards M5Stack
     ///
-    /// in case of failure, then user should set the correct password in the M5Stack ini file, or, in case there's no password set in the ini file, switch off and on the M5Stack
     func authentication(success: Bool, forM5Stack m5Stack:M5Stack) {
         trace("in authentication with success = %{public}@", log: self.log, type: .info, success.description)
+        
+        // if authentication not successful then disconnect and don't reconnect, user should verify password or reset the M5Stack, disconnect and set shouldconnect to false, permenantly (ie store in core data)
+        // disconnection is done because maybe another device is trying to connect to the M5Stack, need to make it free
+        if !success {
+            
+            // device should not reconnect after disconnecting
+            m5Stack.shouldconnect = false
+            
+            // save in coredata
+            save()
+            
+            // disconnect
+            disconnect(fromM5stack: m5Stack)
+            
+        }
     }
     
     /// there's no ble password set, user should set it in the settings

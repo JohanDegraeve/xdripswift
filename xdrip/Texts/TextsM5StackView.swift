@@ -33,7 +33,7 @@ class Texts_M5StackView {
     }()
     
     static let authenticationFailureWarning: String = {
-        return NSLocalizedString("authenticationFailureWarning", tableName: filename, bundle: Bundle.main, value: "Authentication to M5Stack Failed, either set the pre-configured password in the Settings, or, if the M5Stack does not have a preconfigured password then reset the M5Stack", comment: "in case M5Stack authentication failed")
+        return NSLocalizedString("authenticationFailureWarning", tableName: filename, bundle: Bundle.main, value: "Authentication to M5Stack Failed, either set the pre-configured password in the Settings, or, if the M5Stack does not have a preconfigured password then reset the M5Stack. M5Stack will disconnect now. You can make a new attempt by clicking ", comment: "in case M5Stack authentication failed")
     }()
     
     static let blePasswordMissingWarning: String = {
@@ -56,8 +56,8 @@ class Texts_M5StackView {
         return NSLocalizedString("userdefinedNameAlreadyExists", tableName: filename, bundle: Bundle.main, value: "There is already an M5Stack with this name", comment: "M5Stack view, when user clicks userdefinedname (alias) field")
     }()
     
-    //confirmDeletionM5Stack
     static let confirmDeletionM5Stack: String = {
-        return NSLocalizedString("userdefinedNameAlreadyExists", tableName: filename, bundle: Bundle.main, value: "Do you want to delete M5Stack with ", comment: "M5Stack view, when user clicks the trash button - this is not the complete sentence, it will be followed either by 'name' or 'alias', depending on the availability of a userdefined name")
+        return NSLocalizedString("confirmDeletionM5Stack", tableName: filename, bundle: Bundle.main, value: "Do you want to delete M5Stack with ", comment: "M5Stack view, when user clicks the trash button - this is not the complete sentence, it will be followed either by 'name' or 'alias', depending on the availability of a userdefined name")
     }()
+    
 }

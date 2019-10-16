@@ -157,58 +157,48 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     ///     - name : the wifi name or ssid, if nil then nothing is sent
     ///     - number : the wifi number (1 to 10)
     /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
-   func writeWifiName(name: String?, number: UInt8) -> Bool {
+    ///
+    /// byte 0 will be opcode, byte 1 and 2 packetnumber and number of packets respectively, byte 3 will number of the wifi converted to string, next bytes are the actually name
+    func writeWifiName(name: String?, number: UInt8) -> Bool {
         
-        guard let stringAsData = name?.data(using: .utf8) else {
-            trace("    failed to create data from wifiname, value is probably nil, I'm not sending wifiName of zero length to the M5Stack", log: log, type: .info)
+        guard let name = name else {
+            trace("    name is nil", log: log, type: .info)
             return false
         }
-
-        // initialize dataToSend
-        var dataToSend = Data()
         
-        // add wifi number
-        dataToSend.append(number.data)
+        // we will send the number as a string followed by the actual wifiname
+        let numberAndName = number.description + name
         
-        // add wifi name
-        dataToSend.append(stringAsData)
-
-        // write the data
-        return writeDataToPeripheral(data: dataToSend, opCode: .writeWlanSSIDTx)
+        // use writeStringToPeripheral to send it
+        return writeStringToPeripheral(text: numberAndName, opCode: .writeWlanSSIDTx)
         
     }
-    
+
     /// writes a wifi password
     /// - parameters:
     ///     - password : the wifi password, if nil then nothing is sent
     ///     - number : the wifi number (1 to 10)
     /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
-   func writeWifiPassword(password: String?, number: UInt8) -> Bool {
+    ///
+    /// byte 0 will be opcode, byte 1 and 2 packetnumber and number of packets respectively, byte 3 will number of the wifi converted to string, next bytes are the actually password
+    func writeWifiPassword(password: String?, number: UInt8) -> Bool {
         
-        guard let stringAsData = password?.data(using: .utf8) else {
-            trace("    failed to create data from password, value is probably nil, I'm not sending password of zero length to the M5Stack", log: log, type: .info)
+        guard let password = password else {
+            trace("    password is nil", log: log, type: .info)
             return false
         }
-
-        // initialize dataToSend
-        var dataToSend = Data()
         
-        // add wifi number
-        dataToSend.append(number.data)
+        // we will send the number as a string followed by the actual password
+        let numberAndPassword = number.description + password
         
-        // add wifi name
-        dataToSend.append(stringAsData)
-
-        // write the data
-        return writeDataToPeripheral(data: dataToSend, opCode: .writeWlanPassTx)
-        
+        return writeStringToPeripheral(text: numberAndPassword, opCode: .writeWlanPassTx)
     }
-    
+
     /// writes bloodglucose unit to M5Stack
     /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
     func writeBloodGlucoseUnit(isMgDl: Bool) -> Bool {
         
-        return writeStringToPeripheral(string: isMgDl ? "true":"false", opCode: .writemgdlTx)
+        return writeStringToPeripheral(text: isMgDl ? "true":"false", opCode: .writemgdlTx)
     }
     
     /// writes nightscout url to M5Stack
@@ -218,7 +208,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     func writeNightScoutUrl(url: String?) -> Bool {
         
         if let url = url {
-            return writeStringToPeripheral(string: url, opCode: .writeNightScoutUrlTx)
+            return writeStringToPeripheral(text: url, opCode: .writeNightScoutUrlTx)
         } else {return false}
     }
     
@@ -229,7 +219,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     func writeNightScoutAPIKey(apiKey: String?) -> Bool {
         
         if let apiKey = apiKey {
-            return writeStringToPeripheral(string: apiKey, opCode: .writeNightScoutAPIKeyTx)
+            return writeStringToPeripheral(text: apiKey, opCode: .writeNightScoutAPIKeyTx)
         } else {return false}
     }
     
@@ -414,9 +404,6 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     /// local time = UTC time + offset /// UTC time = local time - offset
     private func sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack() {
         
-        // NOTE : why creating multiple packets (splitTextInBLEPackets) even though it will all fit in one packet ?
-        // goal is to be able to send longer strings, to M5 Stack. Then we could create one string which contains the timestamp and offset (split by blanc). But then for sure there will be multiple packets, and I didn't yet develop the logic to reconcatenate strings in the M5Stack
-        
         // create local time in seconds as Int64
         let localTimeInSeconds = Date().toSecondsAsInt64Local()
         
@@ -486,14 +473,29 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
 
     }
     
-    private func writeStringToPeripheral(string: String, opCode : M5StackTransmitterOpCodeTx) -> Bool {
+    private func writeStringToPeripheral(text: String, opCode : M5StackTransmitterOpCodeTx) -> Bool {
         
-        guard let stringAsData = string.data(using: .utf8) else {
-            trace("    failed to create data from string", log: log, type: .error)
+        // create packets to send with offset
+        guard let packetsWithOffset = M5StackUtilities.splitTextInBLEPackets(text: text, maxBytesInOneBLEPacket: ConstantsM5Stack.maximumMBLEPacketsize, opCode: opCode.rawValue) else {
+            trace("   failed to create packets for sending string", log: log, type: .error)
             return false
         }
         
-        return writeDataToPeripheral(data: stringAsData, opCode: opCode)
+        // initialize result
+        var success = true
+        
+        // send the packets
+        for packet in packetsWithOffset {
+            if !writeDataToPeripheral(data: packet, type: .withoutResponse) {
+                trace("    failed to send packet", log: log, type: .error)
+                success = false
+                break
+            } else {
+                trace("    successfully sent packet to M5Stack", log: log, type: .info)
+            }
+        }
+
+        return success
     }
     
 }

@@ -140,12 +140,24 @@ final class M5StacksViewController: UIViewController {
 extension M5StacksViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return m5Stacks.count
+        
+        // add 1 for the row that will show help info
+        return m5Stacks.count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("Unexpected Table View Cell") }
+        
+        // the last row is the help info
+        if indexPath.row == m5Stacks.count {
+            
+            cell.textLabel?.text = Texts_M5StacksView.m5StackSoftWareHelpCellText
+            cell.detailTextLabel?.text = nil
+            cell.accessoryType = .disclosureIndicator
+            return cell
+            
+        }
         
         // textLabel should be the userdefinedname of the M5Stack, or if userdefinedname == nil, then the address
         cell.textLabel?.text = m5Stacks[indexPath.row].m5StackName?.userDefinedName
@@ -178,7 +190,17 @@ extension M5StacksViewController: UITableViewDataSource, UITableViewDelegate {
         
         tableView.deselectRow(at: indexPath, animated: true)
        
-        self.performSegue(withIdentifier: M5StackViewController.SegueIdentifiers.M5StacksToM5StackSegueIdentifier.rawValue, sender: m5Stacks[indexPath.row])
+        // the last row is the help info
+        if indexPath.row == m5Stacks.count {
+
+            UIAlertController(title: Texts_HomeView.info, message: Texts_M5StacksView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5Stack, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+            
+        } else {
+
+            self.performSegue(withIdentifier: M5StackViewController.SegueIdentifiers.M5StacksToM5StackSegueIdentifier.rawValue, sender: m5Stacks[indexPath.row])
+
+        }
+        
     }
     
 }

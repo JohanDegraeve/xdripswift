@@ -13,6 +13,9 @@ enum ConstantsM5Stack {
     /// default text color
     static let defaultTextColor = M5StackTextColor.white
     
+    /// github url with repository for M5Stack that supports bluetooth
+    static let githubURLM5Stack = "https://github.com/JohanDegraeve/M5_NightscoutMon"
+    
 }
 
 enum M5StackTextColor:UInt16, CaseIterable {
