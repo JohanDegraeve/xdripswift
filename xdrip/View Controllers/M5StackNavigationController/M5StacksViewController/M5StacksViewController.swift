@@ -193,7 +193,9 @@ extension M5StacksViewController: UITableViewDataSource, UITableViewDelegate {
         // the last row is the help info
         if indexPath.row == m5Stacks.count {
 
-            UIAlertController(title: Texts_HomeView.info, message: Texts_M5StacksView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5Stack, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+            let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_M5StacksView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5Stack, actionHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
             
         } else {
 

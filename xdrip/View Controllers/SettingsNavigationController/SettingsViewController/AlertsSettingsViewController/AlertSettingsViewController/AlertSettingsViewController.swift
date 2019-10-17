@@ -37,14 +37,16 @@ final class AlertSettingsViewController: UIViewController {
         if let alertEntry = alertEntryAsNSObject {
             
             // first ask user if ok to delete and if yes delete
-            UIAlertController(title: Texts_Alerts.confirmDeletionAlert, message: nil, actionHandler: {
+            let alert = UIAlertController(title: Texts_Alerts.confirmDeletionAlert, message: nil, actionHandler: {
                 self.alertSettingsViewControllerData.coreDataManager.mainManagedObjectContext.delete(alertEntry)
                 self.alertSettingsViewControllerData.coreDataManager.saveChanges()
                 // go back to alerts settings screen
                 self.performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
                 // go back to alerts settings screen
                 self.performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
-            }, cancelHandler: nil).presentInOwnWindow(animated: true, completion: {})
+            }, cancelHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
             
         } else {
             // go back to alerts settings screen

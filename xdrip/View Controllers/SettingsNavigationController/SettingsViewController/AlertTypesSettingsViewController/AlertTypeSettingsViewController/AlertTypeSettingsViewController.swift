@@ -36,12 +36,14 @@ final class AlertTypeSettingsViewController: UIViewController {
         // delete the alerttype if one exists
         if let alertTypeAsNSObject = alertTypeAsNSObject {
             // first ask user if ok to delete and if yes delete
-            UIAlertController(title: Texts_AlertTypeSettingsView.confirmDeletionAlertType + alertTypeAsNSObject.name + "?", message: nil, actionHandler: {
+            let alert = UIAlertController(title: Texts_AlertTypeSettingsView.confirmDeletionAlertType + alertTypeAsNSObject.name + "?", message: nil, actionHandler: {
                 self.coreDataManager?.mainManagedObjectContext.delete(alertTypeAsNSObject)
                 self.coreDataManager?.saveChanges()
                 // go back to alerttypes settings screen
                 self.performSegue(withIdentifier: UnwindSegueIdentifiers.unwindToAlertTypesSettingsViewController.rawValue, sender: self)
-                }, cancelHandler: nil).presentInOwnWindow(animated: true, completion: {})
+                }, cancelHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
             
         } else {
             // go back to alerttypes settings screen
@@ -146,8 +148,12 @@ final class AlertTypeSettingsViewController: UIViewController {
         for alertTypeAlreadyStored in alertTypesAccessor.getAllAlertTypes() {
             // if name == alertTypeAlreadyStored.name and alertTypeAlreadyStored is not the same object as alertTypeAsNSObject then not ok
             if alertTypeAlreadyStored.name == name && (alertTypeAsNSObject == nil || alertTypeAlreadyStored != alertTypeAsNSObject) {
+                
                 // define and present alertcontroller, this will show message and an ok button, without action when clicking ok
-                UIAlertController(title: Texts_Common.warning, message: Texts_AlertTypeSettingsView.alertTypeNameAlreadyExistsMessage, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
+                let alert = UIAlertController(title: Texts_Common.warning, message: Texts_AlertTypeSettingsView.alertTypeNameAlreadyExistsMessage, actionHandler: nil)
+                
+                self.present(alert, animated: true, completion: nil)
+                
                 return
             }
         }

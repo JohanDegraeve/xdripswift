@@ -1,14 +1,6 @@
 import UIKit
 
 extension UIAlertController {
-    /// presents UIAlertController in rootViewController, the alert will pop up no matter where the user is
-    func presentInOwnWindow(animated: Bool, completion: (() -> Void)?) {
-        let alertWindow = UIWindow(frame: UIScreen.main.bounds)
-        alertWindow.rootViewController = UIViewController()
-        alertWindow.windowLevel = UIWindow.Level.alert + 1;
-        alertWindow.makeKeyAndVisible()
-        alertWindow.rootViewController?.present(self, animated: animated, completion: completion)
-    }
     
     /// creates a UIAlertController of type alert with a title and message and adds an ok button, nothing else
     /// - parameters:

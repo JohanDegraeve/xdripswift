@@ -16,7 +16,11 @@ final class RootViewController: UIViewController {
     @IBAction func calibrateButtonAction(_ sender: UIButton) {
         
         if let transmitterType = UserDefaults.standard.transmitterType, transmitterType.canWebOOP(), UserDefaults.standard.webOOPEnabled {
-            UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+            
+            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
+            
         } else {
             requestCalibration(userRequested: true)
         }
@@ -32,7 +36,11 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var preSnoozeButtonOutlet: UIButton!
     
     @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
-        UIAlertController(title: "Info", message: "Unfortuantely, presnooze functionality is not yet implemented", actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+        
+        let alert = UIAlertController(title: "Info", message: "Unfortuantely, presnooze functionality is not yet implemented", actionHandler: nil)
+        
+        self.present(alert, animated: true, completion: nil)
+        
     }
     
     /// outlet for label that shows how many minutes ago and so on
@@ -188,15 +196,19 @@ final class RootViewController: UIViewController {
         
         // if licenseinfo not yet accepted, show license info with only ok button
         if !UserDefaults.standard.licenseInfoAccepted {
-            UIAlertController(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress, actionHandler: {
+            let alert = UIAlertController(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress, actionHandler: {
                 
                 // set licenseInfoAccepted to true
                 UserDefaults.standard.licenseInfoAccepted = true
                 
                 // create info screen about transmitters
-                UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterInfo, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+                let infoScreenAlert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterInfo, actionHandler: nil)
                 
-            }).presentInOwnWindow(animated: true, completion: nil)
+                self.present(infoScreenAlert, animated: true, completion: nil)
+                
+            })
+            
+            self.present(alert, animated: true, completion: nil)
         }
         
         // whenever app comes from-back to freground, updateLabels needs to be called
@@ -240,7 +252,11 @@ final class RootViewController: UIViewController {
         
         // setup nightscout synchronizer
         nightScoutUploadManager = NightScoutUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
-            UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
+            
+            let alert = UIAlertController(title: title, message: message, actionHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
+            
         })
         
         // setup SoundPlayer
@@ -263,7 +279,11 @@ final class RootViewController: UIViewController {
         
         // setup dexcomShareUploadManager
         dexcomShareUploadManager = DexcomShareUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
-            UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: {})
+            
+            let alert = UIAlertController(title: title, message: message, actionHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
+            
         })
         
         // setup m5StackManager
@@ -446,7 +466,11 @@ final class RootViewController: UIViewController {
     
     // inform user that pairing request timed out
     @objc private func informUserThatPairingTimedOut() {
-        UIAlertController(title: Texts_Common.warning, message: "time out", actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+        
+        let alert = UIAlertController(title: Texts_Common.warning, message: "time out", actionHandler: nil)
+        
+        self.present(alert, animated: true, completion: nil)
+        
     }
     
     /// will call cgmTransmitter.initiatePairing() - also sets timer, if no successful pairing within a few seconds, then info will be given to user asking to wait another few minutes
@@ -510,13 +534,21 @@ final class RootViewController: UIViewController {
         
         // check if sensor active and if not don't continue
         guard let activeSensor = activeSensor else {
-            UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.startSensorBeforeCalibration, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+            
+            let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.startSensorBeforeCalibration, actionHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
+            
             return
         }
         
         // if it's a user requested calibration, but there's no calibration yet, then give info and return - first calibration will be requested by app via notification
         if calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) == nil && userRequested {
-            UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.thereMustBeAreadingBeforeCalibration, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+            
+            let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.thereMustBeAreadingBeforeCalibration, actionHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
+            
             return
         }
         
@@ -925,7 +957,9 @@ final class RootViewController: UIViewController {
         }
         
         // display textoToshow
-        UIAlertController(title: Texts_HomeView.statusActionTitle, message: textToShow, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+        let alert = UIAlertController(title: Texts_HomeView.statusActionTitle, message: textToShow, actionHandler: nil)
+        
+        self.present(alert, animated: true, completion: nil)
         
     }
     
@@ -947,13 +981,22 @@ final class RootViewController: UIViewController {
                 break
             case .alreadyScanning:
                 // probably user started scanning two times, let's show a pop up that scanning is ongoing
-                UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: Texts_HomeView.scanBluetoothDeviceOngoing, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+                let alert = UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: Texts_HomeView.scanBluetoothDeviceOngoing, actionHandler: nil)
+                
+                self.present(alert, animated: true, completion: nil)
+                
             case .bluetoothNotPoweredOn( _):
                 // bluetooth is not on, user should switch it on
-                UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: Texts_HomeView.bluetoothIsNotOn, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+                let alert = UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: Texts_HomeView.bluetoothIsNotOn, actionHandler: nil)
+                
+                self.present(alert, animated: true, completion: nil)
+                
             case .other(let reason):
                 // other unknown error occured
-                UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: "Error while starting scanning. Reason : " + reason, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+                let alert = UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: "Error while starting scanning. Reason : " + reason, actionHandler: nil)
+                
+                self.present(alert, animated: true, completion: nil)
+                
             }
         }
     }
@@ -1023,7 +1066,7 @@ final class RootViewController: UIViewController {
         // if this is the first time user starts a sensor, give warning that time should be correct
         // if not the first them, then immediately open the timePickAlertController
         if (!UserDefaults.standard.startSensorTimeInfoGiven) {
-            UIAlertController(title: Texts_HomeView.startSensorActionTitle, message: Texts_HomeView.startSensorTimeInfo, actionHandler: {
+            let alert = UIAlertController(title: Texts_HomeView.startSensorActionTitle, message: Texts_HomeView.startSensorTimeInfo, actionHandler: {
                 
                 // create and present pickerviewcontroller
                 DatePickerViewController.displayDatePickerViewController(datePickerViewData: datePickerViewData, parentController: self)
@@ -1031,7 +1074,10 @@ final class RootViewController: UIViewController {
                 // no need to display sensor start time info next sensor start
                 UserDefaults.standard.startSensorTimeInfoGiven = true
                 
-            }).presentInOwnWindow(animated: true, completion: nil)
+            })
+            
+            self.present(alert, animated: true, completion: nil)
+            
         } else {
             DatePickerViewController.displayDatePickerViewController(datePickerViewData: datePickerViewData, parentController: self)
         }
@@ -1046,7 +1092,11 @@ final class RootViewController: UIViewController {
 extension RootViewController:CGMTransmitterDelegate {
     
     func error(message: String) {
-        UIAlertController(title: Texts_Common.warning, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+        
+        let alert = UIAlertController(title: Texts_Common.warning, message: message, actionHandler: nil)
+        
+        self.present(alert, animated: true, completion: nil)
+        
     }
     
     func reset(successful: Bool) {
@@ -1093,7 +1143,10 @@ extension RootViewController:CGMTransmitterDelegate {
         }
         
         // inform user
-        UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterPairingSuccessful, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+        let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterPairingSuccessful, actionHandler: nil)
+        
+        self.present(alert, animated: true, completion: nil)
+        
     }
     
     func cgmTransmitterDidConnect(address:String?, name:String?) {
@@ -1107,7 +1160,10 @@ extension RootViewController:CGMTransmitterDelegate {
         if userDidInitiateScanning {
             userDidInitiateScanning = false
             // additional info for the user
-            UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: Texts_HomeView.bluetoothDeviceConnectedInfo, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+            let alert = UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: Texts_HomeView.bluetoothDeviceConnectedInfo, actionHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
+            
         }
     }
     
@@ -1209,7 +1265,10 @@ extension RootViewController:CGMTransmitterDelegate {
             // if it was too long since notification was fired, then forget about it
             if Date() > maxTimeUserCanOpenApp {
                 trace("in cgmTransmitterNeedsPairing, user opened the app too late", log: self.log, type: .error)
-                UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.transmitterPairingTooLate, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+                let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.transmitterPairingTooLate, actionHandler: nil)
+                
+                self.present(alert, animated: true, completion: nil)
+                
                 return
             }
             
@@ -1369,7 +1428,9 @@ extension RootViewController:UNUserNotificationCenterDelegate {
         } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
             
             // if user clicks notification "sensor not detected", then show uialert with title and body
-            UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.sensorNotDetected, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.sensorNotDetected, actionHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
             
         } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             

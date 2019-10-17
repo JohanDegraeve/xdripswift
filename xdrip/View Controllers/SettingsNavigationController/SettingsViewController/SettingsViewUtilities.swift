@@ -124,8 +124,9 @@ class SettingsViewUtilities {
                 
             case let .showInfoText(title, message):
                 
-                UIAlertController(title: title, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+                let alert = UIAlertController(title: title, message: message, actionHandler: nil)
                 
+                uIViewController.present(alert, animated: true, completion: nil)
             }
             
 

@@ -317,7 +317,7 @@ final class M5StackViewController: UIViewController {
         }
         
         // first ask user if ok to delete and if yes delete
-        UIAlertController(title: Texts_M5StackView.confirmDeletionM5Stack + " " + textToAdd + "?", message: nil, actionHandler: {
+        let alert = UIAlertController(title: Texts_M5StackView.confirmDeletionM5Stack + " " + textToAdd + "?", message: nil, actionHandler: {
             
             // delete
             self.m5StackManager?.deleteM5Stack(m5Stack: m5StackAsNSObject)
@@ -327,7 +327,9 @@ final class M5StackViewController: UIViewController {
             
             self.performSegue(withIdentifier: UnwindSegueIdentifiers.M5StackToM5StacksUnWindSegueIdentifier.rawValue, sender: self)
             
-        }, cancelHandler: nil).presentInOwnWindow(animated: true, completion: {})
+        }, cancelHandler: nil)
+        
+        self.present(alert, animated:true)
 
     }
     
@@ -480,7 +482,10 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
         case .address:
             guard let m5StackAsNSObject = m5StackAsNSObject else {return}
             
-            UIAlertController(title: Texts_M5StackView.address, message: m5StackAsNSObject.address, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+            let alert = UIAlertController(title: Texts_M5StackView.address, message: m5StackAsNSObject.address, actionHandler: nil)
+            
+            // present the alert
+            self.present(alert, animated: true, completion: nil)
             
         case .name, .blePassword, .connectionStatus:
             break
@@ -503,7 +508,10 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
                             if m5StackName.userDefinedName == text {
                                 
                                 // m5stack userdefined name already exists
-                                UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.userdefinedNameAlreadyExists, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+                                let alreadyExistsAlert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.userdefinedNameAlreadyExists, actionHandler: nil)
+                                
+                                // present the alert
+                                self.present(alreadyExistsAlert, animated: true, completion: nil)
                                 
                                 return
                                 
@@ -601,43 +609,49 @@ extension M5StackViewController: M5StackBluetoothDelegate {
         if !success {
             
             // show warning, inform that user should set password or reset M5Stack
-            UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
+            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
                 
                 // by the time user clicks 'ok', the M5stack will be disconnected by the M5StackManager (see authentication in M5StackManager)
                 self.shouldConnectTemporaryValue = m5Stack.shouldconnect
                 
                 self.setConnectButtonLabelText()
                 
-            }).presentInOwnWindow(animated: true, completion: nil)
+            })
+            
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
     func blePasswordMissing(forM5Stack m5Stack: M5Stack) {
         
         // show warning, inform that user should set password or reset M5Stack
-        UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
+        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the M5StackManager (see authentication in M5StackManager)
             self.shouldConnectTemporaryValue = m5Stack.shouldconnect
             
             self.setConnectButtonLabelText()
             
-        }).presentInOwnWindow(animated: true, completion: nil)
+        })
+        
+        self.present(alert, animated: true, completion: nil)
 
     }
     
     func m5StackResetRequired(forM5Stack m5Stack: M5Stack) {
 
         // show warning, inform that user should set password or reset M5Stack
-        UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.m5StackResetRequiredWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
+        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.m5StackResetRequiredWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the M5StackManager (see authentication in M5StackManager)
             self.shouldConnectTemporaryValue = m5Stack.shouldconnect
             
             self.setConnectButtonLabelText()
             
-        }).presentInOwnWindow(animated: true, completion: nil)
+        })
 
+        self.present(alert, animated: true, completion: nil)
+        
     }
     
     func didConnect(forM5Stack m5Stack: M5Stack?, address: String?, name: String?, bluetoothTransmitter: M5StackBluetoothTransmitter) {
@@ -656,7 +670,10 @@ extension M5StackViewController: M5StackBluetoothDelegate {
     }
     
     func error(message: String) {
-        UIAlertController(title: Texts_Common.warning, message: message, actionHandler: nil).presentInOwnWindow(animated: true, completion: nil)
+        
+        let alert = UIAlertController(title: Texts_Common.warning, message: message, actionHandler: nil)
+        
+        self.present(alert, animated: true, completion: nil)
     }
     
 }
