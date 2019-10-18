@@ -10,7 +10,7 @@ fileprivate enum Setting:Int, CaseIterable {
 struct SettingsViewM5StackBluetoothSettingsViewModel: SettingsViewModelProtocol {
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.m5StackSettingsViewScreenTitle
+        return Texts_SettingsView.m5StackSectionTitleBluetooth
     }
     
     func settingsRowText(index: Int) -> String {

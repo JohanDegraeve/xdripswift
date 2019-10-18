@@ -1188,7 +1188,7 @@ extension RootViewController:CGMTransmitterDelegate {
             UserDefaults.standard.lastdisConnectTimestamp = Date()
         case .poweredOn:
             // user changes device bluetooth status to on
-            debuglogging("in deviceDidUpdateBluetoothState, status = poweredon")
+
             if UserDefaults.standard.cgmTransmitterDeviceAddress == nil, let cgmTransmitter = cgmTransmitter, let transmitterType  = UserDefaults.standard.transmitterType, transmitterType.startScanningAfterInit() {
                 // bluetoothDeviceAddress = nil, means app hasn't connected before to the transmitter
                 // cgmTransmitter != nil, means user has configured transmitter type and transmitterid

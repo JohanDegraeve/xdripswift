@@ -9,9 +9,6 @@ protocol M5StackManaging: AnyObject {
     /// will stop scanning, this is again for the case where scanning for a new M5Stack has started
     func stopScanningForNewDevice()
     
-    /// will call coreDataManager.saveChanges
-    func save()
-    
     /// try to connect to the M5Stack
     func connect(toM5Stack m5Stack: M5Stack)
     
@@ -32,5 +29,8 @@ protocol M5StackManaging: AnyObject {
     
     /// sets flag m5StacksParameterUpdateNeeded for m5Stack to true
     func updateNeeded(forM5Stack m5Stack: M5Stack)
+    
+    /// bluetoothtransmitter for this m5Stack will be deleted, as a result this will also disconnect the M5Stack
+    func setBluetoothTransmitterToNil(forM5Stack m5Stack: M5Stack)
     
 }

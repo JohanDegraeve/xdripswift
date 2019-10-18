@@ -255,7 +255,9 @@ class M5StackManager: NSObject {
 
 }
 
-// MARK: - conform to M5StackManaging
+// MARK: - extensions
+
+// MARK: extension M5StackManaging
 
 extension M5StackManager: M5StackManaging {
     
@@ -280,11 +282,6 @@ extension M5StackManager: M5StackManaging {
             self.tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack = nil
             
         }
-    }
-    
-    /// will call coreDataManager.saveChanges
-    func save() {
-        coreDataManager.saveChanges()
     }
     
     /// try to connect to the M5Stack
@@ -324,7 +321,7 @@ extension M5StackManager: M5StackManaging {
         m5Stack.shouldconnect = false
         
         // save in coredata
-        save()
+        coreDataManager.saveChanges()
         
         if let bluetoothTransmitter = m5StacksBlueToothTransmitters[m5Stack] {
             if let bluetoothTransmitter =  bluetoothTransmitter {
@@ -376,13 +373,19 @@ extension M5StackManager: M5StackManaging {
     }
     
     /// sets flag m5StacksParameterUpdateNeeded for m5Stack to true
-    public func updateNeeded(forM5Stack m5Stack: M5Stack) {
+    func updateNeeded(forM5Stack m5Stack: M5Stack) {
         m5Stack.parameterUpdateNeeded = true
+    }
+    
+    /// bluetoothtransmitter for this m5Stack will be deleted, as a result this will also disconnect the M5Stack
+    func setBluetoothTransmitterToNil(forM5Stack m5Stack: M5Stack) {
+        
+        self.m5StacksBlueToothTransmitters[m5Stack] = (M5StackBluetoothTransmitter?).none
     }
 
 }
 
-// MARK: - conform to M5StackBluetoothDelegate
+// MARK: extensions M5StackBluetoothDelegate
 
 extension M5StackManager: M5StackBluetoothDelegate {
     
@@ -493,7 +496,11 @@ extension M5StackManager: M5StackBluetoothDelegate {
         
         // if authentication not successful then disconnect and don't reconnect, user should verify password or reset the M5Stack, disconnect and set shouldconnect to false, permenantly (ie store in core data)
         // disconnection is done because maybe another device is trying to connect to the M5Stack, need to make it free
+        // also set shouldConnect to false (note that this is also done in M5StackViewController if an instance of that exists, no issue, shouldConnect will be set to false two times
         if !success {
+            
+            m5Stack.shouldconnect = false
+            coreDataManager.saveChanges()
             
             // disconnect
             disconnect(fromM5stack: m5Stack)
@@ -501,21 +508,27 @@ extension M5StackManager: M5StackBluetoothDelegate {
         }
     }
     
-    /// there's no ble password set, user should set it in the settings - disconnect will be called
+    /// there's no ble password set, user should set it in the settings - disconnect will be called, shouldconnect is set to false
     func blePasswordMissing(forM5Stack m5Stack: M5Stack) {
 
         trace("in blePasswordMissing", log: self.log, type: .info)
         
+        m5Stack.shouldconnect = false
+        coreDataManager.saveChanges()
+
         // disconnect
         disconnect(fromM5stack: m5Stack)
 
     }
 
-    /// it's an M5Stack without password configured in the ini file. xdrip app has been requesting temp password to M5Stack but this was already done once. M5Stack needs to be reset. - disconnect will be called
+    /// it's an M5Stack without password configured in the ini file. xdrip app has been requesting temp password to M5Stack but this was already done once. M5Stack needs to be reset. - disconnect will be called, shouldconnect is set to false
     func m5StackResetRequired(forM5Stack m5Stack:M5Stack) {
 
         trace("in m5StackResetRequired", log: self.log, type: .info)
         
+        m5Stack.shouldconnect = false
+        coreDataManager.saveChanges()
+
         // disconnect
         disconnect(fromM5stack: m5Stack)
 

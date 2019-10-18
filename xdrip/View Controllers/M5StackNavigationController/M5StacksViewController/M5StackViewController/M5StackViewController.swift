@@ -91,11 +91,6 @@ final class M5StackViewController: UIViewController {
     /// temp storage of value while user is editing the M5Stack attributes
     private var userDefinedNameTemporaryValue: String?
     
-    /// should the app try to connect automatically to the M5Stack or not, setting to false because compiler needs to have a value. It's set to the correct value in configure
-    ///
-    /// temp storage of value while user is editing the M5Stack attributes
-    private var shouldConnectTemporaryValue: Bool = false
-    
     /// textColor to be used in M5Stack
     ///
     /// temp storage of value while user is editing the M5Stack attributes
@@ -117,13 +112,12 @@ final class M5StackViewController: UIViewController {
         if let m5StackAsNSObject = m5StackAsNSObject {
             
             // set self as delegate in bluetoothTransmitter
-            m5StackManager.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = self
+            if let bluetoothTransmitter = m5StackManager.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: false) {
+                bluetoothTransmitter.m5StackBluetoothTransmitterDelegateVariable = self
+            }
             
             // temporary store the userDefinedName, user can change this name via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
             userDefinedNameTemporaryValue = m5StackAsNSObject.m5StackName?.userDefinedName
-            
-            // temporary store the value of shouldConnect, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
-            shouldConnectTemporaryValue = m5StackAsNSObject.shouldconnect
             
             // temporary store the value of textColor, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
             textColorTemporaryValue = M5StackTextColor(forUInt16: UInt16(m5StackAsNSObject.textcolor))
@@ -238,9 +232,6 @@ final class M5StackViewController: UIViewController {
                 m5StackAsNSObject.m5StackName = m5Stackname
             }
             
-            // store value of shouldconnect
-            m5StackAsNSObject.shouldconnect = shouldConnectTemporaryValue
-            
             // store value of textcolor
             if let textColor = textColorTemporaryValue {
                 
@@ -248,7 +239,7 @@ final class M5StackViewController: UIViewController {
             }
             
             // save all changes now
-            m5StackManager?.save()
+            coreDataManager.saveChanges()
 
         }
         
@@ -273,7 +264,6 @@ final class M5StackViewController: UIViewController {
             self.m5StackAsNSObject = m5Stack
             
             // assign local variables
-            self.shouldConnectTemporaryValue = m5Stack.shouldconnect
             self.userDefinedNameTemporaryValue = m5Stack.m5StackName?.userDefinedName //should be nil anyway
             self.textColorTemporaryValue = M5StackTextColor(forUInt16: UInt16(m5Stack.textcolor))
             
@@ -338,28 +328,44 @@ final class M5StackViewController: UIViewController {
         // let's first check if m5stack exists, it should because otherwise connectButton should be disabled
         guard let m5StackAsNSObject = m5StackAsNSObject else {return}
         
-        if shouldConnectTemporaryValue {
+        if m5StackAsNSObject.shouldconnect {
             
             // device should not automaticaly connect, which means, each time the app restarts, it will not try to connect to this M5Stack
-            // if user clicks cancel button (ie goes back to previous view controller without clicking done, then this value will not be saved
-            shouldConnectTemporaryValue = false
+            m5StackAsNSObject.shouldconnect = false
             
+            // save the update in coredata
+            coreDataManager?.saveChanges()
+
+            // update the connect button text
+            setConnectButtonLabelText()
+
             // normally there should be a bluetoothTransmitter
             if let bluetoothTransmitter = m5StackManager?.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: false) {
                 
-                // disconnect, even if not connected for the moment
-                bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
+                // set delegate in bluetoothtransmitter to nil, as we're going to disconnect permenantly, so not interested anymore to receive info
+                bluetoothTransmitter.m5StackBluetoothTransmitterDelegateVariable = nil
+
+                // this will also set bluetoothTransmitter to nil and also disconnect the M5Stack
+                m5StackManager?.setBluetoothTransmitterToNil(forM5Stack: m5StackAsNSObject)
                 
             }
             
         } else {
             
-            // device should automatically connect, this will be stored in coredata (only after clicking done button), which means, each time the app restarts, it will try to connect to this M5Stack
-            // if user clicks cancel button (ie goes back to previous view controller without clicking done, then this value will not be saved
-            shouldConnectTemporaryValue = true
+            // device should automatically connect, this will be stored in coredata
+            m5StackAsNSObject.shouldconnect = true
+            coreDataManager?.saveChanges()
             
-            // connect,
-            m5StackManager?.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: true)?.connect()
+            // get bluetoothTransmitter
+            if let bluetoothTransmitter = m5StackManager?.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: true) {
+                
+                // set delegate
+                bluetoothTransmitter.m5StackBluetoothTransmitterDelegateVariable = self
+                
+                // connect
+                bluetoothTransmitter.connect()
+                
+            }
             
         }
         
@@ -386,17 +392,21 @@ final class M5StackViewController: UIViewController {
     private func setConnectButtonLabelText() {
 
         // if M5Stack is nil, then set text to "Always Connect", it's disabled anyway - if m5Stack not nil, then set depending on value of shouldconnect
-        if m5StackAsNSObject == nil {
-            connectButtonOutlet.setTitle(Texts_M5StackView.alwaysConnect, for: .normal)
-        } else {
+        if let m5StackAsNSObject = m5StackAsNSObject {
+            
             // set label of connect button, according to curren status
-            connectButtonOutlet.setTitle(shouldConnectTemporaryValue ? Texts_M5StackView.donotconnect:Texts_M5StackView.alwaysConnect, for: .normal)
+            connectButtonOutlet.setTitle(m5StackAsNSObject.shouldconnect ? Texts_M5StackView.donotconnect:Texts_M5StackView.alwaysConnect, for: .normal)
+            
+        } else {
+            
+            connectButtonOutlet.setTitle(Texts_M5StackView.alwaysConnect, for: .normal)
+            
         }
-
+        
     }
     
     /// user clicked cancel button
-    public func cancelButtonAction() {
+    private func cancelButtonAction() {
         
         // just in case scanning for a new device is still ongoing, call stopscanning
         m5StackManager?.stopScanningForNewDevice()
@@ -406,9 +416,21 @@ final class M5StackViewController: UIViewController {
 
     }
 
+    /// sets m5Stack.shouldconnect to false, saves in coredata, calls setConnectButtonLabelText
+    private func setShouldConnectToFalse(forM5Stack m5Stack: M5Stack) {
+
+        m5Stack.shouldconnect = false
+        
+        coreDataManager?.saveChanges()
+        
+        self.setConnectButtonLabelText()
+
+    }
 }
 
 // MARK: - extensions
+
+// MARK: extension UITableViewDataSource, UITableViewDelegate
 
 extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
     
@@ -585,6 +607,8 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
 
 }
 
+// MARK: extension M5StackBluetoothDelegate
+
 extension M5StackViewController: M5StackBluetoothDelegate {
     
     func isAskingForAllParameters(m5Stack: M5Stack) {
@@ -612,10 +636,8 @@ extension M5StackViewController: M5StackBluetoothDelegate {
             let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
                 
                 // by the time user clicks 'ok', the M5stack will be disconnected by the M5StackManager (see authentication in M5StackManager)
-                self.shouldConnectTemporaryValue = m5Stack.shouldconnect
-                
-                self.setConnectButtonLabelText()
-                
+                self.setShouldConnectToFalse(forM5Stack: m5Stack)
+
             })
             
             self.present(alert, animated: true, completion: nil)
@@ -628,10 +650,8 @@ extension M5StackViewController: M5StackBluetoothDelegate {
         let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the M5StackManager (see authentication in M5StackManager)
-            self.shouldConnectTemporaryValue = m5Stack.shouldconnect
-            
-            self.setConnectButtonLabelText()
-            
+            self.setShouldConnectToFalse(forM5Stack: m5Stack)
+
         })
         
         self.present(alert, animated: true, completion: nil)
@@ -644,10 +664,8 @@ extension M5StackViewController: M5StackBluetoothDelegate {
         let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.m5StackResetRequiredWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the M5StackManager (see authentication in M5StackManager)
-            self.shouldConnectTemporaryValue = m5Stack.shouldconnect
-            
-            self.setConnectButtonLabelText()
-            
+            self.setShouldConnectToFalse(forM5Stack: m5Stack)
+
         })
 
         self.present(alert, animated: true, completion: nil)
@@ -677,6 +695,8 @@ extension M5StackViewController: M5StackBluetoothDelegate {
     }
     
 }
+
+// MARK: extension M5StackBluetoothDelegate
 
 /// defines perform segue identifiers used within M5StackViewController
 extension M5StackViewController {

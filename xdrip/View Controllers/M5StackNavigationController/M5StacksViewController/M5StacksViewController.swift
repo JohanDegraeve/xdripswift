@@ -135,7 +135,9 @@ final class M5StacksViewController: UIViewController {
 
 }
 
-// MARK: - UITableViewDataSource and UITableViewDelegate protocol Methods
+// MARK: - extensions
+
+// MARK: extension UITableViewDataSource and UITableViewDelegate
 
 extension M5StacksViewController: UITableViewDataSource, UITableViewDelegate {
     
@@ -206,6 +208,8 @@ extension M5StacksViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
 }
+
+// MARK: extension M5StackBluetoothDelegate
 
 extension M5StacksViewController: M5StackBluetoothDelegate {
     

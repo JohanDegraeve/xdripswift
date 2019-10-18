@@ -378,6 +378,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             
         case .readBlePassWordError2Rx:
             if let m5Stack = m5Stack {
+                
                 m5StackBluetoothTransmitterDelegateFixed?.m5StackResetRequired(forM5Stack: m5Stack)
                 m5StackBluetoothTransmitterDelegateVariable?.m5StackResetRequired(forM5Stack: m5Stack)
             }
