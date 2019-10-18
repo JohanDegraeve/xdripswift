@@ -453,17 +453,17 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
         case .name:
             cell.textLabel?.text = Texts_Common.name
             cell.detailTextLabel?.text = m5StackAsNSObject?.name
-            cell.accessoryType = UITableViewCell.AccessoryType.none
+            cell.accessoryType = .none
             
         case .address:
             cell.textLabel?.text = Texts_M5StackView.address
             cell.detailTextLabel?.text = m5StackAsNSObject?.address
-            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            cell.accessoryType = .disclosureIndicator
             
         case .blePassword:
             cell.textLabel?.text = Texts_Common.password
             cell.detailTextLabel?.text = m5StackAsNSObject?.blepassword
-            cell.accessoryType = UITableViewCell.AccessoryType.none
+            cell.accessoryType = .none
 
         case .connectionStatus:
             cell.textLabel?.text = Texts_M5StackView.status
@@ -472,7 +472,7 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
         case .userDefinedName:
             cell.textLabel?.text = Texts_M5StackView.m5StackAlias
             cell.detailTextLabel?.text = userDefinedNameTemporaryValue
-            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            cell.accessoryType = .disclosureIndicator
             
         case .textColor:
             cell.textLabel?.text = Texts_SettingsView.m5StackTextColor
@@ -486,6 +486,8 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
                     cell.detailTextLabel?.text = ConstantsM5Stack.defaultTextColor.description
                 }
             }
+            
+            cell.accessoryType = .disclosureIndicator
 
         }
         
