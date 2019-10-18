@@ -29,6 +29,13 @@ class SoundPlayer {
         }
         
         do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch let error {
+            trace("in playSound, could not set AVAudioSession category to playback and mixwithOthers, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+        }
+        
+        do {
             try audioPlayer = AVAudioPlayer(contentsOf: url)
             
             if let audioPlayer = audioPlayer {
