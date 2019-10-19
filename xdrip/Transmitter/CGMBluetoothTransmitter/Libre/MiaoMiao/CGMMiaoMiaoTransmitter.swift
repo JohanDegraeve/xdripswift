@@ -98,7 +98,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         if writeDataToPeripheral(data: Data.init([0xF0]), type: .withoutResponse) {
             return true
         } else {
-            trace("in sendStartReadingCommmand, write failed", log: log, type: .error)
+            trace("in sendStartReadingCommand, write failed", log: log, type: .error)
             return false
         }
     }
@@ -192,7 +192,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                                 trace("in peripheralDidUpdateValueFor, successfully sent 0xD3 and 0x01, confirm sensor change to MiaoMiao", log: self.log, type: .info)
                                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
                                     if !self.sendStartReadingCommand() {
-                                        trace("in peripheralDidUpdateValueFor, sendStartReadingCommmand failed", log: self.log, type: .error)
+                                        trace("in peripheralDidUpdateValueFor, sendStartReadingCommand failed", log: self.log, type: .error)
                                     } else {
                                         trace("in peripheralDidUpdateValueFor, successfully sent startReadingCommand to MiaoMiao", log: self.log, type: .info)
                                     }
