@@ -339,9 +339,17 @@ extension UserDefaults {
         set {
             var value = newValue
             if let newValue = newValue {
+                
+                // if url doesn't start with http, then add https
                 if !newValue.startsWith("http") {
                     value = "https://" + newValue
                 }
+                
+                // if url ends with /, remove it
+                if value!.last == "/" {
+                    value!.removeLast()
+                }
+                
             }
             set(value, forKey: Key.nightScoutUrl.rawValue)
         }
