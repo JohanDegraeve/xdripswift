@@ -59,7 +59,7 @@ struct SettingsViewM5StackBluetoothSettingsViewModel: SettingsViewModelProtocol 
         
         switch setting {
         case .blePassword:
-            return SettingsSelectedRowAction.askText(title: Texts_Common.password, message: Texts_SettingsView.giveBlueToothPassword, keyboardType: .asciiCapableNumberPad, text: UserDefaults.standard.m5StackBlePassword, placeHolder: Texts_Common.default0, actionTitle: nil, cancelTitle: nil, actionHandler:
+            return SettingsSelectedRowAction.askText(title: Texts_Common.password, message: Texts_SettingsView.giveBlueToothPassword, keyboardType: .default, text: UserDefaults.standard.m5StackBlePassword, placeHolder: Texts_Common.default0, actionTitle: nil, cancelTitle: nil, actionHandler:
                 {(blepassword:String) in
                 
                     if blepassword == Texts_Common.default0 {
