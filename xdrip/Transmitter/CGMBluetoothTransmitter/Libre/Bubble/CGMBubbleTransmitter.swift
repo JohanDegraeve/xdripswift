@@ -99,7 +99,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
     // MARK: - public functions
     
     func sendStartReadingCommmand() -> Bool {
-        if writeDataToPeripheral(data: Data([0x00, 0x00, 0x5]), type: .withoutResponse) {
+        if writeDataToPeripheral(data: Data([0x00, 0x00, 0x05]), type: .withoutResponse) {
             return true
         } else {
             trace("in sendStartReadingCommmand, write failed", log: log, type: .error)
