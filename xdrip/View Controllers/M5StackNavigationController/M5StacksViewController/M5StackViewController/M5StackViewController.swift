@@ -369,9 +369,6 @@ final class M5StackViewController: UIViewController {
             
         }
         
-        // enable the done button, because this m5Stack has modified values, user can click done button which will save those changes
-        self.doneButtonOutlet.enable()
-        
         // will change text of the button
         self.setConnectButtonLabelText()
         
