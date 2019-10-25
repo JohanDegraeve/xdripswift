@@ -39,10 +39,14 @@ final class RootViewController: UIViewController {
     
     @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
         
+        statusChartsManager.updateChart()
+        statusChartsManager.prerender()
+        chartOutlet.reloadChart()
+        /*
         let alert = UIAlertController(title: "Info", message: "Unfortuantely, presnooze functionality is not yet implemented", actionHandler: nil)
         
         self.present(alert, animated: true, completion: nil)
-        
+            */
     }
     
     /// outlet for label that shows how many minutes ago and so on

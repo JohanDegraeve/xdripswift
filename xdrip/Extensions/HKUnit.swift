@@ -31,4 +31,14 @@ extension HKUnit {
             return 1 / 25
         }
     }
+    
+    // A formatting helper for determining the preferred decimal style for a given unit
+    var preferredFractionDigits: Int {
+        if self.unitString == "mg/dL" {
+            return 0
+        } else {
+            return 1
+        }
+    }
+
 }

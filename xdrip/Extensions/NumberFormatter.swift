@@ -12,6 +12,16 @@ import HealthKit
 
 extension NumberFormatter {
     
+    static func glucoseFormatter(for unit: HKUnit) -> NumberFormatter {
+        let numberFormatter = NumberFormatter()
+        
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.minimumFractionDigits = unit.preferredFractionDigits
+        numberFormatter.maximumFractionDigits = unit.preferredFractionDigits
+        return numberFormatter
+    }
+    
+
     func string(from number: Double) -> String? {
         return string(from: NSNumber(value: number))
     }

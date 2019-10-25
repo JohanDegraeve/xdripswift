@@ -46,17 +46,21 @@ public final class StatusChartsManager {
         }
     }
     
+    /// need to remove this, add an observer for UserDefaults.standard.bloodGlucoseUnitIsMgDl, then call glucoseDisplayRange didset whenever the value is changed
     public var glucoseUnit: HKUnit = UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .milligramsPerDeciliter : .millimolesPerLiter {
         didSet {
             
             if glucoseUnit != oldValue {
-                // Regenerate the glucose display points
+                // this will call the didSet of variable glucoseDisplayRange to be called (see next)
                 let oldRange = glucoseDisplayRange
                 glucoseDisplayRange = oldRange
             }
         }
     }
 
+    /// this is the range of the chart, in currently chosen unit (mgdl or mmol)
+    ///
+    /// Whenever glucoseDisplayRange is assigned a new value, glucoseChart is set to nil
     public var glucoseDisplayRange: (min: HKQuantity, max: HKQuantity)? {
         didSet {
             if let range = glucoseDisplayRange {
@@ -70,19 +74,16 @@ public final class StatusChartsManager {
         }
     }
 
-    public var glucosePoints: [ChartPoint] = [] {
+    /// chartpoint array with actually reading values
+    ///
+    /// Whenever glucoseChartPoints is assigned a new value, glucoseChart is set to nil
+    public var glucoseChartPoints: [ChartPoint] = [] {
         didSet {
             glucoseChart = nil
             
-            if let lastDate = glucosePoints.last?.x as? ChartAxisValueDate {
+            if let lastDate = glucoseChartPoints.last?.x as? ChartAxisValueDate {
                 updateEndDate(lastDate.date)
             }
-        }
-    }
-    
-    public var glucoseDisplayRangePoints: [ChartPoint] = [] {
-        didSet {
-            glucoseChart = nil
         }
     }
     
@@ -105,9 +106,9 @@ public final class StatusChartsManager {
         return numberFormatter
     }
 
-    private var axisLabelSettings: ChartLabelSettings
+    private var chartLabelSettings: ChartLabelSettings
 
-    private var guideLinesLayerSettings: ChartGuideLinesLayerSettings
+    private var chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings
     
     /// The latest date on the X-axis
     private var endDate = Date() {
@@ -122,6 +123,9 @@ public final class StatusChartsManager {
         }
     }
     
+    /// A ChartAxisValue models a value along a particular chart axis. For example, two ChartAxisValues represent the two components of a ChartPoint. It has a backing Double scalar value, which provides a canonical form for all subclasses to be laid out along an axis. It also has one or more labels that are drawn in the chart.
+    ///
+    /// see https://github.com/i-schuetz/SwiftCharts/blob/ec538d027d6d4c64028d85f86d3d72fcda41c016/SwiftCharts/AxisValues/ChartAxisValue.swift#L12, is not meant to be instantiated
     private var xAxisValues: [ChartAxisValue]? {
         didSet {
             if let xAxisValues = xAxisValues, xAxisValues.count > 1 {
@@ -136,9 +140,27 @@ public final class StatusChartsManager {
     
     private var xAxisModel: ChartAxisModel?
     
+    /// the chart with glucose values
     private var glucoseChart: Chart?
     
     private var glucoseChartCache: ChartPointsTouchHighlightLayerViewCache?
+    
+    /// two chartPoints, one for minimum glucose value, one for maximum, value depends on chosen unit
+    private var glucoseDisplayRangePoints: [ChartPoint] = [] {
+        didSet {
+            glucoseChart = nil
+        }
+    }
+    
+    private let dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .none
+        dateFormatter.timeStyle = .short
+        
+        return dateFormatter
+    }()
+    
+
     
     // MARK: - intializer
     
@@ -147,23 +169,40 @@ public final class StatusChartsManager {
         self.colors = colors
         self.chartSettings = settings
         
-        axisLabelSettings = ChartLabelSettings(
+        chartLabelSettings = ChartLabelSettings(
             font: .systemFont(ofSize: 14),  // caption1, but hard-coded until axis can scale with type preference
             fontColor: colors.axisLabel
         )
         
-        guideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: colors.grid)
+        chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: colors.grid)
         
     }
 
     // MARK: - public functions
+    
+    /// updates chart ?
+    public func updateChart() {
+        
+        let now = Date()
+        
+        let glucose = [(now, 110.0), (now.addingTimeInterval(-300), 120.0), (now.addingTimeInterval(-600), 130.0)]
+        
+        glucoseChartPoints = glucose.map {
+            ChartPoint(
+                x: ChartAxisValueDate(date: $0.0, formatter: dateFormatter),
+                y: ChartAxisValueDouble($0.1)
+            )
+        }
+        
+
+    }
     
     public func didReceiveMemoryWarning() {
         
         trace("in didReceiveMemoryWarning, Purging chart data in response to memory warning", log: self.log, type: .error)
 
         xAxisValues = nil
-        glucosePoints = []
+        glucoseChartPoints = []
         glucoseChartCache = nil
         
     }
@@ -223,7 +262,7 @@ public final class StatusChartsManager {
             return nil
         }
         
-        let points = glucosePoints + glucoseDisplayRangePoints
+        let points = glucoseChartPoints + glucoseDisplayRangePoints
         
         guard points.count > 1 else {
             return nil
@@ -234,7 +273,7 @@ public final class StatusChartsManager {
                                                                                             maxSegmentCount: 4,
                                                                                             multiple: glucoseUnit.chartableIncrement * 25,
                                                                                             axisValueGenerator: {
-                                                                                                ChartAxisValueDouble($0, labelSettings: self.axisLabelSettings)
+                                                                                                ChartAxisValueDouble($0, labelSettings: self.chartLabelSettings)
         },
                                                                                             addPaddingSegmentIfEdge: false
         )
@@ -247,16 +286,16 @@ public final class StatusChartsManager {
         
         
         // Grid lines
-        let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: guideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: yAxisValues)
+        let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: chartGuideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: yAxisValues)
         
-        let circles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucosePoints, displayDelay: 0, itemSize: CGSize(width: 4, height: 4), itemFillColor: colors.glucoseTint, optimized: true)
+        let circles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: 4, height: 4), itemFillColor: colors.glucoseTint, optimized: true)
         
         if gestureRecognizer != nil {
             glucoseChartCache = ChartPointsTouchHighlightLayerViewCache(
                 xAxisLayer: xAxisLayer,
                 yAxisLayer: yAxisLayer,
-                axisLabelSettings: self.axisLabelSettings,
-                chartPoints: glucosePoints,
+                axisLabelSettings: self.chartLabelSettings,
+                chartPoints: glucoseChartPoints,
                 tintColor: colors.glucoseTint,
                 gestureRecognizer: gestureRecognizer
             )
@@ -300,7 +339,7 @@ public final class StatusChartsManager {
             ChartAxisValueDate(
                 date: ChartAxisValueDate.dateFromScalar($0),
                 formatter: timeFormatter,
-                labelSettings: self.axisLabelSettings
+                labelSettings: self.chartLabelSettings
             )
         }, addPaddingSegmentIfEdge: false)
         
