@@ -1,8 +1,14 @@
 PODS:
   - ActionClosurable (1.2.0)
+  - SwiftCharts (0.6.5)
 
 DEPENDENCIES:
   - ActionClosurable (from `https://github.com/takasek/ActionClosurable.git`)
+  - SwiftCharts (~> 0.6.5)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - SwiftCharts
 
 EXTERNAL SOURCES:
   ActionClosurable:
@@ -15,7 +21,8 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   ActionClosurable: ff826688551b031c6bd936cb4928ebf63571893a
+  SwiftCharts: 2e755ea292f0b87d3e4b2c1eb5afc080a20cdc15
 
-PODFILE CHECKSUM: 347a5d9f3343257452289e61c10025c2eed103bb
+PODFILE CHECKSUM: 9dee35b1fb05f0e2bf7a6c38eb6213635af56273
 
 COCOAPODS: 1.8.4

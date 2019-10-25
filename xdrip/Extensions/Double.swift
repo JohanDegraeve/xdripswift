@@ -1,6 +1,21 @@
 import Foundation
 
-extension Double {
+extension Double: RawRepresentable {
+
+    //MARK: - copied from https://github.com/LoopKit/LoopKit
+    
+    public typealias RawValue = Double
+    
+    public init?(rawValue: RawValue) {
+        self = rawValue
+    }
+    
+    public var rawValue: RawValue {
+        return self
+    }
+    
+    // MARK: - own code
+    
     /// converts mgdl to mmol
     func mgdlToMmol() -> Double {
         return self * ConstantsBloodGlucose.mgDlToMmoll
@@ -61,7 +76,6 @@ extension Double {
         return asDate.description(with: .current)
     }
     
-  
 }
 
 

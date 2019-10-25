@@ -206,6 +206,28 @@
 		F8BDD450221CAA64006EAB84 /* TextsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */; };
 		F8BDD452221DEAB2006EAB84 /* TextsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */; };
 		F8BDD455221DEF22006EAB84 /* SettingsViews.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD457221DEF22006EAB84 /* SettingsViews.strings */; };
+		F8BECB02235CE3E20060DAE1 /* BloodGlucoseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB01235CE3E20060DAE1 /* BloodGlucoseChartView.swift */; };
+		F8BECB05235CE5D80060DAE1 /* StatusChartsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB04235CE5D80060DAE1 /* StatusChartsManager.swift */; };
+		F8BECB0C235CE7220060DAE1 /* ChartLineModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB07235CE7220060DAE1 /* ChartLineModel.swift */; };
+		F8BECB0D235CE7220060DAE1 /* StateColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB08235CE7220060DAE1 /* StateColorPalette.swift */; };
+		F8BECB0E235CE7220060DAE1 /* ChartAxisValueDoubleUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB09235CE7220060DAE1 /* ChartAxisValueDoubleUnit.swift */; };
+		F8BECB0F235CE7220060DAE1 /* ChartColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB0A235CE7220060DAE1 /* ChartColorPalette.swift */; };
+		F8BECB10235CE7220060DAE1 /* ChartAxisValueDoubleLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB0B235CE7220060DAE1 /* ChartAxisValueDoubleLog.swift */; };
+		F8BECB12235CEA9B0060DAE1 /* TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB11235CEA9B0060DAE1 /* TimeInterval.swift */; };
+		F8BECB14235CF3AA0060DAE1 /* HKUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB13235CF3AA0060DAE1 /* HKUnit.swift */; };
+		F8BECB18235CF7EE0060DAE1 /* GlucoseRangeSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB17235CF7EE0060DAE1 /* GlucoseRangeSchedule.swift */; };
+		F8BECB1A235CF8480060DAE1 /* DailyQuantitySchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB19235CF8480060DAE1 /* DailyQuantitySchedule.swift */; };
+		F8BECB1C235CFAB20060DAE1 /* DailyValueSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB1B235CFAB20060DAE1 /* DailyValueSchedule.swift */; };
+		F8BECB1E235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB1D235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift */; };
+		F8BECB20235E04910060DAE1 /* ChartPointsContextFillLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB1F235E04910060DAE1 /* ChartPointsContextFillLayer.swift */; };
+		F8BECB22235E0A8E0060DAE1 /* BidirectionalCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB21235E0A8E0060DAE1 /* BidirectionalCollection.swift */; };
+		F8BECB24235E0B030060DAE1 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB23235E0B030060DAE1 /* UIColor.swift */; };
+		F8BECB26235E0BB60060DAE1 /* ChartPointsScatterDownTrianglesLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB25235E0BB60060DAE1 /* ChartPointsScatterDownTrianglesLayer.swift */; };
+		F8BECB28235E0C3F0060DAE1 /* ChartPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB27235E0C3F0060DAE1 /* ChartPoint.swift */; };
+		F8BECB2E235E0E060060DAE1 /* SampleValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB2D235E0E060060DAE1 /* SampleValue.swift */; };
+		F8BECB31235E0EBE0060DAE1 /* CGPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB30235E0EBD0060DAE1 /* CGPoint.swift */; };
+		F8BECB33235E64530060DAE1 /* TimeZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB32235E64520060DAE1 /* TimeZone.swift */; };
+		F8BECB35235E65FF0060DAE1 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB34235E65FF0060DAE1 /* NumberFormatter.swift */; };
 		F8C5EBE522F297F000563B5F /* LibreSensorSerialNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE422F297EF00563B5F /* LibreSensorSerialNumber.swift */; };
 		F8C5EBE722F38F0E00563B5F /* Trace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE622F38F0E00563B5F /* Trace.swift */; };
 		F8C5EBEA22F49AC700563B5F /* CGMDroplet1Transmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE922F49AC700563B5F /* CGMDroplet1Transmitter.swift */; };
@@ -555,6 +577,28 @@
 		F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsSettingsView.swift; sourceTree = "<group>"; };
 		F8BDD456221DEF22006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F8BDD458221DEF24006EAB84 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SettingsViews.strings; sourceTree = "<group>"; };
+		F8BECB01235CE3E20060DAE1 /* BloodGlucoseChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BloodGlucoseChartView.swift; sourceTree = "<group>"; };
+		F8BECB04235CE5D80060DAE1 /* StatusChartsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusChartsManager.swift; sourceTree = "<group>"; };
+		F8BECB07235CE7220060DAE1 /* ChartLineModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartLineModel.swift; sourceTree = "<group>"; };
+		F8BECB08235CE7220060DAE1 /* StateColorPalette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateColorPalette.swift; sourceTree = "<group>"; };
+		F8BECB09235CE7220060DAE1 /* ChartAxisValueDoubleUnit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartAxisValueDoubleUnit.swift; sourceTree = "<group>"; };
+		F8BECB0A235CE7220060DAE1 /* ChartColorPalette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartColorPalette.swift; sourceTree = "<group>"; };
+		F8BECB0B235CE7220060DAE1 /* ChartAxisValueDoubleLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartAxisValueDoubleLog.swift; sourceTree = "<group>"; };
+		F8BECB11235CEA9B0060DAE1 /* TimeInterval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInterval.swift; sourceTree = "<group>"; };
+		F8BECB13235CF3AA0060DAE1 /* HKUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HKUnit.swift; sourceTree = "<group>"; };
+		F8BECB17235CF7EE0060DAE1 /* GlucoseRangeSchedule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlucoseRangeSchedule.swift; sourceTree = "<group>"; };
+		F8BECB19235CF8480060DAE1 /* DailyQuantitySchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyQuantitySchedule.swift; sourceTree = "<group>"; };
+		F8BECB1B235CFAB20060DAE1 /* DailyValueSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyValueSchedule.swift; sourceTree = "<group>"; };
+		F8BECB1D235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPointsTouchHighlightLayerViewCache.swift; sourceTree = "<group>"; };
+		F8BECB1F235E04910060DAE1 /* ChartPointsContextFillLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsContextFillLayer.swift; sourceTree = "<group>"; };
+		F8BECB21235E0A8E0060DAE1 /* BidirectionalCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BidirectionalCollection.swift; sourceTree = "<group>"; };
+		F8BECB23235E0B030060DAE1 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
+		F8BECB25235E0BB60060DAE1 /* ChartPointsScatterDownTrianglesLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesLayer.swift; sourceTree = "<group>"; };
+		F8BECB27235E0C3F0060DAE1 /* ChartPoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPoint.swift; sourceTree = "<group>"; };
+		F8BECB2D235E0E060060DAE1 /* SampleValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleValue.swift; sourceTree = "<group>"; };
+		F8BECB30235E0EBD0060DAE1 /* CGPoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGPoint.swift; sourceTree = "<group>"; };
+		F8BECB32235E64520060DAE1 /* TimeZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeZone.swift; sourceTree = "<group>"; };
+		F8BECB34235E65FF0060DAE1 /* NumberFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatter.swift; sourceTree = "<group>"; };
 		F8C5EBE422F297EF00563B5F /* LibreSensorSerialNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreSensorSerialNumber.swift; sourceTree = "<group>"; };
 		F8C5EBE622F38F0E00563B5F /* Trace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Trace.swift; sourceTree = "<group>"; };
 		F8C5EBE922F49AC700563B5F /* CGMDroplet1Transmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMDroplet1Transmitter.swift; sourceTree = "<group>"; };
@@ -638,24 +682,31 @@
 			isa = PBXGroup;
 			children = (
 				F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */,
+				F8BECB21235E0A8E0060DAE1 /* BidirectionalCollection.swift */,
 				F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */,
 				F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */,
+				F8BECB30235E0EBD0060DAE1 /* CGPoint.swift */,
 				F8025C1221DA683400ECF0C0 /* Data.swift */,
 				F8EA6C8121B723BC0082976B /* Date.swift */,
 				F8025E4D21ED450300ECF0C0 /* Double.swift */,
-				F897AAFA2201018800CDDD10 /* String.swift */,
-				F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */,
-				F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */,
-				F8BDD4232218790E006EAB84 /* UserDefaults.swift */,
-				F8B3A78A225D473D004BA588 /* UIAlertController.swift */,
-				F8B3A857227F6971004BA588 /* UISwitch.swift */,
+				F8BECB13235CF3AA0060DAE1 /* HKUnit.swift */,
 				F8B3A85C22821BB6004BA588 /* Int.swift */,
 				F8EEDD5322FF685400D2D610 /* NSMutableURLRequest.swift */,
-				F898EDE9233F53BF00BFB79B /* UIButton.swift */,
+				F897AAFA2201018800CDDD10 /* String.swift */,
+				F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */,
+				F8BECB11235CEA9B0060DAE1 /* TimeInterval.swift */,
+				F8B3A78A225D473D004BA588 /* UIAlertController.swift */,
 				F898EDEB233F549100BFB79B /* UIBarButtonItem.swift */,
+				F898EDE9233F53BF00BFB79B /* UIButton.swift */,
+				F8BECB23235E0B030060DAE1 /* UIColor.swift */,
 				F898EDF1234A8A0500BFB79B /* UInt8.swift */,
 				F898EDF3234A8A3200BFB79B /* UInt16.swift */,
 				F898EDF5234A8A5700BFB79B /* UInt32.swift */,
+				F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */,
+				F8B3A857227F6971004BA588 /* UISwitch.swift */,
+				F8BDD4232218790E006EAB84 /* UserDefaults.swift */,
+				F8BECB32235E64520060DAE1 /* TimeZone.swift */,
+				F8BECB34235E65FF0060DAE1 /* NumberFormatter.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -813,6 +864,7 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				F8BECB03235CE5970060DAE1 /* Charts */,
 				F8F6226A233A85A700BE8796 /* M5Stack */,
 				F81D6D4622BD5F43005EFAE2 /* DexcomShare */,
 				F821CF9922AEF2DF005C1E43 /* Speak */,
@@ -1085,7 +1137,7 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
-				F821CF9822AE589E005C1E43 /* xdrip.entitlements */,
+				F8BECB06235CE6EC0060DAE1 /* Models */,
 				F85DC2FB21D2CD7000B9F74A /* Application Delegate */,
 				F8EA6CA521BAD5AD0082976B /* Calibration */,
 				F8EA6C7D21B70DEA0082976B /* Constants */,
@@ -1099,7 +1151,9 @@
 				F85DC2FC21D3E83100B9F74A /* Transmitter */,
 				F8EA6C8021B723A80082976B /* Utilities */,
 				F85DC2FA21D2CD3000B9F74A /* View Controllers */,
+				F8BECB00235CE3E20060DAE1 /* Views */,
 				F8A54B0A22D9215500934E7A /* xdrip-Bridging-Header.h */,
+				F821CF9822AE589E005C1E43 /* xdrip.entitlements */,
 			);
 			path = xdrip;
 			sourceTree = "<group>";
@@ -1282,6 +1336,42 @@
 				F8B48A9322B2A705009BCC01 /* TextsSpeakReading.swift */,
 			);
 			path = Texts;
+			sourceTree = "<group>";
+		};
+		F8BECB00235CE3E20060DAE1 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F8BECB01235CE3E20060DAE1 /* BloodGlucoseChartView.swift */,
+				F8BECB1D235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		F8BECB03235CE5970060DAE1 /* Charts */ = {
+			isa = PBXGroup;
+			children = (
+				F8BECB04235CE5D80060DAE1 /* StatusChartsManager.swift */,
+			);
+			path = Charts;
+			sourceTree = "<group>";
+		};
+		F8BECB06235CE6EC0060DAE1 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F8BECB27235E0C3F0060DAE1 /* ChartPoint.swift */,
+				F8BECB25235E0BB60060DAE1 /* ChartPointsScatterDownTrianglesLayer.swift */,
+				F8BECB1F235E04910060DAE1 /* ChartPointsContextFillLayer.swift */,
+				F8BECB17235CF7EE0060DAE1 /* GlucoseRangeSchedule.swift */,
+				F8BECB0B235CE7220060DAE1 /* ChartAxisValueDoubleLog.swift */,
+				F8BECB09235CE7220060DAE1 /* ChartAxisValueDoubleUnit.swift */,
+				F8BECB0A235CE7220060DAE1 /* ChartColorPalette.swift */,
+				F8BECB07235CE7220060DAE1 /* ChartLineModel.swift */,
+				F8BECB08235CE7220060DAE1 /* StateColorPalette.swift */,
+				F8BECB19235CF8480060DAE1 /* DailyQuantitySchedule.swift */,
+				F8BECB1B235CFAB20060DAE1 /* DailyValueSchedule.swift */,
+				F8BECB2D235E0E060060DAE1 /* SampleValue.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		F8C5EBE822F49AB300563B5F /* Droplet */ = {
@@ -1571,6 +1661,7 @@
 				F8A54ABA22D9111900934E7A /* GlucoseData.swift in Sources */,
 				F8B3A84A227F090E004BA588 /* SettingsViewGeneralSettingsViewModel.swift in Sources */,
 				F8B3A85B2280CCD1004BA588 /* AlertSettingsViewController.swift in Sources */,
+				F8BECB1A235CF8480060DAE1 /* DailyQuantitySchedule.swift in Sources */,
 				F8B3A81B227DEC92004BA588 /* SensorsAccessor.swift in Sources */,
 				F8B3A85D22821BB6004BA588 /* Int.swift in Sources */,
 				F898EDF6234A8A5700BFB79B /* UInt32.swift in Sources */,
@@ -1586,6 +1677,8 @@
 				F8A54AEA22D911BA00934E7A /* PairRequestTxMessage.swift in Sources */,
 				F8C5EBEA22F49AC700563B5F /* CGMDroplet1Transmitter.swift in Sources */,
 				F8EEDD4422FD80A600D2D610 /* LibreOOPResponse.swift in Sources */,
+				F8BECB28235E0C3F0060DAE1 /* ChartPoint.swift in Sources */,
+				F8BECB24235E0B030060DAE1 /* UIColor.swift in Sources */,
 				F821CF56229BF43A005C1E43 /* AlertKind.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
 				F8A54AE422D911BA00934E7A /* NSData+CRC.swift in Sources */,
@@ -1594,6 +1687,7 @@
 				F8A54AE022D911BA00934E7A /* SensorDataRxMessage.swift in Sources */,
 				F8A389F0233575DE0010F405 /* M5StackNavigationController.swift in Sources */,
 				F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */,
+				F8BECB18235CF7EE0060DAE1 /* GlucoseRangeSchedule.swift in Sources */,
 				F821CF6F229FC280005C1E43 /* Endpoint+NightScout.swift in Sources */,
 				F821CF5D229BF43A005C1E43 /* NSDateFormatter.swift in Sources */,
 				F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */,
@@ -1603,6 +1697,7 @@
 				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
 				F8A7406E22D9C0E700967CFC /* CGMBluconTransmitter.swift in Sources */,
 				F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */,
+				F8BECB10235CE7220060DAE1 /* ChartAxisValueDoubleLog.swift in Sources */,
 				F8A389C3231F1A4B0010F405 /* M5StackReadBlePassWordTxMessage.swift in Sources */,
 				F8B3A7B2226A0878004BA588 /* TextsAlerts.swift in Sources */,
 				F8A54B0022D9179100934E7A /* LibreDataParser.swift in Sources */,
@@ -1612,6 +1707,9 @@
 				F821CF61229BF4A2005C1E43 /* NightScoutUploadManager.swift in Sources */,
 				F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */,
 				F8A54ADD22D911BA00934E7A /* BatteryStatusTxMessage.swift in Sources */,
+				F8BECB22235E0A8E0060DAE1 /* BidirectionalCollection.swift in Sources */,
+				F8BECB20235E04910060DAE1 /* ChartPointsContextFillLayer.swift in Sources */,
+				F8BECB35235E65FF0060DAE1 /* NumberFormatter.swift in Sources */,
 				F8EEDD5022FE25D400D2D610 /* LibreGlucoseSmoothing.swift in Sources */,
 				F8A389E2232D3E070010F405 /* SettingsViewM5StackBluetoothSettingsViewModel.swift in Sources */,
 				F8A1585522EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift in Sources */,
@@ -1620,6 +1718,7 @@
 				F8A54AE522D911BA00934E7A /* TransmitterVersionRxMessage.swift in Sources */,
 				F821CF57229BF43A005C1E43 /* SnoozeParameters.swift in Sources */,
 				F8F62278233D1CED00BE8796 /* TextsM5StackView.swift in Sources */,
+				F8BECB0E235CE7220060DAE1 /* ChartAxisValueDoubleUnit.swift in Sources */,
 				F8A54AFF22D9179100934E7A /* CRC.swift in Sources */,
 				F8B3A79722635A25004BA588 /* AlertEntry+CoreDataProperties.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
@@ -1637,19 +1736,23 @@
 				F821CF59229BF43A005C1E43 /* AlertEntryUnit.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
 				F8EEDD4C22FE224B00D2D610 /* LibreRawGlucoseData.swift in Sources */,
+				F8BECB0F235CE7220060DAE1 /* ChartColorPalette.swift in Sources */,
 				F8B3A844227F090E004BA588 /* SettingsViewAlertSettingsViewModel.swift in Sources */,
 				F8A54AD822D911BA00934E7A /* CGMG5Transmitter.swift in Sources */,
 				F8A1586322EDB86E007F5B5D /* ConstantsSounds.swift in Sources */,
 				F8A1587322EDC893007F5B5D /* ConstantsDexcomShare.swift in Sources */,
 				F8A1586F22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift in Sources */,
 				F8A54AB822D9111900934E7A /* TransmitterBatteryInfo.swift in Sources */,
+				F8BECB0D235CE7220060DAE1 /* StateColorPalette.swift in Sources */,
 				F8B3A82D227F07D6004BA588 /* SettingsNavigationController.swift in Sources */,
 				F8A54AB722D9111900934E7A /* CGMTransmitter.swift in Sources */,
+				F8BECB05235CE5D80060DAE1 /* StatusChartsManager.swift in Sources */,
 				EE9947E822EEDD2E00DCB876 /* CGMBubbleTransmitter.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
 				F8F62270233AA3B200BE8796 /* M5StackAccessor.swift in Sources */,
 				F8A389E3232D3E070010F405 /* SettingsViewM5StackGeneralSettingsViewModel.swift in Sources */,
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,
+				F8BECB26235E0BB60060DAE1 /* ChartPointsScatterDownTrianglesLayer.swift in Sources */,
 				F8B3A81C227DEC92004BA588 /* AlertEntriesAccessor.swift in Sources */,
 				F8A1585B22EDB7EA007F5B5D /* ConstantsDexcomG5.swift in Sources */,
 				F898EDF4234A8A3200BFB79B /* UInt16.swift in Sources */,
@@ -1667,6 +1770,7 @@
 				F821CF8E22AB090C005C1E43 /* DatePickerViewController.swift in Sources */,
 				F898EDF8234F8EDF00BFB79B /* M5StackName+CoreDataProperties.swift in Sources */,
 				F8A1585322EDB602007F5B5D /* ConstantsBloodGlucose.swift in Sources */,
+				F8BECB31235E0EBE0060DAE1 /* CGPoint.swift in Sources */,
 				F8A389C823203E3E0010F405 /* ConstantsM5Stack.swift in Sources */,
 				F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */,
 				F8A54AE322D911BA00934E7A /* AuthRequestRxMessage.swift in Sources */,
@@ -1685,12 +1789,14 @@
 				F8B3A850227F26F8004BA588 /* AlertTypesSettingsViewController.swift in Sources */,
 				F8A7407022DBB24800967CFC /* BluconTransmitterOpCode.swift in Sources */,
 				F8EA6CAD21BC2CA40082976B /* BluetoothTransmitter.swift in Sources */,
+				F8BECB2E235E0E060060DAE1 /* SampleValue.swift in Sources */,
 				F8B3A808227A2933004BA588 /* SettingsSelectedRowAction.swift in Sources */,
 				F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */,
 				F8B3A78E22622954004BA588 /* AlertType+CoreDataClass.swift in Sources */,
 				F821CF5A229BF43A005C1E43 /* CoreDataManager.swift in Sources */,
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
 				F821CF7B22A1D359005C1E43 /* NightScoutFollowerDelegate.swift in Sources */,
+				F8BECB12235CEA9B0060DAE1 /* TimeInterval.swift in Sources */,
 				F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */,
 				F898EDF2234A8A0500BFB79B /* UInt8.swift in Sources */,
 				F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */,
@@ -1698,6 +1804,7 @@
 				F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */,
 				F8C5EBE722F38F0E00563B5F /* Trace.swift in Sources */,
 				F8B48A9422B2A705009BCC01 /* TextsSpeakReading.swift in Sources */,
+				F8BECB14235CF3AA0060DAE1 /* HKUnit.swift in Sources */,
 				F8A54AE222D911BA00934E7A /* ResetMessage.swift in Sources */,
 				F821CF5F229BF43A005C1E43 /* ApplicationManager.swift in Sources */,
 				F8B3A834227F08AC004BA588 /* PickerViewData.swift in Sources */,
@@ -1710,7 +1817,9 @@
 				F8B3A78B225D473D004BA588 /* UIAlertController.swift in Sources */,
 				F8A54AEB22D911BA00934E7A /* CGMG4xDripTransmitter.swift in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
+				F8BECB1C235CFAB20060DAE1 /* DailyValueSchedule.swift in Sources */,
 				F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */,
+				F8BECB0C235CE7220060DAE1 /* ChartLineModel.swift in Sources */,
 				F821CF66229EE68B005C1E43 /* NightScoutFollowManager.swift in Sources */,
 				F8A54AF622D9156600934E7A /* CGMGNSEntryTransmitter.swift in Sources */,
 				F8A389E7232ECE7E0010F405 /* SettingsViewUtilities.swift in Sources */,
@@ -1732,9 +1841,11 @@
 				F85C4A9D2336D05100D6A86F /* M5StackViewController.swift in Sources */,
 				F8A54ADE22D911BA00934E7A /* AESCrypt.m in Sources */,
 				F8A54ADC22D911BA00934E7A /* AuthChallengeTxMessage.swift in Sources */,
+				F8BECB33235E64530060DAE1 /* TimeZone.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 				F8A54AFA22D9156600934E7A /* CGMMiaoMiaoTransmitter.swift in Sources */,
+				F8BECB02235CE3E20060DAE1 /* BloodGlucoseChartView.swift in Sources */,
 				F8A1584D22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift in Sources */,
 				F8A389ED23342EB10010F405 /* ConstantsNightScout.swift in Sources */,
 				F8A54AB922D9111900934E7A /* CGMTransmitterDelegate.swift in Sources */,
@@ -1742,6 +1853,7 @@
 				F8A54AE822D911BA00934E7A /* BatteryStatusRxMessage.swift in Sources */,
 				F8EEDD4522FD80A600D2D610 /* LibreOOPClient.swift in Sources */,
 				F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */,
+				F8BECB1E235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift in Sources */,
 				F8C5EBE522F297F000563B5F /* LibreSensorSerialNumber.swift in Sources */,
 				F8A389E1232D3E070010F405 /* SettingsViewM5StackWiFiSettingsViewModel.swift in Sources */,
 				F8B3A845227F090E004BA588 /* SettingsViewDexcomSettingsViewModel.swift in Sources */,
@@ -2111,6 +2223,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8DKSZ5HNLB;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
@@ -2121,6 +2234,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -2135,6 +2249,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8DKSZ5HNLB;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
@@ -2145,6 +2260,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
