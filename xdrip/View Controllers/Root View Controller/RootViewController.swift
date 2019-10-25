@@ -5,6 +5,8 @@ import CoreBluetooth
 import UserNotifications
 import AVFoundation
 import AudioToolbox
+import SwiftCharts
+import HealthKitUI
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController {
@@ -51,6 +53,9 @@ final class RootViewController: UIViewController {
     
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
+
+    /// outlet for chart
+    @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
     
     // MARK: - Constants for ApplicationManager usage
     
@@ -125,7 +130,37 @@ final class RootViewController: UIViewController {
     /// timestamp of last notification for pairing
     private var timeStampLastNotificationForPairing:Date?
     
+    /// manages m5Stack that this app knows
     private var m5StackManager: M5StackManager?
+    
+    private lazy var statusChartsManager: StatusChartsManager = {
+        let statusChartsManager = StatusChartsManager(
+            colors: ChartColorPalette(
+                axisLine: .axisLineColor,
+                axisLabel: .axisLabelColor,
+                grid: .gridColor,
+                glucoseTint: .glucoseTintColor,
+                doseTint: .doseTintColor
+            ),
+            settings: {
+                var settings = ChartSettings()
+                settings.top = 4
+                settings.bottom = 8
+                settings.trailing = 8
+                settings.axisTitleLabelsToLabelsSpacing = 0
+                settings.labelsToAxisSpacingX = 6
+                settings.clipInnerFrame = false
+                return settings
+        }()
+        )
+        
+        statusChartsManager.glucoseDisplayRange = (
+            min: HKQuantity(unit: .milligramsPerDeciliter, doubleValue: 100),
+            max: HKQuantity(unit: .milligramsPerDeciliter, doubleValue: 175)
+        )
+        
+        return statusChartsManager
+    }()
     
     // MARK: - View Life Cycle
     
@@ -151,6 +186,13 @@ final class RootViewController: UIViewController {
             // create transmitter based on UserDefaults
             self.initializeCGMTransmitter()
             
+            self.statusChartsManager.prerender()
+            self.chartOutlet.chartGenerator = { [weak self] (frame) in
+                
+                return self?.statusChartsManager.glucoseChartWithFrame(frame)?.view
+                
+            }
+
         })
         
         // Setup View
@@ -1337,6 +1379,7 @@ extension RootViewController:CGMTransmitterDelegate {
         // process new readings
         processNewGlucoseData(glucoseData: &glucoseData, sensorTimeInMinutes: sensorTimeInMinutes)
     }
+    
     
 }
 

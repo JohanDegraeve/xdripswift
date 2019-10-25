@@ -58,15 +58,22 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0nE-AX-r0w" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
+                                <rect key="frame" x="5" y="225" width="310" height="289"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="zWo-AR-qJE" firstAttribute="leading" secondItem="fSY-nc-amN" secondAttribute="trailing" constant="10" id="25g-Is-au8" userLabel="Transmitter Button Outlet.leading = Pre Snooze Button Outlet.trailing + 20"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="bottom" secondItem="0nE-AX-r0w" secondAttribute="bottom" constant="5" id="BQf-b6-LQR"/>
                             <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="7Wo-wd-80o" secondAttribute="trailing" constant="10" id="BUd-jO-rYC"/>
                             <constraint firstItem="7Wo-wd-80o" firstAttribute="leading" secondItem="uyn-2k-K74" secondAttribute="trailing" constant="20" id="FGt-tL-VHM"/>
                             <constraint firstItem="fSY-nc-amN" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" id="Gsa-fG-7Wh"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="0nE-AX-r0w" secondAttribute="trailing" constant="5" id="JSx-f2-Nzm"/>
                             <constraint firstItem="We3-bN-ffR" firstAttribute="top" secondItem="uyn-2k-K74" secondAttribute="bottom" constant="20" id="Jp5-yH-yTW"/>
                             <constraint firstItem="7Wo-wd-80o" firstAttribute="top" secondItem="zWo-AR-qJE" secondAttribute="bottom" constant="10" id="Lya-27-hOa"/>
+                            <constraint firstItem="0nE-AX-r0w" firstAttribute="top" secondItem="We3-bN-ffR" secondAttribute="bottom" constant="5" id="MNR-X1-b8C"/>
                             <constraint firstItem="fSY-nc-amN" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="20" id="TFc-gV-Hzd"/>
                             <constraint firstItem="zWo-AR-qJE" firstAttribute="top" secondItem="PQr-Ze-W5v" secondAttribute="top" id="WMb-YS-LdS"/>
                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="leading" secondItem="zWo-AR-qJE" secondAttribute="trailing" constant="10" id="YZw-LD-39g" userLabel="Calibrate Button Outlet.leading = Transmitter Button Outlet.trailing + 20"/>
@@ -74,6 +81,7 @@
                             <constraint firstItem="We3-bN-ffR" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" id="Z2H-jd-XOW"/>
                             <constraint firstItem="uyn-2k-K74" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="10" id="fmo-f7-DDl"/>
                             <constraint firstItem="We3-bN-ffR" firstAttribute="centerX" secondItem="tsR-hK-woN" secondAttribute="centerX" id="fz5-iV-QmC"/>
+                            <constraint firstItem="0nE-AX-r0w" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" constant="5" id="h0o-M3-5Pj"/>
                             <constraint firstItem="uyn-2k-K74" firstAttribute="top" secondItem="fSY-nc-amN" secondAttribute="bottom" constant="10" id="pqR-9I-Dpv"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="PQr-Ze-W5v"/>
@@ -83,6 +91,7 @@
                     </tabBarItem>
                     <connections>
                         <outlet property="calibrateButtonOutlet" destination="mSJ-jy-nHJ" id="XSS-W3-gbX"/>
+                        <outlet property="chartOutlet" destination="0nE-AX-r0w" id="ivs-se-S3b"/>
                         <outlet property="diffLabelOutlet" destination="7Wo-wd-80o" id="nnn-w9-1sX"/>
                         <outlet property="minutesLabelOutlet" destination="uyn-2k-K74" id="XXm-rq-Suy"/>
                         <outlet property="preSnoozeButtonOutlet" destination="fSY-nc-amN" id="T25-Z1-3Ad"/>
