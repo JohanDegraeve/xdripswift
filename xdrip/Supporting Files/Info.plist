@@ -28,7 +28,9 @@
 		<true/>
 	</dict>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Connect to CGM Transmitter</string>
+	<string>Connect to CGM Transmitter and M5Stack</string>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Connect to CGM Transmitter and M5Stack</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Store bloodglucose readings</string>
 	<key>NSHealthUpdateUsageDescription</key>
