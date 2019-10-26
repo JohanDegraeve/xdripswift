@@ -95,7 +95,7 @@ public final class StatusChartsManager {
     private var chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings
     
     /// The latest date on the X-axis
-    private var endDate = Date() {
+    private var endDate: Date {
         didSet {
             if endDate != oldValue {
                 
@@ -103,25 +103,18 @@ public final class StatusChartsManager {
                 
                 xAxisValues = nil
                 
-                // Set a new startdate
-                startDate = endDate.addingTimeInterval(.hours(-ConstantsGlucoseChart.defaultChartWidthInHours))
+                // current difference between end and startdate
+                let diffEndAndStartDate = oldValue.timeIntervalSince(startDate).hours
+                
+                // Set a new startdate, difference is equal to previous difference
+                startDate = endDate.addingTimeInterval(.hours(-diffEndAndStartDate))
                 
             }
         }
     }
     
     /// The earliest date on the X-axis
-    private var startDate = Date() {
-        didSet {
-            if startDate != oldValue {
-                
-                trace("New chart startdate: %@", log: self.log, type: .info,  String(describing: startDate))
-                
-                xAxisValues = nil
-                
-            }
-        }
-    }
+    private var startDate: Date
 
     /// A ChartAxisValue models a value along a particular chart axis. For example, two ChartAxisValues represent the two components of a ChartPoint. It has a backing Double scalar value, which provides a canonical form for all subclasses to be laid out along an axis. It also has one or more labels that are drawn in the chart.
     ///
@@ -152,6 +145,7 @@ public final class StatusChartsManager {
         }
     }
     
+    /// dateformatter for chartpoints ???
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .none
@@ -160,7 +154,8 @@ public final class StatusChartsManager {
         return dateFormatter
     }()
     
-
+    /// timeformatter for horizontal axis label
+    private let axisLabelTimeFormatter:  DateFormatter
     
     // MARK: - intializer
     
@@ -176,6 +171,15 @@ public final class StatusChartsManager {
         
         chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: colors.grid)
         
+        // initialize enddate
+        endDate = Date()
+        
+        // intialize startdate, which is enddate minus a few hours
+        startDate = endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours))
+        
+        axisLabelTimeFormatter = DateFormatter()
+        axisLabelTimeFormatter.dateFormat = UserDefaults.standard.chartTimeAxisLabelFormat
+
     }
 
     // MARK: - public functions
@@ -267,14 +271,12 @@ public final class StatusChartsManager {
             return nil
         }
         
-        let yAxisValues = ChartAxisValuesStaticGenerator.generateYAxisValuesWithChartPoints(points,
-                                                                                            minSegmentCount: 2,
-                                                                                            maxSegmentCount: 4,
-                                                                                            multiple: glucoseUnit.chartableIncrement * 25,
-                                                                                            axisValueGenerator: {
-                                                                                                ChartAxisValueDouble($0, labelSettings: self.chartLabelSettings)
-        },
-                                                                                            addPaddingSegmentIfEdge: false
+        let yAxisValues = ChartAxisValuesStaticGenerator.generateYAxisValuesWithChartPoints(points, minSegmentCount: 2, maxSegmentCount: 4, multiple: glucoseUnit.chartableIncrement * 25, axisValueGenerator: {
+            
+            ChartAxisValueDouble($0, labelSettings: self.chartLabelSettings)
+            
+        }
+            , addPaddingSegmentIfEdge: false
         )
         
         let yAxisModel = ChartAxisModel(axisValues: yAxisValues, lineColor: colors.axisLine, labelSpaceReservationMode: .fixed(labelsWidthY))
@@ -318,17 +320,14 @@ public final class StatusChartsManager {
 
     private func generateXAxisValues() {
         
-        let timeFormatter = DateFormatter()
-        timeFormatter.dateFormat = "h a"
-        
         /// the startdate and the enddate as ChartPoint
         let points = [
             ChartPoint(
-                x: ChartAxisValueDate(date: startDate, formatter: timeFormatter),
+                x: ChartAxisValueDate(date: startDate, formatter: axisLabelTimeFormatter),
                 y: ChartAxisValue(scalar: 0)
             ),
             ChartPoint(
-                x: ChartAxisValueDate(date: endDate, formatter: timeFormatter),
+                x: ChartAxisValueDate(date: endDate, formatter: axisLabelTimeFormatter),
                 y: ChartAxisValue(scalar: 0)
             )
         ]
@@ -336,10 +335,10 @@ public final class StatusChartsManager {
         /// how many full hours between startdate and enddate
         let segments = ceil(endDate.timeIntervalSince(startDate).hours)
         
-        let xAxisValues = ChartAxisValuesStaticGenerator.generateXAxisValuesWithChartPoints(points, minSegmentCount: segments - 1, maxSegmentCount: segments + 1, multiple: TimeInterval(hours: 1), axisValueGenerator: {
+        let xAxisValues = ChartAxisValuesStaticGenerator.generateXAxisValuesWithChartPoints(points, minSegmentCount: segments - 1, maxSegmentCount: segments + 1, multiple: TimeInterval(hours: 2), axisValueGenerator: {
             ChartAxisValueDate(
                 date: ChartAxisValueDate.dateFromScalar($0),
-                formatter: timeFormatter,
+                formatter: axisLabelTimeFormatter,
                 labelSettings: self.chartLabelSettings
             )
         }, addPaddingSegmentIfEdge: false)
