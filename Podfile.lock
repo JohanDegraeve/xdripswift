@@ -7,7 +7,7 @@ DEPENDENCIES:
   - SwiftCharts (~> 0.6.5)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - SwiftCharts
 
 EXTERNAL SOURCES:
