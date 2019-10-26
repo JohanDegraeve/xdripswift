@@ -188,8 +188,11 @@ public final class StatusChartsManager {
     public func updateChart() {
         
         let now = Date()
-        
-        let glucose = [(now, 110.0), (now.addingTimeInterval(-300), 120.0), (now.addingTimeInterval(-600), 130.0)]
+        //for testing only, 1 per 5 minutes
+        //let intervals = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+        let intervals = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+        let glucose = intervals.map { (Date(timeInterval: -Double($0)*300.0, since: now), 10.0 + Double($0)*2.0) }
+        //let glucose = [(now, 110.0), (now.addingTimeInterval(-300), 120.0), (now.addingTimeInterval(-600), 130.0)]
         
         glucoseChartPoints = glucose.map {
             ChartPoint(
@@ -319,30 +322,26 @@ public final class StatusChartsManager {
     }
 
     private func generateXAxisValues() {
+
+        // in the comments, assume it is now 13:26 and width is 6 hours, that means startDate = 07:26, endDate = 13:26
         
-        /// the startdate and the enddate as ChartPoint
-        let points = [
-            ChartPoint(
-                x: ChartAxisValueDate(date: startDate, formatter: axisLabelTimeFormatter),
-                y: ChartAxisValue(scalar: 0)
-            ),
-            ChartPoint(
-                x: ChartAxisValueDate(date: endDate, formatter: axisLabelTimeFormatter),
-                y: ChartAxisValue(scalar: 0)
-            )
-        ]
+        /// how many full hours between startdate and enddate - result would be 6 - maybe we just need to use the userdefaults setting ?
+        let amountOfFullHours = Int(ceil(endDate.timeIntervalSince(startDate).hours))
         
-        /// how many full hours between startdate and enddate
-        let segments = ceil(endDate.timeIntervalSince(startDate).hours)
+        /// create array that goes from 1 to number of full hours, as helper to map to array of ChartAxisValueDate - array will go from 1 to 6
+        let mappingArray = Array(1...amountOfFullHours)
         
-        let xAxisValues = ChartAxisValuesStaticGenerator.generateXAxisValuesWithChartPoints(points, minSegmentCount: segments - 1, maxSegmentCount: segments + 1, multiple: TimeInterval(hours: 2), axisValueGenerator: {
-            ChartAxisValueDate(
-                date: ChartAxisValueDate.dateFromScalar($0),
-                formatter: axisLabelTimeFormatter,
-                labelSettings: self.chartLabelSettings
-            )
-        }, addPaddingSegmentIfEdge: false)
+        /// first, for each int in mappingArray, we create a ChartAxisValueDate, which will have as date one of the hours, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
+        let startDateLower = startDate.toLowerHour()
+        var xAxisValues = mappingArray.map { ChartAxisValueDate(date: Date(timeInterval: Double($0)*3600, since: startDateLower), formatter: axisLabelTimeFormatter, labelSettings: chartLabelSettings) }
         
+        /// insert the start Date as first element, in this example 07:26
+        xAxisValues.insert(ChartAxisValueDate(date: startDate, formatter: axisLabelTimeFormatter, labelSettings: chartLabelSettings), at: 0)
+        
+        /// now append the endDate as last element, in this example 13:26
+        xAxisValues.append(ChartAxisValueDate(date: endDate, formatter: axisLabelTimeFormatter, labelSettings: chartLabelSettings))
+         
+        /// don't show the first and last hour, because this is usually not something like 13 but rather 13:26
         xAxisValues.first?.hidden = true
         xAxisValues.last?.hidden = true
         
