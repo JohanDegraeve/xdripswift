@@ -19,6 +19,7 @@
 		F804870C2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */; };
 		F804870D2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */; };
 		F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */; };
+		F80859272364355F00F3829D /* ConstantsGlucoseChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */; };
 		F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */; };
 		F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */; };
 		F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D5122C27F18005EFAE2 /* BgReading+DexcomShare.swift */; };
@@ -270,6 +271,7 @@
 		F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5Stack+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5Stack+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionClosureable-extension.swift"; sourceTree = "<group>"; };
+		F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsGlucoseChart.swift; sourceTree = "<group>"; };
 		F81D6D4522B67F55005EFAE2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareUploadManager.swift; sourceTree = "<group>"; };
 		F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsDexcomShareTestResult.swift; sourceTree = "<group>"; };
@@ -1405,6 +1407,7 @@
 				F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */,
 				F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */,
 				F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */,
+				F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -1843,6 +1846,7 @@
 				F8A54ADC22D911BA00934E7A /* AuthChallengeTxMessage.swift in Sources */,
 				F8BECB33235E64530060DAE1 /* TimeZone.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
+				F80859272364355F00F3829D /* ConstantsGlucoseChart.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 				F8A54AFA22D9156600934E7A /* CGMMiaoMiaoTransmitter.swift in Sources */,
 				F8BECB02235CE3E20060DAE1 /* BloodGlucoseChartView.swift in Sources */,

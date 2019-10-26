@@ -15,22 +15,6 @@ public final class StatusChartsManager {
         return chartSettings.leading + chartSettings.trailing + labelsWidthY + chartSettings.labelsToAxisSpacingY
     }
     
-    /// The earliest date on the X-axis
-    public var startDate = Date() {
-        didSet {
-            if startDate != oldValue {
-                
-                trace("New chart start date: %@", log: self.log, type: .info,  String(describing: startDate))
-                
-                xAxisValues = nil
-                
-                // Set a new minimum end date
-                endDate = startDate.addingTimeInterval(.hours(3))
-                
-            }
-        }
-    }
-    
     public var gestureRecognizer: UIGestureRecognizer?
     
     /// The latest allowed date on the X-axis
@@ -115,14 +99,30 @@ public final class StatusChartsManager {
         didSet {
             if endDate != oldValue {
                 
-                trace("New chart end date: %@", log: self.log, type: .info,  String(describing: endDate))
+                trace("New chart enddate: %@", log: self.log, type: .info,  String(describing: endDate))
+                
+                xAxisValues = nil
+                
+                // Set a new startdate
+                startDate = endDate.addingTimeInterval(.hours(-ConstantsGlucoseChart.defaultChartWidthInHours))
+                
+            }
+        }
+    }
+    
+    /// The earliest date on the X-axis
+    private var startDate = Date() {
+        didSet {
+            if startDate != oldValue {
+                
+                trace("New chart startdate: %@", log: self.log, type: .info,  String(describing: startDate))
                 
                 xAxisValues = nil
                 
             }
         }
     }
-    
+
     /// A ChartAxisValue models a value along a particular chart axis. For example, two ChartAxisValues represent the two components of a ChartPoint. It has a backing Double scalar value, which provides a canonical form for all subclasses to be laid out along an axis. It also has one or more labels that are drawn in the chart.
     ///
     /// see https://github.com/i-schuetz/SwiftCharts/blob/ec538d027d6d4c64028d85f86d3d72fcda41c016/SwiftCharts/AxisValues/ChartAxisValue.swift#L12, is not meant to be instantiated
@@ -193,7 +193,6 @@ public final class StatusChartsManager {
                 y: ChartAxisValueDouble($0.1)
             )
         }
-        
 
     }
     
@@ -322,6 +321,7 @@ public final class StatusChartsManager {
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "h a"
         
+        /// the startdate and the enddate as ChartPoint
         let points = [
             ChartPoint(
                 x: ChartAxisValueDate(date: startDate, formatter: timeFormatter),
@@ -333,6 +333,7 @@ public final class StatusChartsManager {
             )
         ]
         
+        /// how many full hours between startdate and enddate
         let segments = ceil(endDate.timeIntervalSince(startDate).hours)
         
         let xAxisValues = ChartAxisValuesStaticGenerator.generateXAxisValuesWithChartPoints(points, minSegmentCount: segments - 1, maxSegmentCount: segments + 1, multiple: TimeInterval(hours: 1), axisValueGenerator: {
