@@ -6,7 +6,7 @@ import HealthKit
 import SwiftCharts
 import os.log
 
-public final class StatusChartsManager {
+public final class GlucoseChartManager {
     
     // MARK: - public properties
     
@@ -302,7 +302,7 @@ public final class StatusChartsManager {
         // Grid lines
         let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: chartGuideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: yAxisValues)
         
-        let circles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: 4, height: 4), itemFillColor: colors.glucoseTint, optimized: true)
+        let circles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: colors.glucoseTint, optimized: true)
         
         if gestureRecognizer != nil {
             glucoseChartCache = ChartPointsTouchHighlightLayerViewCache(

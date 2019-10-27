@@ -138,7 +138,7 @@ final class RootViewController: UIViewController {
     private var m5StackManager: M5StackManager?
     
     /// manage glucose chart
-    private var glucoseChartManager: StatusChartsManager?
+    private var glucoseChartManager: GlucoseChartManager?
     
     // MARK: - View Life Cycle
     
@@ -310,7 +310,7 @@ final class RootViewController: UIViewController {
         m5StackManager = M5StackManager(coreDataManager: coreDataManager)
         
         // setup glucoseChartManager
-        glucoseChartManager = StatusChartsManager()
+        glucoseChartManager = GlucoseChartManager()
     }
     
     /// process new glucose data received from transmitter.
