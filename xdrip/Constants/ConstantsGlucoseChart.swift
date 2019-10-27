@@ -1,4 +1,4 @@
-import Foundation
+import UIKit
 
 enum ConstantsGlucoseChart {
     
@@ -10,38 +10,60 @@ enum ConstantsGlucoseChart {
     /// H is hour 24 hour format, "h a" is hour 12 hour format  with a either am or pm
     static let defaultTimeAxisLabelFormat = "H"
     
-    /// if unit is mgdl, we wil have a horizointal line each ... mgdl
-    static let chartTableIncrementForMgDL = 50.0
-    
-    /// if unit is mmol, we wil have a horizointal line each ... mmol
-    static let chartTableIncrementForMmol = 2.0
-    
     /// usually 40.0 mgdl is the lowest value that cgm's give, putting it to 38 guarantees the points will always be visible
     ///
     /// only in mgdl because the label will not be shown, hence no bizar values to be shown when going to mgdl
     static let absoluteMinimumChartValueInMgdl = 38.0
     
-    /// the minimum value that a cgm can show, it should be greater than absoluteMinimumChartValueInMgdl
-    static let minimumCGMGlucoseValueInMgdl = 40.0
+    /// if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
+    static let initialGlucoseValueRangeInMgDl = [50.0, 100.0, 150.0, 200.0]
     
-    /// default initial max mgdl value in chart, in mgdl - xdrip will try to maximize the use of the available height. If there's no glucose reading higher than this value, then the maximum in the graph will be this value
-    ///
-    /// it's default, because a user will be able to modify the value later in the settings  - in the code, the value will be
-    static let defaultInitialMaxChartValueInMgdl = 200.0
+    /// if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mmol
+    static let initialGlucoseValueRangeInMmol = [3.0, 6.0, 9.0, 12.0]
     
-    /// default initial max mmol value in chart, in mmol - xdrip will try to maximize the use of the available height. If there's no glucose reading higher than this value, then the maximum in the graph will be this value
-    ///
-    /// it's default, because a user will be able to modify the value later in the settings  - in the code, the value will be
-    static let defaultInitialMaxChartValueInMmol = 11.0
+    /// if the maximum in initialGlucoseValueRangeInMgDl isn't enough to show all values, if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
+    static let secondGlucoseValueRangeInMgDl = [250.0, 300.0]
     
-    /// default increase  in maxium mgdl value in the chart, in mgdl - xdrip will try to maximize the use of the available height. If there's a glucose reading higher than the initial value, then the maximum will be increased with this value, until all readings fit in the chart
-    ///
-    /// it's default, because a user will be able to modify the value later in the settings
-    static let defaultIncreaseMaxChartValueInMgdl = 100.0
+    /// if the maximum in initialGlucoseValueRangeInMgDl isn't enough to show all values, if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
+    static let secondGlucoseValueRangeInMmol = [15.0, 18.0]
     
-    /// default increase  in maxium mmol value in the chart, in mmol - xdrip will try to maximize the use of the available height. If there's a glucose reading higher than the initial value, then the maximum will be increased with this value, until all readings fit in the chart
-    ///
-    /// it's default, because a user will be able to modify the value later in the settings
-    static let defaultIncreaseMaxChartValueInMmol = 6.0
+    /// if the maximum in secondGlucoseValueRangeInMgDl isn't enough to show all values, if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
+    static let thirdGlucoseValueRangeInMgDl = [350.0, 400.0]
+    
+    /// if the maximum in initialGlucoseValueRangeInMgDl isn't enough to show all values, if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
+    static let thirdGlucoseValueRangeInMmol = [21.0, 23.0]
+    
+    /// axis line color
+    static let axisLineColor = UIColor.black
+    
+    /// axis line label
+    static let axisLabelColor = UIColor.black
+    
+    /// grid color
+    static let gridColor = UIColor.gray
+    
+    /// glucose color
+    static let glucoseTintColor = UIColor.green
+    
+    /// labels width for vertical axis
+    static let yAxisLabelsWidth: CGFloat = 30
+    
+    /// Empty space in points added to the leading edge of the chart
+    static let leading: CGFloat = 0
+    
+    /// Empty space in points added to the top edge of the chart
+    static let top: CGFloat = 8
+    
+    /// Empty space in points added to the trailing edge of the chart
+    static let trailing: CGFloat = 4
+    
+    /// Empty space in points added to the bottom edge of the chart
+    static let bottom: CGFloat = 0
+    
+    /// The spacing in points between X axis labels and the X axis line
+    static let labelsToAxisSpacingX: CGFloat = 6
+    
+    /// The spacing in points between axis title labels and axis labels
+    static let axisTitleLabelsToLabelsSpacing: CGFloat = 0
 
 }

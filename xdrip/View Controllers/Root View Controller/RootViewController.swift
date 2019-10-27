@@ -39,8 +39,8 @@ final class RootViewController: UIViewController {
     
     @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
         
-        statusChartsManager.updateChart()
-        statusChartsManager.prerender()
+        glucoseChartManager?.updateChart()
+        glucoseChartManager?.prerender()
         chartOutlet.reloadChart()
         /*
         let alert = UIAlertController(title: "Info", message: "Unfortuantely, presnooze functionality is not yet implemented", actionHandler: nil)
@@ -137,29 +137,8 @@ final class RootViewController: UIViewController {
     /// manages m5Stack that this app knows
     private var m5StackManager: M5StackManager?
     
-    private lazy var statusChartsManager: StatusChartsManager = {
-        let statusChartsManager = StatusChartsManager(
-            colors: ChartColorPalette(
-                axisLine: .axisLineColor,
-                axisLabel: .axisLabelColor,
-                grid: .gridColor,
-                glucoseTint: .glucoseTintColor,
-                doseTint: .doseTintColor
-            ),
-            settings: {
-                var settings = ChartSettings()
-                settings.top = 4
-                settings.bottom = 8
-                settings.trailing = 8
-                settings.axisTitleLabelsToLabelsSpacing = 0
-                settings.labelsToAxisSpacingX = 6
-                settings.clipInnerFrame = false
-                return settings
-        }()
-        )
-        
-        return statusChartsManager
-    }()
+    /// manage glucose chart
+    private var glucoseChartManager: StatusChartsManager?
     
     // MARK: - View Life Cycle
     
@@ -185,10 +164,10 @@ final class RootViewController: UIViewController {
             // create transmitter based on UserDefaults
             self.initializeCGMTransmitter()
             
-            self.statusChartsManager.prerender()
+            self.glucoseChartManager?.prerender()
             self.chartOutlet.chartGenerator = { [weak self] (frame) in
                 
-                return self?.statusChartsManager.glucoseChartWithFrame(frame, chartTableIncrement: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ConstantsGlucoseChart.chartTableIncrementForMgDL : ConstantsGlucoseChart.chartTableIncrementForMmol)?.view
+                return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
                 
             }
 
@@ -329,6 +308,9 @@ final class RootViewController: UIViewController {
         
         // setup m5StackManager
         m5StackManager = M5StackManager(coreDataManager: coreDataManager)
+        
+        // setup glucoseChartManager
+        glucoseChartManager = StatusChartsManager()
     }
     
     /// process new glucose data received from transmitter.

@@ -16,7 +16,7 @@ public struct ChartColorPalette {
     public let grid: UIColor
     public let glucoseTint: UIColor
 
-    public init(axisLine: UIColor, axisLabel: UIColor, grid: UIColor, glucoseTint: UIColor, doseTint: UIColor) {
+    public init(axisLine: UIColor, axisLabel: UIColor, grid: UIColor, glucoseTint: UIColor) {
         
         self.axisLine = axisLine
         self.axisLabel = axisLabel

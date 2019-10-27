@@ -223,7 +223,6 @@
 		F8BECB1E235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB1D235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift */; };
 		F8BECB20235E04910060DAE1 /* ChartPointsContextFillLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB1F235E04910060DAE1 /* ChartPointsContextFillLayer.swift */; };
 		F8BECB22235E0A8E0060DAE1 /* BidirectionalCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB21235E0A8E0060DAE1 /* BidirectionalCollection.swift */; };
-		F8BECB24235E0B030060DAE1 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB23235E0B030060DAE1 /* UIColor.swift */; };
 		F8BECB26235E0BB60060DAE1 /* ChartPointsScatterDownTrianglesLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB25235E0BB60060DAE1 /* ChartPointsScatterDownTrianglesLayer.swift */; };
 		F8BECB28235E0C3F0060DAE1 /* ChartPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB27235E0C3F0060DAE1 /* ChartPoint.swift */; };
 		F8BECB2E235E0E060060DAE1 /* SampleValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB2D235E0E060060DAE1 /* SampleValue.swift */; };
@@ -596,7 +595,6 @@
 		F8BECB1D235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPointsTouchHighlightLayerViewCache.swift; sourceTree = "<group>"; };
 		F8BECB1F235E04910060DAE1 /* ChartPointsContextFillLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsContextFillLayer.swift; sourceTree = "<group>"; };
 		F8BECB21235E0A8E0060DAE1 /* BidirectionalCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BidirectionalCollection.swift; sourceTree = "<group>"; };
-		F8BECB23235E0B030060DAE1 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		F8BECB25235E0BB60060DAE1 /* ChartPointsScatterDownTrianglesLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesLayer.swift; sourceTree = "<group>"; };
 		F8BECB27235E0C3F0060DAE1 /* ChartPoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPoint.swift; sourceTree = "<group>"; };
 		F8BECB2D235E0E060060DAE1 /* SampleValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleValue.swift; sourceTree = "<group>"; };
@@ -702,7 +700,6 @@
 				F8B3A78A225D473D004BA588 /* UIAlertController.swift */,
 				F898EDEB233F549100BFB79B /* UIBarButtonItem.swift */,
 				F898EDE9233F53BF00BFB79B /* UIButton.swift */,
-				F8BECB23235E0B030060DAE1 /* UIColor.swift */,
 				F898EDF1234A8A0500BFB79B /* UInt8.swift */,
 				F898EDF3234A8A3200BFB79B /* UInt16.swift */,
 				F898EDF5234A8A5700BFB79B /* UInt32.swift */,
@@ -1684,7 +1681,6 @@
 				F8C5EBEA22F49AC700563B5F /* CGMDroplet1Transmitter.swift in Sources */,
 				F8EEDD4422FD80A600D2D610 /* LibreOOPResponse.swift in Sources */,
 				F8BECB28235E0C3F0060DAE1 /* ChartPoint.swift in Sources */,
-				F8BECB24235E0B030060DAE1 /* UIColor.swift in Sources */,
 				F821CF56229BF43A005C1E43 /* AlertKind.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
 				F8A54AE422D911BA00934E7A /* NSData+CRC.swift in Sources */,
