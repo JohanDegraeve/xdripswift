@@ -30,34 +30,6 @@ public final class StatusChartsManager {
         }
     }
     
-    /// need to remove this, add an observer for UserDefaults.standard.bloodGlucoseUnitIsMgDl, then call glucoseDisplayRange didset whenever the value is changed
-    public var glucoseUnit: HKUnit = UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .milligramsPerDeciliter : .millimolesPerLiter {
-        didSet {
-            
-            if glucoseUnit != oldValue {
-                // this will call the didSet of variable glucoseDisplayRange to be called (see next)
-                let oldRange = glucoseDisplayRange
-                glucoseDisplayRange = oldRange
-            }
-        }
-    }
-
-    /// this is the range of the chart, in currently chosen unit (mgdl or mmol)
-    ///
-    /// Whenever glucoseDisplayRange is assigned a new value, glucoseChart is set to nil
-    public var glucoseDisplayRange: (min: HKQuantity, max: HKQuantity)? {
-        didSet {
-            if let range = glucoseDisplayRange {
-                glucoseDisplayRangePoints = [
-                    ChartPoint(x: ChartAxisValue(scalar: 0), y: ChartAxisValueDouble(range.min.doubleValue(for: glucoseUnit))),
-                    ChartPoint(x: ChartAxisValue(scalar: 0), y: ChartAxisValueDouble(range.max.doubleValue(for: glucoseUnit)))
-                ]
-            } else {
-                glucoseDisplayRangePoints = []
-            }
-        }
-    }
-
     /// chartpoint array with actually reading values
     ///
     /// Whenever glucoseChartPoints is assigned a new value, glucoseChart is set to nil
@@ -68,6 +40,7 @@ public final class StatusChartsManager {
             if let lastDate = glucoseChartPoints.last?.x as? ChartAxisValueDate {
                 updateEndDate(lastDate.date)
             }
+            
         }
     }
     
@@ -137,13 +110,6 @@ public final class StatusChartsManager {
     private var glucoseChart: Chart?
     
     private var glucoseChartCache: ChartPointsTouchHighlightLayerViewCache?
-    
-    /// two chartPoints, one for minimum glucose value, one for maximum, value depends on chosen unit
-    private var glucoseDisplayRangePoints: [ChartPoint] = [] {
-        didSet {
-            glucoseChart = nil
-        }
-    }
     
     /// dateformatter for chartpoints ???
     private let dateFormatter: DateFormatter = {
@@ -235,7 +201,7 @@ public final class StatusChartsManager {
         }
     }
 
-    public func glucoseChartWithFrame(_ frame: CGRect) -> Chart? {
+    public func glucoseChartWithFrame(_ frame: CGRect, chartTableIncrement: Double) -> Chart? {
         
         if let chart = glucoseChart, chart.frame != frame {
 
@@ -245,7 +211,7 @@ public final class StatusChartsManager {
         }
 
         if glucoseChart == nil {
-            glucoseChart = generateGlucoseChartWithFrame(frame)
+            glucoseChart = generateGlucoseChartWithFrame(frame, chartTableIncrement: chartTableIncrement)
         }
 
         return glucoseChart
@@ -262,25 +228,52 @@ public final class StatusChartsManager {
     
     // MARK: - private functions
     
-    private func generateGlucoseChartWithFrame(_ frame: CGRect) -> Chart? {
+    private func generateGlucoseChartWithFrame(_ frame: CGRect, chartTableIncrement: Double) -> Chart? {
         
-        guard let xAxisModel = xAxisModel, let xAxisValues = xAxisValues else {
-            return nil
+        guard let xAxisModel = xAxisModel, let xAxisValues = xAxisValues else {return nil}
+        
+        // just to save typing
+        let unitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
+        // create yAxisValues, start with 38 mgdl, this is to make sure we show a bit lower than the real lowest value which is isually 40 mgdl, make the label invisible
+        let firstYAxisValue: ChartAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgdlToMmol(mgdl: unitIsMgDl), labelSettings: chartLabelSettings)
+        
+        // now create 40, still make the label invisible
+        let secondYAxisValue: ChartAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.minimumCGMGlucoseValueInMgdl).mgdlToMmol(mgdl: unitIsMgDl), labelSettings: chartLabelSettings)
+        secondYAxisValue.hidden = true
+        
+        // create now the yAxisValues and add the first two
+        var yAxisValues = [firstYAxisValue, secondYAxisValue]
+
+        // determine the maximum value in the glucosechartPoints, in mgdl
+        // start with maximum value defined in constants
+        var maximumValueInGlucoseChartPointsInMgdl = ConstantsGlucoseChart.defaultInitialMaxChartValueInMgdl
+        // now iterate through glucosechartpoints to determine the maximum
+        for glucoseChartPoint in glucoseChartPoints {
+            maximumValueInGlucoseChartPointsInMgdl = max(maximumValueInGlucoseChartPointsInMgdl, glucoseChartPoint.y.scalar.mmolToMgdl(mgdl: unitIsMgDl))
         }
         
-        let points = glucoseChartPoints + glucoseDisplayRangePoints
-        
-        guard points.count > 1 else {
-            return nil
+        // now the maximum in the chart needs to be calculated
+        var maximumToShowInChartInUserUnit = unitIsMgDl ? ConstantsGlucoseChart.defaultInitialMaxChartValueInMgdl:ConstantsGlucoseChart.defaultInitialMaxChartValueInMmol
+        // increase the maximum as long as the valule is lower than maximumValueInGlucoseChartPointsInMgdl
+        while maximumToShowInChartInUserUnit < maximumValueInGlucoseChartPointsInMgdl.mgdlToMmol(mgdl: unitIsMgDl) {
+            maximumToShowInChartInUserUnit += unitIsMgDl ? ConstantsGlucoseChart.defaultIncreaseMaxChartValueInMgdl:ConstantsGlucoseChart.defaultIncreaseMaxChartValueInMmol
         }
         
-        let yAxisValues = ChartAxisValuesStaticGenerator.generateYAxisValuesWithChartPoints(points, minSegmentCount: 2, maxSegmentCount: 4, multiple: glucoseUnit.chartableIncrement * 25, axisValueGenerator: {
-            
-            ChartAxisValueDouble($0, labelSettings: self.chartLabelSettings)
-            
+        // get increment to use on yAxis
+        let incrementToUse = unitIsMgDl ? ConstantsGlucoseChart.chartTableIncrementForMgDL : ConstantsGlucoseChart.chartTableIncrementForMmol
+        
+        // add the remaining chartpoints
+        while yAxisValues.last!.scalar < maximumToShowInChartInUserUnit {
+            yAxisValues.append(ChartAxisValueDouble(yAxisValues.last!.scalar + incrementToUse,  labelSettings: chartLabelSettings))
         }
-            , addPaddingSegmentIfEdge: false
-        )
+        
+        // the last label should not be visible
+        yAxisValues.last?.hidden = true
+        
+        yAxisValues.map {
+            debuglogging("scalar = " + $0.scalar.description)
+        }
         
         let yAxisModel = ChartAxisModel(axisValues: yAxisValues, lineColor: colors.axisLine, labelSpaceReservationMode: .fixed(labelsWidthY))
         

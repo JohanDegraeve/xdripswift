@@ -23,15 +23,6 @@ extension HKUnit {
         return HKUnit.moleUnit(with: .milli, molarMass: HKUnitMolarMassBloodGlucose).unitDivided(by: HKUnit.liter())
     }()
     
-    /// The smallest value expected to be visible on a chart
-    var chartableIncrement: Double {
-        if unitString == "mg/dL" {
-            return 1
-        } else {
-            return 1 / 25
-        }
-    }
-    
     // A formatting helper for determining the preferred decimal style for a given unit
     var preferredFractionDigits: Int {
         if self.unitString == "mg/dL" {

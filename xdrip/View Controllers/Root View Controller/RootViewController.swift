@@ -158,11 +158,6 @@ final class RootViewController: UIViewController {
         }()
         )
         
-        statusChartsManager.glucoseDisplayRange = (
-            min: HKQuantity(unit: .milligramsPerDeciliter, doubleValue: 100),
-            max: HKQuantity(unit: .milligramsPerDeciliter, doubleValue: 175)
-        )
-        
         return statusChartsManager
     }()
     
@@ -193,7 +188,7 @@ final class RootViewController: UIViewController {
             self.statusChartsManager.prerender()
             self.chartOutlet.chartGenerator = { [weak self] (frame) in
                 
-                return self?.statusChartsManager.glucoseChartWithFrame(frame)?.view
+                return self?.statusChartsManager.glucoseChartWithFrame(frame, chartTableIncrement: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ConstantsGlucoseChart.chartTableIncrementForMgDL : ConstantsGlucoseChart.chartTableIncrementForMmol)?.view
                 
             }
 
