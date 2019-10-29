@@ -841,12 +841,8 @@ final class RootViewController: UIViewController {
     /// updates the homescreen labels and chart
     @objc private func updateLabelsAndChart() {
         
-        debuglogging("in updateLabelsAndChart 1")
-        
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabels is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
-        
-        debuglogging("in updateLabelsAndChart 2")
         
         // last reading and lateButOneReading variable definition - optional
         var lastReading:BgReading?
@@ -871,15 +867,21 @@ final class RootViewController: UIViewController {
             if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
                 
                 let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
-                attributeString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
+                attributeString.addAttribute(.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
                 
                 valueLabelOutlet.attributedText = attributeString
                 
             } else {
+                
                 if !lastReading.hideSlope {
                     calculatedValueAsString = calculatedValueAsString + " " + lastReading.slopeArrow()
                 }
+                
+                // no strikethrough needed, but attributedText may still be set to strikethrough from previous period during which there was no recent reading. Always set it to nil here, this removes the strikethrough attribute
+                valueLabelOutlet.attributedText = nil
+                
                 valueLabelOutlet.text = calculatedValueAsString
+                
             }
             
             // set color, depending on value lower than low mark or higher than high mark
