@@ -3,7 +3,7 @@ import UIKit
 import os
 
 /// development as explained in cocoacasts.com https://cocoacasts.com/bring-your-own
-final class CoreDataManager {
+public final class CoreDataManager {
     
     // MARK: - Type Aliases
     

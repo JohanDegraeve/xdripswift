@@ -12,13 +12,21 @@ class BgReadingsAccessor {
     /// CoreDataManager to use
     private let coreDataManager:CoreDataManager
     
+    /// to be used when fetch request needs to run on a background thread
+    private let privateManagedObjectContext: NSManagedObjectContext
+    
     // MARK: - initializer
     
     init(coreDataManager:CoreDataManager) {
+        
         self.coreDataManager = coreDataManager
+        
+        privateManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateManagedObjectContext.persistentStoreCoordinator = coreDataManager.mainManagedObjectContext.persistentStoreCoordinator
+        
     }
     
-    // MARK: - functions
+    // MARK: - public functions
     
     /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil, with maximumDays old
     ///
@@ -97,6 +105,43 @@ class BgReadingsAccessor {
         }
     }
     
+    /// gets readings on a managedObjectContact that is created with concurrencyType: .privateQueueConcurrencyType
+    /// - parameters:
+    ///     - to : if specified, only return readings with timestamp  smaller than fromDate
+    ///     - from : if specified, only return readings with timestamp greater than fromDate
+    func getBgReadingOnPrivateManagedObjectContext(from: Date?, to: Date?) -> [BgReading] {
+        
+        let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: false)]
+        
+        // create predicate
+        if let from = from, to == nil {
+            let predicate = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: from.timeIntervalSince1970))
+            fetchRequest.predicate = predicate
+        } else if let to = to, from == nil {
+            let predicate = NSPredicate(format: "timeStamp < %@", NSDate(timeIntervalSince1970: to.timeIntervalSince1970))
+            fetchRequest.predicate = predicate
+        } else if let to = to, let from = from {
+            let predicate = NSPredicate(format: "timeStamp < %@ AND timeStamp > %@", NSDate(timeIntervalSince1970: to.timeIntervalSince1970), NSDate(timeIntervalSince1970: from.timeIntervalSince1970))
+            fetchRequest.predicate = predicate
+        }
+        
+        var bgReadings = [BgReading]()
+        
+        privateManagedObjectContext.performAndWait {
+            do {
+                // Execute Fetch Request
+                bgReadings = try fetchRequest.execute()
+            } catch {
+                let fetchError = error as NSError
+                trace("in getBgReadingOnPrivateManagedObjectContext, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+            }
+        }
+        
+        return bgReadings
+
+    }
+    
     // MARK: - private helper functions
     
     /// returnvalue can be empty array
@@ -132,4 +177,5 @@ class BgReadingsAccessor {
         
         return bgReadings
     }
+    
 }

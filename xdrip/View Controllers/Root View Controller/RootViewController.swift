@@ -39,14 +39,10 @@ final class RootViewController: UIViewController {
     
     @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
         
-        glucoseChartManager?.updateChart()
-        glucoseChartManager?.prerender()
-        chartOutlet.reloadChart()
-        /*
         let alert = UIAlertController(title: "Info", message: "Unfortuantely, presnooze functionality is not yet implemented", actionHandler: nil)
         
         self.present(alert, animated: true, completion: nil)
-            */
+
     }
     
     /// outlet for label that shows how many minutes ago and so on
@@ -146,7 +142,7 @@ final class RootViewController: UIViewController {
         super.viewWillAppear(animated)
         
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
-        updateLabels()
+        updateLabelsAndChart()
     }
     
     override func viewDidLoad() {
@@ -159,20 +155,21 @@ final class RootViewController: UIViewController {
             self.setupApplicationData()
             
             // update label texts, minutes ago, diff and value
-            self.updateLabels()
+            self.updateLabelsAndChart()
             
             // create transmitter based on UserDefaults
             self.initializeCGMTransmitter()
-            
-            self.glucoseChartManager?.prerender()
-            self.chartOutlet.chartGenerator = { [weak self] (frame) in
-                
-                return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
-                
-            }
+
+            // glucoseChartManager still needs the refernce to coreDataManager
+            self.glucoseChartManager?.coreDataManager = self.coreDataManager
+            // and now call again updateGlucoseChart, as readings can be fetched now from coreData
+            self.updateGlucoseChart()
 
         })
         
+        // initialize glucoseChartManager
+        glucoseChartManager = GlucoseChartManager()
+
         // Setup View
         setupView()
         
@@ -232,10 +229,15 @@ final class RootViewController: UIViewController {
         }
         
         // whenever app comes from-back to freground, updateLabels needs to be called
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabels, closure: {self.updateLabels()})
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabels, closure: {self.updateLabelsAndChart()})
         
         // setup AVAudioSession
         setupAVAudioSession()
+        
+        // initialize chartGenerator in chartOutlet
+        self.chartOutlet.chartGenerator = { [weak self] (frame) in
+            return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
+        }
         
     }
     
@@ -250,7 +252,7 @@ final class RootViewController: UIViewController {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, m5StackManager
     private func setupApplicationData() {
         
         // if coreDataManager is nil then there's no reason to continue
@@ -309,8 +311,6 @@ final class RootViewController: UIViewController {
         // setup m5StackManager
         m5StackManager = M5StackManager(coreDataManager: coreDataManager)
         
-        // setup glucoseChartManager
-        glucoseChartManager = GlucoseChartManager()
     }
     
     /// process new glucose data received from transmitter.
@@ -391,7 +391,7 @@ final class RootViewController: UIViewController {
                     // update notification
                     createBgReadingNotification()
                     // update all text in  first screen
-                    updateLabels()
+                    updateLabelsAndChart()
                 }
                 
                 nightScoutUploadManager?.upload()
@@ -483,6 +483,10 @@ final class RootViewController: UIViewController {
         preSnoozeButtonOutlet.setTitle(Texts_HomeView.snoozeButton, for: .normal)
         transmitterButtonOutlet.setTitle(Texts_HomeView.transmitter, for: .normal)
         
+        // at this moment, coreDataManager is not yet initialized, we're just calling here prerender and reloadChart to show the chart with x and y axis and gridlines, but without readings. The readings will be loaded once coreDataManager is setup, after which updateGlucoseChart() will be called, which will initiate loading of readings from coredata
+        self.glucoseChartManager?.prerender()
+        self.chartOutlet.reloadChart()
+
     }
     
     // MARK: - private helper functions
@@ -494,6 +498,15 @@ final class RootViewController: UIViewController {
         
         self.present(alert, animated: true, completion: nil)
         
+    }
+    
+    private func updateGlucoseChart() {
+        
+        glucoseChartManager?.updateGlucoseChartPoints {
+            self.glucoseChartManager?.prerender()
+            self.chartOutlet.reloadChart()
+        }
+
     }
     
     /// will call cgmTransmitter.initiatePairing() - also sets timer, if no successful pairing within a few seconds, then info will be given to user asking to wait another few minutes
@@ -532,7 +545,7 @@ final class RootViewController: UIViewController {
             // check if timer already exists, if so invalidate it
             invalidateUpdateLabelsTimer()
             // now recreate, schedule and return
-            return Timer.scheduledTimer(timeInterval: ConstantsHomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabels), userInfo: nil, repeats: true)
+            return Timer.scheduledTimer(timeInterval: ConstantsHomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabelsAndChart), userInfo: nil, repeats: true)
         }
         
         // call scheduleUpdateLabelsTimer function now - as the function setupUpdateLabelsTimer is called from viewdidload, it will be called immediately after app launch
@@ -627,7 +640,7 @@ final class RootViewController: UIViewController {
                                 }
                                 
                                 // update labels
-                                self.updateLabels()
+                                self.updateLabelsAndChart()
                             }
                         }
                     }
@@ -825,12 +838,15 @@ final class RootViewController: UIViewController {
         }
     }
     
-    /// updates the homescreen
-    @objc private func updateLabels() {
+    /// updates the homescreen labels and chart
+    @objc private func updateLabelsAndChart() {
+        
+        debuglogging("in updateLabelsAndChart 1")
         
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabels is called from viewDidload at app launch
-        
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
+        
+        debuglogging("in updateLabelsAndChart 2")
         
         // last reading and lateButOneReading variable definition - optional
         var lastReading:BgReading?
@@ -889,6 +905,10 @@ final class RootViewController: UIViewController {
             minutesLabelOutlet.text = ""
             diffLabelOutlet.text = ""
         }
+        
+        // update chart
+        updateGlucoseChart()
+        
     }
     
     /// when user clicks transmitter button, this will create and present the actionsheet, contents depend on type of transmitter and sensor status
@@ -1522,7 +1542,7 @@ extension RootViewController:NightScoutFollowerDelegate {
                 createBgReadingNotification()
                 
                 // update all text in  first screen
-                updateLabels()
+                updateLabelsAndChart()
                 
                 // check alerts
                 if let alertManager = alertManager {

@@ -67,6 +67,6 @@ enum ConstantsGlucoseChart {
     static let axisTitleLabelsToLabelsSpacing: CGFloat = 0
     
     /// diameter of the circle for blood glucose readings
-    static let glucoseCircleDiameter: CGFloat = 7
+    static let glucoseCircleDiameter: CGFloat = 5
 
 }
