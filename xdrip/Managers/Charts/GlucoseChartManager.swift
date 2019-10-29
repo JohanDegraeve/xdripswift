@@ -118,7 +118,7 @@ public final class GlucoseChartManager {
     init() {
         
         chartLabelSettings = ChartLabelSettings(
-            font: .systemFont(ofSize: 14),  // caption1, but hard-coded until axis can scale with type preference
+            font: .systemFont(ofSize: 14),
             fontColor: colors.axisLabel
         )
         
@@ -137,26 +137,6 @@ public final class GlucoseChartManager {
     }
     
     // MARK: - public functions
-    
-    /// updates chart ?
-    public func updateChart() {
-        
-        let now = Date()
-        //for testing only, 1 per 5 minutes
-        //let intervals = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-        let intervals = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-        let glucose = intervals.map { (Date(timeInterval: -(Double($0)*900), since: now), (10.0 + Double($0)*20.0).mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)) }
-        //let glucose = [(now, 110.0), (now.addingTimeInterval(-300), 120.0), (now.addingTimeInterval(-600), 130.0)]
-        
-        glucoseChartPoints = glucose.map {
-            ChartPoint(
-                x: ChartAxisValueDate(date: $0.0, formatter: chartPointDateFormatter),
-                y: ChartAxisValueDouble($0.1)
-            )
-        }
-        
-
-    }
     
     /// updates the glucoseChartPoints array and calls completionHandler when finished, also chart is set to nil
     /// - parameters:
