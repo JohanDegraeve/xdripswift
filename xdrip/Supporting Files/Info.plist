@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.7.1</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>2.7.1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -27,10 +27,10 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Connect to CGM Transmitter and M5Stack</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Connect to CGM Transmitter and M5Stack</string>
-    <key>NSBluetoothAlwaysUsageDescription</key>
-    <string>Connect to CGM Transmitter and M5Stack</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Store bloodglucose readings</string>
 	<key>NSHealthUpdateUsageDescription</key>
@@ -71,7 +71,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-    <key>UIUserInterfaceStyle</key>
-    <string>Light</string>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
 </dict>
 </plist>
