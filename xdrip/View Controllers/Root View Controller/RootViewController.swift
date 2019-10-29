@@ -326,7 +326,7 @@ final class RootViewController: UIViewController {
         
         if activeSensor == nil {
             
-            if let sensorTimeInMinutes = sensorTimeInMinutes {
+            if let sensorTimeInMinutes = sensorTimeInMinutes, UserDefaults.standard.transmitterType?.canDetectNewSensor() ?? false {
                 activeSensor = Sensor(startDate: Date(timeInterval: -Double(sensorTimeInMinutes * 60), since: Date()),nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                 if let activeSensor = activeSensor {
                     trace("created sensor with id : %{public}@ and startdate  %{public}@", log: self.log, type: .info, activeSensor.id, activeSensor.startDate.description)
