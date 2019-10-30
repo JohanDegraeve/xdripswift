@@ -213,6 +213,7 @@ public enum AlertKind:Int, CaseIterable {
 
         case .calibration:
                 // if alertEntry not enabled, return false
+                // if lastCalibration == nil then also no need to create an alert, could be an oop web enabled transmitter
                 if !currentAlertEntry.alertType.enabled || lastCalibration == nil {return (false, nil, nil, nil)}
                                 
                 // if lastCalibration not nil, check the timestamp and check if delay > value (in hours)
