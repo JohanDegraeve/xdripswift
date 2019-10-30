@@ -4,21 +4,23 @@ If you want to participate to the testing, send an email to xdrip@proximus.be
 
 Current Status
 - Supported transmitters :
-    - G5 and G6
+    - G5
     - MiaoMiao
     - G4 with xBridge
     - Blucon
     - Bubble
+    - Droplet 1
+- 6 hour graph with readings
 - Alerting
 - Upload to Nightscout
 - Follower mode, with NightScout
 - Store readings in HealthKit
 - Speak readings
 - upload to Dexcom share servers
+- Bluetooth Connection to M5Stack, the M5Stack software to be used can be found here : https://github.com/JohanDegraeve/M5_NightscoutMon
 
 Not yet supported
 - translations, English only
 - sidiary
-- graph on the homescreen
 
 For developers : please go to the Wiki : https://github.com/JohanDegraeve/xdripswift/wiki
