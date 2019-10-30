@@ -92,6 +92,6 @@ enum ConstantsLog {
     static let categoryM5StackManager = "categoryM5StackManager"
 
     /// StatusChartsManager logging
-    static let categoryStatusChartsManager = "categoryStatusChartsManager"
+    static let categoryGlucoseChartManager = "categoryGlucoseChartManager"
 }
 

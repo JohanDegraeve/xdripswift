@@ -33,7 +33,7 @@ public final class GlucoseChartManager {
     }
     
     /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryStatusChartsManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
 
     private let colors = ChartColorPalette(axisLine: ConstantsGlucoseChart.axisLineColor, axisLabel: ConstantsGlucoseChart.axisLabelColor, grid: ConstantsGlucoseChart.gridColor, glucoseTint: ConstantsGlucoseChart.glucoseTintColor)
 
