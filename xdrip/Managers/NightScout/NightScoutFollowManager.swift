@@ -94,7 +94,8 @@ class NightScoutFollowManager:NSObject {
         // for dev : creation of BgReading is done in seperate static function. This allows to do the BgReading creation in other place, as is done also for readings received from a transmitter.
         
         // create new bgReading
-        let bgReading = BgReading(timeStamp: followGlucoseData.timeStamp, sensor: nil, calibration: nil, rawData: followGlucoseData.unfiltered, filteredData: followGlucoseData.filtered, deviceName: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        // using sgv as value for filteredData and rawData because in some case these values are not available in NightScout
+        let bgReading = BgReading(timeStamp: followGlucoseData.timeStamp, sensor: nil, calibration: nil, rawData: followGlucoseData.sgv, filteredData: followGlucoseData.sgv, deviceName: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 
         // set calculatedValue
         bgReading.calculatedValue = followGlucoseData.sgv

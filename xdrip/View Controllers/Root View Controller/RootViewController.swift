@@ -849,7 +849,7 @@ final class RootViewController: UIViewController {
         var lastButOneReading:BgReading?
         
         // assign latestReading if it exists
-        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: 1, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
+        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         if latestReadings.count > 0 {
             lastReading = latestReadings[0]
         }

@@ -111,7 +111,7 @@ public class AlertManager:NSObject {
         uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: alertNotificationIdentifers)
         
         // get last bgreading, ignore sensor, because it must also work for follower mode
-        let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
+        let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         // get latest calibration
         var lastCalibration:Calibration?

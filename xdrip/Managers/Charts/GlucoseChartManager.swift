@@ -144,7 +144,7 @@ public final class GlucoseChartManager {
     public func updateGlucoseChartPoints(completionHandler: @escaping () -> ()) {
         
         guard let bgReadingsAccessor = bgReadingsAccessor else {
-            trace("in updateGlucoseChartPoints, bgReadingsAccessor, probably coreDataManager is not assigned, looks like a coding error", log: self.log, type: .error)
+            trace("in updateGlucoseChartPoints, bgReadingsAccessor, probably coreDataManager is not yet assigned", log: self.log, type: .info)
             return
         }
         
