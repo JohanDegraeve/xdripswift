@@ -61,6 +61,7 @@
 		F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */; };
 		F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */; };
 		F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */; };
+		F889CB60236C3DCB00A81068 /* CGMBlueReaderTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F889CB5F236C3DCB00A81068 /* CGMBlueReaderTransmitter.swift */; };
 		F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */; };
 		F897AAFB2201018800CDDD10 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAFA2201018800CDDD10 /* String.swift */; };
 		F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F898EDE9233F53BF00BFB79B /* UIButton.swift */; };
@@ -305,6 +306,7 @@
 		F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Calibration+CoreDataProperties.swift"; path = "xdrip/Core Data/extensions/Calibration+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		F889CB5F236C3DCB00A81068 /* CGMBlueReaderTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMBlueReaderTransmitter.swift; sourceTree = "<group>"; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
 		F897AAFA2201018800CDDD10 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		F898EDE9233F53BF00BFB79B /* UIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIButton.swift; sourceTree = "<group>"; };
@@ -911,6 +913,14 @@
 			path = GenericBluetoothTransmitter;
 			sourceTree = "<group>";
 		};
+		F889CB5E236C3DA600A81068 /* BlueReader */ = {
+			isa = PBXGroup;
+			children = (
+				F889CB5F236C3DCB00A81068 /* CGMBlueReaderTransmitter.swift */,
+			);
+			path = BlueReader;
+			sourceTree = "<group>";
+		};
 		F8A389B82315DB080010F405 /* M5Stack */ = {
 			isa = PBXGroup;
 			children = (
@@ -1036,6 +1046,7 @@
 		F8A54AEC22D9156600934E7A /* Libre */ = {
 			isa = PBXGroup;
 			children = (
+				F889CB5E236C3DA600A81068 /* BlueReader */,
 				F8C5EBE822F49AB300563B5F /* Droplet */,
 				EE9947E622EEDD0700DCB876 /* Bubble */,
 				F8A54AFB22D9179100934E7A /* Utilities */,
@@ -1716,6 +1727,7 @@
 				F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */,
 				F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
+				F889CB60236C3DCB00A81068 /* CGMBlueReaderTransmitter.swift in Sources */,
 				F8A389CA232118E80010F405 /* M5StackBluetoothDelegate.swift in Sources */,
 				F8B3A847227F090E004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,
 				F8B3A79622635A25004BA588 /* AlertEntry+CoreDataClass.swift in Sources */,

@@ -697,6 +697,9 @@ final class RootViewController: UIViewController {
             case .Droplet1:
                 cgmTransmitter = CGMDroplet1Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self)
                 
+            case .blueReader:
+                cgmTransmitter = CGMBlueReaderTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self)
+                
             }
             
             // assign calibrator
@@ -704,7 +707,7 @@ final class RootViewController: UIViewController {
                 
             case .dexcomG4, .dexcomG5, .dexcomG6:
                 calibrator = DexcomCalibrator()
-            case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1:
+            case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader:
                 // for all transmitters used with Libre1, calibrator is either NoCalibrator or Libre1Calibrator, depending if oopWeb is supported by the transmitter and on value of webOOPEnabled in settings
                 calibrator = RootViewController.getCalibrator(transmitterType: selectedTransmitterType, webOOPEnabled: UserDefaults.standard.webOOPEnabled)
             }

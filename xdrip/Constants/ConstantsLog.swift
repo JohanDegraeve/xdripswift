@@ -82,6 +82,9 @@ enum ConstantsLog {
     /// droplet 1
     static let categoryCGMDroplet1 = "categoryCGMDroplet1"
     
+    /// bluereader
+    static let categoryCGMBlueReader = "categoryCGMBlueReader"
+    
     /// LibreOOPClient
     static let categoryLibreOOPClient = "categoryLibreOOPClient"
     

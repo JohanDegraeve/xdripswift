@@ -82,6 +82,9 @@ enum CGMTransmitterType:String, CaseIterable {
     /// Droplet
     case Droplet1 = "Droplet-1"
     
+    /// BlueReader
+    case blueReader = "BlueReader"
+    
     /// does the transmitter need a transmitter id ?
     ///
     /// can be used in UI stuff, if reset not possible then there's no need to show that option in the settings UI
@@ -104,6 +107,9 @@ enum CGMTransmitterType:String, CaseIterable {
             return true
             
         case .Droplet1:
+            return false
+            
+        case .blueReader:
             return false
             
         }
@@ -136,6 +142,9 @@ enum CGMTransmitterType:String, CaseIterable {
         case .Droplet1:
             return false
             
+        case .blueReader:
+            return false
+            
         }
     }
     
@@ -166,6 +175,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .Droplet1:
             return false
             
+        case .blueReader:
+            return false
         }
     }
     
@@ -202,6 +213,9 @@ enum CGMTransmitterType:String, CaseIterable {
             // todo: validate transmitter id for blucon
             return nil
             
+        case .blueReader:
+            return nil
+            
         }
     }
     
@@ -229,6 +243,9 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .Droplet1:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDroplet
+            
+        case .blueReader:
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelBlueReader
             
         }
     }
@@ -258,6 +275,9 @@ enum CGMTransmitterType:String, CaseIterable {
         case .Droplet1:
             return false
             
+        case .blueReader:
+            return false
+            
         }
     }
     
@@ -282,6 +302,10 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .Blucon:
             return "%"
+            
+        case .blueReader:
+            return "%"
+            
         }
     }
     
@@ -306,6 +330,10 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .Blucon:
             return false
+            
+        case .blueReader:
+            return false
+            
         }
     }
 }
