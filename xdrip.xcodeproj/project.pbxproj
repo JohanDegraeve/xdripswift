@@ -344,6 +344,22 @@
 		F889CB8A236D851500A81068 /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/DexcomShareTestResults.strings; sourceTree = "<group>"; };
 		F889CB8B236D851600A81068 /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/DexcomShareTestResults.strings"; sourceTree = "<group>"; };
 		F889CB8C236D851700A81068 /* es-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-ES"; path = "es-ES.lproj/DexcomShareTestResults.strings"; sourceTree = "<group>"; };
+		F889CB8D236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		F889CB8E236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
+		F889CB8F236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/DexcomShareTestResults.strings; sourceTree = "<group>"; };
+		F889CB90236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Alerts.strings; sourceTree = "<group>"; };
+		F889CB91236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
+		F889CB92236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/CalibrationRequest.strings; sourceTree = "<group>"; };
+		F889CB93236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Common.strings; sourceTree = "<group>"; };
+		F889CB94236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F889CB95236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/ErrorMessages.strings; sourceTree = "<group>"; };
+		F889CB96236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/HomeView.strings; sourceTree = "<group>"; };
+		F889CB97236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		F889CB98236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/M5StacksView.strings; sourceTree = "<group>"; };
+		F889CB99236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/M5StackView.strings; sourceTree = "<group>"; };
+		F889CB9A236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/NightScoutTestResult.strings; sourceTree = "<group>"; };
+		F889CB9B236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SettingsViews.strings; sourceTree = "<group>"; };
+		F889CB9C236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
 		F897AAFA2201018800CDDD10 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		F898EDE9233F53BF00BFB79B /* UIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIButton.swift; sourceTree = "<group>"; };
@@ -1541,6 +1557,7 @@
 				fr,
 				zh,
 				pt,
+				de,
 			);
 			mainGroup = F8AC425121ADEBD60078C348;
 			productRefGroup = F8AC425B21ADEBD60078C348 /* Products */;
@@ -1881,6 +1898,7 @@
 				F889CB6C236D849D00A81068 /* sl */,
 				F889CB6D236D849E00A81068 /* es-MX */,
 				F889CB6E236D849F00A81068 /* es-ES */,
+				F889CB98236D89C800A81068 /* de */,
 			);
 			name = M5StacksView.strings;
 			sourceTree = "<group>";
@@ -1900,6 +1918,7 @@
 				F889CB7A236D84B900A81068 /* sl */,
 				F889CB7B236D84BA00A81068 /* es-MX */,
 				F889CB7C236D84BC00A81068 /* es-ES */,
+				F889CB99236D89C800A81068 /* de */,
 			);
 			name = M5StackView.strings;
 			sourceTree = "<group>";
@@ -1919,6 +1938,7 @@
 				F889CB8A236D851500A81068 /* sl */,
 				F889CB8B236D851600A81068 /* es-MX */,
 				F889CB8C236D851700A81068 /* es-ES */,
+				F889CB8F236D89C800A81068 /* de */,
 			);
 			name = DexcomShareTestResults.strings;
 			sourceTree = "<group>";
@@ -1937,6 +1957,7 @@
 				F8B48AF022B37C5B009BCC01 /* it */,
 				F8B48AFC22B37C67009BCC01 /* fr */,
 				F8B48B0822B37C83009BCC01 /* zh */,
+				F889CB8E236D89C800A81068 /* de */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -1954,6 +1975,7 @@
 				F8B48AEF22B37C5A009BCC01 /* it */,
 				F8B48AFB22B37C67009BCC01 /* fr */,
 				F8B48B0722B37C83009BCC01 /* zh */,
+				F889CB8D236D89C800A81068 /* de */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -1971,6 +1993,7 @@
 				F8B48AF922B37C5C009BCC01 /* it */,
 				F8B48B0522B37C67009BCC01 /* fr */,
 				F8B48B1122B37C84009BCC01 /* zh */,
+				F889CB9A236D89C800A81068 /* de */,
 			);
 			name = NightScoutTestResult.strings;
 			sourceTree = "<group>";
@@ -1988,6 +2011,7 @@
 				F8B48AF422B37C5C009BCC01 /* it */,
 				F8B48B0022B37C67009BCC01 /* fr */,
 				F8B48B0C22B37C83009BCC01 /* zh */,
+				F889CB90236D89C800A81068 /* de */,
 			);
 			name = Alerts.strings;
 			sourceTree = "<group>";
@@ -2005,6 +2029,7 @@
 				F8B48AF522B37C5C009BCC01 /* it */,
 				F8B48B0122B37C67009BCC01 /* fr */,
 				F8B48B0D22B37C84009BCC01 /* zh */,
+				F889CB91236D89C800A81068 /* de */,
 			);
 			name = AlertTypesSettingsView.strings;
 			sourceTree = "<group>";
@@ -2024,6 +2049,7 @@
 				F8B48AFF22B37C67009BCC01 /* fr */,
 				F8B48B0B22B37C83009BCC01 /* zh */,
 				F81D6D4522B67F55005EFAE2 /* pt */,
+				F889CB9C236D89C800A81068 /* de */,
 			);
 			name = SpeakReading.strings;
 			sourceTree = "<group>";
@@ -2041,6 +2067,7 @@
 				F8B48AF222B37C5C009BCC01 /* it */,
 				F8B48AFE22B37C67009BCC01 /* fr */,
 				F8B48B0A22B37C83009BCC01 /* zh */,
+				F889CB96236D89C800A81068 /* de */,
 			);
 			name = HomeView.strings;
 			sourceTree = "<group>";
@@ -2058,6 +2085,7 @@
 				F8B48AF122B37C5B009BCC01 /* it */,
 				F8B48AFD22B37C67009BCC01 /* fr */,
 				F8B48B0922B37C83009BCC01 /* zh */,
+				F889CB92236D89C800A81068 /* de */,
 			);
 			name = CalibrationRequest.strings;
 			sourceTree = "<group>";
@@ -2075,6 +2103,7 @@
 				F8B48AF822B37C5C009BCC01 /* it */,
 				F8B48B0422B37C67009BCC01 /* fr */,
 				F8B48B1022B37C84009BCC01 /* zh */,
+				F889CB97236D89C800A81068 /* de */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2094,6 +2123,7 @@
 				F8B48B0E22B37C84009BCC01 /* zh */,
 				F8C5EBED22F5A52400563B5F /* pt-BR */,
 				F8C5EBEE22F5A52800563B5F /* pt */,
+				F889CB93236D89C800A81068 /* de */,
 			);
 			name = Common.strings;
 			sourceTree = "<group>";
@@ -2111,6 +2141,7 @@
 				F8B48AF722B37C5C009BCC01 /* it */,
 				F8B48B0322B37C67009BCC01 /* fr */,
 				F8B48B0F22B37C84009BCC01 /* zh */,
+				F889CB95236D89C800A81068 /* de */,
 			);
 			name = ErrorMessages.strings;
 			sourceTree = "<group>";
@@ -2130,6 +2161,7 @@
 				F8B48B1222B37C84009BCC01 /* zh */,
 				F846CDD523046BAC00DCF016 /* pt-BR */,
 				F846CDD623046BAE00DCF016 /* pt */,
+				F889CB9B236D89C800A81068 /* de */,
 			);
 			name = SettingsViews.strings;
 			sourceTree = "<group>";
@@ -2149,6 +2181,7 @@
 				F8EEDD602300139700D2D610 /* fr */,
 				F8EEDD612300139800D2D610 /* zh */,
 				F8EEDD622300139A00D2D610 /* pt */,
+				F889CB94236D89C800A81068 /* de */,
 			);
 			name = DexcomShareTestResult.strings;
 			sourceTree = "<group>";
