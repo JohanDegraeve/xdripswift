@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14492.1" systemVersion="18G87" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="AlertEntry" representedClassName=".AlertEntry" syncable="YES">
+        <attribute name="alertkind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="start" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="value" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="alertType" maxCount="1" deletionRule="No Action" destinationEntity="AlertType" inverseName="alertEntries" inverseEntity="AlertType" syncable="YES"/>
+    </entity>
+    <entity name="AlertType" representedClassName=".AlertType" syncable="YES">
+        <attribute name="enabled" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="name" attributeType="String" syncable="YES"/>
+        <attribute name="overridemute" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="snooze" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="snoozeperiod" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="soundname" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="vibrate" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="alertEntries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AlertEntry" inverseName="alertType" inverseEntity="AlertEntry" syncable="YES"/>
+    </entity>
+    <entity name="BgReading" representedClassName=".BgReading" syncable="YES">
+        <attribute name="a" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="ageAdjustedRawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="b" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="c" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="calculatedValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="calculatedValueSlope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="calibrationFlag" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="deviceName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="filteredCalculatedValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="filteredData" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="hideSlope" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="id" attributeType="String" syncable="YES"/>
+        <attribute name="ra" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rawData" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rb" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rc" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="timeStamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="calibration" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Calibration" inverseName="bgreadings" inverseEntity="Calibration" syncable="YES"/>
+        <relationship name="sensor" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" inverseName="readings" inverseEntity="Sensor" syncable="YES"/>
+    </entity>
+    <entity name="Calibration" representedClassName=".Calibration" syncable="YES">
+        <attribute name="adjustedRawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="bg" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="deviceName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="distanceFromEstimate" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="estimateRawAtTimeOfCalibration" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="id" attributeType="String" syncable="YES"/>
+        <attribute name="intercept" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="possibleBad" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rawTimeStamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="rawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="sensorConfidence" attributeType="Double" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="slope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="slopeConfidence" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="timeStamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="bgreadings" toMany="YES" deletionRule="Deny" destinationEntity="BgReading" inverseName="calibration" inverseEntity="BgReading" syncable="YES"/>
+        <relationship name="sensor" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" inverseName="calibrations" inverseEntity="Sensor" syncable="YES"/>
+    </entity>
+    <entity name="M5Stack" representedClassName=".M5Stack" syncable="YES">
+        <attribute name="address" attributeType="String" syncable="YES"/>
+        <attribute name="blepassword" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" attributeType="String" syncable="YES"/>
+        <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="textcolor" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="m5StackName" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="M5StackName" syncable="YES"/>
+    </entity>
+    <entity name="M5StackName" representedClassName=".M5StackName" syncable="YES">
+        <attribute name="address" attributeType="String" syncable="YES"/>
+        <attribute name="userDefinedName" attributeType="String" minValueString="1" syncable="YES"/>
+    </entity>
+    <entity name="Sensor" representedClassName=".Sensor" syncable="YES">
+        <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="id" attributeType="String" syncable="YES"/>
+        <attribute name="startDate" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="calibrations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Calibration" inverseName="sensor" inverseEntity="Calibration" syncable="YES"/>
+        <relationship name="readings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BgReading" inverseName="sensor" inverseEntity="BgReading" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
+        <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
+        <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
+        <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
+        <element name="M5Stack" positionX="-657" positionY="180" width="128" height="135"/>
+        <element name="M5StackName" positionX="-657" positionY="180" width="128" height="75"/>
+        <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="120"/>
+    </elements>
+</model>
