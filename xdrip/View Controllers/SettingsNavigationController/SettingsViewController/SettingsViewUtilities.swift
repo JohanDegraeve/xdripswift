@@ -64,7 +64,10 @@ class SettingsViewUtilities {
     }
     
     /// for cell at cellIndex and SectionIndex, runs the selectedRowAction. tableView is needed because a reload must be done in some cases
-    static func runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction, forRowWithIndex rowIndex: Int, forSectionWithIndex sectionIndex: Int, withViewModel viewModel: SettingsViewModelProtocol, tableView: UITableView, forUIViewController uIViewController: UIViewController) {
+    /// - parameters:
+    ///     - withViewModel : need to know if refresh of the table is needed, can be nil in case a viewmodel is not used (eg M5StackViewController)
+    ///     - tableView : need to know if refresh of the table is needed, can be nil in case a viewmodel is not used (eg M5StackViewController)
+    static func runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction, forRowWithIndex rowIndex: Int, forSectionWithIndex sectionIndex: Int, withViewModel viewModel: SettingsViewModelProtocol?, tableView: UITableView?, forUIViewController uIViewController: UIViewController) {
         
             
             switch selectedRowAction {
@@ -138,12 +141,17 @@ class SettingsViewUtilities {
     ///
     /// Changing one setting value, may need hiding or masking or other setting rows. Goal is to minimize the refresh to the section if possible and to avoid refreshing the whole screen as much as possible.
     /// This function will verify if complete reload is needed or not
-    private static func checkIfReloadNeededAndReloadIfNeeded(tableView: UITableView, viewModel:SettingsViewModelProtocol, rowIndex:Int, sectionIndex:Int ) {
+    /// - parameters:
+    ///     - tableView : if nil then no reload will be done, eg M5StackViewController uses these utilites but will not have a viewModel
+    ///     - viewModel : if nil then no reload will be done, eg M5StackViewController uses these utilites but will not have a viewModel
+    private static func checkIfReloadNeededAndReloadIfNeeded(tableView: UITableView?, viewModel:SettingsViewModelProtocol?, rowIndex:Int, sectionIndex:Int ) {
         
-        if viewModel.completeSettingsViewRefreshNeeded(index: rowIndex) {
-            tableView.reloadSections(IndexSet(integersIn: 0..<tableView.numberOfSections), with: .none)
-        } else {
-            tableView.reloadSections(IndexSet(integer: sectionIndex), with: .none)
+        if let viewModel = viewModel, let tableView = tableView {
+            if viewModel.completeSettingsViewRefreshNeeded(index: rowIndex) {
+                tableView.reloadSections(IndexSet(integersIn: 0..<tableView.numberOfSections), with: .none)
+            } else {
+                tableView.reloadSections(IndexSet(integer: sectionIndex), with: .none)
+            }
         }
     }
     

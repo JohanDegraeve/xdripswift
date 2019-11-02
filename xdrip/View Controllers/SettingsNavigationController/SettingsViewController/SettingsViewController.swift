@@ -188,7 +188,7 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
             
             let selectedRowAction = viewModel.onRowSelect(index: indexPath.row)
             
-            SettingsViewUtilities.runSelectedRowAction(selectedRowAction: selectedRowAction, forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withViewModel: section.viewModel(), tableView: tableView, forUIViewController: self)
+            SettingsViewUtilities.runSelectedRowAction(selectedRowAction: selectedRowAction, forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withViewModel: viewModel, tableView: tableView, forUIViewController: self)
             
         }
         

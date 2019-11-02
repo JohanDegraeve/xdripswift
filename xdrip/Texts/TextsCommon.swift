@@ -105,6 +105,10 @@ class Texts_Common {
         return NSLocalizedString("yellow", tableName: filename, bundle: Bundle.main, value: "yellow", comment: "yellow")
     }()
     
+    static let black = {
+        return NSLocalizedString("black", tableName: filename, bundle: Bundle.main, value: "black", comment: "black")
+    }()
+    
     static let name = {
         return NSLocalizedString("Name", tableName: filename, bundle: Bundle.main, value: "Name", comment: "name")
     }()

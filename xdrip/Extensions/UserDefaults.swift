@@ -87,6 +87,9 @@ extension UserDefaults {
         /// M5Stack text color
         case m5StackTextColor = "m5StackTextColor"
         
+        /// M5Stack background color
+        case m5StackBackGroundColor = "m5StackBackGroundColor"
+        
         /// name of wifi 1 to be configured in M5Stack
         case m5StackWiFiName1 = "m5StackWiFiName1"
         
@@ -527,12 +530,12 @@ extension UserDefaults {
         }
     }
     
-    /// M5 Stack text color
-    var m5StackTextColor: M5StackTextColor? {
+    /// M5 Stack text color, this is the default text color for new m5Stacks. Per M5Stack it is possible to change the textcolor
+    var m5StackTextColor: M5StackColor? {
         get {
             let textColorAsInt = integer(forKey: Key.m5StackTextColor.rawValue)
             if textColorAsInt > 0 {
-                return M5StackTextColor(forUInt16: UInt16(textColorAsInt))
+                return M5StackColor(forUInt16: UInt16(textColorAsInt))
             } else {
                 return nil
             }

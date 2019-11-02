@@ -132,7 +132,13 @@ class M5StackManager: NSObject {
         if !m5StackBluetoothTransmitter.writeBloodGlucoseUnit(isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {success = false}
 
         // send textColor
-        if !m5StackBluetoothTransmitter.writeTextColor(textColor: M5StackTextColor(forUInt16: UInt16(m5Stack.textcolor)) ?? UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor) {success = false}
+        if !m5StackBluetoothTransmitter.writeTextColor(textColor: M5StackColor(forUInt16: UInt16(m5Stack.textcolor)) ?? UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor) {success = false}
+        
+        // send backGroundColor
+        if !m5StackBluetoothTransmitter.writeBackGroundColor(backGroundColor: M5StackColor(forUInt16: UInt16(m5Stack.backGroundColor)) ?? ConstantsM5Stack.defaultBackGroundColor ) {success = false}
+        
+        // send rotation
+        if !m5StackBluetoothTransmitter.writeRotation(rotation: Int(m5Stack.rotation)) {success = false}
         
         // send WiFiSSID's
         if let wifiName = UserDefaults.standard.m5StackWiFiName1 {
@@ -181,7 +187,7 @@ class M5StackManager: NSObject {
                 // first check keyValueObserverTimeKeeper
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.m5StackWiFiName1, UserDefaults.Key.m5StackWiFiName2, UserDefaults.Key.m5StackWiFiName3, UserDefaults.Key.m5StackWiFiPassword1, UserDefaults.Key.m5StackWiFiPassword2, UserDefaults.Key.m5StackWiFiPassword3, UserDefaults.Key.nightScoutAPIKey, UserDefaults.Key.nightScoutUrl  :
+                case UserDefaults.Key.m5StackWiFiName1, UserDefaults.Key.m5StackWiFiName2, UserDefaults.Key.m5StackWiFiName3, UserDefaults.Key.m5StackWiFiPassword1, UserDefaults.Key.m5StackWiFiPassword2, UserDefaults.Key.m5StackWiFiPassword3, UserDefaults.Key.nightScoutAPIKey, UserDefaults.Key.nightScoutUrl, UserDefaults.Key.bloodGlucoseUnitIsMgDl  :
                     
                     // transmittertype change triggered by user, should not be done within 200 ms
                     if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -245,6 +251,9 @@ class M5StackManager: NSObject {
                             m5StackPair.key.parameterUpdateNeeded = true
                         }
 
+                    } else {
+                        // seems to be an M5Stack which is currently disconnected - need to send parameterUpdateNeeded = true, so that all parameters will be sent as soon as reconnect occurs
+                        m5StackPair.key.parameterUpdateNeeded = true
                     }
                 }
                 
@@ -448,7 +457,10 @@ extension M5StackManager: M5StackBluetoothDelegate {
             bluetoothTransmitter.stopScanning()
             
             // create a new M5Stack with new peripheral's address and name
-            let newM5Stack = M5Stack(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+            let newM5Stack = M5Stack(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+            
+            // assign password stored in UserDefaults (might be nil)
+            newM5Stack.blepassword = UserDefaults.standard.m5StackBlePassword
             
             // add to list of m5StacksBlueToothTransmitters
             m5StacksBlueToothTransmitters[newM5Stack] = bluetoothTransmitter

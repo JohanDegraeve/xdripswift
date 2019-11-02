@@ -231,6 +231,14 @@ class Texts_SettingsView {
         return NSLocalizedString("m5stack_settingsviews_textColor", tableName: filename, bundle: Bundle.main, value: "Text Color", comment: "name of setting for text color")
     }()
     
+    static let m5StackbackGroundColor: String = {
+        return NSLocalizedString("m5stack_settingsviews_backGroundColor", tableName: filename, bundle: Bundle.main, value: "Background Color", comment: "name of setting for back ground color")
+    }()
+
+    static let m5StackRotation: String = {
+        return NSLocalizedString("m5stack_settingsviews_rotation", tableName: filename, bundle: Bundle.main, value: "Rotation", comment: "name of setting for rotation")
+    }()
+    
     static let m5StackSectionTitleBluetooth: String = {
         return NSLocalizedString("m5stack_settingsviews_sectiontitlebluetooth", tableName: filename, bundle: Bundle.main, value: "Bluetooth", comment: "bluetooth settings, section title")
     }()

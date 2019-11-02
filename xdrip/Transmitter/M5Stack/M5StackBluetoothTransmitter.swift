@@ -42,6 +42,9 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     /// is the transmitter ready to receive data like parameter updates or reading values
     private (set) var isReadyToReceiveData: Bool = false
     
+    /// possible rotation values, , the value is how it will be sent to the M5Stack but not  how it's stored in the M5Stack object - In the M5Stack object we store an Int value which is used as index in rotationValues and rotationStrings
+    private let rotationValues: [UInt16] = [ 1, 2, 3, 0]
+
     // MARK: - initializer
 
     /// - parameters:
@@ -57,11 +60,12 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: m5Stack.address, name: m5Stack.name)
         }
         
+        // as mentioned in the parameter documentation, the blePassword in the M5Stack parameter gets priority over the password in the parameter blePassword
         if let m5Stack = m5Stack, let blePassword = m5Stack.blepassword {
             // m5Stack object is not nil and does have a blePassword, use that value
             self.blePassword = blePassword
         } else {
-            // use blePassword that was in the parameter list, possibily nil value
+            // use blePassword that was in the parameter list, possibly nil value
             self.blePassword = blePassword
         }
 
@@ -140,7 +144,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     /// writes textColor to the M5Stack
     /// - returns:
     ///     true if successfully transmitted to M5Stack, doesn't mean M5Stack did receive it, but chance is high
-    func writeTextColor(textColor: M5StackTextColor) -> Bool {
+    func writeTextColor(textColor: M5StackColor) -> Bool {
 
         guard let textColorAsData = textColor.data else {
             trace("in writeTextColor, failed to create textColor as data ", log: log, type: .error)// looks like a software error
@@ -149,6 +153,33 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
 
         trace("in writeTextColor, attempting to send", log: log, type: .info)
         return writeDataToPeripheral(data: textColorAsData, opCode: .writeTextColorTx)
+        
+    }
+    
+    /// writes backgroundColor to the M5Stack
+    /// - returns:
+    ///     true if successfully transmitted to M5Stack, doesn't mean M5Stack did receive it, but chance is high
+    func writeBackGroundColor(backGroundColor: M5StackColor) -> Bool {
+        
+        guard let colorAsData = backGroundColor.data else {
+            trace("in writeBackGroundColor, failed to create backGroundColor as data ", log: log, type: .error)// looks like a software error
+            return false
+        }
+        
+        trace("in writeBackGroundColor, attempting to send", log: log, type: .info)
+        return writeDataToPeripheral(data: colorAsData, opCode: .writeBackGroundColorTx)
+        
+    }
+    
+    /// writes backgroundColor to the M5Stack
+    /// - returns:
+    ///     true if successfully transmitted to M5Stack, doesn't mean M5Stack did receive it, but chance is high
+    /// - parameters:
+    ///     rotation value as expected by M5Stack, 0 is horizontal, 1
+    func writeRotation(rotation: Int) -> Bool {
+        
+        trace("in writeRotation, attempting to send", log: log, type: .info)
+        return writeDataToPeripheral(data: rotationValues[rotation].data, opCode: .writeRotationTx)
         
     }
     

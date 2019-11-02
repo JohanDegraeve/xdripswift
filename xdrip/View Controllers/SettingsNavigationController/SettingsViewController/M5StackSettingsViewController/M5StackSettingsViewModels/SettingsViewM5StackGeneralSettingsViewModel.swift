@@ -64,8 +64,8 @@ struct SettingsViewM5StackGeneralSettingsViewModel: SettingsViewModelProtocol {
         switch setting {
         case .textColor:
             var texts = [String]()
-            var colors = [M5StackTextColor]()
-            for textColor in M5StackTextColor.allCases {
+            var colors = [M5StackColor]()
+            for textColor in M5StackColor.allCases {
                 texts.append(textColor.description)
                 colors.append(textColor)
             }

@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:xdrip/Core Data/classes/M5Stack+CoreDataProperties.swift">
+   </FileRef>
+   <FileRef
       location = "group:xdrip.xcodeproj">
    </FileRef>
    <FileRef

@@ -1,9 +1,8 @@
 //
 //  M5Stack+CoreDataProperties.swift
-//  xdrip
+//  
 //
-//  Created by Johan Degraeve on 06/10/2019.
-//  Copyright © 2019 Johan Degraeve. All rights reserved.
+//  Created by Johan Degraeve on 02/11/2019.
 //
 //
 
@@ -18,8 +17,10 @@ extension M5Stack {
     }
 
     @NSManaged public var address: String
+    @NSManaged public var backGroundColor: Int32
     @NSManaged public var blepassword: String?
     @NSManaged public var name: String
+    @NSManaged public var rotation: Int32
     @NSManaged public var shouldconnect: Bool
     @NSManaged public var textcolor: Int32
     @NSManaged public var m5StackName: M5StackName?

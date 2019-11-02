@@ -11,14 +11,20 @@ enum ConstantsM5Stack {
     static let maximumMBLEPacketsize = 20
     
     /// default text color
-    static let defaultTextColor = M5StackTextColor.white
+    static let defaultTextColor = M5StackColor.white
+    
+    /// default background color
+    static let defaultBackGroundColor = M5StackColor.black
+    
+    /// default rotation to use, 0 = flat. The value is stored in the coreData as M5Stack entity attribute, it is also used as index in an array of Strings, shown to the user in the M5StackViewController, and also as index in array of UInt16 values, which is sent to the M5Stack
+    static let defaultRotation:UInt16 = 0
     
     /// github url with repository for M5Stack that supports bluetooth
     static let githubURLM5Stack = "https://github.com/JohanDegraeve/M5_NightscoutMon"
     
 }
 
-enum M5StackTextColor:UInt16, CaseIterable {
+enum M5StackColor:UInt16, CaseIterable {
     
     // here what I found as hex values for RGB565 colors
     //  TFT_BLACK       0x0000
@@ -48,6 +54,8 @@ enum M5StackTextColor:UInt16, CaseIterable {
     
     case yellow = 0xFFE0
     
+    case black = 0x0000
+    
     var description:String {
         switch self {
         case .red:
@@ -58,6 +66,8 @@ enum M5StackTextColor:UInt16, CaseIterable {
             return Texts_Common.white
         case .yellow:
             return Texts_Common.yellow
+        case .black:
+            return Texts_Common.black
         }
     }
     
@@ -72,6 +82,8 @@ enum M5StackTextColor:UInt16, CaseIterable {
             return Data(hexadecimalString: "FFFF")
         case .yellow:
             return Data(hexadecimalString: "FFE0")
+        case .black:
+            return Data(hexadecimalString: "0000")
             
         }
     }
