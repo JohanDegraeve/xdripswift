@@ -413,7 +413,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             }
             
         case .readTimeStampRx:
-            // M5Stack is requesting for password
+            // M5Stack is requesting for timestamp
             sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
             
         case .readAllParametersRx:

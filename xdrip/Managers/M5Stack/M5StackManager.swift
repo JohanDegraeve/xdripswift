@@ -381,7 +381,7 @@ extension M5StackManager: M5StackManaging {
         return Array(m5StacksBlueToothTransmitters.keys)
     }
     
-    /// sets flag m5StacksParameterUpdateNeeded for m5Stack to true
+    /// sets flag parameterUpdateNeeded for m5Stack to true
     func updateNeeded(forM5Stack m5Stack: M5Stack) {
         m5Stack.parameterUpdateNeeded = true
     }
@@ -401,11 +401,11 @@ extension M5StackManager: M5StackBluetoothDelegate {
     /// m5Stack is asking for an update of all parameters, send them
     func isAskingForAllParameters(m5Stack: M5Stack) {
         
-        // send all parameters, if successful,then for this m5Stack we can set m5StacksParameterUpdateNeeded to false
+        // send all parameters, if successful,then for this m5Stack we can set parameterUpdateNeeded to false
         if sendAllParameters(toM5Stack: m5Stack) {
             m5Stack.parameterUpdateNeeded = false
         } else {
-            // failed, so we need to set m5StacksParameterUpdateNeeded to true, so that next time it connects we will send all parameters
+            // failed, so we need to set parameterUpdateNeeded to true, so that next time it connects we will send all parameters
             m5Stack.parameterUpdateNeeded = true
         }
 
