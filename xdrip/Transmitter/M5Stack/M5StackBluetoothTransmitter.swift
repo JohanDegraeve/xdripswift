@@ -293,8 +293,6 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     
     func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
         
-        trace("in peripheralDidUpdateNotificationStateFor, failed to subscribe for characteristic %{public}@", log: log, type: .error, characteristic.uuid.description)
-        
         // check if subscribe to notifications succeeded
         if characteristic.isNotifying {
             
