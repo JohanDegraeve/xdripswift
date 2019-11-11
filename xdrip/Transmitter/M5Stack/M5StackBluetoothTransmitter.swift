@@ -37,7 +37,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     /// will be used to pass data back
     ///
     /// there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : M5StackManager and UIViewControllers. There's only one instance of M5StackManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
-    private weak var m5StackBluetoothTransmitterDelegateFixed:M5StackBluetoothDelegate?
+    private weak var m5StackBluetoothTransmitterDelegateFixed:M5StackBluetoothDelegate!
     
     /// is the transmitter ready to receive data like parameter updates or reading values
     private (set) var isReadyToReceiveData: Bool = false
@@ -257,7 +257,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     // MARK: - BluetoothTransmitterDelegate functions
     
     func centralManagerDidConnect(address: String?, name: String?) {
-        m5StackBluetoothTransmitterDelegateFixed?.didConnect(forM5Stack: m5Stack, address: address, name: name, bluetoothTransmitter: self)
+        m5StackBluetoothTransmitterDelegateFixed.didConnect(forM5Stack: m5Stack, address: address, name: name, bluetoothTransmitter: self)
         m5StackBluetoothTransmitterDelegateVariable?.didConnect(forM5Stack: m5Stack, address: address, name: name, bluetoothTransmitter: self)
     }
     
@@ -269,7 +269,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         
         if let m5Stack = m5Stack {
             
-            m5StackBluetoothTransmitterDelegateFixed?.deviceDidUpdateBluetoothState(state: state, forM5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.deviceDidUpdateBluetoothState(state: state, forM5Stack: m5Stack)
             m5StackBluetoothTransmitterDelegateVariable?.deviceDidUpdateBluetoothState(state: state, forM5Stack: m5Stack)
             
         } else {
@@ -285,7 +285,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         isReadyToReceiveData = false
         
         if let m5Stack = m5Stack {
-            m5StackBluetoothTransmitterDelegateFixed?.didDisconnect(forM5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.didDisconnect(forM5Stack: m5Stack)
             m5StackBluetoothTransmitterDelegateVariable?.didDisconnect(forM5Stack: m5Stack)
         }
         
@@ -359,7 +359,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
                 
                 self.blePassword = newBlePassword
                 
-                m5StackBluetoothTransmitterDelegateFixed?.newBlePassWord(newBlePassword: newBlePassword, forM5Stack: m5Stack)
+                m5StackBluetoothTransmitterDelegateFixed!.newBlePassWord(newBlePassword: newBlePassword, forM5Stack: m5Stack)
                 m5StackBluetoothTransmitterDelegateVariable?.newBlePassWord(newBlePassword: newBlePassword, forM5Stack: m5Stack)
                 
             }
@@ -369,7 +369,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             
             // this is the time when the M5stack is ready to receive readings or parameter updates
             isReadyToReceiveData = true
-            m5StackBluetoothTransmitterDelegateFixed?.isReadyToReceiveData(m5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.isReadyToReceiveData(m5Stack: m5Stack)
             m5StackBluetoothTransmitterDelegateVariable?.isReadyToReceiveData(m5Stack: m5Stack)
             
             
@@ -381,7 +381,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             guard let m5Stack = m5Stack else {return}// would be a software error if this happens
             
             // inform delegates
-            m5StackBluetoothTransmitterDelegateFixed?.authentication(success: true, forM5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.authentication(success: true, forM5Stack: m5Stack)
             m5StackBluetoothTransmitterDelegateVariable?.authentication(success: true, forM5Stack: m5Stack)
 
             // even though not requested, and even if M5Stack may already have it, send the local time
@@ -389,26 +389,26 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             
             // this is the time when the M5stack is ready to receive readings or parameter updates
             isReadyToReceiveData = true
-            m5StackBluetoothTransmitterDelegateFixed?.isReadyToReceiveData(m5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.isReadyToReceiveData(m5Stack: m5Stack)
             m5StackBluetoothTransmitterDelegateVariable?.isReadyToReceiveData(m5Stack: m5Stack)
             
         case .authenticateFailureRx:
             // received authentication failure, inform delegates
             if let m5Stack = m5Stack {
-                m5StackBluetoothTransmitterDelegateFixed?.authentication(success: false, forM5Stack: m5Stack)
+                m5StackBluetoothTransmitterDelegateFixed!.authentication(success: false, forM5Stack: m5Stack)
                 m5StackBluetoothTransmitterDelegateVariable?.authentication(success: false, forM5Stack: m5Stack)
             }
             
         case .readBlePassWordError1Rx:
             if let m5Stack = m5Stack {
-                m5StackBluetoothTransmitterDelegateFixed?.blePasswordMissing(forM5Stack: m5Stack)
+                m5StackBluetoothTransmitterDelegateFixed!.blePasswordMissing(forM5Stack: m5Stack)
                 m5StackBluetoothTransmitterDelegateVariable?.blePasswordMissing(forM5Stack: m5Stack)
             }
             
         case .readBlePassWordError2Rx:
             if let m5Stack = m5Stack {
                 
-                m5StackBluetoothTransmitterDelegateFixed?.m5StackResetRequired(forM5Stack: m5Stack)
+                m5StackBluetoothTransmitterDelegateFixed!.m5StackResetRequired(forM5Stack: m5Stack)
                 m5StackBluetoothTransmitterDelegateVariable?.m5StackResetRequired(forM5Stack: m5Stack)
             }
             
@@ -421,7 +421,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             
             guard let m5Stack = m5Stack else {return}// would be a software error if this happens
             
-            m5StackBluetoothTransmitterDelegateFixed?.isAskingForAllParameters(m5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.isAskingForAllParameters(m5Stack: m5Stack)
             m5StackBluetoothTransmitterDelegateVariable?.isAskingForAllParameters(m5Stack: m5Stack)
             
         }
