@@ -12,9 +12,6 @@ protocol M5StackManaging: AnyObject {
     /// try to connect to the M5Stack
     func connect(toM5Stack m5Stack: M5Stack)
     
-    /// disconnect from M5Stack
-    func disconnect(fromM5stack m5Stack: M5Stack)
-    
     /// returns the M5StackBluetoothTransmitter for the m5stack
     /// - parameters:
     ///     - forM5Stack : the m5Stack for which bluetoothTransmitter should be returned

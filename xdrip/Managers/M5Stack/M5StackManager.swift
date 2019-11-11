@@ -176,6 +176,22 @@ class M5StackManager: NSObject {
         return success
     }
     
+    /// disconnect from M5Stack - and don't reconnect - set shouldconnect to false
+    func disconnect(fromM5stack m5Stack: M5Stack) {
+        
+        // device should not reconnect after disconnecting
+        m5Stack.shouldconnect = false
+        
+        // save in coredata
+        coreDataManager.saveChanges()
+        
+        if let bluetoothTransmitter = m5StacksBlueToothTransmitters[m5Stack] {
+            if let bluetoothTransmitter =  bluetoothTransmitter {
+                bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
+            }
+        }
+    }
+    
     // MARK:- override observe function
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -323,22 +339,6 @@ extension M5StackManager: M5StackManaging {
         }
     }
     
-    /// disconnect from M5Stack - and don't reconnect - set shouldconnect to false
-    func disconnect(fromM5stack m5Stack: M5Stack) {
-        
-        // device should not reconnect after disconnecting
-        m5Stack.shouldconnect = false
-        
-        // save in coredata
-        coreDataManager.saveChanges()
-        
-        if let bluetoothTransmitter = m5StacksBlueToothTransmitters[m5Stack] {
-            if let bluetoothTransmitter =  bluetoothTransmitter {
-                bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
-            }
-        }
-    }
-
     /// returns the M5StackBluetoothTransmitter for the m5stack
     /// - parameters:
     ///     - forM5Stack : the m5Stack for which bluetoothTransmitter should be returned
