@@ -255,6 +255,12 @@ extension M5StacksViewController: M5StackBluetoothDelegate {
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, forM5Stack m5Stack: M5Stack) {
+        
+        // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
+        if state == CBManagerState.poweredOff {
+            updateRow(forM5Stack: m5Stack)
+        }
+
     }
     
     func error(message: String) {

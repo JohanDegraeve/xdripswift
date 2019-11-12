@@ -342,7 +342,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         timeStampLastStatusUpdate = Date()
         
-        trace("connected, for peripheral with name %{public}@, will discover services", log: log, type: .info, deviceName ?? "'unknown'")
+        trace("connected to peripheral with name %{public}@, will discover services", log: log, type: .info, deviceName ?? "'unknown'")
         peripheral.discoverServices(servicesCBUUIDs)
         
         bluetoothTransmitterDelegate?.centralManagerDidConnect(address: deviceAddress, name: deviceName)
