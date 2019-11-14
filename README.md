@@ -2,7 +2,8 @@ Project in development.
 
 If you want to participate to the testing, send an email to xdrip@proximus.be
 
-Current Status
+Current Status :
+
 - Supported transmitters :
     - G5
     - MiaoMiao
@@ -18,6 +19,7 @@ Current Status
 - Speak readings
 - upload to Dexcom share servers
 - Bluetooth Connection to M5Stack, the M5Stack software to be used can be found here : https://github.com/JohanDegraeve/M5_NightscoutMon
+- Bluetooth Connection to M5StickC, the M5Stickc software to be used can be found here : https://github.com/JohanDegraeve/M5_StickC_xdrip_iOS
 
 Not yet supported
 - translations, English only
