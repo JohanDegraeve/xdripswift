@@ -57,6 +57,11 @@ final class RootViewController: UIViewController {
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
     
+    /// user long pressed the value label
+    @IBAction func valueLabelLongPressedAction(_ sender: UILongPressGestureRecognizer) {
+        valueLabelLongPressed(sender)
+    }
+    
     // MARK: - Constants for ApplicationManager usage
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updatelabelstimer
@@ -239,6 +244,11 @@ final class RootViewController: UIViewController {
             return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
         }
         
+        // user may have long pressed the value label, so the screen will not lock, when going back to background, set isIdleTimerDisabled back to false
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateUpdateLabelsTimer, closure: {
+            UIApplication.shared.isIdleTimerDisabled = false
+        })
+
     }
     
     /// sets AVAudioSession category to AVAudioSession.Category.playback with option mixWithOthers and
@@ -1130,6 +1140,18 @@ final class RootViewController: UIViewController {
             DatePickerViewController.displayDatePickerViewController(datePickerViewData: datePickerViewData, parentController: self)
         }
         
+    }
+    
+    private func valueLabelLongPressed(_ sender: UILongPressGestureRecognizer) {
+        if sender.state == .began {
+            
+            // vibrate so that user knows the long press is detected
+            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+            
+            // prevent screen lock
+            UIApplication.shared.isIdleTimerDisabled = true
+
+        }
     }
     
 }
