@@ -79,6 +79,9 @@ final class RootViewController: UIViewController {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initial calibration
     private let applicationManagerKeyInitialCalibration = "RootViewController-InitialCalibration"
     
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground -  isIdleTimerDisabled
+    private let applicationManagerKeyIsIdleTimerDisabled = "RootViewController-isIdleTimerDisabled"
+    
     // MARK: - Properties - other private properties
     
     /// a reference to the CGMTransmitter currently in use - nil means there's none, because user hasn't selected yet all required settings
@@ -245,7 +248,7 @@ final class RootViewController: UIViewController {
         }
         
         // user may have long pressed the value label, so the screen will not lock, when going back to background, set isIdleTimerDisabled back to false
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateUpdateLabelsTimer, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyIsIdleTimerDisabled, closure: {
             UIApplication.shared.isIdleTimerDisabled = false
         })
 
