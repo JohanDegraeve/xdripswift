@@ -10,8 +10,6 @@ public final class GlucoseChartManager {
     
     // MARK: - public properties
     
-    public var gestureRecognizer: UIGestureRecognizer?
-    
     /// reference to coreDataManager
     public var coreDataManager: CoreDataManager? {
         didSet {
@@ -34,8 +32,6 @@ public final class GlucoseChartManager {
     
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
-
-    private let colors = ChartColorPalette(axisLine: ConstantsGlucoseChart.axisLineColor, axisLabel: ConstantsGlucoseChart.axisLabelColor, grid: ConstantsGlucoseChart.gridColor, glucoseTint: ConstantsGlucoseChart.glucoseTintColor)
 
     private let chartSettings: ChartSettings = {
         var settings = ChartSettings()
@@ -82,7 +78,7 @@ public final class GlucoseChartManager {
         didSet {
             
             if let xAxisValues = xAxisValues, xAxisValues.count > 1 {
-                xAxisModel = ChartAxisModel(axisValues: xAxisValues, lineColor: colors.axisLine, labelSpaceReservationMode: .fixed(20))
+                xAxisModel = ChartAxisModel(axisValues: xAxisValues, lineColor: ConstantsGlucoseChart.axisLineColor, labelSpaceReservationMode: .fixed(20))
             } else {
                 xAxisModel = nil
             }
@@ -95,8 +91,6 @@ public final class GlucoseChartManager {
     
     /// the chart with glucose values
     private var glucoseChart: Chart?
-    
-    private var glucoseChartCache: ChartPointsTouchHighlightLayerViewCache?
     
     /// dateformatter for timestamp in chartpoints
     private let chartPointDateFormatter: DateFormatter = {
@@ -119,10 +113,10 @@ public final class GlucoseChartManager {
         
         chartLabelSettings = ChartLabelSettings(
             font: .systemFont(ofSize: 14),
-            fontColor: colors.axisLabel
+            fontColor: ConstantsGlucoseChart.axisLabelColor
         )
         
-        chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: colors.grid)
+        chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: ConstantsGlucoseChart.gridColor)
         
         // initialize enddate
         endDate = Date()
@@ -184,7 +178,6 @@ public final class GlucoseChartManager {
 
         xAxisValues = nil
         glucoseChartPoints = []
-        glucoseChartCache = nil
         
     }
 
@@ -265,7 +258,7 @@ public final class GlucoseChartManager {
         // the last label should not be visible
         yAxisValues.last?.hidden = true
         
-        let yAxisModel = ChartAxisModel(axisValues: yAxisValues, lineColor: colors.axisLine, labelSpaceReservationMode: .fixed(labelsWidthY))
+        let yAxisModel = ChartAxisModel(axisValues: yAxisValues, lineColor: ConstantsGlucoseChart.axisLineColor, labelSpaceReservationMode: .fixed(labelsWidthY))
         
         let coordsSpace = ChartCoordsSpaceLeftBottomSingleAxis(chartSettings: chartSettings, chartFrame: frame, xModel: xAxisModel, yModel: yAxisModel)
         
@@ -275,24 +268,12 @@ public final class GlucoseChartManager {
         // Grid lines
         let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: chartGuideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: yAxisValues)
         
-        let circles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: colors.glucoseTint, optimized: true)
-        
-        if gestureRecognizer != nil {
-            glucoseChartCache = ChartPointsTouchHighlightLayerViewCache(
-                xAxisLayer: xAxisLayer,
-                yAxisLayer: yAxisLayer,
-                axisLabelSettings: self.chartLabelSettings,
-                chartPoints: glucoseChartPoints,
-                tintColor: colors.glucoseTint,
-                gestureRecognizer: gestureRecognizer
-            )
-        }
+        let circles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseTintColor, optimized: true)
         
         let layers: [ChartLayer?] = [
             gridLayer,
             xAxisLayer,
             yAxisLayer,
-            glucoseChartCache?.highlightLayer,
             circles
         ]
         

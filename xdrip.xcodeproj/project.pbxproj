@@ -21,7 +21,6 @@
 		F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */; };
 		F80859272364355F00F3829D /* ConstantsGlucoseChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */; };
 		F80859292364D61B00F3829D /* UserDefaults+charts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80859282364D61B00F3829D /* UserDefaults+charts.swift */; };
-		F808592B23660F4500F3829D /* BidirectionalCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F808592A23660F4500F3829D /* BidirectionalCollection.swift */; };
 		F808592D23677D6A00F3829D /* ChartPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = F808592C23677D6A00F3829D /* ChartPoint.swift */; };
 		F80ED2EC236F68F90005C035 /* SettingsViewM5StackBluetoothSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80ED2E9236F68F90005C035 /* SettingsViewM5StackBluetoothSettingsViewModel.swift */; };
 		F80ED2ED236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80ED2EA236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift */; };
@@ -216,10 +215,7 @@
 		F8BDD455221DEF22006EAB84 /* SettingsViews.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD457221DEF22006EAB84 /* SettingsViews.strings */; };
 		F8BECB02235CE3E20060DAE1 /* BloodGlucoseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB01235CE3E20060DAE1 /* BloodGlucoseChartView.swift */; };
 		F8BECB05235CE5D80060DAE1 /* GlucoseChartManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB04235CE5D80060DAE1 /* GlucoseChartManager.swift */; };
-		F8BECB0F235CE7220060DAE1 /* ChartColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB0A235CE7220060DAE1 /* ChartColorPalette.swift */; };
 		F8BECB12235CEA9B0060DAE1 /* TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB11235CEA9B0060DAE1 /* TimeInterval.swift */; };
-		F8BECB1E235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB1D235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift */; };
-		F8BECB31235E0EBE0060DAE1 /* CGPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB30235E0EBD0060DAE1 /* CGPoint.swift */; };
 		F8C5EBE522F297F000563B5F /* LibreSensorSerialNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE422F297EF00563B5F /* LibreSensorSerialNumber.swift */; };
 		F8C5EBE722F38F0E00563B5F /* Trace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE622F38F0E00563B5F /* Trace.swift */; };
 		F8C5EBEA22F49AC700563B5F /* CGMDroplet1Transmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE922F49AC700563B5F /* CGMDroplet1Transmitter.swift */; };
@@ -262,7 +258,6 @@
 		F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionClosureable-extension.swift"; sourceTree = "<group>"; };
 		F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsGlucoseChart.swift; sourceTree = "<group>"; };
 		F80859282364D61B00F3829D /* UserDefaults+charts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+charts.swift"; sourceTree = "<group>"; };
-		F808592A23660F4500F3829D /* BidirectionalCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BidirectionalCollection.swift; sourceTree = "<group>"; };
 		F808592C23677D6A00F3829D /* ChartPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPoint.swift; sourceTree = "<group>"; };
 		F80ED2E9236F68F90005C035 /* SettingsViewM5StackBluetoothSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackBluetoothSettingsViewModel.swift; sourceTree = "<group>"; };
 		F80ED2EA236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackGeneralSettingsViewModel.swift; sourceTree = "<group>"; };
@@ -627,10 +622,7 @@
 		F8BDD458221DEF24006EAB84 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F8BECB01235CE3E20060DAE1 /* BloodGlucoseChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BloodGlucoseChartView.swift; sourceTree = "<group>"; };
 		F8BECB04235CE5D80060DAE1 /* GlucoseChartManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlucoseChartManager.swift; sourceTree = "<group>"; };
-		F8BECB0A235CE7220060DAE1 /* ChartColorPalette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartColorPalette.swift; sourceTree = "<group>"; };
 		F8BECB11235CEA9B0060DAE1 /* TimeInterval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInterval.swift; sourceTree = "<group>"; };
-		F8BECB1D235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPointsTouchHighlightLayerViewCache.swift; sourceTree = "<group>"; };
-		F8BECB30235E0EBD0060DAE1 /* CGPoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGPoint.swift; sourceTree = "<group>"; };
 		F8C5EBE422F297EF00563B5F /* LibreSensorSerialNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreSensorSerialNumber.swift; sourceTree = "<group>"; };
 		F8C5EBE622F38F0E00563B5F /* Trace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Trace.swift; sourceTree = "<group>"; };
 		F8C5EBE922F49AC700563B5F /* CGMDroplet1Transmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMDroplet1Transmitter.swift; sourceTree = "<group>"; };
@@ -712,10 +704,8 @@
 			isa = PBXGroup;
 			children = (
 				F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */,
-				F808592A23660F4500F3829D /* BidirectionalCollection.swift */,
 				F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */,
 				F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */,
-				F8BECB30235E0EBD0060DAE1 /* CGPoint.swift */,
 				F8025C1221DA683400ECF0C0 /* Data.swift */,
 				F8EA6C8121B723BC0082976B /* Date.swift */,
 				F8025E4D21ED450300ECF0C0 /* Double.swift */,
@@ -1183,7 +1173,6 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
-				F8BECB06235CE6EC0060DAE1 /* Models */,
 				F85DC2FB21D2CD7000B9F74A /* Application Delegate */,
 				F8EA6CA521BAD5AD0082976B /* Calibration */,
 				F8EA6C7D21B70DEA0082976B /* Constants */,
@@ -1388,7 +1377,6 @@
 			isa = PBXGroup;
 			children = (
 				F8BECB01235CE3E20060DAE1 /* BloodGlucoseChartView.swift */,
-				F8BECB1D235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1399,14 +1387,6 @@
 				F8BECB04235CE5D80060DAE1 /* GlucoseChartManager.swift */,
 			);
 			path = Charts;
-			sourceTree = "<group>";
-		};
-		F8BECB06235CE6EC0060DAE1 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				F8BECB0A235CE7220060DAE1 /* ChartColorPalette.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		F8C5EBE822F49AB300563B5F /* Droplet */ = {
@@ -1713,7 +1693,6 @@
 				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
 				F8A54AEA22D911BA00934E7A /* PairRequestTxMessage.swift in Sources */,
 				F8C5EBEA22F49AC700563B5F /* CGMDroplet1Transmitter.swift in Sources */,
-				F808592B23660F4500F3829D /* BidirectionalCollection.swift in Sources */,
 				F8EEDD4422FD80A600D2D610 /* LibreOOPResponse.swift in Sources */,
 				F821CF56229BF43A005C1E43 /* AlertKind.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
@@ -1766,7 +1745,6 @@
 				F821CF59229BF43A005C1E43 /* AlertEntryUnit.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
 				F8EEDD4C22FE224B00D2D610 /* LibreRawGlucoseData.swift in Sources */,
-				F8BECB0F235CE7220060DAE1 /* ChartColorPalette.swift in Sources */,
 				F8B3A844227F090E004BA588 /* SettingsViewAlertSettingsViewModel.swift in Sources */,
 				F8A54AD822D911BA00934E7A /* CGMG5Transmitter.swift in Sources */,
 				F8A1586322EDB86E007F5B5D /* ConstantsSounds.swift in Sources */,
@@ -1799,7 +1777,6 @@
 				F898EDF8234F8EDF00BFB79B /* M5StackName+CoreDataProperties.swift in Sources */,
 				F8A1585322EDB602007F5B5D /* ConstantsBloodGlucose.swift in Sources */,
 				F80ED2EE236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift in Sources */,
-				F8BECB31235E0EBE0060DAE1 /* CGPoint.swift in Sources */,
 				F8A389C823203E3E0010F405 /* ConstantsM5Stack.swift in Sources */,
 				F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */,
 				F8A54AE322D911BA00934E7A /* AuthRequestRxMessage.swift in Sources */,
@@ -1881,7 +1858,6 @@
 				F8A54AE822D911BA00934E7A /* BatteryStatusRxMessage.swift in Sources */,
 				F8EEDD4522FD80A600D2D610 /* LibreOOPClient.swift in Sources */,
 				F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */,
-				F8BECB1E235CFB1E0060DAE1 /* ChartPointsTouchHighlightLayerViewCache.swift in Sources */,
 				F8C5EBE522F297F000563B5F /* LibreSensorSerialNumber.swift in Sources */,
 				F8B3A845227F090E004BA588 /* SettingsViewDexcomSettingsViewModel.swift in Sources */,
 				F8A1585F22EDB81E007F5B5D /* ConstantsLog.swift in Sources */,
