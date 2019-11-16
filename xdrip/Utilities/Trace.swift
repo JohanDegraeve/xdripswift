@@ -6,7 +6,6 @@ fileprivate var log:OSLog = {
     return log
 }()
 
-
 /// will only be used during development
 func debuglogging(_ logtext:String) {
     os_log("%{public}@", log: log, type: .debug, logtext)

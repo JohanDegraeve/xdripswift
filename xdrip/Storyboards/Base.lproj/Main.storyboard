@@ -65,6 +65,11 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0nE-AX-r0w" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
                                 <rect key="frame" x="5" y="225" width="310" height="289"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="Fi5-iu-Usk" appends="YES" id="Rkv-hK-sLH"/>
+                                    <outletCollection property="gestureRecognizers" destination="axt-dD-sCA" appends="YES" id="Bxm-Qp-L3P"/>
+                                </connections>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -95,7 +100,9 @@
                     </tabBarItem>
                     <connections>
                         <outlet property="calibrateButtonOutlet" destination="mSJ-jy-nHJ" id="XSS-W3-gbX"/>
+                        <outlet property="chartLongPressGestureRecognizerOutlet" destination="axt-dD-sCA" id="mUZ-cu-720"/>
                         <outlet property="chartOutlet" destination="0nE-AX-r0w" id="ivs-se-S3b"/>
+                        <outlet property="chartPanGestureRecognizerOutlet" destination="Fi5-iu-Usk" id="zn5-wp-DKt"/>
                         <outlet property="diffLabelOutlet" destination="7Wo-wd-80o" id="nnn-w9-1sX"/>
                         <outlet property="minutesLabelOutlet" destination="uyn-2k-K74" id="XXm-rq-Suy"/>
                         <outlet property="preSnoozeButtonOutlet" destination="fSY-nc-amN" id="T25-Z1-3Ad"/>
@@ -106,7 +113,17 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
                 <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.90000000000000002" id="tYH-fG-Lky">
                     <connections>
-                        <action selector="valueLabelLongPressedAction:" destination="9pv-A4-QxB" id="NlL-kQ-dpZ"/>
+                        <action selector="valueLabelLongPressGestureRecognizerAction:" destination="9pv-A4-QxB" id="NlL-kQ-dpZ"/>
+                    </connections>
+                </pongPressGestureRecognizer>
+                <panGestureRecognizer minimumNumberOfTouches="1" id="Fi5-iu-Usk">
+                    <connections>
+                        <action selector="chartPanGestureRecognizerAction:" destination="9pv-A4-QxB" id="NUY-gV-rdx"/>
+                    </connections>
+                </panGestureRecognizer>
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="axt-dD-sCA">
+                    <connections>
+                        <action selector="chartLongPressGestureRecognizerAction:" destination="9pv-A4-QxB" id="6qG-44-Nd4"/>
                     </connections>
                 </pongPressGestureRecognizer>
             </objects>

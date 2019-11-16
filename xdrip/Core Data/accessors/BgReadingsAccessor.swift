@@ -38,12 +38,12 @@ class BgReadingsAccessor {
     ///     - if ignoreCalculatedValue = true, then value of calculatedValue will be ignored
     /// - returns: an array with readings, can be empty array.
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
-    func getLatestBgReadings(limit:Int?, howOld maximumDays:Int?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> [BgReading] {
+    func getLatestBgReadings(limit:Int?, howOld:Int?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> [BgReading] {
         
         // if maximum age specified then create fromdate
         var fromDate:Date?
-        if let maximumDays = maximumDays, maximumDays >= 0 {
-            fromDate = Date(timeIntervalSinceNow: Double(-maximumDays * 60 * 60 * 24))
+        if let howOld = howOld, howOld >= 0 {
+            fromDate = Date(timeIntervalSinceNow: Double(-howOld * 60 * 60 * 24))
         }
         
         return getLatestBgReadings(limit: limit, fromDate: fromDate, forSensor: sensor, ignoreRawData: ignoreRawData, ignoreCalculatedValue: ignoreCalculatedValue)
@@ -106,13 +106,15 @@ class BgReadingsAccessor {
     }
     
     /// gets readings on a managedObjectContact that is created with concurrencyType: .privateQueueConcurrencyType
+    /// - returns:
+    ///        readings sorted by timestamp, ascending (ie first is oldest)
     /// - parameters:
-    ///     - to : if specified, only return readings with timestamp  smaller than fromDate
-    ///     - from : if specified, only return readings with timestamp greater than fromDate
-    func getBgReadingOnPrivateManagedObjectContext(from: Date?, to: Date?) -> [BgReading] {
+    ///     - to : if specified, only return readings with timestamp  smaller than fromDate (not equal to)
+    ///     - from : if specified, only return readings with timestamp greater than fromDate (not equal to)
+    func getBgReadingsOnPrivateManagedObjectContext(from: Date?, to: Date?) -> [BgReading] {
         
         let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: false)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: true)]
         
         // create predicate
         if let from = from, to == nil {
@@ -148,6 +150,8 @@ class BgReadingsAccessor {
     /// - parameters:
     ///     - limit: maximum amount of readings to fetch, if 0 then no limit
     ///     - fromDate : if specified, only return readings with timestamp > fromDate
+    /// - returns:
+    ///     List of readings, descending, ie first is youngest
     private func fetchBgReadings(limit:Int?, fromDate:Date?) -> [BgReading] {
         let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: false)]

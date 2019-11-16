@@ -68,5 +68,17 @@ enum ConstantsGlucoseChart {
     
     /// diameter of the circle for blood glucose readings
     static let glucoseCircleDiameter: CGFloat = 5
+    
+    /// when user pans the chart, when ending the gesture, deceleration is done. At regular intervals the chart needs to be redrawn. This is the interval in seconds
+    static let decelerationTimerValueInSeconds = 0.02
+    
+    /// deceleration rate to use when ending pan gesture on chart
+    static let decelerationRate = UIScrollView.DecelerationRate.normal.rawValue
+    
+    /// maximum amount of elements in the glucoseChartPoints array, this will be limited for performance reasons
+    static let maximumElementsInGlucoseChartPointsArray:Int = 1000
 
+    /// dateformat for minutesAgo label when user is panning the chart back in time. The label will show the timestamp of the latest shown value in the chart
+    static let dateFormatLatestChartPointWhenPanning = "E d MMM HH:mm"
+    
 }

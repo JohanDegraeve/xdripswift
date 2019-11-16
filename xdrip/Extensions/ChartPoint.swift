@@ -3,6 +3,7 @@ import SwiftCharts
 
 extension ChartPoint {
     
+    // if bgReading.calculatedValue == 0 then return  nil
     convenience init?(bgReading: BgReading, formatter: DateFormatter, unitIsMgDl: Bool) {
         
         if bgReading.calculatedValue > 0 {

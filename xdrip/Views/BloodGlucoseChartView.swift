@@ -4,7 +4,7 @@ import SwiftCharts
 // source used : https://github.com/LoopKit/Loop
 
 /// a SwiftChart to be added 
-class BloodGlucoseChartView: UIView {
+public class BloodGlucoseChartView: UIView {
     
     // MARK: - public properties
     

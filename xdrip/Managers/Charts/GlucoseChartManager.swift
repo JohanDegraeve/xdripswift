@@ -1,10 +1,8 @@
-//
-//  based on loopkit https://github.com/loopkit
-//
 import Foundation
 import HealthKit
 import SwiftCharts
 import os.log
+import UIKit
 
 public final class GlucoseChartManager {
     
@@ -31,7 +29,7 @@ public final class GlucoseChartManager {
     }
     
     /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
+    private var oslog = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
 
     private let chartSettings: ChartSettings = {
         var settings = ChartSettings()
@@ -52,43 +50,11 @@ public final class GlucoseChartManager {
     private var chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings
     
     /// The latest date on the X-axis
-    private var endDate: Date {
-        didSet {
-            if endDate != oldValue {
-                
-                xAxisValues = nil
-                
-                // current difference between end and startdate
-                let diffEndAndStartDate = oldValue.timeIntervalSince(startDate).hours
-                
-                // Set a new startdate, difference is equal to previous difference
-                startDate = endDate.addingTimeInterval(.hours(-diffEndAndStartDate))
-                
-            }
-        }
-    }
+    private var endDate: Date
     
     /// The earliest date on the X-axis
     private var startDate: Date
 
-    /// A ChartAxisValue models a value along a particular chart axis. For example, two ChartAxisValues represent the two components of a ChartPoint. It has a backing Double scalar value, which provides a canonical form for all subclasses to be laid out along an axis. It also has one or more labels that are drawn in the chart.
-    ///
-    /// see https://github.com/i-schuetz/SwiftCharts/blob/ec538d027d6d4c64028d85f86d3d72fcda41c016/SwiftCharts/AxisValues/ChartAxisValue.swift#L12, is not meant to be instantiated
-    private var xAxisValues: [ChartAxisValue]? {
-        didSet {
-            
-            if let xAxisValues = xAxisValues, xAxisValues.count > 1 {
-                xAxisModel = ChartAxisModel(axisValues: xAxisValues, lineColor: ConstantsGlucoseChart.axisLineColor, labelSpaceReservationMode: .fixed(20))
-            } else {
-                xAxisModel = nil
-            }
-            
-            glucoseChart = nil
-        }
-    }
-    
-    private var xAxisModel: ChartAxisModel?
-    
     /// the chart with glucose values
     private var glucoseChart: Chart?
     
@@ -102,15 +68,56 @@ public final class GlucoseChartManager {
     }()
     
     /// timeformatter for horizontal axis label
-    private let axisLabelTimeFormatter:  DateFormatter
+    private let axisLabelTimeFormatter: DateFormatter
     
     /// a BgReadingsAccessor
     private var bgReadingsAccessor: BgReadingsAccessor?
-
+    
+    /// used when panning, difference in seconds between two points ?
+    ///
+    /// default value 1.0 which is probably not correct but it can't be initiated as long as innerFrameWidth is not initialized, to avoid having to work with optional, i assign it to 1.0
+    private var diffInSecondsBetweenTwoPoints = 1.0
+    
+    /// innerFrame width
+    ///
+    /// default value 300.0 which is probably not correct but it can't be initiated as long as glusoseChart is not initialized, to avoid having to work with optional, i assign it to 300.0
+    private var innerFrameWidth: Double = 300.0  {
+        didSet {
+            diffInSecondsBetweenTwoPoints = endDate.timeIntervalSince(startDate)/Double(innerFrameWidth)
+        }
+    }
+    
+    /// used for getting bgreadings on a background thread
+    private let operationQueue: OperationQueue
+    
+    /// This timer is used when decelerating the chart after end of panning.  We'll set a timer, each time the timer expires the chart will be shifted a bit
+    private var gestureTimer:RepeatingTimer?
+    
+    /// used when user stopped panning and deceleration is still ongoing. If set to true, then deceleration needs to be stopped
+    private var stopDeceleration = false
+    
+    /// the maximum value in glucoseChartPoints array between start and endPoint
+    ///
+    /// value calculated in loopThroughGlucoseChartPointsAndFindValues
+    private var maximumValueInGlucoseChartPoints = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+    
+    /// - if glucoseChartPoints.count > 0, then this is the latest one that has timestamp less than endDate.
+    ///
+    /// value calculated in loopThroughGlucoseChartPointsAndFindValues
+    private(set) var lastChartPointEarlierThanEndDate: ChartPoint?
+    
+    /// is chart in panned state or not, meaning is it currently shifted back in time
+    private(set) var chartIsPannedBackward: Bool = false
+    
     // MARK: - intializer
     
-    init() {
+    /// - parameters:
+    ///     - chartLongPressGestureRecognizer : defined here as parameter so that this class can handle the config of the recognizer
+    init(chartLongPressGestureRecognizer: UILongPressGestureRecognizer) {
         
+        // for tapping the chart, we're using UILongPressGestureRecognizer because UITapGestureRecognizer doesn't react on touch down. With UILongPressGestureRecognizer and minimumPressDuration set to 0, we get a trigger as soon as the chart is touched
+        chartLongPressGestureRecognizer.minimumPressDuration = 0
+
         chartLabelSettings = ChartLabelSettings(
             font: .systemFont(ofSize: 14),
             fontColor: ConstantsGlucoseChart.axisLabelColor
@@ -121,52 +128,122 @@ public final class GlucoseChartManager {
         // initialize enddate
         endDate = Date()
         
-        
         // intialize startdate, which is enddate minus a few hours
         startDate = endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours))
         
         axisLabelTimeFormatter = DateFormatter()
         axisLabelTimeFormatter.dateFormat = UserDefaults.standard.chartTimeAxisLabelFormat
+        
+        // initialize operationQueue
+        operationQueue = OperationQueue()
+        
+        // operationQueue will be queue of blocks that gets readings and updates glucoseChartPoints, startDate and endDate. To avoid race condition, the operations should be one after the other
+        operationQueue.maxConcurrentOperationCount = 1
 
     }
     
     // MARK: - public functions
     
-    /// updates the glucoseChartPoints array and calls completionHandler when finished, also chart is set to nil
+    /// updates the glucoseChartPoints array and calls completionHandler when finished - if called multiple times after each other (eg because user is panning or zooming fast) there might be calls skipped, ie completionhandler will not be called if skipped, only the last task in the operationqueue is used
     /// - parameters:
-    ///     - completionHandler will be called when finished
-    public func updateGlucoseChartPoints(completionHandler: @escaping () -> ()) {
-        
-        guard let bgReadingsAccessor = bgReadingsAccessor else {
-            trace("in updateGlucoseChartPoints, bgReadingsAccessor, probably coreDataManager is not yet assigned", log: self.log, type: .info)
-            return
-        }
-        
-        let queue = OperationQueue()
+    ///     - completionHandler : will be called when glucoseChartPoints array is ready to be used, in this completionhandler for instance chart should be upated
+    ///     - endDate :endDate to apply
+    ///     - startDate :startDate to apply, if nil then no change will be done in chardwidth, ie current difference between start and end will be reused
+    ///
+    /// update of glucoseChartPoints array will be done on background thread. The actual redrawing of the chartoutlet needs to be done on the main thread, so the caller adds a block of code in the completionHandler which will be executed in the main thread.
+    /// While updating glucoseChartPoints in background thread, the main thread may call again updateGlucoseChartPoints with a new endDate (because the user is panning or zooming). A new block will be added in the operation queue and processed later.
+    public func updateGlucoseChartPoints(endDate: Date, startDate: Date?, chartOutlet: BloodGlucoseChartView, completionHandler: (() -> ())?) {
         
         let operation = BlockOperation(block: {
             
-            // reset endDate
-            self.endDate = Date()
-            
-            // get glucosePoints from coredata
-            let glucoseChartPoints = bgReadingsAccessor.getBgReadingOnPrivateManagedObjectContext(from: self.startDate, to: self.endDate).compactMap {
-                
-                ChartPoint(bgReading: $0, formatter: self.chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                
+            // if there's more than one operation waiting for execution, it makes no sense to execute this one, the next one has a newer endDate to use
+            guard self.operationQueue.operations.count <= 1 else {
+                return
             }
             
-            //let glucosePoints = BgReadingsAccessor.get
+            // startDateToUse is either parameter value or (if nil), endDate minutes current chartwidth
+            let startDateToUse = startDate != nil ? startDate! : Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: endDate)
+            
+            
+            guard let bgReadingsAccessor = self.bgReadingsAccessor else {
+                trace("in updateGlucoseChartPoints, bgReadingsAccessor, probably coreDataManager is not yet assigned", log: self.oslog, type: .info)
+                return
+            }
+            
+            // we're going to check if we have already all chartpoints in the array self.glucoseChartPoints for the new start and date time. If not we're going to prepand a new array and/or append a new array
+            
+            // initialize new list of glucoseChartPoints to prepend
+            var newGlucoseChartPointsToPrepend = [ChartPoint]()
+
+            // initialize new list of glucoseChartPoints to append
+            var newGlucoseChartPointsToAppend = [ChartPoint]()
+            
+            // do we reuse the existing list ? for instance if new startDate > date of currently stored last chartpoint, then we don't reuse the existing list, probably better to reinitialize from scratch to avoid ending up with too long lists
+            // and if there's more than a predefined amount of elements already in the array then we restart from scratch because (on an iPhone SE with iOS 13), the panning is getting slowed down when there's more than 1000 elements in the array
+            var reUseExistingChartPointList = self.glucoseChartPoints.count <= ConstantsGlucoseChart.maximumElementsInGlucoseChartPointsArray ? true:false
+
+            if let lastGlucoseChartPoint = self.glucoseChartPoints.last, let lastGlucoseChartPointX = lastGlucoseChartPoint.x as? ChartAxisValueDate {
+                
+                // if reUseExistingChartPointListget = false, then we're actually forcing to use a complete new array, because the current array glucoseChartPoints is too big. If true, then we start from timestamp of the last chartpoint
+                let lastGlucoseTimeStamp = reUseExistingChartPointList ? lastGlucoseChartPointX.date : Date(timeIntervalSince1970: 0)
+                
+                // first see if we need to append new chartpoints
+                if startDateToUse > lastGlucoseTimeStamp {
+                    
+                    // startDate is bigger than the the date of the last currently stored ChartPoint, let's reinitialize the glucosechartpoints
+                    reUseExistingChartPointList = false
+                    
+                    // use newGlucoseChartPointsToAppend and assign it to new list of chartpoints startDate to endDate
+                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: bgReadingsAccessor)
+                    
+                } else if endDate <= lastGlucoseTimeStamp {
+                    // so starDate <= date of last known glucosechartpoint and enddate is also <= that date
+                    // no need to append anything
+                } else {
+                    
+                    // append glucseChartpoints with date > x.date up to endDate
+                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: lastGlucoseTimeStamp, endDate: endDate, bgReadingsAccessor: bgReadingsAccessor)
+                }
+                
+                // now see if we need to prepend
+                // if reUseExistingChartPointList = false, then it means startDate > date of last know glucosepoint, there's no need to prepend
+                if reUseExistingChartPointList {
+                    
+                    if let firstGlucoseChartPoint = self.glucoseChartPoints.first, let firstGlucoseChartPointX = firstGlucoseChartPoint.x as? ChartAxisValueDate, startDateToUse < firstGlucoseChartPointX.date {
+                        
+                        newGlucoseChartPointsToPrepend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: firstGlucoseChartPointX.date, bgReadingsAccessor: bgReadingsAccessor)
+                    }
+                    
+                }
+                
+            } else {
+                
+                // this should be a case where there's no glucoseChartPoints stored yet, we just create a new array to append
+
+                // get glucosePoints from coredata
+                newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: bgReadingsAccessor)
+            }
+
             DispatchQueue.main.async {
                 
-                self.glucoseChartPoints = glucoseChartPoints
+                // so we're in the main thread, now endDate and startDate and glucoseChartPoints can be safely assigned to value that was passed in the call to updateGlucoseChartPoints
+                self.endDate = endDate
+                self.startDate = startDateToUse
+                self.glucoseChartPoints = newGlucoseChartPointsToPrepend + (reUseExistingChartPointList ? self.glucoseChartPoints : [ChartPoint]()) + newGlucoseChartPointsToAppend
                 
-                completionHandler()
+                // update the chart outlet
+                chartOutlet.reloadChart()
+                
+                // call completionhandler on main thread
+                if let completionHandler = completionHandler {
+                    completionHandler()
+                }
+
             }
             
         })
         
-        queue.addOperation {
+        operationQueue.addOperation {
             operation.start()
         }
         
@@ -174,9 +251,8 @@ public final class GlucoseChartManager {
     
     public func didReceiveMemoryWarning() {
         
-        trace("in didReceiveMemoryWarning, Purging chart data in response to memory warning", log: self.log, type: .error)
+        trace("in didReceiveMemoryWarning, Purging chart data in response to memory warning", log: self.oslog, type: .error)
 
-        xAxisValues = nil
         glucoseChartPoints = []
         
     }
@@ -185,7 +261,7 @@ public final class GlucoseChartManager {
         
         if let chart = glucoseChart, chart.frame != frame {
 
-            trace("Glucose chart frame changed to %{public}@", log: self.log, type: .info,  String(describing: frame))
+            trace("Glucose chart frame changed to %{public}@", log: self.oslog, type: .info,  String(describing: frame))
 
             self.glucoseChart = nil
         }
@@ -196,39 +272,214 @@ public final class GlucoseChartManager {
 
         return glucoseChart
     }
+    
+    /// handles either UIPanGestureRecognizer or UILongPressGestureRecognizer.  UILongPressGestureRecognizer is there to detect taps
+    /// - parameters:
+    ///     - completionhandler : any block that caller wants to see executed when chart has been updated
+    ///     - chartOutlet : needed to trigger updated of chart
+    public func handleUIGestureRecognizer(recognizer: UIGestureRecognizer, chartOutlet: BloodGlucoseChartView, completionHandler: (() -> ())?) {
+        
+        if let uiPanGestureRecognizer = recognizer as? UIPanGestureRecognizer {
+            
+            handleUiPanGestureRecognizer(uiPanGestureRecognizer: uiPanGestureRecognizer, chartOutlet: chartOutlet, completionHandler: completionHandler)
 
-    /// Runs any necessary steps before rendering charts
-    public func prerender() {
+        } else if let uiLongPressGestureRecognizer = recognizer as? UILongPressGestureRecognizer {
+            
+            handleUiLongPressGestureRecognizer(uiLongPressGestureRecognizer: uiLongPressGestureRecognizer, chartOutlet: chartOutlet)
+            
+        }
+        
+    }
 
-        if xAxisValues == nil {
-            generateXAxisValues()
+    // MARK: - private functions
+
+    private func stopDeceleration() {
+        
+        // user touches the chart, in case we're handling a decelerating gesture, stop it
+        // call to suspend doesn't really seem to stop the deceleration, that's why also setting to nil and using stopDeceleration
+        gestureTimer?.suspend()
+        gestureTimer = nil
+        stopDeceleration = true
+
+    }
+    
+    private func handleUiLongPressGestureRecognizer(uiLongPressGestureRecognizer: UILongPressGestureRecognizer, chartOutlet: BloodGlucoseChartView) {
+        
+        if uiLongPressGestureRecognizer.state == .began {
+            
+            stopDeceleration()
+            
+        }
+        
+    }
+
+    private func handleUiPanGestureRecognizer(uiPanGestureRecognizer: UIPanGestureRecognizer, chartOutlet: BloodGlucoseChartView, completionHandler: (() -> ())?) {
+
+        if uiPanGestureRecognizer.state == .began {
+
+            // user touches the chart, possibily chart is still decelerating from a previous pan. Needs to be stopped
+            stopDeceleration()
+            
+        }
+        
+        let translationX = uiPanGestureRecognizer.translation(in: uiPanGestureRecognizer.view).x
+        
+        // if translationX negative and if not chartIsPannedBackward, then stop processing, we're not going back to the future
+        if !chartIsPannedBackward && translationX < 0 {
+            uiPanGestureRecognizer.setTranslation(CGPoint.zero, in: chartOutlet)
+            
+            if let completionHandler = completionHandler {
+                completionHandler()
+            }
+            
+            return
+        }
+        
+        // user either started panning backward or continues panning (back or forward). Assume chart is currently in backward panned state, which is probably true
+        chartIsPannedBackward = true
+        
+        if uiPanGestureRecognizer.state == .ended {
+            
+            // user has lifted finger. Deceleration needs to be done.
+            decelerate(translationX: translationX, velocityX: uiPanGestureRecognizer.velocity(in: uiPanGestureRecognizer.view).x, chartOutlet: chartOutlet, completionHandler: {
+                
+                
+                uiPanGestureRecognizer.setTranslation(CGPoint.zero, in: chartOutlet)
+                
+                // call the completion handler that was created by the original caller, in this case RootViewController created this code block
+                if let completionHandler = completionHandler {
+                    completionHandler()
+                }
+                
+            })
+            
+        } else {
+            
+            // ongoing panning
+            
+            // this will update the chart and set new start and enddate, for specific translation
+            setNewStartAndEndDate(translationX: translationX, chartOutlet: chartOutlet, completionHandler: {
+                
+                uiPanGestureRecognizer.setTranslation(CGPoint.zero, in: chartOutlet)
+
+                // call the completion handler that was created by the original caller, in this case RootViewController created this code block
+                if let completionHandler = completionHandler {
+                    completionHandler()
+                }
+
+            })
+            
         }
 
     }
     
-    // MARK: - private functions
+    /// - will call setNewStartAndEndDate with a new translationX value, every x milliseconds, x being 20 milliseconds by default as defined in the constants.
+    /// - Every time the new values are set, the completion handler will be called
+    /// - Every time the new values are set, chartOutlet will be updated
+    private func decelerate(translationX: CGFloat, velocityX: CGFloat, chartOutlet: BloodGlucoseChartView, completionHandler: @escaping () -> ()) {
+        
+        //The default deceleration rate is λ = 0.998, meaning that the scroll view loses 0.2% of its velocity per millisecond.
+        //The distance traveled is the area under the curve in a velocity-time-graph, thus the distance traveled until the content comes to rest is the integral of the velocity from zero to infinity.
+        // current deceleration = v*λ^t, t in milliseconds
+        // distanceTravelled = integral of current deceleration from 0 to actual time = λ^t/ln(λ) - λ^0/ln(λ)
+        // this is multiplied with 0.001, I don't know why but the result matches the formula that is advised by Apple to calculate target x, target x would be translationX + (velocityX / 1000.0) * decelerationRate / (1.0 - decelerationRate)
+        
+        /// this is the integral calculated for time 0
+        let constant = Double(velocityX) *  pow(Double(ConstantsGlucoseChart.decelerationRate), 0.0) / log(Double(ConstantsGlucoseChart.decelerationRate))
+        
+        /// the start time, actual elapsed time will always be calculated agains this value
+        let initialStartOfDecelerationTimeStampInMilliseconds = Date().toMillisecondsAsDouble()
+        
+        /// initial distance travelled is nul, this will be increased each time
+        var distanceTravelled: CGFloat = 0.0
+        
+        // set stopDeceleration to false initially
+        stopDeceleration = false
+        
+        // at regulat intervals new distance to travel the chart will be calculated and setNewStartAndEndDate will be called
+        gestureTimer = RepeatingTimer(timeInterval: TimeInterval(ConstantsGlucoseChart.decelerationTimerValueInSeconds), eventHandler: {
+            
+            // if stopDeceleration is set, then return
+            if self.stopDeceleration {
+                return
+            }
+            
+            // what is the elapsed time since the user ended the panning
+            let timeSinceStart = Date().toMillisecondsAsDouble() - initialStartOfDecelerationTimeStampInMilliseconds
+            
+            // calculate additional distance to travel the chart
+            let additionalDistanceToTravel = CGFloat(round(0.001*(
+                
+                Double(velocityX) *  pow(Double(ConstantsGlucoseChart.decelerationRate), timeSinceStart) / log(Double(ConstantsGlucoseChart.decelerationRate))
+                    
+                    - constant))) - distanceTravelled
+            
+            // if less than 2 pixels then stop the gestureTimer
+            if abs(additionalDistanceToTravel) < 2 {
+                self.stopDeceleration()
+            }
+            
+            self.setNewStartAndEndDate(translationX: translationX + additionalDistanceToTravel, chartOutlet: chartOutlet, completionHandler: completionHandler)
+            
+            // increase distance already travelled
+            distanceTravelled += additionalDistanceToTravel
+            
+        })
+        
+        // start the timer
+        gestureTimer?.resume()
+        
+    }
+    
+    /// - calculates new startDate and endDate
+    /// - updates glucseChartPoints array for given translation
+    /// - uptdate chartOutlet
+    /// - calls block in completion handler.
+    private func setNewStartAndEndDate(translationX: CGFloat, chartOutlet: BloodGlucoseChartView, completionHandler: @escaping () -> ()) {
+        
+        // calculate new start and enddate, based on how much the user's been panning
+        var newEndDate = endDate.addingTimeInterval(-diffInSecondsBetweenTwoPoints * Double(translationX))
+        
+        // maximum value should be current date
+        if newEndDate > Date() {
+            
+            newEndDate = Date()
+            
+            // this is also the time to set chartIsPannedBackward to false, user is panning back to the future, he can not pan further than the endDate so that chart will not be any panned state anymore
+            chartIsPannedBackward = false
+            
+            // stop the deceleration
+            stopDeceleration()
+            
+        }
+        
+        // newStartDate = enddate minus current difference between endDate and startDate
+        let newStartDate = Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: newEndDate)
+        
+        updateGlucoseChartPoints(endDate: newEndDate, startDate: newStartDate, chartOutlet: chartOutlet, completionHandler: completionHandler)
+        
+    }
     
     private func generateGlucoseChartWithFrame(_ frame: CGRect) -> Chart? {
         
-        guard let xAxisModel = xAxisModel, let xAxisValues = xAxisValues else {return nil}
+        // first calculate necessary values by looping through all chart points
+        loopThroughGlucoseChartPointsAndFindValues()
         
+        let xAxisValues = generateXAxisValues()
+        
+        guard xAxisValues.count > 1 else {return nil}
+        
+        let xAxisModel = ChartAxisModel(axisValues: xAxisValues, lineColor: ConstantsGlucoseChart.axisLineColor, labelSpaceReservationMode: .fixed(20))
+
         // just to save typing
         let unitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
-        // create yAxisValues, start with 38 mgdl, this is to make sure we show a bit lower than the real lowest value which is isually 40 mgdl, make the label hidden
+        // create yAxisValues, start with 38 mgdl, this is to make sure we show a bit lower than the real lowest value which is usually 40 mgdl, make the label hidden
         let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgdlToMmol(mgdl: unitIsMgDl), labelSettings: chartLabelSettings)
         firstYAxisValue.hidden = true
         
         // create now the yAxisValues and add the first
         var yAxisValues = [firstYAxisValue as ChartAxisValue]
-        
-        // determine the maximum value in the glucosechartPoint
-        // start with maximum value defined in constants
-        var maximumValueInGlucoseChartPoints = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: unitIsMgDl)
-        // now iterate through glucosechartpoints to determine the maximum
-        for glucoseChartPoint in glucoseChartPoints {
-            maximumValueInGlucoseChartPoints = max(maximumValueInGlucoseChartPoints, glucoseChartPoint.y.scalar)
-        }
         
         // add first series
         if unitIsMgDl {
@@ -264,6 +515,8 @@ public final class GlucoseChartManager {
         
         let (xAxisLayer, yAxisLayer, innerFrame) = (coordsSpace.xAxisLayer, coordsSpace.yAxisLayer, coordsSpace.chartInnerFrame)
         
+        // now that we know innerFrame we can set innerFrameWidth
+        innerFrameWidth = Double(innerFrame.width)
         
         // Grid lines
         let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: chartGuideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: yAxisValues)
@@ -285,11 +538,11 @@ public final class GlucoseChartManager {
         )
     }
 
-    private func generateXAxisValues() {
+    private func generateXAxisValues() -> [ChartAxisValue] {
 
         // in the comments, assume it is now 13:26 and width is 6 hours, that means startDate = 07:26, endDate = 13:26
         
-        /// how many full hours between startdate and enddate - result would be 6 - maybe we just need to use the userdefaults setting ?
+        /// how many full hours between startdate and enddate
         let amountOfFullHours = Int(ceil(endDate.timeIntervalSince(startDate).hours))
         
         /// create array that goes from 1 to number of full hours, as helper to map to array of ChartAxisValueDate - array will go from 1 to 6
@@ -309,7 +562,53 @@ public final class GlucoseChartManager {
         xAxisValues.first?.hidden = true
         xAxisValues.last?.hidden = true
 
-        self.xAxisValues = xAxisValues
+        return xAxisValues
+        
+    }
+    
+    /// gets array of chartpoints that have a calculatedValue > 0 and date > startDate (not equal to) and < endDate (not equal to), from coreData
+    /// - returns:
+    ///     - chartpoints for readings that have calculatedvalue > 0, order ascending, ie first element is the oldest
+    private func getGlucoseChartPoints(startDate: Date, endDate: Date, bgReadingsAccessor: BgReadingsAccessor) -> [ChartPoint] {
+        
+        return bgReadingsAccessor.getBgReadingsOnPrivateManagedObjectContext(from: startDate, to: endDate).compactMap {
+            
+            ChartPoint(bgReading: $0, formatter: self.chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            
+        }
+    }
+    
+    /// function to be called when glucoseChartPoints array is updated, as first function in generateGlucoseChartWithFrame. Will loop through glucoseChartPoints and find :
+    /// - the maximum bg value of the chartPoints between start and end date
+    /// - the timeStamp of the chartPoint with the highest timestamp that is still lower than the endDate, in the list of glucoseChartPoints
+    private func loopThroughGlucoseChartPointsAndFindValues() {
+
+        maximumValueInGlucoseChartPoints = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        
+        lastChartPointEarlierThanEndDate = nil
+        
+        for glucoseChartPoint in glucoseChartPoints {
+
+            maximumValueInGlucoseChartPoints = max(maximumValueInGlucoseChartPoints, glucoseChartPoint.y.scalar)
+                
+            if let lastChartPointEarlierThanEndDate = lastChartPointEarlierThanEndDate {
+                
+                if
+                    (glucoseChartPoint.x as! ChartAxisValueDate).date <= endDate
+                    &&
+                    (lastChartPointEarlierThanEndDate.x as! ChartAxisValueDate).date < (glucoseChartPoint.x as! ChartAxisValueDate).date {
+                    
+                    self.lastChartPointEarlierThanEndDate = glucoseChartPoint
+                    
+                }
+                
+            } else {
+                
+                lastChartPointEarlierThanEndDate = glucoseChartPoint
+                
+            }
+
+        }
         
     }
     

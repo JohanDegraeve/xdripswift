@@ -58,20 +58,71 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
     
     /// user long pressed the value label
-    @IBAction func valueLabelLongPressedAction(_ sender: UILongPressGestureRecognizer) {
+    @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
         valueLabelLongPressed(sender)
     }
     
+    @IBAction func chartPanGestureRecognizerAction(_ sender: UIPanGestureRecognizer) {
+        
+        glucoseChartManager.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: {
+
+            // user has been panning, if chart is panned backward, then need to set valueLabel to value of latest chartPoint shown in the chart, and minutesAgo text to timeStamp of latestChartPoint
+            if self.glucoseChartManager.chartIsPannedBackward {
+
+                if let lastChartPointEarlierThanEndDate = self.glucoseChartManager.lastChartPointEarlierThanEndDate, let chartAxisValueDate = lastChartPointEarlierThanEndDate.x as? ChartAxisValueDate  {
+                    
+                    // valuueLabel text should not be strikethrough (might still be strikethrough in case latest reading is older than 10 minutes
+                    self.valueLabelOutlet.attributedText = nil
+                    // set value to value of latest chartPoint
+                    self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                    
+                    // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
+                    self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
+                    self.minutesLabelOutlet.textColor = UIColor.red
+                    
+                    // don't show anything in diff outlet
+                    self.diffLabelOutlet.text = ""
+                    
+                } else {
+                    
+                    // this should normally not happen because lastChartPointEarlierThanEndDate should normally always be set
+                    self.updateLabelsAndChart()
+                    
+                }
+
+            } else {
+                
+                // chart is not panned, update labels is necessary
+                self.updateLabelsAndChart()
+                
+            }
+            
+        })
+        
+    }
+    
+    @IBOutlet var chartPanGestureRecognizerOutlet: UIPanGestureRecognizer!
+    
+    @IBAction func chartLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
+        
+        // this one needs trigger in case user has panned, chart is decelerating, user clicks to stop the decleration, call to handleUIGestureRecognizer will stop the deceleration
+        // there's no completionhandler needed because the call in chartPanGestureRecognizerAction to handleUIGestureRecognizer already includes a completionhandler
+        glucoseChartManager.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: nil)
+        
+    }
+    
+    @IBOutlet var chartLongPressGestureRecognizerOutlet: UILongPressGestureRecognizer!
+    
     // MARK: - Constants for ApplicationManager usage
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updatelabelstimer
-    private let applicationManagerKeyCreateUpdateLabelsTimer = "RootViewController-CreateUpdateLabelsTimer"
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updateLabelsAndChartTimer
+    private let applicationManagerKeyCreateupdateLabelsAndChartTimer = "RootViewController-CreateupdateLabelsAndChartTimer"
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate updatelabelstimer
-    private let applicationManagerKeyInvalidateUpdateLabelsTimer = "RootViewController-InvalidateUpdateLabelsTimer"
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate updateLabelsAndChartTimer
+    private let applicationManagerKeyInvalidateupdateLabelsAndChartTimer = "RootViewController-InvalidateupdateLabelsAndChartTimer"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - updateLabels
-    private let applicationManagerKeyUpdateLabels = "RootViewController-UpdateLabels"
+    private let applicationManagerKeyUpdateLabelsAndChart = "RootViewController-UpdateLabelsAndChart"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initiate pairing
     private let applicationManagerKeyInitiatePairing = "RootViewController-InitiatePairing"
@@ -138,24 +189,43 @@ final class RootViewController: UIViewController {
     /// timestamp of last notification for pairing
     private var timeStampLastNotificationForPairing:Date?
     
-    /// manages m5Stack that this app knows
+    /// manages m5Stacks that this app knows
     private var m5StackManager: M5StackManager?
     
     /// manage glucose chart
-    private var glucoseChartManager: GlucoseChartManager?
+    private var glucoseChartManager: GlucoseChartManager!
+    
+    /// dateformatter for minutesLabelOutlet, when user is panning the chart
+    private let dateTimeFormatterForMinutesLabelWhenPanning: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = ConstantsGlucoseChart.dateFormatLatestChartPointWhenPanning
+        
+        return dateFormatter
+    }()
     
     // MARK: - View Life Cycle
     
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // never seen it triggered, copied that from Loop
+        glucoseChartManager.didReceiveMemoryWarning()
+        
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart()
+        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // initialize glucoseChartManager
+        glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet)
+
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
         // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like initializing the views
         coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
@@ -168,16 +238,13 @@ final class RootViewController: UIViewController {
             // create transmitter based on UserDefaults
             self.initializeCGMTransmitter()
 
-            // glucoseChartManager still needs the refernce to coreDataManager
-            self.glucoseChartManager?.coreDataManager = self.coreDataManager
-            // and now call again updateGlucoseChart, as readings can be fetched now from coreData
-            self.updateGlucoseChart()
+            // glucoseChartManager still needs the reference to coreDataManager
+            self.glucoseChartManager.coreDataManager = self.coreDataManager
+            // and now call again updateChart, as readings can be fetched now from coreData
+            self.updateChartWithResetEndDate()
 
         })
         
-        // initialize glucoseChartManager
-        glucoseChartManager = GlucoseChartManager()
-
         // Setup View
         setupView()
         
@@ -217,7 +284,7 @@ final class RootViewController: UIViewController {
         self.tabBarController?.delegate = self
         
         // setup the timer logic for updating the view regularly
-        setupUpdateLabelsTimer()
+        setupUpdateLabelsAndChartTimer()
         
         // if licenseinfo not yet accepted, show license info with only ok button
         if !UserDefaults.standard.licenseInfoAccepted {
@@ -236,15 +303,15 @@ final class RootViewController: UIViewController {
             self.present(alert, animated: true, completion: nil)
         }
         
-        // whenever app comes from-back to freground, updateLabels needs to be called
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabels, closure: {self.updateLabelsAndChart()})
+        // whenever app comes from-back to foreground, updateLabelsAndChart needs to be called
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {self.updateLabelsAndChart()})
         
         // setup AVAudioSession
         setupAVAudioSession()
         
         // initialize chartGenerator in chartOutlet
         self.chartOutlet.chartGenerator = { [weak self] (frame) in
-            return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
+            return self?.glucoseChartManager.glucoseChartWithFrame(frame)?.view
         }
         
         // user may have long pressed the value label, so the screen will not lock, when going back to background, set isIdleTimerDisabled back to false
@@ -496,8 +563,10 @@ final class RootViewController: UIViewController {
         preSnoozeButtonOutlet.setTitle(Texts_HomeView.snoozeButton, for: .normal)
         transmitterButtonOutlet.setTitle(Texts_HomeView.transmitter, for: .normal)
         
-        // at this moment, coreDataManager is not yet initialized, we're just calling here prerender and reloadChart to show the chart with x and y axis and gridlines, but without readings. The readings will be loaded once coreDataManager is setup, after which updateGlucoseChart() will be called, which will initiate loading of readings from coredata
-        self.glucoseChartManager?.prerender()
+        chartLongPressGestureRecognizerOutlet.delegate = self
+        chartPanGestureRecognizerOutlet.delegate = self
+        
+        // at this moment, coreDataManager is not yet initialized, we're just calling here prerender and reloadChart to show the chart with x and y axis and gridlines, but without readings. The readings will be loaded once coreDataManager is setup, after which updateChart() will be called, which will initiate loading of readings from coredata
         self.chartOutlet.reloadChart()
 
     }
@@ -513,12 +582,10 @@ final class RootViewController: UIViewController {
         
     }
     
-    private func updateGlucoseChart() {
+    /// will update the chart with endDate = currentDate
+    private func updateChartWithResetEndDate() {
         
-        glucoseChartManager?.updateGlucoseChartPoints {
-            self.glucoseChartManager?.prerender()
-            self.chartOutlet.reloadChart()
-        }
+        glucoseChartManager.updateGlucoseChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, completionHandler: nil)
 
     }
     
@@ -541,34 +608,34 @@ final class RootViewController: UIViewController {
     /// launches timer that will do regular screen updates - and adds closure to ApplicationManager : when going to background, stop the timer, when coming to foreground, restart the timer
     ///
     /// should be called only once immediately after app start, ie in viewdidload
-    private func setupUpdateLabelsTimer() {
+    private func setupUpdateLabelsAndChartTimer() {
         
         // this is the actual timer
-        var updateLabelsTimer:Timer?
+        var updateLabelsAndChartTimer:Timer?
         
         // create closure to invalide the timer, if it exists
-        let invalidateUpdateLabelsTimer = {
-            if let updateLabelsTimer = updateLabelsTimer {
-                updateLabelsTimer.invalidate()
+        let invalidateUpdateLabelsAndChartTimer = {
+            if let updateLabelsAndChartTimer = updateLabelsAndChartTimer {
+                updateLabelsAndChartTimer.invalidate()
             }
         }
         
         // create closure that launches the timer to update the first view every x seconds, and returns the created timer
-        let createAndScheduleUpdateLabelsTimer:() -> Timer = {
+        let createAndScheduleUpdateLabelsAndChartTimer:() -> Timer = {
             // check if timer already exists, if so invalidate it
-            invalidateUpdateLabelsTimer()
+            invalidateUpdateLabelsAndChartTimer()
             // now recreate, schedule and return
             return Timer.scheduledTimer(timeInterval: ConstantsHomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabelsAndChart), userInfo: nil, repeats: true)
         }
         
-        // call scheduleUpdateLabelsTimer function now - as the function setupUpdateLabelsTimer is called from viewdidload, it will be called immediately after app launch
-        updateLabelsTimer = createAndScheduleUpdateLabelsTimer()
+        // call scheduleUpdateLabelsAndChartTimer function now - as the function setupUpdateLabelsAndChartTimer is called from viewdidload, it will be called immediately after app launch
+        updateLabelsAndChartTimer = createAndScheduleUpdateLabelsAndChartTimer()
         
-        // updateLabelsTimer needs to be created when app comes back from background to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyCreateUpdateLabelsTimer, closure: {updateLabelsTimer = createAndScheduleUpdateLabelsTimer()})
+        // updateLabelsAndChartTimer needs to be created when app comes back from background to foreground
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyCreateupdateLabelsAndChartTimer, closure: {updateLabelsAndChartTimer = createAndScheduleUpdateLabelsAndChartTimer()})
         
-        // updateLabelsTimer needs to be invalidated when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateUpdateLabelsTimer, closure: {invalidateUpdateLabelsTimer()})
+        // updateLabelsAndChartTimer needs to be invalidated when app goes to background
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateupdateLabelsAndChartTimer, closure: {invalidateUpdateLabelsAndChartTimer()})
     }
     
     /// opens an alert, that requests user to enter a calibration value, and calibrates
@@ -854,78 +921,80 @@ final class RootViewController: UIViewController {
         }
     }
     
-    /// updates the homescreen labels and chart
+    /// updates the labels and the chart,
     @objc private func updateLabelsAndChart() {
         
-        // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabels is called from viewDidload at app launch
+        // check if chart is currently panned back in time, in that case we don't update the labels
+        if glucoseChartManager.chartIsPannedBackward {
+            return
+        }
+
+        // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
-        // last reading and lateButOneReading variable definition - optional
-        var lastReading:BgReading?
-        var lastButOneReading:BgReading?
+        // set minutesLabelOutlet.textColor to black, might still be red due to panning back in time
+        self.minutesLabelOutlet.textColor = UIColor.black
         
-        // assign latestReading if it exists
-        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-        if latestReadings.count > 0 {
-            lastReading = latestReadings[0]
-        }
-        if latestReadings.count > 1 {
-            lastButOneReading = latestReadings[1]
-        }
+        // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's not going to be a latestReading
+        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
-        // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's no going to be a latestReading
-        if let lastReading = lastReading {
-            
-            // start creating text for valueLabelOutlet, first the calculated value
-            var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-            
-            // if latestReading older dan 11 minutes, then it should be strikethrough
-            if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
-                
-                let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
-                attributeString.addAttribute(.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
-                
-                valueLabelOutlet.attributedText = attributeString
-                
-            } else {
-                
-                if !lastReading.hideSlope {
-                    calculatedValueAsString = calculatedValueAsString + " " + lastReading.slopeArrow()
-                }
-                
-                // no strikethrough needed, but attributedText may still be set to strikethrough from previous period during which there was no recent reading. Always set it to nil here, this removes the strikethrough attribute
-                valueLabelOutlet.attributedText = nil
-                
-                valueLabelOutlet.text = calculatedValueAsString
-                
-            }
-            
-            // set color, depending on value lower than low mark or higher than high mark
-            if lastReading.calculatedValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
-                valueLabelOutlet.textColor = UIColor.red
-            } else if lastReading.calculatedValue >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
-                valueLabelOutlet.textColor = "#a0b002".hexStringToUIColor()
-            } else {
-                valueLabelOutlet.textColor = UIColor.black
-            }
-            
-            // get minutes ago and create text for minutes ago label
-            let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
-            let minutesAgoText = minutesAgo.description + " " + (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) + " " + Texts_HomeView.ago
-            
-            minutesLabelOutlet.text = minutesAgoText
-            
-            // create delta text
-            diffLabelOutlet.text = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-            
-        } else {
+        // if there's no readings, then give empty fields
+        guard latestReadings.count > 0 else {
             valueLabelOutlet.text = "---"
             minutesLabelOutlet.text = ""
             diffLabelOutlet.text = ""
+            return
+        }
+
+        // assign last reading
+        let lastReading = latestReadings[0]
+        // assign last but one reading
+        let lastButOneReading = latestReadings.count > 1 ? latestReadings[1]:nil
+
+        // start creating text for valueLabelOutlet, first the calculated value
+        var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        
+        // if latestReading older dan 11 minutes, then it should be strikethrough
+        if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
+            
+            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
+            attributeString.addAttribute(.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
+            
+            valueLabelOutlet.attributedText = attributeString
+            
+        } else {
+            
+            if !lastReading.hideSlope {
+                calculatedValueAsString = calculatedValueAsString + " " + lastReading.slopeArrow()
+            }
+            
+            // no strikethrough needed, but attributedText may still be set to strikethrough from previous period during which there was no recent reading. Always set it to nil here, this removes the strikethrough attribute
+            valueLabelOutlet.attributedText = nil
+            
+            valueLabelOutlet.text = calculatedValueAsString
+            
         }
         
-        // update chart
-        updateGlucoseChart()
+        // set color, depending on value lower than low mark or higher than high mark
+        if lastReading.calculatedValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+            valueLabelOutlet.textColor = UIColor.red
+        } else if lastReading.calculatedValue >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+            valueLabelOutlet.textColor = "#a0b002".hexStringToUIColor()
+        } else {
+            valueLabelOutlet.textColor = UIColor.black
+        }
+        
+        // get minutes ago and create text for minutes ago label
+        let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
+        let minutesAgoText = minutesAgo.description + " " + (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) + " " + Texts_HomeView.ago
+        
+        minutesLabelOutlet.text = minutesAgoText
+        
+        // create delta text
+        diffLabelOutlet.text = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+
+        // update the chart up to now
+        updateChartWithResetEndDate()
         
     }
     
@@ -1326,7 +1395,7 @@ extension RootViewController:CGMTransmitterDelegate {
         let maxTimeUserCanOpenApp = Date(timeIntervalSinceNow: TimeInterval(ConstantsDexcomG5.maxTimeToAcceptPairingInSeconds - 1))
         
         // we will not just count on it that the user will click the notification to open the app (assuming the app is in the background, if the app is in the foreground, then we come in another flow)
-        // whenever app comes from-back to foreground, updateLabels needs to be called
+        // whenever app comes from-back to foreground, updateLabelsAndChart needs to be called
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyInitiatePairing, closure: {
             
             // first of all reremove from application key manager
@@ -1592,4 +1661,22 @@ extension RootViewController:NightScoutFollowerDelegate {
             }
         }
     }
+}
+
+extension RootViewController: UIGestureRecognizerDelegate {
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        
+        if gestureRecognizer.view != chartOutlet {
+            return false
+        }
+        
+        if gestureRecognizer.view != otherGestureRecognizer.view {
+            return false
+        }
+        
+        return true
+        
+    }
+    
 }
