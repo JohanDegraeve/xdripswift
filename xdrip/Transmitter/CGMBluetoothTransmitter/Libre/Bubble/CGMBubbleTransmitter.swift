@@ -148,7 +148,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
                         
                         // get hardware, firmware and batteryPercentage
                         let hardware = value[2].description + ".0"
-                        let firmware = value[1].description + ".0"
+                        let firmware = value[2].description + "." + value[3].description
                         let batteryPercentage = Int(value[4])
 
                         // send hardware, firmware and batteryPercentage to delegate
