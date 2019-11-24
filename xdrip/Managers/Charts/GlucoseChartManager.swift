@@ -94,7 +94,7 @@ public final class GlucoseChartManager {
     private var gestureTimer:RepeatingTimer?
     
     /// used when user stopped panning and deceleration is still ongoing. If set to true, then deceleration needs to be stopped
-    private var stopDeceleration = false
+    private var stopDecelerationNextGestureTimerRun = false
     
     /// the maximum value in glucoseChartPoints array between start and endPoint
     ///
@@ -296,10 +296,10 @@ public final class GlucoseChartManager {
     private func stopDeceleration() {
         
         // user touches the chart, in case we're handling a decelerating gesture, stop it
-        // call to suspend doesn't really seem to stop the deceleration, that's why also setting to nil and using stopDeceleration
+        // call to suspend doesn't really seem to stop the deceleration, that's why also setting to nil and using stopDecelerationNextGestureTimerRun
         gestureTimer?.suspend()
         gestureTimer = nil
-        stopDeceleration = true
+        stopDecelerationNextGestureTimerRun = true
 
     }
     
@@ -393,14 +393,14 @@ public final class GlucoseChartManager {
         /// initial distance travelled is nul, this will be increased each time
         var distanceTravelled: CGFloat = 0.0
         
-        // set stopDeceleration to false initially
-        stopDeceleration = false
+        // set stopDecelerationNextGestureTimerRun to false initially
+        stopDecelerationNextGestureTimerRun = false
         
         // at regulat intervals new distance to travel the chart will be calculated and setNewStartAndEndDate will be called
         gestureTimer = RepeatingTimer(timeInterval: TimeInterval(ConstantsGlucoseChart.decelerationTimerValueInSeconds), eventHandler: {
             
-            // if stopDeceleration is set, then return
-            if self.stopDeceleration {
+            // if stopDecelerationNextGestureTimerRun is set, then return
+            if self.stopDecelerationNextGestureTimerRun {
                 return
             }
             
