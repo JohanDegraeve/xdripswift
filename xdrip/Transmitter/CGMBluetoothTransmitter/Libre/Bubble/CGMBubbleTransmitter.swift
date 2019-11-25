@@ -245,10 +245,10 @@ class CGMBubbleTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, C
 }
 
 fileprivate enum BubbleResponseType: UInt8 {
-    case dataPacket = 130
-    case dataInfo = 128
-    case noSensor = 191
-    case serialNumber = 192
+    case dataPacket = 130 //0x82
+    case dataInfo = 128 //0x80
+    case noSensor = 191 //0xBF
+    case serialNumber = 192 //0xC0
 }
 
 extension BubbleResponseType: CustomStringConvertible {
