@@ -183,6 +183,18 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         
     }
     
+    /// writes brightness to the M5Stack
+    /// - returns:
+    ///     true if successfully transmitted to M5Stack, doesn't mean M5Stack did receive it, but chance is high
+    /// - parameters:
+    ///     brightness value as expected by M5Stack, between 0 and 100
+    func writeBrightness(brightness: Int) -> Bool {
+        
+        trace("in writeBrightness, attempting to send", log: log, type: .info)
+        return writeDataToPeripheral(data: brightness.toData(), opCode: .writeBrightnessTx)
+        
+    }
+    
     /// writes a wifi name
     /// - parameters:
     ///     - name : the wifi name or ssid, if nil then nothing is sent

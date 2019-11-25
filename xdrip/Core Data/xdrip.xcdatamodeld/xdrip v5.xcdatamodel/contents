@@ -59,6 +59,7 @@
         <attribute name="address" attributeType="String"/>
         <attribute name="backGroundColor" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="blepassword" optional="YES" attributeType="String"/>
+        <attribute name="brightness" optional="YES" attributeType="Integer 16" defaultValueString="100" usesScalarValueType="YES"/>
         <attribute name="name" attributeType="String"/>
         <attribute name="rotation" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -81,7 +82,7 @@
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
-        <element name="M5Stack" positionX="-657" positionY="180" width="128" height="163"/>
+        <element name="M5Stack" positionX="-657" positionY="180" width="128" height="178"/>
         <element name="M5StackName" positionX="-657" positionY="180" width="128" height="75"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="120"/>
     </elements>

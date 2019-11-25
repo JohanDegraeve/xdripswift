@@ -28,6 +28,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// rotation
     case rotation = 7
     
+    /// case brightness
+    case brightness = 8
+    
 }
 
 /// UIViewController to show 
@@ -112,11 +115,19 @@ final class M5StackViewController: UIViewController {
     /// temp storage of value while user is editing the M5Stack attributes
     private var backGroundColorTemporaryValue: M5StackColor?
     
+    /// brightness to be used in M5Stack
+    ///
+    /// temp storage of value while user is editing the M5Stack attributes
+    private var brightnessTemporaryValue: Int?
+    
     /// M5StackNames accessor
     private var m5StackNameAccessor: M5StackNameAccessor?
     
     /// possible rotation keys, , the value is shown to the user
     private let rotationStrings: [String] = [ "0", "90", "180", "270"]
+    
+    /// possible brightness values, the value is shown to the user
+    private let brightnessStrings: [String] = ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"]
     
     // MARK:- public functions
     
@@ -146,6 +157,9 @@ final class M5StackViewController: UIViewController {
             
             // temporary store the value of backGroundColor, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
             backGroundColorTemporaryValue = M5StackColor(forUInt16: UInt16(m5StackAsNSObject.backGroundColor))
+            
+            // temporary store the value of brightness, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
+            brightnessTemporaryValue = Int(m5StackAsNSObject.brightness)
             
             // don't delete the M5Stack when going back to prevous viewcontroller
             deleteM5StackWhenClosingViewController = false
@@ -270,6 +284,11 @@ final class M5StackViewController: UIViewController {
             // store value of rotation
             if let rotation = rotationTempValue {
                 m5StackAsNSObject.rotation = Int32(rotation)
+            }
+            
+            // store value of brightness
+            if let brightness = brightnessTemporaryValue {
+                m5StackAsNSObject.brightness = Int16(brightness)
             }
             
             // save all changes now
@@ -544,6 +563,17 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
 
             cell.accessoryType = .disclosureIndicator
             
+        case .brightness:
+            cell.textLabel?.text = Texts_SettingsView.m5StackBrightness
+            
+            if let brightness = brightnessTemporaryValue {
+                cell.detailTextLabel?.text = brightnessStrings[Int(brightness/10)]
+            } else {
+                cell.detailTextLabel?.text = brightnessStrings[brightnessStrings.count - 1]
+            }
+            
+            cell.accessoryType = .disclosureIndicator
+            
         }
         
         return cell
@@ -744,6 +774,49 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
             
             // create and present PickerViewController
             PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+            
+        case .brightness:
+            
+            //find index for brightness stored in M5Stack or use 100 as default value
+            var selectedRow:Int? = nil
+            // brightness goes from 0 to 100, in steps of 10. Dividing by 10 gives the selected row
+            if let brightness = brightnessTemporaryValue {
+                selectedRow = brightness/10
+            } else {
+                // default value is 100
+                selectedRow = 10
+            }
+            
+            // configure PickerViewData
+            let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: Texts_SettingsView.m5StackBrightness, withData: brightnessStrings, selectedRow: selectedRow, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ index: Int) in
+                
+                if index != selectedRow {
+                    
+                    // set rotationTempValue to new rotation
+                    self.brightnessTemporaryValue = index * 10
+                    
+                    // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
+                    if let m5Stack = self.m5StackAsNSObject, let m5StackManager = self.m5StackManager {
+                        if let blueToothTransmitter = m5StackManager.m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeBrightness(brightness: index * 10) {
+                            // do nothing, brightness successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
+                        } else {
+                            m5StackManager.updateNeeded(forM5Stack: m5Stack)
+                        }
+                    }
+                    
+                    // reload table
+                    tableView.reloadRows(at: [IndexPath(row: Setting.brightness.rawValue, section: 0)], with: .none)
+                    
+                    // enable the done button
+                    self.doneButtonOutlet.enable()
+                    
+                }
+                
+            }, onCancelClick: nil, didSelectRowHandler: nil)
+            
+            // create and present PickerViewController
+            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+
 
         }
     }

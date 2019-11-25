@@ -49,3 +49,4 @@
 "m5stack_settingsviews_backGroundColor" = "Background Color";
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth password";
+"m5stack_settingsviews_brightness" = "Brightness";

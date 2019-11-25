@@ -247,4 +247,7 @@ class Texts_SettingsView {
         return NSLocalizedString("m5stack_settingsviews_giveBluetoothPassword", tableName: filename, bundle: Bundle.main, value: "Enter Bluetooth password", comment: "M5 stack bluetooth  settings, pop up that asks user to enter the password")
     }()
 
+    static let m5StackBrightness: String = {
+        return NSLocalizedString("m5stack_settingsviews_brightness", tableName: filename, bundle: Bundle.main, value: "Brightness", comment: "M5 stack setting, brightness")
+    }()
 }

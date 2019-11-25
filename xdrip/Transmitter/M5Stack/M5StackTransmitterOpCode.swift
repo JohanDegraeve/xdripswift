@@ -53,8 +53,11 @@ enum M5StackTransmitterOpCodeTx: UInt8, CaseIterable {
     /// write backGroundColor to M5Stack
     case writeBackGroundColorTx = 0x17
     
-    /// write rotationToM5Stack to M5Stack
+    /// write rotation to M5Stack
     case writeRotationTx = 0x18
+    
+    /// write brightness to M5Stack
+    case writeBrightnessTx = 0x19
     
 }
 

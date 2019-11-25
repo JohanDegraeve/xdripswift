@@ -457,7 +457,7 @@ extension M5StackManager: M5StackBluetoothDelegate {
             bluetoothTransmitter.stopScanning()
             
             // create a new M5Stack with new peripheral's address and name
-            let newM5Stack = M5Stack(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+            let newM5Stack = M5Stack(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, brightness: 100, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
             
             // assign password stored in UserDefaults (might be nil)
             newM5Stack.blepassword = UserDefaults.standard.m5StackBlePassword

@@ -12,6 +12,7 @@ import CoreData
 /// - backGroundColor : color to use, see M5StackColor
 /// - m5StackName : optional. A reference to a user defined name
 /// - rotation : screen rotation to apply, between 0 and 360
+/// - brightness : value between 0 and 100
 public class M5Stack: NSManagedObject {
 
     /// this property is not stored in coreData. It is used to keep track of parameter updates sent to the M5Stack. If value is true, then xdrip needs to send an update off all parameters to this M5Stack as soon as possible (ie when connected)
@@ -20,7 +21,7 @@ public class M5Stack: NSManagedObject {
     /// create M5Stack, shouldconnect default value = true
     /// - parameters:
     ///     - rotation is internally stored as Int32, actual value should always be between 0 and 360 so UInt16 as parameter is sufficient.
-    init(address: String, name: String, textColor: M5StackColor, backGroundColor: M5StackColor, rotation: UInt16, nsManagedObjectContext:NSManagedObjectContext) {
+    init(address: String, name: String, textColor: M5StackColor, backGroundColor: M5StackColor, rotation: UInt16, brightness: Int, nsManagedObjectContext:NSManagedObjectContext) {
        
         let entity = NSEntityDescription.entity(forEntityName: "M5Stack", in: nsManagedObjectContext)!
         
@@ -32,6 +33,7 @@ public class M5Stack: NSManagedObject {
         self.textcolor = Int32(textColor.rawValue)
         self.backGroundColor = Int32(backGroundColor.rawValue)
         self.rotation = Int32(rotation)
+        self.brightness = Int16(brightness)
         
     }
     
