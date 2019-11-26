@@ -1,7 +1,7 @@
 import Foundation
 
-/// used by M5Stack UI view controllers - it's the glue between M5StackManager and UIViewControllers - defines functions to scan for devices, connect/disconnect, delete an M5 stack, change the username, etc. 
-protocol M5StackManaging: AnyObject {
+/// used by M5Stack UI view controllers - it's the glue between BluetoothPeripheralManager and UIViewControllers - defines functions to scan for devices, connect/disconnect, delete an M5 stack, change the username, etc.
+protocol BluetoothPeripheralManaging: AnyObject {
     
     /// to scan for a new M5SStack - callback will be called when a new M5Stack is found and connected
     func startScanningForNewDevice(callback: @escaping (M5Stack) -> Void)
@@ -21,7 +21,7 @@ protocol M5StackManaging: AnyObject {
     /// deletes the M5Stack in coredata, and also the corresponding M5StackBluetoothTransmitter if there is one will be deleted
     func deleteM5Stack(m5Stack: M5Stack)
     
-    /// - returns: the M5Stack's managed by this M5StackManager
+    /// - returns: the M5Stack's managed by this BluetoothPeripheralManager
     func m5Stacks() -> [M5Stack]
     
     /// sets flag m5StacksParameterUpdateNeeded for m5Stack to true

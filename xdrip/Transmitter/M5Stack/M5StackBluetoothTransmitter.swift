@@ -11,7 +11,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     
     /// will be used to pass data back
     ///
-    /// there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : M5StackManager and UIViewControllers. There's only one instance of M5StackManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
+    /// there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : BluetoothPeripheralManager and UIViewControllers. There's only one instance of BluetoothPeripheralManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
     public weak var m5StackBluetoothTransmitterDelegateVariable: M5StackBluetoothDelegate?
 
     // MARK: - private properties
@@ -36,7 +36,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     
     /// will be used to pass data back
     ///
-    /// there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : M5StackManager and UIViewControllers. There's only one instance of M5StackManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
+    /// there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : BluetoothPeripheralManager and UIViewControllers. There's only one instance of BluetoothPeripheralManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
     private weak var m5StackBluetoothTransmitterDelegateFixed:M5StackBluetoothDelegate!
     
     /// is the transmitter ready to receive data like parameter updates or reading values
@@ -49,7 +49,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
 
     /// - parameters:
     ///     - m5Stack : an instance of M5Stack, if nil then this instance is created to scan for a new M5Stack, address and name not yet known, so not possible yet to create an M5Stack instance
-    ///     - delegateFixed : there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : M5StackManager and UIViewControllers. There's only one instance of M5StackManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
+    ///     - delegateFixed : there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : BluetoothPeripheralManager and UIViewControllers. There's only one instance of BluetoothPeripheralManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
     ///     - blePassword : optional. If nil then xdrip will send a M5StackReadBlePassWordTxMessage to the M5Stack, so this would be a case where the M5Stack (all M5Stacks managed by xdrip) do not have a fixed blepassword
     /// The blepassword in the M5Stack object gets priority over the blePassword in the parameter list
     init(m5Stack: M5Stack?, delegateFixed: M5StackBluetoothDelegate, blePassword: String?) {

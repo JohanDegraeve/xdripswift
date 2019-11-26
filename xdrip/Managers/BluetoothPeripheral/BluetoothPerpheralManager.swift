@@ -2,7 +2,7 @@ import Foundation
 import os
 import CoreBluetooth
 
-class M5StackManager: NSObject {
+class BluetoothPeripheralManager: NSObject {
     
     // MARK: - private properties
     
@@ -10,7 +10,7 @@ class M5StackManager: NSObject {
     private let coreDataManager:CoreDataManager
     
     /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryM5StackManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBluetoothPeripheralManager)
     
     /// dictionary with key = an instance of M5Stack, and value an instance of M5StackBluetoothTransmitter. Value can be nil in which case we found an M5Stack in the coredata but shouldconnect == false so we don't instanstiate an M5StackBluetoothTransmitter
     private var m5StacksBlueToothTransmitters = [M5Stack : M5StackBluetoothTransmitter?]()
@@ -282,9 +282,9 @@ class M5StackManager: NSObject {
 
 // MARK: - extensions
 
-// MARK: extension M5StackManaging
+// MARK: extension BluetoothPeripheralManaging
 
-extension M5StackManager: M5StackManaging {
+extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
     
     /// to scan for a new M5SStack - callback will be called when a new M5Stack is found and connected
     func startScanningForNewDevice(callback: @escaping (M5Stack) -> Void) {
@@ -376,7 +376,7 @@ extension M5StackManager: M5StackManaging {
         
     }
     
-    /// - returns: the M5Stack's managed by this M5StackManager
+    /// - returns: the M5Stack's managed by this BluetoothPeripheralManager
     func m5Stacks() -> [M5Stack] {
         return Array(m5StacksBlueToothTransmitters.keys)
     }
@@ -396,7 +396,7 @@ extension M5StackManager: M5StackManaging {
 
 // MARK: extensions M5StackBluetoothDelegate
 
-extension M5StackManager: M5StackBluetoothDelegate {
+extension BluetoothPeripheralManager: M5StackBluetoothDelegate {
     
     /// m5Stack is asking for an update of all parameters, send them
     func isAskingForAllParameters(m5Stack: M5Stack) {
@@ -411,7 +411,7 @@ extension M5StackManager: M5StackBluetoothDelegate {
 
     }
     
-    /// will be called if M5Stack is connected, and authentication was successful, M5StackManager can start sending data like parameter updates or bgreadings
+    /// will be called if M5Stack is connected, and authentication was successful, BluetoothPeripheralManager can start sending data like parameter updates or bgreadings
     func isReadyToReceiveData(m5Stack : M5Stack) {
         
         // if the M5Stack needs new parameters, then send them

@@ -7,17 +7,17 @@ final class M5StackNavigationController: UINavigationController {
     /// reference to coreDataManager
     private var coreDataManager:CoreDataManager?
     
-    /// an m5stackManager
-    private weak var m5StackManager: M5StackManaging?
+    /// a bluetoothPeripheralManager
+    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging?
     
     // MARK:- public functions
     
     /// configure
-    public func configure(coreDataManager: CoreDataManager, m5StackManager: M5StackManaging) {
+    public func configure(coreDataManager: CoreDataManager, bluetoothPeripheralManager: BluetoothPeripheralManaging) {
         
         // initalize private properties
         self.coreDataManager = coreDataManager
-        self.m5StackManager = m5StackManager
+        self.bluetoothPeripheralManager = bluetoothPeripheralManager
         
     }
     
@@ -34,8 +34,8 @@ final class M5StackNavigationController: UINavigationController {
 extension M5StackNavigationController: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         
-        if let m5StacksViewController = viewController as? M5StacksViewController, let coreDataManager = coreDataManager, let m5StackManager = m5StackManager {
-            m5StacksViewController.configure(coreDataManager: coreDataManager, m5StackManager: m5StackManager)
+        if let m5StacksViewController = viewController as? M5StacksViewController, let coreDataManager = coreDataManager, let bluetoothPeripheralManager = bluetoothPeripheralManager {
+            m5StacksViewController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
         }
     }
 }

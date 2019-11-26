@@ -91,8 +91,8 @@ enum ConstantsLog {
     /// for use in M5Stack
     static let categoryM5StackBluetoothTransmitter = "categoryM5StackBluetoothTransmitter"
     
-    /// M5Stack manager logging
-    static let categoryM5StackManager = "categoryM5StackManager"
+    /// BluetoothPeripheralManager logging
+    static let categoryBluetoothPeripheralManager = "categoryBluetoothPeripheralManager"
 
     /// StatusChartsManager logging
     static let categoryGlucoseChartManager = "categoryGlucoseChartManager"

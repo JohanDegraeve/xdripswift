@@ -190,7 +190,7 @@ final class RootViewController: UIViewController {
     private var timeStampLastNotificationForPairing:Date?
     
     /// manages m5Stacks that this app knows
-    private var m5StackManager: M5StackManager?
+    private var bluetoothPeripheralManager: BluetoothPeripheralManager?
     
     /// manage glucose chart
     private var glucoseChartManager: GlucoseChartManager!
@@ -332,7 +332,7 @@ final class RootViewController: UIViewController {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, m5StackManager
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager
     private func setupApplicationData() {
         
         // if coreDataManager is nil then there's no reason to continue
@@ -388,8 +388,8 @@ final class RootViewController: UIViewController {
             
         })
         
-        // setup m5StackManager
-        m5StackManager = M5StackManager(coreDataManager: coreDataManager)
+        // setup bluetoothPeripheralManager
+        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager)
         
     }
     
@@ -484,7 +484,7 @@ final class RootViewController: UIViewController {
                 
                 dexcomShareUploadManager?.upload()
                 
-                m5StackManager?.sendLatestReading()
+                bluetoothPeripheralManager?.sendLatestReading()
                 
             }
         }
@@ -1495,9 +1495,9 @@ extension RootViewController: UITabBarControllerDelegate {
             
             navigationController.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
             
-        } else if let navigationController = viewController as? M5StackNavigationController, let m5StackManager = m5StackManager, let coreDataManager = coreDataManager {
+        } else if let navigationController = viewController as? M5StackNavigationController, let bluetoothPeripheralManager = bluetoothPeripheralManager, let coreDataManager = coreDataManager {
 
-            navigationController.configure(coreDataManager: coreDataManager, m5StackManager: m5StackManager)
+            navigationController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
             
         }
     }
@@ -1656,7 +1656,7 @@ extension RootViewController:NightScoutFollowerDelegate {
                     bgReadingSpeaker.speakNewReading()
                 }
                 
-                m5StackManager?.sendLatestReading()
+                bluetoothPeripheralManager?.sendLatestReading()
                 
             }
         }

@@ -26,8 +26,8 @@ final class M5StacksViewController: UIViewController {
     /// reference to coreDataManager
     private var coreDataManager:CoreDataManager?
     
-    /// an m5stackManager
-    private weak var m5StackManager: M5StackManaging?
+    /// a bluetoothPeripheralManager
+    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging?
 
     /// list of M5Stack's
     private var m5Stacks: [M5Stack] = []
@@ -35,11 +35,11 @@ final class M5StacksViewController: UIViewController {
     // MARK: public functions
     
     /// configure
-    public func configure(coreDataManager: CoreDataManager, m5StackManager: M5StackManaging) {
+    public func configure(coreDataManager: CoreDataManager, bluetoothPeripheralManager: BluetoothPeripheralManaging) {
         
         // initalize private properties
         self.coreDataManager = coreDataManager
-        self.m5StackManager = m5StackManager
+        self.bluetoothPeripheralManager = bluetoothPeripheralManager
         initializeM5Stacks()
         
     }
@@ -68,11 +68,11 @@ final class M5StacksViewController: UIViewController {
         switch segueIdentifierAsCase {
             
         case M5StackViewController.SegueIdentifiers.M5StacksToM5StackSegueIdentifier:
-            guard let vc = segue.destination as? M5StackViewController, let coreDataManager = coreDataManager, let m5StackManager = m5StackManager else {
-                fatalError("In M5StacksViewController, prepare for segue, viewcontroller is not M5StackViewController or coreDataManager is nil or m5StackManager is nil" )
+            guard let vc = segue.destination as? M5StackViewController, let coreDataManager = coreDataManager, let bluetoothPeripheralManager = bluetoothPeripheralManager else {
+                fatalError("In M5StacksViewController, prepare for segue, viewcontroller is not M5StackViewController or coreDataManager is nil or bluetoothPeripheralManager is nil" )
             }
             
-            vc.configure(m5Stack: sender as? M5Stack, coreDataManager: coreDataManager, m5StackManager: m5StackManager)
+            vc.configure(m5Stack: sender as? M5Stack, coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
         }
     }
     
@@ -121,11 +121,11 @@ final class M5StacksViewController: UIViewController {
     /// initializes m5Stacks array
     private func initializeM5Stacks() {
         
-        if let m5StackManager = m5StackManager {
-            m5Stacks = m5StackManager.m5Stacks()
+        if let bluetoothPeripheralManager = bluetoothPeripheralManager {
+            m5Stacks = bluetoothPeripheralManager.m5Stacks()
             
             for m5Stack in m5Stacks {
-                m5StackManager.m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = self
+                bluetoothPeripheralManager.m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = self
             }
             
         } else {// should never happen or it would be a coding error, but let's assign to empty string
@@ -169,7 +169,7 @@ extension M5StacksViewController: UITableViewDataSource, UITableViewDelegate {
         
         // detail is the connection status
         cell.detailTextLabel?.text = Texts_M5StackView.notConnected // start with not connected
-        if let bluetoothTransmitter = m5StackManager?.m5StackBluetoothTransmitter(forM5stack: m5Stacks[indexPath.row], createANewOneIfNecesssary: false) {
+        if let bluetoothTransmitter = bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forM5stack: m5Stacks[indexPath.row], createANewOneIfNecesssary: false) {
             
             if let connectionStatus = bluetoothTransmitter.getConnectionStatus(), connectionStatus == CBPeripheralState.connected {
                 cell.detailTextLabel?.text = Texts_M5StackView.connected
@@ -223,7 +223,7 @@ extension M5StacksViewController: M5StackBluetoothDelegate {
     
     func newBlePassWord(newBlePassword: String, forM5Stack m5Stack: M5Stack) {
         
-        // blePassword is also saved in M5StackManager, tant pis
+        // blePassword is also saved in BluetoothPerpheralManager, tant pis
         m5Stack.blepassword = newBlePassword
         
     }
