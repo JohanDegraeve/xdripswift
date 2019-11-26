@@ -189,7 +189,7 @@ final class RootViewController: UIViewController {
     /// timestamp of last notification for pairing
     private var timeStampLastNotificationForPairing:Date?
     
-    /// manages m5Stacks that this app knows
+    /// manages bluetoothPeripherals that this app knows
     private var bluetoothPeripheralManager: BluetoothPeripheralManager?
     
     /// manage glucose chart
@@ -1495,7 +1495,7 @@ extension RootViewController: UITabBarControllerDelegate {
             
             navigationController.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
             
-        } else if let navigationController = viewController as? M5StackNavigationController, let bluetoothPeripheralManager = bluetoothPeripheralManager, let coreDataManager = coreDataManager {
+        } else if let navigationController = viewController as? BluetoothPeripheralNavigationController, let bluetoothPeripheralManager = bluetoothPeripheralManager, let coreDataManager = coreDataManager {
 
             navigationController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
             

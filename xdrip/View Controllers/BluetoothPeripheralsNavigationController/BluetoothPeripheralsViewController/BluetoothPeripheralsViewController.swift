@@ -2,7 +2,7 @@ import UIKit
 import CoreBluetooth
 
 /// uiviewcontroller to show list of M5Stacks, first uiviewcontroller when clicking the M5Stack tab
-final class M5StacksViewController: UIViewController {
+final class BluetoothPeripheralsViewController: UIViewController {
     
     // MARK: - IBOutlet's and IBAction's
 
@@ -12,7 +12,7 @@ final class M5StacksViewController: UIViewController {
         addButtonAction()
     }
     
-    @IBAction func unwindToM5StacksViewController (segue: UIStoryboardSegue) {
+    @IBAction func unwindToBluetoothPeripheralsViewController (segue: UIStoryboardSegue) {
         
         // reinitialise m5Stacks because we're coming back from M5StackViewController where an M5Stack may have been added or deleted
         initializeM5Stacks()
@@ -58,18 +58,18 @@ final class M5StacksViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         guard let segueIdentifier = segue.identifier else {
-            fatalError("In M5StacksViewController, prepare for segue, Segue had no identifier")
+            fatalError("In BluetoothPeripheralsViewController, prepare for segue, Segue had no identifier")
         }
         
         guard let segueIdentifierAsCase = M5StackViewController.SegueIdentifiers(rawValue: segueIdentifier) else {
-            fatalError("In M5StacksViewController, segueIdentifierAsCase could not be initialized")
+            fatalError("In BluetoothPeripheralsViewController, segueIdentifierAsCase could not be initialized")
         }
         
         switch segueIdentifierAsCase {
             
         case M5StackViewController.SegueIdentifiers.M5StacksToM5StackSegueIdentifier:
             guard let vc = segue.destination as? M5StackViewController, let coreDataManager = coreDataManager, let bluetoothPeripheralManager = bluetoothPeripheralManager else {
-                fatalError("In M5StacksViewController, prepare for segue, viewcontroller is not M5StackViewController or coreDataManager is nil or bluetoothPeripheralManager is nil" )
+                fatalError("In BluetoothPeripheralsViewController, prepare for segue, viewcontroller is not M5StackViewController or coreDataManager is nil or bluetoothPeripheralManager is nil" )
             }
             
             vc.configure(m5Stack: sender as? M5Stack, coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
@@ -105,7 +105,7 @@ final class M5StacksViewController: UIViewController {
         if let coreDataManager = coreDataManager {
             return coreDataManager
         } else {
-            fatalError("in M5StacksViewController, coreDataManager is nil")
+            fatalError("in BluetoothPeripheralsViewController, coreDataManager is nil")
         }
     }
     
@@ -139,7 +139,7 @@ final class M5StacksViewController: UIViewController {
 
 // MARK: extension UITableViewDataSource and UITableViewDelegate
 
-extension M5StacksViewController: UITableViewDataSource, UITableViewDelegate {
+extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
@@ -211,7 +211,7 @@ extension M5StacksViewController: UITableViewDataSource, UITableViewDelegate {
 
 // MARK: extension M5StackBluetoothDelegate
 
-extension M5StacksViewController: M5StackBluetoothDelegate {
+extension BluetoothPeripheralsViewController: M5StackBluetoothDelegate {
     
     func isAskingForAllParameters(m5Stack: M5Stack) {
         // viewcontroller doesn't use this

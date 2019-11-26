@@ -1,6 +1,6 @@
 import UIKit
 
-final class M5StackNavigationController: UINavigationController {
+final class BluetoothPeripheralNavigationController: UINavigationController {
     
     // MARK:- private properties
     
@@ -31,11 +31,11 @@ final class M5StackNavigationController: UINavigationController {
     
 }
 
-extension M5StackNavigationController: UINavigationControllerDelegate {
+extension BluetoothPeripheralNavigationController: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         
-        if let m5StacksViewController = viewController as? M5StacksViewController, let coreDataManager = coreDataManager, let bluetoothPeripheralManager = bluetoothPeripheralManager {
-            m5StacksViewController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
+        if let bluetoothPeripheralsViewController = viewController as? BluetoothPeripheralsViewController, let coreDataManager = coreDataManager, let bluetoothPeripheralManager = bluetoothPeripheralManager {
+            bluetoothPeripheralsViewController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
         }
     }
 }

@@ -192,7 +192,7 @@ final class M5StackViewController: UIViewController {
         
         switch segueIdentifierAsCase {
             
-        case M5StackViewController.UnwindSegueIdentifiers.M5StackToM5StacksUnWindSegueIdentifier:
+        case M5StackViewController.UnwindSegueIdentifiers.M5StackToBluetoothPeripheralsUnWindSegueIdentifier:
             
             if deleteM5StackWhenClosingViewController, let m5StackAsNSObject = m5StackAsNSObject {
                 bluetoothPeripheralManager?.deleteM5Stack(m5Stack: m5StackAsNSObject)
@@ -299,8 +299,8 @@ final class M5StackViewController: UIViewController {
         // don't delete the M5Stack when going back to prevous viewcontroller
         self.deleteM5StackWhenClosingViewController = false
         
-        // return to M5StacksViewController
-        performSegue(withIdentifier: UnwindSegueIdentifiers.M5StackToM5StacksUnWindSegueIdentifier.rawValue, sender: self)
+        // return to BluetoothPeripheralsViewController
+        performSegue(withIdentifier: UnwindSegueIdentifiers.M5StackToBluetoothPeripheralsUnWindSegueIdentifier.rawValue, sender: self)
         
     }
     
@@ -370,7 +370,7 @@ final class M5StackViewController: UIViewController {
             // as the M5Stack is already deleted, there's no need to call delete again, when prepareForSegue
             self.deleteM5StackWhenClosingViewController = false
             
-            self.performSegue(withIdentifier: UnwindSegueIdentifiers.M5StackToM5StacksUnWindSegueIdentifier.rawValue, sender: self)
+            self.performSegue(withIdentifier: UnwindSegueIdentifiers.M5StackToBluetoothPeripheralsUnWindSegueIdentifier.rawValue, sender: self)
             
         }, cancelHandler: nil)
         
@@ -463,8 +463,8 @@ final class M5StackViewController: UIViewController {
         // just in case scanning for a new device is still ongoing, call stopscanning
         bluetoothPeripheralManager?.stopScanningForNewDevice()
         
-        // return to M5StacksViewController
-        performSegue(withIdentifier: UnwindSegueIdentifiers.M5StackToM5StacksUnWindSegueIdentifier.rawValue, sender: self)
+        // return to BluetoothPeripheralsViewController
+        performSegue(withIdentifier: UnwindSegueIdentifiers.M5StackToBluetoothPeripheralsUnWindSegueIdentifier.rawValue, sender: self)
 
     }
 
@@ -924,14 +924,14 @@ extension M5StackViewController: M5StackBluetoothDelegate {
 extension M5StackViewController {
     public enum SegueIdentifiers:String {
         
-        /// to go from M5StacksViewController to M5StackViewController
+        /// to go from BluetoothPeripheralsViewController to M5StackViewController
         case M5StacksToM5StackSegueIdentifier = "M5StacksToM5StackSegueIdentifier"
         
     }
     
     private enum UnwindSegueIdentifiers:String {
         
-        /// to go back from M5StackViewController to M5StacksViewController
-        case M5StackToM5StacksUnWindSegueIdentifier = "M5StackToM5StacksUnWindSegueIdentifier"
+        /// to go back from M5StackViewController to BluetoothPeripheralsViewController
+        case M5StackToBluetoothPeripheralsUnWindSegueIdentifier = "M5StackToBluetoothPeripheralsUnWindSegueIdentifier"
     }
 }
