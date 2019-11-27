@@ -70,7 +70,7 @@ enum ConstantsGlucoseChart {
     static let glucoseCircleDiameter: CGFloat = 5
     
     /// when user pans the chart, when ending the gesture, deceleration is done. At regular intervals the chart needs to be redrawn. This is the interval in seconds
-    static let decelerationTimerValueInSeconds = 0.02
+    static let decelerationTimerValueInSeconds = 0.030
     
     /// deceleration rate to use when ending pan gesture on chart
     static let decelerationRate = UIScrollView.DecelerationRate.normal.rawValue
