@@ -61,14 +61,14 @@ final class BluetoothPeripheralsViewController: UIViewController {
             fatalError("In BluetoothPeripheralsViewController, prepare for segue, Segue had no identifier")
         }
         
-        guard let segueIdentifierAsCase = M5StackViewController.SegueIdentifiers(rawValue: segueIdentifier) else {
+        guard let segueIdentifierAsCase = BluetoothPeripheralViewController.SegueIdentifiers(rawValue: segueIdentifier) else {
             fatalError("In BluetoothPeripheralsViewController, segueIdentifierAsCase could not be initialized")
         }
         
         switch segueIdentifierAsCase {
             
-        case M5StackViewController.SegueIdentifiers.M5StacksToM5StackSegueIdentifier:
-            guard let vc = segue.destination as? M5StackViewController, let coreDataManager = coreDataManager, let bluetoothPeripheralManager = bluetoothPeripheralManager else {
+        case BluetoothPeripheralViewController.SegueIdentifiers.M5StacksToM5StackSegueIdentifier:
+            guard let vc = segue.destination as? BluetoothPeripheralViewController, let coreDataManager = coreDataManager, let bluetoothPeripheralManager = bluetoothPeripheralManager else {
                 fatalError("In BluetoothPeripheralsViewController, prepare for segue, viewcontroller is not M5StackViewController or coreDataManager is nil or bluetoothPeripheralManager is nil" )
             }
             
@@ -84,7 +84,7 @@ final class BluetoothPeripheralsViewController: UIViewController {
     private func addButtonAction() {
         
         /// go to screen to add a new M5Stack
-        self.performSegue(withIdentifier: M5StackViewController.SegueIdentifiers.M5StacksToM5StackSegueIdentifier.rawValue, sender: nil)
+        self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.M5StacksToM5StackSegueIdentifier.rawValue, sender: nil)
 
     }
     
@@ -201,7 +201,7 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
             
         } else {
 
-            self.performSegue(withIdentifier: M5StackViewController.SegueIdentifiers.M5StacksToM5StackSegueIdentifier.rawValue, sender: m5Stacks[indexPath.row])
+            self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.M5StacksToM5StackSegueIdentifier.rawValue, sender: m5Stacks[indexPath.row])
 
         }
         

@@ -34,7 +34,7 @@ fileprivate enum Setting:Int, CaseIterable {
 }
 
 /// UIViewController to show 
-final class M5StackViewController: UIViewController {
+final class BluetoothPeripheralViewController: UIViewController {
     
     // MARK: - IBOutlet's and IBAction's
     
@@ -186,13 +186,13 @@ final class M5StackViewController: UIViewController {
             fatalError("In M5StackViewController, prepare for segue, Segue had no identifier")
         }
         
-        guard let segueIdentifierAsCase = M5StackViewController.UnwindSegueIdentifiers(rawValue: segueIdentifier) else {
+        guard let segueIdentifierAsCase = BluetoothPeripheralViewController.UnwindSegueIdentifiers(rawValue: segueIdentifier) else {
             fatalError("In M5StackViewController, segueIdentifierAsCase could not be initialized")
         }
         
         switch segueIdentifierAsCase {
             
-        case M5StackViewController.UnwindSegueIdentifiers.M5StackToBluetoothPeripheralsUnWindSegueIdentifier:
+        case BluetoothPeripheralViewController.UnwindSegueIdentifiers.M5StackToBluetoothPeripheralsUnWindSegueIdentifier:
             
             if deleteM5StackWhenClosingViewController, let m5StackAsNSObject = m5StackAsNSObject {
                 bluetoothPeripheralManager?.deleteM5Stack(m5Stack: m5StackAsNSObject)
@@ -484,7 +484,7 @@ final class M5StackViewController: UIViewController {
 
 // MARK: extension UITableViewDataSource, UITableViewDelegate
 
-extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
+extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return Setting.allCases.count
@@ -825,7 +825,7 @@ extension M5StackViewController: UITableViewDataSource, UITableViewDelegate {
 
 // MARK: extension M5StackBluetoothDelegate
 
-extension M5StackViewController: M5StackBluetoothDelegate {
+extension BluetoothPeripheralViewController: M5StackBluetoothDelegate {
     
     func isAskingForAllParameters(m5Stack: M5Stack) {
         // viewcontroller doesn't use this
@@ -921,7 +921,7 @@ extension M5StackViewController: M5StackBluetoothDelegate {
 // MARK: extension M5StackBluetoothDelegate
 
 /// defines perform segue identifiers used within M5StackViewController
-extension M5StackViewController {
+extension BluetoothPeripheralViewController {
     public enum SegueIdentifiers:String {
         
         /// to go from BluetoothPeripheralsViewController to M5StackViewController

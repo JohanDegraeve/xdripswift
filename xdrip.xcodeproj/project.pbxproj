@@ -57,9 +57,9 @@
 		F821CF9D22AEF483005C1E43 /* BGReadingSpeaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF9C22AEF483005C1E43 /* BGReadingSpeaker.swift */; };
 		F8297F45238DC4AC00D74D66 /* BluetoothPerpheralManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F43238DC4AC00D74D66 /* BluetoothPerpheralManager.swift */; };
 		F8297F46238DC4AC00D74D66 /* BluetoothPeripheralManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F44238DC4AC00D74D66 /* BluetoothPeripheralManaging.swift */; };
-		F8297F4D238DCAD800D74D66 /* M5StackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F4A238DCAD800D74D66 /* M5StackViewController.swift */; };
 		F8297F4E238DCAD800D74D66 /* BluetoothPeripheralsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F4B238DCAD800D74D66 /* BluetoothPeripheralsViewController.swift */; };
 		F8297F4F238DCAD800D74D66 /* BluetoothPeripheralNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F4C238DCAD800D74D66 /* BluetoothPeripheralNavigationController.swift */; };
+		F8297F52238ECA3200D74D66 /* BluetoothPeripheralViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F51238ECA3200D74D66 /* BluetoothPeripheralViewController.swift */; };
 		F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
@@ -297,9 +297,9 @@
 		F8297F41238C3A6400D74D66 /* xdrip v5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v5.xcdatamodel"; sourceTree = "<group>"; };
 		F8297F43238DC4AC00D74D66 /* BluetoothPerpheralManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPerpheralManager.swift; sourceTree = "<group>"; };
 		F8297F44238DC4AC00D74D66 /* BluetoothPeripheralManaging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralManaging.swift; sourceTree = "<group>"; };
-		F8297F4A238DCAD800D74D66 /* M5StackViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = M5StackViewController.swift; sourceTree = "<group>"; };
 		F8297F4B238DCAD800D74D66 /* BluetoothPeripheralsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralsViewController.swift; sourceTree = "<group>"; };
 		F8297F4C238DCAD800D74D66 /* BluetoothPeripheralNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralNavigationController.swift; sourceTree = "<group>"; };
+		F8297F51238ECA3200D74D66 /* BluetoothPeripheralViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralViewController.swift; sourceTree = "<group>"; };
 		F846CDD523046BAC00DCF016 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SettingsViews.strings"; sourceTree = "<group>"; };
 		F846CDD623046BAE00DCF016 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBluetoothPairing.swift; sourceTree = "<group>"; };
@@ -887,18 +887,18 @@
 		F8297F48238DCAD800D74D66 /* BluetoothPeripheralsViewController */ = {
 			isa = PBXGroup;
 			children = (
-				F8297F49238DCAD800D74D66 /* M5StackViewController */,
+				F8297F50238ECA3200D74D66 /* BluetoothPeripheralViewController */,
 				F8297F4B238DCAD800D74D66 /* BluetoothPeripheralsViewController.swift */,
 			);
 			path = BluetoothPeripheralsViewController;
 			sourceTree = "<group>";
 		};
-		F8297F49238DCAD800D74D66 /* M5StackViewController */ = {
+		F8297F50238ECA3200D74D66 /* BluetoothPeripheralViewController */ = {
 			isa = PBXGroup;
 			children = (
-				F8297F4A238DCAD800D74D66 /* M5StackViewController.swift */,
+				F8297F51238ECA3200D74D66 /* BluetoothPeripheralViewController.swift */,
 			);
-			path = M5StackViewController;
+			path = BluetoothPeripheralViewController;
 			sourceTree = "<group>";
 		};
 		F85DC29B21CFCEB800B9F74A /* Recovered References */ = {
@@ -1730,7 +1730,6 @@
 				F821CF57229BF43A005C1E43 /* SnoozeParameters.swift in Sources */,
 				F8F62278233D1CED00BE8796 /* TextsM5StackView.swift in Sources */,
 				F8A54AFF22D9179100934E7A /* CRC.swift in Sources */,
-				F8297F4D238DCAD800D74D66 /* M5StackViewController.swift in Sources */,
 				F8B3A79722635A25004BA588 /* AlertEntry+CoreDataProperties.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
@@ -1827,6 +1826,7 @@
 				F8A54AEB22D911BA00934E7A /* CGMG4xDripTransmitter.swift in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
 				F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */,
+				F8297F52238ECA3200D74D66 /* BluetoothPeripheralViewController.swift in Sources */,
 				F821CF66229EE68B005C1E43 /* NightScoutFollowManager.swift in Sources */,
 				F8A54AF622D9156600934E7A /* CGMGNSEntryTransmitter.swift in Sources */,
 				F8A389E7232ECE7E0010F405 /* SettingsViewUtilities.swift in Sources */,

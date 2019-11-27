@@ -496,7 +496,7 @@
         <!--M5 Stack View Controller-->
         <scene sceneID="fw3-II-GI1">
             <objects>
-                <viewController id="FJ0-eY-Fv0" userLabel="M5 Stack View Controller" customClass="M5StackViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="FJ0-eY-Fv0" userLabel="M5 Stack View Controller" customClass="BluetoothPeripheralViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="0Ho-lg-UtI">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
