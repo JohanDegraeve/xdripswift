@@ -73,27 +73,23 @@ public final class GlucoseChartManager {
     /// a BgReadingsAccessor
     private var bgReadingsAccessor: BgReadingsAccessor?
     
-    /// used when panning, difference in seconds between two points ?
-    ///
-    /// default value 1.0 which is probably not correct but it can't be initiated as long as innerFrameWidth is not initialized, to avoid having to work with optional, i assign it to 1.0
-    private var diffInSecondsBetweenTwoPoints = 1.0
+    /// difference in seconds between two pixels (or x values, not sure if it's pixels)
+    private var diffInSecondsBetweenTwoPoints: Double  {
+        endDate.timeIntervalSince(startDate)/Double(innerFrameWidth)
+    }
     
     /// innerFrame width
     ///
     /// default value 300.0 which is probably not correct but it can't be initiated as long as glusoseChart is not initialized, to avoid having to work with optional, i assign it to 300.0
-    private var innerFrameWidth: Double = 300.0  {
-        didSet {
-            diffInSecondsBetweenTwoPoints = endDate.timeIntervalSince(startDate)/Double(innerFrameWidth)
-        }
-    }
+    private var innerFrameWidth: Double = 300.0
     
-    /// used for getting bgreadings on a background thread
+    /// used for getting bgreadings on a background thread, bgreadings are used to create list of chartPoints
     private let operationQueue: OperationQueue
     
     /// This timer is used when decelerating the chart after end of panning.  We'll set a timer, each time the timer expires the chart will be shifted a bit
     private var gestureTimer:RepeatingTimer?
     
-    /// used when user stopped panning and deceleration is still ongoing. If set to true, then deceleration needs to be stopped
+    /// used when user touches the chart. Deceleration is maybe still ongoing (from a previous pan). If set to true, then deceleration needs to be stopped
     private var stopDecelerationNextGestureTimerRun = false
     
     /// the maximum value in glucoseChartPoints array between start and endPoint
@@ -144,16 +140,19 @@ public final class GlucoseChartManager {
     
     // MARK: - public functions
     
-    /// updates the glucoseChartPoints array and calls completionHandler when finished - if called multiple times after each other (eg because user is panning or zooming fast) there might be calls skipped, ie completionhandler will not be called if skipped, only the last task in the operationqueue is used
+    /// - updates the glucoseChartPoints array , and the chartOutlet, and calls completionHandler when finished
+    /// - if called multiple times after each other (eg because user is panning or zooming fast) there might be calls skipped,
+    /// - completionhandler will be called when chartOutlet is updated
     /// - parameters:
-    ///     - completionHandler : will be called when glucoseChartPoints array is ready to be used, in this completionhandler for instance chart should be upated
+    ///     - completionHandler : will be called when glucoseChartPoints and chartOutlet are updated
     ///     - endDate :endDate to apply
-    ///     - startDate :startDate to apply, if nil then no change will be done in chardwidth, ie current difference between start and end will be reused
+    ///     - startDate :startDate to apply, if nil then no change will be done in chart width, ie current difference between start and end will be reused
     ///
-    /// update of glucoseChartPoints array will be done on background thread. The actual redrawing of the chartoutlet needs to be done on the main thread, so the caller adds a block of code in the completionHandler which will be executed in the main thread.
-    /// While updating glucoseChartPoints in background thread, the main thread may call again updateGlucoseChartPoints with a new endDate (because the user is panning or zooming). A new block will be added in the operation queue and processed later.
+    /// update of glucoseChartPoints array will be done on background thread. The actual redrawing of the chartoutlet is  done on the main thread. Also the completionHandler runs in the main thread.
+    /// While updating glucoseChartPoints in background thread, the main thread may call again updateGlucoseChartPoints with a new endDate (because the user is panning or zooming). A new block will be added in the operation queue and processed later. If there's multiple operations waiting in the queue, only the last one will be executed. This can be the case when the user is doing a fast panning.
     public func updateGlucoseChartPoints(endDate: Date, startDate: Date?, chartOutlet: BloodGlucoseChartView, completionHandler: (() -> ())?) {
         
+        // create a new operation
         let operation = BlockOperation(block: {
             
             // if there's more than one operation waiting for execution, it makes no sense to execute this one, the next one has a newer endDate to use
@@ -164,7 +163,7 @@ public final class GlucoseChartManager {
             // startDateToUse is either parameter value or (if nil), endDate minutes current chartwidth
             let startDateToUse = startDate != nil ? startDate! : Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: endDate)
             
-            
+            // check that bgReadingsAccessor is not nil (should normally not be nil except at app startup)
             guard let bgReadingsAccessor = self.bgReadingsAccessor else {
                 trace("in updateGlucoseChartPoints, bgReadingsAccessor, probably coreDataManager is not yet assigned", log: self.oslog, type: .info)
                 return
@@ -184,7 +183,7 @@ public final class GlucoseChartManager {
 
             if let lastGlucoseChartPoint = self.glucoseChartPoints.last, let lastGlucoseChartPointX = lastGlucoseChartPoint.x as? ChartAxisValueDate {
                 
-                // if reUseExistingChartPointListget = false, then we're actually forcing to use a complete new array, because the current array glucoseChartPoints is too big. If true, then we start from timestamp of the last chartpoint
+                // if reUseExistingChartPointList = false, then we're actually forcing to use a complete new array, because the current array glucoseChartPoints is too big. If true, then we start from timestamp of the last chartpoint
                 let lastGlucoseTimeStamp = reUseExistingChartPointList ? lastGlucoseChartPointX.date : Date(timeIntervalSince1970: 0)
                 
                 // first see if we need to append new chartpoints
@@ -234,7 +233,7 @@ public final class GlucoseChartManager {
                 // update the chart outlet
                 chartOutlet.reloadChart()
                 
-                // call completionhandler on main thread
+                // call completionhandler if not nil
                 if let completionHandler = completionHandler {
                     completionHandler()
                 }
@@ -243,6 +242,7 @@ public final class GlucoseChartManager {
             
         })
         
+        // add the operation to the queue and start it. As maxConcurrentOperationCount = 1, it may be kept until a previous operation has finished
         operationQueue.addOperation {
             operation.start()
         }
@@ -328,21 +328,17 @@ public final class GlucoseChartManager {
         if !chartIsPannedBackward && translationX < 0 {
             uiPanGestureRecognizer.setTranslation(CGPoint.zero, in: chartOutlet)
             
-            if let completionHandler = completionHandler {
-                completionHandler()
-            }
-            
             return
+            
         }
         
-        // user either started panning backward or continues panning (back or forward). Assume chart is currently in backward panned state, which is probably true
+        // user either started panning backward or continues panning (back or forward). Assume chart is currently in backward panned state, which is not necessarily true
         chartIsPannedBackward = true
         
         if uiPanGestureRecognizer.state == .ended {
             
             // user has lifted finger. Deceleration needs to be done.
             decelerate(translationX: translationX, velocityX: uiPanGestureRecognizer.velocity(in: uiPanGestureRecognizer.view).x, chartOutlet: chartOutlet, completionHandler: {
-                
                 
                 uiPanGestureRecognizer.setTranslation(CGPoint.zero, in: chartOutlet)
                 
@@ -373,7 +369,7 @@ public final class GlucoseChartManager {
 
     }
     
-    /// - will call setNewStartAndEndDate with a new translationX value, every x milliseconds, x being 20 milliseconds by default as defined in the constants.
+    /// - will call setNewStartAndEndDate with a new translationX value, every x milliseconds, x being 30 milliseconds by default as defined in the constants.
     /// - Every time the new values are set, the completion handler will be called
     /// - Every time the new values are set, chartOutlet will be updated
     private func decelerate(translationX: CGFloat, velocityX: CGFloat, chartOutlet: BloodGlucoseChartView, completionHandler: @escaping () -> ()) {
@@ -396,7 +392,7 @@ public final class GlucoseChartManager {
         // set stopDecelerationNextGestureTimerRun to false initially
         stopDecelerationNextGestureTimerRun = false
         
-        // at regulat intervals new distance to travel the chart will be calculated and setNewStartAndEndDate will be called
+        // at regular intervals new distance to travel the chart will be calculated and setNewStartAndEndDate will be called
         gestureTimer = RepeatingTimer(timeInterval: TimeInterval(ConstantsGlucoseChart.decelerationTimerValueInSeconds), eventHandler: {
             
             // if stopDecelerationNextGestureTimerRun is set, then return
@@ -407,7 +403,7 @@ public final class GlucoseChartManager {
             // what is the elapsed time since the user ended the panning
             let timeSinceStart = Date().toMillisecondsAsDouble() - initialStartOfDecelerationTimeStampInMilliseconds
             
-            // calculate additional distance to travel the chart
+            // calculate additional distance to travel the chart - this is the integral function again that is used
             let additionalDistanceToTravel = CGFloat(round(0.001*(
                 
                 Double(velocityX) *  pow(Double(ConstantsGlucoseChart.decelerationRate), timeSinceStart) / log(Double(ConstantsGlucoseChart.decelerationRate))
@@ -433,7 +429,7 @@ public final class GlucoseChartManager {
     
     /// - calculates new startDate and endDate
     /// - updates glucseChartPoints array for given translation
-    /// - uptdate chartOutlet
+    /// - uptdates chartOutlet
     /// - calls block in completion handler.
     private func setNewStartAndEndDate(translationX: CGFloat, chartOutlet: BloodGlucoseChartView, completionHandler: @escaping () -> ()) {
         
