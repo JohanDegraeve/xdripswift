@@ -2,7 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
-final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
+final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -43,37 +43,40 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         //assign transmitterId
         self.transmitterId = transmitterID
 
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G4, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G4)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_G4, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_G4, startScanningAfterInit: CGMTransmitterType.dexcomG4.startScanningAfterInit())
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G4, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G4)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_G4, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_G4, startScanningAfterInit: CGMTransmitterType.dexcomG4.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
         
-        // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
-        bluetoothTransmitterDelegate = self
     }
     
-    // MARK: - functions
+    // MARK: - MARK: CBCentralManager overriden functions
     
-    // MARK: - BluetoothTransmitterDelegate functions
-    
-    func centralManagerDidConnect(address:String?, name:String?) {
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        
+        super.centralManager(central, didConnect: peripheral)
+        
+        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
+        
     }
     
-    func centralManagerDidFailToConnect(error: Error?) {
-        trace("in centralManagerDidFailToConnect", log: log, type: .error)
+    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        
+        super.centralManagerDidUpdateState(central)
+        
+        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
+        
     }
     
-    func centralManagerDidUpdateState(state: CBManagerState) {
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state)
-    }
-    
-    func centralManagerDidDisconnectPeripheral(error: Error?) {
+    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+        
         cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
+        
     }
     
-    func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
-        trace("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
-    }
-    
-    func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
+        
         //check if value is not nil
         guard let value = characteristic.value else {
             trace("in peripheral didUpdateValueFor, characteristic.value is nil", log: log, type: .info)
@@ -96,12 +99,12 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
         //only for logging
         let data = value.hexEncodedString()
         trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .debug, data)
-
+        
         switch XdripResponseType(rawValue: value[1]) {
         case .dataPacket?:
             //process value and get result
             let result = processxBridgeDataPacket(value: value)
-                
+            
             // check transmitterid, if not correct write correct value and return
             if let data = checkTransmitterId(receivedTransmitterId: result.transmitterID, expectedTransmitterId: self.transmitterId, log: log) {
                 trace("    in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, type: .info, self.transmitterId)
@@ -128,7 +131,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
                 trace("    in peripheral didUpdateValueFor, packet length is not 7,  no further processing", log: log, type: .info)
                 return
             }
-
+            
             //read txid
             let receivedTransmitterId = decodeTxID(TxID: value.uint32(position: 2))
             trace("    in peripheral didUpdateValueFor, received beaconPacket with txid %{public}@", log: log, type: .info, receivedTransmitterId)
@@ -154,6 +157,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, BluetoothTransmitterDel
                 cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
             }
         }
+        
     }
     
     // MARK: CGMTransmitter protocol functions

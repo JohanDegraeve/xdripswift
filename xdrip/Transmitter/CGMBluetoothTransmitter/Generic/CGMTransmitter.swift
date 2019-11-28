@@ -11,7 +11,7 @@ protocol CGMTransmitter {
     /// get device address, cgmtransmitters should also derive from BlueToothTransmitter, hence no need to implement this function
     ///
     /// this function is implemented in class BluetoothTransmitter.swift, it's not necessary for transmitter types to implement this function (as new transmitterType class conform to protocol CGMTransmitter but also extend the BluetoothTransmitter class
-    func address() -> String?
+    func getAddress() -> String?
     
     /// get device name, cgmtransmitters should also derive from BlueToothTransmitter, hence no need to implement this function
     ///

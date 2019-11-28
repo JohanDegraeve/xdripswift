@@ -2,7 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
+class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -86,10 +86,8 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         self.oopWebToken = oopWebToken
         self.oopWebSite = oopWebSite
 
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, startScanningAfterInit: CGMTransmitterType.miaomiao.startScanningAfterInit())
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, startScanningAfterInit: CGMTransmitterType.miaomiao.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
         
-        // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
-        bluetoothTransmitterDelegate = self
     }
     
     // MARK: - public functions
@@ -103,31 +101,45 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         }
     }
     
-    // MARK: - BluetoothTransmitterDelegate functions
+    // MARK: - overriden  BluetoothTransmitter functions
     
-    func centralManagerDidConnect(address:String?, name:String?) {
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        
+        super.centralManager(central, didConnect: peripheral)
+        
+        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
+        
     }
     
-    func centralManagerDidFailToConnect(error: Error?) {
-        trace("in centralManagerDidFailToConnect", log: log, type: .error)
+    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        
+        super.centralManagerDidUpdateState(central)
+        
+        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
+        
     }
     
-    func centralManagerDidUpdateState(state: CBManagerState) {
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state)
-    }
-    
-    func centralManagerDidDisconnectPeripheral(error: Error?) {
+    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+        
         cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
+        
     }
     
-    func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
+        
         if error == nil && characteristic.isNotifying {
             _ = sendStartReadingCommand()
         }
+        
     }
-    
-    func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
+
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
         if let value = characteristic.value {
             
@@ -155,7 +167,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                                 let firmware = String(describing: rxBuffer[14...15].hexEncodedString())
                                 let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
                                 let batteryPercentage = Int(rxBuffer[13])
-
+                                
                                 LibreDataParser.libreDataProcessor(sensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)))?.serialNumber, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
                                     self.timeStampLastBgReading = timeStampLastBgReading
                                     
@@ -218,6 +230,8 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         } else {
             trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
         }
+        
+        
     }
     
     // MARK: CGMTransmitter protocol functions

@@ -2,7 +2,7 @@ import Foundation
 import os
 import CoreBluetooth
 
-class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
+class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -39,35 +39,39 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         // assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate
         
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Droplet)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Droplet, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Droplet, startScanningAfterInit: CGMTransmitterType.Droplet1.startScanningAfterInit())
-        
-        // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
-        bluetoothTransmitterDelegate = self
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Droplet)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Droplet, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Droplet, startScanningAfterInit: CGMTransmitterType.Droplet1.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
         
     }
     
-    // MARK: - BluetoothTransmitterDelegate functions
+    // MARK: - overriden  BluetoothTransmitter functions
     
-    func centralManagerDidConnect(address:String?, name:String?) {
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        
+        super.centralManager(central, didConnect: peripheral)
+        
+        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
+
     }
     
-    func centralManagerDidFailToConnect(error: Error?) {
-        trace("in centralManagerDidFailToConnect", log: log, type: .error)
+    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        
+        super.centralManagerDidUpdateState(central)
+        
+        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
+        
     }
-    
-    func centralManagerDidUpdateState(state: CBManagerState) {
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state)
-    }
-    
-    func centralManagerDidDisconnectPeripheral(error: Error?) {
+
+    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+     
         cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
+        
     }
     
-    func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
-    }
-    
-    func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
         trace("in peripheral didUpdateValueFor", log: log, type: .info)
         
@@ -88,7 +92,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 trace("    there's less than 3 spaces", log: log, type: .error)
                 return
             }
-
+            
             // get first field
             let firstField = String(valueAsString[valueAsString.startIndex..<indexesOfSplitter[0]])
             
@@ -97,7 +101,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 cgmTransmitterDelegate?.sensorNotDetected()
                 return
             }
-
+            
             // first field : first digits are rawvalue, to be multiplied with 100, last two digits are sensor type indicator, 10=L1, 20=L2, 30=US 14 day, 40=Lpro/h
             let rawValueAsString = firstField[0..<(firstField.count - 2)] + "00"
             let sensorTypeIndicator = firstField[(firstField.count - 2)..<firstField.count]
@@ -108,7 +112,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 trace("    failed to convert rawValueAsString to double", log: log, type: .error)
                 return
             }
-
+            
             // third field is battery percentage, stop if convert to Int fails
             guard let batteryPercentage = Int(String(valueAsString[valueAsString.index(after: indexesOfSplitter[1])..<indexesOfSplitter[2]])) else {
                 trace("    failed to convert batteryPercentage field to Int", log: log, type: .error)
@@ -120,7 +124,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 trace("    failed to convert sensorTimeInMinutes field  to Int", log: log, type: .error)
                 return
             }
-
+            
             // send to delegate
             var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawValueAsDouble)]
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: nil, sensorTimeInMinutes: sensorTimeInMinutes * 10, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
@@ -128,6 +132,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         } else {
             trace("    value is nil, no further processing", log: log, type: .error)
         }
+        
     }
     
     // MARK: CGMTransmitter protocol functions

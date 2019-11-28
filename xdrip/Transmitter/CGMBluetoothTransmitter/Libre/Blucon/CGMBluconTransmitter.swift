@@ -91,14 +91,11 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         rxBuffer = Data()
 
         // initialize
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_BluconService)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Blucon, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Blucon, startScanningAfterInit: CGMTransmitterType.Blucon.startScanningAfterInit())
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_BluconService)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Blucon, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Blucon, startScanningAfterInit: CGMTransmitterType.Blucon.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
 
         //assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate
         
-        // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
-        bluetoothTransmitterDelegate = self
-
     }
     
     // MARK: - private helper functions
@@ -231,52 +228,43 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     /// this transmitter does not support oop web
     func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
 
-}
+    // MARK: - overriden  BluetoothTransmitter functions
+    
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
 
-extension CGMBluconTransmitter: CGMTransmitter {
-    
-    func initiatePairing() {
-        // nothing to do, Blucon keeps on reconnecting, resulting in continous pairing request
-        return
-    }
-    
-    func reset(requested: Bool) {
-        // no reset supported for blucon
-        return
-    }
-    
-    /// this transmitter does not support oopWeb
-    func setWebOOPEnabled(enabled: Bool) {
-    }
-
-}
-
-extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
-    
-    func centralManagerDidConnect(address: String?, name: String?) {
+        super.centralManager(central, didConnect: peripheral)
+        
         trace("in centralManagerDidConnect", log: log, type: .info)
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
+        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
+
     }
+
+    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
     
-    func centralManagerDidFailToConnect(error: Error?) {
-        trace("in centralManagerDidFailToConnect", log: log, type: .error)
+        super.centralManagerDidUpdateState(central)
+        
+        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
+
     }
+
+    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
     
-    func centralManagerDidUpdateState(state: CBManagerState) {
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state)
-    }
-    
-    func centralManagerDidDisconnectPeripheral(error: Error?) {
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+        
         trace("in centralManagerDidDisconnectPeripheral", log: log, type: .info)
         cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
+
     }
     
-    func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
+        
         trace("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
         
         // check if error occurred
         if let error = error {
-
+            
             // no need to log the error, it's already logged in BluetoothTransmitter
             
             // check if it's an encryption error, if so call delegate
@@ -292,19 +280,22 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                 waitingSuccessfulPairing = false
             }
         }
+
     }
     
-    func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
         // log the received characteristic value
         trace("in peripheralDidUpdateValueFor with characteristic UUID = %{public}@", log: log, type: .info, characteristic.uuid.uuidString)
-
+        
         // this is only applicable the very first time that blucon connects and pairing is done
         if waitingSuccessfulPairing {
             cgmTransmitterDelegate?.successfullyPaired()
             waitingSuccessfulPairing = false
         }
-
+        
         // check if error occured
         if let error = error {
             trace("   error: %{public}@", log: log, type: .error , error.localizedDescription)
@@ -330,24 +321,24 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                     
                 case .wakeUpRequest:
                     
-                        // start by setting waitingForGlucoseData to false, it might still have value true due to protocol error
-                        waitingForGlucoseData = false
-                        
-                        // send getPatchInfoRequest
-                        sendCommandToBlucon(opcode: BluconTransmitterOpCode.getPatchInfoRequest)
+                    // start by setting waitingForGlucoseData to false, it might still have value true due to protocol error
+                    waitingForGlucoseData = false
                     
-                        // by default set battery level to 100
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 100), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
-
-                
+                    // send getPatchInfoRequest
+                    sendCommandToBlucon(opcode: BluconTransmitterOpCode.getPatchInfoRequest)
+                    
+                    // by default set battery level to 100
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 100), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                    
+                    
                 case .error14:
                     
                     // Blucon didn't receive the next command it was waiting for, need to wait 5 minutes
                     trace("    Timeout received, need to  wait 5 minutes or push button to restart!", log: log, type: .error)
-
+                    
                     // and send Blucon to sleep
                     sendCommandToBlucon(opcode: .sleep)
-
+                    
                 case .sensorNotDetected:
                     
                     // Blucon didn't detect sensor, call delegate
@@ -390,14 +381,14 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                     } else {
                         
                         trace("    sensorState =  %{public}@", log: log, type: .info, sensorState.description)
-
+                        
                         sendCommandToBlucon(opcode: BluconTransmitterOpCode.sleep)
-
+                        
                     }
-
+                    
                     // inform delegate about sensorSerialNumber and sensorState
                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: sensorState, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: sensorSerialNumber)
-
+                    
                     return
                     
                 case .bluconAckResponse:
@@ -409,12 +400,12 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                     // assuming bluconAckResponse will arrive less than 5 seconds after having send wakeUpResponse
                     if let timeStampLastWakeUpResponse = timeStampLastWakeUpResponse, abs(timeStampLastWakeUpResponse.timeIntervalSinceNow) < 5 && shouldSendUnknown1CommandAfterReceivingBluconAckResponse {
                         
-                            // set to false to be sure
-                            shouldSendUnknown1CommandAfterReceivingBluconAckResponse = false
-
-                            // send unknown1Command
-                            sendCommandToBlucon(opcode: BluconTransmitterOpCode.unknown1Command)
-                            
+                        // set to false to be sure
+                        shouldSendUnknown1CommandAfterReceivingBluconAckResponse = false
+                        
+                        // send unknown1Command
+                        sendCommandToBlucon(opcode: BluconTransmitterOpCode.unknown1Command)
+                        
                     } else {
                         
                         trace("    no further processing, Blucon is sleeping now and should send a new reading in 5 minutes", log: log, type: .info)
@@ -424,33 +415,33 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                 case .unknown1CommandResponse:
                     
                     sendCommandToBlucon(opcode: BluconTransmitterOpCode.unknown2Command)
-
+                    
                 case .unknown2CommandResponse:
                     
                     // check if there's a battery low indication
                     if valueAsString.startsWith(unknownCommand2BatteryLowIndicator) {
-
+                        
                         // this is considered as battery level 5%
                         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 5), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
                         
                     }
-
+                    
                     // if timeStampLastBgReading > 5 minutes ago, then we'll get historic data, otherwise just get the latest reading
                     if abs(timeStampLastBgReading.timeIntervalSinceNow) > 5 * 60 + 10 {
-
+                        
                         sendCommandToBlucon(opcode: BluconTransmitterOpCode.getHistoricDataAllBlocksCommand)
-
+                        
                     } else {
-
+                        
                         // not asking for sensorAge as in Spike and xdripplus, we know the sensorAge because we started with getHistoricDataAllBlocksCommand
                         sendCommandToBlucon(opcode: BluconTransmitterOpCode.getNowDataIndex)
                         
                     }
-
+                    
                 case .multipleBlockResponseIndex:
                     
                     if handleNewHistoricData(block: value) {
-
+                        
                         // when Blucon responds with bluconAckResponse, then there's no need to send unknown1Command
                         shouldSendUnknown1CommandAfterReceivingBluconAckResponse = false
                         
@@ -458,11 +449,11 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                         sendCommandToBlucon(opcode: .sleep)
                         
                     }
-
+                    
                 case .singleBlockInfoResponsePrefix:
-
+                    
                     if !waitingForGlucoseData {
-
+                        
                         // get blockNumber and compose command
                         let commandToSend = BluconTransmitterOpCode.singleBlockInfoPrefix.rawValue + blockNumberForNowGlucoseData(input: value)
                         
@@ -478,12 +469,12 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                             
                             trace("    failed to convert commandToSend to Data", log: log, type: .error)
                         }
-
+                        
                     }  else {
                         
                         // reset waitingForGlucoseData to false as we will not wait for glucosedata, after having processed this reading
                         waitingForGlucoseData = false
-
+                        
                         // to be sure that waitingForGlucoseData is not having value true due to having broken protcol, verify when SingleBlockInfoPrefix was sent
                         if let timeStampOfSendingSingleBlockInfoPrefix = timeStampOfSendingSingleBlockInfoPrefix {
                             // should be a matter of milliseconds, so take 2 seconds
@@ -503,7 +494,7 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                         if abs(timeStampLastBgReading.timeIntervalSinceNow) < 30 {
                             trace("    last reading less than 30 seconds old, ignoring this one", log: log, type: .info)
                         } else {
-
+                            
                             trace("    creating glucoseValue", log: log, type: .info)
                             
                             // create glucose reading with timestamp now
@@ -515,31 +506,50 @@ extension CGMBluconTransmitter: BluetoothTransmitterDelegate {
                             let glucoseData = GlucoseData(timeStamp: timeStampLastBgReading, glucoseLevelRaw: glucoseValue, glucoseLevelFiltered: glucoseValue)
                             var glucoseDataArray = [glucoseData]
                             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
-
+                            
                         }
                         
                         sendCommandToBlucon(opcode: .sleep)
                         
                     }
-
+                    
                 case .bluconBatteryLowIndication1:
                     
                     // this is considered as battery level 3%
                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 3), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
-
+                    
                 case .bluconBatteryLowIndication2:
                     
                     // this is considered as battery level 2%
                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 2), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
-
+                    
                 }
                 
             }
-
+            
         } else {
             trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
         }
-        
+
+    }
+
+}
+
+extension CGMBluconTransmitter: CGMTransmitter {
+    
+    func initiatePairing() {
+        // nothing to do, Blucon keeps on reconnecting, resulting in continous pairing request
+        return
     }
     
+    func reset(requested: Bool) {
+        // no reset supported for blucon
+        return
+    }
+    
+    /// this transmitter does not support oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+    }
+
 }
+
