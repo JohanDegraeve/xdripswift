@@ -1,6 +1,6 @@
 import Foundation
 
-class Texts_M5StackView {
+class Text_BluetoothPeripheralView {
     
     static private let filename = "M5StackView"
     

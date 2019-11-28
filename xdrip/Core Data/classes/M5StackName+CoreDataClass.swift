@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 
 
-public class M5StackName: NSManagedObject {
+public class M5StackName: NSManagedObject, BluetoothPeripheral {
 
     /// create M5StackName
     init(address: String, userDefinedName: String, nsManagedObjectContext:NSManagedObjectContext) {

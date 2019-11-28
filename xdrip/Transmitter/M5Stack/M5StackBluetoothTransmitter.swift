@@ -52,16 +52,16 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     ///     - delegateFixed : there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : BluetoothPeripheralManager and UIViewControllers. There's only one instance of BluetoothPeripheralManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
     ///     - blePassword : optional. If nil then xdrip will send a M5StackReadBlePassWordTxMessage to the M5Stack, so this would be a case where the M5Stack (all M5Stacks managed by xdrip) do not have a fixed blepassword
     /// The blepassword in the M5Stack object gets priority over the blePassword in the parameter list
-    init(m5Stack: M5Stack?, delegateFixed: M5StackBluetoothDelegate, blePassword: String?) {
+    init(bluetoothPeripheral: M5Stack?, delegateFixed: M5StackBluetoothDelegate, blePassword: String?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "M5Stack")
-        if let m5Stack = m5Stack {
+        if let m5Stack = bluetoothPeripheral {
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: m5Stack.address, name: m5Stack.name)
         }
         
         // as mentioned in the parameter documentation, the blePassword in the M5Stack parameter gets priority over the password in the parameter blePassword
-        if let m5Stack = m5Stack, let blePassword = m5Stack.blepassword {
+        if let m5Stack = bluetoothPeripheral, let blePassword = m5Stack.blepassword {
             // m5Stack object is not nil and does have a blePassword, use that value
             self.blePassword = blePassword
         } else {
@@ -69,7 +69,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             self.blePassword = blePassword
         }
 
-        self.m5Stack = m5Stack
+        self.m5Stack = bluetoothPeripheral
         
         self.m5StackBluetoothTransmitterDelegateFixed = delegateFixed
 

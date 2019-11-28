@@ -84,7 +84,7 @@ final class BluetoothPeripheralViewController: UIViewController {
     // MARK: - private properties
     
     /// the m5stack being edited - will only be used initially to initialize the temp properties used locally, and in the end to update the m5stack - if nil then it's about creating a new m5stack
-    private var m5StackAsNSObject:M5Stack?
+    private var bluetoothPeripheralAsNSObject:M5Stack?
     
     /// this is for cases where a new M5Stack is being scanned. If there's a new M5Stack, and if the user has clicked 'done', then when closing the viewcontroller, the M5Stack should be deleted. This attribute defines if the M5Stack should be deleted or not
     private var deleteM5StackWhenClosingViewController: Bool = false
@@ -132,34 +132,34 @@ final class BluetoothPeripheralViewController: UIViewController {
     // MARK:- public functions
     
     /// configure the viewController
-    public func configure(m5Stack: M5Stack?, coreDataManager: CoreDataManager, bluetoothPeripheralManager: BluetoothPeripheralManaging) {
+    public func configure(bluetoothPeripheral: BluetoothPeripheral?, coreDataManager: CoreDataManager, bluetoothPeripheralManager: BluetoothPeripheralManaging) {
         
-        self.m5StackAsNSObject = m5Stack
+        self.bluetoothPeripheralASNSObject = bluetoothPeripheral
         self.coreDataManager = coreDataManager
         self.m5StackNameAccessor = M5StackNameAccessor(coreDataManager: coreDataManager)
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         
-        if let m5StackAsNSObject = m5StackAsNSObject {
+        if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
             
             // set self as delegate in bluetoothTransmitter
-            if let bluetoothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: false) {
+            if let bluetoothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false) {
                 bluetoothTransmitter.m5StackBluetoothTransmitterDelegateVariable = self
             }
             
-            // temporary store the userDefinedName, user can change this name via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
-            userDefinedNameTemporaryValue = m5StackAsNSObject.m5StackName?.userDefinedName
+            // temporary store the userDefinedName, user can change this name via the view, it will be stored back in the bluetoothPeripheralASNSObject only after clicking 'done' button
+            userDefinedNameTemporaryValue = bluetoothPeripheralASNSObject.m5StackName?.userDefinedName
             
-            // temporary store the value of textColor, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
-            textColorTemporaryValue = M5StackColor(forUInt16: UInt16(m5StackAsNSObject.textcolor))
+            // temporary store the value of textColor, user can change this via the view, it will be stored back in the bluetoothPeripheralASNSObject only after clicking 'done' button
+            textColorTemporaryValue = M5StackColor(forUInt16: UInt16(bluetoothPeripheralASNSObject.textcolor))
             
-            // temporary store the value of rotation, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
-            rotationTempValue = UInt16(m5StackAsNSObject.rotation)
+            // temporary store the value of rotation, user can change this via the view, it will be stored back in the bluetoothPeripheralASNSObject only after clicking 'done' button
+            rotationTempValue = UInt16(bluetoothPeripheralASNSObject.rotation)
             
-            // temporary store the value of backGroundColor, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
-            backGroundColorTemporaryValue = M5StackColor(forUInt16: UInt16(m5StackAsNSObject.backGroundColor))
+            // temporary store the value of backGroundColor, user can change this via the view, it will be stored back in the bluetoothPeripheralASNSObject only after clicking 'done' button
+            backGroundColorTemporaryValue = M5StackColor(forUInt16: UInt16(bluetoothPeripheralASNSObject.backGroundColor))
             
-            // temporary store the value of brightness, user can change this via the view, it will be stored back in the m5StackAsNSObject only after clicking 'done' button
-            brightnessTemporaryValue = Int(m5StackAsNSObject.brightness)
+            // temporary store the value of brightness, user can change this via the view, it will be stored back in the bluetoothPeripheralASNSObject only after clicking 'done' button
+            brightnessTemporaryValue = Int(bluetoothPeripheralASNSObject.brightness)
             
             // don't delete the M5Stack when going back to prevous viewcontroller
             deleteM5StackWhenClosingViewController = false
@@ -173,7 +173,7 @@ final class BluetoothPeripheralViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = Texts_M5StackView.screenTitle
+        title = Text_BluetoothPeripheralView.screenTitle
         
         setupView()
     }
@@ -194,8 +194,8 @@ final class BluetoothPeripheralViewController: UIViewController {
             
         case BluetoothPeripheralViewController.UnwindSegueIdentifiers.M5StackToBluetoothPeripheralsUnWindSegueIdentifier:
             
-            if deleteM5StackWhenClosingViewController, let m5StackAsNSObject = m5StackAsNSObject {
-                bluetoothPeripheralManager?.deleteM5Stack(m5Stack: m5StackAsNSObject)
+            if deleteM5StackWhenClosingViewController, let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
+                bluetoothPeripheralManager?.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheralASNSObject)
             }
         }
     }
@@ -207,7 +207,7 @@ final class BluetoothPeripheralViewController: UIViewController {
         // set label of connect button, according to current status
         setConnectButtonLabelText()
         
-        if m5StackAsNSObject == nil {
+        if bluetoothPeripheralAsNSObject == nil {
 
             // should be disabled, as there's nothing to delete yet
             trashButtonOutlet.disable()
@@ -252,13 +252,13 @@ final class BluetoothPeripheralViewController: UIViewController {
     /// user cliks done button
     private func doneButtonAction() {
         
-        if let m5StackAsNSObject = m5StackAsNSObject, let coreDataManager = coreDataManager, let m5StackNameAccessor = m5StackNameAccessor {
+        if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject, let coreDataManager = coreDataManager, let m5StackNameAccessor = m5StackNameAccessor {
             
-            // set variable delegate in m5StackAsNSObject to nil,  no need anymore to receive info
-            bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = nil
+            // set variable delegate in bluetoothPeripheralASNSObject to nil,  no need anymore to receive info
+            bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = nil
             
             // if user has set or changed a userDefinedName, stored it, or delete it if userDefinedName is set to nil
-            if let m5StackName = m5StackAsNSObject.m5StackName {
+            if let m5StackName = bluetoothPeripheralASNSObject.m5StackName {
                 if let userDefinedName = userDefinedNameTemporaryValue {
                     m5StackName.userDefinedName = userDefinedName
                 } else {
@@ -267,28 +267,28 @@ final class BluetoothPeripheralViewController: UIViewController {
                 }
                 
             } else if let userDefinedName = userDefinedNameTemporaryValue {
-                let m5Stackname = M5StackName(address: m5StackAsNSObject.address, userDefinedName: userDefinedName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                m5StackAsNSObject.m5StackName = m5Stackname
+                let m5Stackname = M5StackName(address: bluetoothPeripheralASNSObject.address, userDefinedName: userDefinedName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                bluetoothPeripheralASNSObject.m5StackName = m5Stackname
             }
             
             // store value of textColor
             if let textColor = textColorTemporaryValue {
-                m5StackAsNSObject.textcolor = Int32(textColor.rawValue)
+                bluetoothPeripheralASNSObject.textcolor = Int32(textColor.rawValue)
             }
             
             // store value of backGroundColor
             if let backGroundColor = backGroundColorTemporaryValue {
-                m5StackAsNSObject.backGroundColor = Int32(backGroundColor.rawValue)
+                bluetoothPeripheralASNSObject.backGroundColor = Int32(backGroundColor.rawValue)
             }
 
             // store value of rotation
             if let rotation = rotationTempValue {
-                m5StackAsNSObject.rotation = Int32(rotation)
+                bluetoothPeripheralASNSObject.rotation = Int32(rotation)
             }
             
             // store value of brightness
             if let brightness = brightnessTemporaryValue {
-                m5StackAsNSObject.brightness = Int16(brightness)
+                bluetoothPeripheralASNSObject.brightness = Int16(brightness)
             }
             
             // save all changes now
@@ -307,14 +307,14 @@ final class BluetoothPeripheralViewController: UIViewController {
     /// user clicks scan button
     private func scanButtonAction() {
         
-        // if m5StackAsNSObject is not nil, then there's already an M5stack for which scanning has started or which is already known from a previous scan (either connected or not connected) (m5StackAsNSObject should be nil because if it is not, the scanbutton should not even be enabled, anyway let's check).
+        // if bluetoothPeripheralASNSObject is not nil, then there's already an M5stack for which scanning has started or which is already known from a previous scan (either connected or not connected) (bluetoothPeripheralASNSObject should be nil because if it is not, the scanbutton should not even be enabled, anyway let's check).
         // Also check BluetoothPeripheralManager not nil
-        guard m5StackAsNSObject == nil, let bluetoothPeripheralManager =  bluetoothPeripheralManager else {return}
+        guard bluetoothPeripheralAsNSObject == nil, let bluetoothPeripheralManager =  bluetoothPeripheralManager else {return}
         
         bluetoothPeripheralManager.startScanningForNewDevice(callback: { (m5Stack) in
             
-            // assign internal m5StackAsNSObject to new m5Stack
-            self.m5StackAsNSObject = m5Stack
+            // assign internal bluetoothPeripheralASNSObject to new m5Stack
+            self.bluetoothPeripheralASNSObject = m5Stack
             
             // assign local variables
             self.userDefinedNameTemporaryValue = m5Stack.m5StackName?.userDefinedName //should be nil anyway
@@ -341,7 +341,7 @@ final class BluetoothPeripheralViewController: UIViewController {
             self.deleteM5StackWhenClosingViewController = true
             
             // set self as delegate in the bluetoothTransmitter
-            self.bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = self
+            self.bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = self
             
             })
         
@@ -352,20 +352,20 @@ final class BluetoothPeripheralViewController: UIViewController {
     
     private func trashButtonAction() {
         
-        // let's first check if m5stack exists, otherwise there's nothing to trash, normally this shouldn't happen because trashbutton should be disabled if there's no m5StackAsNSObject
-        guard let m5StackAsNSObject = m5StackAsNSObject else {return}
+        // let's first check if m5stack exists, otherwise there's nothing to trash, normally this shouldn't happen because trashbutton should be disabled if there's no bluetoothPeripheralASNSObject
+        guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject else {return}
 
         // textToAdd is either 'address' + the address, or 'alias' + the userDefinedName, depending if userDefinedName has a value
-        var textToAdd = Texts_M5StackView.address + m5StackAsNSObject.address
+        var textToAdd = Text_BluetoothPeripheralView.address + bluetoothPeripheralASNSObject.address
         if let userDefinedName = userDefinedNameTemporaryValue {
-            textToAdd = Texts_M5StackView.m5StackAlias + userDefinedName
+            textToAdd = Text_BluetoothPeripheralView.m5StackAlias + userDefinedName
         }
         
         // first ask user if ok to delete and if yes delete
-        let alert = UIAlertController(title: Texts_M5StackView.confirmDeletionM5Stack + " " + textToAdd + "?", message: nil, actionHandler: {
+        let alert = UIAlertController(title: Text_BluetoothPeripheralView.confirmDeletionM5Stack + " " + textToAdd + "?", message: nil, actionHandler: {
             
             // delete
-            self.bluetoothPeripheralManager?.deleteM5Stack(m5Stack: m5StackAsNSObject)
+            self.bluetoothPeripheralManager?.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheralASNSObject)
             
             // as the M5Stack is already deleted, there's no need to call delete again, when prepareForSegue
             self.deleteM5StackWhenClosingViewController = false
@@ -381,12 +381,12 @@ final class BluetoothPeripheralViewController: UIViewController {
     private func connectButtonAction() {
         
         // let's first check if m5stack exists, it should because otherwise connectButton should be disabled
-        guard let m5StackAsNSObject = m5StackAsNSObject else {return}
+        guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject else {return}
         
-        if m5StackAsNSObject.shouldconnect {
+        if bluetoothPeripheralASNSObject.shouldconnect {
             
             // device should not automaticaly connect, which means, each time the app restarts, it will not try to connect to this M5Stack
-            m5StackAsNSObject.shouldconnect = false
+            bluetoothPeripheralASNSObject.shouldconnect = false
             
             // save the update in coredata
             coreDataManager?.saveChanges()
@@ -395,24 +395,24 @@ final class BluetoothPeripheralViewController: UIViewController {
             setConnectButtonLabelText()
 
             // normally there should be a bluetoothTransmitter
-            if let bluetoothTransmitter = bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: false) {
+            if let bluetoothTransmitter = bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false) {
                 
                 // set delegate in bluetoothtransmitter to nil, as we're going to disconnect permenantly, so not interested anymore to receive info
                 bluetoothTransmitter.m5StackBluetoothTransmitterDelegateVariable = nil
 
                 // this will also set bluetoothTransmitter to nil and also disconnect the M5Stack
-                bluetoothPeripheralManager?.setBluetoothTransmitterToNil(forM5Stack: m5StackAsNSObject)
+                bluetoothPeripheralManager?.setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheralASNSObject)
                 
             }
             
         } else {
             
             // device should automatically connect, this will be stored in coredata
-            m5StackAsNSObject.shouldconnect = true
+            bluetoothPeripheralASNSObject.shouldconnect = true
             coreDataManager?.saveChanges()
             
             // get bluetoothTransmitter
-            if let bluetoothTransmitter = bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: true) {
+            if let bluetoothTransmitter = bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: true) {
                 
                 // set delegate
                 bluetoothTransmitter.m5StackBluetoothTransmitterDelegateVariable = self
@@ -429,13 +429,13 @@ final class BluetoothPeripheralViewController: UIViewController {
         
     }
     
-    /// checks if m5StackAsNSObject is not nil, etc.
+    /// checks if bluetoothPeripheralASNSObject is not nil, etc.
     /// - returns: true if m5stack exists and is connected, false in all other cases
     private func m5StackIsConnected() -> Bool {
         
-        guard let m5StackAsNSObject = m5StackAsNSObject else {return false}
+        guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject else {return false}
         
-        guard let connectionStatus = bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forM5stack: m5StackAsNSObject, createANewOneIfNecesssary: false)?.getConnectionStatus() else {return false}
+        guard let connectionStatus = bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false)?.getConnectionStatus() else {return false}
         
         return connectionStatus == CBPeripheralState.connected
 
@@ -444,14 +444,14 @@ final class BluetoothPeripheralViewController: UIViewController {
     private func setConnectButtonLabelText() {
 
         // if M5Stack is nil, then set text to "Always Connect", it's disabled anyway - if m5Stack not nil, then set depending on value of shouldconnect
-        if let m5StackAsNSObject = m5StackAsNSObject {
+        if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
             
             // set label of connect button, according to curren status
-            connectButtonOutlet.setTitle(m5StackAsNSObject.shouldconnect ? Texts_M5StackView.donotconnect:Texts_M5StackView.alwaysConnect, for: .normal)
+            connectButtonOutlet.setTitle(bluetoothPeripheralASNSObject.shouldconnect ? Text_BluetoothPeripheralView.donotconnect:Text_BluetoothPeripheralView.alwaysConnect, for: .normal)
             
         } else {
             
-            connectButtonOutlet.setTitle(Texts_M5StackView.alwaysConnect, for: .normal)
+            connectButtonOutlet.setTitle(Text_BluetoothPeripheralView.alwaysConnect, for: .normal)
             
         }
         
@@ -504,25 +504,25 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             
         case .name:
             cell.textLabel?.text = Texts_Common.name
-            cell.detailTextLabel?.text = m5StackAsNSObject?.name
+            cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject?.name
             cell.accessoryType = .none
             
         case .address:
-            cell.textLabel?.text = Texts_M5StackView.address
-            cell.detailTextLabel?.text = m5StackAsNSObject?.address
+            cell.textLabel?.text = Text_BluetoothPeripheralView.address
+            cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject?.address
             cell.accessoryType = .disclosureIndicator
             
         case .blePassword:
             cell.textLabel?.text = Texts_Common.password
-            cell.detailTextLabel?.text = m5StackAsNSObject?.blepassword
+            cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject?.blepassword
             cell.accessoryType = .none
 
         case .connectionStatus:
-            cell.textLabel?.text = Texts_M5StackView.status
-            cell.detailTextLabel?.text = m5StackAsNSObject == nil ? nil : m5StackIsConnected() ? Texts_M5StackView.connected:Texts_M5StackView.notConnected
+            cell.textLabel?.text = Text_BluetoothPeripheralView.status
+            cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject == nil ? nil : m5StackIsConnected() ? Text_BluetoothPeripheralView.connected:Text_BluetoothPeripheralView.notConnected
             
         case .userDefinedName:
-            cell.textLabel?.text = Texts_M5StackView.m5StackAlias
+            cell.textLabel?.text = Text_BluetoothPeripheralView.m5StackAlias
             cell.detailTextLabel?.text = userDefinedNameTemporaryValue
             cell.accessoryType = .disclosureIndicator
             
@@ -589,9 +589,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         switch setting {
             
         case .address:
-            guard let m5StackAsNSObject = m5StackAsNSObject else {return}
+            guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject else {return}
             
-            let alert = UIAlertController(title: Texts_M5StackView.address, message: m5StackAsNSObject.address, actionHandler: nil)
+            let alert = UIAlertController(title: Text_BluetoothPeripheralView.address, message: bluetoothPeripheralASNSObject.address, actionHandler: nil)
             
             // present the alert
             self.present(alert, animated: true, completion: nil)
@@ -604,20 +604,20 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             // clicked cell to change userdefined name (alias) - need to ask for new name, and verify if there's already another M5Stack existing with the same name
 
             // first off al check that M5Stack already exists, otherwise makes no sense to change the name, check here also m5StackNameAccessor, although should not be nil, but it needs to happen
-            guard let m5StackAsNSObject = m5StackAsNSObject, let m5StackNameAccessor = m5StackNameAccessor  else {return}
+            guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject, let m5StackNameAccessor = m5StackNameAccessor  else {return}
             
-            let alert = UIAlertController(title: Texts_M5StackView.m5StackAlias, message: Texts_M5StackView.selectAliasText, keyboardType: .default, text: userDefinedNameTemporaryValue, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
+            let alert = UIAlertController(title: Text_BluetoothPeripheralView.m5StackAlias, message: Text_BluetoothPeripheralView.selectAliasText, keyboardType: .default, text: userDefinedNameTemporaryValue, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
                 
                 let newUserDefinedName = text.toNilIfLength0()
                 
                 if newUserDefinedName != nil {
                     for m5StackName in m5StackNameAccessor.getM5StackNames() {
-                        // not checking address of m5StackAsNSObject, because obviously that one could have the same userdefinedname
-                        if m5StackName.address != m5StackAsNSObject.address {
+                        // not checking address of bluetoothPeripheralASNSObject, because obviously that one could have the same userdefinedname
+                        if m5StackName.address != bluetoothPeripheralASNSObject.address {
                             if m5StackName.userDefinedName == text {
                                 
                                 // m5stack userdefined name already exists
-                                let alreadyExistsAlert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.userdefinedNameAlreadyExists, actionHandler: nil)
+                                let alreadyExistsAlert = UIAlertController(title: Texts_Common.warning, message: Text_BluetoothPeripheralView.userdefinedNameAlreadyExists, actionHandler: nil)
                                 
                                 // present the alert
                                 self.present(alreadyExistsAlert, animated: true, completion: nil)
@@ -668,11 +668,11 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     self.textColorTemporaryValue = colors[index]
                     
                     // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
-                    if let m5Stack = self.m5StackAsNSObject, let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
-                        if let textColor = self.textColorTemporaryValue, let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeTextColor(textColor: textColor) {
+                    if let m5Stack = self.bluetoothPeripheralAsNSObject, let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
+                        if let textColor = self.textColorTemporaryValue, let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeTextColor(textColor: textColor) {
                             // do nothing, textColor successfully written to m5Stack - although it's not yet 100% sure because 
                         } else {
-                            bluetoothPeripheralManager.updateNeeded(forM5Stack: m5Stack)
+                            bluetoothPeripheralManager.updateNeeded(forBluetoothPeripheral: m5Stack)
                         }
                     }
                     
@@ -715,11 +715,11 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     self.backGroundColorTemporaryValue = colors[index]
                     
                     // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
-                    if let m5Stack = self.m5StackAsNSObject, let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
-                        if let backGroundColor = self.backGroundColorTemporaryValue, let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeBackGroundColor(backGroundColor: backGroundColor) {
+                    if let m5Stack = self.bluetoothPeripheralAsNSObject, let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
+                        if let backGroundColor = self.backGroundColorTemporaryValue, let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeBackGroundColor(backGroundColor: backGroundColor) {
                             // do nothing, backGroundColor successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
                         } else {
-                            bluetoothPeripheralManager.updateNeeded(forM5Stack: m5Stack)
+                            bluetoothPeripheralManager.updateNeeded(forBluetoothPeripheral: m5Stack)
                         }
                     }
                     
@@ -754,11 +754,11 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     self.rotationTempValue = UInt16(index)
                     
                     // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
-                    if let m5Stack = self.m5StackAsNSObject, let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
-                        if let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeRotation(rotation: index) {
+                    if let m5Stack = self.bluetoothPeripheralAsNSObject, let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
+                        if let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeRotation(rotation: index) {
                             // do nothing, rotation successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
                         } else {
-                            bluetoothPeripheralManager.updateNeeded(forM5Stack: m5Stack)
+                            bluetoothPeripheralManager.updateNeeded(forBluetoothPeripheral: m5Stack)
                         }
                     }
                     
@@ -796,11 +796,11 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     self.brightnessTemporaryValue = index * 10
                     
                     // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
-                    if let m5Stack = self.m5StackAsNSObject, let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
-                        if let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forM5stack: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeBrightness(brightness: index * 10) {
+                    if let m5Stack = self.bluetoothPeripheralAsNSObject, let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
+                        if let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeBrightness(brightness: index * 10) {
                             // do nothing, brightness successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
                         } else {
-                            bluetoothPeripheralManager.updateNeeded(forM5Stack: m5Stack)
+                            bluetoothPeripheralManager.updateNeeded(forBluetoothPeripheral: m5Stack)
                         }
                     }
                     
@@ -838,7 +838,7 @@ extension BluetoothPeripheralViewController: M5StackBluetoothDelegate {
     func newBlePassWord(newBlePassword: String, forM5Stack m5Stack: M5Stack) {
         
         // blePassword is also saved in BluetoothPeripheralManager, tant pis
-        m5StackAsNSObject?.blepassword = newBlePassword
+        bluetoothPeripheralAsNSObject?.blepassword = newBlePassword
         
         tableView.reloadRows(at: [IndexPath(row: Setting.blePassword.rawValue, section: 0)], with: .none)
         
@@ -849,7 +849,7 @@ extension BluetoothPeripheralViewController: M5StackBluetoothDelegate {
         if !success {
             
             // show warning, inform that user should set password or reset M5Stack
-            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
+            let alert = UIAlertController(title: Texts_Common.warning, message: Text_BluetoothPeripheralView.authenticationFailureWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
                 
                 // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
                 self.setShouldConnectToFalse(forM5Stack: m5Stack)
@@ -863,7 +863,7 @@ extension BluetoothPeripheralViewController: M5StackBluetoothDelegate {
     func blePasswordMissing(forM5Stack m5Stack: M5Stack) {
         
         // show warning, inform that user should set password
-        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
+        let alert = UIAlertController(title: Texts_Common.warning, message: Text_BluetoothPeripheralView.authenticationFailureWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
             self.setShouldConnectToFalse(forM5Stack: m5Stack)
@@ -877,7 +877,7 @@ extension BluetoothPeripheralViewController: M5StackBluetoothDelegate {
     func m5StackResetRequired(forM5Stack m5Stack: M5Stack) {
 
         // show warning, inform that user should reset M5Stack
-        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.m5StackResetRequiredWarning + " " + Texts_M5StackView.alwaysConnect, actionHandler: {
+        let alert = UIAlertController(title: Texts_Common.warning, message: Text_BluetoothPeripheralView.m5StackResetRequiredWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
             self.setShouldConnectToFalse(forM5Stack: m5Stack)
@@ -925,7 +925,7 @@ extension BluetoothPeripheralViewController {
     public enum SegueIdentifiers:String {
         
         /// to go from BluetoothPeripheralsViewController to M5StackViewController
-        case M5StacksToM5StackSegueIdentifier = "M5StacksToM5StackSegueIdentifier"
+        case BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier = "M5StacksToM5StackSegueIdentifier"
         
     }
     

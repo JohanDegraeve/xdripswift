@@ -1,33 +1,33 @@
 import Foundation
 
-/// used by M5Stack UI view controllers - it's the glue between BluetoothPeripheralManager and UIViewControllers - defines functions to scan for devices, connect/disconnect, delete an M5 stack, change the username, etc.
+/// used by BluetoothPeripheral UI view controllers - it's the glue between BluetoothPeripheralManager and UIViewControllers - defines functions to scan for devices, connect/disconnect, delete a BluetoothPeripheral, change the username, etc.
 protocol BluetoothPeripheralManaging: AnyObject {
     
-    /// to scan for a new M5SStack - callback will be called when a new M5Stack is found and connected
-    func startScanningForNewDevice(callback: @escaping (M5Stack) -> Void)
+    /// to scan for a new BluetoothPeripheral - callback will be called when a new BluetoothPeripheral is found and connected
+    func startScanningForNewDevice(callback: @escaping (BluetoothPeripheral) -> Void)
     
-    /// will stop scanning, this is again for the case where scanning for a new M5Stack has started
+    /// will stop scanning, this is again for the case where scanning for a new BluetoothPeripheral has started
     func stopScanningForNewDevice()
     
-    /// try to connect to the M5Stack
-    func connect(toM5Stack m5Stack: M5Stack)
+    /// try to connect to the BluetoothPeripheral
+    func connect(toBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral)
     
-    /// returns the M5StackBluetoothTransmitter for the m5stack
+    /// returns the BluetoothTransmitter for the specified bluetoothPeripheral
     /// - parameters:
-    ///     - forM5Stack : the m5Stack for which bluetoothTransmitter should be returned
-    ///     - createANewOneIfNecesssary : if bluetoothTransmitter is nil, then should one be created ?
-    func m5StackBluetoothTransmitter(forM5stack m5Stack: M5Stack, createANewOneIfNecesssary: Bool) -> M5StackBluetoothTransmitter?
+    ///     - forM5Stack : the object that conforms to bluetoothPeripheral, for which bluetoothTransmitter should be returned (remember bluetoothPeripheral is a protocol, every BluetoothTransmitter conforms to this protocol)
+    ///     - createANewOneIfNecesssary : if there's no instance yet,  then should one be created ?
+    func bluetoothTransmitter(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral, createANewOneIfNecesssary: Bool) -> BluetoothTransmitter?
 
-    /// deletes the M5Stack in coredata, and also the corresponding M5StackBluetoothTransmitter if there is one will be deleted
-    func deleteM5Stack(m5Stack: M5Stack)
+    /// deletes the BluetoothPeripheral in coredata, and also the corresponding BluetoothTransmitter if there is one will be deleted
+    func deleteBluetoothPeripheral(bluetoothPeripheral: BluetoothPeripheral)
     
-    /// - returns: the M5Stack's managed by this BluetoothPeripheralManager
-    func m5Stacks() -> [M5Stack]
+    /// - returns: the BluetoothPeripheral's managed by this BluetoothPeripheralManager
+    func bluetoothPeripherals() -> [BluetoothPeripheral]
     
-    /// sets flag m5StacksParameterUpdateNeeded for m5Stack to true
-    func updateNeeded(forM5Stack m5Stack: M5Stack)
+    /// sets flag bluetoothPeripheralParameterUpdateNeeded for BluetoothPeripheral to true
+    func updateNeeded(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral)
     
-    /// bluetoothtransmitter for this m5Stack will be deleted, as a result this will also disconnect the M5Stack
-    func setBluetoothTransmitterToNil(forM5Stack m5Stack: M5Stack)
+    /// bluetoothtransmitter for this bluetoothperiheral will be deleted, as a result this will also disconnect the bluetoothtransmitter
+    func setBluetoothTransmitterToNil(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral)
     
 }
