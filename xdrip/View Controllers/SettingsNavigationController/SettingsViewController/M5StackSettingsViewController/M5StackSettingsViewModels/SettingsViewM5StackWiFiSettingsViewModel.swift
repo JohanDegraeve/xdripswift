@@ -129,7 +129,7 @@ struct SettingsViewM5StackWiFiSettingsViewModel: SettingsViewModelProtocol {
         case .wifi3Name:
             wifiNumberAsInt = 3
             text = UserDefaults.standard.m5StackWiFiName3
-            actionHandler = {(name:String) in UserDefaults.standard.m5StackWiFiName2 = name.toNilIfLength0()}
+            actionHandler = {(name:String) in UserDefaults.standard.m5StackWiFiName3 = name.toNilIfLength0()}
         case .wifi1Password:
             wifiNumberAsInt = 1
             text = UserDefaults.standard.m5StackWiFiPassword1
