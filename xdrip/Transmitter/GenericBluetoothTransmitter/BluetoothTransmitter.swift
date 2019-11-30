@@ -9,7 +9,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     // MARK: - properties
     
-    /// the BluetoothTransmitterDelegate
+    /// the BluetoothPeripheralDelegate
     public weak var bluetoothTransmitterDelegate:BluetoothTransmitterDelegate?
     
     /// the address of the transmitter. If nil then transmitter never connected, so we don't know the name.
@@ -491,7 +491,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: methods to get address and name
     
     /// read device address
-    func address() -> String? {
+    func getAddress() -> String? {
         return deviceAddress
     }
     

@@ -12,7 +12,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     /// will be used to pass data back
     ///
     /// there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : BluetoothPeripheralManager and UIViewControllers. There's only one instance of BluetoothPeripheralManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
-    public weak var m5StackBluetoothTransmitterDelegateVariable: M5StackBluetoothDelegate?
+    public weak var m5StackBluetoothTransmitterDelegateVariable: BluetoothPeripheralDelegate?
 
     // MARK: - private properties
     
@@ -37,7 +37,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     /// will be used to pass data back
     ///
     /// there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : BluetoothPeripheralManager and UIViewControllers. There's only one instance of BluetoothPeripheralManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
-    private weak var m5StackBluetoothTransmitterDelegateFixed:M5StackBluetoothDelegate!
+    private weak var m5StackBluetoothTransmitterDelegateFixed:BluetoothPeripheralDelegate!
     
     /// is the transmitter ready to receive data like parameter updates or reading values
     private (set) var isReadyToReceiveData: Bool = false
@@ -52,7 +52,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     ///     - delegateFixed : there's two delegates, one public, one private. The private one will be assigned during object creation. There's two because two other classes want to receive feedback : BluetoothPeripheralManager and UIViewControllers. There's only one instance of BluetoothPeripheralManager and it's always the same. An instance will be assigned to m5StackBluetoothTransmitterDelegateFixed. There can be different UIViewController' and they can change, an instance will be assigned to m5StackBluetoothTransmitterDelegateVariable
     ///     - blePassword : optional. If nil then xdrip will send a M5StackReadBlePassWordTxMessage to the M5Stack, so this would be a case where the M5Stack (all M5Stacks managed by xdrip) do not have a fixed blepassword
     /// The blepassword in the M5Stack object gets priority over the blePassword in the parameter list
-    init(bluetoothPeripheral: M5Stack?, delegateFixed: M5StackBluetoothDelegate, blePassword: String?) {
+    init(bluetoothPeripheral: M5Stack?, delegateFixed: BluetoothPeripheralDelegate, blePassword: String?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "M5Stack")
@@ -269,8 +269,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
     // MARK: - BluetoothTransmitterDelegate functions
     
     func centralManagerDidConnect(address: String?, name: String?) {
-        m5StackBluetoothTransmitterDelegateFixed.didConnect(forM5Stack: m5Stack, address: address, name: name, bluetoothTransmitter: self)
-        m5StackBluetoothTransmitterDelegateVariable?.didConnect(forM5Stack: m5Stack, address: address, name: name, bluetoothTransmitter: self)
+        m5StackBluetoothTransmitterDelegateFixed.didConnect(forBluetoothPeripheral: m5Stack, address: address, name: name, bluetoothTransmitter: self)
+        m5StackBluetoothTransmitterDelegateVariable?.didConnect(forBluetoothPeripheral: m5Stack, address: address, name: name, bluetoothTransmitter: self)
     }
     
     func centralManagerDidFailToConnect(error: Error?) {
@@ -281,8 +281,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         
         if let m5Stack = m5Stack {
             
-            m5StackBluetoothTransmitterDelegateFixed!.deviceDidUpdateBluetoothState(state: state, forM5Stack: m5Stack)
-            m5StackBluetoothTransmitterDelegateVariable?.deviceDidUpdateBluetoothState(state: state, forM5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.deviceDidUpdateBluetoothState(state: state, bluetoothPeripheral: m5Stack)
+            m5StackBluetoothTransmitterDelegateVariable?.deviceDidUpdateBluetoothState(state: state, bluetoothPeripheral: m5Stack)
             
         } else {
             /// this bluetoothTransmitter is created to start scanning for a new, unknown M5Stack, so start scanning
@@ -297,8 +297,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         isReadyToReceiveData = false
         
         if let m5Stack = m5Stack {
-            m5StackBluetoothTransmitterDelegateFixed!.didDisconnect(forM5Stack: m5Stack)
-            m5StackBluetoothTransmitterDelegateVariable?.didDisconnect(forM5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.didDisconnect(bluetoothPeripheral: m5Stack)
+            m5StackBluetoothTransmitterDelegateVariable?.didDisconnect(bluetoothPeripheral: m5Stack)
         }
         
     }
@@ -381,8 +381,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             
             // this is the time when the M5stack is ready to receive readings or parameter updates
             isReadyToReceiveData = true
-            m5StackBluetoothTransmitterDelegateFixed!.isReadyToReceiveData(m5Stack: m5Stack)
-            m5StackBluetoothTransmitterDelegateVariable?.isReadyToReceiveData(m5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.isReadyToReceiveData(bluetoothPeripheral: m5Stack)
+            m5StackBluetoothTransmitterDelegateVariable?.isReadyToReceiveData(bluetoothPeripheral: m5Stack)
             
             
         case .authenticateSuccessRx:
@@ -401,8 +401,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             
             // this is the time when the M5stack is ready to receive readings or parameter updates
             isReadyToReceiveData = true
-            m5StackBluetoothTransmitterDelegateFixed!.isReadyToReceiveData(m5Stack: m5Stack)
-            m5StackBluetoothTransmitterDelegateVariable?.isReadyToReceiveData(m5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.isReadyToReceiveData(bluetoothPeripheral: m5Stack)
+            m5StackBluetoothTransmitterDelegateVariable?.isReadyToReceiveData(bluetoothPeripheral: m5Stack)
             
         case .authenticateFailureRx:
             // received authentication failure, inform delegates
@@ -433,8 +433,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             
             guard let m5Stack = m5Stack else {return}// would be a software error if this happens
             
-            m5StackBluetoothTransmitterDelegateFixed!.isAskingForAllParameters(m5Stack: m5Stack)
-            m5StackBluetoothTransmitterDelegateVariable?.isAskingForAllParameters(m5Stack: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.isAskingForAllParameters(bluetoothPeripheral: m5Stack)
+            m5StackBluetoothTransmitterDelegateVariable?.isAskingForAllParameters(bluetoothPeripheral: m5Stack)
             
         }
     }

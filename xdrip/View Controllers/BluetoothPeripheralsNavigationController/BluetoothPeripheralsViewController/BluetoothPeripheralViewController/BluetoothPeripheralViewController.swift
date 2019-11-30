@@ -672,7 +672,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                         if let textColor = self.textColorTemporaryValue, let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeTextColor(textColor: textColor) {
                             // do nothing, textColor successfully written to m5Stack - although it's not yet 100% sure because 
                         } else {
-                            bluetoothPeripheralManager.updateNeeded(forBluetoothPeripheral: m5Stack)
+                            m5Stack.parameterUpdateNeededAtNextConnect()
                         }
                     }
                     
@@ -719,7 +719,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                         if let backGroundColor = self.backGroundColorTemporaryValue, let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeBackGroundColor(backGroundColor: backGroundColor) {
                             // do nothing, backGroundColor successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
                         } else {
-                            bluetoothPeripheralManager.updateNeeded(forBluetoothPeripheral: m5Stack)
+                            m5Stack.parameterUpdateNeededAtNextConnect()
                         }
                     }
                     
@@ -758,7 +758,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                         if let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeRotation(rotation: index) {
                             // do nothing, rotation successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
                         } else {
-                            bluetoothPeripheralManager.updateNeeded(forBluetoothPeripheral: m5Stack)
+                            m5Stack.parameterUpdateNeededAtNextConnect()
                         }
                     }
                     
@@ -800,7 +800,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                         if let blueToothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false), blueToothTransmitter.writeBrightness(brightness: index * 10) {
                             // do nothing, brightness successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
                         } else {
-                            bluetoothPeripheralManager.updateNeeded(forBluetoothPeripheral: m5Stack)
+                            m5Stack.parameterUpdateNeededAtNextConnect()
                         }
                     }
                     
@@ -825,13 +825,13 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
 
 // MARK: extension M5StackBluetoothDelegate
 
-extension BluetoothPeripheralViewController: M5StackBluetoothDelegate {
+extension BluetoothPeripheralViewController: BluetoothPeripheralDelegate {
     
-    func isAskingForAllParameters(m5Stack: M5Stack) {
+    func isAskingForAllParameters(bluetoothPeripheral: M5Stack) {
         // viewcontroller doesn't use this
     }
     
-    func isReadyToReceiveData(m5Stack: M5Stack) {
+    func isReadyToReceiveData(bluetoothPeripheral: M5Stack) {
         // viewcontroller doesn't use this
     }
     
@@ -888,13 +888,13 @@ extension BluetoothPeripheralViewController: M5StackBluetoothDelegate {
         
     }
     
-    func didConnect(forM5Stack m5Stack: M5Stack?, address: String?, name: String?, bluetoothTransmitter: M5StackBluetoothTransmitter) {
+    func didConnect(forBluetoothPeripheral m5Stack: M5Stack?, address: String?, name: String?, bluetoothTransmitter: M5StackBluetoothTransmitter) {
         
         tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
         
     }
     
-    func didDisconnect(forM5Stack m5Stack: M5Stack) {
+    func didDisconnect(forBluetoothPeripheral m5Stack: M5Stack) {
         
         tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
 

@@ -280,7 +280,7 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         // if status changed to poweredon, and if address = nil then superclass will not start the scanning
         // but for DexcomG5 we can start scanning
         if state == .poweredOn {
-            if (address() == nil) {
+            if (getAddress() == nil) {
                     _ = startScanning()
             }
         }
