@@ -73,12 +73,6 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
         
     }
     
-    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-        
-        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
-        
-    }
-    
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
