@@ -2,7 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
+class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -141,9 +141,6 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         //assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate
         
-        // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
-        bluetoothTransmitterDelegate = self
-        
         // start scanning
         _ = startScanning()
     }
@@ -183,112 +180,25 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
     
     // MARK: CBCentralManager overriden functions
     
-    override func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        if Date() < Date(timeInterval: 60, since: timeStampOfLastG5Reading) {
-            // will probably never come here because reconnect doesn't happen with scanning, hence diddiscover will never be called excep the very first time that an app tries to connect to a G5
-            trace("diddiscover peripheral, but last reading was less than 1 minute ago, will ignore", log: log, type: .info)
-        } else {
-            super.centralManager(central, didDiscover: peripheral, advertisementData: advertisementData, rssi: RSSI)
-        }
-    }
-
-    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
         
-        // if last reading was less than a minute ago, then no need to continue, otherwise continue with process by calling super.centralManager(central, didConnect: peripheral)
-        if Date() < Date(timeInterval: 60, since: timeStampOfLastG5Reading) {
-            trace("connected, but last reading was less than 1 minute ago", log: log, type: .info)
-            // don't disconnect here, keep the connection open, the transmitter will disconnect in a few seconds, assumption is that this will increase battery life
-        } else {
-            super.centralManager(central, didConnect: peripheral)
-        }
+        super.centralManagerDidUpdateState(central)
         
-        // to be sure waitingPairingConfirmation is reset to false
-        waitingPairingConfirmation = false
-    }
-    
-    override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        trace("didDiscoverCharacteristicsFor", log: log, type: .info)
-        
-        // log error if any
-        if let error = error {
-            trace("    error: %{public}@", log: log, type: .error , error.localizedDescription)
-        }
-        
-        if let characteristics = service.characteristics {
-            for characteristic in characteristics {
-                
-                if let characteristicValue = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString) {
-
-                    trace("    characteristic : %{public}@", log: log, type: .info, characteristicValue.description)
-                    
-                    switch characteristicValue {
-                    case .CBUUID_Backfill:
-                        backfillCharacteristic = characteristic
-                        
-                    case .CBUUID_Write_Control:
-                        writeControlCharacteristic = characteristic
-                        
-                    case .CBUUID_Communication:
-                        communicationCharacteristic = characteristic
-                        
-                    case .CBUUID_Receive_Authentication:
-                        receiveAuthenticationCharacteristic = characteristic
-                        trace("    calling setNotifyValue true", log: log, type: .info)
-                        peripheral.setNotifyValue(true, for: characteristic)
-                        
-                    }
-                } else {
-                    trace("    characteristic UUID unknown : %{public}@", log: log, type: .error, characteristic.uuid.uuidString)
-                }
-            }
-        } else {
-            trace("characteristics is nil. There must be some error.", log: log, type: .error)
-        }
-    }
-    
-    // MARK: CGMTransmitter protocol functions
-    
-    /// to ask pairing
-    func initiatePairing() {
-        // assuming that the transmitter is effectively awaiting the pairing, otherwise this obviously won't work
-        sendPairingRequest()
-    }
-    
-    /// to ask transmitter reset
-    func reset(requested:Bool) {
-        G5ResetRequested = requested
-    }
-    
-    /// this transmitter does not support oopWeb
-    func setWebOOPEnabled(enabled: Bool) {
-    }
-    
-    /// this transmitter does not support oop web
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
-    
-    // MARK: BluetoothTransmitterDelegate functions
-    
-    func centralManagerDidConnect(address:String?, name:String?) {
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
-    }
-    
-    func centralManagerDidFailToConnect(error: Error?) {
-        trace("in centralManagerDidFailToConnect", log: log, type: .error)
-    }
-    
-    func centralManagerDidUpdateState(state: CBManagerState) {
         // if status changed to poweredon, and if address = nil then superclass will not start the scanning
         // but for DexcomG5 we can start scanning
-        if state == .poweredOn {
+        if central.state == .poweredOn {
             if (getAddress() == nil) {
-                    _ = startScanning()
+                _ = startScanning()
             }
         }
+        
+        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
 
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state)
     }
-    
-    func centralManagerDidDisconnectPeripheral(error: Error?) {
+
+    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
         
         if waitingPairingConfirmation {
             // device has requested a pairing request and is now in a status of verifying if pairing was successfull or not, this by doing setNotify to writeCharacteristic. If a disconnect occurs now, it means pairing has failed (probably because user didn't approve it
@@ -300,9 +210,13 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         
         // inform delegate
         cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
+        
     }
-    
-    func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
+
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
+        
         trace("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
         
         if let error = error {
@@ -338,12 +252,15 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
         } else {
             trace("    characteristicValue is nil", log: log, type: .error)
         }
+        
     }
     
-    func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
         guard let characteristic_UUID = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString) else {
-           trace("in peripheralDidUpdateValueFor, unknown characteristic received with uuid = %{public}@", log: log, type: .error, characteristic.uuid.uuidString)
+            trace("in peripheralDidUpdateValueFor, unknown characteristic received with uuid = %{public}@", log: log, type: .error, characteristic.uuid.uuidString)
             return
         }
         
@@ -380,14 +297,14 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                                 cgmTransmitterDelegate?.cgmTransmitterNeedsPairing()
                                 
                             } else {
-
+                                
                                 // subscribe to writeControlCharacteristic
                                 if let writeControlCharacteristic = writeControlCharacteristic {
                                     setNotifyValue(true, for: writeControlCharacteristic)
                                 } else {
                                     trace("    writeControlCharacteristic is nil, can not set notifyValue", log: log, type: .error)
                                 }
-
+                                
                             }
                             
                         } else {
@@ -445,8 +362,8 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                             //if reset was done recently, less than 5 minutes ago, then ignore the reading
                             if Date() < Date(timeInterval: 5 * 60, since: timeStampTransmitterReset) {
                                 trace("    last transmitter reset was less than 5 minutes ago, ignoring this reading", log: log, type: .info)
-                            //} else if sensorDataRxMessage.unfiltered == 0.0 {
-                              //  trace("    sensorDataRxMessage.unfiltered = 0.0, ignoring this reading", log: log, type: .info)
+                                //} else if sensorDataRxMessage.unfiltered == 0.0 {
+                                //  trace("    sensorDataRxMessage.unfiltered = 0.0, ignoring this reading", log: log, type: .info)
                             } else {
                                 if Date() < Date(timeInterval: 60, since: timeStampOfLastG5Reading) {
                                     // should probably never come here because this check is already done at connection time
@@ -508,8 +425,100 @@ class CGMG5Transmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTr
                 trace("    characteristic.value is nil", log: log, type: .error)
             }
         }
+        
+    }
+    
+    override func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+        
+        if Date() < Date(timeInterval: 60, since: timeStampOfLastG5Reading) {
+            // will probably never come here because reconnect doesn't happen with scanning, hence diddiscover will never be called excep the very first time that an app tries to connect to a G5
+            trace("diddiscover peripheral, but last reading was less than 1 minute ago, will ignore", log: log, type: .info)
+        } else {
+            super.centralManager(central, didDiscover: peripheral, advertisementData: advertisementData, rssi: RSSI)
+        }
+        
     }
 
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        
+        // not calling super.didconnect here
+        
+        // if last reading was less than a minute ago, then no need to continue, otherwise continue with process by calling super.centralManager(central, didConnect: peripheral)
+        if Date() < Date(timeInterval: 60, since: timeStampOfLastG5Reading) {
+            trace("connected, but last reading was less than 1 minute ago", log: log, type: .info)
+            // don't disconnect here, keep the connection open, the transmitter will disconnect in a few seconds, assumption is that this will increase battery life
+        } else {
+            super.centralManager(central, didConnect: peripheral)
+        }
+        
+        // to be sure waitingPairingConfirmation is reset to false
+        waitingPairingConfirmation = false
+        
+    }
+    
+    override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        
+        // not using super.didDiscoverCharacteristicsFor here
+        
+        trace("didDiscoverCharacteristicsFor", log: log, type: .info)
+        
+        // log error if any
+        if let error = error {
+            trace("    error: %{public}@", log: log, type: .error , error.localizedDescription)
+        }
+        
+        if let characteristics = service.characteristics {
+            for characteristic in characteristics {
+                
+                if let characteristicValue = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString) {
+
+                    trace("    characteristic : %{public}@", log: log, type: .info, characteristicValue.description)
+                    
+                    switch characteristicValue {
+                    case .CBUUID_Backfill:
+                        backfillCharacteristic = characteristic
+                        
+                    case .CBUUID_Write_Control:
+                        writeControlCharacteristic = characteristic
+                        
+                    case .CBUUID_Communication:
+                        communicationCharacteristic = characteristic
+                        
+                    case .CBUUID_Receive_Authentication:
+                        receiveAuthenticationCharacteristic = characteristic
+                        trace("    calling setNotifyValue true", log: log, type: .info)
+                        peripheral.setNotifyValue(true, for: characteristic)
+                        
+                    }
+                } else {
+                    trace("    characteristic UUID unknown : %{public}@", log: log, type: .error, characteristic.uuid.uuidString)
+                }
+            }
+        } else {
+            trace("characteristics is nil. There must be some error.", log: log, type: .error)
+        }
+    }
+    
+    // MARK: CGMTransmitter protocol functions
+    
+    /// to ask pairing
+    func initiatePairing() {
+        // assuming that the transmitter is effectively awaiting the pairing, otherwise this obviously won't work
+        sendPairingRequest()
+    }
+    
+    /// to ask transmitter reset
+    func reset(requested:Bool) {
+        G5ResetRequested = requested
+    }
+    
+    /// this transmitter does not support oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+    }
+    
+    /// this transmitter does not support oop web
+    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
+    
     // MARK: helper functions
     
     /// sends SensorTxMessage to transmitter

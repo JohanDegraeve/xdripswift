@@ -2,7 +2,7 @@ import Foundation
 import os
 import CoreBluetooth
 
-class CGMBlueReaderTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate, CGMTransmitter {
+class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -41,33 +41,43 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegat
         
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_BlueReader)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_BlueReader, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_BlueReader, startScanningAfterInit: CGMTransmitterType.blueReader.startScanningAfterInit())
         
-        // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
-        bluetoothTransmitterDelegate = self
+    }
+    
+    // MARK: - overriden  BluetoothTransmitter functions
+    
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        
+        super.centralManager(central, didConnect: peripheral)
+        
+        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
         
     }
     
-    // MARK: - BluetoothTransmitterDelegate functions
-    
-    func centralManagerDidConnect(address:String?, name:String?) {
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
+    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        
+        super.centralManagerDidUpdateState(central)
+        
+        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
+        
     }
     
-    func centralManagerDidFailToConnect(error: Error?) {
-        trace("in centralManagerDidFailToConnect", log: log, type: .error)
-    }
-    
-    func centralManagerDidUpdateState(state: CBManagerState) {
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state)
-    }
-    
-    func centralManagerDidDisconnectPeripheral(error: Error?) {
+    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+        
         cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
+        
+    }
+
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
+        
     }
     
-    func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
-    }
-    
-    func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
         trace("in peripheral didUpdateValueFor", log: log, type: .info)
         
@@ -97,7 +107,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegat
                 trace("    failed to convert rawDataAsString to double", log: log, type: .error)
                 return
             }
-
+            
             // if there's more than one field, then the second field is battery level
             // there could be 2 fields or more
             //var batteryLevelAsString:String? = nil
@@ -120,6 +130,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegat
         } else {
             trace("    value is nil, no further processing", log: log, type: .error)
         }
+        
     }
     
     // MARK: CGMTransmitter protocol functions
@@ -135,8 +146,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegat
     func reset(requested:Bool) {}
     
     /// this transmitter does not support oopWeb
-    func setWebOOPEnabled(enabled: Bool) {
-    }
+    func setWebOOPEnabled(enabled: Bool) {}
     
     /// this transmitter does not support oop web
     func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}

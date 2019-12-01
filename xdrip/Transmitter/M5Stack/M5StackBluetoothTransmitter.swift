@@ -5,7 +5,7 @@ import os
 /// bluetoothTransmitter for an M5 Stack
 /// - will start scanning as soon as created or as soon as bluetooth is switched on
 /// - there's only one characteristic which is used for write and notify, not read. To get data from the M5Stack, xdrip app will write a specific opcode, then M5Stack will reply and the reply will arrive as notify. So we don't use .withResponse
-final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmitterDelegate {
+final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     
     // MARK: - public properties
     
@@ -75,9 +75,6 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
 
         // call super
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service)], CBUUID_ReceiveCharacteristic: CBUUID_TxRxCharacteristic, CBUUID_WriteCharacteristic: CBUUID_TxRxCharacteristic, startScanningAfterInit: false)
-        
-        // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
-        bluetoothTransmitterDelegate = self
         
         // start scanning, probably the scanning will not yet start, this will happen only when centralManagerDidUpdateState is called
         _ = startScanning()
@@ -266,32 +263,36 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
         } else {return false}
     }
     
-    // MARK: - BluetoothTransmitterDelegate functions
+    // MARK: - overriden  BluetoothTransmitter functions
     
-    func centralManagerDidConnect(address: String?, name: String?) {
-        m5StackBluetoothTransmitterDelegateFixed.didConnect(forBluetoothPeripheral: m5Stack, address: address, name: name, bluetoothTransmitter: self)
-        m5StackBluetoothTransmitterDelegateVariable?.didConnect(forBluetoothPeripheral: m5Stack, address: address, name: name, bluetoothTransmitter: self)
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+       
+        super.centralManager(central, didConnect: peripheral)
+        
+        m5StackBluetoothTransmitterDelegateFixed.didConnect(forBluetoothPeripheral: m5Stack, address: deviceAddress, name: deviceName, bluetoothTransmitter: self)
+        m5StackBluetoothTransmitterDelegateVariable?.didConnect(forBluetoothPeripheral: m5Stack, address: deviceAddress, name: deviceName, bluetoothTransmitter: self)
+
     }
     
-    func centralManagerDidFailToConnect(error: Error?) {
-        trace("in centralManagerDidFailToConnect", log: log, type: .error)
-    }
-    
-    func centralManagerDidUpdateState(state: CBManagerState) {
+    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        
+        super.centralManagerDidUpdateState(central)
         
         if let m5Stack = m5Stack {
             
-            m5StackBluetoothTransmitterDelegateFixed!.deviceDidUpdateBluetoothState(state: state, bluetoothPeripheral: m5Stack)
-            m5StackBluetoothTransmitterDelegateVariable?.deviceDidUpdateBluetoothState(state: state, bluetoothPeripheral: m5Stack)
+            m5StackBluetoothTransmitterDelegateFixed!.deviceDidUpdateBluetoothState(state: central.state, bluetoothPeripheral: m5Stack)
+            m5StackBluetoothTransmitterDelegateVariable?.deviceDidUpdateBluetoothState(state: central.state, bluetoothPeripheral: m5Stack)
             
         } else {
             /// this bluetoothTransmitter is created to start scanning for a new, unknown M5Stack, so start scanning
             _ = startScanning()
         }
-        
+
     }
     
-    func centralManagerDidDisconnectPeripheral(error: Error?) {
+    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
         
         // can not write data anymore to the device
         isReadyToReceiveData = false
@@ -300,17 +301,19 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             m5StackBluetoothTransmitterDelegateFixed!.didDisconnect(bluetoothPeripheral: m5Stack)
             m5StackBluetoothTransmitterDelegateVariable?.didDisconnect(bluetoothPeripheral: m5Stack)
         }
-        
+
     }
     
-    func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
         
         // check if subscribe to notifications succeeded
         if characteristic.isNotifying {
             
             // time to send password to M5Stack, if there isn't one known in the settings then we assume that the user didn't set a password in the M5Stack config (M5NS.INI) and that we didn't connect to this M5Stack yet after the last M5Stack restart. So in that case we will request a random password
             if let blePassword = blePassword, let authenticateTxMessageData = M5StackAuthenticateTXMessage(password: blePassword).data {
-
+                
                 if !writeDataToPeripheral(data: authenticateTxMessageData, type: .withoutResponse) {
                     trace("failed to send authenticateTx to M5Stack", log: log, type: .error)
                 } else {
@@ -324,16 +327,19 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
                 } else {
                     trace("successfully sent readBlePassWordTx to M5Stack", log: log, type: .error)
                 }
-
+                
             }
             
         } else {
-           trace("in peripheralDidUpdateNotificationStateFor, failed to subscribe for characteristic %{public}@", log: log, type: .error, characteristic.uuid.description)
+            trace("in peripheralDidUpdateNotificationStateFor, failed to subscribe for characteristic %{public}@", log: log, type: .error, characteristic.uuid.description)
         }
+
     }
     
-    func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         
+        super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
+     
         //check if value is not nil
         guard let value = characteristic.value else {
             trace("in peripheral didUpdateValueFor, characteristic.value is nil", log: log, type: .info)
@@ -375,7 +381,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
                 m5StackBluetoothTransmitterDelegateVariable?.newBlePassWord(newBlePassword: newBlePassword, forM5Stack: m5Stack)
                 
             }
-
+            
             // this is usually a case where M5Stack has restarted, so it needs to get time and timeoffset
             sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
             
@@ -395,7 +401,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             // inform delegates
             m5StackBluetoothTransmitterDelegateFixed!.authentication(success: true, forM5Stack: m5Stack)
             m5StackBluetoothTransmitterDelegateVariable?.authentication(success: true, forM5Stack: m5Stack)
-
+            
             // even though not requested, and even if M5Stack may already have it, send the local time
             sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
             
@@ -437,8 +443,9 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter, BluetoothTransmit
             m5StackBluetoothTransmitterDelegateVariable?.isAskingForAllParameters(bluetoothPeripheral: m5Stack)
             
         }
-    }
 
+    }
+    
     // MARK: private helper functions
     
     /// sends local time in seconds since 1.1.1970 and also timeoffset from UTC in seconds. to M5Stack

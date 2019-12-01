@@ -110,35 +110,37 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
         //assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate
         
-        // set self as delegate for BluetoothTransmitterDelegate - this parameter is defined in the parent class BluetoothTransmitter
-        bluetoothTransmitterDelegate = self
     }
     
-    // MARK: BluetoothTransmitterDelegate functions
+    // MARK: - overriden  BluetoothTransmitter functions
     
-    func centralManagerDidConnect(address:String?, name:String?) {
-        trace("in centralManagerDidConnect", log: log, type: .info)
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: address, name: name)
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        
+        super.centralManager(central, didConnect: peripheral)
+        
+        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
+        
     }
     
-    func centralManagerDidFailToConnect(error: Error?) {
-        trace("in centralManagerDidFailToConnect", log: log, type: .error)
+    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        
+        super.centralManagerDidUpdateState(central)
+        
+        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
+        
     }
     
-    func centralManagerDidUpdateState(state: CBManagerState) {
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state)
-    }
-    
-    func centralManagerDidDisconnectPeripheral(error: Error?) {
-        trace("in centralManagerDidDisconnectPeripheral", log: log, type: .info)
+    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+        
         cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
+        
     }
     
-    func peripheralDidUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
-        trace("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
-    }
-    
-    func peripheralDidUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        
+        super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
         // log the received characteristic value
         trace("in peripheralDidUpdateValueFor with characteristic UUID = %{public}@, matches characteristic name %{public}@", log: log, type: .info, characteristic.uuid.uuidString, receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString)?.description ?? "not available")
@@ -181,7 +183,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 var valueDecoded = XORENC(inD: [UInt8](value))
                 
                 let valueDecodedAsHexString = Data(valueDecoded).hexEncodedString()
-                 trace("   in peripheralDidUpdateValueFor, GNW Notify with hex value = %{public}@", log: log, type: .info , valueDecodedAsHexString)
+                trace("   in peripheralDidUpdateValueFor, GNW Notify with hex value = %{public}@", log: log, type: .info , valueDecodedAsHexString)
                 
                 // reading status, as per GNSEntry documentation
                 let readingStatus = getIntAtPosition(numberOfBytes: 1, position: 0, data: &valueDecoded)
@@ -218,10 +220,10 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                     loop: while Int(7.0 + i * 2.0) < valueDecoded.count - 1 && i < amountOfPerMinuteReadings + amountOfPer15MinuteReadings {
                         // timestamp of the reading in minutes, counting from 1 1 1970
                         let readingTimeStampInMinutes:Double = currentTimeInMinutes - (i < amountOfPerMinuteReadings ? i : i * 15.0)
-
+                        
                         // get the reading value (mgdl)
                         let readingValueInMgDl = getIntAtPosition(numberOfBytes: 2, position: Int(7 + i * 2), data: &valueDecoded)
-
+                        
                         //new reading should be at least 30 seconds younger than timeStampLastBgReadingStoredInDatabase
                         if readingTimeStampInMinutes > ((timeStampLastBgReadingInMinutes * 2) + 1)/2 {
                             
@@ -233,7 +235,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                                     timeStampLastAddedGlucoseDataInMinutes = readingTimeStampInMinutes
                                 }
                             }
-
+                            
                         } else {
                             break loop
                         }
@@ -251,6 +253,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, BluetoothTransmitterDelegate,
                 }
             }
         }
+        
     }
     
     // MARK: CGMTransmitter protocol functions
