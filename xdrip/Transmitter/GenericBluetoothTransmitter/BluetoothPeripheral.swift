@@ -2,8 +2,7 @@ import Foundation
 
 /// Every class that represents a bluetooth peripheral needs to conform to this protocol. Classes being core data classes, ie NSManagedObject classes. Example M5Stack conforms to this protocol.
 ///
-/// - BluetoothPeripheral vs BluetoothTransmitter ? What's in a name. . I created BluetoothPeripheral so I can extend every core data type (eg M5Stack) with this functionality.
-/// - implementation of the functions in this protocol will usually be the content for all implementations. As Swift doesn't support abstract classes, and as at the ame time the classes (like M5Stack) extens NSManagedObject, I see no other way
+/// - implementation of the functions in this protocol will usually be the same for all implementations. As Swift doesn't support abstract classes, and as at the same time the classes (like M5Stack) extens NSManagedObject, I see no other way
 protocol BluetoothPeripheral {
     
     /// mac address of the peripheral
@@ -14,11 +13,6 @@ protocol BluetoothPeripheral {
     /// what type of peripheral is this
     func bluetoothPeripheralType() -> BluetoothPeripheralType
     
-    /// tells the app that it should not try to connect to this bluetoothperipheral
-    ///
-    /// it's just an internal boolean value that is stored
-    func dontTryToConnectToThisBluetoothPeripheral()
-    
     /// tells the app that it should always try to connect to this bluetoothperipheral
     ///
     /// it's just an internal boolean value that is stored
@@ -27,7 +21,7 @@ protocol BluetoothPeripheral {
     /// should xdrip try to connect yes or no ?
     ///
     /// it's just an internal boolean value that is stored
-    func xdripShouldTryToConnectToThisBluetoothPeripheral() -> Bool
+    func shouldXdripTryToConnectToThisBluetoothPeripheral() -> Bool
 
     /// when peripheral reconnects, app should not send list of parameters
     ///

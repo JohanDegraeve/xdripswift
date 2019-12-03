@@ -8,7 +8,7 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
     private var coreDataManager:CoreDataManager?
     
     /// a bluetoothPeripheralManager
-    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging?
+    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging!
     
     // MARK:- public functions
     
@@ -34,7 +34,7 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
 extension BluetoothPeripheralNavigationController: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         
-        if let bluetoothPeripheralsViewController = viewController as? BluetoothPeripheralsViewController, let coreDataManager = coreDataManager, let bluetoothPeripheralManager = bluetoothPeripheralManager {
+        if let bluetoothPeripheralsViewController = viewController as? BluetoothPeripheralsViewController, let coreDataManager = coreDataManager {
             bluetoothPeripheralsViewController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
         }
     }

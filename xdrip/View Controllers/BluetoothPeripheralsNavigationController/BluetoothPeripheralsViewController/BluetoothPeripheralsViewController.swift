@@ -27,11 +27,8 @@ final class BluetoothPeripheralsViewController: UIViewController {
     private var coreDataManager:CoreDataManager?
     
     /// a bluetoothPeripheralManager
-    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging?
-
-    /// list of bluetoothPeripheral's
-    private var bluetoothPeripherals: [BluetoothPeripheral] = []
-
+    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging!
+    
     // MARK: public functions
     
     /// configure
@@ -53,6 +50,7 @@ final class BluetoothPeripheralsViewController: UIViewController {
         title = Texts_BluetoothPeripheralsView.screenTitle
         
         setupView()
+        
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -73,6 +71,7 @@ final class BluetoothPeripheralsViewController: UIViewController {
             }
             
             vc.configure(bluetoothPeripheral: sender as? BluetoothPeripheral, coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
+            
         }
     }
     
@@ -110,31 +109,26 @@ final class BluetoothPeripheralsViewController: UIViewController {
     }
     
     /// calls tableView.reloadRows for the row where bluetoothPeripheral is shown
-    private func updateRow(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral) {
+    private func updateRow(for bluetoothPeripheral: BluetoothPeripheral) {
         
-        if let index = bluetoothPeripherals.firstIndex(where: {$0.getAddress() == bluetoothPeripheral.getAddress()}) {
+        if let index = bluetoothPeripheralManager.getBluetoothPeripherals().firstIndex(where: {$0.getAddress() == bluetoothPeripheral.getAddress()}) {
             tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
         }
 
     }
     
     /// initializes bluetoothPeripherals
-    ///  array
+    /// - sets the delegates of each transmitter to self
     private func initializeBluetoothPeripherals() {
         
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
-            // should never happen or it would be a coding error, but let's assign to empty string
-            bluetoothPeripherals = []
+        for bluetoothtTransmitter in bluetoothPeripheralManager.getBluetoothTransmitters() {
+            
+            bluetoothtTransmitter.variableBluetoothTransmitterDelegate = self
+            
         }
         
-        bluetoothPeripherals = bluetoothPeripheralManager.getBluetoothPeripherals()
-        
-        for bluetoothPeripheral in bluetoothPeripherals {
-            bluetoothPeripheralManager.bluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheral, createANewOneIfNecesssary: false)?.bluetoothTransmitterDelegate = self
-        }
-
     }
-
+    
 }
 
 // MARK: - extensions
@@ -146,7 +140,7 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         // add 1 for the row that will show help info
-        return bluetoothPeripherals.count + 1
+        return bluetoothPeripheralManager.getBluetoothPeripherals().count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -154,7 +148,7 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("Unexpected Table View Cell") }
         
         // the last row is the help info
-        if indexPath.row == bluetoothPeripherals.count {
+        if indexPath.row == bluetoothPeripheralManager.getBluetoothPeripherals().count {
             
             cell.textLabel?.text = Texts_BluetoothPeripheralsView.m5StackSoftWareHelpCellText
             cell.detailTextLabel?.text = nil
@@ -164,14 +158,14 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         }
         
         // textLabel should be the user defined alias of the BluetoothPeripheral, or if user defined alias == nil, then the address
-        cell.textLabel?.text = bluetoothPeripherals[indexPath.row].m5StackName?.userDefinedName
+        cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].m5StackName?.userDefinedName
         if cell.textLabel?.text == nil {
-            cell.textLabel?.text = bluetoothPeripherals[indexPath.row].address
+            cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].address
         }
         
         // detail is the connection status
         cell.detailTextLabel?.text = Text_BluetoothPeripheralView.notConnected // start with not connected
-        if let bluetoothTransmitter = bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stacks[indexPath.row], createANewOneIfNecesssary: false) {
+        if let bluetoothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stacks[indexPath.row], createANewOneIfNecesssary: false) {
             
             if let connectionStatus = bluetoothTransmitter.getConnectionStatus(), connectionStatus == CBPeripheralState.connected {
                 cell.detailTextLabel?.text = Text_BluetoothPeripheralView.connected
@@ -195,7 +189,7 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         tableView.deselectRow(at: indexPath, animated: true)
        
         // the last row is the help info
-        if indexPath.row == bluetoothPeripherals.count {
+        if indexPath.row == bluetoothPeripheralManager.getBluetoothPeripherals().count {
 
             let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralsView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5Stack, actionHandler: nil)
             
@@ -203,7 +197,7 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
             
         } else {
 
-            self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier.rawValue, sender: bluetoothPeripherals[indexPath.row])
+            self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier.rawValue, sender: bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row])
 
         }
         
@@ -211,56 +205,56 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
     
 }
 
-// MARK: extension BluetoothPeripheralDelegate
+// MARK: extension M5StackBluetoothTransmitterDelegate
 
-extension BluetoothPeripheralsViewController: BluetoothPeripheralDelegate {
-    
-    func isAskingForAllParameters(bluetoothPeripheral: BluetoothPeripheral) {
+extension BluetoothPeripheralsViewController: M5StackBluetoothTransmitterDelegate {
+
+    func isAskingForAllParameters(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         // viewcontroller doesn't use this
     }
     
-    func isReadyToReceiveData(bluetoothPeripheral: BluetoothPeripheral) {
+    func isReadyToReceiveData(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         // viewcontroller doesn't use this
     }
     
-    func newBlePassWord(newBlePassword: String, forM5Stack m5Stack: M5Stack) {
+    func newBlePassWord(newBlePassword: String, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
-        // blePassword is also saved in BluetoothPerpheralManager, possibly it will be saved two times but that's no issue
-        m5Stack.blepassword = newBlePassword
-        
-    }
-    
-    func authentication(success: Bool, forM5Stack m5Stack: M5Stack) {
-        // no further handling, means when this view is open, user won't see that authentication is failing
-    }
-    
-    func blePasswordMissing(forM5Stack m5Stack: M5Stack) {
-       // no further handling, means when this view is open, user won't see that ble password is missing
-    }
-    
-    func m5StackResetRequired(forM5Stack m5Stack: M5Stack) {
-        // no further handling, means when this view is open, user won't see that reset is required
-    }
-    
-    func didConnect(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral?, address: String?, name: String?, bluetoothTransmitter : BluetoothTransmitter) {
-        
-        if let bluetoothPeripheral = bluetoothPeripheral {
-            updateRow(forBluetoothPeripheral: bluetoothPeripheral)
+        // blePassword is also saved in BluetoothPeripheralManager, possibly it will be saved two times but that's no issue
+        if let m5Stack = bluetoothPeripheralManager.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack {
+            m5Stack.blepassword = newBlePassword
         }
         
     }
     
-    func didDisconnect(bluetoothPeripheral: BluetoothPeripheral) {
+    func authentication(success: Bool, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        // no further handling, means when this view is open, user won't see that authentication is failing
+    }
+    
+    func blePasswordMissing(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+       // no further handling, means when this view is open, user won't see that ble password is missing
+    }
+    
+    func m5StackResetRequired(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        // no further handling, means when this view is open, user won't see that reset is required
+    }
+    
+    func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
         
-        updateRow(forBluetoothPeripheral: bluetoothPeripheral)
+        updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
 
     }
     
-    func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothPeripheral: BluetoothPeripheral) {
+    func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
+        
+        updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
+
+    }
+    
+    func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
         
         // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
         if state == CBManagerState.poweredOff {
-            updateRow(forBluetoothPeripheral: bluetoothPeripheral)
+            updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
         }
 
     }

@@ -17,7 +17,7 @@ class BluetoothPeripheralManager: NSObject {
     //private var m5StacksBlueToothTransmitters = [BluetoothPeripheral : BluetoothTransmitter?]()
     
     /// all currently known BluetoothPeripheral's (MStacks, cgmtransmitters, watlaa , ...)
-    private var bluetoothPeripherals: [BluetoothPeripheral] = []
+    fileprivate var bluetoothPeripherals: [BluetoothPeripheral] = []
     
     /// the bluetoothTransmitter's, array must have the same size as bluetoothPeripherals. For each element in bluetoothPeripherals, there's an element at the same index in bluetoothTransmitters, which may be nil. nil value means user selected not to connect
     private var bluetoothTransmitters: [BluetoothTransmitter?] = []
@@ -82,12 +82,12 @@ class BluetoothPeripheralManager: NSObject {
     
     // MARK: - public functions
     
-    /// will send latest reading to all BluetoothPeripherals that need this info and only if it's less than 5 minutes old
+    /// will send latest reading to all BluetoothTransmitters that need this info and only if it's less than 5 minutes old
     /// - parameters:
-    ///     - forBluetoothPeripheral : if nil then latest reading will be sent to all connected BluetoothPeripherals that need this info, otherwise only to the specified BluetoothPeripheral
+    ///     - to :if nil then latest reading will be sent to all connected BluetoothTransmitters that need this info, otherwise only to the specified BluetoothTransmitter
     ///
-    /// this function has knowledge about different types of bluetoothperipheral and knows to which it should send to reading, to which not
-    public func sendLatestReading(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral? = nil) {
+    /// this function has knowledge about different types of BluetoothTransmitter and knows to which it should send to reading, to which not
+    public func sendLatestReading(to bluetoothPeripheral: BluetoothPeripheral? = nil) {
         
         // get reading of latest 5 minutes
         let bgReadingToSend = bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: Date(timeIntervalSinceNow: -5 * 60), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
@@ -99,6 +99,8 @@ class BluetoothPeripheralManager: NSObject {
         }
 
         if let bluetoothPeripheral = bluetoothPeripheral {
+            
+            guard let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral), let bluetoothTransmitter = bluetoothTransmitters[index] else {return}
 
             // get type of bluetoothPeripheral
             let bluetoothPeripheralType = bluetoothPeripheral.bluetoothPeripheralType()
@@ -107,16 +109,13 @@ class BluetoothPeripheralManager: NSObject {
             switch bluetoothPeripheralType {
                 
             case .M5Stack:
-
-                // get the bluetooth transmitter, and if it's an M5StackBluetoothTransmitter, then send the bgReading
-                if let bluetoothTransmitter = bluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter =  bluetoothTransmitter as? M5StackBluetoothTransmitter {
-                    
+                
+                if let m5StackBluetoothTransmitter = bluetoothTransmitter as? M5StackBluetoothTransmitter {
                     _ = m5StackBluetoothTransmitter.writeBgReadingInfo(bgReading: bgReadingToSend[0])
-
                 }
-
+                
             }
-
+            
             
         } else {
             
@@ -132,12 +131,12 @@ class BluetoothPeripheralManager: NSObject {
                     for bluetoothPeripheral in bluetoothPeripherals {
                         
                         // get the bluetooth transmitter, and if it's an M5StackBluetoothTransmitter, then send the bgReading
-                        if let bluetoothTransmitter = bluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter =  bluetoothTransmitter as? M5StackBluetoothTransmitter {
+                        if let bluetoothTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter =  bluetoothTransmitter as? M5StackBluetoothTransmitter {
                             
                             _ = m5StackBluetoothTransmitter.writeBgReadingInfo(bgReading: bgReadingToSend[0])
                             
                         }
-
+                        
                     }
                     
                 }
@@ -145,8 +144,9 @@ class BluetoothPeripheralManager: NSObject {
             }
             
         }
+
     }
-    
+
     // MARK: - private helper functions
     
     /// when user changes M5Stack related settings, then the transmitter need to get that info, add observers
@@ -166,89 +166,24 @@ class BluetoothPeripheralManager: NSObject {
 
     }
     
-    /// send all parameters to m5Stack
-    /// - parameters:
-    ///     - m5Stack : if m5Stack is not type M5Stack then
-    /// - returns:
-    ///     successfully written all parameters or not
-    private func sendAllParametersToM5Stack(to m5Stack : M5Stack) -> Bool {
-        
-        guard let bluetoothTransmitter = bluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter =  bluetoothTransmitter as? M5StackBluetoothTransmitter else {
-            trace("in sendAllParametersToM5Stack, there's no m5StackBluetoothTransmitter for the specified m5Stack", log: self.log, type: .info)
-            return false
-        }
-        
-        guard m5StackBluetoothTransmitter.isReadyToReceiveData else {
-            trace("in sendAllParameters, bluetoothTransmitter is not ready to receive data", log: self.log, type: .info)
-            return false
-        }
-        
-        // initialise returnValue, result
-        var success = true
-        
-        // send bloodglucoseunit
-        if !m5StackBluetoothTransmitter.writeBloodGlucoseUnit(isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {success = false}
-
-        // send textColor
-        if !m5StackBluetoothTransmitter.writeTextColor(textColor: M5StackColor(forUInt16: UInt16(m5Stack.textcolor)) ?? UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor) {success = false}
-        
-        // send backGroundColor
-        if !m5StackBluetoothTransmitter.writeBackGroundColor(backGroundColor: M5StackColor(forUInt16: UInt16(m5Stack.backGroundColor)) ?? ConstantsM5Stack.defaultBackGroundColor ) {success = false}
-        
-        // send rotation
-        if !m5StackBluetoothTransmitter.writeRotation(rotation: Int(m5Stack.rotation)) {success = false}
-        
-        // send WiFiSSID's
-        if let wifiName = UserDefaults.standard.m5StackWiFiName1 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 1) {success = false}
-        }
-        if let wifiName = UserDefaults.standard.m5StackWiFiName2 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 2) {success = false}
-        }
-        if let wifiName = UserDefaults.standard.m5StackWiFiName3 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 3) {success = false}
-        }
-
-        // send WiFiPasswords
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword1 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 1) {success = false}
-        }
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword2 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 2) {success = false}
-        }
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword3 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 3) {success = false}
-        }
-        
-        // send nightscout url
-        if let url = UserDefaults.standard.nightScoutUrl {
-            if !m5StackBluetoothTransmitter.writeNightScoutUrl(url: url) {success = false}
-        }
-        
-        // send nightscout token
-        if let token = UserDefaults.standard.nightScoutAPIKey {
-            if !m5StackBluetoothTransmitter.writeNightScoutAPIKey(apiKey: token) {success = false}
-        }
-        
-        // return success
-        return success
-    }
-    
     /// disconnect from bluetoothPeripheral - and don't reconnect - set shouldconnect to false
     func disconnect(fromBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral) {
         
         // device should not reconnect after disconnecting
-        bluetoothPeripheral.dontTryToConnectToThisBluetoothPeripheral()
-        
+        bluetoothPeripheral.shouldAlwaysTryToConnect()
         // save in coredata
         coreDataManager.saveChanges()
         
-        if let bluetoothTransmitter = bluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheral, createANewOneIfNecesssary: false) {
+        if let bluetoothTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) {
             
             bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
             
         }
         
+    }
+    
+    func firstIndexInBluetoothPeripherals(bluetoothPeripheral: BluetoothPeripheral) -> Int? {
+        return bluetoothPeripherals.firstIndex(where: {$0.getAddress() == bluetoothPeripheral.getAddress()})
     }
     
     // MARK:- override observe function
@@ -284,7 +219,7 @@ class BluetoothPeripheralManager: NSObject {
                 for bluetoothPeripheral in bluetoothPeripherals {
                     
                     // get the bluetooth transmitter, and if it's an M5StackBluetoothTransmitter, then send the bgReading
-                    if let bluetoothTransmitter = bluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = bluetoothTransmitter as? M5StackBluetoothTransmitter {
+                    if let bluetoothTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = bluetoothTransmitter as? M5StackBluetoothTransmitter {
                         
                         // check that bluetoothPeripheral is of type M5Stack, if not then this might be a coding error
                         guard let m5Stack = bluetoothPeripheral as? M5Stack else {
@@ -351,11 +286,8 @@ class BluetoothPeripheralManager: NSObject {
             }
             
         }
-        
-
                 
     }
-    
 
 }
 
@@ -366,14 +298,20 @@ class BluetoothPeripheralManager: NSObject {
 extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
     
     /// to scan for a new BluetoothPeripheral - callback will be called when a new BluetoothPeripheral is found and connected
-    func startScanningForNewDevice(callback: @escaping (BluetoothPeripheral) -> Void) {
+    func startScanningForNewDevice(callback: @escaping (BluetoothPeripheral) -> Void, type: BluetoothPeripheralType) {
         
         callBackAfterDiscoveringDevice = callback
         
-        tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = M5StackBluetoothTransmitter(bluetoothPeripheral: nil, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
+        switch type {
+            
+        case .M5Stack:
+            
+            tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = M5StackBluetoothTransmitter(bluetoothPeripheral: nil, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
+            
+            _ = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
+        }
         
-        _ = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
-        
+
     }
     
     /// stops scanning for new device
@@ -389,42 +327,38 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
     }
     
     /// try to connect to the M5Stack
-    func connect(toBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral) {
+    func connect(to bluetoothPeripheral: BluetoothPeripheral) {
         
-        if let bluetoothTransmitter = m5StacksBlueToothTransmitters[bluetoothPeripheral] {
-            
-            // because m5StacksBlueToothTransmitters is a dictionary whereby the value is optional, bluetoothTransmitter is now optional, so we have to check again if it's nil or not
-            if let bluetoothTransmitter =  bluetoothTransmitter {
-                
-                // bluetoothtransmitter exists, but not connected, call the connect function
-                _ = bluetoothTransmitter.connect()
-                
-            } else {
-                
-                // this can be the case where initially shouldconnect was set to false, and user sets it to true via uiviewcontroller, uiviewcontroller calls this function, connect should automatially be initiated
-                let newBlueToothTransmitter = M5StackBluetoothTransmitter(bluetoothPeripheral: bluetoothPeripheral, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
-                
-                m5StacksBlueToothTransmitters[bluetoothPeripheral] = newBlueToothTransmitter
+        // the trick : by calling bluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheral, createANewOneIfNecesssary: true), there's two cases
+        // - either the bluetoothTransmitter already exists but not connected, it will be found in the call to bluetoothTransmitter and returned, then we connect to it
+        // - either the bluetoothTransmitter doesn't exist yet. It will be created. We assum here that bluetoothPeripheral has a mac address, as a consequence the BluetoothTransmitter will automatically try to connect. Here we try to connect again, but that's no issue
+        
+        let transmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: true)
+        
+        transmitter?.connect()
 
-            }
-            
-        } else {
-            
-            // I don't think this code will be used, because value m5Stack should always be in m5StacksBlueToothTransmitters, anyway let's add it
-            let newBlueToothTransmitter = M5StackBluetoothTransmitter(bluetoothPeripheral: bluetoothPeripheral, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
-            
-            m5StacksBlueToothTransmitters[bluetoothPeripheral] = newBlueToothTransmitter
-            
+    }
+    
+    /// returns the BluetoothPeripheral for the specified BluetoothTransmitter
+    /// - parameters:
+    ///     - for : the bluetoothTransmitter, for which BluetoothPeripheral should be returned
+    func getBluetoothPeripheral(for bluetoothTransmitter: BluetoothTransmitter) -> BluetoothPeripheral {
+        
+        guard let index = bluetoothTransmitters.firstIndex(of: bluetoothTransmitter) else {
+            fatalError("in BluetoothPeripheralManager, function getBluetoothPeripherals, could not find specified bluetoothTransmitter")
         }
+        
+        return bluetoothPeripherals[index]
+        
     }
     
     /// returns the bluetoothTransmitter for the bluetoothPeripheral
     /// - parameters:
     ///     - forBluetoothPeripheral : the bluetoothPeripheral for which bluetoothTransmitter should be returned
     ///     - createANewOneIfNecesssary : if bluetoothTransmitter is nil, then should one be created ?
-    func bluetoothTransmitter(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral, createANewOneIfNecesssary: Bool) -> BluetoothTransmitter? {
+    func getBluetoothTransmitter(for bluetoothPeripheral: BluetoothPeripheral, createANewOneIfNecesssary: Bool) -> BluetoothTransmitter? {
         
-        if let index = bluetoothPeripherals.firstIndex(where: {$0.getAddress() == bluetoothPeripheral.getAddress()}) {
+        if let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral) {
             
             if let bluetoothTransmitter = bluetoothTransmitters[index] {
                 return bluetoothTransmitter
@@ -433,17 +367,17 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
             if createANewOneIfNecesssary {
                 
                 var newTransmitter: BluetoothTransmitter? = nil
-                
-                for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
 
-                    switch bluetoothPeripheralType {
-                        
-                        case .M5Stack:
-                            newTransmitter = M5StackBluetoothTransmitter(bluetoothPeripheral: bluetoothPeripheral as? M5Stack, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
-
+                switch bluetoothPeripheral.bluetoothPeripheralType() {
+                    
+                case .M5Stack:
+                    
+                    if let m5Stack = bluetoothPeripheral as? M5Stack {
+                        newTransmitter = M5StackBluetoothTransmitter(bluetoothPeripheral: m5Stack, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
                     }
+                    
                 }
-                
+
                 bluetoothTransmitters[index] = newTransmitter
                 
                 return newTransmitter
@@ -459,7 +393,7 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
     func deleteBluetoothPeripheral(bluetoothPeripheral: BluetoothPeripheral) {
        
         // find the bluetoothPeripheral in array bluetoothPeripherals, if it's not there then this looks like a coding error
-        guard let index = bluetoothPeripherals.firstIndex(where: {$0.getAddress() == bluetoothPeripheral.getAddress()}) else {
+        guard let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral) else {
             trace("in deleteBluetoothPeripheral but bluetoothPeripheral not found in bluetoothPeripherals, looks like a coding error ", log: self.log, type: .error)
         }
         
@@ -480,13 +414,31 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
     
     /// - returns: the bluetoothPeripheral's managed by this BluetoothPeripheralManager
     func getBluetoothPeripherals() -> [BluetoothPeripheral] {
+        
         return bluetoothPeripherals
+        
+    }
+    
+    /// - returns: the bluetoothTransmitters managed by this BluetoothPeripheralManager
+    func getBluetoothTransmitters() -> [BluetoothTransmitter] {
+        
+        var bluetoothTransmitters: [BluetoothTransmitter] = []
+        
+        for bluetoothTransmitter in self.bluetoothTransmitters {
+            if let bluetoothTransmitter = bluetoothTransmitter {
+                bluetoothTransmitters.append(bluetoothTransmitter)
+            }
+        }
+        
+        return bluetoothTransmitters
+        
     }
 
     /// bluetoothtransmitter for this bluetoothPeripheral will be deleted, as a result this will also disconnect the bluetoothPeripheral
     func setBluetoothTransmitterToNil(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral) {
         
-        if let index = bluetoothPeripherals.firstIndex(where: {$0.getAddress() == bluetoothPeripheral.getAddress()}) {
+        if let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral) {
+            
             bluetoothTransmitters[index] = nil
             
         }
@@ -494,116 +446,93 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
 
 }
 
-// MARK: extensions M5StackBluetoothDelegate
+// MARK: extension M5StackBluetoothDelegate
 
-extension BluetoothPeripheralManager: BluetoothPeripheralDelegate {
+extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     
-    /// bluetoothPeripheral is asking for an update of all parameters, send them
-    func isAskingForAllParameters(bluetoothPeripheral: BluetoothPeripheral) {
+    func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
         
-        // send all parameters, if successful,then for this m5Stack we can set parameterUpdateNeeded to false
-        if sendAllParameters(toM5Stack: bluetoothPeripheral) {
-            bluetoothPeripheral.parameterUpdateNeeded = false
-        } else {
-            // failed, so we need to set parameterUpdateNeeded to true, so that next time it connects we will send all parameters
-            bluetoothPeripheral.parameterUpdateNeeded = true
-        }
-
-    }
-    
-    /// will be called if M5Stack is connected, and authentication was successful, BluetoothPeripheralManager can start sending data like parameter updates or bgreadings
-    func isReadyToReceiveData(m5Stack : M5Stack) {
-        
-        // if the M5Stack needs new parameters, then send them
-        if m5Stack.parameterUpdateNeeded {
-            
-            // send all parameters
-            if sendAllParameters(toM5Stack: m5Stack) {
-                m5Stack.parameterUpdateNeeded = false
-            }
-            
-        }
-        
-        // send latest reading
-        sendLatestReading(forBluetoothPeripheral: m5Stack)
-        
-    }
-
-    func didConnect(forM5Stack m5Stack: M5Stack?, address: String?, name: String?, bluetoothTransmitter : M5StackBluetoothTransmitter) {
-        
-        guard tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral != nil else {
-            trace("in didConnect, tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack is nil, no further processing", log: self.log, type: .info)
+        // if tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil, then this is a connection to an already known/stored BluetoothTransmitter. BluetoothPeripheralManager is not interested in this info.
+        guard let tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral else {
+            trace("in didConnect, tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil, no further processing", log: self.log, type: .info)
             return
         }
         
-        // we're interested in new M5stack's which were scanned for, so that would mean m5Stack parameter would be nil, and if nil, then address should not yet be any of the known/stored M5Stack's
-        if m5Stack == nil, let address = address, let name = name {
-            
-            // go through all the known m5Stacks and see if the address matches to any of them
-            for m5StackPair in m5StacksBlueToothTransmitters {
-                if m5StackPair.key.address == address {
-                    
-                    // it's an already known m5Stack, not storing this, on the contrary disconnecting because maybe it's an m5stack already known for which user has preferred not to connect to
-                    // If we're actually waiting for a new scan result, then there's an instance of M5StacksBlueToothTransmitter stored in tempM5StackBlueToothTransmitterWhileScanningForNewM5Stack - but this one stopped scanning, so let's recreate an instance of M5StacksBlueToothTransmitter
-                    tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = M5StackBluetoothTransmitter(bluetoothPeripheral: nil, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
-                    _ = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
-
-                    return
-                    
-                }
-            }
-            
-            // looks like we haven't found the address in list of known M5Stacks, so it's a new M5Stack, stop the scanning
-            bluetoothTransmitter.stopScanning()
-            
-            // create a new M5Stack with new peripheral's address and name
-            let newM5Stack = M5Stack(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, brightness: 100, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-            
-            // assign password stored in UserDefaults (might be nil)
-            newM5Stack.blepassword = UserDefaults.standard.m5StackBlePassword
-            
-            // add to list of m5StacksBlueToothTransmitters
-            m5StacksBlueToothTransmitters[newM5Stack] = bluetoothTransmitter
-            
-            // no need to keep a reference to the bluetothTransmitter, this is now stored in m5StacksBlueToothTransmitters
-            tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
-            
-            // assign n
-            bluetoothTransmitter.m5Stack = newM5Stack
-            
-            // call the callback function
-            if let callBackAfterDiscoveringDevice = callBackAfterDiscoveringDevice {
-                callBackAfterDiscoveringDevice(newM5Stack)
-                self.callBackAfterDiscoveringDevice = nil
-            }
-
-        } else {
-            // if m5Stack is not nil, then this is a connect of one of the known M5Stacks
-            // nothing needed
+        // check that address and name are not nil, otherwise this looks like a codding error
+        guard let address = bluetoothTransmitter.deviceAddress, let name = bluetoothTransmitter.deviceName else {
+            trace("in didConnect, address or name of new transmitter is nil, looks like a coding error", log: self.log, type: .error)
+            return
         }
+        
+        // check that tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral and tge bluetoothTransmitter to which connection is made are actually the same objects, otherwise it's again a connection that is made to a already known/stored BluetoothTransmitter
+        guard tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral == bluetoothTransmitter else {
+            trace("in didConnect, tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is not nil and not equal to  bluetoothTransmitter", log: self.log, type: .info)
+            return
+        }
+        
+        // it's a new peripheral that we will store. No need to continue scanning
+        bluetoothTransmitter.stopScanning()
+        
+        // initialize new bluetoothPeripheral
+        var newBluetoothPeripheral: BluetoothPeripheral?
+        
+        for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
+            
+            switch bluetoothPeripheralType {
+                
+            case .M5Stack:
+
+                // create a new M5Stack with new peripheral's address and name
+                let newM5Stack = M5Stack(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, brightness: 100, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                
+                // assign password stored in UserDefaults (might be nil)
+                newM5Stack.blepassword = UserDefaults.standard.m5StackBlePassword
+                
+                // add to list of bluetoothPeripherals and bluetoothTransmitters
+                bluetoothPeripherals.append(newM5Stack)
+                bluetoothTransmitters.append(bluetoothTransmitter)
+                
+                // no need to keep a reference to the bluetothTransmitter, this is now stored in m5StacksBlueToothTransmitters
+                self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
+
+                // assign newM5stack to newM5Stack
+                newBluetoothPeripheral = newM5Stack
+            }
+        }
+        
+        
+        // call the callback function
+        if let callBackAfterDiscoveringDevice = callBackAfterDiscoveringDevice, let newBluetoothPeripheral = newBluetoothPeripheral {
+            callBackAfterDiscoveringDevice(newBluetoothPeripheral)
+            self.callBackAfterDiscoveringDevice = nil
+        }
+
     }
     
-    func deviceDidUpdateBluetoothState(state: CBManagerState, forM5Stack m5Stack: M5Stack) {
+    func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
         trace("in deviceDidUpdateBluetoothState, no further action", log: self.log, type: .info)
+
     }
     
     func error(message: String) {
         trace("in error, no further action", log: self.log, type: .info)
     }
     
-    /// if a new ble password is received from M5Stack
-    func newBlePassWord(newBlePassword: String, forM5Stack m5Stack: M5Stack) {
-        
-        trace("in newBlePassWord, storing the password in M5Stack", log: self.log, type: .info)
-        // possibily this is a new scanned m5stack, calling coreDataManager.saveChanges() but still the user may be in M5stackviewcontroller and decide not to save the m5stack, tant pis
-        m5Stack.blepassword = newBlePassword
-        coreDataManager.saveChanges()
-        
+    func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
+        // no further action, This is for UIViewcontroller's that also receive this info, means info can only be shown if this happens while user has one of the UIViewcontrollers open
+        trace("in didDisconnectFrom", log: self.log, type: .info)
+
     }
 
+}
+
+// MARK: conform to M5StackBluetoothTransmitterDelegate
+
+extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
+    
     /// did the app successfully authenticate towards M5Stack, if no, then disconnect will be done
-    ///
-    func authentication(success: Bool, forM5Stack m5Stack:M5Stack) {
+    func authentication(success: Bool, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
         trace("in authentication with success = %{public}@", log: self.log, type: .info, success.description)
         
         // if authentication not successful then disconnect and don't reconnect, user should verify password or reset the M5Stack, disconnect and set shouldconnect to false, permenantly (ie store in core data)
@@ -611,7 +540,13 @@ extension BluetoothPeripheralManager: BluetoothPeripheralDelegate {
         // also set shouldConnect to false (note that this is also done in M5StackViewController if an instance of that exists, no issue, shouldConnect will be set to false two times
         if !success {
             
+            // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
+            guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
+
+            // don't try to reconnect after disconnecting
             m5Stack.shouldconnect = false
+            
+            // store in core data
             coreDataManager.saveChanges()
             
             // disconnect
@@ -619,37 +554,165 @@ extension BluetoothPeripheralManager: BluetoothPeripheralDelegate {
             
         }
     }
-    
-    /// there's no ble password set, user should set it in the settings - disconnect will be called, shouldconnect is set to false
-    func blePasswordMissing(forM5Stack m5Stack: M5Stack) {
 
+    /// there's no ble password set, user should set it in the settings - disconnect will be called, shouldconnect is set to false
+    func blePasswordMissing(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
         trace("in blePasswordMissing", log: self.log, type: .info)
         
-        m5Stack.shouldconnect = false
-        coreDataManager.saveChanges()
+        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
+        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
 
+        // don't try to reconnect after disconnecting
+        m5Stack.shouldconnect = false
+        
+        // store in core data
+        coreDataManager.saveChanges()
+        
         // disconnect
         disconnect(fromBluetoothPeripheral: m5Stack)
+        
+    }
 
+    /// if a new ble password is received from M5Stack
+    func newBlePassWord(newBlePassword: String, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
+        trace("in newBlePassWord, storing the password in M5Stack", log: self.log, type: .info)
+
+        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
+        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
+
+        // possibily this is a new scanned m5stack, calling coreDataManager.saveChanges() but still the user may be in M5stackviewcontroller and decide not to save the m5stack, bad luck
+        m5Stack.blepassword = newBlePassword
+        
+        coreDataManager.saveChanges()
+        
     }
 
     /// it's an M5Stack without password configured in the ini file. xdrip app has been requesting temp password to M5Stack but this was already done once. M5Stack needs to be reset. - disconnect will be called, shouldconnect is set to false
-    func m5StackResetRequired(forM5Stack m5Stack:M5Stack) {
-
+    func m5StackResetRequired(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
         trace("in m5StackResetRequired", log: self.log, type: .info)
         
+        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
+        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
+
         m5Stack.shouldconnect = false
         coreDataManager.saveChanges()
-
+        
         // disconnect
         disconnect(fromBluetoothPeripheral: m5Stack)
-
+        
     }
 
-    /// did disconnect from M5Stack
-    func didDisconnect(forM5Stack m5Stack:M5Stack) {
-        // no further action, This is for UIViewcontroller's that also receive this info, means info can only be shown if this happens while user has one of the UIViewcontrollers open
-        trace("in didDisconnect", log: self.log, type: .info)
+    /// bluetoothPeripheral is asking for an update of all parameters, send them
+    func isAskingForAllParameters(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
+        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter) else {
+            trace("in isAskingForAllParameters, could not find index of bluetoothTransmitter, looks like a coding error", log: self.log, type: .error)
+            return
+        }
+        
+        // send all parameters, if successful,then for this m5Stack we can set parameterUpdateNeeded to false
+        if sendAllParametersToM5Stack(to: m5StackBluetoothTransmitter) {
+            (bluetoothPeripherals[index] as? M5Stack)?.parameterUpdateNotNeededAtNextConnect()
+        } else {
+            // failed, so we need to set parameterUpdateNeeded to true, so that next time it connects we will send all parameters
+            (bluetoothPeripherals[index] as? M5Stack)?.parameterUpdateNeededAtNextConnect()
+        }
+        
     }
+    
+    /// will be called if M5Stack is connected, and authentication was successful, BluetoothPeripheralManager can start sending data like parameter updates or bgreadings
+    func isReadyToReceiveData(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
 
+        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
+        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
+
+        // if the M5Stack needs new parameters, then send them
+        if m5Stack.isParameterUpdateNeededAtNextConnect() {
+            
+            // send all parameters
+            if sendAllParametersToM5Stack(to: m5StackBluetoothTransmitter) {
+                m5Stack.parameterUpdateNotNeededAtNextConnect()
+            }
+            
+        }
+        
+        // send latest reading
+        sendLatestReading(to: m5Stack)
+        
+    }
+    
+    // MARK: private functions
+    
+    /// send all parameters to m5Stack
+    /// - parameters:
+    ///     - to : m5StackBluetoothTransmitter to send all parameters
+    /// - returns:
+    ///     successfully written all parameters or not
+    private func sendAllParametersToM5Stack(to m5StackBluetoothTransmitter : M5StackBluetoothTransmitter) -> Bool {
+        
+        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
+        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return false}
+
+        // M5Stack must be ready to receive data
+        guard m5StackBluetoothTransmitter.isReadyToReceiveData else {
+            trace("in sendAllParameters, bluetoothTransmitter is not ready to receive data", log: self.log, type: .info)
+            return false
+        }
+        
+        // initialise returnValue, result
+        var success = true
+        
+        // send bloodglucoseunit
+        if !m5StackBluetoothTransmitter.writeBloodGlucoseUnit(isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {success = false}
+        
+        // send textColor
+        if !m5StackBluetoothTransmitter.writeTextColor(textColor: M5StackColor(forUInt16: UInt16(m5Stack.textcolor)) ?? UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor) {success = false}
+        
+        // send backGroundColor
+        if !m5StackBluetoothTransmitter.writeBackGroundColor(backGroundColor: M5StackColor(forUInt16: UInt16(m5Stack.backGroundColor)) ?? ConstantsM5Stack.defaultBackGroundColor ) {success = false}
+        
+        // send rotation
+        if !m5StackBluetoothTransmitter.writeRotation(rotation: Int(m5Stack.rotation)) {success = false}
+        
+        // send WiFiSSID's
+        if let wifiName = UserDefaults.standard.m5StackWiFiName1 {
+            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 1) {success = false}
+        }
+        if let wifiName = UserDefaults.standard.m5StackWiFiName2 {
+            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 2) {success = false}
+        }
+        if let wifiName = UserDefaults.standard.m5StackWiFiName3 {
+            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 3) {success = false}
+        }
+        
+        // send WiFiPasswords
+        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword1 {
+            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 1) {success = false}
+        }
+        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword2 {
+            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 2) {success = false}
+        }
+        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword3 {
+            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 3) {success = false}
+        }
+        
+        // send nightscout url
+        if let url = UserDefaults.standard.nightScoutUrl {
+            if !m5StackBluetoothTransmitter.writeNightScoutUrl(url: url) {success = false}
+        }
+        
+        // send nightscout token
+        if let token = UserDefaults.standard.nightScoutAPIKey {
+            if !m5StackBluetoothTransmitter.writeNightScoutAPIKey(apiKey: token) {success = false}
+        }
+        
+        // return success
+        return success
+    }
+    
+    
 }
+

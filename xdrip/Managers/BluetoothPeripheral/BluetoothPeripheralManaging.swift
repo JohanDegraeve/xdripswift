@@ -4,20 +4,25 @@ import Foundation
 protocol BluetoothPeripheralManaging: AnyObject {
     
     /// to scan for a new BluetoothPeripheral - callback will be called when a new BluetoothPeripheral is found and connected
-    func startScanningForNewDevice(callback: @escaping (BluetoothPeripheral) -> Void)
+    func startScanningForNewDevice(callback: @escaping (BluetoothPeripheral) -> Void, type: BluetoothPeripheralType)
     
     /// will stop scanning, this is again for the case where scanning for a new BluetoothPeripheral has started
     func stopScanningForNewDevice()
     
     /// try to connect to the BluetoothPeripheral
-    func connect(toBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral)
+    func connect(to bluetoothPeripheral: BluetoothPeripheral)
     
     /// returns the BluetoothTransmitter for the specified bluetoothPeripheral
     /// - parameters:
-    ///     - forM5Stack : the object that conforms to bluetoothPeripheral, for which bluetoothTransmitter should be returned (remember bluetoothPeripheral is a protocol, every BluetoothTransmitter conforms to this protocol)
+    ///     - for : the bluetoothPeripheral, for which bluetoothTransmitter should be returned
     ///     - createANewOneIfNecesssary : if there's no instance yet,  then should one be created ?
-    func bluetoothTransmitter(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral, createANewOneIfNecesssary: Bool) -> BluetoothTransmitter?
+    func getBluetoothTransmitter(for bluetoothPeripheral: BluetoothPeripheral, createANewOneIfNecesssary: Bool) -> BluetoothTransmitter?
 
+    /// returns the BluetoothPeripheral for the specified BluetoothTransmitter
+    /// - parameters:
+    ///     - for : the bluetoothTransmitter, for which BluetoothPeripheral should be returned
+    func getBluetoothPeripheral(for bluetoothTransmitter: BluetoothTransmitter) -> BluetoothPeripheral
+    
     /// deletes the BluetoothPeripheral in coredata, and also the corresponding BluetoothTransmitter if there is one will be deleted
     func deleteBluetoothPeripheral(bluetoothPeripheral: BluetoothPeripheral)
     

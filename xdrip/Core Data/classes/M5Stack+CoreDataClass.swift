@@ -15,6 +15,9 @@ import CoreData
 /// - brightness : value between 0 and 100
 public class M5Stack: NSManagedObject {
 
+    /// explanation, see function parameterUpdateNotNeededAtNextConnect in protocol BluetoothPeripheral
+    public var parameterUpdateNeeded: Bool = false
+    
     /// create M5Stack, shouldconnect default value = true
     /// - parameters:
     ///     - rotation is internally stored as Int32, actual value should always be between 0 and 360 so UInt16 as parameter is sufficient.

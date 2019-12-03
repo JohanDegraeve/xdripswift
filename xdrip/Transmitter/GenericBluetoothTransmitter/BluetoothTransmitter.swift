@@ -2,12 +2,17 @@ import Foundation
 import CoreBluetooth
 import os
 
-/// generic bluetoothtransmitter class that handles scanning, connect, discover services, discover characteristics, subscribe to receive characteristic, reconnect.
+/// Generic bluetoothtransmitter class that handles scanning, connect, discover services, discover characteristics, subscribe to receive characteristic, reconnect. This class is a base class for specific type of transmitters.
 ///
-/// The class assumes that the transmitter has a receive and transmit characterisitc (which is mostly the case)
+/// The class assumes that the transmitter has a receive and transmit characterisitc (which is mostly the case) - incase there's more characteristics to be processed, then the derived class will need to override didUpdateValueFor function
 class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
-    // MARK: - properties
+    // MARK: - public properties
+    
+    /// public , variable : it can get a new value during app run, will be used by rootviewcontroller's that want to receive info
+    private weak var variableBluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
+
+    // MARK: - private properties
     
     /// the address of the transmitter. If nil then transmitter never connected, so we don't know the name.
     private(set) var deviceAddress:String?
@@ -55,10 +60,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     private var receiveCharacteristic:CBCharacteristic?
     
     /// used in BluetoothTransmitter class, eg if after calling discoverServices new method is called and time is exceed, then cancel connection
-    let maxTimeToWaitForPeripheralResponse = 5.0
+    private let maxTimeToWaitForPeripheralResponse = 5.0
     
     /// should the app try to reconnect after disconnect?
     private var reconnectAfterDisconnect:Bool = true
+
+    /// private , fixed : it will be set during init and  not change, there's also a variable one, named variableBluetoothTransmitterDelegate
+    private weak var fixedBluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
 
     // MARK: - Initialization
     
@@ -71,7 +79,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     ///     - servicesCBUUIDs: service uuid's
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
-    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID], CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, startScanningAfterInit:Bool) {
+    ///     - delegate : a
+    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID], CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, startScanningAfterInit:Bool, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
         
         switch addressAndName {
             
@@ -95,6 +104,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         //initialize timeStampLastStatusUpdate
         timeStampLastStatusUpdate = Date()
+        
+        // assign delegate
+        self.fixedBluetoothTransmitterDelegate = bluetoothTransmitterDelegate
         
         super.init()
 
@@ -339,7 +351,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         timeStampLastStatusUpdate = Date()
         
-        trace("connected to peripheral with name %{public}@, will discover services", log: log, type: .info, deviceName ?? "'unknown'")
+        trace("connected to peripheral with name %{public}@", log: log, type: .info, deviceName ?? "'unknown'")
+        
+        fixedBluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
         
         peripheral.discoverServices(servicesCBUUIDs)
         
@@ -362,6 +376,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         timeStampLastStatusUpdate = Date()
         
         trace("in centralManagerDidUpdateState, for peripheral with name %{public}@, new state is %{public}@", log: log, type: .info, deviceName ?? "'unknown'", "\(central.state.toString())")
+        
+        fixedBluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
 
         /// in case status changed to powered on and if device address known then try either to retrieveperipherals, or if that doesn't succeed, start scanning
         if central.state == .poweredOn, reconnectAfterDisconnect {
@@ -379,6 +395,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         timeStampLastStatusUpdate = Date()
         
         trace("    didDisconnect peripheral with name %{public}@", log: log, type: .info , deviceName ?? "'unknown'")
+        
+        fixedBluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: self)
 
         if let error = error {
             trace("    error: %{public}@", log: log, type: .error , error.localizedDescription)

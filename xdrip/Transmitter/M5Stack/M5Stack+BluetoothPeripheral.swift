@@ -2,36 +2,38 @@ import Foundation
 
 extension M5Stack: BluetoothPeripheral {
     
+    // get the mac address
     func getAddress() -> String {
-        <#code#>
+        return address
     }
     
+    // get the type of BluetoothPeripheral: "M5Strack", ...
     func bluetoothPeripheralType() -> BluetoothPeripheralType {
-        <#code#>
+        return .M5Stack
     }
     
     func dontTryToConnectToThisBluetoothPeripheral() {
-        <#code#>
+        shouldconnect = false
     }
     
     func alwaysTryToConnectToThisBluetoothPeripheral() {
-        <#code#>
+        shouldconnect = true
     }
     
-    func xdripShouldTryToConnectToThisBluetoothPeripheral() -> Bool {
-        <#code#>
+    func shouldXdripTryToConnectToThisBluetoothPeripheral() -> Bool {
+        return shouldconnect
     }
     
     func parameterUpdateNotNeededAtNextConnect() {
-        <#code#>
+        parameterUpdateNeeded = false
     }
     
     func parameterUpdateNeededAtNextConnect() {
-        <#code#>
+        parameterUpdateNeeded = true
     }
     
     func isParameterUpdateNeededAtNextConnect() -> Bool {
-        <#code#>
+        return parameterUpdateNeeded
     }
     
     

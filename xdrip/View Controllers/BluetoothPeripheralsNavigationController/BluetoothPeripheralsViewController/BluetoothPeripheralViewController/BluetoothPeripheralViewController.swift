@@ -93,7 +93,7 @@ final class BluetoothPeripheralViewController: UIViewController {
     private var coreDataManager:CoreDataManager?
     
     /// a BluetoothPeripheralManager
-    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging?
+    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging!
     
     /// name given by user as alias , to easier recognize different M5Stacks
     ///
@@ -195,7 +195,7 @@ final class BluetoothPeripheralViewController: UIViewController {
         case BluetoothPeripheralViewController.UnwindSegueIdentifiers.M5StackToBluetoothPeripheralsUnWindSegueIdentifier:
             
             if deleteM5StackWhenClosingViewController, let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
-                bluetoothPeripheralManager?.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheralASNSObject)
+                bluetoothPeripheralManager!.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheralASNSObject)
             }
         }
     }
@@ -255,7 +255,7 @@ final class BluetoothPeripheralViewController: UIViewController {
         if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject, let coreDataManager = coreDataManager, let m5StackNameAccessor = m5StackNameAccessor {
             
             // set variable delegate in bluetoothPeripheralASNSObject to nil,  no need anymore to receive info
-            bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = nil
+            bluetoothPeripheralManager!.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = nil
             
             // if user has set or changed a userDefinedName, stored it, or delete it if userDefinedName is set to nil
             if let m5StackName = bluetoothPeripheralASNSObject.m5StackName {
@@ -341,7 +341,7 @@ final class BluetoothPeripheralViewController: UIViewController {
             self.deleteM5StackWhenClosingViewController = true
             
             // set self as delegate in the bluetoothTransmitter
-            self.bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = self
+            self.bluetoothPeripheralManager!.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stack, createANewOneIfNecesssary: false)?.m5StackBluetoothTransmitterDelegateVariable = self
             
             })
         
@@ -365,7 +365,7 @@ final class BluetoothPeripheralViewController: UIViewController {
         let alert = UIAlertController(title: Text_BluetoothPeripheralView.confirmDeletionM5Stack + " " + textToAdd + "?", message: nil, actionHandler: {
             
             // delete
-            self.bluetoothPeripheralManager?.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheralASNSObject)
+            self.bluetoothPeripheralManager!.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheralASNSObject)
             
             // as the M5Stack is already deleted, there's no need to call delete again, when prepareForSegue
             self.deleteM5StackWhenClosingViewController = false
@@ -395,13 +395,13 @@ final class BluetoothPeripheralViewController: UIViewController {
             setConnectButtonLabelText()
 
             // normally there should be a bluetoothTransmitter
-            if let bluetoothTransmitter = bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false) {
+            if let bluetoothTransmitter = bluetoothPeripheralManager!.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false) {
                 
                 // set delegate in bluetoothtransmitter to nil, as we're going to disconnect permenantly, so not interested anymore to receive info
                 bluetoothTransmitter.m5StackBluetoothTransmitterDelegateVariable = nil
 
                 // this will also set bluetoothTransmitter to nil and also disconnect the M5Stack
-                bluetoothPeripheralManager?.setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheralASNSObject)
+                bluetoothPeripheralManager!.setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheralASNSObject)
                 
             }
             
@@ -412,7 +412,7 @@ final class BluetoothPeripheralViewController: UIViewController {
             coreDataManager?.saveChanges()
             
             // get bluetoothTransmitter
-            if let bluetoothTransmitter = bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: true) {
+            if let bluetoothTransmitter = bluetoothPeripheralManager!.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: true) {
                 
                 // set delegate
                 bluetoothTransmitter.m5StackBluetoothTransmitterDelegateVariable = self
@@ -435,7 +435,7 @@ final class BluetoothPeripheralViewController: UIViewController {
         
         guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject else {return false}
         
-        guard let connectionStatus = bluetoothPeripheralManager?.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false)?.getConnectionStatus() else {return false}
+        guard let connectionStatus = bluetoothPeripheralManager!.m5StackBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false)?.getConnectionStatus() else {return false}
         
         return connectionStatus == CBPeripheralState.connected
 
@@ -461,7 +461,7 @@ final class BluetoothPeripheralViewController: UIViewController {
     private func cancelButtonAction() {
         
         // just in case scanning for a new device is still ongoing, call stopscanning
-        bluetoothPeripheralManager?.stopScanningForNewDevice()
+        bluetoothPeripheralManager!.stopScanningForNewDevice()
         
         // return to BluetoothPeripheralsViewController
         performSegue(withIdentifier: UnwindSegueIdentifiers.M5StackToBluetoothPeripheralsUnWindSegueIdentifier.rawValue, sender: self)
@@ -480,9 +480,8 @@ final class BluetoothPeripheralViewController: UIViewController {
     }
 }
 
-// MARK: - extensions
 
-// MARK: extension UITableViewDataSource, UITableViewDelegate
+// MARK: - extension UITableViewDataSource, UITableViewDelegate
 
 extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewDelegate {
     
@@ -823,9 +822,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
 
 }
 
-// MARK: extension M5StackBluetoothDelegate
+// MARK: - extension BluetoothTransmitterDelegate
 
-extension BluetoothPeripheralViewController: BluetoothPeripheralDelegate {
+extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
     
     func isAskingForAllParameters(bluetoothPeripheral: M5Stack) {
         // viewcontroller doesn't use this
@@ -917,8 +916,6 @@ extension BluetoothPeripheralViewController: BluetoothPeripheralDelegate {
     }
     
 }
-
-// MARK: extension M5StackBluetoothDelegate
 
 /// defines perform segue identifiers used within M5StackViewController
 extension BluetoothPeripheralViewController {
