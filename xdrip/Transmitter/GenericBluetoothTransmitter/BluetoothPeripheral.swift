@@ -7,11 +7,27 @@ protocol BluetoothPeripheral {
     
     /// mac address of the peripheral
     ///
-    /// implmentation will always be the same, ie return the address
+    /// implementation will always be the same, ie return the address
     func getAddress() -> String
+    
+    /// userdefined alias of the peripheral
+    ///
+    /// implementation will always be the same, ie the alias
+    func getAlias() -> String?
+    
+    /// device name as given by the peripheral
+    func getDeviceName() -> String
+    
+    /// set the alias
+    func setAlias(_ value: String?)
     
     /// what type of peripheral is this
     func bluetoothPeripheralType() -> BluetoothPeripheralType
+    
+    /// tells the app that it should not try to connect to this bluetoothperipheral
+    ///
+    /// it's just an internal boolean value that is stored
+    func dontTryToConnectToThisBluetoothPeripheral()
     
     /// tells the app that it should always try to connect to this bluetoothperipheral
     ///

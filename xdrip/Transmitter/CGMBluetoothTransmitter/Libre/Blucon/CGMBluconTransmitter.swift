@@ -91,7 +91,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         rxBuffer = Data()
 
         // initialize
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_BluconService)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Blucon, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Blucon, startScanningAfterInit: CGMTransmitterType.Blucon.startScanningAfterInit())
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_BluconService)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Blucon, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Blucon, startScanningAfterInit: CGMTransmitterType.Blucon.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
 
         //assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate

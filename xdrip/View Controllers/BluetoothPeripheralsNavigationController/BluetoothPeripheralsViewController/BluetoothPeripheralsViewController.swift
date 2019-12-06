@@ -158,14 +158,14 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         }
         
         // textLabel should be the user defined alias of the BluetoothPeripheral, or if user defined alias == nil, then the address
-        cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].m5StackName?.userDefinedName
+        cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].getAlias()
         if cell.textLabel?.text == nil {
-            cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].address
+            cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].getAddress()
         }
         
         // detail is the connection status
         cell.detailTextLabel?.text = Text_BluetoothPeripheralView.notConnected // start with not connected
-        if let bluetoothTransmitter = bluetoothPeripheralManager.m5StackBluetoothTransmitter(forBluetoothPeripheral: m5Stacks[indexPath.row], createANewOneIfNecesssary: false) {
+        if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row], createANewOneIfNecesssary: false) {
             
             if let connectionStatus = bluetoothTransmitter.getConnectionStatus(), connectionStatus == CBPeripheralState.connected {
                 cell.detailTextLabel?.text = Text_BluetoothPeripheralView.connected

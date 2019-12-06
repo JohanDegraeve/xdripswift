@@ -17,7 +17,7 @@ class BluetoothPeripheralManager: NSObject {
     //private var m5StacksBlueToothTransmitters = [BluetoothPeripheral : BluetoothTransmitter?]()
     
     /// all currently known BluetoothPeripheral's (MStacks, cgmtransmitters, watlaa , ...)
-    fileprivate var bluetoothPeripherals: [BluetoothPeripheral] = []
+    private var bluetoothPeripherals: [BluetoothPeripheral] = []
     
     /// the bluetoothTransmitter's, array must have the same size as bluetoothPeripherals. For each element in bluetoothPeripherals, there's an element at the same index in bluetoothTransmitters, which may be nil. nil value means user selected not to connect
     private var bluetoothTransmitters: [BluetoothTransmitter?] = []
@@ -60,7 +60,7 @@ class BluetoothPeripheralManager: NSObject {
                 // create an instance of M5StackBluetoothTransmitter, M5StackBluetoothTransmitter will automatically try to connect to the M5Stack with the address that is stored in m5Stack
                 // add it to the array of bluetoothTransmitters
                 
-                bluetoothTransmitters.append(M5StackBluetoothTransmitter(bluetoothPeripheral: m5Stack, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword))
+                bluetoothTransmitters.append(M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: m5Stack.blepassword))
                 
             } else {
                 
@@ -170,7 +170,8 @@ class BluetoothPeripheralManager: NSObject {
     func disconnect(fromBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral) {
         
         // device should not reconnect after disconnecting
-        bluetoothPeripheral.shouldAlwaysTryToConnect()
+        bluetoothPeripheral.dontTryToConnectToThisBluetoothPeripheral()
+        
         // save in coredata
         coreDataManager.saveChanges()
         
@@ -306,9 +307,10 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
             
         case .M5Stack:
             
-            tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = M5StackBluetoothTransmitter(bluetoothPeripheral: nil, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
+            tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = M5StackBluetoothTransmitter(address: nil, name: nil, delegate: self, blePassword: UserDefaults.standard.m5StackBlePassword)
             
             _ = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
+            
         }
         
 
@@ -373,7 +375,7 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
                 case .M5Stack:
                     
                     if let m5Stack = bluetoothPeripheral as? M5Stack {
-                        newTransmitter = M5StackBluetoothTransmitter(bluetoothPeripheral: m5Stack, delegateFixed: self, blePassword: UserDefaults.standard.m5StackBlePassword)
+                        newTransmitter = M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: UserDefaults.standard.m5StackBlePassword)
                     }
                     
                 }
@@ -395,6 +397,7 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         // find the bluetoothPeripheral in array bluetoothPeripherals, if it's not there then this looks like a coding error
         guard let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral) else {
             trace("in deleteBluetoothPeripheral but bluetoothPeripheral not found in bluetoothPeripherals, looks like a coding error ", log: self.log, type: .error)
+            return
         }
         
         // set bluetoothTransmitter to nil, this will also initiate a disconnect
@@ -482,8 +485,8 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
                 
             case .M5Stack:
 
-                // create a new M5Stack with new peripheral's address and name
-                let newM5Stack = M5Stack(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, brightness: 100, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                // create a new BluetoothPeripheral of type M5Stack
+                let newM5Stack = M5Stack(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, brightness: 100, alias: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                 
                 // assign password stored in UserDefaults (might be nil)
                 newM5Stack.blepassword = UserDefaults.standard.m5StackBlePassword

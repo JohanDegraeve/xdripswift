@@ -29,6 +29,9 @@ protocol BluetoothPeripheralManaging: AnyObject {
     /// - returns: the BluetoothPeripheral's managed by this BluetoothPeripheralManager
     func getBluetoothPeripherals() -> [BluetoothPeripheral]
     
+    /// - returns: the BluetoothTransmittersl's managed by this BluetoothPeripheralManager
+    func getBluetoothTransmitters() -> [BluetoothTransmitter]
+    
     /// bluetoothtransmitter for this bluetoothperiheral will be deleted, as a result this will also disconnect the bluetoothtransmitter
     func setBluetoothTransmitterToNil(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral)
     

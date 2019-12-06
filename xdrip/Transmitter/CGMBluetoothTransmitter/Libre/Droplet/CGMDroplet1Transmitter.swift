@@ -39,7 +39,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
         // assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate
         
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Droplet)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Droplet, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Droplet, startScanningAfterInit: CGMTransmitterType.Droplet1.startScanningAfterInit())
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Droplet)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Droplet, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Droplet, startScanningAfterInit: CGMTransmitterType.Droplet1.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
         
     }
     

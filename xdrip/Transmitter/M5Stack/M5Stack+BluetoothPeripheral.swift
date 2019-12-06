@@ -2,6 +2,18 @@ import Foundation
 
 extension M5Stack: BluetoothPeripheral {
     
+    func getDeviceName() -> String {
+        return name
+    }
+    
+    func setAlias(_ value: String?) {
+        alias = value
+    }
+   
+    func getAlias() -> String? {
+        return alias
+    }
+    
     // get the mac address
     func getAddress() -> String {
         return address

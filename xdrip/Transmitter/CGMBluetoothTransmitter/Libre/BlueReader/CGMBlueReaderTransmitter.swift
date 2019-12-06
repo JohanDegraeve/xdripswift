@@ -39,7 +39,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
         // assign CGMTransmitterDelegate
         cgmTransmitterDelegate = delegate
         
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_BlueReader)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_BlueReader, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_BlueReader, startScanningAfterInit: CGMTransmitterType.blueReader.startScanningAfterInit())
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_BlueReader)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_BlueReader, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_BlueReader, startScanningAfterInit: CGMTransmitterType.blueReader.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
         
     }
     

@@ -21,7 +21,7 @@ public class M5Stack: NSManagedObject {
     /// create M5Stack, shouldconnect default value = true
     /// - parameters:
     ///     - rotation is internally stored as Int32, actual value should always be between 0 and 360 so UInt16 as parameter is sufficient.
-    init(address: String, name: String, textColor: M5StackColor, backGroundColor: M5StackColor, rotation: UInt16, brightness: Int, nsManagedObjectContext:NSManagedObjectContext) {
+    init(address: String, name: String, textColor: M5StackColor, backGroundColor: M5StackColor, rotation: UInt16, brightness: Int, alias: String?, nsManagedObjectContext:NSManagedObjectContext) {
        
         let entity = NSEntityDescription.entity(forEntityName: "M5Stack", in: nsManagedObjectContext)!
         
@@ -34,6 +34,7 @@ public class M5Stack: NSManagedObject {
         self.backGroundColor = Int32(backGroundColor.rawValue)
         self.rotation = Int32(rotation)
         self.brightness = Int16(brightness)
+        self.alias = alias
         
     }
     

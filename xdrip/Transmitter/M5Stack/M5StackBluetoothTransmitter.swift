@@ -242,25 +242,13 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         } else {return false}
     }
     
-    // MARK: - overriden  BluetoothTransmitter functions
-    
-    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-       
-        super.centralManager(central, didConnect: peripheral)
-        
-        m5StackBluetoothTransmitterDelegate.didConnectTo(bluetoothTransmitter: self)
-
-    }
+    // MARK: - overriden BluetoothTransmitter functions
     
     override func centralManagerDidUpdateState(_ central: CBCentralManager) {
         
         super.centralManagerDidUpdateState(central)
         
-        if deviceAddress != nil {
-            
-            m5StackBluetoothTransmitterDelegate.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
-            
-        } else {
+        if deviceAddress == nil {
             /// this bluetoothTransmitter is created to start scanning for a new, unknown M5Stack, so start scanning
             _ = startScanning()
         }
@@ -274,8 +262,6 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         // can not write data anymore to the device
         isReadyToReceiveData = false
         
-        m5StackBluetoothTransmitterDelegate.didDisconnectFrom(bluetoothTransmitter: self)
-
     }
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
@@ -349,7 +335,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
                 
                 self.blePassword = newBlePassword
                 
-                m5StackBluetoothTransmitterDelegate.newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: self)
+                (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)? .newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: self)
+                (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: self)
                 
             }
             
@@ -359,7 +346,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             // this is the time when the M5stack is ready to receive readings or parameter updates
             isReadyToReceiveData = true
             
-            m5StackBluetoothTransmitterDelegate.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
+            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
+            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
             
         case .authenticateSuccessRx:
             // received from M5Stack, need to inform delegates, send timestamp to M5Stack, and also set isReadyToReceiveData to true
@@ -367,28 +355,33 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             trace("    successfully authenticated", log: log, type: .error)
             
             // inform delegates
-            m5StackBluetoothTransmitterDelegate.authentication(success: true, m5StackBluetoothTransmitter: self)
+            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.authentication(success: true, m5StackBluetoothTransmitter: self)
+            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.authentication(success: true, m5StackBluetoothTransmitter: self)
             
             // even though not requested, and even if M5Stack may already have it, send the local time
             sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
             
             // this is the time when the M5stack is ready to receive readings or parameter updates
             isReadyToReceiveData = true
-            m5StackBluetoothTransmitterDelegate.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
-            
+            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
+            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
+           
         case .authenticateFailureRx:
             // received authentication failure, inform delegates
 
-            m5StackBluetoothTransmitterDelegate.authentication(success: false, m5StackBluetoothTransmitter: self)
+            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.authentication(success: false, m5StackBluetoothTransmitter: self)
+            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.authentication(success: false, m5StackBluetoothTransmitter: self)
             
         case .readBlePassWordError1Rx:
             
-            m5StackBluetoothTransmitterDelegate.blePasswordMissing(m5StackBluetoothTransmitter: self)
+            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.blePasswordMissing(m5StackBluetoothTransmitter: self)
+            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.blePasswordMissing(m5StackBluetoothTransmitter: self)
             
         case .readBlePassWordError2Rx:
 
-            m5StackBluetoothTransmitterDelegate.m5StackResetRequired(m5StackBluetoothTransmitter: self)
-
+            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.m5StackResetRequired(m5StackBluetoothTransmitter: self)
+            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.m5StackResetRequired(m5StackBluetoothTransmitter: self)
+            
         case .readTimeStampRx:
             
             // M5Stack is requesting for timestamp
@@ -397,7 +390,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         case .readAllParametersRx:
             
             // M5Stack is asking for all parameters
-            m5StackBluetoothTransmitterDelegate.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
+            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
+            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
             
         }
 
