@@ -602,7 +602,7 @@ extension BluetoothPeripheralViewController {
     public enum SegueIdentifiers:String {
         
         /// to go from BluetoothPeripheralsViewController to BluetoothPeripheralViewController
-        case BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier = "M5StacksToM5StackSegueIdentifier"
+        case BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier = "BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier"
         
     }
     
