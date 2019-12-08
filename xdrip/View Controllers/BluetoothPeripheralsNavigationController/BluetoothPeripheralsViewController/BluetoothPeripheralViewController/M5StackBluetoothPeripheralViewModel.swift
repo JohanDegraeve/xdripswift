@@ -60,7 +60,7 @@ class M5StackBluetoothPeripheralViewModel {
     private weak var tableView: UITableView?
     
     private weak var bluetoothPeripheralViewController: BluetoothPeripheralViewController?
-    
+
 }
 
 // MARK: - extension BluetoothTransmitterDelegate
@@ -161,6 +161,24 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
 
 extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     
+    func storeTempValues(bluetoothPeripheral: BluetoothPeripheral) {
+        
+        guard let m5StackBluetoothPeripheral = bluetoothPeripheral as? M5Stack else {return}
+        
+        // temporary store the value of textColor, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
+        textColorTemporaryValue = M5StackColor(forUInt16: UInt16(m5StackBluetoothPeripheral.textcolor))
+        
+        // temporary store the value of rotation, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
+        rotationTempValue = UInt16(m5StackBluetoothPeripheral.rotation)
+        
+        // temporary store the value of backGroundColor, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
+        backGroundColorTemporaryValue = M5StackColor(forUInt16: UInt16(m5StackBluetoothPeripheral.backGroundColor))
+        
+        // temporary store the value of brightness, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
+        brightnessTemporaryValue = Int(m5StackBluetoothPeripheral.brightness)
+        
+    }
+
     func numberOfSettings() -> Int {
         return Setting.allCases.count
     }
@@ -477,17 +495,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         if let bluetoothPeripheral = bluetoothPeripheral as? M5Stack  {
             
-            // temporary store the value of textColor, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-            textColorTemporaryValue = M5StackColor(forUInt16: UInt16(bluetoothPeripheral.textcolor))
-            
-            // temporary store the value of rotation, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-            rotationTempValue = UInt16(bluetoothPeripheral.rotation)
-            
-            // temporary store the value of backGroundColor, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-            backGroundColorTemporaryValue = M5StackColor(forUInt16: UInt16(bluetoothPeripheral.backGroundColor))
-            
-            // temporary store the value of brightness, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-            brightnessTemporaryValue = Int(bluetoothPeripheral.brightness)
+            storeTempValues(bluetoothPeripheral: bluetoothPeripheral)
             
         }
     }

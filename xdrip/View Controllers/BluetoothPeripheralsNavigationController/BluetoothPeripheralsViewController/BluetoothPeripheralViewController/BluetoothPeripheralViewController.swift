@@ -253,7 +253,8 @@ class BluetoothPeripheralViewController: UIViewController {
             // assign local variables
             self.aliasTemporaryValue = nil //should be nil anyway
             
-            self.bluetoothPeripheralViewModel = bluetoothPeripheral.bluetoothPeripheralType().getViewModel()
+            // call storeTempValues in the model
+            self.bluetoothPeripheralViewModel.storeTempValues(bluetoothPeripheral: bluetoothPeripheral)
             
             // enable the connect button
             self.connectButtonOutlet.enable()

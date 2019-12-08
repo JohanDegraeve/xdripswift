@@ -28,4 +28,7 @@ protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     /// get number of settings in the viewmodel
     func numberOfSettings() -> Int
     
+    /// used when new peripheral is discovered and connected, to temporary store values in model (eg in case of M5Stack, store the rotation value which would be a default value)
+    func storeTempValues(bluetoothPeripheral: BluetoothPeripheral)
+    
 }
