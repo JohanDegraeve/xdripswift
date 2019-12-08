@@ -66,8 +66,8 @@ final class BluetoothPeripheralsViewController: UIViewController {
         switch segueIdentifierAsCase {
             
         case BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier:
-            guard let vc = segue.destination as? BluetoothPeripheralViewController, let coreDataManager = coreDataManager, let bluetoothPeripheralManager = bluetoothPeripheralManager else {
-                fatalError("In BluetoothPeripheralsViewController, prepare for segue, viewcontroller is not M5StackViewController or coreDataManager is nil or bluetoothPeripheralManager is nil" )
+            guard let vc = segue.destination as? BluetoothPeripheralViewController, let coreDataManager = coreDataManager else {
+                fatalError("In BluetoothPeripheralsViewController, prepare for segue, viewcontroller is not M5StackViewController or coreDataManager is nil" )
             }
             
             vc.configure(bluetoothPeripheral: sender as? BluetoothPeripheral, coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
@@ -82,7 +82,7 @@ final class BluetoothPeripheralsViewController: UIViewController {
     /// user clicked add button
     private func addButtonAction() {
         
-        /// go to screen to add a new M5Stack
+        /// go to screen to add a new BluetoothPeripheral
         self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier.rawValue, sender: nil)
 
     }
@@ -205,7 +205,7 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
     
 }
 
-// MARK: extension M5StackBluetoothTransmitterDelegate
+// MARK: - extension M5StackBluetoothTransmitterDelegate
 
 extension BluetoothPeripheralsViewController: M5StackBluetoothTransmitterDelegate {
 
@@ -238,16 +238,22 @@ extension BluetoothPeripheralsViewController: M5StackBluetoothTransmitterDelegat
         // no further handling, means when this view is open, user won't see that reset is required
     }
     
+}
+
+// MARK: - extension BluetoothTransmitterDelegate
+
+extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
+    
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
         
         updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
-
+        
     }
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
         
         updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
-
+        
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
@@ -256,13 +262,8 @@ extension BluetoothPeripheralsViewController: M5StackBluetoothTransmitterDelegat
         if state == CBManagerState.poweredOff {
             updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
         }
-
+        
     }
-    
-    func error(message: String) {
-        // no further handling, means when this view is open, user won't see the error message
-    }
-    
     
 }
 

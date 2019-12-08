@@ -353,10 +353,10 @@
             </objects>
             <point key="canvasLocation" x="1599" y="566"/>
         </scene>
-        <!--M5Stack Navigation Controller-->
+        <!--Bluetooth Peripheral Navigation Controller-->
         <scene sceneID="H1e-vw-iaX">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="FwD-2z-GTm" userLabel="M5Stack Navigation Controller" customClass="BluetoothPeripheralNavigationController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="FwD-2z-GTm" userLabel="Bluetooth Peripheral Navigation Controller" customClass="BluetoothPeripheralNavigationController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="" image="M5Stack" selectedImage="M5Stack" id="sgT-p5-hUt">
                         <color key="badgeColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBarItem>
@@ -429,10 +429,10 @@
             </objects>
             <point key="canvasLocation" x="2582" y="565"/>
         </scene>
-        <!--M5 Stacks View Controller-->
+        <!--Bluetooth Peripherals View Controller-->
         <scene sceneID="0Ef-2k-ynF">
             <objects>
-                <viewController id="E45-Z1-hcE" userLabel="M5 Stacks View Controller" customClass="BluetoothPeripheralsViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="E45-Z1-hcE" userLabel="Bluetooth Peripherals View Controller" customClass="BluetoothPeripheralsViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="i06-al-mW1">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -486,17 +486,17 @@
                     </navigationItem>
                     <connections>
                         <outlet property="tableView" destination="dMM-nl-Zfn" id="Z76-9m-jPM"/>
-                        <segue destination="FJ0-eY-Fv0" kind="show" identifier="M5StacksToM5StackSegueIdentifier" id="BEa-Az-mem"/>
+                        <segue destination="FJ0-eY-Fv0" kind="show" identifier="BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier" id="BEa-Az-mem"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ajO-AG-xfd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2582" y="-134"/>
         </scene>
-        <!--M5 Stack View Controller-->
+        <!--Bluetooth Peripheral View Controller-->
         <scene sceneID="fw3-II-GI1">
             <objects>
-                <viewController id="FJ0-eY-Fv0" userLabel="M5 Stack View Controller" customClass="BluetoothPeripheralViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="FJ0-eY-Fv0" userLabel="Bluetooth Peripheral View Controller" customClass="BluetoothPeripheralViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="0Ho-lg-UtI">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

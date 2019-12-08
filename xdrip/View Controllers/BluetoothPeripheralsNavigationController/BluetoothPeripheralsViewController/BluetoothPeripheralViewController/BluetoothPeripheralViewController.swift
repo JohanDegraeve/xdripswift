@@ -69,24 +69,27 @@ class BluetoothPeripheralViewController: UIViewController {
     
     // MARK: - public properties
 
-    /// the BluetoothPeripheral being edited - will only be used initially to initialize the temp properties used locally, and in the end to update the BluetoothPeripheral - if nil then it's about creating a new BluetoothPeripheral
-    public var bluetoothPeripheralAsNSObject:BluetoothPeripheral?
-    
     // MARK: - private properties
+    
+    /// the BluetoothPeripheral being edited - will only be used initially to initialize the temp properties used locally, and in the end to update the BluetoothPeripheral - if nil then it's about creating a new BluetoothPeripheral
+    private var bluetoothPeripheralAsNSObject:BluetoothPeripheral?
     
     /// this is for cases where a new M5Stack is being scanned. If there's a new M5Stack, and if the user has clicked 'done', then when closing the viewcontroller, the M5Stack should be deleted. This attribute defines if the M5Stack should be deleted or not
     private var deleteBluetoothPeripheralWhenClosingViewController: Bool = false
 
     /// reference to coreDataManager
-    public var coreDataManager:CoreDataManager?
+    private var coreDataManager:CoreDataManager?
     
     /// a BluetoothPeripheralManager
-    public weak var bluetoothPeripheralManager: BluetoothPeripheralManaging!
+    private weak var bluetoothPeripheralManager: BluetoothPeripheralManager!
     
     /// name given by user as alias , to easier recognize different M5Stacks
     ///
     /// temp storage of value while user is editing the M5Stack attributes
     private var aliasTemporaryValue: String?
+    
+    /// needed to support the bluetooth peripheral type specific attributes
+    private var bluetoothPeripheralViewModel: BluetoothPeripheralViewModel?
 
     // MARK:- public functions
     
@@ -109,6 +112,9 @@ class BluetoothPeripheralViewController: UIViewController {
             
             // don't delete the M5Stack when going back to prevous viewcontroller
             deleteBluetoothPeripheralWhenClosingViewController = false
+            
+            // set bluetoothPeripheralViewModel
+            bluetoothPeripheralViewModel = bluetoothPeripheralASNSObject.getViewModel()
             
         }
         
@@ -240,6 +246,8 @@ class BluetoothPeripheralViewController: UIViewController {
             
             // assign local variables
             self.aliasTemporaryValue = nil //should be nil anyway
+            
+            self.bluetoothPeripheralViewModel = bluetoothPeripheral.getViewModel()
             
             // enable the connect button
             self.connectButtonOutlet.enable()
@@ -407,23 +415,6 @@ class BluetoothPeripheralViewController: UIViewController {
 
     }
     
-    /// - this function should be overriden by deriving UIViewController class, eg M5StackViewController
-    /// - parameters:
-    ///     - withSettingRawValue : rawValue of BluetoothPeripheral specific setting, starting at 0. So BluetoothPeripheralViewController already has a list of settings, the settings defined by the deriving class start counting at 0, although the row in which it really appears is a higher value
-    ///     -  cell : the cell that will be updated by the function
-    public func update(cell: UITableViewCell, withSettingRawValue settingRawValue: Int) {
-        fatalError("BluetoothPeripheralViewController cellForRowAt should be overriden by deriving class")
-    }
-    
-    /// - this function should be overriden by deriving UIViewController class, eg M5StackViewController
-    /// - parameters:
-    ///     - withSettingRawValue : rawValue of BluetoothPeripheral specific setting, starting at 0. So BluetoothPeripheralViewController already has a list of settings, the settings defined by the deriving class start counting at 0, although the row in which it really appears is a higher value
-    ///     - rowOffset : row number where first setting starts
-    ///     - inTableView : a reference to the tablieView
-    public func userDidSelectRow(withSettingRawValue settingRawValue: Int, rowOffset: Int, inTableView tableView: UITableView) {
-        fatalError("BluetoothPeripheralViewController userDidSelect should be overriden by deriving class")
-    }
-    
 }
 
 
@@ -432,7 +423,7 @@ class BluetoothPeripheralViewController: UIViewController {
 extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return Setting.allCases.count
+        return Setting.allCases.count + (bluetoothPeripheralViewModel?.numberOfSettings() ?? 0)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -441,8 +432,11 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         
         if indexPath.row >= Setting.allCases.count {
             
-            // it's a setting not defined here but in a deriving class
-            update(cell: cell, withSettingRawValue: indexPath.row - Setting.allCases.count)
+            // it's a setting not defined here but in a BluetoothPeripheralViewModel
+            // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
+            if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let bluetoothPeripheral = bluetoothPeripheralAsNSObject {
+                bluetoothPeripheralViewModel.update(cell: cell, withSettingRawValue: indexPath.row - Setting.allCases.count, for: bluetoothPeripheral)
+            }
             
             return cell
             
@@ -489,9 +483,12 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         // check if it's one of the common settings or one of the peripheral type specific settings
         if indexPath.row >= Setting.allCases.count {
           
-            // userDidSelectRow should be overriden by derived class that knows the specific settings
-            userDidSelectRow(withSettingRawValue: indexPath.row - Setting.allCases.count, rowOffset: Setting.allCases.count, inTableView: tableView)
-            
+            // it's a setting not defined here but in a BluetoothPeripheralViewModel
+            // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
+            if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let bluetoothPeripheral = bluetoothPeripheralAsNSObject {
+                bluetoothPeripheralViewModel.userDidSelectRow(withSettingRawValue: indexPath.row - Setting.allCases.count, rowOffset: Setting.allCases.count, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet)
+            }
+
             return
             
         }
@@ -596,6 +593,8 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
     }
     
 }
+
+// MARK: - extension adding Segue Identifiers
 
 /// defines perform segue identifiers used within BluetoothPeripheralViewController
 extension BluetoothPeripheralViewController {

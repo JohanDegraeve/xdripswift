@@ -65,7 +65,7 @@
 		F8297F6023902FC300D74D66 /* BluetoothPeripheralType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F5F23902FC300D74D66 /* BluetoothPeripheralType.swift */; };
 		F8297F62239267F900D74D66 /* BluetoothTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F61239267F900D74D66 /* BluetoothTransmitterDelegate.swift */; };
 		F8297F6623942D4200D74D66 /* M5StackBluetoothTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F6523942D4200D74D66 /* M5StackBluetoothTransmitterDelegate.swift */; };
-		F8365EBC239868A600B0501B /* M5StackBluetoothPeripheralViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8365EBB239868A600B0501B /* M5StackBluetoothPeripheralViewController.swift */; };
+		F8365EBC239868A600B0501B /* M5StackBluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8365EBB239868A600B0501B /* M5StackBluetoothPeripheralViewModel.swift */; };
 		F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
@@ -73,6 +73,7 @@
 		F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */; };
 		F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */; };
 		F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */; };
+		F8691888239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8691887239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift */; };
 		F889CB60236C3DCB00A81068 /* CGMBlueReaderTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F889CB5F236C3DCB00A81068 /* CGMBlueReaderTransmitter.swift */; };
 		F889CB61236D844600A81068 /* M5StacksView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F889CB63236D844600A81068 /* M5StacksView.strings */; };
 		F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F889CB71236D84AC00A81068 /* M5StackView.strings */; };
@@ -306,7 +307,7 @@
 		F8297F5F23902FC300D74D66 /* BluetoothPeripheralType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralType.swift; sourceTree = "<group>"; };
 		F8297F61239267F900D74D66 /* BluetoothTransmitterDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothTransmitterDelegate.swift; sourceTree = "<group>"; };
 		F8297F6523942D4200D74D66 /* M5StackBluetoothTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackBluetoothTransmitterDelegate.swift; sourceTree = "<group>"; };
-		F8365EBB239868A600B0501B /* M5StackBluetoothPeripheralViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackBluetoothPeripheralViewController.swift; sourceTree = "<group>"; };
+		F8365EBB239868A600B0501B /* M5StackBluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackBluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
 		F846CDD523046BAC00DCF016 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SettingsViews.strings"; sourceTree = "<group>"; };
 		F846CDD623046BAE00DCF016 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBluetoothPairing.swift; sourceTree = "<group>"; };
@@ -317,6 +318,7 @@
 		F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Calibration+CoreDataProperties.swift"; path = "xdrip/Core Data/extensions/Calibration+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		F8691887239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
 		F889CB5F236C3DCB00A81068 /* CGMBlueReaderTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMBlueReaderTransmitter.swift; sourceTree = "<group>"; };
 		F889CB62236D844600A81068 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/M5StacksView.strings; sourceTree = "<group>"; };
 		F889CB64236D849200A81068 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/M5StacksView.strings; sourceTree = "<group>"; };
@@ -899,8 +901,9 @@
 		F8297F50238ECA3200D74D66 /* BluetoothPeripheralViewController */ = {
 			isa = PBXGroup;
 			children = (
+				F8691887239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift */,
 				F8297F51238ECA3200D74D66 /* BluetoothPeripheralViewController.swift */,
-				F8365EBB239868A600B0501B /* M5StackBluetoothPeripheralViewController.swift */,
+				F8365EBB239868A600B0501B /* M5StackBluetoothPeripheralViewModel.swift */,
 			);
 			path = BluetoothPeripheralViewController;
 			sourceTree = "<group>";
@@ -1695,7 +1698,7 @@
 				F8B3A853227F2743004BA588 /* AlertsSettingsViewController.swift in Sources */,
 				F8B3A849227F090E004BA588 /* SettingsViewSpeakSettingsViewModel.swift in Sources */,
 				F8BDD43F221B5BAF006EAB84 /* TextsErrorMessages.swift in Sources */,
-				F8365EBC239868A600B0501B /* M5StackBluetoothPeripheralViewController.swift in Sources */,
+				F8365EBC239868A600B0501B /* M5StackBluetoothPeripheralViewModel.swift in Sources */,
 				F8B3A7FA2278E0E8004BA588 /* SettingsViewModelProtocol.swift in Sources */,
 				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
 				F8A54AEA22D911BA00934E7A /* PairRequestTxMessage.swift in Sources */,
@@ -1782,6 +1785,7 @@
 				F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */,
 				F804870D2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift in Sources */,
 				F821CF8E22AB090C005C1E43 /* DatePickerViewController.swift in Sources */,
+				F8691888239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift in Sources */,
 				F8297F4F238DCAD800D74D66 /* BluetoothPeripheralNavigationController.swift in Sources */,
 				F8A1585322EDB602007F5B5D /* ConstantsBloodGlucose.swift in Sources */,
 				F80ED2EE236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift in Sources */,
@@ -2316,7 +2320,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.3.1;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -2344,7 +2348,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.3.1;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";

@@ -1,9 +1,13 @@
 import Foundation
 
-/// Every class that represents a bluetooth peripheral needs to conform to this protocol. Classes being core data classes, ie NSManagedObject classes. Example M5Stack conforms to this protocol.
+/// Every class that represents a bluetooth peripheral type needs to conform to this protocol. Classes being core data classes, ie NSManagedObject classes. Example M5Stack conforms to this protocol.
 ///
-/// - implementation of the functions in this protocol will usually be the same for all implementations. As Swift doesn't support abstract classes, and as at the same time the classes (like M5Stack) extens NSManagedObject, I see no other way
 protocol BluetoothPeripheral {
+    
+    // MARK:- functions related to generic parameters like address, alias, devicename,..
+
+    /// what type of peripheral is this
+    func bluetoothPeripheralType() -> BluetoothPeripheralType
     
     /// mac address of the peripheral
     ///
@@ -21,8 +25,7 @@ protocol BluetoothPeripheral {
     /// set the alias
     func setAlias(_ value: String?)
     
-    /// what type of peripheral is this
-    func bluetoothPeripheralType() -> BluetoothPeripheralType
+    // MARK:-  connection related functions
     
     /// tells the app that it should not try to connect to this bluetoothperipheral
     ///
@@ -62,6 +65,11 @@ protocol BluetoothPeripheral {
     /// - Then later, when reconnecting isParameterUpdateNeededAtNextConnect tells us that app should send all parameters to the M5Stack.
     /// - After that a call is made to parameterUpdateNotNeededAtNextConnect
     func isParameterUpdateNeededAtNextConnect() -> Bool
+    
+    //MARK: - view related functions
+    
+    /// returns the viewmodel needed in BluetoothPeripheralViewController
+    func getViewModel() -> BluetoothPeripheralViewModel
     
 }
 

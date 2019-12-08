@@ -1,6 +1,10 @@
 import Foundation
 
 extension M5Stack: BluetoothPeripheral {
+   
+    func getViewModel() -> BluetoothPeripheralViewModel {
+        return M5StackBluetoothPeripheralViewModel()
+    }
     
     func getDeviceName() -> String {
         return name
