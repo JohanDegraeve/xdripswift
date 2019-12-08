@@ -299,7 +299,7 @@ class BluetoothPeripheralManager: NSObject {
 extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
     
     /// to scan for a new BluetoothPeripheral - callback will be called when a new BluetoothPeripheral is found and connected
-    func startScanningForNewDevice(callback: @escaping (BluetoothPeripheral) -> Void, type: BluetoothPeripheralType) {
+    func startScanningForNewDevice(type: BluetoothPeripheralType, callback: @escaping (BluetoothPeripheral) -> Void) {
         
         callBackAfterDiscoveringDevice = callback
         
@@ -403,12 +403,12 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         // set bluetoothTransmitter to nil, this will also initiate a disconnect
         bluetoothTransmitters[index] = nil
 
+        // delete in coredataManager
+        coreDataManager.mainManagedObjectContext.delete(bluetoothPeripherals[index] as! NSManagedObject)
+        
         // remove bluetoothTransmitter and bluetoothPeripheral entry from the two arrays
         bluetoothTransmitters.remove(at: index)
         bluetoothPeripherals.remove(at: index)
-        
-        // delete in coredataManager
-        coreDataManager.mainManagedObjectContext.delete(bluetoothPeripherals[index] as! NSManagedObject)
         
         // save in coredataManager
         coreDataManager.saveChanges()
@@ -600,7 +600,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
         // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
         guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
 
-        m5Stack.shouldconnect = false
+        m5Stack.dontTryToConnectToThisBluetoothPeripheral()
         coreDataManager.saveChanges()
         
         // disconnect

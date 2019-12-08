@@ -66,10 +66,6 @@ protocol BluetoothPeripheral {
     /// - After that a call is made to parameterUpdateNotNeededAtNextConnect
     func isParameterUpdateNeededAtNextConnect() -> Bool
     
-    //MARK: - view related functions
-    
-    /// returns the viewmodel needed in BluetoothPeripheralViewController
-    func getViewModel() -> BluetoothPeripheralViewModel
     
 }
 

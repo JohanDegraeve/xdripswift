@@ -70,7 +70,7 @@ final class BluetoothPeripheralsViewController: UIViewController {
                 fatalError("In BluetoothPeripheralsViewController, prepare for segue, viewcontroller is not M5StackViewController or coreDataManager is nil" )
             }
             
-            vc.configure(bluetoothPeripheral: sender as? BluetoothPeripheral, coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
+            vc.configure(bluetoothPeripheral: sender as? BluetoothPeripheral, coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager, expectedBluetoothPeripheralType: .M5Stack)
             
         }
     }
@@ -236,6 +236,7 @@ extension BluetoothPeripheralsViewController: M5StackBluetoothTransmitterDelegat
     
     func m5StackResetRequired(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         // no further handling, means when this view is open, user won't see that reset is required
+        debuglogging("in m5StackResetRequired ZZZZ")
     }
     
 }

@@ -7,19 +7,19 @@ import CoreBluetooth
 fileprivate enum Setting:Int, CaseIterable {
     
     /// ble password
-    case blePassword = 4
+    case blePassword = 0
     
     /// textColor
-    case textColor = 5
+    case textColor = 1
     
     /// backGroundColor
-    case backGroundColor = 6
+    case backGroundColor = 2
     
     /// rotation
-    case rotation = 7
+    case rotation = 3
     
     /// case brightness
-    case brightness = 8
+    case brightness = 4
     
 }
 
@@ -54,12 +54,12 @@ class M5StackBluetoothPeripheralViewModel {
     private let brightnessStrings: [String] = ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"]
     
     /// reference to bluetoothPeripheralManager
-    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging!
+    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging?
     
     /// reference to the tableView
-    private var tableView: UITableView!
+    private weak var tableView: UITableView?
     
-    private var bluetoothPeripheralViewController: BluetoothPeripheralViewController!
+    private weak var bluetoothPeripheralViewController: BluetoothPeripheralViewController?
     
 }
 
@@ -68,15 +68,15 @@ class M5StackBluetoothPeripheralViewModel {
 extension M5StackBluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
-        bluetoothPeripheralViewController.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
+        bluetoothPeripheralViewController?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
     }
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
-        bluetoothPeripheralViewController.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
+        bluetoothPeripheralViewController?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
-        bluetoothPeripheralViewController.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
+        bluetoothPeripheralViewController?.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
     }
     
     
@@ -97,11 +97,11 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     func newBlePassWord(newBlePassword: String, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
         // note : blePassword is also saved in BluetoothPeripheralManager, it will be saved two times
-        if let m5StackPeripheral = bluetoothPeripheralManager.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack {
+        if let m5StackPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack {
             
             m5StackPeripheral.blepassword = newBlePassword
             
-            tableView.reloadRows(at: [IndexPath(row: Setting.blePassword.rawValue, section: 0)], with: .none)
+            tableView?.reloadRows(at: [IndexPath(row: Setting.blePassword.rawValue, section: 0)], with: .none)
             
         }
         
@@ -109,49 +109,49 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     
     func authentication(success: Bool, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
-        if !success, let m5StackPeripheral = bluetoothPeripheralManager.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack {
+        if !success, let m5StackPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack {
             
             // show warning, inform that user should set password or reset M5Stack
             let alert = UIAlertController(title: Texts_Common.warning, message: Text_BluetoothPeripheralView.authenticationFailureWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
                 
                 // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
-                self.bluetoothPeripheralViewController.setShouldConnectToFalse(for: m5StackPeripheral)
+                self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackPeripheral)
                 
             })
             
-            bluetoothPeripheralViewController.present(alert, animated: true, completion: nil)
+            bluetoothPeripheralViewController?.present(alert, animated: true, completion: nil)
         }
     }
     
     func blePasswordMissing(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
-        guard let m5StackPeripheral = bluetoothPeripheralManager.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack else {return}
+        guard let m5StackPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack else {return}
         
         // show warning, inform that user should set password
         let alert = UIAlertController(title: Texts_Common.warning, message: Text_BluetoothPeripheralView.authenticationFailureWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
-            self.bluetoothPeripheralViewController.setShouldConnectToFalse(for: m5StackPeripheral)
+            self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackPeripheral)
             
         })
         
-        bluetoothPeripheralViewController.present(alert, animated: true, completion: nil)
+        bluetoothPeripheralViewController?.present(alert, animated: true, completion: nil)
         
     }
     
     func m5StackResetRequired(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
-        guard let m5StackBluetoothPeripheral = bluetoothPeripheralManager.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack else {return}
+        guard let m5StackBluetoothPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack else {return}
         
         // show warning, inform that user should reset M5Stack
         let alert = UIAlertController(title: Texts_Common.warning, message: Text_BluetoothPeripheralView.m5StackResetRequiredWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
-            self.bluetoothPeripheralViewController.setShouldConnectToFalse(for: m5StackBluetoothPeripheral)
+            self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackBluetoothPeripheral)
             
         })
         
-        bluetoothPeripheralViewController.present(alert, animated: true, completion: nil)
+        bluetoothPeripheralViewController?.present(alert, animated: true, completion: nil)
         
     }
     
@@ -165,7 +165,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         return Setting.allCases.count
     }
     
-    func userDidSelectRow(withSettingRawValue rawValue: Int, rowOffset: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManager, doneButtonOutlet: UIBarButtonItem) {
+    func userDidSelectRow(withSettingRawValue rawValue: Int, rowOffset: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem) {
         
         guard let setting = Setting(rawValue: rawValue) else { fatalError("M5StackBluetoothPeripheralViewModel userDidSelectRow, unexpected setting") }
         
@@ -208,7 +208,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                     }
                     
                     // reload table
-                    self.tableView.reloadRows(at: [IndexPath(row: Setting.textColor.rawValue, section: 0)], with: .none)
+                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.textColor.rawValue, section: 0)], with: .none)
                     
                     // enable the done button
                     doneButtonOutlet.enable()
@@ -218,7 +218,9 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             }, onCancelClick: nil, didSelectRowHandler: nil)
             
             // create and present PickerViewController
-            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
+            if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
+                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
+            }
             
         case .backGroundColor:
             var texts = [String]()
@@ -255,7 +257,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                     }
                     
                     // reload table
-                    self.tableView.reloadRows(at: [IndexPath(row: Setting.backGroundColor.rawValue + rowOffset, section: 0)], with: .none)
+                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.backGroundColor.rawValue + rowOffset, section: 0)], with: .none)
                     
                     // enable the done button
                     doneButtonOutlet.enable()
@@ -265,8 +267,10 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             }, onCancelClick: nil, didSelectRowHandler: nil)
             
             // create and present PickerViewController
-            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
-            
+            if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
+                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
+            }
+
         case .rotation:
             //find index for rotation stored in M5Stack or userdefaults
             var selectedRow:Int? = nil
@@ -294,7 +298,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                     }
                     
                     // reload table
-                    self.tableView.reloadRows(at: [IndexPath(row: Setting.rotation.rawValue, section: 0)], with: .none)
+                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.rotation.rawValue, section: 0)], with: .none)
                     
                     // enable the done button
                     doneButtonOutlet.enable()
@@ -304,8 +308,10 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             }, onCancelClick: nil, didSelectRowHandler: nil)
             
             // create and present PickerViewController
-            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
-            
+            if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
+                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
+            }
+
         case .brightness:
             
             //find index for brightness stored in M5Stack or use 100 as default value
@@ -336,7 +342,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                     }
                     
                     // reload table
-                    self.tableView.reloadRows(at: [IndexPath(row: Setting.brightness.rawValue, section: 0)], with: .none)
+                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.brightness.rawValue, section: 0)], with: .none)
                     
                     // enable the done button
                     doneButtonOutlet.enable()
@@ -346,8 +352,10 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             }, onCancelClick: nil, didSelectRowHandler: nil)
             
             // create and present PickerViewController
-            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
-            
+            if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
+                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
+            }
+
         }
 
     }
@@ -459,7 +467,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         Text_BluetoothPeripheralView.screenTitle
     }
     
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManager, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         

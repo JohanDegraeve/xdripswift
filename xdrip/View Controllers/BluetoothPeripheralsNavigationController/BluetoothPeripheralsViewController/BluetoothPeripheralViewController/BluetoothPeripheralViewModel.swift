@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-protocol BluetoothPeripheralViewModel {
+protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     
     /// to be called before opening the actual viewcontroller or after discovering a new bluetoothperipheral
     /// - parameters :
@@ -9,7 +9,7 @@ protocol BluetoothPeripheralViewModel {
     ///     - bluetoothPeripheralManager : reference to bluetoothPeripheralManager
     ///     - tableView: reference to tableView
     ///     - bluetoothPeripheralViewController : reference to bluetoothPeripheralViewController
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManager, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController)
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController)
     
     /// screen title for uiviewcontroller
     func screenTitle() -> String
@@ -23,7 +23,9 @@ protocol BluetoothPeripheralViewModel {
     func update(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral)
     
     /// user clicked a row, this function does the necessary
-    func userDidSelectRow(withSettingRawValue rawValue: Int, rowOffset: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManager, doneButtonOutlet: UIBarButtonItem)
+    func userDidSelectRow(withSettingRawValue rawValue: Int, rowOffset: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem)
     
+    /// get number of settings in the viewmodel
     func numberOfSettings() -> Int
+    
 }

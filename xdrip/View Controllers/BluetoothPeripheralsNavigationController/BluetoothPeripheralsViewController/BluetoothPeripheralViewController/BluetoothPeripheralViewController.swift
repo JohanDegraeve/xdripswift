@@ -41,7 +41,7 @@ class BluetoothPeripheralViewController: UIViewController {
 
     /// action for scan Button, to scan for M5Stack
     @IBAction func scanButtonAction(_ sender: UIButton) {
-        self.scanForBluetoothPeripheral(type: nil, callback: nil)
+        self.scanForBluetoothPeripheral(type: expectedBluetoothPeripheralType)
     }
 
     /// action for cancelbutton
@@ -81,7 +81,7 @@ class BluetoothPeripheralViewController: UIViewController {
     private var coreDataManager:CoreDataManager?
     
     /// a BluetoothPeripheralManager
-    private weak var bluetoothPeripheralManager: BluetoothPeripheralManager!
+    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging!
     
     /// name given by user as alias , to easier recognize different M5Stacks
     ///
@@ -89,33 +89,28 @@ class BluetoothPeripheralViewController: UIViewController {
     private var aliasTemporaryValue: String?
     
     /// needed to support the bluetooth peripheral type specific attributes
-    private var bluetoothPeripheralViewModel: BluetoothPeripheralViewModel?
+    private var bluetoothPeripheralViewModel: BluetoothPeripheralViewModel!
+    
+    private var expectedBluetoothPeripheralType: BluetoothPeripheralType!
 
     // MARK:- public functions
     
     /// configure the viewController
-    public func configure(bluetoothPeripheral: BluetoothPeripheral?, coreDataManager: CoreDataManager, bluetoothPeripheralManager: BluetoothPeripheralManaging) {
+    public func configure(bluetoothPeripheral: BluetoothPeripheral?, coreDataManager: CoreDataManager, bluetoothPeripheralManager: BluetoothPeripheralManaging, expectedBluetoothPeripheralType type: BluetoothPeripheralType) {
         
         bluetoothPeripheralAsNSObject = bluetoothPeripheral
         self.coreDataManager = coreDataManager
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
+        self.expectedBluetoothPeripheralType = type
         
         if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
-            
-            // set self as delegate in bluetoothTransmitter
-            if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false) {
-                bluetoothTransmitter.variableBluetoothTransmitterDelegate = self
-            }
             
             // temporary store the alias, user can change this name via the view, it will be stored back in the bluetoothPeripheralASNSObject only after clicking 'done' button
             aliasTemporaryValue = bluetoothPeripheralASNSObject.getAlias()
             
             // don't delete the M5Stack when going back to prevous viewcontroller
             deleteBluetoothPeripheralWhenClosingViewController = false
-            
-            // set bluetoothPeripheralViewModel
-            bluetoothPeripheralViewModel = bluetoothPeripheralASNSObject.getViewModel()
-            
+
         }
         
     }
@@ -126,6 +121,20 @@ class BluetoothPeripheralViewController: UIViewController {
         
         super.viewDidLoad()
         
+        // here the tableView is not nil, we can safely call bluetoothPeripheralViewModel.configure, this one requires a non-nil tableView
+        bluetoothPeripheralViewModel = expectedBluetoothPeripheralType.getViewModel()
+        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheralAsNSObject, bluetoothPeripheralManager: self.bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self)
+        
+        // still need to assign the delegate in the transmitter object
+        if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
+            
+            // set bluetoothPeripheralViewModel as delegate in bluetoothTransmitter
+            if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false) {
+                bluetoothTransmitter.variableBluetoothTransmitterDelegate = bluetoothPeripheralViewModel
+            }
+            
+        }
+
         setupView()
     }
     
@@ -180,7 +189,7 @@ class BluetoothPeripheralViewController: UIViewController {
         
     }
     
-    // MARK: - private helper functions
+    // MARK: - private functions
     
     /// setup datasource, delegate, seperatorInset
     private func setupTableView() {
@@ -228,10 +237,7 @@ class BluetoothPeripheralViewController: UIViewController {
     /// user clicks scan button
     /// - parameter :
     ///     - type is optional here because it's called from within IBAction scanButtonAction
-    ///     - the function will be called form a deriving class with a real type. It will never be called with nil
-    ///
-    /// function will be overriden by the deriving classes and from there it will be called with a non-nil value as type and callback
-    public func scanForBluetoothPeripheral(type: BluetoothPeripheralType?, callback: ((BluetoothPeripheral) -> ())?) {
+    private func scanForBluetoothPeripheral(type: BluetoothPeripheralType?) {
         
         // if bluetoothPeripheralASNSObject is not nil, then there's already a BluetoothPeripheral for which scanning has started or which is already known from a previous scan (either connected or not connected) (bluetoothPeripheralASNSObject should be nil because if it is not, the scanbutton should not even be enabled, anyway let's check).
         guard bluetoothPeripheralAsNSObject == nil else {return}
@@ -239,7 +245,7 @@ class BluetoothPeripheralViewController: UIViewController {
         // should never be called with type == nil
         guard let type = type else {return}
         
-        bluetoothPeripheralManager.startScanningForNewDevice(callback: { (bluetoothPeripheral) in
+        bluetoothPeripheralManager.startScanningForNewDevice(type: type, callback: { (bluetoothPeripheral) in
             
             // assign internal bluetoothPeripheralASNSObject to new bluetoothPeripheral
             self.bluetoothPeripheralAsNSObject = bluetoothPeripheral
@@ -247,7 +253,7 @@ class BluetoothPeripheralViewController: UIViewController {
             // assign local variables
             self.aliasTemporaryValue = nil //should be nil anyway
             
-            self.bluetoothPeripheralViewModel = bluetoothPeripheral.getViewModel()
+            self.bluetoothPeripheralViewModel = bluetoothPeripheral.bluetoothPeripheralType().getViewModel()
             
             // enable the connect button
             self.connectButtonOutlet.enable()
@@ -265,17 +271,12 @@ class BluetoothPeripheralViewController: UIViewController {
             self.deleteBluetoothPeripheralWhenClosingViewController = true
             
             // set self as delegate in the bluetoothTransmitter
-            self.bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false)?.variableBluetoothTransmitterDelegate = self
+            self.bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false)?.variableBluetoothTransmitterDelegate = self.bluetoothPeripheralViewModel
 
-            // call to callback function to be done here, because the deriving class will set additional attributes (similar to aliasTemporaryValue)
-            if let callback = callback {
-                callback(bluetoothPeripheral)
-            }
-            
             // reload the full section , all rows in the tableView
             self.tableView.reloadSections(IndexSet(integer: 0), with: .none)
             
-        }, type: type)
+        })
         
         // scanning now, scanning button can be disabled
         scanButtonOutlet.disable()
@@ -351,7 +352,7 @@ class BluetoothPeripheralViewController: UIViewController {
             if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: true) {
                 
                 // set delegate
-                bluetoothTransmitter.variableBluetoothTransmitterDelegate = self
+                bluetoothTransmitter.variableBluetoothTransmitterDelegate = bluetoothPeripheralViewModel
                 
                 // connect
                 bluetoothTransmitter.connect()
