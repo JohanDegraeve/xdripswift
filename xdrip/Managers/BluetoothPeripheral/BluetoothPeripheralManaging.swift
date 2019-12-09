@@ -9,6 +9,9 @@ protocol BluetoothPeripheralManaging: AnyObject {
     /// will stop scanning, this is again for the case where scanning for a new BluetoothPeripheral has started
     func stopScanningForNewDevice()
     
+    /// to know if bluetoothperipheralmanager is currently scanning for a new device
+    func isScanning() -> Bool
+    
     /// try to connect to the BluetoothPeripheral
     func connect(to bluetoothPeripheral: BluetoothPeripheral)
     

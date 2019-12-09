@@ -54,9 +54,6 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         
         // call super
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service)], CBUUID_ReceiveCharacteristic: CBUUID_TxRxCharacteristic, CBUUID_WriteCharacteristic: CBUUID_TxRxCharacteristic, startScanningAfterInit: false, bluetoothTransmitterDelegate: delegate)
-        
-        // start scanning, probably the scanning will not yet start, this will happen only when centralManagerDidUpdateState is called
-        _ = startScanning()
 
     }
     

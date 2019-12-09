@@ -226,7 +226,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                     }
                     
                     // reload table
-                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.textColor.rawValue, section: 0)], with: .none)
+                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.textColor.rawValue + rowOffset, section: 0)], with: .none)
                     
                     // enable the done button
                     doneButtonOutlet.enable()
@@ -316,7 +316,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                     }
                     
                     // reload table
-                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.rotation.rawValue, section: 0)], with: .none)
+                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.rotation.rawValue + rowOffset, section: 0)], with: .none)
                     
                     // enable the done button
                     doneButtonOutlet.enable()
@@ -360,7 +360,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                     }
                     
                     // reload table
-                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.brightness.rawValue, section: 0)], with: .none)
+                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.brightness.rawValue + rowOffset, section: 0)], with: .none)
                     
                     // enable the done button
                     doneButtonOutlet.enable()

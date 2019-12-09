@@ -157,10 +157,10 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
             
         }
         
-        // textLabel should be the user defined alias of the BluetoothPeripheral, or if user defined alias == nil, then the address
+        // textLabel should be the user defined alias of the BluetoothPeripheral, or if user defined alias == nil, then the devicename
         cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].getAlias()
         if cell.textLabel?.text == nil {
-            cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].getAddress()
+            cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].getDeviceName()
         }
         
         // detail is the connection status
@@ -180,7 +180,7 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        // only 1 section, namely the list of M5Stacks
+        // only 1 section, namely the list of BluetoothPeripherals
         return 1
     }
     

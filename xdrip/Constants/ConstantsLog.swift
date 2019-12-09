@@ -26,75 +26,75 @@ enum ConstantsLog {
     static let debuglogging = "xdripdebuglogging"
     
     /// G5
-    static let categoryCGMG5 = "categoryCGMG5"
+    static let categoryCGMG5 = "CGMG5"
     
     /// GNSEntry
-    static let categoryCGMGNSEntry = "categoryCGMGNSEntry"
+    static let categoryCGMGNSEntry = "CGMGNSEntry"
     
     /// Blucon
-    static let categoryBlucon = "categoryBlucon"
+    static let categoryBlucon = "Blucon"
     
     /// core data manager
-    static let categoryCoreDataManager = "categoryCoreDataManager"
+    static let categoryCoreDataManager = "CoreDataManager"
     
     /// application data bgreadings
-    static let categoryApplicationDataBgReadings = "categoryApplicationDataBgReadings"
+    static let categoryApplicationDataBgReadings = "ApplicationDataBgReadings"
     
     /// application data calibrations
-    static let categoryApplicationDataCalibrations = "categoryApplicationDataCalibrations"
+    static let categoryApplicationDataCalibrations = "ApplicationDataCalibrations"
     
     /// application data sensors
-    static let categoryApplicationDataSensors = "categoryApplicationDataSensors"
+    static let categoryApplicationDataSensors = "ApplicationDataSensors"
     
     /// application data alerttypes
-    static let categoryApplicationDataAlertTypes = "categoryApplicationDataAlertTypes"
+    static let categoryApplicationDataAlertTypes = "ApplicationDataAlertTypes"
     
     /// application data alertentries
-    static let categoryApplicationDataAlertEntries = "categoryApplicationDataAlertEntries"
+    static let categoryApplicationDataAlertEntries = "ApplicationDataAlertEntries"
     
     /// application data for M5Stack
-    static let categoryApplicationDataM5Stacks = "categoryApplicationDataM5Stacks"
+    static let categoryApplicationDataM5Stacks = "ApplicationDataM5Stacks"
     
     /// application for for M5StackName
-    static let categoryApplicationDataM5StackNames = "categoryApplicationDataM5StackNames"
+    static let categoryApplicationDataM5StackNames = "ApplicationDataM5StackNames"
     
     /// nightscout uploader
-    static let categoryNightScoutUploadManager = "categoryNightScoutUploadManager"
+    static let categoryNightScoutUploadManager = "NightScoutUploadManager"
     
     /// nightscout follow
-    static let categoryNightScoutFollowManager = "categoryNightScoutFollowManager"
+    static let categoryNightScoutFollowManager = "NightScoutFollowManager"
     
     /// alertmanager
-    static let categoryAlertManager = "categoryAlertManager"
+    static let categoryAlertManager = "AlertManager"
     
     /// playsound
-    static let categoryPlaySound = "categoryPlaySound"
+    static let categoryPlaySound = "PlaySound"
     
     /// healthkit manager
-    static let categoryHealthKitManager = "categoryHealthKitManager"
+    static let categoryHealthKitManager = "HealthKitManager"
     
     /// SettingsViewHealthKitSettingsViewModel
-    static let categorySettingsViewHealthKitSettingsViewModel = "categorySettingsViewHealthKitSettingsViewModel"
+    static let categorySettingsViewHealthKitSettingsViewModel = "SettingsViewHealthKitSettingsViewModel"
     
     /// dexcom share upload manager
-    static let categoryDexcomShareUploadManager = "categoryDexcomShareUploadManager"
+    static let categoryDexcomShareUploadManager = "DexcomShareUploadManager"
     
     /// droplet 1
-    static let categoryCGMDroplet1 = "categoryCGMDroplet1"
+    static let categoryCGMDroplet1 = "CGMDroplet1"
     
     /// bluereader
-    static let categoryCGMBlueReader = "categoryCGMBlueReader"
+    static let categoryCGMBlueReader = "CGMBlueReader"
     
     /// LibreOOPClient
-    static let categoryLibreOOPClient = "categoryLibreOOPClient"
+    static let categoryLibreOOPClient = "LibreOOPClient"
     
     /// for use in M5Stack
-    static let categoryM5StackBluetoothTransmitter = "categoryM5StackBluetoothTransmitter"
+    static let categoryM5StackBluetoothTransmitter = "M5StackBluetoothTransmitter"
     
     /// BluetoothPeripheralManager logging
-    static let categoryBluetoothPeripheralManager = "categoryBluetoothPeripheralManager"
+    static let categoryBluetoothPeripheralManager = "BluetoothPeripheralManager"
 
     /// StatusChartsManager logging
-    static let categoryGlucoseChartManager = "categoryGlucoseChartManager"
+    static let categoryGlucoseChartManager = "GlucoseChartManager"
 }
 

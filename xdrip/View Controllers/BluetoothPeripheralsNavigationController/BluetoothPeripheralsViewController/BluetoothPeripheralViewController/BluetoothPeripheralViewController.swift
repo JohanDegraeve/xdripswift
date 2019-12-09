@@ -282,6 +282,9 @@ class BluetoothPeripheralViewController: UIViewController {
         // scanning now, scanning button can be disabled
         scanButtonOutlet.disable()
         
+        // app should be scanning now, update of cell is needed
+        tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+        
     }
     
     /// use clicked trash button, need to delete the bluetoothperipheral
@@ -425,18 +428,22 @@ class BluetoothPeripheralViewController: UIViewController {
 extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return Setting.allCases.count + (bluetoothPeripheralViewModel?.numberOfSettings() ?? 0)
+        
+        // if bluetoothPeripheralAsNSObject is still nil, then only the basic, generic settings will be shown
+        return Setting.allCases.count + (bluetoothPeripheralAsNSObject == nil ? 0: (bluetoothPeripheralViewModel?.numberOfSettings() ?? 0))
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("BluetoothPeripheralViewController cellforrowat, Unexpected Table View Cell ") }
         
+        // check if it's a Setting defined here in BluetoothPeripheralViewController, or a setting specific to the type of BluetoothPeripheral
         if indexPath.row >= Setting.allCases.count {
             
             // it's a setting not defined here but in a BluetoothPeripheralViewModel
             // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
             if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let bluetoothPeripheral = bluetoothPeripheralAsNSObject {
+                debuglogging("indexPath.row = " + indexPath.row.description)
                 bluetoothPeripheralViewModel.update(cell: cell, withSettingRawValue: indexPath.row - Setting.allCases.count, for: bluetoothPeripheral)
             }
             
@@ -444,6 +451,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             
         }
             
+        //it's a Setting defined here in BluetoothPeripheralViewController
         guard let setting = Setting(rawValue: indexPath.row) else { fatalError("BluetoothPeripheralViewController cellForRowAt, Unexpected setting") }
         
         // default value for accessoryView is nil
@@ -460,18 +468,25 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         case .address:
             cell.textLabel?.text = Text_BluetoothPeripheralView.address
             cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject?.getAddress()
-            cell.accessoryType = .disclosureIndicator
+            if cell.detailTextLabel?.text == nil {
+                cell.accessoryType = .none
+            } else {
+                cell.accessoryType = .disclosureIndicator
+            }
             
         case .connectionStatus:
             cell.textLabel?.text = Text_BluetoothPeripheralView.status
-            cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject == nil ? nil : bluetoothPeripheralIsConnected() ? Text_BluetoothPeripheralView.connected:Text_BluetoothPeripheralView.notConnected
+            cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject == nil ? (bluetoothPeripheralManager.isScanning() ? "Scanning" : nil) : bluetoothPeripheralIsConnected() ? Text_BluetoothPeripheralView.connected:Text_BluetoothPeripheralView.notConnected
             
         case .alias:
             cell.textLabel?.text = Text_BluetoothPeripheralView.m5StackAlias
             cell.detailTextLabel?.text = aliasTemporaryValue
-            cell.accessoryType = .disclosureIndicator
-            
-            
+            if bluetoothPeripheralAsNSObject == nil {
+                cell.accessoryType = .none
+            } else {
+                cell.accessoryType = .disclosureIndicator
+            }
+
         }
 
         return cell
@@ -581,9 +596,8 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
 
         // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
-        if state == CBManagerState.poweredOff {
-            tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
-        }
+        // do this whenever the bluetooth status changes
+        tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
 
     }
     

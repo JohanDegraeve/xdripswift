@@ -14,7 +14,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
 
     // MARK: - private properties
     
-    /// the address of the transmitter. If nil then transmitter never connected, so we don't know the name.
+    /// the address of the transmitter. If nil then transmitter never connected, so we don't know the address.
     private(set) var deviceAddress:String?
     
     /// the name of the transmitter. If nil then transmitter never connected, so we don't know the name
@@ -160,6 +160,14 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// stops scanning
     func stopScanning() {
         self.centralManager?.stopScan()
+    }
+    
+    /// is the transmitter currently scanning or not
+    func isScanning() -> Bool {
+        if let centralManager = centralManager {
+            return centralManager.isScanning
+        }
+        return false
     }
     
     /// start bluetooth scanning for device
