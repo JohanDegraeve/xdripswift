@@ -2,13 +2,13 @@ import UIKit
 import CoreBluetooth
 
 /// - a case per attribute that can be set in BluetoothPeripheralViewController
-/// - these are applicable to all types of bluetoothperipheral (M5Stack ...)
+/// - these are applicable to all types of bluetoothperipheral types (M5Stack ...)
 fileprivate enum Setting:Int, CaseIterable {
     
     /// the address
     case address = 0
     
-    /// the name received from bluetoothTransmitter, ie the name hardcoded in the M5Stack
+    /// the name received from bluetoothTransmitter, ie the name hardcoded in the BluetoothPeripheral
     case name = 1
 
     /// the alias that user has given, possibly nil
@@ -34,12 +34,12 @@ class BluetoothPeripheralViewController: UIViewController {
         doneButtonHandler()
     }
     
-    /// action for trashButton, to delete the M5Stack
+    /// action for trashButton, to delete the BluetoothPeripheral
     @IBAction func trashButtonAction(_ sender: UIBarButtonItem) {
         trashButtonClicked()
     }
 
-    /// action for scan Button, to scan for M5Stack
+    /// action for scan Button, to scan for BluetoothPeripheral
     @IBAction func scanButtonAction(_ sender: UIButton) {
         self.scanForBluetoothPeripheral(type: expectedBluetoothPeripheralType)
     }
@@ -74,7 +74,7 @@ class BluetoothPeripheralViewController: UIViewController {
     /// the BluetoothPeripheral being edited - will only be used initially to initialize the temp properties used locally, and in the end to update the BluetoothPeripheral - if nil then it's about creating a new BluetoothPeripheral
     private var bluetoothPeripheralAsNSObject:BluetoothPeripheral?
     
-    /// this is for cases where a new M5Stack is being scanned. If there's a new M5Stack, and if the user has clicked 'done', then when closing the viewcontroller, the M5Stack should be deleted. This attribute defines if the M5Stack should be deleted or not
+    /// this is for cases where a new BluetoothPeripheral is being scanned. If there's a new BluetoothPeripheral, and if the user has clicked 'cancel', then when closing the viewcontroller, the BluetoothPeripheral should be deleted. This attribute defines if the BluetoothPeripheral should be deleted or not
     private var deleteBluetoothPeripheralWhenClosingViewController: Bool = false
 
     /// reference to coreDataManager
@@ -83,9 +83,9 @@ class BluetoothPeripheralViewController: UIViewController {
     /// a BluetoothPeripheralManager
     private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging!
     
-    /// name given by user as alias , to easier recognize different M5Stacks
+    /// name given by user as alias , to easier recognize different BluetoothPeripherals
     ///
-    /// temp storage of value while user is editing the M5Stack attributes
+    /// temp storage of value while user is editing the BluetoothPeripheral attributes
     private var aliasTemporaryValue: String?
     
     /// needed to support the bluetooth peripheral type specific attributes
@@ -108,7 +108,7 @@ class BluetoothPeripheralViewController: UIViewController {
             // temporary store the alias, user can change this name via the view, it will be stored back in the bluetoothPeripheralASNSObject only after clicking 'done' button
             aliasTemporaryValue = bluetoothPeripheralASNSObject.getAlias()
             
-            // don't delete the M5Stack when going back to prevous viewcontroller
+            // don't delete the BluetoothPeripheral when going back to prevous viewcontroller
             deleteBluetoothPeripheralWhenClosingViewController = false
 
         }
@@ -123,7 +123,7 @@ class BluetoothPeripheralViewController: UIViewController {
         
         // here the tableView is not nil, we can safely call bluetoothPeripheralViewModel.configure, this one requires a non-nil tableView
         bluetoothPeripheralViewModel = expectedBluetoothPeripheralType.getViewModel()
-        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheralAsNSObject, bluetoothPeripheralManager: self.bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self)
+        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheralAsNSObject, bluetoothPeripheralManager: self.bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self, settingRowOffset: Setting.allCases.count, bluetoothTransmitterDelegate: self)
         
         // still need to assign the delegate in the transmitter object
         if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
@@ -177,13 +177,16 @@ class BluetoothPeripheralViewController: UIViewController {
 
         } else {
             
-            // there's already a known m5stack, no need to scan for it
+            // there's already a known bluetoothperipheral, no need to scan for it
             scanButtonOutlet.disable()
             
         }
         
-        // initially donebutton is disabled, it will get enabled as soon as a new M5Stack is scanned for, or changes are done in the existing M5Stack settings
+        // initially donebutton is disabled, it will get enabled as soon as a new bluetoothperipheral is scanned for, or changes are done in the existing bluetoothperipheral settings
         doneButtonOutlet.disable()
+        
+        // set title
+        title = bluetoothPeripheralViewModel.screenTitle()
         
         setupTableView()
         
@@ -221,12 +224,15 @@ class BluetoothPeripheralViewController: UIViewController {
             bluetoothPeripheralASNSObject.setAlias(aliasTemporaryValue)
             
             
+            // temp values stored by viewmodel needs to be written to bluetoothPeripheralASNSObject
+            bluetoothPeripheralViewModel.writeTempValues(to: bluetoothPeripheralASNSObject)
+            
             // save all changes now
             coreDataManager.saveChanges()
 
         }
         
-        // don't delete the M5Stack when going back to prevous viewcontroller
+        // don't delete the BluetoothPeripheral when going back to prevous viewcontroller
         self.deleteBluetoothPeripheralWhenClosingViewController = false
         
         // return to BluetoothPeripheralsViewController
@@ -254,7 +260,7 @@ class BluetoothPeripheralViewController: UIViewController {
             self.aliasTemporaryValue = nil //should be nil anyway
             
             // call storeTempValues in the model
-            self.bluetoothPeripheralViewModel.storeTempValues(bluetoothPeripheral: bluetoothPeripheral)
+            self.bluetoothPeripheralViewModel.storeTempValues(from: bluetoothPeripheral)
             
             // enable the connect button
             self.connectButtonOutlet.enable()
@@ -268,7 +274,7 @@ class BluetoothPeripheralViewController: UIViewController {
             // enable the doneButtonAction
             self.doneButtonOutlet.enable()
             
-            // if user goes back to previous screen via the back button, then delete the newly discovered M5Stack
+            // if user goes back to previous screen via the back button, then delete the newly discovered BluetoothPeripheral
             self.deleteBluetoothPeripheralWhenClosingViewController = true
             
             // set self as delegate in the bluetoothTransmitter
@@ -296,16 +302,16 @@ class BluetoothPeripheralViewController: UIViewController {
         // textToAdd is either 'address' + the address, or 'alias' + the alias, depending if alias has a value
         var textToAdd = Text_BluetoothPeripheralView.address + bluetoothPeripheralASNSObject.getAddress()
         if let alias = aliasTemporaryValue {
-            textToAdd = Text_BluetoothPeripheralView.m5StackAlias + alias
+            textToAdd = Text_BluetoothPeripheralView.bluetoothPeripheralAlias + alias
         }
         
         // first ask user if ok to delete and if yes delete
-        let alert = UIAlertController(title: Text_BluetoothPeripheralView.confirmDeletionM5Stack + " " + textToAdd + "?", message: nil, actionHandler: {
+        let alert = UIAlertController(title: Text_BluetoothPeripheralView.confirmDeletionBluetoothPeripheral + " " + textToAdd + "?", message: nil, actionHandler: {
             
             // delete
             self.bluetoothPeripheralManager.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheralASNSObject)
             
-            // as the M5Stack is already deleted, there's no need to call delete again, when prepareForSegue
+            // as the BluetoothPeripheral is already deleted, there's no need to call delete again, when prepareForSegue
             self.deleteBluetoothPeripheralWhenClosingViewController = false
             
             self.performSegue(withIdentifier: UnwindSegueIdentifiers.BluetoothPeripheralToBluetoothPeripheralsUnWindSegueIdentifier.rawValue, sender: self)
@@ -384,7 +390,7 @@ class BluetoothPeripheralViewController: UIViewController {
     
     private func setConnectButtonLabelText() {
 
-        // if BluetoothPeripheral is nil, then set text to "Always Connect", it's disabled anyway - if m5Stack not nil, then set depending on value of shouldconnect
+        // if BluetoothPeripheral is nil, then set text to "Always Connect", it's disabled anyway - if BluetoothPeripheral not nil, then set depending on value of shouldconnect
         if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
             
             // set label of connect button, according to curren status
@@ -443,8 +449,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             // it's a setting not defined here but in a BluetoothPeripheralViewModel
             // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
             if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let bluetoothPeripheral = bluetoothPeripheralAsNSObject {
-                debuglogging("indexPath.row = " + indexPath.row.description)
+
                 bluetoothPeripheralViewModel.update(cell: cell, withSettingRawValue: indexPath.row - Setting.allCases.count, for: bluetoothPeripheral)
+                
             }
             
             return cell
@@ -479,7 +486,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject == nil ? (bluetoothPeripheralManager.isScanning() ? "Scanning" : nil) : bluetoothPeripheralIsConnected() ? Text_BluetoothPeripheralView.connected:Text_BluetoothPeripheralView.notConnected
             
         case .alias:
-            cell.textLabel?.text = Text_BluetoothPeripheralView.m5StackAlias
+            cell.textLabel?.text = Text_BluetoothPeripheralView.bluetoothPeripheralAlias
             cell.detailTextLabel?.text = aliasTemporaryValue
             if bluetoothPeripheralAsNSObject == nil {
                 cell.accessoryType = .none
@@ -503,7 +510,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             // it's a setting not defined here but in a BluetoothPeripheralViewModel
             // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
             if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let bluetoothPeripheral = bluetoothPeripheralAsNSObject {
-                bluetoothPeripheralViewModel.userDidSelectRow(withSettingRawValue: indexPath.row - Setting.allCases.count, rowOffset: Setting.allCases.count, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet)
+                bluetoothPeripheralViewModel.userDidSelectRow(withSettingRawValue: indexPath.row - Setting.allCases.count, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet)
             }
 
             return
@@ -527,12 +534,12 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
 
         case .alias:
             
-            // clicked cell to change userdefined name (alias) - need to ask for new name, and verify if there's already another M5Stack existing with the same name
+            // clicked cell to change alias - need to ask for new name, and verify if there's already another BluetoothPerpiheral existing with the same name
 
             // first off al check that BluetoothPeripheral already exists, otherwise makes no sense to change the name
             guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject else {return}
             
-            let alert = UIAlertController(title: Text_BluetoothPeripheralView.m5StackAlias, message: Text_BluetoothPeripheralView.selectAliasText, keyboardType: .default, text: aliasTemporaryValue, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
+            let alert = UIAlertController(title: Text_BluetoothPeripheralView.bluetoothPeripheralAlias, message: Text_BluetoothPeripheralView.selectAliasText, keyboardType: .default, text: aliasTemporaryValue, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
                 
                 let newalias = text.toNilIfLength0()
                 
@@ -546,7 +553,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                             if bluetoothPeripheral.getAlias() == text {
                                 
                                 // bluetoothperipheral userdefined name already exists
-                                let alreadyExistsAlert = UIAlertController(title: Texts_Common.warning, message: Text_BluetoothPeripheralView.userdefinedNameAlreadyExists, actionHandler: nil)
+                                let alreadyExistsAlert = UIAlertController(title: Texts_Common.warning, message: Text_BluetoothPeripheralView.aliasAlreadyExists, actionHandler: nil)
                                 
                                 // present the alert
                                 self.present(alreadyExistsAlert, animated: true, completion: nil)

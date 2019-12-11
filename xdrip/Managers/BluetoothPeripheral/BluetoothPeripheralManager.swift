@@ -515,7 +515,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         for buetoothPeripheral in bluetoothPeripherals {
             if buetoothPeripheral.getAddress() == deviceAddressNewTransmitter {
                 
-                trace("in didConnect, transmitter address already known, will disconnect", log: self.log, type: .info)
+                trace("in didConnect, transmitter address already known. This is not a new device, will disconnect", log: self.log, type: .info)
 
                 // it's an already known BluetoothTransmitter, not storing this, on the contrary disconnecting because maybe it's a bluetoothTransmitter already known for which user has preferred not to connect to
                 // If we're actually waiting for a new scan result, then there's an instance of BluetoothTransmitter stored in tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral - but this one stopped scanning, so let's recreate an instance of BluetoothTransmitter

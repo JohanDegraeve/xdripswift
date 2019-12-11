@@ -67,7 +67,7 @@ final class BluetoothPeripheralsViewController: UIViewController {
             
         case BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier:
             guard let vc = segue.destination as? BluetoothPeripheralViewController, let coreDataManager = coreDataManager else {
-                fatalError("In BluetoothPeripheralsViewController, prepare for segue, viewcontroller is not M5StackViewController or coreDataManager is nil" )
+                fatalError("In BluetoothPeripheralsViewController, prepare for segue, viewcontroller is not BluetoothPeripheralViewController or coreDataManager is nil" )
             }
             
             vc.configure(bluetoothPeripheral: sender as? BluetoothPeripheral, coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager, expectedBluetoothPeripheralType: .M5Stack)
@@ -150,7 +150,7 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         // the last row is the help info
         if indexPath.row == bluetoothPeripheralManager.getBluetoothPeripherals().count {
             
-            cell.textLabel?.text = Texts_BluetoothPeripheralsView.m5StackSoftWareHelpCellText
+            cell.textLabel?.text = Texts_M5StackView.m5StackSoftWareHelpCellText
             cell.detailTextLabel?.text = nil
             cell.accessoryType = .disclosureIndicator
             return cell
@@ -191,7 +191,7 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         // the last row is the help info
         if indexPath.row == bluetoothPeripheralManager.getBluetoothPeripherals().count {
 
-            let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralsView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5Stack, actionHandler: nil)
+            let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_M5StackView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5Stack, actionHandler: nil)
             
             self.present(alert, animated: true, completion: nil)
             
@@ -201,42 +201,6 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
 
         }
         
-    }
-    
-}
-
-// MARK: - extension M5StackBluetoothTransmitterDelegate
-
-extension BluetoothPeripheralsViewController: M5StackBluetoothTransmitterDelegate {
-
-    func isAskingForAllParameters(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-        // viewcontroller doesn't use this
-    }
-    
-    func isReadyToReceiveData(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-        // viewcontroller doesn't use this
-    }
-    
-    func newBlePassWord(newBlePassword: String, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-        
-        // blePassword is also saved in BluetoothPeripheralManager, possibly it will be saved two times but that's no issue
-        if let m5Stack = bluetoothPeripheralManager.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack {
-            m5Stack.blepassword = newBlePassword
-        }
-        
-    }
-    
-    func authentication(success: Bool, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-        // no further handling, means when this view is open, user won't see that authentication is failing
-    }
-    
-    func blePasswordMissing(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-       // no further handling, means when this view is open, user won't see that ble password is missing
-    }
-    
-    func m5StackResetRequired(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-        // no further handling, means when this view is open, user won't see that reset is required
-        debuglogging("in m5StackResetRequired ZZZZ")
     }
     
 }

@@ -74,8 +74,10 @@
 		F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */; };
 		F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */; };
 		F8691888239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8691887239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift */; };
+		F869188A23A043890065B607 /* BluetoothPeripheralsView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F869188923A043880065B607 /* BluetoothPeripheralsView.strings */; };
+		F869188C23A044340065B607 /* TextsM5StackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F869188B23A044340065B607 /* TextsM5StackView.swift */; };
+		F869189023A155100065B607 /* BluetoothPeripheralView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F869188F23A155100065B607 /* BluetoothPeripheralView.strings */; };
 		F889CB60236C3DCB00A81068 /* CGMBlueReaderTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F889CB5F236C3DCB00A81068 /* CGMBlueReaderTransmitter.swift */; };
-		F889CB61236D844600A81068 /* M5StacksView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F889CB63236D844600A81068 /* M5StacksView.strings */; };
 		F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F889CB71236D84AC00A81068 /* M5StackView.strings */; };
 		F889CB7F236D850600A81068 /* DexcomShareTestResults.strings in Resources */ = {isa = PBXBuildFile; fileRef = F889CB81236D850600A81068 /* DexcomShareTestResults.strings */; };
 		F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */; };
@@ -319,31 +321,11 @@
 		F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Calibration+CoreDataProperties.swift"; path = "xdrip/Core Data/extensions/Calibration+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		F8691887239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
+		F869188923A043880065B607 /* BluetoothPeripheralsView.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
+		F869188B23A044340065B607 /* TextsM5StackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsM5StackView.swift; sourceTree = "<group>"; };
+		F869188F23A155100065B607 /* BluetoothPeripheralView.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = BluetoothPeripheralView.strings; sourceTree = "<group>"; };
 		F889CB5F236C3DCB00A81068 /* CGMBlueReaderTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMBlueReaderTransmitter.swift; sourceTree = "<group>"; };
-		F889CB62236D844600A81068 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/M5StacksView.strings; sourceTree = "<group>"; };
-		F889CB64236D849200A81068 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/M5StacksView.strings; sourceTree = "<group>"; };
-		F889CB65236D849400A81068 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/M5StacksView.strings; sourceTree = "<group>"; };
-		F889CB66236D849500A81068 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/M5StacksView.strings; sourceTree = "<group>"; };
-		F889CB67236D849700A81068 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/M5StacksView.strings; sourceTree = "<group>"; };
-		F889CB68236D849800A81068 /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/M5StacksView.strings"; sourceTree = "<group>"; };
-		F889CB69236D849900A81068 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/M5StacksView.strings; sourceTree = "<group>"; };
-		F889CB6A236D849B00A81068 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/M5StacksView.strings"; sourceTree = "<group>"; };
-		F889CB6B236D849C00A81068 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/M5StacksView.strings; sourceTree = "<group>"; };
-		F889CB6C236D849D00A81068 /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/M5StacksView.strings; sourceTree = "<group>"; };
-		F889CB6D236D849E00A81068 /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/M5StacksView.strings"; sourceTree = "<group>"; };
-		F889CB6E236D849F00A81068 /* es-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-ES"; path = "es-ES.lproj/M5StacksView.strings"; sourceTree = "<group>"; };
 		F889CB70236D84AC00A81068 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/M5StackView.strings; sourceTree = "<group>"; };
-		F889CB72236D84B000A81068 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/M5StackView.strings; sourceTree = "<group>"; };
-		F889CB73236D84B100A81068 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/M5StackView.strings; sourceTree = "<group>"; };
-		F889CB74236D84B200A81068 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/M5StackView.strings; sourceTree = "<group>"; };
-		F889CB75236D84B300A81068 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/M5StackView.strings; sourceTree = "<group>"; };
-		F889CB76236D84B400A81068 /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/M5StackView.strings"; sourceTree = "<group>"; };
-		F889CB77236D84B500A81068 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/M5StackView.strings; sourceTree = "<group>"; };
-		F889CB78236D84B600A81068 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/M5StackView.strings; sourceTree = "<group>"; };
-		F889CB79236D84B800A81068 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/M5StackView.strings"; sourceTree = "<group>"; };
-		F889CB7A236D84B900A81068 /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/M5StackView.strings; sourceTree = "<group>"; };
-		F889CB7B236D84BA00A81068 /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/M5StackView.strings"; sourceTree = "<group>"; };
-		F889CB7C236D84BC00A81068 /* es-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-ES"; path = "es-ES.lproj/M5StackView.strings"; sourceTree = "<group>"; };
 		F889CB80236D850600A81068 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/DexcomShareTestResults.strings; sourceTree = "<group>"; };
 		F889CB82236D850C00A81068 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/DexcomShareTestResults.strings; sourceTree = "<group>"; };
 		F889CB83236D851000A81068 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/DexcomShareTestResults.strings; sourceTree = "<group>"; };
@@ -367,8 +349,6 @@
 		F889CB95236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/ErrorMessages.strings; sourceTree = "<group>"; };
 		F889CB96236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/HomeView.strings; sourceTree = "<group>"; };
 		F889CB97236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		F889CB98236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/M5StacksView.strings; sourceTree = "<group>"; };
-		F889CB99236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/M5StackView.strings; sourceTree = "<group>"; };
 		F889CB9A236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/NightScoutTestResult.strings; sourceTree = "<group>"; };
 		F889CB9B236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F889CB9C236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SpeakReading.strings; sourceTree = "<group>"; };
@@ -934,22 +914,23 @@
 		F85DC2F921D2CCC000B9F74A /* Storyboards */ = {
 			isa = PBXGroup;
 			children = (
-				F889CB81236D850600A81068 /* DexcomShareTestResults.strings */,
 				F8B3A7B3226A0A71004BA588 /* Alerts.strings */,
 				F8B3A80B227A3E97004BA588 /* AlertTypesSettingsView.strings */,
+				F869188923A043880065B607 /* BluetoothPeripheralsView.strings */,
 				F8B48AA222B2FA9A009BCC01 /* CalibrationRequest.strings */,
 				F8BDD444221C9D0D006EAB84 /* Common.strings */,
 				F8EEDD572300136F00D2D610 /* DexcomShareTestResult.strings */,
+				F889CB81236D850600A81068 /* DexcomShareTestResults.strings */,
 				F8BDD44A221C9D70006EAB84 /* ErrorMessages.strings */,
 				F8B48A9E22B2FA7B009BCC01 /* HomeView.strings */,
 				F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */,
 				F8BDD436221A0349006EAB84 /* Localizable.strings */,
-				F889CB63236D844600A81068 /* M5StacksView.strings */,
 				F889CB71236D84AC00A81068 /* M5StackView.strings */,
 				F8AC426321ADEBD60078C348 /* Main.storyboard */,
 				F8B3A788225D4473004BA588 /* NightScoutTestResult.strings */,
 				F8BDD457221DEF22006EAB84 /* SettingsViews.strings */,
 				F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */,
+				F869188F23A155100065B607 /* BluetoothPeripheralView.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -1388,6 +1369,7 @@
 				F8B3A782225D37F2004BA588 /* TextsNightScoutTestResult.swift */,
 				F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */,
 				F8B48A9322B2A705009BCC01 /* TextsSpeakReading.swift */,
+				F869188B23A044340065B607 /* TextsM5StackView.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -1571,6 +1553,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F869189023A155100065B607 /* BluetoothPeripheralView.strings in Resources */,
 				F8BDD442221C9D0D006EAB84 /* Common.strings in Resources */,
 				F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */,
 				F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */,
@@ -1592,13 +1575,13 @@
 				F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */,
 				F8B3A80D227A3E98004BA588 /* AlertTypesSettingsView.strings in Resources */,
 				F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */,
-				F889CB61236D844600A81068 /* M5StacksView.strings in Resources */,
 				F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */,
 				F8EEDD552300136F00D2D610 /* DexcomShareTestResult.strings in Resources */,
 				F8B3A7CF226CC0B7004BA588 /* shorthigh4.mp3 in Resources */,
 				F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 in Resources */,
 				F8B3A7CE226CC0B7004BA588 /* shorthigh2.mp3 in Resources */,
 				F889CB7F236D850600A81068 /* DexcomShareTestResults.strings in Resources */,
+				F869188A23A043890065B607 /* BluetoothPeripheralsView.strings in Resources */,
 				F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */,
 				F8B3A7CC226CC0B7004BA588 /* shorthigh1.mp3 in Resources */,
 				F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */,
@@ -1837,6 +1820,7 @@
 				F8297F52238ECA3200D74D66 /* BluetoothPeripheralViewController.swift in Sources */,
 				F821CF66229EE68B005C1E43 /* NightScoutFollowManager.swift in Sources */,
 				F8A54AF622D9156600934E7A /* CGMGNSEntryTransmitter.swift in Sources */,
+				F869188C23A044340065B607 /* TextsM5StackView.swift in Sources */,
 				F8A389E7232ECE7E0010F405 /* SettingsViewUtilities.swift in Sources */,
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				F8B3A820227DEC92004BA588 /* AlertTypesAccessor.swift in Sources */,
@@ -1878,42 +1862,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		F889CB63236D844600A81068 /* M5StacksView.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F889CB62236D844600A81068 /* en */,
-				F889CB64236D849200A81068 /* zh */,
-				F889CB65236D849400A81068 /* nl */,
-				F889CB66236D849500A81068 /* fr */,
-				F889CB67236D849700A81068 /* it */,
-				F889CB68236D849800A81068 /* pl-PL */,
-				F889CB69236D849900A81068 /* pt */,
-				F889CB6A236D849B00A81068 /* pt-BR */,
-				F889CB6B236D849C00A81068 /* ru */,
-				F889CB6C236D849D00A81068 /* sl */,
-				F889CB6D236D849E00A81068 /* es-MX */,
-				F889CB6E236D849F00A81068 /* es-ES */,
-				F889CB98236D89C800A81068 /* de */,
-			);
-			name = M5StacksView.strings;
-			sourceTree = "<group>";
-		};
 		F889CB71236D84AC00A81068 /* M5StackView.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				F889CB70236D84AC00A81068 /* en */,
-				F889CB72236D84B000A81068 /* zh */,
-				F889CB73236D84B100A81068 /* nl */,
-				F889CB74236D84B200A81068 /* it */,
-				F889CB75236D84B300A81068 /* fr */,
-				F889CB76236D84B400A81068 /* pl-PL */,
-				F889CB77236D84B500A81068 /* pt */,
-				F889CB78236D84B600A81068 /* ru */,
-				F889CB79236D84B800A81068 /* pt-BR */,
-				F889CB7A236D84B900A81068 /* sl */,
-				F889CB7B236D84BA00A81068 /* es-MX */,
-				F889CB7C236D84BC00A81068 /* es-ES */,
-				F889CB99236D89C800A81068 /* de */,
 			);
 			name = M5StackView.strings;
 			sourceTree = "<group>";

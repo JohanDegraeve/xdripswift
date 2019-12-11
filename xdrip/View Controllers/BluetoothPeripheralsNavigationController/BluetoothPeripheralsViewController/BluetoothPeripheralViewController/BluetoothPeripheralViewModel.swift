@@ -5,11 +5,13 @@ protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     
     /// to be called before opening the actual viewcontroller or after discovering a new bluetoothperipheral
     /// - parameters :
-    ///     - bluetoothPeripheral : the bluetoothPeripheral that will be shown
-    ///     - bluetoothPeripheralManager : reference to bluetoothPeripheralManager
-    ///     - tableView: reference to tableView
-    ///     - bluetoothPeripheralViewController : reference to bluetoothPeripheralViewController
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController)
+    ///    - bluetoothTransmitterDelegate : usually the uiViewController
+    ///    - bluetoothPeripheral : if nil then the viewcontroller is opened to scan for a new peripheral
+    ///    - bluetoothPeripheralManager : reference to bluetoothPeripheralManaging object
+    ///    - tableView : needed to intiate refresh of row
+    ///    - bluetoothPeripheralViewController : BluetoothPeripheralViewController
+    ///    - settingRowOffset :needs to be set to number of generic settings in BluetoothPeripheralViewController
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, settingRowOffset:Int, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate)
     
     /// screen title for uiviewcontroller
     func screenTitle() -> String
@@ -23,12 +25,15 @@ protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     func update(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral)
     
     /// user clicked a row, this function does the necessary
-    func userDidSelectRow(withSettingRawValue rawValue: Int, rowOffset: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem)
+    func userDidSelectRow(withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem)
     
     /// get number of settings in the viewmodel
     func numberOfSettings() -> Int
     
     /// used when new peripheral is discovered and connected, to temporary store values in model (eg in case of M5Stack, store the rotation value which would be a default value)
-    func storeTempValues(bluetoothPeripheral: BluetoothPeripheral)
+    func storeTempValues(from bluetoothPeripheral: BluetoothPeripheral)
+    
+    /// used when user clicks done button in uiviewcontroller
+    func writeTempValues(to bluetoothPeripheral: BluetoothPeripheral)
     
 }
