@@ -6,7 +6,7 @@ Current Status :
 
 - Supported transmitters :
     - G5
-    - MiaoMiao
+    - MiaoMiao 1 and 2, but only with Libre1
     - G4 with xBridge
     - Blucon
     - Bubble
