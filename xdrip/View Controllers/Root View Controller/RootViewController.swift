@@ -740,7 +740,9 @@ final class RootViewController: UIViewController {
                         // update labels
                         self.updateLabelsAndChart()
                         
-                        
+                        // bluetoothPeripherals (M5Stack, ..) should receive latest reading with calculated value
+                        self.bluetoothPeripheralManager?.sendLatestReading()
+
                     }
                 }
             }
