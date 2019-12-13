@@ -40,6 +40,18 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_follower", tableName: filename, bundle: Bundle.main, value: "Follower", comment: "general settings, literally follower")
     }()
     
+    static let labelShowReadingInNotification: String = {
+        return NSLocalizedString("showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Reading on home screen", comment: "general settings, should reading be shown in notification yes or no")
+    }()
+    
+    static let labelShowReadingInAppBadge: String = {
+        return NSLocalizedString("labelShowReadingInAppBadge", tableName: filename, bundle: Bundle.main, value: "Reading in app badge", comment: "general settings, should reading be shown in app badge yes or no")
+    }()
+    
+    static let multipleAppBadgeValueWith10: String = {
+        return NSLocalizedString("multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiple reading by 10", comment: "general settings, should reading be multiplied with 10 yes or no")
+    }()
+    
     // MARK: - Section Transmitter
     
     static let sectionTitleTransmitter: String = {

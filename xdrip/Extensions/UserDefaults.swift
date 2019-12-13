@@ -15,6 +15,12 @@ extension UserDefaults {
         case highMarkValue = "highMarkValue"
         /// master or follower
         case isMaster = "isMaster"
+        /// should notification be shown with reading yes or no
+        case showReadingInNotification = "showReadingInNotification"
+        /// should readings be shown in app badge yes or no
+        case showReadingInAppBadge = "showReadingInAppBadge"
+        /// should reading by multiplied by 10
+        case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
         
         // Transmitter
         
@@ -246,6 +252,39 @@ extension UserDefaults {
         }
     }
     
+    /// should notification be shown with reading yes or no
+    @objc dynamic var showReadingInNotification: Bool {
+        // default value for bool in userdefaults is false, as default we want readings to be shown
+        get {
+            return !bool(forKey: Key.showReadingInNotification.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showReadingInNotification.rawValue)
+        }
+    }
+
+    /// should reading be shown in app badge yes or no
+    @objc dynamic var showReadingInAppBadge: Bool {
+        // default value for bool in userdefaults is false, as default we want readings not to be shown in app badge
+        get {
+            return bool(forKey: Key.showReadingInAppBadge.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.showReadingInAppBadge.rawValue)
+        }
+    }
+    
+    /// should reading be multiplied by 10 or not
+    @objc dynamic var multipleAppBadgeValueWith10: Bool {
+        // default value for bool in userdefaults is false, as default we want readings not to be multiplied by 10
+        get {
+            return !bool(forKey: Key.multipleAppBadgeValueWith10.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.multipleAppBadgeValueWith10.rawValue)
+        }
+    }
+
     // MARK: Transmitter Settings
     
     /// setting a new transmittertype will also set the transmitterid to nil

@@ -50,3 +50,6 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth password";
 "m5stack_settingsviews_brightness" = "Brightness";
+"showReadingInNotification" = "Reading on home screen";
+"labelShowReadingInAppBadge" = "Reading in app badge";
+"multipleAppBadgeValueWith10" = "Multiple reading by 10";

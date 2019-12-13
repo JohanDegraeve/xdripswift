@@ -248,20 +248,29 @@ final class RootViewController: UIViewController {
         // Setup View
         setupView()
         
-        // when user changes transmitter type or transmitter id, then new transmitter needs to be setup. That's why observer for these settings is required
+        // observe setting changes
+        // when user changes transmitter type or transmitter id, theThat's why observer for these settings is required
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterTypeAsString.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterId.rawValue, options: .new, context: nil)
-        // changing from follower to master or vice versa also requires transmitter setup
+        // changing from follower to master or vice versa requires transmitter setup
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new
             , context: nil)
+        // need to prepare transmitter reset
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterResetRequired.rawValue, options: .new
             , context: nil)
+        // web oop
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPEnabled.rawValue, options: .new
             , context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPtoken.rawValue, options: .new
             , context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPsite.rawValue, options: .new
             , context: nil)
+        // bg reading notification and badge, and multiplication factor
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showReadingInNotification.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showReadingInAppBadge.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.multipleAppBadgeValueWith10.rawValue, options: .new, context: nil)
+        // also update of unit requires update of badge
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
 
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -469,7 +478,7 @@ final class RootViewController: UIViewController {
                     
                 } else {
                     // update notification
-                    createBgReadingNotification()
+                    createBgReadingNotificationAndSetAppBadge()
                     // update all text in  first screen
                     updateLabelsAndChart()
                 }
@@ -545,6 +554,17 @@ final class RootViewController: UIViewController {
                     
                 case UserDefaults.Key.webOOPtoken, UserDefaults.Key.webOOPsite:
                     cgmTransmitter?.setWebOOPSiteAndToken(oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
+                    
+                case UserDefaults.Key.showReadingInNotification:
+                    if !UserDefaults.standard.showReadingInNotification {
+                        // remove existing notification if any
+                        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest])
+
+                    }
+                    
+                case UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
+                    // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
+                    createBgReadingNotificationAndSetAppBadge()
                     
                 default:
                     break
@@ -867,8 +887,11 @@ final class RootViewController: UIViewController {
         
     }
     
-    /// creates bgreading notification
-    private func createBgReadingNotification() {
+    /// creates bgreading notification, and set app badge to value of reading
+    private func createBgReadingNotificationAndSetAppBadge() {
+        
+        // first of all remove the application badge number. Possibly this is an old reading
+        UIApplication.shared.applicationIconBadgeNumber = 0
         
         // bgReadingsAccessor should not be nil at all, but let's not create a fatal error for that, there's already enough checks for it
         guard  let bgReadingsAccessor = bgReadingsAccessor else {
@@ -894,31 +917,64 @@ final class RootViewController: UIViewController {
         // also remove the sensor not detected notification, if any
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected])
         
-        // Create Notification Content
-        let notificationContent = UNMutableNotificationContent()
         
-        // Configure NnotificationContent title, which is bg value in correct unit, add also slopeArrow if !hideSlope and finally the difference with previous reading, if there is one
-        var calculatedValueAsString = lastReading[0].unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-        if !lastReading[0].hideSlope {
-            calculatedValueAsString = calculatedValueAsString + " " + lastReading[0].slopeArrow()
-        }
-        if lastReading.count > 1 {
-            calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-        }
-        notificationContent.title = calculatedValueAsString
-        
-        // must set a body otherwise notification doesn't show up on iOS10
-        notificationContent.body = " "
-        
-        // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest, content: notificationContent, trigger: nil)
-        
-        // Add Request to User Notification Center
-        UNUserNotificationCenter.current().add(notificationRequest) { (error) in
-            if let error = error {
-                trace("Unable to Add bg reading Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
+        // check if notification on home screen is enabled in the settings
+        if UserDefaults.standard.showReadingInNotification  {
+            
+            // Create Notification Content
+            let notificationContent = UNMutableNotificationContent()
+            
+            // Configure notificationContent title, which is bg value in correct unit, add also slopeArrow if !hideSlope and finally the difference with previous reading, if there is one
+            var calculatedValueAsString = lastReading[0].unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            if !lastReading[0].hideSlope {
+                calculatedValueAsString = calculatedValueAsString + " " + lastReading[0].slopeArrow()
+            }
+            if lastReading.count > 1 {
+                calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            }
+            notificationContent.title = calculatedValueAsString
+            
+            // must set a body otherwise notification doesn't show up on iOS10
+            notificationContent.body = " "
+            
+            // Create Notification Request
+            let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest, content: notificationContent, trigger: nil)
+            
+            // Add Request to User Notification Center
+            UNUserNotificationCenter.current().add(notificationRequest) { (error) in
+                if let error = error {
+                    trace("Unable to Add bg reading Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
+                }
             }
         }
+        
+        // check if app badge should have reading value
+        if UserDefaults.standard.showReadingInAppBadge {
+            
+            var readingValue = lastReading[0].calculatedValue
+            
+            // values lower dan 12 are special values, don't show anything
+            guard readingValue > 12 else {return}
+            
+            // high limit to 400
+            if readingValue >= 400.0 {readingValue = 400.0}
+            
+            // low limit ti 40
+            if readingValue <= 40.0 {readingValue = 40.0}
+            
+            // rescale of unit is mmol
+            readingValue = readingValue.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            
+            // if unit is mmol and if value needs to be multiplied by 10, then multiply by 10
+            if !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.multipleAppBadgeValueWith10 {
+                readingValue = readingValue * 10.0
+            }
+            
+            UIApplication.shared.applicationIconBadgeNumber = Int(round(readingValue))
+            
+        }
+        
+
     }
     
     /// updates the labels and the chart,
@@ -1638,7 +1694,7 @@ extension RootViewController:NightScoutFollowerDelegate {
                 coreDataManager.saveChanges()
                 
                 // update notification
-                createBgReadingNotification()
+                createBgReadingNotificationAndSetAppBadge()
                 
                 // update all text in  first screen
                 updateLabelsAndChart()
