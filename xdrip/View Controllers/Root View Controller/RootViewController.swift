@@ -698,51 +698,49 @@ final class RootViewController: UIViewController {
         })
         
         alert.addAction(UIAlertAction(title: Texts_Common.Ok, style: .default, handler: { action in
-            if let activeSensor = self.activeSensor, let coreDataManager = self.coreDataManager, let bgReadingsAccessor = self.bgReadingsAccessor {
-                if let textField = alert.textFields {
-                    if let first = textField.first {
-                        if let value = first.text {
-                            
-                            let valueAsDouble = value.toDouble()!.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                            
-                            var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
-                            
-                            var latestCalibrations = calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
-                            
-                            if let calibrator = self.calibrator {
-                                if latestCalibrations.count == 0 {
-                                    // calling initialCalibration will create two calibrations, they are returned also but we don't need them
-                                    _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                                } else {
-                                    // it's not the first calibration
-                                    if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
-                                        // calling createNewCalibration will create a new  calibrations, it is returned but we don't need it
-                                        _ = calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                                    }
-                                }
-                                
-                                // this will store the newly created calibration(s) in coredata
-                                coreDataManager.saveChanges()
-                                
-                                // initiate upload to NightScout, if needed
-                                if let nightScoutUploadManager = self.nightScoutUploadManager {
-                                    nightScoutUploadManager.upload()
-                                }
-                                
-                                // initiate upload to Dexcom Share, if needed
-                                if let dexcomShareUploadManager = self.dexcomShareUploadManager {
-                                    dexcomShareUploadManager.upload()
-                                }
-                                
-                                // check alerts
-                                if let alertManager = self.alertManager {
-                                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
-                                }
-                                
-                                // update labels
-                                self.updateLabelsAndChart()
+            if let coreDataManager = self.coreDataManager, let bgReadingsAccessor = self.bgReadingsAccessor {
+                if let textField = alert.textFields, let first = textField.first, let value = first.text {
+                    
+                    let valueAsDouble = value.toDouble()!.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                    
+                    var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
+                    
+                    var latestCalibrations = calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
+                    
+                    if let calibrator = self.calibrator {
+                        if latestCalibrations.count == 0 {
+                            // calling initialCalibration will create two calibrations, they are returned also but we don't need them
+                            _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        } else {
+                            // it's not the first calibration
+                            if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
+                                // calling createNewCalibration will create a new  calibrations, it is returned but we don't need it
+                                _ = calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                             }
                         }
+                        
+                        // this will store the newly created calibration(s) in coredata
+                        coreDataManager.saveChanges()
+                        
+                        // initiate upload to NightScout, if needed
+                        if let nightScoutUploadManager = self.nightScoutUploadManager {
+                            nightScoutUploadManager.upload()
+                        }
+                        
+                        // initiate upload to Dexcom Share, if needed
+                        if let dexcomShareUploadManager = self.dexcomShareUploadManager {
+                            dexcomShareUploadManager.upload()
+                        }
+                        
+                        // check alerts
+                        if let alertManager = self.alertManager {
+                            alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
+                        }
+                        
+                        // update labels
+                        self.updateLabelsAndChart()
+                        
+                        
                     }
                 }
             }
