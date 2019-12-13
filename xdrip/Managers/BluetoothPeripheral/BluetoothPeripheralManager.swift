@@ -59,7 +59,6 @@ class BluetoothPeripheralManager: NSObject {
                 
                 // create an instance of M5StackBluetoothTransmitter, M5StackBluetoothTransmitter will automatically try to connect to the M5Stack with the address that is stored in m5Stack
                 // add it to the array of bluetoothTransmitters
-                
                 bluetoothTransmitters.append(M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: m5Stack.blepassword))
                 
             } else {
@@ -413,7 +412,14 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
                 case .M5Stack:
                     
                     if let m5Stack = bluetoothPeripheral as? M5Stack {
-                        newTransmitter = M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: UserDefaults.standard.m5StackBlePassword)
+                        
+                        // blePassword : first check if m5Stack has a blepassword configured. If not then user blepassword from userDefaults, which can also still be nil
+                        var blePassword = m5Stack.blepassword
+                        if blePassword == nil {
+                            blePassword = UserDefaults.standard.m5StackBlePassword
+                        }
+                        
+                        newTransmitter = M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: blePassword)
                     }
                     
                 }
