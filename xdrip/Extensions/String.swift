@@ -1,5 +1,5 @@
 import UIKit
-import CommonCrypto
+import CryptoSwift
 
 extension String {
     //https://stackoverflow.com/questions/39677330/how-does-string-substring-work-in-swift
@@ -68,13 +68,8 @@ extension String {
 
 extension String {
     func sha1() -> String {
-        let data = Data(self.utf8)
-        var digest = [UInt8](repeating: 0, count:Int(CC_SHA1_DIGEST_LENGTH))
-        data.withUnsafeBytes {
-            _ = CC_SHA1($0, CC_LONG(data.count), &digest)
-        }
-        let hexBytes = digest.map { String(format: "%02hhx", $0) }
-        return hexBytes.joined()
+        // sha1() here is a function in CryptoSwift Library
+        return Data(self.utf8).sha1().hexEncodedString()
     }
 }
 

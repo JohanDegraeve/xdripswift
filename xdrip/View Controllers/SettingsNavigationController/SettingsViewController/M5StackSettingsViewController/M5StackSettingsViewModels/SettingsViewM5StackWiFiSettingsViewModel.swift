@@ -145,9 +145,6 @@ struct SettingsViewM5StackWiFiSettingsViewModel: SettingsViewModelProtocol {
             text = UserDefaults.standard.m5StackWiFiPassword3
             actionHandler = {(password:String) in UserDefaults.standard.m5StackWiFiPassword3 = password.toNilIfLength0()}
             titlePart = Texts_Common.password
-        default:
-            // keep the default even if it gives a warning, just in case we add cases which are not processed here but which need processing
-            fatalError("createSettingsSelectedRowActionForWifiName, invalid wifiNumber")
         }
         
         return SettingsSelectedRowAction.askText(title: Texts_Common.WiFi + " " + titlePart + " " + wifiNumberAsInt!.description, message: nil, keyboardType: .default, text: text, placeHolder: "", actionTitle: nil, cancelTitle: nil, actionHandler: actionHandler!, cancelHandler: nil)
