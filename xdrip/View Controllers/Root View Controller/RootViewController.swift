@@ -86,14 +86,14 @@ final class RootViewController: UIViewController {
                 } else {
                     
                     // this should normally not happen because lastChartPointEarlierThanEndDate should normally always be set
-                    self.updateLabelsAndChart()
+                    self.updateLabelsAndChart(overrideApplicationState: false)
                     
                 }
 
             } else {
                 
                 // chart is not panned, update labels is necessary
-                self.updateLabelsAndChart()
+                self.updateLabelsAndChart(overrideApplicationState: false)
                 
             }
             
@@ -213,10 +213,11 @@ final class RootViewController: UIViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
+        
         super.viewWillAppear(animated)
         
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
-        updateLabelsAndChart()
+        updateLabelsAndChart(overrideApplicationState: true)
         
     }
     
@@ -232,16 +233,14 @@ final class RootViewController: UIViewController {
             
             self.setupApplicationData()
             
+            // glucoseChartManager still needs the reference to coreDataManager
+            self.glucoseChartManager.coreDataManager = self.coreDataManager
+
             // update label texts, minutes ago, diff and value
-            self.updateLabelsAndChart()
+            self.updateLabelsAndChart(overrideApplicationState: true)
             
             // create transmitter based on UserDefaults
             self.initializeCGMTransmitter()
-
-            // glucoseChartManager still needs the reference to coreDataManager
-            self.glucoseChartManager.coreDataManager = self.coreDataManager
-            // and now call again updateChart, as readings can be fetched now from coreData
-            self.updateChartWithResetEndDate()
 
         })
         
@@ -313,7 +312,7 @@ final class RootViewController: UIViewController {
         }
         
         // whenever app comes from-back to foreground, updateLabelsAndChart needs to be called
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {self.updateLabelsAndChart()})
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {self.updateLabelsAndChart(overrideApplicationState: true)})
         
         // setup AVAudioSession
         setupAVAudioSession()
@@ -480,7 +479,7 @@ final class RootViewController: UIViewController {
                     // update notification
                     createBgReadingNotificationAndSetAppBadge()
                     // update all text in  first screen
-                    updateLabelsAndChart()
+                    updateLabelsAndChart(overrideApplicationState: false)
                 }
                 
                 nightScoutUploadManager?.upload()
@@ -738,7 +737,7 @@ final class RootViewController: UIViewController {
                         }
                         
                         // update labels
-                        self.updateLabelsAndChart()
+                        self.updateLabelsAndChart(overrideApplicationState: false)
                         
                         // bluetoothPeripherals (M5Stack, ..) should receive latest reading with calculated value
                         self.bluetoothPeripheralManager?.sendLatestReading()
@@ -977,17 +976,23 @@ final class RootViewController: UIViewController {
 
     }
     
-    /// updates the labels and the chart,
-    @objc private func updateLabelsAndChart() {
-        
+    /// - updates the labels and the chart,
+    /// - but only if the chart is not panned backward
+    /// - and if app is in foreground
+    /// - and if overrideApplicationState = false
+    /// - parameters:
+    ///     - overrideApplicationState : if true, then update will be done even if state is not .active
+    @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false) {
+
+        // check that app is in foreground, but only if overrideApplicationState = false
+        guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
+
         // check if chart is currently panned back in time, in that case we don't update the labels
-        if glucoseChartManager.chartIsPannedBackward {
-            return
-        }
+        guard !glucoseChartManager.chartIsPannedBackward else {return}
 
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
-        
+
         // set minutesLabelOutlet.textColor to black, might still be red due to panning back in time
         self.minutesLabelOutlet.textColor = UIColor.black
         
@@ -1697,7 +1702,7 @@ extension RootViewController:NightScoutFollowerDelegate {
                 createBgReadingNotificationAndSetAppBadge()
                 
                 // update all text in  first screen
-                updateLabelsAndChart()
+                updateLabelsAndChart(overrideApplicationState: false)
                 
                 // check alerts
                 if let alertManager = alertManager {
