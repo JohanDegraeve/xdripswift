@@ -244,6 +244,8 @@
 		F8F9723523A5915900C3F17D /* BluetoothTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F9720123A5915900C3F17D /* BluetoothTransmitter.swift */; };
 		F8F9723923A5928D00C3F17D /* M5StackBluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F9723823A5928D00C3F17D /* M5StackBluetoothPeripheralViewModel.swift */; };
 		F8F9723E23A593C000C3F17D /* M5StickCBluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F9723D23A593C000C3F17D /* M5StickCBluetoothPeripheralViewModel.swift */; };
+		F8F9724723A69A8000C3F17D /* BluetoothPeripheralCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F9724623A69A8000C3F17D /* BluetoothPeripheralCategory.swift */; };
+		F8F9724923A69DAE00C3F17D /* M5StickC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F9724823A69DAE00C3F17D /* M5StickC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -647,6 +649,9 @@
 		F8F9720123A5915900C3F17D /* BluetoothTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothTransmitter.swift; sourceTree = "<group>"; };
 		F8F9723823A5928D00C3F17D /* M5StackBluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = M5StackBluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
 		F8F9723D23A593C000C3F17D /* M5StickCBluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = M5StickCBluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
+		F8F9724523A699CE00C3F17D /* xdrip v7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v7.xcdatamodel"; sourceTree = "<group>"; };
+		F8F9724623A69A8000C3F17D /* BluetoothPeripheralCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralCategory.swift; sourceTree = "<group>"; };
+		F8F9724823A69DAE00C3F17D /* M5StickC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StickC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1304,6 +1309,7 @@
 		F8F971B223A5914C00C3F17D /* M5StickC */ = {
 			isa = PBXGroup;
 			children = (
+				F8F9724823A69DAE00C3F17D /* M5StickC.swift */,
 			);
 			path = M5StickC;
 			sourceTree = "<group>";
@@ -1313,6 +1319,7 @@
 			children = (
 				F8F971B423A5914C00C3F17D /* BluetoothPeripheralType.swift */,
 				F8F971B523A5914C00C3F17D /* BluetoothPeripheral.swift */,
+				F8F9724623A69A8000C3F17D /* BluetoothPeripheralCategory.swift */,
 			);
 			path = Generic;
 			sourceTree = "<group>";
@@ -1765,6 +1772,7 @@
 				F8F9722623A5915900C3F17D /* BluconTransmitterOpCode.swift in Sources */,
 				F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */,
 				F8F9723423A5915900C3F17D /* BluetoothTransmitterDelegate.swift in Sources */,
+				F8F9724923A69DAE00C3F17D /* M5StickC.swift in Sources */,
 				F8B3A853227F2743004BA588 /* AlertsSettingsViewController.swift in Sources */,
 				F8B3A849227F090E004BA588 /* SettingsViewSpeakSettingsViewModel.swift in Sources */,
 				F8BDD43F221B5BAF006EAB84 /* TextsErrorMessages.swift in Sources */,
@@ -1892,6 +1900,7 @@
 				F8B3A834227F08AC004BA588 /* PickerViewData.swift in Sources */,
 				F808592D23677D6A00F3829D /* ChartPoint.swift in Sources */,
 				F8F9722823A5915900C3F17D /* BluconUtilities.swift in Sources */,
+				F8F9724723A69A8000C3F17D /* BluetoothPeripheralCategory.swift in Sources */,
 				F8B3A79522635A25004BA588 /* AlertType+CoreDataProperties.swift in Sources */,
 				F8B3A84C227F090E004BA588 /* SettingsViewController.swift in Sources */,
 				F8EEDD5222FECE3800D2D610 /* ConstantsLibreOOP.swift in Sources */,
@@ -2357,7 +2366,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -2385,7 +2394,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.iosxdripreader;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.beatit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -2421,6 +2430,7 @@
 		F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				F8F9724523A699CE00C3F17D /* xdrip v7.xcdatamodel */,
 				F8EBB030239701DA0058B0D4 /* xdrip v6.xcdatamodel */,
 				F8297F41238C3A6400D74D66 /* xdrip v5.xcdatamodel */,
 				F889CB9D236D8EEC00A81068 /* xdrip v4.xcdatamodel */,
@@ -2428,7 +2438,7 @@
 				F85C4A93233632EC00D6A86F /* xdrip v2.xcdatamodel */,
 				F8AC42A021B31F160078C348 /* xdrip.xcdatamodel */,
 			);
-			currentVersion = F8EBB030239701DA0058B0D4 /* xdrip v6.xcdatamodel */;
+			currentVersion = F8F9724523A699CE00C3F17D /* xdrip v7.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

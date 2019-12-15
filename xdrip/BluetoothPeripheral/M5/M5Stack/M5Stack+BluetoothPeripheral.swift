@@ -21,7 +21,7 @@ extension M5Stack: BluetoothPeripheral {
     
     // get the type of BluetoothPeripheral: "M5Strack", ...
     func bluetoothPeripheralType() -> BluetoothPeripheralType {
-        return .M5Stack
+        return .M5StackType
     }
     
     func dontTryToConnectToThisBluetoothPeripheral() {

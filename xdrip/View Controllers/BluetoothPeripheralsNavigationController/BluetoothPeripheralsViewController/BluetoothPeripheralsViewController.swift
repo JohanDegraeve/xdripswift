@@ -66,11 +66,20 @@ final class BluetoothPeripheralsViewController: UIViewController {
         switch segueIdentifierAsCase {
             
         case BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier:
+            
             guard let vc = segue.destination as? BluetoothPeripheralViewController, let coreDataManager = coreDataManager else {
+
                 fatalError("In BluetoothPeripheralsViewController, prepare for segue, viewcontroller is not BluetoothPeripheralViewController or coreDataManager is nil" )
+
             }
             
-            vc.configure(bluetoothPeripheral: sender as? BluetoothPeripheral, coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager, expectedBluetoothPeripheralType: .M5Stack)
+            guard let expectedBluetoothPeripheralType = (sender as? BluetoothPeripheral) != nil ? (sender as! BluetoothPeripheral).bluetoothPeripheralType() : (sender as? BluetoothPeripheralType) != nil ? (sender as! BluetoothPeripheralType):nil  else {
+
+                fatalError("In BluetoothPeripheralsViewController, prepare for segue, sender is not BluetoothPeripheral and not BluetoothPeripheralType" )
+
+            }
+            
+            vc.configure(bluetoothPeripheral: sender as? BluetoothPeripheral, coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager, expectedBluetoothPeripheralType: expectedBluetoothPeripheralType)
             
         }
     }
@@ -82,16 +91,37 @@ final class BluetoothPeripheralsViewController: UIViewController {
     /// user clicked add button
     private func addButtonAction() {
         
-        /// go to screen to add a new BluetoothPeripheral
-        self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier.rawValue, sender: nil)
+        // first user needs to select category of bluetoothperipheral
+        
+        // configure PickerViewData to select category
+        let pickerViewData = PickerViewData (withMainTitle: nil, withSubTitle: Texts_BluetoothPeripheralsView.selectCategory, withData: BluetoothPeripheralCategory.listOfCategories(), selectedRow: nil, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ categoryIndex: Int) in
+                
+            // user select category, now user needs to select type of bluetoothperipheral
+            let pickerViewData = PickerViewData (withMainTitle: nil, withSubTitle: Texts_BluetoothPeripheralsView.selectType, withData: BluetoothPeripheralCategory.listOfBluetoothPeripheralTypes(withCategory: BluetoothPeripheralCategory.listOfCategories()[categoryIndex]), selectedRow: nil, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ typeIndex: Int) in
+                
+                // go to screen to add a new BluetoothPeripheral
+                // in the sender we add the selected bluetoothperipheraltype
+                let type = BluetoothPeripheralType(rawValue: BluetoothPeripheralCategory.listOfBluetoothPeripheralTypes(withCategory: BluetoothPeripheralCategory.listOfCategories()[categoryIndex])[typeIndex])
+                
+                self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier.rawValue, sender: type)
+                
+            }, onCancelClick: nil, didSelectRowHandler: nil)
+            
+            // create and present PickerViewController
+                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+            
+        }, onCancelClick: nil, didSelectRowHandler: nil)
 
+        // create and present PickerViewController
+            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+        
     }
     
     private func setupView() {
         setupTableView()
     }
     
-    /// setup datasource, delegate, seperatorInset
+    // setup datasource, delegate, seperatorInset
     private func setupTableView() {
         if let tableView = tableView {
             tableView.separatorInset = UIEdgeInsets.zero

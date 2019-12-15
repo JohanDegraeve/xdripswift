@@ -10,9 +10,9 @@ import CoreData
 /// - blePassword : optional, if this value is set, then it means this M5Stack does have an internally stored password created during M5Stack launch. If it is not set, then the password in the userdefaults will be used. If that is also nil, then the xdrip app can not authenticate towards the M5Stack
 /// - textColor : color to use, see M5StackColor
 /// - backGroundColor : color to use, see M5StackColor
-/// - m5StackName : optional. A reference to a user defined name
+/// - alias : optional. Name defined by user, to easier recognize the peripheral
 /// - rotation : screen rotation to apply, between 0 and 360
-/// - brightness : value between 0 and 100
+/// - brightness : value between 0 and 100 (doesn't work for M5Stick)
 public class M5Stack: NSManagedObject {
 
     /// explanation, see function parameterUpdateNotNeededAtNextConnect in protocol BluetoothPeripheral
@@ -35,6 +35,9 @@ public class M5Stack: NSManagedObject {
         self.rotation = Int32(rotation)
         self.brightness = Int16(brightness)
         self.alias = alias
+        
+        // this is creation of an M5Stack, not M5Stick, set isM5StickC to false
+        self.isM5StickC = false
         
     }
     

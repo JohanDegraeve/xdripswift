@@ -146,36 +146,30 @@ final class PickerViewController : UIViewController {
     ///     - parentController : the parentController to which the pickerviewcontroller will be added
     public static func displayPickerViewController(pickerViewData:PickerViewData, parentController:UIViewController) {
         
-        // check if there's already another uiviewcontroller being presented, if so just call the cancelhandler
-        if parentController.presentedViewController == nil {
-            
-            let pickerViewController = UIStoryboard.main.instantiateViewController(withIdentifier: "PickerViewController") as! PickerViewController
-            pickerViewController.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
-            
-            //configure pickerViewController
-            pickerViewController.mainTitle = pickerViewData.mainTitle != nil ? pickerViewData.mainTitle:""
-            pickerViewController.subTitle = pickerViewData.subTitle != nil ? pickerViewData.subTitle:""
-            pickerViewController.dataSource = pickerViewData.data
-            pickerViewController.selectedRow = pickerViewData.selectedRow
-            pickerViewController.addButtonTitle = pickerViewData.actionTitle
-            pickerViewController.cancelButtonTitle = pickerViewData.cancelTitle
-            pickerViewController.priority = pickerViewData.priority
-            pickerViewController.addHandler = {(_ index: Int) in
-                pickerViewData.actionHandler(index)
-                pickerViewController.dismiss(animated: true, completion: nil)
-            }
-            pickerViewController.cancelHandler = {
-                if let cancelHandler = pickerViewData.cancelHandler { cancelHandler() }
-                pickerViewController.dismiss(animated: true, completion: nil)
-            }
-            pickerViewController.didSelectRowHandler = pickerViewData.didSelectRowHandler
-            
-            // present it
-            parentController.present(pickerViewController, animated: true)
-        } else {
+        let pickerViewController = UIStoryboard.main.instantiateViewController(withIdentifier: "PickerViewController") as! PickerViewController
+        pickerViewController.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+        
+        //configure pickerViewController
+        pickerViewController.mainTitle = pickerViewData.mainTitle != nil ? pickerViewData.mainTitle:""
+        pickerViewController.subTitle = pickerViewData.subTitle != nil ? pickerViewData.subTitle:""
+        pickerViewController.dataSource = pickerViewData.data
+        pickerViewController.selectedRow = pickerViewData.selectedRow
+        pickerViewController.addButtonTitle = pickerViewData.actionTitle
+        pickerViewController.cancelButtonTitle = pickerViewData.cancelTitle
+        pickerViewController.priority = pickerViewData.priority
+        pickerViewController.addHandler = {(_ index: Int) in
+            pickerViewController.dismiss(animated: true, completion: nil)
+            pickerViewData.actionHandler(index)
+        }
+        pickerViewController.cancelHandler = {
+            pickerViewController.dismiss(animated: true, completion: nil)
             if let cancelHandler = pickerViewData.cancelHandler { cancelHandler() }
         }
+        pickerViewController.didSelectRowHandler = pickerViewData.didSelectRowHandler
         
+        // present it
+        parentController.present(pickerViewController, animated: true)
+
     }
 
 

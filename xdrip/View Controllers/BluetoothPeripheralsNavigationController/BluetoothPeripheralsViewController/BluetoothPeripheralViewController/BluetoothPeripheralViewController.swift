@@ -122,7 +122,7 @@ class BluetoothPeripheralViewController: UIViewController {
         super.viewDidLoad()
         
         // here the tableView is not nil, we can safely call bluetoothPeripheralViewModel.configure, this one requires a non-nil tableView
-        bluetoothPeripheralViewModel = expectedBluetoothPeripheralType.getViewModel()
+        bluetoothPeripheralViewModel = expectedBluetoothPeripheralType.viewModel()
         bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheralAsNSObject, bluetoothPeripheralManager: self.bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self, settingRowOffset: Setting.allCases.count, bluetoothTransmitterDelegate: self)
         
         // still need to assign the delegate in the transmitter object

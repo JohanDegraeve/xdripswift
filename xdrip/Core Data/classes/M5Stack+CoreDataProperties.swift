@@ -2,7 +2,7 @@
 //  M5Stack+CoreDataProperties.swift
 //  
 //
-//  Created by Johan Degraeve on 03/12/2019.
+//  Created by Johan Degraeve on 15/12/2019.
 //
 //
 
@@ -17,6 +17,7 @@ extension M5Stack {
     }
 
     @NSManaged public var address: String
+    @NSManaged public var alias: String?
     @NSManaged public var backGroundColor: Int32
     @NSManaged public var blepassword: String?
     @NSManaged public var brightness: Int16
@@ -24,6 +25,6 @@ extension M5Stack {
     @NSManaged public var rotation: Int32
     @NSManaged public var shouldconnect: Bool
     @NSManaged public var textcolor: Int32
-    @NSManaged public var alias: String?
+    @NSManaged public var isM5StickC: Bool
 
 }
