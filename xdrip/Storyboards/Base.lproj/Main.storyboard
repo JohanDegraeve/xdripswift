@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
     <device id="retina4_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15404"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -357,7 +357,7 @@
         <scene sceneID="H1e-vw-iaX">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="FwD-2z-GTm" userLabel="Bluetooth Peripheral Navigation Controller" customClass="BluetoothPeripheralNavigationController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="" image="M5Stack" selectedImage="M5Stack" id="sgT-p5-hUt">
+                    <tabBarItem key="tabBarItem" title="" image="Bluetooth" selectedImage="Bluetooth" id="sgT-p5-hUt">
                         <color key="badgeColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBarItem>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="mye-hD-w2u">
@@ -1003,8 +1003,8 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Bluetooth" width="48" height="48"/>
         <image name="Home" width="48" height="48"/>
-        <image name="M5Stack" width="48" height="48"/>
         <image name="Settings" width="48" height="48"/>
     </resources>
 </document>

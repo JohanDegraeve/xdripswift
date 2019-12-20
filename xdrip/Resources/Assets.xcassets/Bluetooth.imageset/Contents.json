@@ -2,17 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "M5_48x48.png",
+      "filename" : "bluetooth_48x48.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "M5_96x96.png",
+      "filename" : "bluetooth_96x96.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "M5_144x144.png",
+      "filename" : "bluetooth_144x144.png",
       "scale" : "3x"
     }
   ],
