@@ -221,6 +221,13 @@ final class RootViewController: UIViewController {
         
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        
+        // remove titles from tabbar items
+        self.tabBarController?.cleanTitles()
+        
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -576,6 +583,9 @@ final class RootViewController: UIViewController {
     
     /// Configure View, only stuff that is independent of coredata
     private func setupView() {
+        
+        // remove titles from tabbar items
+        self.tabBarController?.cleanTitles()
         
         // set texts for buttons on top
         calibrateButtonOutlet.setTitle(Texts_HomeView.calibrationButton, for: .normal)
@@ -1559,7 +1569,7 @@ extension RootViewController: UITabBarControllerDelegate {
         } else if let navigationController = viewController as? BluetoothPeripheralNavigationController, let bluetoothPeripheralManager = bluetoothPeripheralManager, let coreDataManager = coreDataManager {
 
             navigationController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
-            
+           
         }
     }
     
