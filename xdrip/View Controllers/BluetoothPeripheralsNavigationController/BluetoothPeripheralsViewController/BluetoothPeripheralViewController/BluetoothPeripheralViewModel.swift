@@ -10,8 +10,7 @@ protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     ///    - bluetoothPeripheralManager : reference to bluetoothPeripheralManaging object
     ///    - tableView : needed to intiate refresh of row
     ///    - bluetoothPeripheralViewController : BluetoothPeripheralViewController
-    ///    - settingRowOffset :needs to be set to number of generic settings in BluetoothPeripheralViewController
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, settingRowOffset:Int, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate)
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate)
     
     /// screen title for uiviewcontroller
     func screenTitle() -> String

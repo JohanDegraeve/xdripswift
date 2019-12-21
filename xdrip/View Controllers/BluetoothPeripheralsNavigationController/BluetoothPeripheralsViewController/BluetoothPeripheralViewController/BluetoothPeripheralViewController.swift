@@ -135,7 +135,7 @@ class BluetoothPeripheralViewController: UIViewController {
         bluetoothPeripheralViewModel = expectedBluetoothPeripheralType?.viewModel()
 
         // configure the bluetoothPeripheralViewModel
-        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheralAsNSObject, bluetoothPeripheralManager: self.bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self, settingRowOffset: Setting.allCases.count, bluetoothTransmitterDelegate: self)
+        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheralAsNSObject, bluetoothPeripheralManager: self.bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self, bluetoothTransmitterDelegate: self)
         
         // still need to assign the delegate in the transmitter object
         if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
@@ -440,10 +440,25 @@ class BluetoothPeripheralViewController: UIViewController {
 
 extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewDelegate {
     
+    func numberOfSections(in tableView: UITableView) -> Int {
+        // one general section with settings applicable for all peripheral types, one specific section with settings specific to type of bluetooth peripheral
+        if bluetoothPeripheralAsNSObject == nil {
+            return 1
+        } else {
+            return 2
+        }
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        // if bluetoothPeripheralAsNSObject is still nil, then only the basic, generic settings will be shown
-        return Setting.allCases.count + (bluetoothPeripheralAsNSObject == nil ? 0: (bluetoothPeripheralViewModel?.numberOfSettings() ?? 0))
+        if section == 0 {
+            return Setting.allCases.count
+        } else if section == 1 {
+            // normally if bluetoothPeripheralViewModel would be nil, then there wouldn't be a second section, so normall bluetoothPeripheralViewModel is not nil here
+            return bluetoothPeripheralViewModel?.numberOfSettings() ?? 0
+        }
+        
+        return 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -451,13 +466,13 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("BluetoothPeripheralViewController cellforrowat, Unexpected Table View Cell ") }
         
         // check if it's a Setting defined here in BluetoothPeripheralViewController, or a setting specific to the type of BluetoothPeripheral
-        if indexPath.row >= Setting.allCases.count {
+        if indexPath.section == 1 {
             
             // it's a setting not defined here but in a BluetoothPeripheralViewModel
             // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
             if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let bluetoothPeripheral = bluetoothPeripheralAsNSObject {
 
-                bluetoothPeripheralViewModel.update(cell: cell, withSettingRawValue: indexPath.row - Setting.allCases.count, for: bluetoothPeripheral)
+                bluetoothPeripheralViewModel.update(cell: cell, withSettingRawValue: indexPath.row, for: bluetoothPeripheral)
                 
             }
             
@@ -512,13 +527,13 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         tableView.deselectRow(at: indexPath, animated: true)
         
         // check if it's one of the common settings or one of the peripheral type specific settings
-        if indexPath.row >= Setting.allCases.count {
+        if indexPath.section == 1 {
           
             // it's a setting not defined here but in a BluetoothPeripheralViewModel
             // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
             if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let bluetoothPeripheral = bluetoothPeripheralAsNSObject {
 
-                bluetoothPeripheralViewModel.userDidSelectRow(withSettingRawValue: indexPath.row - Setting.allCases.count, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet)
+                bluetoothPeripheralViewModel.userDidSelectRow(withSettingRawValue: indexPath.row, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet)
                 
             }
 
@@ -591,6 +606,21 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         }
     }
 
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        
+        
+        if section == 0 {
+            // title for general section
+            return Texts_SettingsView.sectionTitleGeneral
+        } else if section == 1 {
+            // title for bluetoothperipheral type section
+            return bluetoothPeripheralViewModel.screenTitle()
+        }
+        
+        // should never be here
+        return ""
+        
+    }
 }
 
 // MARK: - extension BluetoothTransmitterDelegate

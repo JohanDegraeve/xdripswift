@@ -69,9 +69,6 @@ class M5StackBluetoothPeripheralViewModel {
     
     private weak var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
     
-    /// this is actually the number of setting rows defined in BluetoothPeripheralViewController
-    private var settingRowOffset: Int!
-
     // MARK: - public functions
     
     /// get screenTitle
@@ -131,7 +128,7 @@ class M5StackBluetoothPeripheralViewModel {
                     }
                     
                     // reload table
-                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.textColor.rawValue + self.settingRowOffset, section: 0)], with: .none)
+                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.textColor.rawValue, section: 1)], with: .none)
                     
                     // enable the done button
                     doneButtonOutlet.enable()
@@ -180,7 +177,7 @@ class M5StackBluetoothPeripheralViewModel {
                     }
                     
                     // reload table
-                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.backGroundColor.rawValue + self.settingRowOffset, section: 0)], with: .none)
+                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.backGroundColor.rawValue, section: 1)], with: .none)
                     
                     // enable the done button
                     doneButtonOutlet.enable()
@@ -221,7 +218,7 @@ class M5StackBluetoothPeripheralViewModel {
                     }
                     
                     // reload table
-                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.rotation.rawValue + self.settingRowOffset, section: 0)], with: .none)
+                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.rotation.rawValue, section: 1)], with: .none)
                     
                     // enable the done button
                     doneButtonOutlet.enable()
@@ -265,7 +262,7 @@ class M5StackBluetoothPeripheralViewModel {
                     }
                     
                     // reload table
-                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.brightness.rawValue + self.settingRowOffset, section: 0)], with: .none)
+                    self.tableView?.reloadRows(at: [IndexPath(row: Setting.brightness.rawValue, section: 1)], with: .none)
                     
                     // enable the done button
                     doneButtonOutlet.enable()
@@ -405,7 +402,7 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
             
             m5StackPeripheral.blepassword = newBlePassword
             
-            tableView?.reloadRows(at: [IndexPath(row: Setting.blePassword.rawValue + settingRowOffset, section: 0)], with: .none)
+            tableView?.reloadRows(at: [IndexPath(row: Setting.blePassword.rawValue, section: 1)], with: .none)
             
         }
         
@@ -560,16 +557,13 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     ///    - bluetoothPeripheralManager : reference to bluetoothPeripheralManaging object
     ///    - tableView : needed to intiate refresh of row
     ///    - bluetoothPeripheralViewController : BluetoothPeripheralViewController
-    ///    - settingRowOffset :needs to be set to number of generic settings in BluetoothPeripheralViewController
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, settingRowOffset:Int, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         
         self.tableView = tableView
         
         self.bluetoothPeripheralViewController = bluetoothPeripheralViewController
-        
-        self.settingRowOffset = settingRowOffset
         
         self.bluetoothTransmitterDelegate = bluetoothTransmitterDelegate
         
