@@ -9,6 +9,9 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     
     // MARK: - public properties
     
+    /// M5StackBluetoothTransmitter can be used for bluetoothPeripheralType's M5Stack or M5StickC. We need to store the type for which it is being used
+    public let bluetoothPeripheralType: BluetoothPeripheralType
+
     // MARK: - private properties
     
     /// service to be discovered
@@ -39,7 +42,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - delegate : the M5StackBluetoothTransmitterDelegate
     ///     - blePassword : optional. If nil then xdrip will send a M5StackReadBlePassWordTxMessage to the M5Stack, so this would be a case where the M5Stack (all M5Stacks managed by xdrip) do not have a fixed blepassword
-    init(address:String?, name: String?, delegate: M5StackBluetoothTransmitterDelegate, blePassword: String?) {
+    ///     - bluetoothPeripheralType : M5Stack or M5StickC
+    init(address:String?, name: String?, delegate: M5StackBluetoothTransmitterDelegate, blePassword: String?, bluetoothPeripheralType: BluetoothPeripheralType) {
         
         // assign addressname and name, assume it's not been connected before
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "M5Stack")
@@ -51,6 +55,9 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         
         // assign blePassword
         self.blePassword = blePassword
+        
+        // assign bluetoothPeripheralType
+        self.bluetoothPeripheralType = bluetoothPeripheralType
         
         // call super
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service)], CBUUID_ReceiveCharacteristic: CBUUID_TxRxCharacteristic, CBUUID_WriteCharacteristic: CBUUID_TxRxCharacteristic, startScanningAfterInit: false, bluetoothTransmitterDelegate: delegate)

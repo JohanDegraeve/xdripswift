@@ -41,7 +41,15 @@ class BluetoothPeripheralViewController: UIViewController {
 
     /// action for scan Button, to scan for BluetoothPeripheral
     @IBAction func scanButtonAction(_ sender: UIButton) {
-        self.scanForBluetoothPeripheral(type: expectedBluetoothPeripheralType)
+        
+        if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType {
+            
+            self.scanForBluetoothPeripheral(type: expectedBluetoothPeripheralType)
+            
+        } else {
+            fatalError("in scanButtonAction, expectedBluetoothPeripheralType is nil")
+        }
+        
     }
 
     /// action for cancelbutton
@@ -91,7 +99,7 @@ class BluetoothPeripheralViewController: UIViewController {
     /// needed to support the bluetooth peripheral type specific attributes
     private var bluetoothPeripheralViewModel: BluetoothPeripheralViewModel!
     
-    private var expectedBluetoothPeripheralType: BluetoothPeripheralType!
+    private var expectedBluetoothPeripheralType: BluetoothPeripheralType?
 
     // MARK:- public functions
     
@@ -122,7 +130,11 @@ class BluetoothPeripheralViewController: UIViewController {
         super.viewDidLoad()
         
         // here the tableView is not nil, we can safely call bluetoothPeripheralViewModel.configure, this one requires a non-nil tableView
-        bluetoothPeripheralViewModel = expectedBluetoothPeripheralType.viewModel()
+        
+        // get a viewModel instance for the expectedBluetoothPeripheralType
+        bluetoothPeripheralViewModel = expectedBluetoothPeripheralType?.viewModel()
+
+        // configure the bluetoothPeripheralViewModel
         bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheralAsNSObject, bluetoothPeripheralManager: self.bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self, settingRowOffset: Setting.allCases.count, bluetoothTransmitterDelegate: self)
         
         // still need to assign the delegate in the transmitter object
@@ -241,15 +253,10 @@ class BluetoothPeripheralViewController: UIViewController {
     }
     
     /// user clicks scan button
-    /// - parameter :
-    ///     - type is optional here because it's called from within IBAction scanButtonAction
-    private func scanForBluetoothPeripheral(type: BluetoothPeripheralType?) {
+    private func scanForBluetoothPeripheral(type: BluetoothPeripheralType) {
         
         // if bluetoothPeripheralASNSObject is not nil, then there's already a BluetoothPeripheral for which scanning has started or which is already known from a previous scan (either connected or not connected) (bluetoothPeripheralASNSObject should be nil because if it is not, the scanbutton should not even be enabled, anyway let's check).
         guard bluetoothPeripheralAsNSObject == nil else {return}
-        
-        // should never be called with type == nil
-        guard let type = type else {return}
         
         bluetoothPeripheralManager.startScanningForNewDevice(type: type, callback: { (bluetoothPeripheral) in
             
@@ -300,9 +307,9 @@ class BluetoothPeripheralViewController: UIViewController {
         guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject else {return}
 
         // textToAdd is either 'address' + the address, or 'alias' + the alias, depending if alias has a value
-        var textToAdd = Text_BluetoothPeripheralView.address + bluetoothPeripheralASNSObject.getAddress()
+        var textToAdd = Text_BluetoothPeripheralView.address + " " + bluetoothPeripheralASNSObject.getAddress()
         if let alias = aliasTemporaryValue {
-            textToAdd = Text_BluetoothPeripheralView.bluetoothPeripheralAlias + alias
+            textToAdd = Text_BluetoothPeripheralView.bluetoothPeripheralAlias + " " + alias
         }
         
         // first ask user if ok to delete and if yes delete
@@ -510,7 +517,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             // it's a setting not defined here but in a BluetoothPeripheralViewModel
             // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
             if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let bluetoothPeripheral = bluetoothPeripheralAsNSObject {
+
                 bluetoothPeripheralViewModel.userDidSelectRow(withSettingRawValue: indexPath.row - Setting.allCases.count, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet)
+                
             }
 
             return

@@ -22,6 +22,9 @@ enum ConstantsM5Stack {
     /// github url with repository for M5Stack that supports bluetooth
     static let githubURLM5Stack = "https://github.com/JohanDegraeve/M5_NightscoutMon"
     
+    /// github url with repository for M5StickC that supports bluetooth
+    static let githubURLM5StickC = "https://github.com/JohanDegraeve/M5_StickC_xdrip_iOS"
+    
 }
 
 enum M5StackColor:UInt16, CaseIterable {

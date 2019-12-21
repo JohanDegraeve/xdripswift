@@ -19,8 +19,11 @@ extension M5Stack: BluetoothPeripheral {
         return address
     }
     
-    // get the type of BluetoothPeripheral: "M5Strack", ...
+    // get the type of BluetoothPeripheral: "M5Stack", ...
     func bluetoothPeripheralType() -> BluetoothPeripheralType {
+        if isM5StickC {
+            return .M5StickCType
+        }
         return .M5StackType
     }
     

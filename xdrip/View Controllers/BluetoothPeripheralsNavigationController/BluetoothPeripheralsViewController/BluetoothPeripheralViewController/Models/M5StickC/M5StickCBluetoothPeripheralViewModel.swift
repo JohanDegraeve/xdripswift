@@ -3,6 +3,10 @@ import UIKit
 
 class M5StickCBluetoothPeripheralViewModel : M5StackBluetoothPeripheralViewModel {
     
+    override func m5StackcreenTitle() -> String {
+        return Texts_M5StackView.m5StickCViewscreenTitle
+    }
+    
     override func updateM5Stack(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral) {
         
         // verify that rawValue is within range of setting
@@ -15,6 +19,11 @@ class M5StickCBluetoothPeripheralViewModel : M5StackBluetoothPeripheralViewModel
             
             // M5StickC doesn't support brightness
             cell.accessoryType = .none
+            
+        } else if setting == .m5StackHelpText {
+            
+            // specific text for M5StickC in the cell
+            cell.textLabel?.text = Texts_M5StackView.m5StickCSoftWhereHelpCellText
             
         }
         
@@ -30,6 +39,12 @@ class M5StickCBluetoothPeripheralViewModel : M5StackBluetoothPeripheralViewModel
             
             // On M5StickC, user can't change the brightness, so do nothing
             return
+            
+        }  else if setting == .m5StackHelpText {
+            
+            let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_M5StackView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5StickC, actionHandler: nil)
+            
+            bluetoothPeripheralViewController?.present(alert, animated: true, completion: nil)
             
         } else {
             

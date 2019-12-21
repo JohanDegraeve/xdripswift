@@ -10,20 +10,23 @@ class M5StackBluetoothPeripheralViewModel {
     /// - these are attributes specific to M5Stack, the generic ones are defined in BluetoothPeripheralViewController
     public enum Setting:Int, CaseIterable {
         
+        /// helptext for M5Stack software
+        case m5StackHelpText = 0
+        
         /// ble password
-        case blePassword = 0
+        case blePassword = 1
         
         /// textColor
-        case textColor = 1
+        case textColor = 2
         
         /// backGroundColor
-        case backGroundColor = 2
+        case backGroundColor = 3
         
         /// rotation
-        case rotation = 3
+        case rotation = 4
         
         /// case brightness
-        case brightness = 4
+        case brightness = 5
         
     }
     
@@ -62,7 +65,7 @@ class M5StackBluetoothPeripheralViewModel {
     private weak var tableView: UITableView?
     
     /// reference to BluetoothPeripheralViewController that will own this M5StackBluetoothPeripheralViewModel - needed to present stuff etc
-    private weak var bluetoothPeripheralViewController: BluetoothPeripheralViewController?
+    private(set) weak var bluetoothPeripheralViewController: BluetoothPeripheralViewController?
     
     private weak var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
     
@@ -71,6 +74,13 @@ class M5StackBluetoothPeripheralViewModel {
 
     // MARK: - public functions
     
+    /// get screenTitle
+    ///
+    /// because screentitle is different for M5Stick, this function allows override by M5Stick specific viewmodel
+    public func m5StackcreenTitle() -> String {
+        return Texts_M5StackView.m5StackViewscreenTitle
+    }
+    
     /// - implements the update functions defined in protocol BluetoothPeripheralViewModelProtocol
     /// - this function is defined to allow override by M5StickC specific model class, because
     public func userDidSelectM5StackRow(withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem) {
@@ -78,6 +88,11 @@ class M5StackBluetoothPeripheralViewModel {
         guard let setting = Setting(rawValue: rawValue) else { fatalError("M5StackBluetoothPeripheralViewModel userDidSelectRow, unexpected setting") }
         
         switch setting {
+            
+        case .m5StackHelpText:
+            let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_M5StackView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5Stack, actionHandler: nil)
+            
+            bluetoothPeripheralViewController?.present(alert, animated: true, completion: nil)
             
         case .blePassword:
             break
@@ -288,6 +303,11 @@ class M5StackBluetoothPeripheralViewModel {
         // configure the cell depending on setting
         switch setting {
             
+        case .m5StackHelpText:
+            cell.textLabel?.text = Texts_M5StackView.m5StackSoftWhereHelpCellText
+            cell.detailTextLabel?.text = nil
+            cell.accessoryType = .disclosureIndicator
+
         case .blePassword:
             cell.textLabel?.text = Texts_Common.password
             cell.detailTextLabel?.text = m5Stack.blepassword
@@ -531,7 +551,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     }
     
     func screenTitle() -> String {
-        Texts_M5StackView.screenTitle
+        return m5StackcreenTitle()
     }
     
     /// - parameters :

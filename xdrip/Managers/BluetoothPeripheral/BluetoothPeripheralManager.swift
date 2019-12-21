@@ -59,7 +59,7 @@ class BluetoothPeripheralManager: NSObject {
                 
                 // create an instance of M5StackBluetoothTransmitter, M5StackBluetoothTransmitter will automatically try to connect to the M5Stack with the address that is stored in m5Stack
                 // add it to the array of bluetoothTransmitters
-                bluetoothTransmitters.append(M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: m5Stack.blepassword))
+                bluetoothTransmitters.append(M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: m5Stack.blepassword, bluetoothPeripheralType: m5Stack.isM5StickC ? .M5StickCType : .M5StackType))
                 
             } else {
                 
@@ -173,7 +173,7 @@ class BluetoothPeripheralManager: NSObject {
             
         case .M5StackType, .M5StickCType:
             
-            return M5StackBluetoothTransmitter(address: nil, name: nil, delegate: self, blePassword: UserDefaults.standard.m5StackBlePassword)
+            return M5StackBluetoothTransmitter(address: nil, name: nil, delegate: self, blePassword: UserDefaults.standard.m5StackBlePassword, bluetoothPeripheralType: type)
             
         }
 
@@ -188,8 +188,8 @@ class BluetoothPeripheralManager: NSObject {
                 
             case .M5StackType, .M5StickCType:
                 
-                if bluetoothTransmitter is M5StackBluetoothTransmitter {
-                    return .M5StackType
+                if let bluetoothTransmitter = bluetoothTransmitter as? M5StackBluetoothTransmitter {
+                    return bluetoothTransmitter.bluetoothPeripheralType
                 }
                 
             }
@@ -198,6 +198,7 @@ class BluetoothPeripheralManager: NSObject {
         
         // normally we shouldn't get here, but we need to return a value
         fatalError("BluetoothPeripheralManager :  getTransmitterType did not find a valid type")
+        
     }
     
     // MARK:- override observe function
@@ -400,7 +401,7 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
                             blePassword = UserDefaults.standard.m5StackBlePassword
                         }
                         
-                        newTransmitter = M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: blePassword)
+                        newTransmitter = M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: blePassword, bluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType())
                     }
                     
                 }

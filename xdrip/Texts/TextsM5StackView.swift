@@ -5,8 +5,12 @@ class Texts_M5StackView {
     
     static private let filename = "M5StackView"
     
-    static let screenTitle: String = {
-        return NSLocalizedString("screenTitle", tableName: filename, bundle: Bundle.main, value: "M5Stack", comment: "when M5 stack list is shown, title of the view")
+    static let m5StackViewscreenTitle: String = {
+        return NSLocalizedString("m5StackViewscreenTitle", tableName: filename, bundle: Bundle.main, value: "M5Stack", comment: "when M5Stack list is shown, title of the view")
+    }()
+    
+    static let m5StickCViewscreenTitle: String = {
+        return NSLocalizedString("m5StickCViewscreenTitle", tableName: filename, bundle: Bundle.main, value: "M5StickC", comment: "when M5Stickc list is shown, title of the view")
     }()
      
     static let authenticationFailureWarning: String = {
@@ -21,8 +25,12 @@ class Texts_M5StackView {
         return NSLocalizedString("m5StackResetRequiredWarning", tableName: filename, bundle: Bundle.main, value: "You need to reset the M5Stack in order to get a new temporary password. When done click'", comment: "in case M5Stack authentication failed, and M5Stack is generating a random password")
     }()
     
-    static let m5StackSoftWareHelpCellText: String = {
-        return NSLocalizedString("m5StackSoftWareHelpCellText", tableName: filename, bundle: Bundle.main, value: "Where to find M5Stack software ?", comment: "In list of M5Stacks, the last line allows to show info where to find M5Stack software, this is the text in the cell")
+    static let m5StackSoftWhereHelpCellText: String = {
+        return NSLocalizedString("m5StackSoftWhereHelpCellText", tableName: filename, bundle: Bundle.main, value: "Where to find M5Stack software ?", comment: "In m5Stack view, one line allows to show info where to find M5Stack software, this is the text in the cell")
+    }()
+    
+    static let m5StickCSoftWhereHelpCellText: String = {
+        return NSLocalizedString("m5StickCSoftWhereHelpCellText", tableName: filename, bundle: Bundle.main, value: "Where to find M5StickC software ?", comment: "In m5StickC view, one line allows to show info where to find M5Stack software, this is the text in the cell")
     }()
     
     static let m5StackSoftWareHelpText: String = {

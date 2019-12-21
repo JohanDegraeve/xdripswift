@@ -1247,8 +1247,6 @@
 		F8EA6CA421B9A25B0082976B /* classes */ = {
 			isa = PBXGroup;
 			children = (
-				F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */,
-				F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */,
 				F8B3A79122635A25004BA588 /* AlertEntry+CoreDataClass.swift */,
 				F8B3A79222635A25004BA588 /* AlertEntry+CoreDataProperties.swift */,
 				F8B3A78C22622953004BA588 /* AlertType+CoreDataClass.swift */,
@@ -1257,6 +1255,8 @@
 				F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */,
 				F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */,
 				F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */,
+				F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */,
+				F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */,
 				F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */,
 				F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */,
 			);

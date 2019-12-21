@@ -168,24 +168,12 @@ final class BluetoothPeripheralsViewController: UIViewController {
 extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        // add 1 for the row that will show help info
-        return bluetoothPeripheralManager.getBluetoothPeripherals().count + 1
+        return bluetoothPeripheralManager.getBluetoothPeripherals().count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("Unexpected Table View Cell") }
-        
-        // the last row is the help info
-        if indexPath.row == bluetoothPeripheralManager.getBluetoothPeripherals().count {
-            
-            cell.textLabel?.text = Texts_M5StackView.m5StackSoftWareHelpCellText
-            cell.detailTextLabel?.text = nil
-            cell.accessoryType = .disclosureIndicator
-            return cell
-            
-        }
         
         // textLabel should be the user defined alias of the BluetoothPeripheral, or if user defined alias == nil, then the devicename
         cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].getAlias()
@@ -218,19 +206,8 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         
         tableView.deselectRow(at: indexPath, animated: true)
        
-        // the last row is the help info
-        if indexPath.row == bluetoothPeripheralManager.getBluetoothPeripherals().count {
+        self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier.rawValue, sender: bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row])
 
-            let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_M5StackView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5Stack, actionHandler: nil)
-            
-            self.present(alert, animated: true, completion: nil)
-            
-        } else {
-
-            self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier.rawValue, sender: bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row])
-
-        }
-        
     }
     
 }
