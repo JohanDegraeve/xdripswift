@@ -386,7 +386,7 @@ public class AlertManager:NSObject {
                     if applicableAlertType.overridemute && delayInSecondsToUse == 0 {
                         // play the sound
                         if let soundPlayer = self.soundPlayer {
-                            soundPlayer.playSound(soundFileName: soundToSet, withVolume: nil)
+                            soundPlayer.playSound(soundFileName: soundToSet)
                         }
                     } else {
                         // mute should not be overriden, by adding the sound to the notification, we let iOS decide if the sound will be played or not

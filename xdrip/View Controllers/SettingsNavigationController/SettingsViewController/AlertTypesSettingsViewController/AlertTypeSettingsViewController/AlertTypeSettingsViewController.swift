@@ -357,7 +357,7 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
                     
                     // play the selected sound
                     if let soundPlayer = self.soundPlayer {
-                        soundPlayer.playSound(soundFileName: sounds.fileNames[index - 2], withVolume: nil)
+                        soundPlayer.playSound(soundFileName: sounds.fileNames[index - 2])
                     }
                 }
             })

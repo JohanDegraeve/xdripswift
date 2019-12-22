@@ -20,8 +20,7 @@ class SoundPlayer {
     /// plays the sound, overrides mute
     /// - parameters:
     ///     - soundFileName : name of the file with the sound, the filename must include the extension, eg mp3
-    ///     - volume : optional, must be les than 100, fadeDuration 5 is used
-    public func playSound(soundFileName:String, withVolume volume:Float?) {
+    public func playSound(soundFileName:String) {
         
         guard let url = Bundle.main.url(forResource: soundFileName, withExtension: "") else {
             trace("in playSound, could not create url with sound %{public}@", log: self.log, type: .error, soundFileName)
@@ -39,12 +38,6 @@ class SoundPlayer {
             try audioPlayer = AVAudioPlayer(contentsOf: url)
             
             if let audioPlayer = audioPlayer {
-                if var volume = volume {
-                    if volume > 100.0 {
-                        volume = 100.0
-                    }
-                    audioPlayer.setVolume(volume, fadeDuration: 30)
-                }
                 audioPlayer.play()
             } else {
                 trace("in playSound, could not create url with sound %{public}@", log: self.log, type: .error, soundFileName)
