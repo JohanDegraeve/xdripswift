@@ -5,8 +5,11 @@ fileprivate enum Setting:Int, CaseIterable {
     /// version Number
     case versionNumber = 0
     
+    /// build Number
+    case buildNumber = 1
+    
     /// licenseInfo
-    case licenseInfo = 1
+    case licenseInfo = 2
     
 }
 
@@ -28,6 +31,9 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             
         case .licenseInfo:
             return Texts_SettingsView.license
+            
+        case .buildNumber:
+            return Texts_SettingsView.build
 
         }
         
@@ -40,11 +46,14 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         switch setting {
             
         case .versionNumber:
-            return UITableViewCell.AccessoryType.none
+            return .none
             
-        case .licenseInfo:
-            return UITableViewCell.AccessoryType.detailButton
+        case .buildNumber:
+            return .none
 
+        case .licenseInfo:
+            return .detailButton
+            
         }
         
     }
@@ -61,6 +70,14 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             
             guard let version = dictionary["CFBundleShortVersionString"] as? String else {return "unknown"}
             
+            return version
+            
+        case .buildNumber:
+
+            guard let dictionary = Bundle.main.infoDictionary else {return "unknown"}
+            
+            guard let version = dictionary["CFBundleVersion"] as? String else {return "unknown"}
+
             return version
             
         case .licenseInfo:
@@ -88,8 +105,10 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         case .versionNumber:
             return SettingsSelectedRowAction.nothing
             
-        case .licenseInfo:
+        case .buildNumber:
+            return .nothing
             
+        case .licenseInfo:
             return SettingsSelectedRowAction.showInfoText(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress)
 
         }

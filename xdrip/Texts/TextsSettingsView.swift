@@ -229,6 +229,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_Version", tableName: filename, bundle: Bundle.main, value: "Version", comment: "used in settings, section Info, title of the version setting")
     }()
 
+    static let build = {
+        return NSLocalizedString("settingsviews_build", tableName: filename, bundle: Bundle.main, value: "Build", comment: "used in settings, section Info, title of the build setting")
+    }()
+    
     static let license = {
         return NSLocalizedString("settingsviews_license", tableName: filename, bundle: Bundle.main, value: "License", comment: "used in settings, section Info, title of the license setting")
     }()
