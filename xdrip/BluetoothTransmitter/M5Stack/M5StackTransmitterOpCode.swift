@@ -59,6 +59,12 @@ enum M5StackTransmitterOpCodeTx: UInt8, CaseIterable {
     /// write brightness to M5Stack
     case writeBrightnessTx = 0x19
     
+    /// ask batteryLevel to M5Stack
+    case readBatteryLevelTx = 0x21
+    
+    /// send power off to M5Stack
+    case writepowerOffTx = 0x22
+    
 }
 
 /// opcodes for message from M5stack to app
@@ -84,8 +90,11 @@ enum M5StackTransmitterOpCodeRx: UInt8, CaseIterable {
     /// M5Stack requests timestamp in seconds, local time since 1.1.1970 !!
     case readTimeStampRx = 0x11
     
-    // M5Stack requests all parameters (textcolor, wifi names and passwords,...), this is usually after an M5Stack restart
+    /// M5Stack requests all parameters (textcolor, wifi names and passwords,...), this is usually after an M5Stack restart
     case readAllParametersRx = 0x16
+    
+    /// M5Stack sending battery level
+    case readBatteryLevelRx = 0x20
 
 }
 
@@ -107,6 +116,8 @@ extension M5StackTransmitterOpCodeRx: CustomStringConvertible {
             return "readTimeStampRx"
         case .readAllParametersRx:
             return "readAllParametersRx"
+        case .readBatteryLevelRx:
+            return "readBatteryLevelRx"
         }
     }
 }

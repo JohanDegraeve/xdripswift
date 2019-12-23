@@ -60,6 +60,7 @@
 		F8297F59238EE14E00D74D66 /* TextsBluetoothPeripheralsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F57238EE14E00D74D66 /* TextsBluetoothPeripheralsView.swift */; };
 		F8297F5A238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F58238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift */; };
 		F83098FE23AD3F84005741DF /* UITabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83098FD23AD3F84005741DF /* UITabBarController.swift */; };
+		F830990223B15FFD005741DF /* ConstantsUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F830990123B15FFD005741DF /* ConstantsUI.swift */; };
 		F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
@@ -308,6 +309,7 @@
 		F8297F57238EE14E00D74D66 /* TextsBluetoothPeripheralsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextsBluetoothPeripheralsView.swift; sourceTree = "<group>"; };
 		F8297F58238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextsBluetoothPeripheralView.swift; sourceTree = "<group>"; };
 		F83098FD23AD3F84005741DF /* UITabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITabBarController.swift; sourceTree = "<group>"; };
+		F830990123B15FFD005741DF /* ConstantsUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsUI.swift; sourceTree = "<group>"; };
 		F846CDD523046BAC00DCF016 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SettingsViews.strings"; sourceTree = "<group>"; };
 		F846CDD623046BAE00DCF016 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBluetoothPairing.swift; sourceTree = "<group>"; };
@@ -1226,6 +1228,7 @@
 				F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */,
 				F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */,
 				F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */,
+				F830990123B15FFD005741DF /* ConstantsUI.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -1728,7 +1731,7 @@
 		};
 		F84F2BEC22EF80B300313474 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 8;
+			buildActionMask = 12;
 			files = (
 			);
 			inputFileListPaths = (
@@ -1739,7 +1742,7 @@
 			);
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${INFOPLIST_FILE}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${INFOPLIST_FILE}\"\n";
 		};
@@ -1797,6 +1800,7 @@
 				F8F9721A23A5915900C3F17D /* CGMBubbleTransmitter.swift in Sources */,
 				F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
+				F830990223B15FFD005741DF /* ConstantsUI.swift in Sources */,
 				F8A1585122EDB597007F5B5D /* ConstantsBGGraphBuilder.swift in Sources */,
 				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
 				F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */,
@@ -2368,7 +2372,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.4.2;
+				MARKETING_VERSION = 3.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2396,7 +2400,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.4.2;
+				MARKETING_VERSION = 3.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

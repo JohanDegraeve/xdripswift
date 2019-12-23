@@ -553,6 +553,14 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
 
 extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
     
+    func receivedBattery(level: Int, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
+        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
+        
+        m5Stack.batteryLevel = level
+        
+    }
+    
     /// did the app successfully authenticate towards M5Stack, if no, then disconnect will be done
     func authentication(success: Bool, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
@@ -602,7 +610,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
         
         trace("in newBlePassWord, storing the password in M5Stack", log: self.log, type: .info)
 
-        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
+        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and also the bluetoothPeripheral and it should be an M5Stack
         guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
 
         // possibily this is a new scanned m5stack, calling coreDataManager.saveChanges() but still the user may be in M5stackviewcontroller and decide not to save the m5stack, bad luck

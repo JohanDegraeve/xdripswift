@@ -7,3 +7,6 @@
 "m5StackSoftWareHelpText" = "Go to";
 "m5StackViewscreenTitle" = "M5Stack";
 "m5StickCViewscreenTitle" = "M5StickC";
+"deviceMustBeConnectedToPowerOff" = "M5Stack must be connected to be able to power it off";
+"powerOffConfirm" = "Are you sure you want to power off the M5Stack ?";
+"powerOff" = "Power Off";

@@ -246,6 +246,16 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         } else {return false}
     }
     
+    /// to ask batteryLevel to M5Stack
+    func readBatteryLevel() -> Bool {
+        return writeOpCodeToPeripheral(opCode: .readBatteryLevelTx)
+    }
+    
+    /// to ask powerOff
+    func powerOff() -> Bool {
+        return writeOpCodeToPeripheral(opCode: .writepowerOffTx)
+    }
+    
     // MARK: - overriden BluetoothTransmitter functions
     
     override func centralManagerDidUpdateState(_ central: CBCentralManager) {
@@ -344,14 +354,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
                 
             }
             
-            // this is usually a case where M5Stack has restarted, so it needs to get time and timeoffset
-            sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
-            
-            // this is the time when the M5stack is ready to receive readings or parameter updates
-            isReadyToReceiveData = true
-            
-            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
-            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
+            finalizeConnectionSetup()
             
         case .authenticateSuccessRx:
             // received from M5Stack, need to inform delegates, send timestamp to M5Stack, and also set isReadyToReceiveData to true
@@ -362,14 +365,9 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.authentication(success: true, m5StackBluetoothTransmitter: self)
             (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.authentication(success: true, m5StackBluetoothTransmitter: self)
             
-            // even though not requested, and even if M5Stack may already have it, send the local time
-            sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
+            // final steps after successful communication
+            finalizeConnectionSetup()
             
-            // this is the time when the M5stack is ready to receive readings or parameter updates
-            isReadyToReceiveData = true
-            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
-            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
-           
         case .authenticateFailureRx:
             // received authentication failure, inform delegates
 
@@ -396,6 +394,21 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             // M5Stack is asking for all parameters
             (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
             (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
+            
+        case .readBatteryLevelRx:
+            
+            guard value.count >= 2 else {
+                
+                trace("   value length should be minimum 2", log: log, type: .error)
+                return
+                
+            }
+            
+            let receivedBatteryLevel = Int(value[1])
+            
+            // M5Stack is sending batteryLevel, which is in the second byte
+            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.receivedBattery(level: receivedBatteryLevel, m5StackBluetoothTransmitter: self)
+            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.receivedBattery(level: receivedBatteryLevel, m5StackBluetoothTransmitter: self)
             
         }
 
@@ -477,6 +490,24 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
 
     }
     
+    private func writeOpCodeToPeripheral(opCode : M5StackTransmitterOpCodeTx) ->  Bool {
+        
+        // initialize dataToSend
+        var dataToSend = Data()
+        
+        // add opcode
+        dataToSend.append(opCode.rawValue.data)
+        
+        if !writeDataToPeripheral(data: dataToSend, type: .withoutResponse) {
+            trace("    failed to send opcode", log: log, type: .error)
+            return false
+        } else {
+            trace("    successfully sent opcode to M5Stack", log: log, type: .info)
+            return true
+        }
+        
+    }
+    
     private func writeStringToPeripheral(text: String, opCode : M5StackTransmitterOpCodeTx) -> Bool {
         
         // create packets to send with offset
@@ -500,6 +531,22 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         }
 
         return success
+    }
+    
+    /// final communication steps when authentication is done
+    private func finalizeConnectionSetup() {
+        
+        // even though not requested, and even if M5Stack may already have it, send the local time
+        sendLocalTimeAndUTCTimeOffSetInSecondsToM5Stack()
+        
+        // read batteryLevel
+        _ = readBatteryLevel()
+        
+        // this is the time when the M5stack is ready to receive readings or parameter updates
+        isReadyToReceiveData = true
+        (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
+        (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
+
     }
     
 }

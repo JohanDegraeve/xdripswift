@@ -22,4 +22,7 @@ protocol M5StackBluetoothTransmitterDelegate: BluetoothTransmitterDelegate {
     /// it's an M5Stack without password configired in the ini file. xdrip app has been requesting temp password to M5Stack but this was already done once. M5Stack needs to be reset
     func m5StackResetRequired(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter)
     
+    /// M5Stack is sending batteryLevel
+    func receivedBattery(level: Int, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter)
+    
 }

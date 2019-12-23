@@ -287,8 +287,8 @@ class BluetoothPeripheralViewController: UIViewController {
             // set self as delegate in the bluetoothTransmitter
             self.bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false)?.variableBluetoothTransmitterDelegate = self.bluetoothPeripheralViewModel
 
-            // reload the full section , all rows in the tableView
-            self.tableView.reloadSections(IndexSet(integer: 0), with: .none)
+            // reload the full screen , all rows in all sections in the tableView
+            self.tableView.reloadData()
             
         })
         
@@ -485,6 +485,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         
         // default value for accessoryView is nil
         cell.accessoryView = nil
+        
+        // default color for text - explicitly setting it to colorActive here, because other cells are set to gray in M5StickCBluetoothPeripheralViewModel, these seems to interfere when scrolling
+        cell.textLabel?.textColor = ConstantsUI.colorActiveSetting
         
         // configure the cell depending on setting
         switch setting {

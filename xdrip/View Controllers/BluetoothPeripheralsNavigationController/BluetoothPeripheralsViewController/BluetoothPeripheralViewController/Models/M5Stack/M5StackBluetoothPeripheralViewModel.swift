@@ -25,8 +25,14 @@ class M5StackBluetoothPeripheralViewModel {
         /// rotation
         case rotation = 4
         
+        /// batteryLevel
+        case batteryLevel = 5
+        
         /// case brightness
-        case brightness = 5
+        case brightness = 6
+        
+        /// user is requesting power off
+        case powerOff = 7
         
     }
     
@@ -276,8 +282,35 @@ class M5StackBluetoothPeripheralViewModel {
                 PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
             }
             
+        case .batteryLevel:
+            break
+            
+        case .powerOff:
+            
+            if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.getConnectionStatus() == CBPeripheralState.connected {
+                
+                
+                // first ask user confirmation
+                let alert = UIAlertController(title: Texts_M5StackView.powerOffConfirm, message: nil, actionHandler: {
+                    
+                    _ = m5StackBluetoothTransmitter.powerOff()
+                    
+                }, cancelHandler: nil)
+                
+                bluetoothPeripheralViewController?.present(alert, animated: true, completion: nil)
+                
+                
+                
+            } else {
+                
+                let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.deviceMustBeConnectedToPowerOff, actionHandler: nil)
+                
+                // present the alert
+                bluetoothPeripheralViewController?.present(alert, animated: true, completion: nil)
+                
+            }
+            
         }
-        
         
     }
     
@@ -296,6 +329,9 @@ class M5StackBluetoothPeripheralViewModel {
         
         // default value for accessoryView is nil
         cell.accessoryView = nil
+        
+        // default color for text
+        cell.textLabel?.textColor = ConstantsUI.colorActiveSetting
         
         // configure the cell depending on setting
         switch setting {
@@ -358,6 +394,16 @@ class M5StackBluetoothPeripheralViewModel {
             
             cell.accessoryType = .disclosureIndicator
             
+        case .batteryLevel:
+            cell.textLabel?.text = Texts_BluetoothPeripheralsView.batteryLevel
+            cell.detailTextLabel?.text = m5Stack.batteryLevel.description
+            cell.accessoryType = .none
+            
+        case .powerOff:
+            cell.textLabel?.text = Texts_M5StackView.powerOff
+            cell.accessoryType = .disclosureIndicator
+            cell.detailTextLabel?.text = nil
+            
         }
 
     }
@@ -386,6 +432,13 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
 // MARK: - extension M5StackBluetoothTransmitterDelegate
 
 extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelegate {
+    
+    func receivedBattery(level: Int, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
+        // batteryLevel should get updated in M5Stack object by bluetoothPeripheralManager, here's the trigger to update the table
+        tableView?.reloadRows(at: [IndexPath(row: Setting.batteryLevel.rawValue, section: 1)], with: .none)
+        
+    }
     
     func isAskingForAllParameters(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         // viewcontroller doesn't use this
@@ -567,9 +620,16 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         self.bluetoothTransmitterDelegate = bluetoothTransmitterDelegate
         
-        if let bluetoothPeripheral = bluetoothPeripheral as? M5Stack  {
+        if let m5StackPeripheral = bluetoothPeripheral as? M5Stack  {
             
-            storeTempValues(from: bluetoothPeripheral)
+            storeTempValues(from: m5StackPeripheral)
+            
+            // also request batteryLevel, this may have been updated
+            if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5StackPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter {
+                
+                _ = m5StackBluetoothTransmitter.readBatteryLevel()
+                
+            }
             
         }
     }

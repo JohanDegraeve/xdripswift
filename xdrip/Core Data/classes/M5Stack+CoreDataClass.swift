@@ -18,6 +18,9 @@ public class M5Stack: NSManagedObject {
     /// explanation, see function parameterUpdateNotNeededAtNextConnect in protocol BluetoothPeripheral
     public var parameterUpdateNeeded: Bool = false
     
+    /// batterylevel, not stored in coreData, will only be available after having received it form the M5Stack
+    public var batteryLevel: Int = 0
+    
     /// create M5Stack, shouldconnect default value = true
     /// - parameters:
     ///     - rotation is internally stored as Int32, actual value should always be between 0 and 360 so UInt16 as parameter is sufficient.

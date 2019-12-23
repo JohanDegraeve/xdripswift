@@ -37,5 +37,16 @@ class Texts_M5StackView {
         return NSLocalizedString("m5StackSoftWareHelpText", tableName: filename, bundle: Bundle.main, value: "Go to", comment: "this is the text shown when clicking the cell 'where to find M5Stack software'")
     }()
 
+    static let deviceMustBeConnectedToPowerOff: String = {
+        return NSLocalizedString("deviceMustBeConnectedToPowerOff", tableName: filename, bundle: Bundle.main, value: "M5Stack must be connected to be able to power it off", comment: "in case user tires to power off the M5Stack via xdrip but it's not connected")
+    }()
+    
+    static let powerOff: String = {
+        return NSLocalizedString("powerOff", tableName: filename, bundle: Bundle.main, value: "Power Off", comment: "cell text, to power off")
+    }()
+    
+    static let powerOffConfirm: String = {
+        return NSLocalizedString("powerOffConfirm", tableName: filename, bundle: Bundle.main, value: "Are you sure you want to power off the M5Stack ?", comment: "user clicks power off in M5Stack view, confirmation is needed")
+    }()
 }
 

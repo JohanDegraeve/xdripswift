@@ -16,4 +16,7 @@ class Texts_BluetoothPeripheralsView {
         return NSLocalizedString("selectType", tableName: filename, bundle: Bundle.main, value: "Select Type", comment: "when clicking add button in screen with list of bluetoothperipherals, after having selected the category, a new pop up appears, this is the title of pop up where user  needs to select bluetooth peripheral type")
     }()
     
+    static let batteryLevel: String = {
+        return NSLocalizedString("batteryLevel", tableName: filename, bundle: Bundle.main, value: "Battery Level", comment: "title of the cell where transmitter battery level is shown in detailed screen")
+    }()
 }
