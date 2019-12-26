@@ -118,7 +118,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
             //    batteryLevelAsString = String(valueAsString[valueAsString.index(after: indexesOfSplitter[0])..<indexesOfSplitter[1]])
             //}
             
-            var transMitterBatteryInfo:TransmitterBatteryInfo? = nil
+            let transMitterBatteryInfo:TransmitterBatteryInfo? = nil
             //if let batteryLevelAsString = batteryLevelAsString, let batteryLevelAsInt = Int(batteryLevelAsString) {
             //    transMitterBatteryInfo = TransmitterBatteryInfo.percentage(percentage: batteryLevelAsInt)
             //}
