@@ -15,13 +15,8 @@ protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     /// screen title for uiviewcontroller
     func screenTitle() -> String
     
-    /// user clicked done button in uiviewcontroller
-    /// - parameters:
-    ///     - bluetoothPeripheral : the bluetoothPeripheral being shown
-    func doneButtonHandler(bluetoothPeripheral: BluetoothPeripheral?)
-    
     /// updates the contents of a cell, for setting with rawValue withSettingRawValue
-    func update(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral)
+    func update(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem)
     
     /// user clicked a row, this function does the necessary
     func userDidSelectRow(withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem)

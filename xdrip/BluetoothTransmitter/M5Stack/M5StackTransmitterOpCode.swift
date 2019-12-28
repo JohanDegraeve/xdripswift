@@ -65,6 +65,9 @@ enum M5StackTransmitterOpCodeTx: UInt8, CaseIterable {
     /// send power off to M5Stack
     case writepowerOffTx = 0x22
     
+    /// send connectToWifi parameter
+    case writeConnectToWiFiTx = 0x23
+    
 }
 
 /// opcodes for message from M5stack to app

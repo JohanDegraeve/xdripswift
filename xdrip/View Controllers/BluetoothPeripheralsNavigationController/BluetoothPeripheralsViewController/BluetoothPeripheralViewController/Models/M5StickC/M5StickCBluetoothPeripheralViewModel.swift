@@ -7,13 +7,13 @@ class M5StickCBluetoothPeripheralViewModel : M5StackBluetoothPeripheralViewModel
         return Texts_M5StackView.m5StickCViewscreenTitle
     }
     
-    override func updateM5Stack(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral) {
+    override func updateM5Stack(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem) {
         
         // verify that rawValue is within range of setting
         guard let setting = Setting(rawValue: rawValue) else { fatalError("M5StackBluetoothPeripheralViewModel update, Unexpected setting")
         }
         
-        super.updateM5Stack(cell: cell, withSettingRawValue: rawValue, for: bluetoothPeripheral)
+        super.updateM5Stack(cell: cell, withSettingRawValue: rawValue, for: bluetoothPeripheral, doneButtonOutlet: doneButtonOutlet)
         
         switch setting {
             
@@ -48,7 +48,7 @@ class M5StickCBluetoothPeripheralViewModel : M5StackBluetoothPeripheralViewModel
             // inactive setting, set color
             cell.textLabel?.textColor = ConstantsUI.colorInActiveSetting
 
-        case .blePassword, .textColor, .backGroundColor, .rotation:
+        case .blePassword, .textColor, .backGroundColor, .rotation, .connectToWiFi:
             cell.textLabel?.textColor = ConstantsUI.colorActiveSetting
             
         }
@@ -86,6 +86,9 @@ class M5StickCBluetoothPeripheralViewModel : M5StackBluetoothPeripheralViewModel
             
             super.userDidSelectM5StackRow(withSettingRawValue: rawValue, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet)
 
+        case .connectToWiFi:
+            break
+            
         }
         
     }

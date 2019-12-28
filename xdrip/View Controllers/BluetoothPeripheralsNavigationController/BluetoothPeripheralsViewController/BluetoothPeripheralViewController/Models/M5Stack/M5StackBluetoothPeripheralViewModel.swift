@@ -25,14 +25,16 @@ class M5StackBluetoothPeripheralViewModel {
         /// rotation
         case rotation = 4
         
+        case connectToWiFi = 5
+        
         /// batteryLevel
-        case batteryLevel = 5
+        case batteryLevel = 6
         
         /// case brightness
-        case brightness = 6
+        case brightness = 7
         
         /// user is requesting power off
-        case powerOff = 7
+        case powerOff = 8
         
     }
     
@@ -43,10 +45,15 @@ class M5StackBluetoothPeripheralViewModel {
     /// temp storage of value while user is editing the M5Stack attributes
     private var textColorTemporaryValue: M5StackColor?
     
-    /// roration to be used in M5Stack
+    /// rotation to be used in M5Stack
     ///
     /// temp storage of value while user is editing the M5Stack attributes
     private var rotationTempValue: UInt16?
+    
+    /// connectToWiFi value to be used in M5Stack
+    ///
+    /// temp storage of value while user is editing the M5Stack attributes
+    private var connectToWiFiTempValue: Bool?
     
     /// backGroundColor to be used in M5Stack
     ///
@@ -91,6 +98,9 @@ class M5StackBluetoothPeripheralViewModel {
         guard let setting = Setting(rawValue: rawValue) else { fatalError("M5StackBluetoothPeripheralViewModel userDidSelectRow, unexpected setting") }
         
         switch setting {
+            
+        case .connectToWiFi:
+            break
             
         case .m5StackHelpText:
             let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_M5StackView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5Stack, actionHandler: nil)
@@ -316,7 +326,7 @@ class M5StackBluetoothPeripheralViewModel {
     
     /// - implements the update functions defined in protocol BluetoothPeripheralViewModelProtocol
     /// - this function is defined to allow override by M5StickC specific model class, because
-    public func updateM5Stack(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral) {
+    public func updateM5Stack(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem) {
       
         // verify that rawValue is within range of setting
         guard let setting = Setting(rawValue: rawValue) else { fatalError("M5StackBluetoothPeripheralViewModel update, Unexpected setting")
@@ -335,6 +345,31 @@ class M5StackBluetoothPeripheralViewModel {
         
         // configure the cell depending on setting
         switch setting {
+            
+        case .connectToWiFi:
+            cell.textLabel?.text = Texts_M5StackView.connectToWiFi
+            cell.detailTextLabel?.text = nil
+            
+            cell.accessoryView = UISwitch(isOn: connectToWiFiTempValue ?? false, action: {
+                (isOn:Bool) in
+                
+                self.connectToWiFiTempValue = isOn
+                
+                // enable the done button, because value has changed
+                doneButtonOutlet.enable()
+                
+                // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
+                if let m5StackAsPeripheral = bluetoothPeripheral as? M5Stack, let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
+                    if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5StackAsPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.writeConnectToWiFi(connect: isOn) {
+                        // do nothing, ConnectToWiFi successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
+                    } else {
+                        m5StackAsPeripheral.parameterUpdateNeededAtNextConnect()
+                    }
+                }
+
+                self.tableView?.reloadRows(at: [IndexPath(row: Setting.connectToWiFi.rawValue, section: 1)], with: .none)
+                
+            })
             
         case .m5StackHelpText:
             cell.textLabel?.text = Texts_M5StackView.m5StackSoftWhereHelpCellText
@@ -519,20 +554,37 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         guard let m5StackBluetoothPeripheral = bluetoothPeripheral as? M5Stack else {return}
         
-        if let textColorTemporaryValue = textColorTemporaryValue {
-            m5StackBluetoothPeripheral.textcolor = Int32(textColorTemporaryValue.rawValue)
-        }
-        
-        if let rotation = rotationTempValue {
-            m5StackBluetoothPeripheral.rotation = Int32(rotation)
-        }
-        
-        if let backGroundColor = backGroundColorTemporaryValue {
-            m5StackBluetoothPeripheral.backGroundColor = Int32(backGroundColor.rawValue)
-        }
+        // creating enum to make sure we don't forget new cases
+        for setting in Setting.allCases {
+            switch setting {
+                
+            case .m5StackHelpText, .blePassword, .batteryLevel, .powerOff:
+                break
+                
+            case .textColor:
+                if let textColorTemporaryValue = textColorTemporaryValue {
+                    m5StackBluetoothPeripheral.textcolor = Int32(textColorTemporaryValue.rawValue)
+                }
+                
+            case .backGroundColor:
+                if let backGroundColor = backGroundColorTemporaryValue {
+                    m5StackBluetoothPeripheral.backGroundColor = Int32(backGroundColor.rawValue)
+                }
 
-        if let brightness = brightnessTemporaryValue {
-            m5StackBluetoothPeripheral.brightness = Int16(brightness)
+            case .rotation:
+                if let rotation = rotationTempValue {
+                    m5StackBluetoothPeripheral.rotation = Int32(rotation)
+                }
+                
+            case .connectToWiFi:
+                m5StackBluetoothPeripheral.connectToWiFi = connectToWiFiTempValue ?? false
+                
+            case .brightness:
+                if let brightness = brightnessTemporaryValue {
+                    m5StackBluetoothPeripheral.brightness = Int16(brightness)
+                }
+                
+            }
         }
         
     }
@@ -541,17 +593,37 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         guard let m5StackBluetoothPeripheral = bluetoothPeripheral as? M5Stack else {return}
         
-        // temporary store the value of textColor, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-        textColorTemporaryValue = M5StackColor(forUInt16: UInt16(m5StackBluetoothPeripheral.textcolor))
-        
-        // temporary store the value of rotation, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-        rotationTempValue = UInt16(m5StackBluetoothPeripheral.rotation)
-        
-        // temporary store the value of backGroundColor, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-        backGroundColorTemporaryValue = M5StackColor(forUInt16: UInt16(m5StackBluetoothPeripheral.backGroundColor))
-        
-        // temporary store the value of brightness, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-        brightnessTemporaryValue = Int(m5StackBluetoothPeripheral.brightness)
+        // creating enum to make sure we don't forget new cases
+        for setting in Setting.allCases {
+            
+            switch setting {
+                
+            case .m5StackHelpText, .blePassword, .batteryLevel, .powerOff:
+                break
+
+            case .textColor:
+                // temporary store the value of textColor, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
+                textColorTemporaryValue = M5StackColor(forUInt16: UInt16(m5StackBluetoothPeripheral.textcolor))
+
+            case .backGroundColor:
+                // temporary store the value of backGroundColor, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
+                backGroundColorTemporaryValue = M5StackColor(forUInt16: UInt16(m5StackBluetoothPeripheral.backGroundColor))
+
+            case .rotation:
+                // temporary store the value of rotation, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
+                rotationTempValue = UInt16(m5StackBluetoothPeripheral.rotation)
+
+            case .connectToWiFi:
+                // temporary store the value of connectToWiFi, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
+                connectToWiFiTempValue = m5StackBluetoothPeripheral.connectToWiFi
+
+            case .brightness:
+                // temporary store the value of brightness, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
+                brightnessTemporaryValue = Int(m5StackBluetoothPeripheral.brightness)
+
+            }
+            
+        }
         
     }
 
@@ -566,40 +638,12 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     }
 
     
-    func update(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral) {
+    func update(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem) {
         
-        updateM5Stack(cell: cell, withSettingRawValue: rawValue, for: bluetoothPeripheral)
+        updateM5Stack(cell: cell, withSettingRawValue: rawValue, for: bluetoothPeripheral, doneButtonOutlet: doneButtonOutlet)
         
     }
 
-    func doneButtonHandler(bluetoothPeripheral: BluetoothPeripheral?) {
-        
-        if let bluetoothPeripheral = bluetoothPeripheral as? M5Stack {
-            
-            // store value of textColor
-            if let textColor = textColorTemporaryValue {
-                bluetoothPeripheral.textcolor = Int32(textColor.rawValue)
-            }
-            
-            // store value of backGroundColor
-            if let backGroundColor = backGroundColorTemporaryValue {
-                bluetoothPeripheral.backGroundColor = Int32(backGroundColor.rawValue)
-            }
-            
-            // store value of rotation
-            if let rotation = rotationTempValue {
-                bluetoothPeripheral.rotation = Int32(rotation)
-            }
-            
-            // store value of brightness
-            if let brightness = brightnessTemporaryValue {
-                bluetoothPeripheral.brightness = Int16(brightness)
-            }
-            
-        }
-
-    }
-    
     func screenTitle() -> String {
         return m5StackcreenTitle()
     }

@@ -472,7 +472,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
             if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let bluetoothPeripheral = bluetoothPeripheralAsNSObject {
 
-                bluetoothPeripheralViewModel.update(cell: cell, withSettingRawValue: indexPath.row, for: bluetoothPeripheral)
+                bluetoothPeripheralViewModel.update(cell: cell, withSettingRawValue: indexPath.row, for: bluetoothPeripheral, doneButtonOutlet: doneButtonOutlet)
                 
             }
             

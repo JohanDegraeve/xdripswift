@@ -708,6 +708,9 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
         // send rotation
         if !m5StackBluetoothTransmitter.writeRotation(rotation: Int(m5Stack.rotation)) {success = false}
         
+        // send connectToWiFi
+        if !m5StackBluetoothTransmitter.writeConnectToWiFi(connect: m5Stack.connectToWiFi) {success = false}
+        
         // send WiFiSSID's
         if let wifiName = UserDefaults.standard.m5StackWiFiName1 {
             if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 1) {success = false}

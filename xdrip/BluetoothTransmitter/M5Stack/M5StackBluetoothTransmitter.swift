@@ -222,6 +222,15 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     func writeBloodGlucoseUnit(isMgDl: Bool) -> Bool {
         
         return writeStringToPeripheral(text: isMgDl ? "true":"false", opCode: .writemgdlTx)
+        
+    }
+    
+    /// writes value of connectToWiFi
+    /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
+    func writeConnectToWiFi(connect: Bool) -> Bool {
+        
+        return writeStringToPeripheral(text: connect ? "true":"false", opCode: .writeConnectToWiFiTx)
+        
     }
     
     /// writes nightscout url to M5Stack
@@ -233,6 +242,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         if let url = url {
             return writeStringToPeripheral(text: url, opCode: .writeNightScoutUrlTx)
         } else {return false}
+        
     }
     
     /// writes nightscout apikey to M5Stack
@@ -244,6 +254,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         if let apiKey = apiKey {
             return writeStringToPeripheral(text: apiKey, opCode: .writeNightScoutAPIKeyTx)
         } else {return false}
+        
     }
     
     /// to ask batteryLevel to M5Stack

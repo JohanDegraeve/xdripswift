@@ -48,5 +48,9 @@ class Texts_M5StackView {
     static let powerOffConfirm: String = {
         return NSLocalizedString("powerOffConfirm", tableName: filename, bundle: Bundle.main, value: "Are you sure you want to power off the M5Stack ?", comment: "user clicks power off in M5Stack view, confirmation is needed")
     }()
+    
+    static let connectToWiFi: String = {
+        return NSLocalizedString("connectToWiFi", tableName: filename, bundle: Bundle.main, value: "Connect to Wifi", comment: "text for cell in settings view, connect to wifi yes or no")
+    }()
 }
 

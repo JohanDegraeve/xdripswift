@@ -32,14 +32,17 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
+            
         case .nightScoutEnabled:
             return SettingsSelectedRowAction.nothing
+            
         case .nightScoutUrl:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightScoutUrl, message: Texts_SettingsView.giveNightScoutUrl, keyboardType: .URL, text: UserDefaults.standard.nightScoutUrl, placeHolder: "yoursitename", actionTitle: nil, cancelTitle: nil, actionHandler: {(nightscouturl:String) in UserDefaults.standard.nightScoutUrl = nightscouturl.toNilIfLength0()}, cancelHandler: nil)
 
         case .nightScoutAPIKey:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightScoutAPIKey, message:  Texts_SettingsView.giveNightScoutAPIKey, keyboardType: .default, text: UserDefaults.standard.nightScoutAPIKey, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(apiKey:String) in
                 UserDefaults.standard.nightScoutAPIKey = apiKey.toNilIfLength0()}, cancelHandler: nil)
+            
         }
     }
     
