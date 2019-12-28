@@ -7,13 +7,13 @@ class M5StickCBluetoothPeripheralViewModel : M5StackBluetoothPeripheralViewModel
         return Texts_M5StackView.m5StickCViewscreenTitle
     }
     
-    override func updateM5Stack(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem) {
+    override func updateM5Stack(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem) {
+        
+        super.updateM5Stack(cell: cell, forRow: rawValue, forSection: section, for: bluetoothPeripheral, doneButtonOutlet: doneButtonOutlet)
         
         // verify that rawValue is within range of setting
-        guard let setting = Setting(rawValue: rawValue) else { fatalError("M5StackBluetoothPeripheralViewModel update, Unexpected setting")
+        guard let setting = CommonM5Setting(rawValue: rawValue) else { fatalError("M5StackBluetoothPeripheralViewModel update, Unexpected setting")
         }
-        
-        super.updateM5Stack(cell: cell, withSettingRawValue: rawValue, for: bluetoothPeripheral, doneButtonOutlet: doneButtonOutlet)
         
         switch setting {
             
@@ -21,44 +21,21 @@ class M5StickCBluetoothPeripheralViewModel : M5StackBluetoothPeripheralViewModel
             // specific text for M5StickC in the cell
             cell.textLabel?.text = Texts_M5StackView.m5StickCSoftWhereHelpCellText
             
-        case .batteryLevel:
-            
-            // No battery level available on M5StickC
-            cell.accessoryType = .none
-            cell.detailTextLabel?.text = nil
-            
-            // inactive setting, set color
-            cell.textLabel?.textColor = ConstantsUI.colorInActiveSetting
-
-        case .brightness:
-            
-            // M5StickC doesn't support brightness
-            cell.accessoryType = .none
-            cell.detailTextLabel?.text = nil
-            
-            // inactive setting, set color
-            cell.textLabel?.textColor = ConstantsUI.colorInActiveSetting
-            
-        case .powerOff:
-            
-            // No power off functionality on M5StickC
-            cell.accessoryType = .none
-            cell.detailTextLabel?.text = nil
-            
-            // inactive setting, set color
-            cell.textLabel?.textColor = ConstantsUI.colorInActiveSetting
-
         case .blePassword, .textColor, .backGroundColor, .rotation, .connectToWiFi:
-            cell.textLabel?.textColor = ConstantsUI.colorActiveSetting
+            break
             
         }
         
     }
     
-    override func userDidSelectM5StackRow(withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem) {
+    override func userDidSelectM5StackRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem) {
+        
+        
+        // M5Stick C doesn't suppor the M5Stack specific settings, so if section > number of sections - 1 then return (should normally never arrive here with such value)
+        guard section < super.numberOfM5Sections() else {return}
         
         // verify that rawValue is within range of setting
-        guard let setting = Setting(rawValue: rawValue) else {
+        guard let setting = CommonM5Setting(rawValue: rawValue) else {
             fatalError("M5StackBluetoothPeripheralViewModel update, Unexpected setting")
         }
         
@@ -70,26 +47,17 @@ class M5StickCBluetoothPeripheralViewModel : M5StackBluetoothPeripheralViewModel
             
             bluetoothPeripheralViewController?.present(alert, animated: true, completion: nil)
 
-        case .batteryLevel:
-            // No battery level available on M5StickC
-            break
+        case .blePassword, .textColor, .backGroundColor, .rotation, .connectToWiFi :
             
-        case .brightness:
-            // On M5StickC, user can't change the brightness, so do nothing
-            break
-            
-        case .powerOff:
-            // No power off functionality on M5StickC
-            break
+            super.userDidSelectM5StackRow(withSettingRawValue: rawValue, forSection: section, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet)
 
-        case .blePassword, .textColor, .backGroundColor, .rotation:
-            
-            super.userDidSelectM5StackRow(withSettingRawValue: rawValue, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet)
-
-        case .connectToWiFi:
-            break
-            
         }
         
     }
+    
+    /// - this function is defined to allow override by M5StickC specific model class, because the number of sections is different for M5StickC
+    override public func numberOfM5Sections() -> Int {
+        return super.numberOfM5Sections() - 1
+    }
+
 }

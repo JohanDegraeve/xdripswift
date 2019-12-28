@@ -16,13 +16,18 @@ protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     func screenTitle() -> String
     
     /// updates the contents of a cell, for setting with rawValue withSettingRawValue
-    func update(cell: UITableViewCell, withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem)
+    func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem)
     
     /// user clicked a row, this function does the necessary
-    func userDidSelectRow(withSettingRawValue rawValue: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem)
+    func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem)
     
-    /// get number of settings in the viewmodel
-    func numberOfSettings() -> Int
+    /// - get number of settings in the viewmodel, in specified section number
+    /// - this is the same as the number of rows in the section
+    /// - section counting starts at 1, which is actually the section with index 1 in the uiviewcontroller
+    func numberOfSettings(inSection section:Int) -> Int
+    
+    /// how many sections does this viewmodel define, in addition to the section already defined in BluetoothPeripheralViewController
+    func numberOfSections() -> Int
     
     /// used when new peripheral is discovered and connected, to temporary store values in model (eg in case of M5Stack, store the rotation value which would be a default value)
     func storeTempValues(from bluetoothPeripheral: BluetoothPeripheral)
