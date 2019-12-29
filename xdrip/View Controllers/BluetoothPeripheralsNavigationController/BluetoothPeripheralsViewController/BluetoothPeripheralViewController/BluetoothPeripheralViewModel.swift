@@ -15,6 +15,8 @@ protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     /// screen title for uiviewcontroller
     func screenTitle() -> String
     
+    func sectionTitle(forSection section: Int) -> String
+    
     /// updates the contents of a cell, for setting with rawValue withSettingRawValue
     func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem)
     

@@ -26,6 +26,7 @@ class M5StackBluetoothPeripheralViewModel {
         /// rotation
         case rotation = 4
         
+        /// should the M5Stack connect to WiFi or not
         case connectToWiFi = 5
         
     }
@@ -44,13 +45,32 @@ class M5StackBluetoothPeripheralViewModel {
 
     }
     
+    /// - list of sections available in M5Stack, the last section is only applicable to M5Stack, not M5Stick
+    /// - counting starts at 1
+    public enum M5StackSections: Int, CaseIterable {
+        
+        /// helptest, blepassword, rotation, color, ... settings applicable to both M5Stack and M5StickC
+        case commonM5Settings = 1
+    
+        /// - settings only applicable to M5Stack : battery level, brightness, power off
+        /// - THIS SHOULD ALWAYS BE THE LAST SECTION - so if sections are added, add them before this setting and increase the number of this setting
+        case specificM5StackSettings = 2
+        
+        func sectionTitle() -> String {
+            switch self {
+            case .commonM5Settings:
+                return "M5"
+            case .specificM5StackSettings:// hidden for M5StickC
+                return "M5Stack"
+            }
+        }
+        
+    }
+    
     // MARK: - private properties
     
     /// section number for section with helpText, blePassword, textColor, backGroundColor, rotation, connectToWiFi
     private let sectionNumberForM5StackCommonSettings = 1
-    
-    /// if we ever add sections, that are common to M5Stack and M5StickC, then this number will need to be increased
-    private let sectionNumberForM5StackSpecificSettings = 2
     
     /// textColor to be used in M5Stack
     ///
@@ -303,7 +323,7 @@ class M5StackBluetoothPeripheralViewModel {
                         }
                         
                         // reload table
-                        self.tableView?.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.brightness.rawValue, section: self.sectionNumberForM5StackSpecificSettings)], with: .none)
+                        self.tableView?.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.brightness.rawValue, section: M5StackSections.allCases.count)], with: .none)
                         
                         // enable the done button
                         doneButtonOutlet.enable()
@@ -491,7 +511,7 @@ class M5StackBluetoothPeripheralViewModel {
     
     /// - this function is defined to allow override by M5StickC specific model class, because the number of sections is different for M5StickC
     public func numberOfM5Sections() -> Int {
-        return sectionNumberForM5StackSpecificSettings
+        return M5StackSections.allCases.count
     }
     
 }
@@ -522,7 +542,7 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     func receivedBattery(level: Int, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
         // batteryLevel should get updated in M5Stack object by bluetoothPeripheralManager, here's the trigger to update the table
-        tableView?.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.batteryLevel.rawValue, section: sectionNumberForM5StackSpecificSettings)], with: .none)
+        tableView?.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.batteryLevel.rawValue, section: M5StackSections.allCases.count)], with: .none)
         
     }
     
@@ -731,6 +751,10 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
     func screenTitle() -> String {
         return m5StackcreenTitle()
+    }
+    
+    func sectionTitle(forSection section: Int) -> String {
+        return M5StackSections(rawValue: section)?.sectionTitle() ?? ""
     }
     
     /// - parameters :

@@ -5,14 +5,14 @@ import CoreBluetooth
 /// - these are applicable to all types of bluetoothperipheral types (M5Stack ...)
 fileprivate enum Setting:Int, CaseIterable {
     
-    /// the address
-    case address = 0
-    
     /// the name received from bluetoothTransmitter, ie the name hardcoded in the BluetoothPeripheral
-    case name = 1
+    case name = 0
 
     /// the alias that user has given, possibly nil
-    case alias = 2
+    case alias = 1
+    
+    /// the address
+    case address = 2
     
     /// the current connection status
     case connectionStatus = 3
@@ -507,6 +507,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         case .connectionStatus:
             cell.textLabel?.text = Text_BluetoothPeripheralView.status
             cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject == nil ? (bluetoothPeripheralManager.isScanning() ? "Scanning" : nil) : bluetoothPeripheralIsConnected() ? Text_BluetoothPeripheralView.connected:Text_BluetoothPeripheralView.notConnected
+            cell.accessoryType = .none
             
         case .alias:
             cell.textLabel?.text = Text_BluetoothPeripheralView.bluetoothPeripheralAlias
@@ -610,16 +611,13 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         
         if section == 0 {
-            // title for general section
-            return Texts_SettingsView.sectionTitleGeneral
-        } else if section == 1 {
-            // title for bluetoothperipheral type section
-            return bluetoothPeripheralViewModel.screenTitle()
+            // title for first section
+            return Texts_SettingsView.m5StackSectionTitleBluetooth
         }
         
-        // should never be here
-        return " "
-        
+        // title for bluetoothperipheral type section
+        return bluetoothPeripheralViewModel.sectionTitle(forSection: section)
+
     }
     
 }

@@ -256,7 +256,7 @@ class Texts_SettingsView {
     }()
     
     static let m5StackSectionTitleBluetooth: String = {
-        return NSLocalizedString("m5stack_settingsviews_sectiontitlebluetooth", tableName: filename, bundle: Bundle.main, value: "Bluetooth", comment: "bluetooth settings, section title")
+        return NSLocalizedString("m5stack_settingsviews_sectiontitlebluetooth", tableName: filename, bundle: Bundle.main, value: "Bluetooth", comment: "bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section")
     }()
     
     static let giveBlueToothPassword: String = {
