@@ -38,6 +38,7 @@ final class SettingsViewController: UIViewController {
     // MARK: - other overriden functions
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
         guard let segueIdentifier = segue.identifier else {
             fatalError("In SettingsViewController, prepare for segue, Segue had no identifier")
         }
@@ -51,12 +52,20 @@ final class SettingsViewController: UIViewController {
         case .settingsToAlertTypeSettings:
             let vc = segue.destination as! AlertTypesSettingsViewController
             vc.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
+            
         case .settingsToAlertSettings:
             let vc = segue.destination as! AlertsSettingsViewController
             vc.configure(coreDataManager: coreDataManager)
+            
         case .settingsToM5StackSettings:
             // nothing to configure
             break
+            
+        case .settingsToSchedule:
+            if let vc = segue.destination as? TimeScheduleViewController, let sender = sender as? TimeSchedule {
+                vc.configure(timeSchedule: sender)
+            }
+            
         }
     }
 
@@ -215,6 +224,9 @@ extension SettingsViewController {
         
         /// to go from general settings screen to M5Stack settings screen
         case settingsToM5StackSettings = "settingsToM5StackSettings"
+        
+        /// to go from general settings to schedule screen
+        case settingsToSchedule = "settingsToSchedule"
         
     }
 }

@@ -23,9 +23,9 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
 
         switch setting {
         case .alertTypes:
-            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToAlertTypeSettings.rawValue)
+            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToAlertTypeSettings.rawValue, sender: nil)
         case .alerts:
-            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToAlertSettings.rawValue)
+            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToAlertSettings.rawValue, sender: nil)
         }
     }
     
@@ -60,4 +60,5 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     func detailedText(index: Int) -> String? {
         return nil
     }
+    
 }

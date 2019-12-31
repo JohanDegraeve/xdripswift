@@ -170,6 +170,14 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_nightScoutUrl", tableName: filename, bundle: Bundle.main, value: "Url", comment: "nightscout settings, where user can set the nightscout url")
     }()
     
+    static let useSchedule = {
+        return NSLocalizedString("settingsviews_useSchedule", tableName: filename, bundle: Bundle.main, value: "Use schedule", comment: "nightscout settings, where user can select to use schedule or not")
+    }()
+    
+    static let schedule = {
+        return NSLocalizedString("schedule", tableName: filename, bundle: Bundle.main, value: "Schedule", comment: "nightscout or dexcom share settings, where user can select to edit the schedule")
+    }()
+    
     static let giveNightScoutUrl = {
         return NSLocalizedString("settingsviews_giveNightScoutUrl", tableName: filename, bundle: Bundle.main, value: "Enter NightScout Url", comment: "nightscout  settings, pop up that asks user to enter nightscout url")
     }()
@@ -182,6 +190,14 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_giveNightScoutAPIKey", tableName: filename, bundle: Bundle.main, value: "Enter NightScout API Key", comment: "nightscout settings, pop up that asks user to enter nightscout api key")
     }()
     
+    static let editScheduleTimePickerSubtitle: String = {
+        return NSLocalizedString("editScheduleTimePickerSubtitle", tableName: filename, bundle: Bundle.main, value: "change : ", comment: "used for editing schedule for NightScout upload and Dexcom Share upload")
+    }()
+    
+    static let timeScheduleViewTitle: String = {
+        return NSLocalizedString("timeScheduleViewTitle", tableName: filename, bundle: Bundle.main, value: "On/Off time schedule for ", comment: "When creating schedule for Nightscout or Dexcom Share upload, this is the top label text")
+    }()
+
     // MARK: - Section Speak
     
     static let sectionTitleSpeak: String = {
@@ -266,4 +282,5 @@ class Texts_SettingsView {
     static let m5StackBrightness: String = {
         return NSLocalizedString("m5stack_settingsviews_brightness", tableName: filename, bundle: Bundle.main, value: "Brightness", comment: "M5 stack setting, brightness")
     }()
+    
 }

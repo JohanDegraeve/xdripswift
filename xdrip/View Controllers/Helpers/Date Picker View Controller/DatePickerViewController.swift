@@ -159,8 +159,8 @@ final class DatePickerViewController: UIViewController {
             }
             
             datePickerViewController.cancelHandler = {
-                if let cancelHandler = datePickerViewData.cancelHandler { cancelHandler() }
                 datePickerViewController.dismiss(animated: true, completion: nil)
+                if let cancelHandler = datePickerViewData.cancelHandler { cancelHandler() }
             }
             
             // present it

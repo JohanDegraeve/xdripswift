@@ -53,10 +53,28 @@ public class NightScoutUploadManager:NSObject {
     
     /// uploads latest BgReadings to NightScout
     public func upload() {
-        // check if NightScout upload is enabled
-        if UserDefaults.standard.nightScoutEnabled && UserDefaults.standard.isMaster, let siteURL = UserDefaults.standard.nightScoutUrl, let apiKey = UserDefaults.standard.nightScoutAPIKey {
-            uploadBgReadingsToNightScout(siteURL: siteURL, apiKey: apiKey)
+        
+        // check if NightScout is enabled
+        guard UserDefaults.standard.nightScoutEnabled else {return}
+        
+        // check if master is enabled
+        guard UserDefaults.standard.isMaster else {return}
+        
+        // check if siteUrl and apiKey exist
+        guard let siteURL = UserDefaults.standard.nightScoutUrl, let apiKey = UserDefaults.standard.nightScoutAPIKey else {return}
+        
+        // if schedule is on, check if upload is needed according to schedule
+        if UserDefaults.standard.nightScoutUseSchedule {
+            if let schedule = UserDefaults.standard.nightScoutSchedule {
+                if !schedule.indicatesOn(forWhen: Date()) {
+                    return
+                }
+            }
         }
+        
+        // upload
+        uploadBgReadingsToNightScout(siteURL: siteURL, apiKey: apiKey)
+        
     }
     
     // MARK: - overriden functions

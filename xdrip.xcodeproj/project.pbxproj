@@ -60,6 +60,7 @@
 		F8297F59238EE14E00D74D66 /* TextsBluetoothPeripheralsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F57238EE14E00D74D66 /* TextsBluetoothPeripheralsView.swift */; };
 		F8297F5A238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8297F58238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift */; };
 		F83098FE23AD3F84005741DF /* UITabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83098FD23AD3F84005741DF /* UITabBarController.swift */; };
+		F830990523B94ED7005741DF /* TimeScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F830990423B94ED7005741DF /* TimeScheduleViewController.swift */; };
 		F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */; };
 		F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
 		F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
@@ -309,6 +310,7 @@
 		F8297F58238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextsBluetoothPeripheralView.swift; sourceTree = "<group>"; };
 		F83098FD23AD3F84005741DF /* UITabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITabBarController.swift; sourceTree = "<group>"; };
 		F830990323B3928E005741DF /* xdrip v8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v8.xcdatamodel"; sourceTree = "<group>"; };
+		F830990423B94ED7005741DF /* TimeScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeScheduleViewController.swift; sourceTree = "<group>"; };
 		F846CDD523046BAC00DCF016 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SettingsViews.strings"; sourceTree = "<group>"; };
 		F846CDD623046BAE00DCF016 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBluetoothPairing.swift; sourceTree = "<group>"; };
@@ -947,13 +949,6 @@
 			path = "Application Delegate";
 			sourceTree = "<group>";
 		};
-		F85DC2FC21D3E83100B9F74A /* Transmitter */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Transmitter;
-			sourceTree = "<group>";
-		};
 		F8A389CD232A6A6F0010F405 /* M5StackSettingsViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -997,7 +992,6 @@
 				F85DC2F921D2CCC000B9F74A /* Storyboards */,
 				F8025E5B21F7AFC600ECF0C0 /* Supporting Files */,
 				F8BDD44C221CAA26006EAB84 /* Texts */,
-				F85DC2FC21D3E83100B9F74A /* Transmitter */,
 				F8EA6C8021B723A80082976B /* Utilities */,
 				F85DC2FA21D2CD3000B9F74A /* View Controllers */,
 				F8BECB00235CE3E20060DAE1 /* Views */,
@@ -1110,6 +1104,7 @@
 				F8B3A841227F090D004BA588 /* SettingsViewController.swift */,
 				F8B3A837227F090D004BA588 /* SettingsViewModels */,
 				F8A389E6232ECE7E0010F405 /* SettingsViewUtilities.swift */,
+				F830990423B94ED7005741DF /* TimeScheduleViewController.swift */,
 			);
 			path = SettingsViewController;
 			sourceTree = "<group>";
@@ -1867,6 +1862,7 @@
 				F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */,
 				F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */,
 				F8B3A858227F6971004BA588 /* UISwitch.swift in Sources */,
+				F830990523B94ED7005741DF /* TimeScheduleViewController.swift in Sources */,
 				F8F9722123A5915900C3F17D /* LibreSensorSerialNumber.swift in Sources */,
 				F8A1586722EDB8BF007F5B5D /* ConstantsHomeView.swift in Sources */,
 				F8A1585922EDB7C6007F5B5D /* ConstantsDefaultAlertLevels.swift in Sources */,

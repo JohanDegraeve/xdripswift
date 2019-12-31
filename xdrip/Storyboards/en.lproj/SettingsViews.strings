@@ -54,3 +54,6 @@
 "labelShowReadingInAppBadge" = "Reading in app badge";
 "multipleAppBadgeValueWith10" = "Multiple reading by 10";
 "settingsviews_build" = "Build";
+"useSchedule" = "Use schedule";
+"editScheduleTimePickerSubtitle" = "change : ";
+"timeScheduleViewTitle" = "On/Off time schedule for ";

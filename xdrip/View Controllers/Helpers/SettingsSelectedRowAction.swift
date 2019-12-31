@@ -48,7 +48,7 @@ enum SettingsSelectedRowAction {
     /// performSegue to be done with specified identifier
     ///
     /// (it's not the right place to define this, not a clear split view/model)
-    case performSegue(withIdentifier: String)
+    case performSegue(withIdentifier: String, sender: Any?)
     
     /// to show Info to user, eg licenseInfo, with a title and a message
     ///

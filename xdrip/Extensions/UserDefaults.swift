@@ -39,6 +39,11 @@ extension UserDefaults {
         
         /// should readings be uploaded to nightscout
         case nightScoutEnabled = "nightScoutEnabled"
+        /// should schedule be used for nightscout upload ?
+        case nightScoutUseSchedule = "nightScoutUseSchedule"
+        /// - schedule for nightscout use, only applicable if nightScoutUseSchedule = true
+        /// - string of values, seperate by '-', values are int values and represent minutes
+        case nightScoutSchedule = "nightScoutSchedule"
         /// nightscout url
         case nightScoutUrl = "nightScoutUrl"
         /// nightscout api key
@@ -371,6 +376,16 @@ extension UserDefaults {
         }
     }
     
+    /// use schedule for nightscoutupload ?
+    @objc dynamic var nightScoutUseSchedule: Bool {
+        get {
+            return bool(forKey: Key.nightScoutUseSchedule.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.nightScoutUseSchedule.rawValue)
+        }
+    }
+    
     /// the nightscout url - starts with http
     ///
     /// when assigning a new value, it will be checked if it starts with http, if not then automatically https:// will be added
@@ -396,6 +411,18 @@ extension UserDefaults {
             set(value, forKey: Key.nightScoutUrl.rawValue)
         }
     }
+    
+    /// - schedule for nightscout use, only applicable if nightScoutUseSchedule = true
+    /// - string of values, seperate by '-', values are int values and represent minutes
+    var nightScoutSchedule: String? {
+        get {
+            return string(forKey: Key.nightScoutSchedule.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.nightScoutSchedule.rawValue)
+        }
+    }
+    
 
     /// the nightscout api key
     @objc dynamic var nightScoutAPIKey:String? {

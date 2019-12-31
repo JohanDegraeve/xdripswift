@@ -55,10 +55,13 @@ extension M5StackSettingsViewController {
                 
             case .general:
                 return SettingsViewM5StackGeneralSettingsViewModel()
+                
             case .bluetooth:
                 return SettingsViewM5StackBluetoothSettingsViewModel()
+                
             case .wifi:
                 return SettingsViewM5StackWiFiSettingsViewModel()
+
             }
         }
 

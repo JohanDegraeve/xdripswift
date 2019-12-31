@@ -26,3 +26,6 @@
 "black" = "black";
 "name" = "Name";
 "WiFi" = "WiFi";
+"on" = "on";
+"off" = "off";
+"delete" = "Delete";

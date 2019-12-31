@@ -1,12 +1,22 @@
 import UIKit
 
 fileprivate enum Setting:Int, CaseIterable {
+    
     ///should readings be uploaded or not
     case nightScoutEnabled = 0
+    
     ///nightscout url
     case nightScoutUrl = 1
+    
     /// nightscout api key
     case nightScoutAPIKey = 2
+    
+    /// use nightscout schedule or not
+    case useSchedule = 3
+    
+    /// open uiviewcontroller to edit schedule
+    case schedule = 4
+    
 }
 
 /// conforms to SettingsViewModelProtocol for all nightscout settings in the first sections screen
@@ -29,6 +39,7 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
+        
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
@@ -43,6 +54,12 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightScoutAPIKey, message:  Texts_SettingsView.giveNightScoutAPIKey, keyboardType: .default, text: UserDefaults.standard.nightScoutAPIKey, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(apiKey:String) in
                 UserDefaults.standard.nightScoutAPIKey = apiKey.toNilIfLength0()}, cancelHandler: nil)
             
+        case .useSchedule:
+            return .nothing
+            
+        case .schedule:
+            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToSchedule.rawValue, sender: self)
+            
         }
     }
     
@@ -54,6 +71,9 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         
         // if nightscout upload not enabled then only first row is shown
         if UserDefaults.standard.nightScoutEnabled {
+            if !UserDefaults.standard.nightScoutUseSchedule {
+                return Setting.allCases.count - 1
+            }
             return Setting.allCases.count
         } else {
             return 1
@@ -64,12 +84,18 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
+            
         case .nightScoutAPIKey:
             return Texts_SettingsView.labelNightScoutAPIKey
         case .nightScoutUrl:
             return Texts_SettingsView.labelNightScoutUrl
         case .nightScoutEnabled:
             return Texts_SettingsView.labelNightScoutEnabled
+        case .useSchedule:
+            return Texts_SettingsView.useSchedule
+        case .schedule:
+            return Texts_SettingsView.schedule
+            
         }
     }
     
@@ -82,6 +108,10 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         case .nightScoutUrl:
             return UITableViewCell.AccessoryType.disclosureIndicator
         case .nightScoutAPIKey:
+            return UITableViewCell.AccessoryType.disclosureIndicator
+        case .useSchedule:
+            return UITableViewCell.AccessoryType.none
+        case .schedule:
             return UITableViewCell.AccessoryType.disclosureIndicator
         }
     }
@@ -96,6 +126,10 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
             return UserDefaults.standard.nightScoutAPIKey
         case .nightScoutUrl:
             return UserDefaults.standard.nightScoutUrl
+        case .useSchedule:
+            return nil
+        case .schedule:
+            return nil
         }
     }
     
@@ -103,12 +137,70 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
+            
         case .nightScoutEnabled:
             return UISwitch(isOn: UserDefaults.standard.nightScoutEnabled, action: {(isOn:Bool) in UserDefaults.standard.nightScoutEnabled = isOn})
-        default:
+        
+        case .nightScoutUrl:
             return nil
+            
+        case .nightScoutAPIKey:
+            return nil
+            
+        case .useSchedule:
+            return UISwitch(isOn: UserDefaults.standard.nightScoutUseSchedule, action: {(isOn:Bool) in UserDefaults.standard.nightScoutUseSchedule = isOn})
+            
+        case .schedule:
+            return nil
+            
         }
     }
+    
+}
+
+extension SettingsViewNightScoutSettingsViewModel: TimeSchedule {
+    
+    func serviceName() -> String {
+        return "NightScout"
+    }
+    
+    func getSchedule() -> [Int] {
+
+        var schedule = [Int]()
+        
+        if let scheduleInSettings = UserDefaults.standard.nightScoutSchedule {
+            
+            schedule = scheduleInSettings.split(separator: "-").map({Int($0) ?? 0})
+            
+        }
+
+        return schedule
+        
+    }
+    
+    func storeSchedule(schedule: [Int]) {
+        
+        var scheduleToStore: String?
+        
+        for entry in schedule {
+            
+            if scheduleToStore == nil {
+                
+                scheduleToStore = entry.description
+                
+            } else {
+                
+                scheduleToStore = scheduleToStore! + "-" + entry.description
+                
+            }
+            
+        }
+        
+        UserDefaults.standard.nightScoutSchedule = scheduleToStore
+        
+    }
+    
+    
 }
 
 

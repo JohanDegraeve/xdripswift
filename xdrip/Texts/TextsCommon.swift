@@ -117,4 +117,16 @@ class Texts_Common {
         return NSLocalizedString("WiFi", tableName: filename, bundle: Bundle.main, value: "WiFi", comment: "WiFi")
     }()
     
+    static let on = {
+        return NSLocalizedString("on", tableName: filename, bundle: Bundle.main, value: "on", comment: "on")
+    }()
+
+    static let off = {
+        return NSLocalizedString("off", tableName: filename, bundle: Bundle.main, value: "off", comment: "off")
+    }()
+
+    static let delete = {
+        return NSLocalizedString("Delete", tableName: filename, bundle: Bundle.main, value: "Delete", comment: "Delete")
+    }()
+    
 }
