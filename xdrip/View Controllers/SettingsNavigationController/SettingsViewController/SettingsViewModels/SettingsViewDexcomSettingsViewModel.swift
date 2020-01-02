@@ -11,6 +11,11 @@ fileprivate enum Setting:Int, CaseIterable {
     case useUSDexcomShareurl = 3
     /// dexcomShareSerialNumber
     case dexcomShareSerialNumber = 4
+    /// use dexcom share schedule or not
+    case useSchedule = 5
+    /// open uiviewcontroller to edit schedule
+    case schedule = 6
+
 }
 
 /// conforms to SettingsViewModelProtocol for all Dexcom settings in the first sections screen
@@ -76,6 +81,13 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
                 }
 
             }, cancelHandler: nil)
+            
+        case .useSchedule:
+            return .nothing
+            
+        case .schedule:
+            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToSchedule.rawValue, sender: self)
+            
         }
     }
     
@@ -84,10 +96,14 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
     }
 
     func numberOfRows() -> Int {
+        
         if !UserDefaults.standard.uploadReadingstoDexcomShare {
             return 1
         }
         else {
+            if !UserDefaults.standard.dexcomShareUseSchedule {
+                return Setting.allCases.count - 1
+            }
             return Setting.allCases.count
         }
     }
@@ -106,6 +122,10 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.labelUseUSDexcomShareurl
         case .dexcomShareAccountName:
             return Texts_SettingsView.labelDexcomShareAccountName
+        case .useSchedule:
+            return Texts_SettingsView.useSchedule
+        case .schedule:
+            return Texts_SettingsView.schedule
         }
     }
     
@@ -122,6 +142,10 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
         case .useUSDexcomShareurl:
             return UITableViewCell.AccessoryType.none
         case .dexcomShareSerialNumber:
+            return UITableViewCell.AccessoryType.disclosureIndicator
+        case .useSchedule:
+            return UITableViewCell.AccessoryType.none
+        case .schedule:
             return UITableViewCell.AccessoryType.disclosureIndicator
         }
     }
@@ -140,6 +164,10 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
             return nil
         case .dexcomShareSerialNumber:
             return UserDefaults.standard.dexcomShareSerialNumber
+        case .useSchedule:
+            return nil
+        case .schedule:
+            return nil
         }
     }
     
@@ -153,6 +181,57 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
             return UISwitch(isOn: UserDefaults.standard.useUSDexcomShareurl, action: {(isOn:Bool) in UserDefaults.standard.useUSDexcomShareurl = isOn})
         case .dexcomShareAccountName,.dexcomSharePassword,.dexcomShareSerialNumber:
             return nil
+        case .useSchedule:
+            return UISwitch(isOn: UserDefaults.standard.dexcomShareUseSchedule, action: {(isOn:Bool) in UserDefaults.standard.dexcomShareUseSchedule = isOn})
+            
+        case .schedule:
+            return nil
         }
     }
 }
+
+extension SettingsViewDexcomSettingsViewModel: TimeSchedule {
+    
+    func serviceName() -> String {
+        return "Dexcom Share"
+    }
+    
+    func getSchedule() -> [Int] {
+        
+        var schedule = [Int]()
+        
+        if let scheduleInSettings = UserDefaults.standard.dexcomShareSchedule {
+            
+            schedule = scheduleInSettings.split(separator: "-").map({Int($0) ?? 0})
+            
+        }
+        
+        return schedule
+        
+    }
+    
+    func storeSchedule(schedule: [Int]) {
+        
+        var scheduleToStore: String?
+        
+        for entry in schedule {
+            
+            if scheduleToStore == nil {
+                
+                scheduleToStore = entry.description
+                
+            } else {
+                
+                scheduleToStore = scheduleToStore! + "-" + entry.description
+                
+            }
+            
+        }
+        
+        UserDefaults.standard.dexcomShareSchedule = scheduleToStore
+        
+    }
+    
+    
+}
+

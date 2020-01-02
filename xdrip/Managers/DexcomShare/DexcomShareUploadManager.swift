@@ -65,10 +65,28 @@ class DexcomShareUploadManager:NSObject {
     
     /// uploads latest BgReadings to Dexcom Share
     public func upload() {
-        // check if Dexcom share upload is enabled and required settings are set
-        if UserDefaults.standard.uploadReadingstoDexcomShare && UserDefaults.standard.dexcomShareAccountName != nil && UserDefaults.standard.dexcomSharePassword != nil && UserDefaults.standard.dexcomShareSerialNumber != nil {
-            uploadBgReadingsToDexcomShare(firstAttempt: true)
+        
+        // check if dexcomShare is enabled
+        guard UserDefaults.standard.uploadReadingstoDexcomShare else {return}
+        
+        // check if master is enabled
+        guard UserDefaults.standard.isMaster else {return}
+        
+        // check if accountname and password and serial number exist
+        guard UserDefaults.standard.dexcomShareSerialNumber != nil, UserDefaults.standard.dexcomShareAccountName != nil, UserDefaults.standard.dexcomSharePassword != nil else {return}
+        
+        // if schedule is on, check if upload is needed according to schedule
+        if UserDefaults.standard.dexcomShareUseSchedule {
+            if let schedule = UserDefaults.standard.dexcomShareSchedule {
+                if !schedule.indicatesOn(forWhen: Date()) {
+                    return
+                }
+            }
         }
+        
+        // upload
+        uploadBgReadingsToDexcomShare(firstAttempt: true)
+        
     }
 
     // MARK: - overriden functions

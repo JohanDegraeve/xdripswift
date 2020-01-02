@@ -61,7 +61,12 @@ extension UserDefaults {
         case useUSDexcomShareurl = "useUSDexcomShareurl"
         /// dexcom share serial number
         case dexcomShareSerialNumber = "dexcomShareSerialNumber"
-        
+        /// should schedule be used for dexcom share upload ?
+        case dexcomShareUseSchedule = "dexcomShareUseSchedule"
+        /// - schedule for dexcomShare use, only applicable if dexcomShareUseSchedule = true
+        /// - string of values, seperate by '-', values are int values and represent minutes
+        case dexcomShareSchedule = "dexcomShareSchedule"
+
         // Healthkit
         
         /// should readings be stored in healthkit, true or false
@@ -483,6 +488,27 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.dexcomShareSerialNumber.rawValue)
+        }
+    }
+    
+    /// - schedule for dexcomShare use, only applicable if dexcomShareUseSchedule = true
+    /// - string of values, seperate by '-', values are int values and represent minutes
+    var dexcomShareSchedule: String? {
+        get {
+            return string(forKey: Key.dexcomShareSchedule.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.dexcomShareSchedule.rawValue)
+        }
+    }
+    
+    /// use schedule for dexcomShareupload ?
+    @objc dynamic var dexcomShareUseSchedule: Bool {
+        get {
+            return bool(forKey: Key.dexcomShareUseSchedule.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.dexcomShareUseSchedule.rawValue)
         }
     }
 
