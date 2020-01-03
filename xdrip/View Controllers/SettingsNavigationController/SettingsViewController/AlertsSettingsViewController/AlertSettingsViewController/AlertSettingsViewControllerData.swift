@@ -212,16 +212,20 @@ extension AlertSettingsViewControllerData {
             if AlertSettingsViewControllerData.getAlertKind(alertKind: alertKind).valueNeedsConversionToMmol() && !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
                 keyboardType = .decimalPad
             }
-            let alert = UIAlertController(title: AlertSettingsViewControllerData.getAlertKind(alertKind: alertKind).alertTitle(), message: Texts_Alerts.changeAlertValue + " (" + alertKindAsAlertKind.valueUnitText(transmitterType: UserDefaults.standard.transmitterType) + ")", keyboardType: keyboardType, text: Double(value).mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
+            let alert = UIAlertController(title: AlertSettingsViewControllerData.getAlertKind(alertKind: alertKind).alertTitle(), message: Texts_Alerts.changeAlertValue + " (" + alertKindAsAlertKind.valueUnitText(transmitterType: UserDefaults.standard.transmitterType) + ")", keyboardType: keyboardType, text: Double(value).mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl || !AlertSettingsViewControllerData.getAlertKind(alertKind: self.alertKind).valueNeedsConversionToMmol()), placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
+                
                 if var asdouble = text.toDouble() {
-                    if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
+                    
+                    if !UserDefaults.standard.bloodGlucoseUnitIsMgDl && AlertSettingsViewControllerData.getAlertKind(alertKind: self.alertKind).valueNeedsConversionToMmol() {
                         asdouble = asdouble.mmolToMgdl()
                     }
+                    
                     self.value = Int16(asdouble)
                     tableView.reloadRows(at: [IndexPath(row: Setting.value.rawValue, section: 0)], with: .none)
                     // checkIfPropertiesChanged
                     self.checkIfPropertiesChanged()
                 }
+                
             }, cancelHandler: nil)
             
             // present the alert
