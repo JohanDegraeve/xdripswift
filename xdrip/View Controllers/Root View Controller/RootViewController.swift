@@ -316,6 +316,7 @@ final class RootViewController: UIViewController {
             })
             
             self.present(alert, animated: true, completion: nil)
+            
         }
         
         // whenever app comes from-back to foreground, updateLabelsAndChart needs to be called
@@ -926,12 +927,34 @@ final class RootViewController: UIViewController {
         // also remove the sensor not detected notification, if any
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected])
         
+        // prepare value for badge
+        var readingValueForBadge = lastReading[0].calculatedValue
+        // values lower dan 12 are special values, don't show anything
+        guard readingValueForBadge > 12 else {return}
+        // high limit to 400
+        if readingValueForBadge >= 400.0 {readingValueForBadge = 400.0}
+        // low limit ti 40
+        if readingValueForBadge <= 40.0 {readingValueForBadge = 40.0}
         
         // check if notification on home screen is enabled in the settings
         if UserDefaults.standard.showReadingInNotification  {
             
             // Create Notification Content
             let notificationContent = UNMutableNotificationContent()
+            
+            // set value in badge if required
+            if UserDefaults.standard.showReadingInAppBadge {
+                
+                // rescale if unit is mmol
+                if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
+                    readingValueForBadge = readingValueForBadge.mgdlToMmol().roundToDecimal(1)
+                } else {
+                    readingValueForBadge = readingValueForBadge.roundToDecimal(0)
+                }
+                
+                notificationContent.badge = NSNumber(value: readingValueForBadge.rawValue)
+                
+            }
             
             // Configure notificationContent title, which is bg value in correct unit, add also slopeArrow if !hideSlope and finally the difference with previous reading, if there is one
             var calculatedValueAsString = lastReading[0].unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
@@ -956,33 +979,23 @@ final class RootViewController: UIViewController {
                 }
             }
         }
-        
-        // check if app badge should have reading value
-        if UserDefaults.standard.showReadingInAppBadge {
+        else {
             
-            var readingValue = lastReading[0].calculatedValue
-            
-            // values lower dan 12 are special values, don't show anything
-            guard readingValue > 12 else {return}
-            
-            // high limit to 400
-            if readingValue >= 400.0 {readingValue = 400.0}
-            
-            // low limit ti 40
-            if readingValue <= 40.0 {readingValue = 40.0}
-            
-            // rescale of unit is mmol
-            readingValue = readingValue.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-            
-            // if unit is mmol and if value needs to be multiplied by 10, then multiply by 10
-            if !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.multipleAppBadgeValueWith10 {
-                readingValue = readingValue * 10.0
+            // notification shouldn't be shown, but maybe the badge counter. Here the badge value needs to be shown in another way
+            if UserDefaults.standard.showReadingInAppBadge {
+                
+                // rescale of unit is mmol
+                readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                
+                // if unit is mmol and if value needs to be multiplied by 10, then multiply by 10
+                if !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.multipleAppBadgeValueWith10 {
+                    readingValueForBadge = readingValueForBadge * 10.0
+                }
+                
+                UIApplication.shared.applicationIconBadgeNumber = Int(round(readingValueForBadge))
+                
             }
-            
-            UIApplication.shared.applicationIconBadgeNumber = Int(round(readingValue))
-            
         }
-        
 
     }
     

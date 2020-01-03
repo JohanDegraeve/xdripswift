@@ -49,7 +49,7 @@ class Texts_SettingsView {
     }()
     
     static let multipleAppBadgeValueWith10: String = {
-        return NSLocalizedString("multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiple reading by 10", comment: "general settings, should reading be multiplied with 10 yes or no")
+        return NSLocalizedString("multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply reading by 10", comment: "general settings, should reading be multiplied with 10 yes or no")
     }()
     
     // MARK: - Section Transmitter

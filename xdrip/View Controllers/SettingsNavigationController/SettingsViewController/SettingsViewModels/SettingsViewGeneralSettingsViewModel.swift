@@ -76,8 +76,9 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
 
     func numberOfRows() -> Int {
         
-        // if unit is mmol and if show value in app badge is on, then show also if to be multiplied by 10 yes or no
-        if !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.showReadingInAppBadge {
+        // if unit is mmol and if show value in app badge is on and if showReadingInNotification is not on, then show also if to be multiplied by 10 yes or no
+        // (if showReadingInNotification is on, then badge counter will be set via notification, in this case we can use NSNumber so we don't need to multiply by 10)
+        if !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.showReadingInAppBadge && !UserDefaults.standard.showReadingInNotification {
             return Setting.allCases.count
         } else {
             return Setting.allCases.count - 1
