@@ -268,18 +268,24 @@ final class RootViewController: UIViewController {
                 
             } else {
                 
+                guard let url = URL(string: "https://testflight.apple.com/join/6ZqKUGpm") else {
+                    return //be safe
+                }
+                
                 let expirationDateString = "14/01/2020"
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "dd/MM/yyyy"
                 if let expirationDate = dateFormatter.date(from: expirationDateString) {
                     
-                    let diff = Date().timeIntervalSince(expirationDate)
+                    let diff = expirationDate.timeIntervalSince(Date())
                     
-                    if diff > 3600 * 24 * 4 {
+                    if diff < 3600 * 24 * 4 {
                         
-                        let test = UIAlertController(title: Texts_Common.warning, message: "xDrip will move to another account. If you want to continue using xDrip,  you need to reinstall and reconfigure xDrip before 14/01. ", actionHandler: {
-                            
-                        }, cancelHandler: nil)
+                        let test = UIAlertController(title: Texts_Common.warning, message: "xDrip will move to another account. If you want to continue using xDrip,  you need to reinstall and reconfigure xDrip before 14/01. ", actionTitle: "Install", actionHandler: {
+                            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                        })
+                        
+                        self.present(test, animated: true, completion: nil)
                         
                     }
                     
