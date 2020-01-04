@@ -248,6 +248,25 @@ final class RootViewController: UIViewController {
             
             // create transmitter based on UserDefaults
             self.initializeCGMTransmitter()
+            
+            // if licenseinfo not yet accepted, show license info with only ok button
+            if !UserDefaults.standard.licenseInfoAccepted {
+                
+                let alert = UIAlertController(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress, actionHandler: {
+                    
+                    // set licenseInfoAccepted to true
+                    UserDefaults.standard.licenseInfoAccepted = true
+                    
+                    // create info screen about transmitters
+                    let infoScreenAlert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterInfo, actionHandler: nil)
+                    
+                    self.present(infoScreenAlert, animated: true, completion: nil)
+                    
+                })
+                
+                self.present(alert, animated: true, completion: nil)
+                
+            }
 
         })
         
@@ -300,24 +319,6 @@ final class RootViewController: UIViewController {
         
         // setup the timer logic for updating the view regularly
         setupUpdateLabelsAndChartTimer()
-        
-        // if licenseinfo not yet accepted, show license info with only ok button
-        if !UserDefaults.standard.licenseInfoAccepted {
-            let alert = UIAlertController(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress, actionHandler: {
-                
-                // set licenseInfoAccepted to true
-                UserDefaults.standard.licenseInfoAccepted = true
-                
-                // create info screen about transmitters
-                let infoScreenAlert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterInfo, actionHandler: nil)
-                
-                self.present(infoScreenAlert, animated: true, completion: nil)
-                
-            })
-            
-            self.present(alert, animated: true, completion: nil)
-            
-        }
         
         // whenever app comes from-back to foreground, updateLabelsAndChart needs to be called
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {self.updateLabelsAndChart(overrideApplicationState: true)})
@@ -904,7 +905,7 @@ final class RootViewController: UIViewController {
         UIApplication.shared.applicationIconBadgeNumber = 0
         
         // bgReadingsAccessor should not be nil at all, but let's not create a fatal error for that, there's already enough checks for it
-        guard  let bgReadingsAccessor = bgReadingsAccessor else {
+        guard let bgReadingsAccessor = bgReadingsAccessor else {
             return
         }
         
