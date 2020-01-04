@@ -279,7 +279,7 @@ final class RootViewController: UIViewController {
                     
                     let diff = expirationDate.timeIntervalSince(Date())
                     
-                    if diff < 3600 * 24 * 4 {
+                    if diff < 3600 * 24 * 5 {
                         
                         let test = UIAlertController(title: Texts_Common.warning, message: "xDrip will move to another account. If you want to continue using xDrip,  you need to reinstall and reconfigure xDrip before 14/01. ", actionTitle: "Install", actionHandler: {
                             UIApplication.shared.open(url, options: [:], completionHandler: nil)
