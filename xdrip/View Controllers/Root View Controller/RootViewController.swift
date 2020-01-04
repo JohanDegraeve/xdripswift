@@ -266,6 +266,25 @@ final class RootViewController: UIViewController {
                 
                 self.present(alert, animated: true, completion: nil)
                 
+            } else {
+                
+                let expirationDateString = "14/01/2020"
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "dd/MM/yyyy"
+                if let expirationDate = dateFormatter.date(from: expirationDateString) {
+                    
+                    let diff = Date().timeIntervalSince(expirationDate)
+                    
+                    if diff > 3600 * 24 * 4 {
+                        
+                        let test = UIAlertController(title: Texts_Common.warning, message: "xDrip will move to another account. If you want to continue using xDrip,  you need to reinstall and reconfigure xDrip before 14/01. ", actionHandler: {
+                            
+                        }, cancelHandler: nil)
+                        
+                    }
+                    
+                }
+                
             }
 
         })
