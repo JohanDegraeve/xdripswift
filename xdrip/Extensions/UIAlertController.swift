@@ -31,7 +31,7 @@ extension UIAlertController {
         }))
         
         // add cancel button
-        addAction(UIAlertAction(title: Texts_Common.Cancel, style: .default, handler: nil))
+        addAction(UIAlertAction(title: Texts_Common.Cancel, style: .cancel, handler: nil))
 
     }
     
