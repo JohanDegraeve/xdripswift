@@ -16,6 +16,25 @@ extension UIAlertController {
         }))
     }
     
+    /// creates a UIAlertController of type alert with a title and message and adds an ok button and cancel button. Text in Ok button can be canged
+    /// - parameters:
+    ///     - title : title, optional, used in init(title: title, message: message, preferredStyle: .alert)
+    ///     - message : message, optional, used in init(title: title, message: message, preferredStyle: .alert)
+    ///     - actionHandler : optional closure which will be executed when user clickx ok, without in- output
+    ///     - actionTitle : text for ok button
+    convenience init(title:String?, message:String?, actionTitle: String, actionHandler: (() -> Void)?) {
+        
+        self.init(title: title, message: message, preferredStyle: .alert)
+        
+        addAction(UIAlertAction(title: actionTitle, style: .default, handler: { (action:UIAlertAction) in
+            if let actionHandler = actionHandler {actionHandler()}
+        }))
+        
+        // add cancel button
+        addAction(UIAlertAction(title: Texts_Common.Cancel, style: .default, handler: nil))
+
+    }
+    
     /// creates a UIAlertController of type alert with a title and message and adds an ok button and a cancel button, if ok click then the actionHandler is executed, if cancel clicked then the cancelhandler which is optional
     /// - parameters:
     ///     - title : title, optional, used in init(title: title, message: message, preferredStyle: .alert)
