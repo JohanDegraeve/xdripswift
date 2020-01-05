@@ -50,7 +50,7 @@ extension UInt8 {
 
 extension Data {
     var isCRCValid: Bool {
-        return dropLast(2).crc16 == suffix(2).toInt(position: 0)
+        return dropLast(2).crc16 == suffix(2).toInt(position: 0, length: 2)
     }
 
     func appendingCRC() -> Data {

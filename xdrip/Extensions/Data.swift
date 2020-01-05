@@ -79,10 +79,9 @@ extension Data {
         return number
     }
     
-    func toInt (position: Int) -> Int {
-        let intSize = MemoryLayout<Int>.size
+    func toInt (position: Int, length: Int) -> Int {
         let start = position
-        let end = start.advanced(by: intSize)
+        let end = start.advanced(by: length)
         let number: Int =  self.subdata(in: start..<end).withUnsafeBytes { $0.load(as: Int.self) }
         return number
     }
