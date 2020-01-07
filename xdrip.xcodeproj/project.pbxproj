@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		86163BDC23C256EB00B56C09 /* SystemInfoHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 86163BDB23C256EB00B56C09 /* SystemInfoHelper.m */; };
+		86163BE923C25A8100B56C09 /* ConstantsWebServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86163BE823C25A8100B56C09 /* ConstantsWebServices.swift */; };
+		86B97E4223C3D18B0055F54C /* WebServicesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B97E4123C3D18B0055F54C /* WebServicesManager.swift */; };
+		86B97E4723C3D4270055F54C /* ca.der in Resources */ = {isa = PBXBuildFile; fileRef = 86B97E4523C3D4260055F54C /* ca.der */; };
+		86B97E4823C3D4270055F54C /* localhost.p12 in Resources */ = {isa = PBXBuildFile; fileRef = 86B97E4623C3D4270055F54C /* localhost.p12 */; };
 		A48D2DE552F4A356AA32746A /* Pods_xdrip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */; };
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
 		F8025C1321DA683400ECF0C0 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1221DA683400ECF0C0 /* Data.swift */; };
@@ -253,6 +258,12 @@
 /* Begin PBXFileReference section */
 		148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.debug.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.debug.xcconfig"; sourceTree = "<group>"; };
 		662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		86163BDA23C256EB00B56C09 /* SystemInfoHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemInfoHelper.h; sourceTree = "<group>"; };
+		86163BDB23C256EB00B56C09 /* SystemInfoHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SystemInfoHelper.m; sourceTree = "<group>"; };
+		86163BE823C25A8100B56C09 /* ConstantsWebServices.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsWebServices.swift; sourceTree = "<group>"; };
+		86B97E4123C3D18B0055F54C /* WebServicesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebServicesManager.swift; sourceTree = "<group>"; };
+		86B97E4523C3D4260055F54C /* ca.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = ca.der; sourceTree = "<group>"; };
+		86B97E4623C3D4270055F54C /* localhost.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = localhost.p12; sourceTree = "<group>"; };
 		E2648F65F347D56D7DFFFAB7 /* Pods-xdrip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.release.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.release.xcconfig"; sourceTree = "<group>"; };
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
 		F8025C1221DA683400ECF0C0 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
@@ -690,6 +701,23 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		86163BD323C2567A00B56C09 /* WebServices */ = {
+			isa = PBXGroup;
+			children = (
+				86B97E4123C3D18B0055F54C /* WebServicesManager.swift */,
+			);
+			path = WebServices;
+			sourceTree = "<group>";
+		};
+		86163BDD23C257AB00B56C09 /* Certificates */ = {
+			isa = PBXGroup;
+			children = (
+				86B97E4523C3D4260055F54C /* ca.der */,
+				86B97E4623C3D4270055F54C /* localhost.p12 */,
+			);
+			path = Certificates;
+			sourceTree = "<group>";
+		};
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -739,6 +767,7 @@
 		F8025E5A21F7AFA100ECF0C0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				86163BDD23C257AB00B56C09 /* Certificates */,
 				F8B3A7B7226CC0B7004BA588 /* sounds */,
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
 			);
@@ -816,6 +845,8 @@
 		F821CF69229FC22D005C1E43 /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				86163BDA23C256EB00B56C09 /* SystemInfoHelper.h */,
+				86163BDB23C256EB00B56C09 /* SystemInfoHelper.m */,
 				F821CF6A229FC22D005C1E43 /* Endpoint.swift */,
 			);
 			path = Network;
@@ -901,6 +932,7 @@
 				F821CF48229BF43A005C1E43 /* Alerts */,
 				F821CF54229BF43A005C1E43 /* Application */,
 				F821CF4D229BF43A005C1E43 /* CoreData */,
+				86163BD323C2567A00B56C09 /* WebServices */,
 				F821CF4F229BF43A005C1E43 /* NightScout */,
 			);
 			path = Managers;
@@ -1221,6 +1253,7 @@
 				F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */,
 				F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */,
 				F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */,
+				86163BE823C25A8100B56C09 /* ConstantsWebServices.swift */,
 				F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */,
 			);
 			name = Constants;
@@ -1656,7 +1689,9 @@
 				F8B3A7C6226CC0B7004BA588 /* shortlow2.mp3 in Resources */,
 				F8B3A7CA226CC0B7004BA588 /* shortlow1.mp3 in Resources */,
 				F8B3A7D1226CC0B7004BA588 /* betterwakeup.mp3 in Resources */,
+				86B97E4723C3D4270055F54C /* ca.der in Resources */,
 				F8B3A81F227DEC92004BA588 /* README.md in Resources */,
+				86B97E4823C3D4270055F54C /* localhost.p12 in Resources */,
 				F8BDD455221DEF22006EAB84 /* SettingsViews.strings in Resources */,
 				F8B48A9C22B2FA66009BCC01 /* SpeakReading.strings in Resources */,
 				F8B3A7C7226CC0B7004BA588 /* shortlow3.mp3 in Resources */,
@@ -1908,6 +1943,7 @@
 				F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */,
 				F8B3A78B225D473D004BA588 /* UIAlertController.swift in Sources */,
 				F8F9720E23A5915900C3F17D /* AuthRequestRxMessage.swift in Sources */,
+				86163BE923C25A8100B56C09 /* ConstantsWebServices.swift in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
 				F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */,
 				F8F9723023A5915900C3F17D /* M5StackUtilities.swift in Sources */,
@@ -1933,8 +1969,10 @@
 				F821CF5E229BF43A005C1E43 /* BgReading+NightScout.swift in Sources */,
 				F8A389EB233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
+				86163BDC23C256EB00B56C09 /* SystemInfoHelper.m in Sources */,
 				F8F9722023A5915900C3F17D /* LibreGlucoseSmoothing.swift in Sources */,
 				F80859272364355F00F3829D /* ConstantsGlucoseChart.swift in Sources */,
+				86B97E4223C3D18B0055F54C /* WebServicesManager.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 				F8297F56238ED07700D74D66 /* BluetoothPeripheralManager.swift in Sources */,
 				F8297F5A238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift in Sources */,
@@ -2355,10 +2393,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 3009;
-				DEVELOPMENT_TEAM = RNX44PP998;
+				DEVELOPMENT_TEAM = 9YNCZB3344;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2366,9 +2404,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.6.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = br.cfj.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = xdripswift;
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -2383,10 +2421,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 3009;
-				DEVELOPMENT_TEAM = RNX44PP998;
+				DEVELOPMENT_TEAM = 9YNCZB3344;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2394,9 +2432,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.6.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = br.cfj.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = xdripswift;
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
