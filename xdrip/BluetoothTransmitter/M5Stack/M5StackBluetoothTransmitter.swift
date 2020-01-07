@@ -269,17 +269,6 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     
     // MARK: - overriden BluetoothTransmitter functions
     
-    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        
-        super.centralManagerDidUpdateState(central)
-        
-        if deviceAddress == nil {
-            /// this bluetoothTransmitter is created to start scanning for a new, unknown M5Stack, so start scanning
-            _ = startScanning()
-        }
-
-    }
-    
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         
         super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)

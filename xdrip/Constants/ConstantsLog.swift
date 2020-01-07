@@ -28,6 +28,9 @@ enum ConstantsLog {
     /// G5
     static let categoryCGMG5 = "CGMG5"
     
+    /// watlaa
+    static let categoryWatlaa = "watlaa"
+    
     /// GNSEntry
     static let categoryCGMGNSEntry = "CGMGNSEntry"
     

@@ -75,7 +75,7 @@
         <relationship name="calibrations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Calibration" inverseName="sensor" inverseEntity="Calibration"/>
         <relationship name="readings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BgReading" inverseName="sensor" inverseEntity="BgReading"/>
     </entity>
-    <entity name="Watlaa" representedClassName="Watlaa" syncable="YES" codeGenerationType="class">
+    <entity name="Watlaa" representedClassName=".Watlaa" syncable="YES">
         <attribute name="address" attributeType="String"/>
         <attribute name="alias" optional="YES" attributeType="String"/>
         <attribute name="name" attributeType="String"/>

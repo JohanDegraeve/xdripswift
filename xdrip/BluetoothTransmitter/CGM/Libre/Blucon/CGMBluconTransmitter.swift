@@ -296,11 +296,6 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             waitingSuccessfulPairing = false
         }
         
-        // check if error occured
-        if let error = error {
-            trace("   error: %{public}@", log: log, type: .error , error.localizedDescription)
-        }
-        
         if let value = characteristic.value {
             
             // convert to string and log the value

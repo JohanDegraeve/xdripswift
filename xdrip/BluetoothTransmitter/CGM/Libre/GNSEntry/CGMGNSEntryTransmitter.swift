@@ -145,10 +145,6 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
         // log the received characteristic value
         trace("in peripheralDidUpdateValueFor with characteristic UUID = %{public}@, matches characteristic name %{public}@", log: log, type: .info, characteristic.uuid.uuidString, receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString)?.description ?? "not available")
         
-        if let error = error {
-            trace("   error: %{public}@", log: log, type: .error , error.localizedDescription)
-        }
-        
         if let receivedCharacteristic = receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString), let value = characteristic.value {
             
             switch receivedCharacteristic {
@@ -278,11 +274,6 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         trace("didDiscoverCharacteristicsFor", log: log, type: .info)
-        
-        // log error if any
-        if let error = error {
-            trace("    error: %{public}@", log: log, type: .error , error.localizedDescription)
-        }
         
         if let characteristics = service.characteristics {
             for characteristic in characteristics {

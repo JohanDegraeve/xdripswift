@@ -406,7 +406,7 @@ final class RootViewController: UIViewController {
         })
         
         // setup bluetoothPeripheralManager
-        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager)
+        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self)
         
     }
     

@@ -36,15 +36,19 @@ class BluetoothPeripheralManager: NSObject {
     
     /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
     private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
+    
+    /// will be used to pass back bluetooth and cgm related events
+    private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
 
     // MARK: - initializer
     
-    init(coreDataManager: CoreDataManager) {
+    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate) {
         
         // initialize properties
         self.coreDataManager = coreDataManager
         self.m5StackAccessor = M5StackAccessor(coreDataManager: coreDataManager)
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+        self.cgmTransmitterDelegate = cgmTransmitterDelegate
         
         super.init()
         
@@ -120,6 +124,10 @@ class BluetoothPeripheralManager: NSObject {
                         _ = m5StackBluetoothTransmitter.writeBgReadingInfo(bgReading: bgReadingToSend[0])
                     }
                     
+                case .watlaaMaster:
+                    // no need to send reading to watlaa in master mode
+                    break
+                    
                 }
 
             }
@@ -175,6 +183,10 @@ class BluetoothPeripheralManager: NSObject {
             
             return M5StackBluetoothTransmitter(address: nil, name: nil, delegate: self, blePassword: UserDefaults.standard.m5StackBlePassword, bluetoothPeripheralType: type)
             
+        case .watlaaMaster:
+            
+            return WatlaaBluetoothTransmitterMaster(address: nil, name: nil, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, bluetoothPeripheralType: type)
+            
         }
 
     }
@@ -190,6 +202,12 @@ class BluetoothPeripheralManager: NSObject {
                 
                 if let bluetoothTransmitter = bluetoothTransmitter as? M5StackBluetoothTransmitter {
                     return bluetoothTransmitter.bluetoothPeripheralType
+                }
+                
+            case .watlaaMaster:
+                
+                if bluetoothTransmitter is WatlaaBluetoothTransmitterMaster {
+                    return .watlaaMaster
                 }
                 
             }
@@ -297,6 +315,9 @@ class BluetoothPeripheralManager: NSObject {
                 if !success {
                     bluetoothPeripheral.parameterUpdateNeededAtNextConnect()
                 }
+             
+            case .watlaaMaster:
+                break
                 
             }
             
@@ -402,6 +423,14 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
                         }
                         
                         newTransmitter = M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: blePassword, bluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType())
+                    }
+                    
+                case .watlaaMaster:
+                    
+                    if let watlaa = bluetoothPeripheral as? Watlaa {
+
+                        newTransmitter = WatlaaBluetoothTransmitterMaster(address: watlaa.address, name: watlaa.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, bluetoothPeripheralType: .watlaaMaster)
+
                     }
                     
                 }
@@ -533,7 +562,13 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
-        trace("in deviceDidUpdateBluetoothState, no further action", log: self.log, type: .info)
+        
+        trace("in deviceDidUpdateBluetoothState", log: self.log, type: .info)
+        
+        if bluetoothTransmitter.deviceAddress == nil {
+            /// this bluetoothTransmitter is created to start scanning for a new, unknown M5Stack, so start scanning
+            bluetoothTransmitter.startScanning()
+        }
 
     }
     

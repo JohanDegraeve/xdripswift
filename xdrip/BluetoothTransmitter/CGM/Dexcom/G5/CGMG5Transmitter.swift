@@ -219,10 +219,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         trace("in peripheralDidUpdateNotificationStateFor", log: log, type: .info)
         
-        if let error = error {
-            trace("    error: %{public}@", log: log, type: .error , error.localizedDescription)
-        }
-        
         if let characteristicValue = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString) {
             
             trace("    characteristic : %{public}@", log: log, type: .info, characteristicValue.description)
@@ -265,10 +261,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         }
         
         trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, type: .info, characteristic_UUID.description)
-        
-        if let error = error {
-            trace("error: %{public}@", log: log, type: .error , error.localizedDescription)
-        }
         
         if let value = characteristic.value {
             
@@ -461,11 +453,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // not using super.didDiscoverCharacteristicsFor here
         
         trace("didDiscoverCharacteristicsFor", log: log, type: .info)
-        
-        // log error if any
-        if let error = error {
-            trace("    error: %{public}@", log: log, type: .error , error.localizedDescription)
-        }
         
         if let characteristics = service.characteristics {
             for characteristic in characteristics {
