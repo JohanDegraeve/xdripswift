@@ -1,17 +1,28 @@
 import UIKit
 import CoreData
 
+
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate:  UIResponder, UIApplicationDelegate {
     
     // MARK: - Properties
     
     var window: UIWindow?
     
+    var wsManager: WebServicesManager?
+    
     // MARK: - Application Life Cycle
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        wsManager = WebServicesManager()
+        wsManager?.start()
+        
         return true
+    }
+    
+    func applicationWillTerminate(aNotification: NSNotification) {
+        wsManager!.stop()
     }
     
     func applicationWillResignActive(_ application: UIApplication) {

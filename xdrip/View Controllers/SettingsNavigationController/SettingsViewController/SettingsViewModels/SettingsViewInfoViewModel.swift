@@ -11,6 +11,12 @@ fileprivate enum Setting:Int, CaseIterable {
     /// licenseInfo
     case licenseInfo = 2
     
+    //webServicesInfo1
+    case webServicesInfo1 = 3
+    
+    //webServicesInfo2
+    case webServicesInfo2 = 4
+
 }
 
 struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
@@ -34,7 +40,12 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             
         case .buildNumber:
             return Texts_SettingsView.build
+            
+        case .webServicesInfo1:
+            return Texts_SettingsView.webServices1
 
+        case .webServicesInfo2:
+            return Texts_SettingsView.webServices2
         }
         
     }
@@ -54,12 +65,20 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         case .licenseInfo:
             return .detailButton
             
+        case .webServicesInfo1:
+            return .none
+  
+        case .webServicesInfo2:
+            return .none
         }
-        
     }
     
     func detailedText(index: Int) -> String? {
         
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let isSecure = appDelegate.wsManager?.server.isSecure
+        let proto = isSecure ?? false ? "https" : "http"
+
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
@@ -83,7 +102,16 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         case .licenseInfo:
             
             return nil
-
+ 
+        case .webServicesInfo1:
+            let address = ConstantsWebServices.webServicesLo
+            
+            return "\(proto)://\(address):\(ConstantsWebServices.webServicesPort)"
+            
+        case .webServicesInfo2:
+            let address = SystemInfoHelper.ipAddress()
+            
+            return "\(proto)://\(address):\(ConstantsWebServices.webServicesPort)"
         }
         
     }
@@ -97,7 +125,11 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
     }
     
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
-        
+
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let isSecure = appDelegate.wsManager?.server.isSecure
+        let proto = isSecure ?? false ? "https" : "http"
+
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
@@ -111,6 +143,23 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         case .licenseInfo:
             return SettingsSelectedRowAction.showInfoText(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress)
 
+        case .webServicesInfo1:
+            return .callFunction(function: {
+                let address = ConstantsWebServices.webServicesLo
+                if let url = URL(string: "\(proto)://\(address):\(ConstantsWebServices.webServicesPort)") {
+                
+                  UIApplication.shared.open(url)
+                }
+            })
+            
+        case .webServicesInfo2:
+            return .callFunction(function: {
+                let address = SystemInfoHelper.ipAddress()
+                if let url = URL(string: "\(proto)://\(address):\(ConstantsWebServices.webServicesPort)") {
+                
+                  UIApplication.shared.open(url)
+                }
+            })
         }
     }
     

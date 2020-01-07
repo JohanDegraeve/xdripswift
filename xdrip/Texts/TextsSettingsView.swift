@@ -253,6 +253,14 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_license", tableName: filename, bundle: Bundle.main, value: "License", comment: "used in settings, section Info, title of the license setting")
     }()
     
+    static let webServices1 = {
+        return NSLocalizedString("settingsviews_webservices", tableName: filename, bundle: Bundle.main, value: "WebServer", comment: "used in settings, section Info, title of the WebServices setting")
+    }()
+
+    static let webServices2 = {
+        return NSLocalizedString("settingsviews_webservices", tableName: filename, bundle: Bundle.main, value: "WebServer WiFi", comment: "used in settings, section Info, title of the WebServices setting")
+    }()
+
     // MARK: - Section M5Stack
     
     static let m5StackSettingsViewScreenTitle: String = {
