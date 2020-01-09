@@ -25,9 +25,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     // used in parsing packet
     private var timeStampLastBgReading:Date
     
-    // counts number of times resend was requested due to crc error
-    private var resendPacketCounter:Int = 0
-    
     /// used when processing Bubble data packet
     private var startDate:Date
     // receive buffer for bubble packets
@@ -241,7 +238,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     private func resetRxBuffer() {
         rxBuffer = Data()
         startDate = Date()
-        resendPacketCounter = 0
     }
     
     /// this transmitter supports oopWeb
