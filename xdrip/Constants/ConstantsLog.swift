@@ -29,7 +29,7 @@ enum ConstantsLog {
     static let categoryCGMG5 = "CGMG5"
     
     /// watlaa
-    static let categoryWatlaa = "watlaa"
+    static let categoryWatlaa = "Watlaa"
     
     /// GNSEntry
     static let categoryCGMGNSEntry = "CGMGNSEntry"
@@ -57,6 +57,9 @@ enum ConstantsLog {
     
     /// application data for M5Stack
     static let categoryApplicationDataM5Stacks = "ApplicationDataM5Stacks"
+    
+    /// application data for M5Stack
+    static let categoryApplicationDataWatlaa = "ApplicationDataWatlaa"
     
     /// application for for M5StackName
     static let categoryApplicationDataM5StackNames = "ApplicationDataM5StackNames"

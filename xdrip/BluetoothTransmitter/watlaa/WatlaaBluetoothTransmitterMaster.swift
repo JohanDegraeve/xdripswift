@@ -101,6 +101,8 @@ class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
 
     private func handleUpdateValueFor_RawData_Characteristic(value: Data) {
         
+        
+        
     }
     
     private func handleUpdateValueFor_BridgeConnectionStatus_Characteristic(value: Data) {

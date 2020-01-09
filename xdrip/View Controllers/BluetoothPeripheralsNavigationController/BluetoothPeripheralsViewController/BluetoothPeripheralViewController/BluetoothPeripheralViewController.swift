@@ -227,17 +227,17 @@ class BluetoothPeripheralViewController: UIViewController {
     /// user cliks done button
     public func doneButtonHandler() {
         
-        if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject, let coreDataManager = coreDataManager {
+        if let bluetoothPeripheralAsNSObject = bluetoothPeripheralAsNSObject, let coreDataManager = coreDataManager {
             
             // set variable delegate in bluetoothPeripheralASNSObject to nil,  no need anymore to receive info
-            bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false)?.variableBluetoothTransmitterDelegate = nil
+            bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralAsNSObject, createANewOneIfNecesssary: false)?.variableBluetoothTransmitterDelegate = nil
             
             // set alias temp value, possibly this is a nil value
-            bluetoothPeripheralASNSObject.setAlias(aliasTemporaryValue)
+            bluetoothPeripheralAsNSObject.setAlias(aliasTemporaryValue)
             
             
             // temp values stored by viewmodel needs to be written to bluetoothPeripheralASNSObject
-            bluetoothPeripheralViewModel.writeTempValues(to: bluetoothPeripheralASNSObject)
+            bluetoothPeripheralViewModel.writeTempValues(to: bluetoothPeripheralAsNSObject)
             
             // save all changes now
             coreDataManager.saveChanges()

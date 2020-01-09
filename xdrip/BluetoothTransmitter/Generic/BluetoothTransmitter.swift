@@ -442,6 +442,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         timeStampLastStatusUpdate = Date()
         
         trace("didDiscoverServices for peripheral with name %{public}@", log: log, type: .info, deviceName ?? "'unknown'")
+        
         if let error = error {
             trace("    didDiscoverServices error: %{public}@", log: log, type: .error ,  "\(error.localizedDescription)")
         }

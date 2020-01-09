@@ -28,6 +28,9 @@ class BluetoothPeripheralManager: NSObject {
     /// reference to BgReadingsAccessor
     private var bgReadingsAccessor: BgReadingsAccessor
     
+    /// reference to watlaaAccessor
+    private var watlaaAccessor: WatlaaAccessor
+    
     /// if scan is called, and a connection is successfully made to a new device, then a new M5Stack must be created, and this function will be called. It is owned by the UIViewController that calls the scan function
     private var callBackAfterDiscoveringDevice: ((BluetoothPeripheral) -> Void)?
     
@@ -48,37 +51,84 @@ class BluetoothPeripheralManager: NSObject {
         self.coreDataManager = coreDataManager
         self.m5StackAccessor = M5StackAccessor(coreDataManager: coreDataManager)
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+        self.watlaaAccessor = WatlaaAccessor(coreDataManager: coreDataManager)
         self.cgmTransmitterDelegate = cgmTransmitterDelegate
         
         super.init()
         
-        // initialize m5Stacks
-        let m5Stacks = m5StackAccessor.getM5Stacks()
-        for m5Stack in m5Stacks {
+        // need to initialize all types of bluetoothperipheral
+        // using enum here to make sure future types are not forgotten
+        for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
             
-            // add it to the list of bluetoothPeripherals
-            bluetoothPeripherals.append(m5Stack)
-            
-            if m5Stack.shouldconnect {
+            switch bluetoothPeripheralType {
+              
+            case .M5StickCType:
+                // no seperate handling needed for M5StickC because M5StickC is stored in coredata as M5Stack objecct, so it will be handled when going through case M5StackType
+                break
                 
-                // create an instance of M5StackBluetoothTransmitter, M5StackBluetoothTransmitter will automatically try to connect to the M5Stack with the address that is stored in m5Stack
-                // add it to the array of bluetoothTransmitters
-                bluetoothTransmitters.append(M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: m5Stack.blepassword, bluetoothPeripheralType: m5Stack.isM5StickC ? .M5StickCType : .M5StackType))
+            case .M5StackType:
                 
-            } else {
+                // initialize m5Stacks
+                let m5Stacks = m5StackAccessor.getM5Stacks()
+                for m5Stack in m5Stacks {
+                    
+                    // add it to the list of bluetoothPeripherals
+                    bluetoothPeripherals.append(m5Stack)
+                    
+                    if m5Stack.shouldconnect {
+                        
+                        // create an instance of M5StackBluetoothTransmitter, M5StackBluetoothTransmitter will automatically try to connect to the M5Stack with the address that is stored in m5Stack
+                        // add it to the array of bluetoothTransmitters
+                        bluetoothTransmitters.append(M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: m5Stack.blepassword, bluetoothPeripheralType: m5Stack.isM5StickC ? .M5StickCType : .M5StackType))
+                        
+                    } else {
+                        
+                        // shouldn't connect, so don't create an instance of M5StackBluetoothTransmitter
+                        // but append a nil element
+                        bluetoothTransmitters.append(nil)
+                        
+                    }
+                    
+                    // each time the app launches, we will send the parameters to all BluetoothPeripherals
+                    m5Stack.parameterUpdateNeededAtNextConnect()
+                    
+                }
                 
-                // shouldn't connect, so don't create an instance of M5StackBluetoothTransmitter
-                // but append a nil element
-                bluetoothTransmitters.append(nil)
+
+
+            case .watlaaMaster:
                 
+                // initialize watlaa's
+                let watlaas = watlaaAccessor.getWatlaas()
+                for watlaa in watlaas {
+                    
+                    // add it to the list of bluetoothPeripherals
+                    bluetoothPeripherals.append(watlaa)
+                    
+                    if watlaa.shouldconnect {
+                        
+                        // create an instance of WatlaaBluetoothTransmitter, WatlaaBluetoothTransmitter will automatically try to connect to the watlaa with the address that is stored in watlaa
+                        // add it to the array of bluetoothTransmitters
+                        bluetoothTransmitters.append(WatlaaBluetoothTransmitterMaster(address: watlaa.address, name: watlaa.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, bluetoothPeripheralType: .watlaaMaster))
+                        
+                    } else {
+                        
+                        // shouldn't connect, so don't create an instance of M5StackBluetoothTransmitter
+                        // but append a nil element
+                        bluetoothTransmitters.append(nil)
+                        
+                    }
+                    
+                    // each time the app launches, we will send the parameters to all BluetoothPeripherals
+                    watlaa.parameterUpdateNeededAtNextConnect()
+                    
+                }
+
             }
-            
-            // each time the app launches, we will send the parameters to all BluetoothPeripherals
-            m5Stack.parameterUpdateNeededAtNextConnect()
             
         }
         
-        // when user changes M5Stack related settings, then the transmitter need to get that info
+        // when user changes any of the buetooth peripheral related settings, that need to be sent to the transmitter
         addObservers()
 
     }
@@ -150,7 +200,6 @@ class BluetoothPeripheralManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutAPIKey.rawValue, options: .new, context: nil)
-
 
     }
     
@@ -559,6 +608,8 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             self.callBackAfterDiscoveringDevice = nil
         }
 
+        // assign tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral to nil here
+        self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
@@ -567,7 +618,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         if bluetoothTransmitter.deviceAddress == nil {
             /// this bluetoothTransmitter is created to start scanning for a new, unknown M5Stack, so start scanning
-            bluetoothTransmitter.startScanning()
+            _ = bluetoothTransmitter.startScanning()
         }
 
     }
