@@ -8,9 +8,6 @@
 
 @import Foundation;
 
-#define CRBundleIdentifier          @"io.criollo.Criollo"
-#define CRCriolloVersionFallback    @"0.1.12"
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface SystemInfoHelper : NSObject
@@ -23,7 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)memoryInfo:(NSError * _Nullable __autoreleasing *)error;
 + (NSString *)requestsServed;
 + (void)addRequest;
-+ (NSString *)criolloVersion;
 + (NSString *)bundleVersion;
 
 @end

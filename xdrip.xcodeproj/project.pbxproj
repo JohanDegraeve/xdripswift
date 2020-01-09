@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		8600CFEF23C61F8300D0E2DB /* DarwinNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8600CFEE23C61F8300D0E2DB /* DarwinNotificationCenter.swift */; };
 		860E156A23C7C44500EA7F46 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 860E156923C7C44500EA7F46 /* index.html */; };
-		860E156C23C7C4A000EA7F46 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 860E156B23C7C4A000EA7F46 /* logo.png */; };
+		860E156E23C7C90F00EA7F46 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 860E156D23C7C90F00EA7F46 /* logo.png */; };
 		86163BDC23C256EB00B56C09 /* SystemInfoHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 86163BDB23C256EB00B56C09 /* SystemInfoHelper.m */; };
 		86163BE923C25A8100B56C09 /* ConstantsWebServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86163BE823C25A8100B56C09 /* ConstantsWebServices.swift */; };
 		86B97E4223C3D18B0055F54C /* WebServicesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B97E4123C3D18B0055F54C /* WebServicesManager.swift */; };
@@ -263,7 +263,7 @@
 		662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8600CFEE23C61F8300D0E2DB /* DarwinNotificationCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DarwinNotificationCenter.swift; sourceTree = "<group>"; };
 		860E156923C7C44500EA7F46 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
-		860E156B23C7C4A000EA7F46 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = Assets.xcassets/AppIcon.appiconset/logo.png; sourceTree = "<group>"; };
+		860E156D23C7C90F00EA7F46 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = Assets.xcassets/logo.png; sourceTree = "<group>"; };
 		86163BDA23C256EB00B56C09 /* SystemInfoHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemInfoHelper.h; sourceTree = "<group>"; };
 		86163BDB23C256EB00B56C09 /* SystemInfoHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SystemInfoHelper.m; sourceTree = "<group>"; };
 		86163BE823C25A8100B56C09 /* ConstantsWebServices.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsWebServices.swift; sourceTree = "<group>"; };
@@ -773,8 +773,8 @@
 		F8025E5A21F7AFA100ECF0C0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				860E156D23C7C90F00EA7F46 /* logo.png */,
 				860E156923C7C44500EA7F46 /* index.html */,
-				860E156B23C7C4A000EA7F46 /* logo.png */,
 				86163BDD23C257AB00B56C09 /* Certificates */,
 				F8B3A7B7226CC0B7004BA588 /* sounds */,
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
@@ -1689,7 +1689,6 @@
 				F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */,
 				F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */,
 				F8B3A786225D4473004BA588 /* NightScoutTestResult.strings in Resources */,
-				860E156C23C7C4A000EA7F46 /* logo.png in Resources */,
 				F8B48AA022B2FA7B009BCC01 /* HomeView.strings in Resources */,
 				F8BDD448221C9D70006EAB84 /* ErrorMessages.strings in Resources */,
 				F8B3A7C9226CC0B7004BA588 /* modern2.mp3 in Resources */,
@@ -1711,6 +1710,7 @@
 				F8B3A80D227A3E98004BA588 /* AlertTypesSettingsView.strings in Resources */,
 				F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */,
 				F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */,
+				860E156E23C7C90F00EA7F46 /* logo.png in Resources */,
 				F8EEDD552300136F00D2D610 /* DexcomShareTestResult.strings in Resources */,
 				F8B3A7CF226CC0B7004BA588 /* shorthigh4.mp3 in Resources */,
 				F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 in Resources */,

@@ -152,19 +152,6 @@ static dispatch_queue_t backgroundQueue;
     return [NSString stringWithFormat:@"about %@%@%@", [formatter stringFromNumber:@(requestCount)], unit.length > 0 ? @" " : @"", unit];
 }
 
-+ (NSString *)criolloVersion {
-    static NSString* criolloVersion;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        NSBundle *criolloBundle = [NSBundle bundleWithIdentifier:CRBundleIdentifier];
-        criolloVersion = [criolloBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-        if ( criolloVersion == nil ) {
-            criolloVersion = CRCriolloVersionFallback;
-        }
-    });
-    return criolloVersion;
-}
-
 + (NSString *)bundleVersion {
     static NSString* bundleVersion;
     static dispatch_once_t onceToken;
