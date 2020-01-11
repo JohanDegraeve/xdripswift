@@ -516,7 +516,7 @@ class M5StackBluetoothPeripheralViewModel {
     
 }
 
-// MARK: - extension BluetoothTransmitterDelegate
+// MARK: - conform to BluetoothTransmitterDelegate
 
 extension M5StackBluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     
@@ -535,7 +535,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     
 }
 
-// MARK: - extension M5StackBluetoothTransmitterDelegate
+// MARK: - conform to M5StackBluetoothTransmitterDelegate
 
 extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelegate {
     
@@ -773,12 +773,12 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         self.bluetoothTransmitterDelegate = bluetoothTransmitterDelegate
         
-        if let m5StackPeripheral = bluetoothPeripheral as? M5Stack  {
+        if let m5Stack = bluetoothPeripheral as? M5Stack  {
             
-            storeTempValues(from: m5StackPeripheral)
+            storeTempValues(from: m5Stack)
             
             // also request batteryLevel, this may have been updated
-            if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5StackPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter {
+            if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5Stack, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter {
                 
                 _ = m5StackBluetoothTransmitter.readBatteryLevel()
                 

@@ -5,6 +5,9 @@ public class Watlaa: NSManagedObject {
 
     /// explanation, see function parameterUpdateNotNeededAtNextConnect in protocol BluetoothPeripheral
     public var parameterUpdateNeeded: Bool = false
+    
+    /// battery level , not stored in coredata,
+    public var batteryLevel: Int?
 
     /// create Watlaa, shouldconnect default value = true
     /// - parameters:

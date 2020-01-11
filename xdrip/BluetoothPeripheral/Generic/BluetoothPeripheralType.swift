@@ -14,7 +14,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
     case M5StickCType = "M5StickC"
     
     /// watlaa master
-    case watlaaMaster = "watlaaMaster"
+    case watlaaMaster = "Watlaa master"
     
     /// - returns: the BluetoothPeripheralViewModel
     func viewModel() -> BluetoothPeripheralViewModel {

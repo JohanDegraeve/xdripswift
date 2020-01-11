@@ -48,6 +48,10 @@ protocol CGMTransmitterDelegate:AnyObject {
     
     /// to pass some text error message, delegate can decide to show to user, log, ...
     func error(message: String)
+    
+    /// temporary function till all cgm transmitters have moved to bluetooth tab. - this function returns the currently assigned cgmTransmiter
+    func getCGMTransmitter() -> CGMTransmitter?
+    
 }
 
 

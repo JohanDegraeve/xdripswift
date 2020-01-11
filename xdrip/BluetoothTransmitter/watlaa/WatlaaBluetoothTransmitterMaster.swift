@@ -2,7 +2,7 @@ import Foundation
 import os
 import CoreBluetooth
 
-class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
+final class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
     
     // MARK: UUID's
     
@@ -16,7 +16,7 @@ class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
     let CBUUID_CurrentTime_Service = "00002A2B-0000-1000-8000-00805F9B34FB"
     
     /// characteristic uuids (created them in an enum as there's a lot of them, it's easy to switch through the list)
-    private enum CBUUID_Characteristic_UUID:String, CustomStringConvertible {
+    private enum CBUUID_Characteristic_UUID:String, CustomStringConvertible, CaseIterable {
         
         /// Raw data characteristic
         case CBUUID_RawData_Characteristic = "00001011-1212-EFDE-0137-875F45AC0113"
@@ -76,32 +76,137 @@ class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
     /// will be used to pass back bluetooth and cgm related events
     private weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
+    /// receive buffer for bubble packets
+    private var rxBuffer:Data
+
+    /// used when processing Bubble data packet
+    private var startDate:Date
+    
+    // used in parsing packet
+    private var timeStampLastBgReading:Date
+
+    /// battery level Characteristic, needed to be able to read value
+    private var batteryLevelCharacteric: CBCharacteristic?
+
     // MARK: - public functions
     
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
-    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: M5StackBluetoothTransmitterDelegate, bluetoothPeripheralType: BluetoothPeripheralType) {
+    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, bluetoothPeripheralType: BluetoothPeripheralType) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "watlaa")
         if let address = address {
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
         }
+
+        // initialize rxbuffer
+        rxBuffer = Data()
+        startDate = Date()
+
+        //assign CGMTransmitterDelegate
+        self.cgmTransmitterDelegate = cgmTransmitterDelegate
+        
+        //initialize timeStampLastBgReading
+        timeStampLastBgReading = Date(timeIntervalSince1970: 0)
         
         // initialize - CBUUID_Receive_Authentication.rawValue and CBUUID_Write_Control.rawValue will not be used in the superclass
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Data_Service), CBUUID(string: CBUUID_Battery_Service), CBUUID(string: CBUUID_CurrentTime_Service)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_RawData_Characteristic.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Calibration_Characteristic.rawValue, startScanningAfterInit: false, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
-        //assign CGMTransmitterDelegate
-        self.cgmTransmitterDelegate = cgmTransmitterDelegate
+    }
+    
+    /// read battery level
+    public func readBatteryLevel() {
+
+        if let batteryLevelCharacteric = batteryLevelCharacteric {
+            readValueForCharacteristic(for: batteryLevelCharacteric)
+        }
         
     }
     
     // MARK: - private functions
 
+    /// reset rxBuffer, reset startDate, stop packetRxMonitorTimer, set resendPacketCounter to 0
+    private func resetRxBuffer() {
+        rxBuffer = Data()
+        startDate = Date()
+    }
+
+    /// creates CBUUID_Characteristic_UUID for the characteristicUUID
+    private func receivedCharacteristicUUIDToCharacteristic(characteristicUUID:String) -> CBUUID_Characteristic_UUID? {
+        
+        // using enum to make sure  no new characteristics are forgotten in case new are added in the future
+        for characteristic_UUID in CBUUID_Characteristic_UUID.allCases {
+            
+            switch characteristic_UUID {
+                
+            case .CBUUID_RawData_Characteristic:
+                if CBUUID_Characteristic_UUID.CBUUID_RawData_Characteristic.rawValue.containsIgnoringCase(find: characteristicUUID) {
+                    return CBUUID_Characteristic_UUID.CBUUID_RawData_Characteristic
+                }
+
+            case .CBUUID_BridgeConnectionStatus_Characteristic:
+                if CBUUID_Characteristic_UUID.CBUUID_BridgeConnectionStatus_Characteristic.rawValue.containsIgnoringCase(find: characteristicUUID) {
+                    return CBUUID_Characteristic_UUID.CBUUID_BridgeConnectionStatus_Characteristic
+                }
+
+            case .CBUUID_LastBGRawValue_Characteristic:
+                if CBUUID_Characteristic_UUID.CBUUID_LastBGRawValue_Characteristic.rawValue.containsIgnoringCase(find: characteristicUUID) {
+                    return CBUUID_Characteristic_UUID.CBUUID_LastBGRawValue_Characteristic
+                }
+
+            case .CBUUID_Calibration_Characteristic:
+                if CBUUID_Characteristic_UUID.CBUUID_Calibration_Characteristic.rawValue.containsIgnoringCase(find: characteristicUUID) {
+                    return CBUUID_Characteristic_UUID.CBUUID_Calibration_Characteristic
+                }
+
+            case .CBUUID_GlucoseUnit_Characteristic:
+                if CBUUID_Characteristic_UUID.CBUUID_GlucoseUnit_Characteristic.rawValue.containsIgnoringCase(find: characteristicUUID) {
+                    return CBUUID_Characteristic_UUID.CBUUID_GlucoseUnit_Characteristic
+                }
+
+            case .CBUUID_AlertSettings_Characteristic:
+                if CBUUID_Characteristic_UUID.CBUUID_AlertSettings_Characteristic.rawValue.containsIgnoringCase(find: characteristicUUID) {
+                    return CBUUID_Characteristic_UUID.CBUUID_AlertSettings_Characteristic
+                }
+
+            case .CBUUID_BatteryLevel_Characteristic:
+                if CBUUID_Characteristic_UUID.CBUUID_BatteryLevel_Characteristic.rawValue.containsIgnoringCase(find: characteristicUUID) {
+                    return CBUUID_Characteristic_UUID.CBUUID_BatteryLevel_Characteristic
+                }
+
+            case .CBUUID_CurrentTime_Characteristic:
+                if CBUUID_Characteristic_UUID.CBUUID_CurrentTime_Characteristic.rawValue.containsIgnoringCase(find: characteristicUUID) {
+                    return CBUUID_Characteristic_UUID.CBUUID_CurrentTime_Characteristic
+                }
+
+            }
+            
+        }
+        
+        return nil
+    }
+
     private func handleUpdateValueFor_RawData_Characteristic(value: Data) {
+
+        rxBuffer.append(value)
         
-        
+        if rxBuffer.count >= 344 {
+            
+            if (Crc.LibreCrc(data: &rxBuffer, headerOffset: 0)) {
+                
+                // setting webOOPEnabled to false, as we don't have the sensor serial number
+                LibreDataParser.libreDataProcessor(sensorSerialNumber: nil, webOOPEnabled: false, oopWebSite: nil, oopWebToken: nil, libreData: (rxBuffer.subdata(in: 0..<(344 + 0))), cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
+                    self.timeStampLastBgReading = timeStampLastBgReading
+                    
+                })
+                
+                //reset the buffer
+                resetRxBuffer()
+                
+            }
+        }
         
     }
     
@@ -127,6 +232,17 @@ class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
     
     private func handleUpdateValueFor_BatteryLevel_Characteristic(value: Data) {
         
+        guard value.count >= 1 else {
+            trace("   value length should be minimum 1", log: log, type: .error)
+            return
+        }
+
+        // Watlaa is sending batteryLevel, which is in the first byte
+        let receivedBatteryLevel = Int(value[0])
+        
+        (fixedBluetoothTransmitterDelegate as? WatlaaBluetoothTransmitterDelegate)?.receivedBattery(level: receivedBatteryLevel, watlaaBluetoothTransmitter: self)
+        (variableBluetoothTransmitterDelegate as? WatlaaBluetoothTransmitterDelegate)?.receivedBattery(level: receivedBatteryLevel, watlaaBluetoothTransmitter: self)
+
     }
     
     private func handleUpdateValueFor_CurrentTime_Characteristic(value: Data) {
@@ -135,23 +251,45 @@ class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
     
     // MARK: - BluetoothTransmitter overriden functions
     
+    override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        
+        super.peripheral(peripheral, didDiscoverCharacteristicsFor: service, error: error)
+        
+        //need to store some of the characteristics to be able to write to them
+        if let characteristics = service.characteristics {
+            for characteristic in characteristics {
+                
+                if (characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_BatteryLevel_Characteristic.rawValue)) {
+                    trace("    found batteryLevelCharacteristic", log: log, type: .info)
+                    batteryLevelCharacteric = characteristic
+                    
+                }
+            }
+        }
+        
+        // here all characteristics should be known, we can call isReadyToReceiveData
+        (fixedBluetoothTransmitterDelegate as? WatlaaBluetoothTransmitterDelegate)?.isReadyToReceiveData(watlaaBluetoothTransmitter: self)
+        (variableBluetoothTransmitterDelegate as? WatlaaBluetoothTransmitterDelegate)?.isReadyToReceiveData(watlaaBluetoothTransmitter: self)
+        
+    }
+    
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
     
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
         // find the CBUUID_Characteristic_UUID
-        guard let characteristic_UUID = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString) else {
+        guard let receivedCharacteristic = receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString) else {
             trace("in peripheralDidUpdateValueFor, unknown characteristic received with uuid = %{public}@", log: log, type: .error, characteristic.uuid.uuidString)
             return
         }
         
-        trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, type: .info, characteristic_UUID.description)
+        trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, type: .info, receivedCharacteristic.description)
         
         guard let value = characteristic.value else {return}
         
         debuglogging("Received value from Watlaa : " + value.hexEncodedString())
         
-        switch characteristic_UUID {
+        switch receivedCharacteristic {
             
         case .CBUUID_RawData_Characteristic:
             handleUpdateValueFor_RawData_Characteristic(value: value)

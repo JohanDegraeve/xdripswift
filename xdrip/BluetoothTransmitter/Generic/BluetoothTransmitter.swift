@@ -154,7 +154,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 centralManager.cancelPeripheralConnection(peripheral)
             }
         }
-        
+      
     }
     
     /// stops scanning
@@ -236,6 +236,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             trace("in writeDataToPeripheral, for peripheral with name %{public}@, failed because either peripheral or writeCharacteristic is nil or not connected", log: log, type: .error, deviceName ?? "'unknown'")
             return false
         }
+    }
+    
+    /// calls peripheral?.readValue(for: characteristic)
+    func readValueForCharacteristic(for characteristic: CBCharacteristic) {
+        peripheral?.readValue(for: characteristic)
     }
 
     /// will write to characteristicToWriteTo

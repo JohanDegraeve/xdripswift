@@ -40,12 +40,17 @@ class BluetoothPeripheralManager: NSObject {
     /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
     private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     
-    /// will be used to pass back bluetooth and cgm related events
+    /// will be used to pass back bluetooth and cgm related events, probably temporary ?
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
+    
+    /// when xdrip connects to a BluetoothTransmitter that is also CGMTransmitter, then we'll call this function with the BluetoothTransmitter as argument. This is to let the cgmTransmitterDelegate know what is the CGMTransmitter
+    private var onCGMTransmitterCreation: (CGMTransmitter?) -> ()
 
     // MARK: - initializer
     
-    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate) {
+    /// - parameters:
+    ///     - onCGMTransmitterCreation : to be called when cgmtransmitter is created
+    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, onCGMTransmitterCreation: @escaping (CGMTransmitter?) -> ()) {
         
         // initialize properties
         self.coreDataManager = coreDataManager
@@ -53,6 +58,7 @@ class BluetoothPeripheralManager: NSObject {
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.watlaaAccessor = WatlaaAccessor(coreDataManager: coreDataManager)
         self.cgmTransmitterDelegate = cgmTransmitterDelegate
+        self.onCGMTransmitterCreation = onCGMTransmitterCreation
         
         super.init()
         
@@ -187,6 +193,92 @@ class BluetoothPeripheralManager: NSObject {
 
     // MARK: - private functions
     
+    /// check if transmitter in bluetoothTransmitters with index, is the cgmtransmitter currently assigned to delegate, if so set cgmtransmitter at delegate to nil   - This should be temporary till cgm transmitters have moved to bluetooth tab
+    private func setCGMTransmitterToNilAtDelegate(withIndexInBluetoothTransmitters index: Int) {
+
+        if let cgmTransmitter = cgmTransmitterDelegate?.getCGMTransmitter() as? BluetoothTransmitter, let transmitterBeingDeleted = bluetoothTransmitters[index] {
+            
+            if cgmTransmitter.getAddress() == transmitterBeingDeleted.getAddress() {
+                
+                // so the cgmTransmitter is actually being deleted, so we need to also assign cgmTransmitterDelegate to nil to make sure there's no more reference to it
+                onCGMTransmitterCreation(nil)
+                
+            }
+            
+        }
+
+    }
+    
+    /// send all parameters to m5Stack
+    /// - parameters:
+    ///     - to : m5StackBluetoothTransmitter to send all parameters
+    /// - returns:
+    ///     successfully written all parameters or not
+    private func sendAllParametersToM5Stack(to m5StackBluetoothTransmitter : M5StackBluetoothTransmitter) -> Bool {
+        
+        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
+        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return false}
+        
+        // M5Stack must be ready to receive data
+        guard m5StackBluetoothTransmitter.isReadyToReceiveData else {
+            trace("in sendAllParameters, bluetoothTransmitter is not ready to receive data", log: self.log, type: .info)
+            return false
+        }
+        
+        // initialise returnValue, result
+        var success = true
+        
+        // send bloodglucoseunit
+        if !m5StackBluetoothTransmitter.writeBloodGlucoseUnit(isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {success = false}
+        
+        // send textColor
+        if !m5StackBluetoothTransmitter.writeTextColor(textColor: M5StackColor(forUInt16: UInt16(m5Stack.textcolor)) ?? UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor) {success = false}
+        
+        // send backGroundColor
+        if !m5StackBluetoothTransmitter.writeBackGroundColor(backGroundColor: M5StackColor(forUInt16: UInt16(m5Stack.backGroundColor)) ?? ConstantsM5Stack.defaultBackGroundColor ) {success = false}
+        
+        // send rotation
+        if !m5StackBluetoothTransmitter.writeRotation(rotation: Int(m5Stack.rotation)) {success = false}
+        
+        // send connectToWiFi
+        if !m5StackBluetoothTransmitter.writeConnectToWiFi(connect: m5Stack.connectToWiFi) {success = false}
+        
+        // send WiFiSSID's
+        if let wifiName = UserDefaults.standard.m5StackWiFiName1 {
+            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 1) {success = false}
+        }
+        if let wifiName = UserDefaults.standard.m5StackWiFiName2 {
+            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 2) {success = false}
+        }
+        if let wifiName = UserDefaults.standard.m5StackWiFiName3 {
+            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 3) {success = false}
+        }
+        
+        // send WiFiPasswords
+        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword1 {
+            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 1) {success = false}
+        }
+        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword2 {
+            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 2) {success = false}
+        }
+        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword3 {
+            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 3) {success = false}
+        }
+        
+        // send nightscout url
+        if let url = UserDefaults.standard.nightScoutUrl {
+            if !m5StackBluetoothTransmitter.writeNightScoutUrl(url: url) {success = false}
+        }
+        
+        // send nightscout token
+        if let token = UserDefaults.standard.nightScoutAPIKey {
+            if !m5StackBluetoothTransmitter.writeNightScoutAPIKey(apiKey: token) {success = false}
+        }
+        
+        // return success
+        return success
+    }
+
     /// when user changes M5Stack related settings, then the transmitter need to get that info, add observers
     private func addObservers() {
         
@@ -214,7 +306,7 @@ class BluetoothPeripheralManager: NSObject {
         
         if let bluetoothTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) {
             
-            bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
+            _ = bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
             
         }
         
@@ -376,9 +468,7 @@ class BluetoothPeripheralManager: NSObject {
 
 }
 
-// MARK: - extensions
-
-// MARK: extension BluetoothPeripheralManaging
+// MARK: - conform to BluetoothPeripheralManaging
 
 extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
     
@@ -504,6 +594,9 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
             return
         }
         
+        // check if transmitter being deleted is assigned to cgmTransmitterDelegate, if so we need to set it also to nil, otherwise the bluetoothTransmitter deinit function wouldn't get called
+        setCGMTransmitterToNilAtDelegate(withIndexInBluetoothTransmitters: index)
+
         // set bluetoothTransmitter to nil, this will also initiate a disconnect
         bluetoothTransmitters[index] = nil
 
@@ -546,6 +639,9 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         
         if let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral) {
             
+            // check if transmitter being deleted is assigned to cgmTransmitterDelegate, if so we need to set it also to nil, otherwise the bluetoothTransmitter deinit function wouldn't get called
+            setCGMTransmitterToNilAtDelegate(withIndexInBluetoothTransmitters: index)
+
             bluetoothTransmitters[index] = nil
             
         }
@@ -553,11 +649,16 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
 
 }
 
-// MARK: extension M5StackBluetoothDelegate
+// MARK: - conform to BluetoothTransmitterDelegate
 
 extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
+        
+        // temporary,
+        if bluetoothTransmitter is CGMTransmitter {
+            onCGMTransmitterCreation((bluetoothTransmitter as! CGMTransmitter))
+        }
         
         // if tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil, then this is a connection to an already known/stored BluetoothTransmitter. BluetoothPeripheralManager is not interested in this info.
         guard let tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral else {
@@ -635,7 +736,28 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
 
 }
 
-// MARK: conform to M5StackBluetoothTransmitterDelegate
+// MARK: - conform to WatlaaBluetoothTransmitterDelegate
+
+extension BluetoothPeripheralManager: WatlaaBluetoothTransmitterDelegate {
+    
+    func isReadyToReceiveData(watlaaBluetoothTransmitter: WatlaaBluetoothTransmitterMaster) {
+        
+        // request battery level
+        watlaaBluetoothTransmitter.readBatteryLevel()
+        
+    }
+    
+    func receivedBattery(level: Int, watlaaBluetoothTransmitter: WatlaaBluetoothTransmitterMaster) {
+    
+        guard let index = bluetoothTransmitters.firstIndex(of: watlaaBluetoothTransmitter), let watlaa = bluetoothPeripherals[index] as? Watlaa else {return}
+        
+        watlaa.batteryLevel = level
+        
+    }
+    
+}
+
+// MARK: - conform to M5StackBluetoothTransmitterDelegate
 
 extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
     
@@ -722,7 +844,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
         
     }
 
-    /// bluetoothPeripheral is asking for an update of all parameters, send them
+    /// M5Stack is asking for an update of all parameters, send them
     func isAskingForAllParameters(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
         guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter) else {
@@ -761,77 +883,6 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
         
     }
     
-    // MARK: private functions related to M5Stack
-    
-    /// send all parameters to m5Stack
-    /// - parameters:
-    ///     - to : m5StackBluetoothTransmitter to send all parameters
-    /// - returns:
-    ///     successfully written all parameters or not
-    private func sendAllParametersToM5Stack(to m5StackBluetoothTransmitter : M5StackBluetoothTransmitter) -> Bool {
-        
-        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
-        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return false}
-
-        // M5Stack must be ready to receive data
-        guard m5StackBluetoothTransmitter.isReadyToReceiveData else {
-            trace("in sendAllParameters, bluetoothTransmitter is not ready to receive data", log: self.log, type: .info)
-            return false
-        }
-        
-        // initialise returnValue, result
-        var success = true
-        
-        // send bloodglucoseunit
-        if !m5StackBluetoothTransmitter.writeBloodGlucoseUnit(isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {success = false}
-        
-        // send textColor
-        if !m5StackBluetoothTransmitter.writeTextColor(textColor: M5StackColor(forUInt16: UInt16(m5Stack.textcolor)) ?? UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor) {success = false}
-        
-        // send backGroundColor
-        if !m5StackBluetoothTransmitter.writeBackGroundColor(backGroundColor: M5StackColor(forUInt16: UInt16(m5Stack.backGroundColor)) ?? ConstantsM5Stack.defaultBackGroundColor ) {success = false}
-        
-        // send rotation
-        if !m5StackBluetoothTransmitter.writeRotation(rotation: Int(m5Stack.rotation)) {success = false}
-        
-        // send connectToWiFi
-        if !m5StackBluetoothTransmitter.writeConnectToWiFi(connect: m5Stack.connectToWiFi) {success = false}
-        
-        // send WiFiSSID's
-        if let wifiName = UserDefaults.standard.m5StackWiFiName1 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 1) {success = false}
-        }
-        if let wifiName = UserDefaults.standard.m5StackWiFiName2 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 2) {success = false}
-        }
-        if let wifiName = UserDefaults.standard.m5StackWiFiName3 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 3) {success = false}
-        }
-        
-        // send WiFiPasswords
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword1 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 1) {success = false}
-        }
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword2 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 2) {success = false}
-        }
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword3 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 3) {success = false}
-        }
-        
-        // send nightscout url
-        if let url = UserDefaults.standard.nightScoutUrl {
-            if !m5StackBluetoothTransmitter.writeNightScoutUrl(url: url) {success = false}
-        }
-        
-        // send nightscout token
-        if let token = UserDefaults.standard.nightScoutAPIKey {
-            if !m5StackBluetoothTransmitter.writeNightScoutAPIKey(apiKey: token) {success = false}
-        }
-        
-        // return success
-        return success
-    }
     
     
 }

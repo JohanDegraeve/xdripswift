@@ -398,10 +398,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         case .readBatteryLevelRx:
             
             guard value.count >= 2 else {
-                
                 trace("   value length should be minimum 2", log: log, type: .error)
                 return
-                
             }
             
             let receivedBatteryLevel = Int(value[1])
