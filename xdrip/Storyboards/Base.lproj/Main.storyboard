@@ -1057,7 +1057,7 @@
                         <viewLayoutGuide key="safeArea" id="EwQ-ba-QO0"/>
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="wi3-X0-YuZ">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="bCu-HA-PU7">
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="bCu-HA-PU7">
                             <connections>
                                 <action selector="doneButtonAction:" destination="K7Q-YG-EVl" id="wPV-UH-OIz"/>
                             </connections>
