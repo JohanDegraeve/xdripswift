@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8600CFEF23C61F8300D0E2DB /* DarwinNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8600CFEE23C61F8300D0E2DB /* DarwinNotificationCenter.swift */; };
 		860E156A23C7C44500EA7F46 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 860E156923C7C44500EA7F46 /* index.html */; };
 		860E156E23C7C90F00EA7F46 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 860E156D23C7C90F00EA7F46 /* logo.png */; };
 		86163BDC23C256EB00B56C09 /* SystemInfoHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 86163BDB23C256EB00B56C09 /* SystemInfoHelper.m */; };
@@ -261,7 +260,6 @@
 /* Begin PBXFileReference section */
 		148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.debug.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.debug.xcconfig"; sourceTree = "<group>"; };
 		662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8600CFEE23C61F8300D0E2DB /* DarwinNotificationCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DarwinNotificationCenter.swift; sourceTree = "<group>"; };
 		860E156923C7C44500EA7F46 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		860E156D23C7C90F00EA7F46 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = Assets.xcassets/logo.png; sourceTree = "<group>"; };
 		86163BDA23C256EB00B56C09 /* SystemInfoHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemInfoHelper.h; sourceTree = "<group>"; };
@@ -1271,7 +1269,6 @@
 		F8EA6C8021B723A80082976B /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				8600CFEE23C61F8300D0E2DB /* DarwinNotificationCenter.swift */,
 				F8C5EBE622F38F0E00563B5F /* Trace.swift */,
 				F821CF69229FC22D005C1E43 /* Network */,
 				F8B3A7DD226E48C1004BA588 /* SoundPlayer */,
@@ -1862,7 +1859,6 @@
 				F821CF57229BF43A005C1E43 /* SnoozeParameters.swift in Sources */,
 				F8B3A79722635A25004BA588 /* AlertEntry+CoreDataProperties.swift in Sources */,
 				F8F971B723A5914D00C3F17D /* BluetoothPeripheralType.swift in Sources */,
-				8600CFEF23C61F8300D0E2DB /* DarwinNotificationCenter.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
 				F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */,
