@@ -51,7 +51,7 @@ extension Data {
     func uint64 (position:Int)-> UInt64 {
         let start = position
         let end = start.advanced(by: 8)
-        let number: UInt64 =  self.subdata(in: start..<end).withUnsafeBytes { $0.load(as: UInt64.self)}
+        let number: UInt64 =  self.subdata(in: start..<end).toInt()
         return number
     }
     
@@ -59,7 +59,7 @@ extension Data {
     func uint32 (position:Int)-> UInt32 {
         let start = position
         let end = start.advanced(by: 4)
-        let number: UInt32 =  self.subdata(in: start..<end).withUnsafeBytes { $0.load(as: UInt32.self) }
+        let number: UInt32 =  self.subdata(in: start..<end).toInt()
         return number
     }
 
@@ -67,7 +67,7 @@ extension Data {
     func uint16 (position:Int)-> UInt16 {
         let start = position
         let end = start.advanced(by: 2)
-        let number: UInt16 =  self.subdata(in: start..<end).withUnsafeBytes { $0.load(as: UInt16.self) }
+        let number: UInt16 =  self.subdata(in: start..<end).toInt()
         return number
     }
     
@@ -75,15 +75,19 @@ extension Data {
     func uint8 (position:Int)-> UInt8 {
         let start = position
         let end = start.advanced(by: 1)
-        let number: UInt8 =  self.subdata(in: start..<end).withUnsafeBytes { $0.load(as: UInt8.self) }
+        let number: UInt8 =  self.subdata(in: start..<end).toInt()
         return number
     }
     
-    func toInt (position: Int, length: Int) -> Int {
-        let start = position
-        let end = start.advanced(by: length)
-        let number: Int =  self.subdata(in: start..<end).withUnsafeBytes { $0.load(as: Int.self) }
-        return number
+    //source Data.Swift CGMBLEKit
+    func to<T: FixedWidthInteger>(_: T.Type) -> T {
+        return self.withUnsafeBytes { (bytes: UnsafePointer<T>) in
+            return T(littleEndian: bytes.pointee)
+        }
+    }
+
+    func toInt<T: FixedWidthInteger>() -> T {
+        return to(T.self)
     }
     
     mutating func append<T: FixedWidthInteger>(_ newElement: T) {
