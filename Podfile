@@ -15,7 +15,6 @@ target 'xdrip' do
   pod 'CryptoSwift', '~> 1.0'
   
   use_frameworks!
-  pod 'ReachabilitySwift'
   pod 'Telegraph'
 
 end

@@ -8,7 +8,6 @@
 
 import Foundation
 import Telegraph
-import Reachability
 
 public class WebServicesManager: NSObject {
     private var identity: CertificateIdentity?
@@ -20,7 +19,6 @@ public class WebServicesManager: NSObject {
     var server: Server!
     var webSocketClient: WebSocketClient!
     
-    let reachability = try! Reachability()
     var ipAddress = SystemInfoHelper.ipAddress()
 }
 
@@ -33,8 +31,6 @@ public extension WebServicesManager {
         // Create and start the server
         setupServer()
         
-        addObservers()
-        
         // Demonstrate client requests and web socket connection
         //demoClientNormalRequest()
         //demoClientJSONRequest()
@@ -43,7 +39,6 @@ public extension WebServicesManager {
     
     func stop() {
         server.stop()
-        removeObservers()
     }
 }
 
@@ -275,37 +270,6 @@ extension WebServicesManager {
         components.path = path
         return components.url!
     }
-    
-    func addObservers() {
-         NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(note:)), name: .reachabilityChanged, object: reachability)
-        do {
-          try reachability.startNotifier()
-        } catch {
-          print("could not start reachability notifier")
-        }
-    }
-
-    func removeObservers() {
-        reachability.stopNotifier()
-        NotificationCenter.default.removeObserver(self, name: .reachabilityChanged, object: reachability)
-    }
-
-    @objc func reachabilityChanged(note: Notification) {
-      let reachability = note.object as! Reachability
-
-        switch reachability.connection {
-        case .wifi:
-            ipAddress = SystemInfoHelper.ipAddress()
-            print("Reachable via WiFi: \(ipAddress)")
-        case .cellular:
-            print("Reachable via Cellular")
-        case .unavailable:
-            print("Network not reachable")
-        case .none:
-            print("Network not exists")
-        }
-    }
-
 }
 
 extension WebServicesManager {
