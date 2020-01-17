@@ -80,7 +80,7 @@ class AlertEntriesAccessor {
                 alertEntries = try fetchRequest.execute()
             } catch {
                 let fetchError = error as NSError
-                trace("in getAlertEntry, Unable to Execute AlertEntry Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+                trace("in getAlertEntry, Unable to Execute AlertEntry Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataAlertEntries, type: .error, fetchError.localizedDescription)
             }
         }
         

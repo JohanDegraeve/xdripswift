@@ -1,12 +1,18 @@
 import UIKit
 
 fileprivate enum Setting:Int, CaseIterable {
+
+    /// to enable NSLog
+    case NSLogEnabled = 0
     
-    // for G6 testing, factor 1
-    case G6v2ScalingFactor1 = 0
+    /// to enable OSLog
+    case OSLogEnabled = 1
     
-    // for G6 testing, factor 2
-    case G6v2ScalingFactor2 = 1
+    /// for G6 testing, factor 1
+    case G6v2ScalingFactor1 = 2
+    
+    /// for G6 testing, factor 2
+    case G6v2ScalingFactor2 = 3
     
 }
 
@@ -27,6 +33,12 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .G6v2ScalingFactor2:
             return "G6 v2 scaling factor 2"
 
+        case .NSLogEnabled:
+            return "NSLog"
+            
+        case .OSLogEnabled:
+            return "OSLog"
+            
         }
     }
     
@@ -41,6 +53,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
         case .G6v2ScalingFactor2:
             return UITableViewCell.AccessoryType.disclosureIndicator
+            
+        case .NSLogEnabled, .OSLogEnabled:
+            return UITableViewCell.AccessoryType.none
             
         }
     }
@@ -57,22 +72,53 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             } else {
                 return CGMG6Transmitter.G6v2DefaultScalingFactor1.description
             }
+            
         case .G6v2ScalingFactor2:
             if let factor = UserDefaults.standard.G6v2ScalingFactor2 {
                 return factor
             } else {
                 return CGMG6Transmitter.G6v2DefaultScalingFactor2.description
             }
+            
+        case .NSLogEnabled:
+            return "NSLog"
+            
+        case .OSLogEnabled:
+            return "OSLog"
+            
         }
         
     }
     
     func uiView(index: Int) -> UIView? {
         
-        return nil
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+        
+        switch setting {
+            
+        case .NSLogEnabled:
+            return UISwitch(isOn: UserDefaults.standard.NSLogEnabled, action: {
+                (isOn:Bool) in
+                
+                UserDefaults.standard.NSLogEnabled = isOn
+                
+            })
+            
+        case .OSLogEnabled:
+            return UISwitch(isOn: UserDefaults.standard.OSLogEnabled, action: {
+                (isOn:Bool) in
+                
+                UserDefaults.standard.OSLogEnabled = isOn
+                
+            })
+            
+        case .G6v2ScalingFactor1, .G6v2ScalingFactor2:
+            return nil
+            
+        }
         
     }
-    
+
     func numberOfRows() -> Int {
         return Setting.allCases.count
     }
@@ -106,6 +152,8 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
 
             }, cancelHandler: nil)
 
+        case .NSLogEnabled, .OSLogEnabled:
+            return .nothing
         }
     }
     

@@ -160,10 +160,10 @@ public class AlertManager:NSObject {
                 // set missed reading alert, this will be a future planned alert
                 _ = checkAlertAndFire(alertKind: .missedreading, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
             } else {
-                trace("in checkAlerts, latestBgReadings is older than %{public}@ minutes", log: self.log, type: .info, maxAgeOfLastBgReadingInSeconds.description)
+                trace("in checkAlerts, latestBgReadings is older than %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, maxAgeOfLastBgReadingInSeconds.description)
             }
         } else {
-            trace("in checkAlerts, latestBgReadings.count == 0", log: self.log, type: .info)
+            trace("in checkAlerts, latestBgReadings.count == 0", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
         }
     }
     
@@ -194,19 +194,19 @@ public class AlertManager:NSObject {
                     // get the appicable alertEntry so we can find the alertType and default snooze value
                     let (currentAlertEntry, _) = alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor)
                     
-                    trace("in userNotificationCenter, received actionIdentifier : snoozeActionIdentifier, snoozing alert %{public}@ for %{public}@ minutes", log: self.log, type: .info, alertKind.descriptionForLogging(), Int(currentAlertEntry.alertType.snoozeperiod).description)
+                    trace("in userNotificationCenter, received actionIdentifier : snoozeActionIdentifier, snoozing alert %{public}@ for %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), Int(currentAlertEntry.alertType.snoozeperiod).description)
                     
                     snooze(alertKind: alertKind, snoozePeriodInMinutes: Int(currentAlertEntry.alertType.snoozeperiod), response: response)
                     
                 case UNNotificationDefaultActionIdentifier:
                     
-                    trace("in userNotificationCenter, received actionIdentifier : UNNotificationDefaultActionIdentifier (user clicked the notification which opens the app, but not the snooze action)", log: self.log, type: .info)
+                    trace("in userNotificationCenter, received actionIdentifier : UNNotificationDefaultActionIdentifier (user clicked the notification which opens the app, but not the snooze action)", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
 
                     // create pickerViewData for the alertKind for which alert went off, and return it to the caller who in turn needs to allow the user to select a snoozeperiod
                     returnValue = createPickerViewData(forAlertKind: alertKind)
 
                 case UNNotificationDismissActionIdentifier:
-                    trace("in userNotificationCenter, received actionIdentifier : UNNotificationDismissActionIdentifier", log: self.log, type: .info)
+                    trace("in userNotificationCenter, received actionIdentifier : UNNotificationDismissActionIdentifier", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
                     
                     // user is swiping away the notification without opening the app, and not choosing the snooze option even if there would be an option to snooze
                     // if it's a reading alert (low, high, ...) then it will go off again in 5 minutes
@@ -217,7 +217,7 @@ public class AlertManager:NSObject {
 
                 default:
                     
-                    trace("in userNotificationCenter, received actionIdentifier %{public}@", log: self.log, type: .info, response.actionIdentifier)
+                    trace("in userNotificationCenter, received actionIdentifier %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, response.actionIdentifier)
                     
                 }
                 
@@ -276,7 +276,7 @@ public class AlertManager:NSObject {
                                 }
                                 let alertPeriod = self.snoozeValueMinutes[snoozeIndex]
                                 self.getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: alertPeriod)
-                                trace("    snoozing alert %{public}@ for %{public}@ minutes", log: self.log, type: .info, alertKind.descriptionForLogging(), alertPeriod.description)
+                                trace("    snoozing alert %{public}@ for %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), alertPeriod.description)
         },
                               onCancelClick: {
                                 () -> Void in
@@ -293,7 +293,7 @@ public class AlertManager:NSObject {
         
         // check if snoozed
         if getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed {
-            trace("in checkAlert, alert %{public}@ is currently snoozed", log: self.log, type: .info, alertKind.descriptionForLogging())
+            trace("in checkAlert, alert %{public}@ is currently snoozed", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             return false
         }
         
@@ -422,7 +422,7 @@ public class AlertManager:NSObject {
             // Add Request to User Notification Center
             uNUserNotificationCenter.add(notificationRequest) { (error) in
                 if let error = error {
-                    trace("Unable to Add Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
+                    trace("Unable to Add Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
                 }
             }
 
@@ -432,15 +432,15 @@ public class AlertManager:NSObject {
             }
             
             // log the result
-            trace("in checkAlert, raising alert %{public}@", log: self.log, type: .info, alertKind.descriptionForLogging())
+            trace("in checkAlert, raising alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             if delayInSecondsToUse > 0 {
-                trace("   delay = %{public}@ seconds, = %{public}@ minutes", log: self.log, type: .info, delayInSecondsToUse.description, ((round(Double(delayInSecondsToUse)/60*10))/10).description)
+                trace("   delay = %{public}@ seconds, = %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, delayInSecondsToUse.description, ((round(Double(delayInSecondsToUse)/60*10))/10).description)
             }
 
             return true
             
         } else {
-            trace("in checkAlert, there's no need to raise alert %{public}@", log: self.log, type: .info, alertKind.descriptionForLogging())
+            trace("in checkAlert, there's no need to raise alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             return false
         }
     }
@@ -468,11 +468,11 @@ public class AlertManager:NSObject {
             // Add Request to User Notification Center
             uNUserNotificationCenter.add(notificationRequest) { (error) in
                 if let error = error {
-                    trace("Unable to Add Notification Request %{public}@", log: self.log, type: .error, error.localizedDescription)
+                    trace("Unable to Add Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
                 }
             }
             
-            trace("Rescheduled missed reading alert with delay (and repeat) %{public}@ minutes", log: self.log, type: .info, snoozePeriodInMinutes.description)
+            trace("Rescheduled missed reading alert with delay (and repeat) %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, snoozePeriodInMinutes.description)
             
         } else {
             

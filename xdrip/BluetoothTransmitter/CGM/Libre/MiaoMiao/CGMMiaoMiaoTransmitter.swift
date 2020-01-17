@@ -96,7 +96,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         if writeDataToPeripheral(data: Data.init([0xF0]), type: .withoutResponse) {
             return true
         } else {
-            trace("in sendStartReadingCommand, write failed", log: log, type: .error)
+            trace("in sendStartReadingCommand, write failed", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .error)
             return false
         }
     }
@@ -145,7 +145,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
             
             //check if buffer needs to be reset
             if (Date() > timestampFirstPacketReception.addingTimeInterval(CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds - 1)) {
-                trace("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds)
+                trace("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info, CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds)
                 resetRxBuffer()
             }
             
@@ -160,7 +160,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                     case .dataPacket:
                         //if buffer complete, then start processing
                         if rxBuffer.count >= 363  {
-                            trace("in peripheral didUpdateValueFor, Buffer complete", log: log, type: .info)
+                            trace("in peripheral didUpdateValueFor, Buffer complete", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
                             
                             if (Crc.LibreCrc(data: &rxBuffer, headerOffset: miaoMiaoHeaderLength)) {
                                 //get MiaoMiao info from MiaoMiao header
@@ -181,41 +181,41 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 resetRxBuffer()
                                 resendPacketCounter = temp + 1
                                 if resendPacketCounter < maxPacketResendRequests {
-                                    trace("in peripheral didUpdateValueFor, crc error encountered. New attempt launched", log: log, type: .info)
+                                    trace("in peripheral didUpdateValueFor, crc error encountered. New attempt launched", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
                                     _ = sendStartReadingCommand()
                                 } else {
-                                    trace("in peripheral didUpdateValueFor, crc error encountered. Maximum nr of attempts reached", log: log, type: .info)
+                                    trace("in peripheral didUpdateValueFor, crc error encountered. Maximum nr of attempts reached", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
                                     resendPacketCounter = 0
                                 }
                             }
                         }
                         
                     case .frequencyChangedResponse:
-                        trace("in peripheral didUpdateValueFor, frequencyChangedResponse received, shound't happen ?", log: log, type: .error)
+                        trace("in peripheral didUpdateValueFor, frequencyChangedResponse received, shound't happen ?", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .error)
                         
                     case .newSensor:
-                        trace("in peripheral didUpdateValueFor, new sensor detected", log: log, type: .info)
+                        trace("in peripheral didUpdateValueFor, new sensor detected", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
                         cgmTransmitterDelegate?.newSensorDetected()
                         
                         // send 0xD3 and 0x01 to confirm sensor change as defined in MiaoMiao protocol documentation
                         // after that send start reading command, each with delay of 500 milliseconds
                         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
                             if self.writeDataToPeripheral(data: Data.init([0xD3, 0x01]), type: .withoutResponse) {
-                                trace("in peripheralDidUpdateValueFor, successfully sent 0xD3 and 0x01, confirm sensor change to MiaoMiao", log: self.log, type: .info)
+                                trace("in peripheralDidUpdateValueFor, successfully sent 0xD3 and 0x01, confirm sensor change to MiaoMiao", log: self.log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
                                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
                                     if !self.sendStartReadingCommand() {
-                                        trace("in peripheralDidUpdateValueFor, sendStartReadingCommand failed", log: self.log, type: .error)
+                                        trace("in peripheralDidUpdateValueFor, sendStartReadingCommand failed", log: self.log, category: ConstantsLog.categoryCGMMiaoMiao, type: .error)
                                     } else {
-                                        trace("in peripheralDidUpdateValueFor, successfully sent startReadingCommand to MiaoMiao", log: self.log, type: .info)
+                                        trace("in peripheralDidUpdateValueFor, successfully sent startReadingCommand to MiaoMiao", log: self.log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
                                     }
                                 }
                             } else {
-                                trace("in peripheralDidUpdateValueFor, write D301 failed", log: self.log, type: .error)
+                                trace("in peripheralDidUpdateValueFor, write D301 failed", log: self.log, category: ConstantsLog.categoryCGMMiaoMiao, type: .error)
                             }
                         }
                         
                     case .noSensor:
-                        trace("in peripheral didUpdateValueFor, sensor not detected", log: log, type: .info)
+                        trace("in peripheral didUpdateValueFor, sensor not detected", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
                         // call to delegate
                         cgmTransmitterDelegate?.sensorNotDetected()
                         
@@ -223,12 +223,12 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                 } else {
                     //rxbuffer doesn't start with a known miaomiaoresponse
                     //reset the buffer and send start reading command
-                    trace("in peripheral didUpdateValueFor, rx buffer doesn't start with a known miaomiaoresponse, reset the buffer", log: log, type: .error)
+                    trace("in peripheral didUpdateValueFor, rx buffer doesn't start with a known miaomiaoresponse, reset the buffer", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .error)
                     resetRxBuffer()
                 }
             }
         } else {
-            trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
+            trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .error)
         }
         
         

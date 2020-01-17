@@ -124,7 +124,7 @@ class LibreOOPClient {
             do {
                 getCalibrationStatus = try JSONDecoder().decode(GetCalibrationStatus.self, from: data)
             } catch {
-                trace("Failed to decode data received from remote server. data received from remote server = %{public}@", log: log, type: .error, String(bytes: data, encoding: .utf8) ?? "")
+                trace("Failed to decode data received from remote server. data received from remote server = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, String(bytes: data, encoding: .utf8) ?? "")
                 errorDescription =  String(bytes: data, encoding: .utf8) ?? "Failed to decode data received from remote server."
                 return
             }
@@ -136,10 +136,10 @@ class LibreOOPClient {
                     save(data: data)
                 } catch {
                     // encoding data failed, no need to handle as an error, it means probably next time a new post will be done to the oop web server
-                    trace("in calibrateSensor, error while encoding data : %{public}@", log: log, type: .error, error.localizedDescription)
+                    trace("in calibrateSensor, error while encoding data : %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, error.localizedDescription)
                 }
             } else {
-                trace("in calibrateSensor, slope is nil", log: log, type: .error)
+                trace("in calibrateSensor, slope is nil", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
                 errorDescription = "slope is nil"
                 return
             }
@@ -186,7 +186,7 @@ class LibreOOPClient {
                 // error cases
                 if let error = error {
                     
-                    trace("post failed, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+                    trace("post failed, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreOOPClient, type: .error, error.localizedDescription)
                     errorDescription = error.localizedDescription
                     return
                     
@@ -205,7 +205,7 @@ class LibreOOPClient {
         do {
             try data.write(to: url)
         } catch {
-            trace("in save, failed to save data", log: log, type: .error)
+            trace("in save, failed to save data", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
         }
     }
 

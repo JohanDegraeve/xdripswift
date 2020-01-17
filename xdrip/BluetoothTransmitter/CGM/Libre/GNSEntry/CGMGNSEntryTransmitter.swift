@@ -143,10 +143,10 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
         // log the received characteristic value
-        trace("in peripheralDidUpdateValueFor with characteristic UUID = %{public}@, matches characteristic name %{public}@", log: log, type: .info, characteristic.uuid.uuidString, receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString)?.description ?? "not available")
+        trace("in peripheralDidUpdateValueFor with characteristic UUID = %{public}@, matches characteristic name %{public}@", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info, characteristic.uuid.uuidString, receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString)?.description ?? "not available")
         
         if let error = error {
-            trace("   error: %{public}@", log: log, type: .error , error.localizedDescription)
+            trace("   error: %{public}@", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .error , error.localizedDescription)
         }
         
         if let receivedCharacteristic = receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString), let value = characteristic.value {
@@ -174,7 +174,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
                 if let batteryLevel = Int(dataAsString, radix: 16) {
                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryLevel), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
                 } else {
-                    trace("   in peripheralDidUpdateValueFor, could not read batterylevel, received hex value = %{public}@", log: log, type: .error , dataAsString)
+                    trace("   in peripheralDidUpdateValueFor, could not read batterylevel, received hex value = %{public}@", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .error , dataAsString)
                 }
             case .CBUUID_GNW_Write:
                 break
@@ -183,13 +183,13 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
                 var valueDecoded = XORENC(inD: [UInt8](value))
                 
                 let valueDecodedAsHexString = Data(valueDecoded).hexEncodedString()
-                trace("   in peripheralDidUpdateValueFor, GNW Notify with hex value = %{public}@", log: log, type: .info , valueDecodedAsHexString)
+                trace("   in peripheralDidUpdateValueFor, GNW Notify with hex value = %{public}@", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info , valueDecodedAsHexString)
                 
                 // reading status, as per GNSEntry documentation
                 let readingStatus = getIntAtPosition(numberOfBytes: 1, position: 0, data: &valueDecoded)
                 
                 if readingStatus == GNW_BAND_NFC_HW_ERROR || readingStatus == GNW_BAND_NFC_READING_ERROR {
-                    trace("   in peripheralDidUpdateValueFor, readingStatus is not OK", log: log, type: .error)
+                    trace("   in peripheralDidUpdateValueFor, readingStatus is not OK", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .error)
                     // TODO: what to do here ?
                 } else {
                     
@@ -277,61 +277,61 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     // MARK: CBCentralManager overriden functions
     
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        trace("didDiscoverCharacteristicsFor", log: log, type: .info)
+        trace("didDiscoverCharacteristicsFor", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info)
         
         // log error if any
         if let error = error {
-            trace("    error: %{public}@", log: log, type: .error , error.localizedDescription)
+            trace("    error: %{public}@", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .error , error.localizedDescription)
         }
         
         if let characteristics = service.characteristics {
             for characteristic in characteristics {
                 let ASCIIstring = characteristic.uuid.uuidString
-                trace("characteristic uuid: %{public}@", log: log, type: .info, ASCIIstring)
+                trace("characteristic uuid: %{public}@", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info, ASCIIstring)
                 
                 if let receivedCharacteristic = receivedCharacteristicUUIDToCharacteristic(characteristicUUID: characteristic.uuid.uuidString) {
                     switch receivedCharacteristic {
                         
                     case .CBUUID_SerialNumber:
-                        trace("    found serialNumberCharacteristic", log: log, type: .info)
+                        trace("    found serialNumberCharacteristic", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info)
                         serialNumberCharacteristic = characteristic
                         if actualSerialNumber == nil {
                             peripheral.setNotifyValue(true, for: characteristic)
                             peripheral.readValue(for: characteristic)
                         }
                     case .CBUUID_Firmware:
-                        trace("    found firmwareCharacteristic", log: log, type: .info)
+                        trace("    found firmwareCharacteristic", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info)
                         firmwareCharacteristic = characteristic
                         if actualFirmWareVersion == nil {
                             peripheral.setNotifyValue(true, for: characteristic)
                             peripheral.readValue(for: characteristic)
                         }
                     case .CBUUID_Bootloader:
-                        trace("    found bootLoaderCharacteristic", log: log, type: .info)
+                        trace("    found bootLoaderCharacteristic", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info)
                         bootLoaderCharacteristic = characteristic
                         if actualBootLoader == nil {
                             peripheral.setNotifyValue(true, for: characteristic)
                             peripheral.readValue(for: characteristic)
                         }
                     case .CBUUID_BatteryLevel:
-                        trace("    found batteryLevelCharacteristic", log: log, type: .info)
+                        trace("    found batteryLevelCharacteristic", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info)
                         batteryLevelCharacteristic = characteristic
                         peripheral.setNotifyValue(true, for: characteristic)
                         peripheral.readValue(for: characteristic)
                     case .CBUUID_GNW_Write:
-                        trace("    found GNWWriteCharacteristic", log: log, type: .info)
+                        trace("    found GNWWriteCharacteristic", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info)
                         GNWWriteCharacteristic = characteristic
                     case .CBUUID_GNW_Notify:
-                        trace("    found GNWNotifyCharacteristic", log: log, type: .info)
+                        trace("    found GNWNotifyCharacteristic", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info)
                         GNWNotifyCharacteristic = characteristic
                         peripheral.setNotifyValue(true, for: characteristic)
                     }
                 } else {
-                    trace("    characteristic UUID unknown", log: log, type: .error)
+                    trace("    characteristic UUID unknown", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .error)
                 }
             }
         } else {
-            trace("characteristics is nil. There must be some error.", log: log, type: .error)
+            trace("characteristics is nil. There must be some error.", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .error)
         }
     }
     

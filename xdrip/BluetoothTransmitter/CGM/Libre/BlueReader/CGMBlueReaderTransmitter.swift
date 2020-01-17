@@ -79,23 +79,23 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
         
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
-        trace("in peripheral didUpdateValueFor", log: log, type: .info)
+        trace("in peripheral didUpdateValueFor", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .info)
         
         if let value = characteristic.value {
             
             guard let valueAsString = String(bytes: value, encoding: .utf8)  else {
-                trace("    failed to convert value to string", log: log, type: .error)
+                trace("    failed to convert value to string", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .error)
                 return
             }
             
-            trace("    value = %{public}@", log: log, type: .info, valueAsString)
+            trace("    value = %{public}@", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .info, valueAsString)
             
             //find indexes of " "
             let indexesOfSplitter = valueAsString.indexes(of: " ")
             
             // second field is the battery level, there should be at least one space
             guard indexesOfSplitter.count >= 1 else {
-                trace("    there's less than 1 space", log: log, type: .error)
+                trace("    there's less than 1 space", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .error)
                 return
             }
             
@@ -104,7 +104,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
             
             // convert rawDataAsString to double and stop if this fails
             guard let rawDataAsDouble = rawDataAsString.toDouble() else {
-                trace("    failed to convert rawDataAsString to double", log: log, type: .error)
+                trace("    failed to convert rawDataAsString to double", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .error)
                 return
             }
             
@@ -128,7 +128,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transMitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
             
         } else {
-            trace("    value is nil, no further processing", log: log, type: .error)
+            trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .error)
         }
         
     }

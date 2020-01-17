@@ -73,23 +73,23 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
-        trace("in peripheral didUpdateValueFor", log: log, type: .info)
+        trace("in peripheral didUpdateValueFor", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .info)
         
         if let value = characteristic.value {
             
             guard let valueAsString = String(bytes: value, encoding: .utf8)  else {
-                trace("    failed to convert value to string", log: log, type: .error)
+                trace("    failed to convert value to string", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)
                 return
             }
             
-            trace("    value = %{public}@", log: log, type: .info, valueAsString)
+            trace("    value = %{public}@", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .info, valueAsString)
             
             //find indexes of " "
             let indexesOfSplitter = valueAsString.indexes(of: " ")
             
             // length of indexesOfSplitter should be minimum 3 (there should be minimum 3 spaces)
             guard indexesOfSplitter.count >= 3 else {
-                trace("    there's less than 3 spaces", log: log, type: .error)
+                trace("    there's less than 3 spaces", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)
                 return
             }
             
@@ -105,23 +105,23 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
             // first field : first digits are rawvalue, to be multiplied with 100, last two digits are sensor type indicator, 10=L1, 20=L2, 30=US 14 day, 40=Lpro/h
             let rawValueAsString = firstField[0..<(firstField.count - 2)] + "00"
             let sensorTypeIndicator = firstField[(firstField.count - 2)..<firstField.count]
-            trace("    sensor type indicator = %{public}@", log: log, type: .info, rawValueAsString, sensorTypeIndicator)
+            trace("    sensor type indicator = %{public}@", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .info, rawValueAsString, sensorTypeIndicator)
             
             // convert rawValueAsString to double and stop if this fails
             guard let rawValueAsDouble = rawValueAsString.toDouble() else {
-                trace("    failed to convert rawValueAsString to double", log: log, type: .error)
+                trace("    failed to convert rawValueAsString to double", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)
                 return
             }
             
             // third field is battery percentage, stop if convert to Int fails
             guard let batteryPercentage = Int(String(valueAsString[valueAsString.index(after: indexesOfSplitter[1])..<indexesOfSplitter[2]])) else {
-                trace("    failed to convert batteryPercentage field to Int", log: log, type: .error)
+                trace("    failed to convert batteryPercentage field to Int", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)
                 return
             }
             
             // fourth field is sensor time in minutes, stop if convert to Int fails
             guard let sensorTimeInMinutes = Int(String(valueAsString[valueAsString.index(after: indexesOfSplitter[2])..<valueAsString.endIndex])) else {
-                trace("    failed to convert sensorTimeInMinutes field  to Int", log: log, type: .error)
+                trace("    failed to convert sensorTimeInMinutes field  to Int", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)
                 return
             }
             
@@ -130,7 +130,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: nil, sensorTimeInMinutes: sensorTimeInMinutes * 10, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
             
         } else {
-            trace("    value is nil, no further processing", log: log, type: .error)
+            trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)
         }
         
     }

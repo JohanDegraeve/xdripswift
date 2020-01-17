@@ -136,7 +136,7 @@ class BgReadingsAccessor {
                 bgReadings = try fetchRequest.execute()
             } catch {
                 let fetchError = error as NSError
-                trace("in getBgReadingOnPrivateManagedObjectContext, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+                trace("in getBgReadingOnPrivateManagedObjectContext, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
             }
         }
         
@@ -175,7 +175,7 @@ class BgReadingsAccessor {
                 bgReadings = try fetchRequest.execute()
             } catch {
                 let fetchError = error as NSError
-                trace("in fetchBgReadings, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+                trace("in fetchBgReadings, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
             }
         }
         

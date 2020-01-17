@@ -111,12 +111,12 @@ class DexcomShareUploadManager:NSObject {
                                     self.callMessageHandler(withCredentialVerificationResult: success, errorMessage: self.translateDexcomErrorMessage(errorText: error?.localizedDescription ?? nil))
                                     
                                     if success {
-                                        trace("in observeValue, start upload", log: self.log, type: .info)
+                                        trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                                         
                                         self.uploadBgReadingsToDexcomShare(firstAttempt: true)
                                         
                                     } else {
-                                        trace("in observeValue, Dexcom Share credential check failed", log: self.log, type: .error)
+                                        trace("in observeValue, Dexcom Share credential check failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                                     }
                                 }
 
@@ -141,12 +141,12 @@ class DexcomShareUploadManager:NSObject {
                                     DispatchQueue.main.async {
                                         if success {
                                             
-                                            trace("in observeValue, start upload", log: self.log, type: .info)
+                                            trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                                             self.uploadBgReadingsToDexcomShare(firstAttempt: true)
 
                                         } else {
                                             
-                                            trace("in observeValue, Dexcom Share credential check failed", log: self.log, type: .error)
+                                            trace("in observeValue, Dexcom Share credential check failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                                         }
                                     }
                                     
@@ -173,10 +173,10 @@ class DexcomShareUploadManager:NSObject {
     /// dexcomShareSessionId and UserDefaults.standard.dexcomShareSerialNumber should be not nil
     private func startRemoteMonitoringSessionAndStartUpload() {
         
-        trace("in startRemoteMonitoringSessionAndStartUpload", log: self.log, type: .info)
+        trace("in startRemoteMonitoringSessionAndStartUpload", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
         
         guard let url = URL(string: dexcomShareUrl), let dexcomShareSessionId = dexcomShareSessionId, let dexcomShareSerialNumber = UserDefaults.standard.dexcomShareSerialNumber, let dexcomShareAccountName = UserDefaults.standard.dexcomShareAccountName else {
-            trace("    failed to create url or dexcomShareSessionId or dexcomShareSerialNumber or dexcomShareAccountName is nil", log: self.log, type: .error)
+            trace("    failed to create url or dexcomShareSessionId or dexcomShareSerialNumber or dexcomShareAccountName is nil", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
             return
         }
         
@@ -184,7 +184,7 @@ class DexcomShareUploadManager:NSObject {
         
         // create NSURLComponents instance with scheme, host, queryItems
         guard let components = NSURLComponents(url: startRemoteMonitoringSessionUrl, resolvingAgainstBaseURL: false) else {
-            trace("in startRemoteMonitoringSessionAndStartUpload, failed to create components", log: self.log, type: .error)
+            trace("in startRemoteMonitoringSessionAndStartUpload, failed to create components", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
             return
         }
         
@@ -193,7 +193,7 @@ class DexcomShareUploadManager:NSObject {
         components.queryItems = [URLQueryItem(name: "sessionId", value: dexcomShareSessionId), URLQueryItem(name: "serialNumber", value: dexcomShareSerialNumber)]
         
         guard let newUrl = components.url else {
-            trace("in startRemoteMonitoringSessionAndStartUpload, failed to create newUrl", log: self.log, type: .error)
+            trace("in startRemoteMonitoringSessionAndStartUpload, failed to create newUrl", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
             return
         }
 
@@ -209,7 +209,7 @@ class DexcomShareUploadManager:NSObject {
         // Create upload Task
         let dataTask = sharedSession.uploadTask(with: request, from: "".data(using: .utf8), completionHandler: { (data, response, error) -> Void in
             
-            trace("in startRemoteMonitoringSessionAndStartUpload, in uploadTask completionHandler", log: self.log, type: .info)
+            trace("in startRemoteMonitoringSessionAndStartUpload, in uploadTask completionHandlself.er", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
             
             // if ends without success then log the data when existing the scope
             var success = false
@@ -217,7 +217,7 @@ class DexcomShareUploadManager:NSObject {
                 if !success {
                     if let data = data {
                         if let dataAsString = String(bytes: data, encoding: .utf8) {
-                            trace("    data = %{public}@", log: self.log, type: .error, dataAsString)
+                            trace("    data = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, dataAsString)
                         }
                     }
                 }
@@ -225,7 +225,7 @@ class DexcomShareUploadManager:NSObject {
 
             // error cases
             if let error = error {
-                trace("    error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+                trace("    error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, error.localizedDescription)
                 return
             }
             
@@ -237,7 +237,7 @@ class DexcomShareUploadManager:NSObject {
                     // data has sessionid (if success) or error details (if failure) which can be logged and shown to the user
                     guard let decoded = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
                         else {
-                            trace("    JSONSerialization failed", log: self.log, type: .error)
+                            trace("    JSONSerialization failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                             return
                     }
                     
@@ -247,11 +247,11 @@ class DexcomShareUploadManager:NSObject {
                         // failure is a JSON object containing the error code
                         let errorCode = (decoded as? [String: String])?["Code"] ?? "unknown"
                         
-                        trace("    statuscode = %{public}@, error = %{public}@", log: self.log, type: .error, response.statusCode.description, errorCode)
+                        trace("    statuscode = %{public}@, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, response.statusCode.description, errorCode)
                         
                         if errorCode == "MonitoredReceiverSerialNumberDoesNotMatch" {
                             
-                            trace("    MonitoredReceiverSerialNumberDoesNotMatch", log: self.log, type: .error)
+                            trace("    MonitoredReceiverSerialNumberDoesNotMatch", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                             DispatchQueue.main.async {
                                 if let messageHandler = self.messageHandler {
                                     messageHandler(Texts_DexcomShareTestResult.uploadErrorWarning, Texts_DexcomShareTestResult.monitoredReceiverSNDoesNotMatch)
@@ -261,7 +261,7 @@ class DexcomShareUploadManager:NSObject {
                             
                         } else if errorCode == "MonitoredReceiverNotAssigned" {
                             
-                            trace("    new login failed with error MonitoredReceiverNotAssigned", log: self.log, type: .error)
+                            trace("    new login failed with error MonitoredReceiverNotAssigned", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                             DispatchQueue.main.async {
                                 if let messageHandler = self.messageHandler {
                                     messageHandler(Texts_DexcomShareTestResult.uploadErrorWarning, self.createMonitoredReceiverNotAssignedMessage(acount: dexcomShareAccountName, serialNumber: dexcomShareSerialNumber))
@@ -280,12 +280,12 @@ class DexcomShareUploadManager:NSObject {
                     }
                     
                 } else {
-                    trace("    no data received", log: self.log, type: .error)
+                    trace("    no data received", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                     return
                 }
                 
             } else {
-                trace("    response is not HTTPURLResponse", log: self.log, type: .error)
+                trace("    response is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                 return
             }
             
@@ -302,27 +302,27 @@ class DexcomShareUploadManager:NSObject {
     /// firstAttempt is there to avoid that the app runs in an endless loop
     private func uploadBgReadingsToDexcomShare(firstAttempt:Bool) {
         
-        trace("in uploadBgReadingsToDexcomShare", log: self.log, type: .info)
+        trace("in uploadBgReadingsToDexcomShare", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
         
         // dexcomShareSerialNumber and dexcomShareAccountName needed else no further processing
         guard let dexcomShareSerialNumber = UserDefaults.standard.dexcomShareSerialNumber, let dexcomShareAccountName = UserDefaults.standard.dexcomShareAccountName else {
-            trace("    dexcomShareSerialNumber and/or dexcomShareAccountName are/is nil", log: self.log, type: .error)
+            trace("    dexcomShareSerialNumber and/or dexcomShareAccountName are/is nil", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
             return
         }
         
         guard let dexcomShareSessionId = dexcomShareSessionId else {
             
-            trace("    dexcomShareSessionId is nil, will try to login", log: self.log, type: .error)
+            trace("    dexcomShareSessionId is nil, will try to login", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
             
             // try to login
             loginAndStoreSessionId { (success, error) in
                 DispatchQueue.main.async {
                     if success {
-                        trace("in uploadBgReadingsToDexcomShare, login successful, will restart uploadBgReadingsToDexcomShare", log: self.log, type: .info)
+                        trace("in uploadBgReadingsToDexcomShare, login successful, will restart uploadBgReadingsToDexcomShare", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                         // retry the upload
                         self.uploadBgReadingsToDexcomShare(firstAttempt: firstAttempt)
                     } else {
-                        trace("in uploadBgReadingsToDexcomShare, login failed, no further processing", log: self.log, type: .error)
+                        trace("in uploadBgReadingsToDexcomShare, login failed, no further processing", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                     }
                 }
             }
@@ -335,17 +335,17 @@ class DexcomShareUploadManager:NSObject {
             timeStamp = timeStampLatestDexcomShareUploadedBgReading
         }
         let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-        trace("    number of readings to upload : %{public}@", log: self.log, type: .info, bgReadingsToUpload.count.description)
+        trace("    number of readings to upload : %{public}@", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, bgReadingsToUpload.count.description)
 
         // if no no readings to upload, no further processing
         guard bgReadingsToUpload.count > 0 else {
-            trace("    no readings to upload", log: self.log, type: .info)
+            trace("    no readings to upload", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
             return
         }
         
         // create url request
         guard let request = createURLRequestForUploadBgReadings(dexcomShareSessionId: dexcomShareSessionId) else {
-            trace("    failed to create request", log: self.log, type: .error)
+            trace("    failed to create request", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
             return
         }
         
@@ -368,11 +368,11 @@ class DexcomShareUploadManager:NSObject {
             // Create upload Task
             let dataTask = sharedSession.uploadTask(with: request, from: uploadData, completionHandler: { (data, response, error) -> Void in
                 
-                trace("in uploadBgReadingsToDexcomShare, in uploadTask completionHandler", log: self.log, type: .info)
+                trace("in uploadBgReadingsToDexcomShare, in uploadTask completionHandler", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                 
                 // error cases
                 if let error = error {
-                    trace("    failed to upload, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+                    trace("    failed to upload, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, error.localizedDescription)
                     return
                 }
                 
@@ -386,7 +386,7 @@ class DexcomShareUploadManager:NSObject {
                             
                             // success
                             if let lastReading = bgReadingsToUpload.first {
-                                trace("    upload succeeded, setting timeStampLatestDexcomShareUploadedBgReading to %{public}@", log: self.log, type: .info, lastReading.timeStamp.description(with: .current))
+                                trace("    upload succeeded, setting timeStampLatestDexcomShareUploadedBgReading to %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, lastReading.timeStamp.description(with: .current))
                                 UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading = lastReading.timeStamp
                             }
                             
@@ -396,13 +396,13 @@ class DexcomShareUploadManager:NSObject {
                             
                             // returned data, which means an error occurred - although it's still possible that it was successful, eg DuplicateEgvPosted is considered successful
                             if let dataAsString = String(data: data, encoding: String.Encoding.utf8) {
-                                trace("    response from Dexcom = %{public}@", log: self.log, type: .error, dataAsString)
+                                trace("    response from Dexcom = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, dataAsString)
                             }
 
                             // try json decoding
                             guard let decoded = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
                                 else {
-                                    trace("    JSONSerialization failed", log: self.log, type: .error)
+                                    trace("    JSONSerialization failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                                     return
                             }
                             
@@ -412,7 +412,7 @@ class DexcomShareUploadManager:NSObject {
                                 // failure is a JSON object containing the error code
                                 let errorCode = (decoded as? [String: String])?["Code"] ?? "unknown"
                                 
-                                trace("    failed to upload, statuscode = %{public}@, error = %{public}@", log: self.log, type: .error, response.statusCode.description, errorCode)
+                                trace("    failed to upload, statuscode = %{public}@, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, response.statusCode.description, errorCode)
                                 
                                 // evaluate the error code
                                 if errorCode == "SessionNotValid" || errorCode == "SessionIdNotFound" {
@@ -424,11 +424,11 @@ class DexcomShareUploadManager:NSObject {
                                     self.loginAndStoreSessionId { (success, error) in
                                         DispatchQueue.main.async {
                                             if success {
-                                                trace("in uploadBgReadingsToDexcomShare, new login successful", log: self.log, type: .info)
+                                                trace("in uploadBgReadingsToDexcomShare, new login successful", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                                                 // retry the upload
                                                 self.uploadBgReadingsToDexcomShare(firstAttempt: false)
                                             } else {
-                                                trace("in uploadBgReadingsToDexcomShare, new login failed", log: self.log, type: .error)
+                                                trace("in uploadBgReadingsToDexcomShare, new login failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                                             }
                                         }
                                     }
@@ -447,7 +447,7 @@ class DexcomShareUploadManager:NSObject {
                                     // don't return
                                     
                                 } else if errorCode == "MonitoredReceiverSerialNumberDoesNotMatch" {
-                                    trace("in uploadBgReadingsToDexcomShare, new login failed with error MonitoredReceiverSerialNumberDoesNotMatch", log: self.log, type: .error)
+                                    trace("in uploadBgReadingsToDexcomShare, new login failed with error MonitoredReceiverSerialNumberDoesNotMatch", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                                     DispatchQueue.main.async {
                                         if let messageHandler = self.messageHandler {
                                             messageHandler(Texts_DexcomShareTestResult.uploadErrorWarning, Texts_DexcomShareTestResult.monitoredReceiverSNDoesNotMatch)
@@ -456,7 +456,7 @@ class DexcomShareUploadManager:NSObject {
                                     return
                                     
                                 } else if errorCode == "MonitoredReceiverNotAssigned" {
-                                    trace("in uploadBgReadingsToDexcomShare, new login failed with error MonitoredReceiverNotAssigned", log: self.log, type: .error)
+                                    trace("in uploadBgReadingsToDexcomShare, new login failed with error MonitoredReceiverNotAssigned", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                                     DispatchQueue.main.async {
                                         if let messageHandler = self.messageHandler {
                                             messageHandler(Texts_DexcomShareTestResult.uploadErrorWarning, self.createMonitoredReceiverNotAssignedMessage(acount: dexcomShareAccountName, serialNumber: dexcomShareSerialNumber))
@@ -466,7 +466,7 @@ class DexcomShareUploadManager:NSObject {
                                     
                                 } else {
                                     // unknown error code -  the error code value is already logged
-                                    trace("in uploadBgReadingsToDexcomShare, new login failed with unknown error code", log: self.log, type: .error)
+                                    trace("in uploadBgReadingsToDexcomShare, new login failed with unknown error code", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                                     return
                                 }
                                 
@@ -474,7 +474,7 @@ class DexcomShareUploadManager:NSObject {
                             
                             // success
                             if let lastReading = bgReadingsToUpload.first {
-                                trace("    upload succeeded, setting timeStampLatestDexcomShareUploadedBgReading to %{public}@", log: self.log, type: .info, lastReading.timeStamp.description(with: .current))
+                                trace("    upload succeeded, setting timeStampLatestDexcomShareUploadedBgReading to %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, lastReading.timeStamp.description(with: .current))
                                 UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading = lastReading.timeStamp
                             }
                             return
@@ -482,10 +482,10 @@ class DexcomShareUploadManager:NSObject {
                     } else {
                         
                         // don't think we should every come here
-                        trace("    no data received, considered successful upload", log: self.log, type: .error)
+                        trace("    no data received, considered successful upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
 
                         if let lastReading = bgReadingsToUpload.first {
-                            trace("    upload succeeded, setting timeStampLatestDexcomShareUploadedBgReading to %{public}@", log: self.log, type: .info, lastReading.timeStamp.description(with: .current))
+                            trace("    upload succeeded, setting timeStampLatestDexcomShareUploadedBgReading to %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, lastReading.timeStamp.description(with: .current))
                             UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading = lastReading.timeStamp
                         }
                         return
@@ -493,7 +493,7 @@ class DexcomShareUploadManager:NSObject {
                     }
                     
                 } else {
-                    trace("    failed to upload, response is not HTTPURLResponse", log: self.log, type: .error)
+                    trace("    failed to upload, response is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                     return
                 }
                 
@@ -502,7 +502,7 @@ class DexcomShareUploadManager:NSObject {
             dataTask.resume()
             
         } catch let error {
-            trace("     failed to upload, error = %{public}@", log: self.log, type: .info, error.localizedDescription)
+            trace("     failed to upload, error = %{public}@", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, error.localizedDescription)
             return
         }
 
@@ -514,11 +514,11 @@ class DexcomShareUploadManager:NSObject {
     /// in case of success, the function will store the dexcomShareSessionId
     private func loginAndStoreSessionId( _ completion: @escaping (_ success: Bool, _ error: Error?) -> Void) {
         
-        trace("in testDexcomShareCredentials", log: self.log, type: .info)
+        trace("in testDexcomShareCredentials", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
         
         guard let url = URL(string: dexcomShareUrl), let dexcomShareAccountName = UserDefaults.standard.dexcomShareAccountName, let dexcomSharePassword = UserDefaults.standard.dexcomSharePassword else {
             
-            trace("    required credentials are not set", log: self.log, type: .error)
+            trace("    required credentials are not set", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
             completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: "required credentials are not set or failed to create url"]))
             return
             
@@ -548,11 +548,11 @@ class DexcomShareUploadManager:NSObject {
             // Create upload Task
             let dataTask = sharedSession.uploadTask(with: request, from: uploadData, completionHandler: { (data, response, error) -> Void in
                 
-                trace("    in uploadTask completionHandler", log: self.log, type: .info)
+                trace("    in uploadTask completionHandler", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                 
                 // error cases
                 if let error = error {
-                    trace("    failed to login, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+                    trace("    failed to login, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, error.localizedDescription)
                     completion(false, error)
                     return
                 }
@@ -566,14 +566,14 @@ class DexcomShareUploadManager:NSObject {
                         guard let decoded = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
                             else {
                                 
-                                trace("    failed to login, JSONSerialization failed", log: self.log, type: .error)
+                                trace("    failed to login, JSONSerialization failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                                 completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "Could not do JSONSerialization of data"]))
                                 return
                         }
                         
                         guard (200...299).contains(response.statusCode) else {
                             
-                            trace("    failed to login, statuscode = %{public}@", log: self.log, type: .error, response.statusCode.description)
+                            trace("    failed to login, statuscode = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, response.statusCode.description)
                             
                             // failure should be a JSON object containing the error reason, if not use "unknown" as error code
                             let errorCode = (decoded as? [String: String])?["Code"] ?? "unknown"
@@ -587,7 +587,7 @@ class DexcomShareUploadManager:NSObject {
                         if let dexcomShareSessionId = decoded as? String {
                             
                             // success is a JSON-encoded string containing the dexcomShareSessionId
-                            trace("    successful login", log: self.log, type: .info)
+                            trace("    successful login", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                             self.dexcomShareSessionId = dexcomShareSessionId
                             
                             completion(true, nil)
@@ -597,7 +597,7 @@ class DexcomShareUploadManager:NSObject {
                         } else {
                             
                             // failure
-                            trace("    failed to login, failed to get dexcomShareSessionId, decoded is not a string", log: self.log, type: .error)
+                            trace("    failed to login, failed to get dexcomShareSessionId, decoded is not a string", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                             
                             completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "decoded is not a string"]))
                             
@@ -606,13 +606,13 @@ class DexcomShareUploadManager:NSObject {
                         
                         
                     } else {
-                        trace("    failed to login, no date received", log: self.log, type: .error)
+                        trace("    failed to login, no date received", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                         completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "no data received"]))
                         return
                     }
                     
                 } else {
-                    trace("    response is not HTTPURLResponse", log: self.log, type: .error)
+                    trace("    response is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                     completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: "response is not HTTPURLResponse"]))
                     return
                 }
@@ -622,7 +622,7 @@ class DexcomShareUploadManager:NSObject {
             dataTask.resume()
 
         } catch let error {
-            trace("     %{public}@", log: self.log, type: .info, error.localizedDescription)
+            trace("     %{public}@", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, error.localizedDescription)
             completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
             return
         }
@@ -694,14 +694,14 @@ class DexcomShareUploadManager:NSObject {
     private func createURLRequestForUploadBgReadings(dexcomShareSessionId:String) -> URLRequest? {
         // create url
         guard let url = URL(string: dexcomShareUrl) else {
-            trace("in createURLRequestForUploadBgReadings, failed to create url", log: self.log, type: .error)
+            trace("in createURLRequestForUploadBgReadings, failed to create url", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
             return nil
         }
         let postReceiverEgvRecordsUrl = url.appendingPathComponent(postReceiverEgvRecordsPath)
         
         // create NSURLComponents instance with scheme, host, queryItems
         guard let components = NSURLComponents(url: postReceiverEgvRecordsUrl, resolvingAgainstBaseURL: false) else {
-            trace("in createURLRequestForUploadBgReadings, failed to create components", log: self.log, type: .error)
+            trace("in createURLRequestForUploadBgReadings, failed to create components", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
             return nil
         }
         components.scheme = postReceiverEgvRecordsUrl.scheme
@@ -709,7 +709,7 @@ class DexcomShareUploadManager:NSObject {
         components.queryItems = [URLQueryItem(name: "sessionId", value: dexcomShareSessionId)]
         
         guard let newUrl = components.url else {
-            trace("in createURLRequestForUploadBgReadings, failed to create newUrl", log: self.log, type: .error)
+            trace("in createURLRequestForUploadBgReadings, failed to create newUrl", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
             return nil
         }
         

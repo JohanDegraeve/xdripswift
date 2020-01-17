@@ -34,7 +34,7 @@ class M5StackAccessor {
                 m5StackArray = try m5StackFetchRequest.execute()
             } catch {
                 let fetchError = error as NSError
-                trace("in getM5Stacks, Unable to Execute m5Stacks Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+                trace("in getM5Stacks, Unable to Execute m5Stacks Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataM5Stacks, type: .error, fetchError.localizedDescription)
             }
         }
         

@@ -74,7 +74,7 @@ class CalibrationsAccessor {
                 calibrations = try fetchRequest.execute()
             } catch {
                 let fetchError = error as NSError
-                trace("in getLatestCalibrations, Unable to Execute Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+                trace("in getLatestCalibrations, Unable to Execute Fetch Request : %{public}@", log: log, category: ConstantsLog.categoryApplicationDataCalibrations, type: .error, fetchError.localizedDescription)
             }
         }
         return calibrations
@@ -105,7 +105,7 @@ class CalibrationsAccessor {
                 calibrations = try fetchRequest.execute()
             } catch {
                 let fetchError = error as NSError
-                trace("in getFirstOrLastCalibration, Unable to Execute Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+                trace("in getFirstOrLastCalibration, Unable to Execute Fetch Request : %{public}@", log: log, category: ConstantsLog.categoryApplicationDataCalibrations, type: .error, fetchError.localizedDescription)
             }
         }
         

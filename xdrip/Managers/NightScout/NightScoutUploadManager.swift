@@ -100,7 +100,7 @@ public class NightScoutUploadManager:NSObject {
                                     if success {
                                         self.upload()
                                     } else {
-                                        trace("in observeValue, NightScout credential check failed", log: self.oslog, type: .info)
+                                        trace("in observeValue, NightScout credential check failed", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
                                     }
                                 }
                             })
@@ -122,7 +122,7 @@ public class NightScoutUploadManager:NSObject {
                                         if success {
                                             self.upload()
                                         } else {
-                                            trace("in observeValue, NightScout credential check failed", log: self.oslog, type: .info)
+                                            trace("in observeValue, NightScout credential check failed", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
                                         }
                                     }
                                 })
@@ -141,7 +141,7 @@ public class NightScoutUploadManager:NSObject {
     
     private func uploadBgReadingsToNightScout(siteURL:String, apiKey:String) {
         
-        trace("in uploadBgReadingsToNightScout", log: self.oslog, type: .info)
+        trace("in uploadBgReadingsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
 
         // get readings to upload, limit to x days, x = ConstantsNightScout.maxDaysToUpload
         var timeStamp = Date(timeIntervalSinceNow: TimeInterval(-ConstantsNightScout.maxDaysToUpload*24*60*60))
@@ -155,7 +155,7 @@ public class NightScoutUploadManager:NSObject {
         let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         if bgReadingsToUpload.count > 0 {
-            trace("    number of readings to upload : %{public}@", log: self.oslog, type: .info, bgReadingsToUpload.count.description)
+            trace("    number of readings to upload : %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, bgReadingsToUpload.count.description)
 
             // map readings to dictionaryRepresentation
             let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map({$0.dictionaryRepresentationForNightScoutUpload})
@@ -182,7 +182,7 @@ public class NightScoutUploadManager:NSObject {
                     // Create upload Task
                     let dataTask = sharedSession.uploadTask(with: request, from: sendData, completionHandler: { (data, response, error) -> Void in
                         
-                        trace("in uploadTask completionHandler", log: self.oslog, type: .info)
+                        trace("in uploadTask completionHandler", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
                         
                         // if ends without success then log the data
                         var success = false
@@ -190,7 +190,7 @@ public class NightScoutUploadManager:NSObject {
                             if !success {
                                 if let data = data {
                                     if let dataAsString = String(bytes: data, encoding: .utf8) {
-                                        trace("    data = %{public}@", log: self.oslog, type: .error, dataAsString)
+                                        trace("    data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .error, dataAsString)
                                     }
                                 }
                             }
@@ -198,18 +198,18 @@ public class NightScoutUploadManager:NSObject {
                         
                         // error cases
                         if let error = error {
-                            trace("    failed to upload, error = %{public}@", log: self.oslog, type: .error, error.localizedDescription)
+                            trace("    failed to upload, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .error, error.localizedDescription)
                             return
                         }
                         
                         // check that response is HTTPURLResponse and error code between 200 and 299
                         if let response = response as? HTTPURLResponse {
                             guard (200...299).contains(response.statusCode) else {
-                                trace("    failed to upload, statuscode = %{public}@", log: self.oslog, type: .error, response.statusCode.description)
+                                trace("    failed to upload, statuscode = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .error, response.statusCode.description)
                                 return
                             }
                         } else {
-                            trace("    response is not HTTPURLResponse", log: self.oslog, type: .error)
+                            trace("    response is not HTTPURLResponse", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .error)
                         }
                         
                         // successful cases,
@@ -217,7 +217,7 @@ public class NightScoutUploadManager:NSObject {
                         
                         // change timeStampLatestNightScoutUploadedBgReading
                         if let lastReading = bgReadingsToUpload.first {
-                            trace("    upload succeeded, setting timeStampLatestNightScoutUploadedBgReading to %{public}@", log: self.oslog, type: .info, lastReading.timeStamp.description(with: .current))
+                            trace("    upload succeeded, setting timeStampLatestNightScoutUploadedBgReading to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, lastReading.timeStamp.description(with: .current))
                             UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading = lastReading.timeStamp
                         }
                         
@@ -225,11 +225,11 @@ public class NightScoutUploadManager:NSObject {
                     dataTask.resume()
                 }
             } catch let error {
-                trace("     %{public}@", log: self.oslog, type: .info, error.localizedDescription)
+                trace("     %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, error.localizedDescription)
             }
             
         } else {
-            trace("    no readings to upload", log: self.oslog, type: .info)
+            trace("    no readings to upload", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
         }
         
     }

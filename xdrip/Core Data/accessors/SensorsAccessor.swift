@@ -49,7 +49,7 @@ class SensorsAccessor {
                 }
             } catch {
                 let fetchError = error as NSError
-                trace("Unable to Execute Sensor Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+                trace("Unable to Execute Sensor Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryCoreDataManager, type: .error, fetchError.localizedDescription)
             }
         }
         
