@@ -93,7 +93,7 @@ class BluetoothPeripheralManager: NSObject {
         
         // check that there's at least 1 reading available
         guard bgReadingToSend.count >= 1 else {
-            trace("in sendLatestReading, there's no recent reading to send", log: self.log, type: .info)
+            trace("in sendLatestReading, there's no recent reading to send", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
             return
         }
 
@@ -241,13 +241,13 @@ class BluetoothPeripheralManager: NSObject {
             case .M5StackType, .M5StickCType:
                 
                 guard let m5StackBluetoothTransmitter = bluetoothTransmitter as? M5StackBluetoothTransmitter else {
-                    trace("in observeValue, bluetoothPeripheral is of type M5Stack but bluetoothTransmitter is not M5StackBluetoothTransmitter", log: self.log, type: .error)
+                    trace("in observeValue, bluetoothPeripheral is of type M5Stack but bluetoothTransmitter is not M5StackBluetoothTransmitter", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
                     return
                 }
                 
                 // check that bluetoothPeripheral is of type M5Stack, if not then this might be a coding error
                 guard let m5Stack = bluetoothPeripheral as? M5Stack else {
-                    trace("in observeValue, transmitter is of type M5StackBluetoothTransmitter but peripheral is not M5Stack", log: self.log, type: .error)
+                    trace("in observeValue, transmitter is of type M5StackBluetoothTransmitter but peripheral is not M5Stack", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
                     return
                 }
                 
@@ -422,7 +422,7 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
        
         // find the bluetoothPeripheral in array bluetoothPeripherals, if it's not there then this looks like a coding error
         guard let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral) else {
-            trace("in deleteBluetoothPeripheral but bluetoothPeripheral not found in bluetoothPeripherals, looks like a coding error ", log: self.log, type: .error)
+            trace("in deleteBluetoothPeripheral but bluetoothPeripheral not found in bluetoothPeripherals, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
             return
         }
         
@@ -483,19 +483,19 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         // if tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil, then this is a connection to an already known/stored BluetoothTransmitter. BluetoothPeripheralManager is not interested in this info.
         guard let tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral else {
-            trace("in didConnect, tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil, no further processing", log: self.log, type: .info)
+            trace("in didConnect, tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil, no further processing", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
             return
         }
         
         // check that address and name are not nil, otherwise this looks like a codding error
         guard let deviceAddressNewTransmitter = bluetoothTransmitter.deviceAddress, let deviceNameNewTransmitter = bluetoothTransmitter.deviceName else {
-            trace("in didConnect, address or name of new transmitter is nil, looks like a coding error", log: self.log, type: .error)
+            trace("in didConnect, address or name of new transmitter is nil, looks like a coding error", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
             return
         }
         
         // check that tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral and the bluetoothTransmitter to which connection is made are actually the same objects, otherwise it's a connection that is made to a already known/stored BluetoothTransmitter
         guard tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral == bluetoothTransmitter else {
-            trace("in didConnect, tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is not nil and not equal to  bluetoothTransmitter", log: self.log, type: .info)
+            trace("in didConnect, tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is not nil and not equal to  bluetoothTransmitter", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
             return
         }
         
@@ -503,7 +503,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         for buetoothPeripheral in bluetoothPeripherals {
             if buetoothPeripheral.getAddress() == deviceAddressNewTransmitter {
                 
-                trace("in didConnect, transmitter address already known. This is not a new device, will disconnect", log: self.log, type: .info)
+                trace("in didConnect, transmitter address already known. This is not a new device, will disconnect", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
 
                 // it's an already known BluetoothTransmitter, not storing this, on the contrary disconnecting because maybe it's a bluetoothTransmitter already known for which user has preferred not to connect to
                 // If we're actually waiting for a new scan result, then there's an instance of BluetoothTransmitter stored in tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral - but this one stopped scanning, so let's recreate an instance of BluetoothTransmitter
@@ -533,17 +533,17 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
-        trace("in deviceDidUpdateBluetoothState, no further action", log: self.log, type: .info)
+        trace("in deviceDidUpdateBluetoothState, no further action", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
 
     }
     
     func error(message: String) {
-        trace("in error, no further action", log: self.log, type: .info)
+        trace("in error, no further action", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
     }
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
         // no further action, This is for UIViewcontroller's that also receive this info, means info can only be shown if this happens while user has one of the UIViewcontrollers open
-        trace("in didDisconnectFrom", log: self.log, type: .info)
+        trace("in didDisconnectFrom", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
 
     }
 
@@ -564,7 +564,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
     /// did the app successfully authenticate towards M5Stack, if no, then disconnect will be done
     func authentication(success: Bool, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
-        trace("in authentication with success = %{public}@", log: self.log, type: .info, success.description)
+        trace("in authentication with success = %{public}@", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info, success.description)
         
         // if authentication not successful then disconnect and don't reconnect, user should verify password or reset the M5Stack, disconnect and set shouldconnect to false, permenantly (ie store in core data)
         // disconnection is done because maybe another device is trying to connect to the M5Stack, need to make it free
@@ -589,7 +589,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
     /// there's no ble password set, user should set it in the settings - disconnect will be called, shouldconnect is set to false
     func blePasswordMissing(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
-        trace("in blePasswordMissing", log: self.log, type: .info)
+        trace("in blePasswordMissing", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
         
         // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
         guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
@@ -608,7 +608,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
     /// if a new ble password is received from M5Stack
     func newBlePassWord(newBlePassword: String, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
-        trace("in newBlePassWord, storing the password in M5Stack", log: self.log, type: .info)
+        trace("in newBlePassWord, storing the password in M5Stack", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
 
         // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and also the bluetoothPeripheral and it should be an M5Stack
         guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
@@ -623,7 +623,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
     /// it's an M5Stack without password configured in the ini file. xdrip app has been requesting temp password to M5Stack but this was already done once. M5Stack needs to be reset. - disconnect will be called, shouldconnect is set to false
     func m5StackResetRequired(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
-        trace("in m5StackResetRequired", log: self.log, type: .info)
+        trace("in m5StackResetRequired", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
         
         // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
         guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
@@ -640,7 +640,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
     func isAskingForAllParameters(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
         guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter) else {
-            trace("in isAskingForAllParameters, could not find index of bluetoothTransmitter, looks like a coding error", log: self.log, type: .error)
+            trace("in isAskingForAllParameters, could not find index of bluetoothTransmitter, looks like a coding error", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
             return
         }
         
@@ -689,7 +689,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
 
         // M5Stack must be ready to receive data
         guard m5StackBluetoothTransmitter.isReadyToReceiveData else {
-            trace("in sendAllParameters, bluetoothTransmitter is not ready to receive data", log: self.log, type: .info)
+            trace("in sendAllParameters, bluetoothTransmitter is not ready to receive data", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
             return false
         }
         

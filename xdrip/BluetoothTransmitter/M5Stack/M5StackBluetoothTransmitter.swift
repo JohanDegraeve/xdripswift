@@ -78,22 +78,22 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     func writeBgReadingInfo(bgReading: BgReading) -> Bool {
         
         guard getConnectionStatus() == CBPeripheralState.connected else {
-            trace("in writeBgReadingInfo, not connected ", log: log, type: .info)
+            trace("in writeBgReadingInfo, not connected ", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
             return false
         }
         
         // create packets to send slopeName
         guard let packetWithSlopeName = M5StackUtilities.splitTextInBLEPackets(text: bgReading.slopeName, maxBytesInOneBLEPacket: ConstantsM5Stack.maximumMBLEPacketsize, opCode: M5StackTransmitterOpCodeTx.writeSlopeNameTx.rawValue) else {
-            trace("in writeBgReading, failed to create packets to send slopeName", log: log, type: .error)
+            trace("in writeBgReading, failed to create packets to send slopeName", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             return false
         }
         
         // send slopename
         for packet in packetWithSlopeName {
             if !writeDataToPeripheral(data: packet, type: .withoutResponse) {
-                trace("in writeBgReading, failed to send packet with slopename", log: log, type: .error)
+                trace("in writeBgReading, failed to send packet with slopename", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             } else {
-                trace("successfully written slopename to M5Stack", log: log, type: .error)
+                trace("successfully written slopename to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             }
         }
         
@@ -102,17 +102,17 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         
         // create packets to send reading and timestamp
         guard let packetsWithReadingAndTimestamp = M5StackUtilities.splitTextInBLEPackets(text: textToSend, maxBytesInOneBLEPacket: ConstantsM5Stack.maximumMBLEPacketsize, opCode: M5StackTransmitterOpCodeTx.bgReadingTx.rawValue) else {
-            trace("in writeBgReading, failed to create packets to send reading and timestamp", log: log, type: .error)
+            trace("in writeBgReading, failed to create packets to send reading and timestamp", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             return false
         }
         
         // send reading and timestamp
         for packet in packetsWithReadingAndTimestamp {
             if !writeDataToPeripheral(data: packet, type: .withoutResponse) {
-                trace("in writeBgReading, failed to send packet with reading and timestamp", log: log, type: .error)
+                trace("in writeBgReading, failed to send packet with reading and timestamp", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
                 return false
             } else {
-               trace("successfully written reading and timestamp to M5Stack", log: log, type: .info)
+               trace("successfully written reading and timestamp to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
                 return true
             }
         }
@@ -127,11 +127,11 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     func writeTextColor(textColor: M5StackColor) -> Bool {
 
         guard let textColorAsData = textColor.data else {
-            trace("in writeTextColor, failed to create textColor as data ", log: log, type: .error)// looks like a software error
+            trace("in writeTextColor, failed to create textColor as data ", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)// looks like a software error
             return false
         }
 
-        trace("in writeTextColor, attempting to send", log: log, type: .info)
+        trace("in writeTextColor, attempting to send", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
         return writeDataToPeripheral(data: textColorAsData, opCode: .writeTextColorTx)
         
     }
@@ -142,11 +142,11 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     func writeBackGroundColor(backGroundColor: M5StackColor) -> Bool {
         
         guard let colorAsData = backGroundColor.data else {
-            trace("in writeBackGroundColor, failed to create backGroundColor as data ", log: log, type: .error)// looks like a software error
+            trace("in writeBackGroundColor, failed to create backGroundColor as data ", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)// looks like a software error
             return false
         }
         
-        trace("in writeBackGroundColor, attempting to send", log: log, type: .info)
+        trace("in writeBackGroundColor, attempting to send", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
         return writeDataToPeripheral(data: colorAsData, opCode: .writeBackGroundColorTx)
         
     }
@@ -158,7 +158,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     ///     rotation value as expected by M5Stack, 0 is horizontal, 1
     func writeRotation(rotation: Int) -> Bool {
         
-        trace("in writeRotation, attempting to send", log: log, type: .info)
+        trace("in writeRotation, attempting to send", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
         return writeDataToPeripheral(data: rotationValues[rotation].data, opCode: .writeRotationTx)
         
     }
@@ -170,7 +170,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     ///     brightness value as expected by M5Stack, between 0 and 100
     func writeBrightness(brightness: Int) -> Bool {
         
-        trace("in writeBrightness, attempting to send", log: log, type: .info)
+        trace("in writeBrightness, attempting to send", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
         return writeDataToPeripheral(data: brightness.toData(), opCode: .writeBrightnessTx)
         
     }
@@ -185,7 +185,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     func writeWifiName(name: String?, number: UInt8) -> Bool {
         
         guard let name = name else {
-            trace("    name is nil", log: log, type: .info)
+            trace("    name is nil", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
             return false
         }
         
@@ -207,7 +207,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     func writeWifiPassword(password: String?, number: UInt8) -> Bool {
         
         guard let password = password else {
-            trace("    password is nil", log: log, type: .info)
+            trace("    password is nil", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
             return false
         }
         
@@ -300,23 +300,23 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             if let blePassword = blePassword, let authenticateTxMessageData = M5StackAuthenticateTXMessage(password: blePassword).data {
                 
                 if !writeDataToPeripheral(data: authenticateTxMessageData, type: .withoutResponse) {
-                    trace("failed to send authenticateTx to M5Stack", log: log, type: .error)
+                    trace("failed to send authenticateTx to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
                 } else {
-                    trace("successfully sent authenticateTx to M5Stack", log: log, type: .error)
+                    trace("successfully sent authenticateTx to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
                 }
                 
             } else {
                 
                 if !writeDataToPeripheral(data: M5StackReadBlePassWordTxMessage().data, type: .withoutResponse) {
-                    trace("failed to send readBlePassWordTx to M5Stack", log: log, type: .error)
+                    trace("failed to send readBlePassWordTx to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
                 } else {
-                    trace("successfully sent readBlePassWordTx to M5Stack", log: log, type: .error)
+                    trace("successfully sent readBlePassWordTx to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
                 }
                 
             }
             
         } else {
-            trace("in peripheralDidUpdateNotificationStateFor, failed to subscribe for characteristic %{public}@", log: log, type: .error, characteristic.uuid.description)
+            trace("in peripheralDidUpdateNotificationStateFor, failed to subscribe for characteristic %{public}@", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error, characteristic.uuid.description)
         }
 
     }
@@ -327,32 +327,32 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
      
         //check if value is not nil
         guard let value = characteristic.value else {
-            trace("in peripheral didUpdateValueFor, characteristic.value is nil", log: log, type: .info)
+            trace("in peripheral didUpdateValueFor, characteristic.value is nil", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
             return
         }
         
         //only for logging
         let data = value.hexEncodedString()
-        trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, type: .debug, data)
+        trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .debug, data)
         
         // value length should be at least 1
         guard value.count > 0 else {
-            trace("    value length is 0, no further processing", log: log, type: .error)
+            trace("    value length is 0, no further processing", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             return
         }
         
         guard let opCode = M5StackTransmitterOpCodeRx(rawValue: value[0]) else {
-            trace("    failed to create opCode", log: log, type: .error)
+            trace("    failed to create opCode", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             return
         }
-        trace("    opcode = %{public}@", log: log, type: .info, opCode.description)
+        trace("    opcode = %{public}@", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info, opCode.description)
         
         switch opCode {
             
         case .readBlePassWordRx:
             // received new password from M5Stack
             
-            trace("    received new password, will store it", log: log, type: .error)
+            trace("    received new password, will store it", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             
             blePasswordM5StackPacket.addNewPacket(value: value)
             
@@ -370,7 +370,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         case .authenticateSuccessRx:
             // received from M5Stack, need to inform delegates, send timestamp to M5Stack, and also set isReadyToReceiveData to true
             
-            trace("    successfully authenticated", log: log, type: .error)
+            trace("    successfully authenticated", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             
             // inform delegates
             (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.authentication(success: true, m5StackBluetoothTransmitter: self)
@@ -410,7 +410,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             
             guard value.count >= 2 else {
                 
-                trace("   value length should be minimum 2", log: log, type: .error)
+                trace("   value length should be minimum 2", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
                 return
                 
             }
@@ -441,31 +441,31 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         
         // create packets to send with offset
         guard let packetsWithOffset = M5StackUtilities.splitTextInBLEPackets(text: offSet.description, maxBytesInOneBLEPacket: ConstantsM5Stack.maximumMBLEPacketsize, opCode: M5StackTransmitterOpCodeTx.writeTimeOffsetTx.rawValue) else {
-            trace("   failed to create packets for sending offset", log: log, type: .error)
+            trace("   failed to create packets for sending offset", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             return
         }
         
         // send the packets with offset
         for packet in packetsWithOffset {
             if !writeDataToPeripheral(data: packet, type: .withoutResponse) {
-                trace("    failed to send packet with offset to M5Stack", log: log, type: .error)
+                trace("    failed to send packet with offset to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             } else {
-                trace("    successfully sent packet with offset to M5Stack", log: log, type: .error)
+                trace("    successfully sent packet with offset to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             }
         }
         
         // create packets to send with local time
         guard let packetsWithLocalTime = M5StackUtilities.splitTextInBLEPackets(text: localTimeInSeconds.description, maxBytesInOneBLEPacket: ConstantsM5Stack.maximumMBLEPacketsize, opCode: M5StackTransmitterOpCodeTx.writeTimeStampTx.rawValue) else {
-            trace("   failed to create packets for sending timestamp", log: log, type: .error)
+            trace("   failed to create packets for sending timestamp", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             return
         }
         
         // send packets with localtime
         for packet in packetsWithLocalTime {
             if !writeDataToPeripheral(data: packet, type: .withoutResponse) {
-                trace("    failed to send packet with local timestamp to M5Stack", log: log, type: .error)
+                trace("    failed to send packet with local timestamp to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             } else {
-                trace("    successfully sent packet with local timestamp to M5Stack", log: log, type: .error)
+                trace("    successfully sent packet with local timestamp to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             }
         }
         
@@ -477,7 +477,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     private func writeDataToPeripheral(data: Data, opCode : M5StackTransmitterOpCodeTx) -> Bool {
         
         guard getConnectionStatus() == CBPeripheralState.connected else {
-            trace("    not connected ", log: log, type: .info)
+            trace("    not connected ", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
             return false
         }
         
@@ -492,10 +492,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         
         // send
         if !writeDataToPeripheral(data: dataToSend, type: .withoutResponse) {
-            trace("    failed to send", log: log, type: .error)
+            trace("    failed to send", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             return false
         } else {
-            trace("    sent", log: log, type: .error)
+            trace("    sent", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             return true
         }
 
@@ -510,10 +510,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         dataToSend.append(opCode.rawValue.data)
         
         if !writeDataToPeripheral(data: dataToSend, type: .withoutResponse) {
-            trace("    failed to send opcode", log: log, type: .error)
+            trace("    failed to send opcode", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             return false
         } else {
-            trace("    successfully sent opcode to M5Stack", log: log, type: .info)
+            trace("    successfully sent opcode to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
             return true
         }
         
@@ -523,7 +523,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         
         // create packets to send with offset
         guard let packetsWithOffset = M5StackUtilities.splitTextInBLEPackets(text: text, maxBytesInOneBLEPacket: ConstantsM5Stack.maximumMBLEPacketsize, opCode: opCode.rawValue) else {
-            trace("   failed to create packets for sending string", log: log, type: .error)
+            trace("   failed to create packets for sending string", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             return false
         }
         
@@ -533,11 +533,11 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         // send the packets
         for packet in packetsWithOffset {
             if !writeDataToPeripheral(data: packet, type: .withoutResponse) {
-                trace("    failed to send packet", log: log, type: .error)
+                trace("    failed to send packet", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
                 success = false
                 break
             } else {
-                trace("    successfully sent packet to M5Stack", log: log, type: .info)
+                trace("    successfully sent packet to M5Stack", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
             }
         }
 

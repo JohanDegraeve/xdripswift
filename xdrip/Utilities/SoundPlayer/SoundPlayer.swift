@@ -23,7 +23,7 @@ class SoundPlayer {
     public func playSound(soundFileName:String) {
         
         guard let url = Bundle.main.url(forResource: soundFileName, withExtension: "") else {
-            trace("in playSound, could not create url with sound %{public}@", log: self.log, type: .error, soundFileName)
+            trace("in playSound, could not create url with sound %{public}@", log: self.log, category: ConstantsLog.categoryPlaySound, type: .error, soundFileName)
             return
         }
         
@@ -31,7 +31,7 @@ class SoundPlayer {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
             try AVAudioSession.sharedInstance().setActive(true)
         } catch let error {
-            trace("in playSound, could not set AVAudioSession category to playback and mixwithOthers, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+            trace("in playSound, could not set AVAudioSession category to playback and mixwithOthers, error = %{public}@", log: self.log, category: ConstantsLog.categoryPlaySound, type: .error, error.localizedDescription)
         }
         
         do {
@@ -40,10 +40,10 @@ class SoundPlayer {
             if let audioPlayer = audioPlayer {
                 audioPlayer.play()
             } else {
-                trace("in playSound, could not create url with sound %{public}@", log: self.log, type: .error, soundFileName)
+                trace("in playSound, could not create url with sound %{public}@", log: self.log, category: ConstantsLog.categoryPlaySound, type: .error, soundFileName)
             }
         } catch let error {
-            trace("in playSound, exception while trying to play sound %{public}@, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+            trace("in playSound, exception while trying to play sound %{public}@, error = %{public}@", log: self.log, category: ConstantsLog.categoryPlaySound, type: .error, error.localizedDescription)
         }
     }
     

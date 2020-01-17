@@ -100,7 +100,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         if writeDataToPeripheral(data: Data([0x00, 0x00, 0x05]), type: .withoutResponse) {
             return true
         } else {
-            trace("in sendStartReadingCommmand, write failed", log: log, type: .error)
+            trace("in sendStartReadingCommmand, write failed", log: log, category: ConstantsLog.categoryCGMBubble, type: .error)
             return false
         }
     }
@@ -149,7 +149,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
             
             //check if buffer needs to be reset
             if (Date() > startDate.addingTimeInterval(CGMBubbleTransmitter.maxWaitForpacketInSeconds - 1)) {
-                trace("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, type: .info, CGMBubbleTransmitter.maxWaitForpacketInSeconds)
+                trace("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMBubble, type: .info, CGMBubbleTransmitter.maxWaitForpacketInSeconds)
                 resetRxBuffer()
             }
             
@@ -187,7 +187,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                         
                                         sensorSerialNumber = libreSensorSerialNumber.serialNumber
                                         
-                                        trace("    new sensor detected :  %{public}@", log: log, type: .info, libreSensorSerialNumber.serialNumber)
+                                        trace("    new sensor detected :  %{public}@", log: log, category: ConstantsLog.categoryCGMBubble, type: .info, libreSensorSerialNumber.serialNumber)
                                         
                                         // inform delegate about new sensor detected
                                         cgmTransmitterDelegate?.newSensorDetected()
@@ -218,7 +218,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                 }
             }
         } else {
-            trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, type: .error)
+            trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMBubble, type: .error)
         }
         
     }

@@ -40,7 +40,7 @@ class AlertTypesAccessor {
                 alertTypes = try fetchRequest.execute()
             } catch {
                 let fetchError = error as NSError
-                trace("in getAlertType, Unable to Execute alertTypes Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+                trace("in getAlertType, Unable to Execute alertTypes Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataAlertTypes, type: .error, fetchError.localizedDescription)
             }
         }
 
@@ -67,7 +67,7 @@ class AlertTypesAccessor {
                 alertTypes = try fetchRequest.execute()
             } catch {
                 let fetchError = error as NSError
-                trace("in getAllAlertTypes, Unable to Execute alertTypes Fetch Request : %{public}@", log: self.log, type: .error, fetchError.localizedDescription)
+                trace("in getAllAlertTypes, Unable to Execute alertTypes Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataAlertTypes, type: .error, fetchError.localizedDescription)
             }
         }
         

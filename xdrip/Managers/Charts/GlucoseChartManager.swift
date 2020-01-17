@@ -165,7 +165,7 @@ public final class GlucoseChartManager {
             
             // check that bgReadingsAccessor is not nil (should normally not be nil except at app startup)
             guard let bgReadingsAccessor = self.bgReadingsAccessor else {
-                trace("in updateGlucoseChartPoints, bgReadingsAccessor, probably coreDataManager is not yet assigned", log: self.oslog, type: .info)
+                trace("in updateGlucoseChartPoints, bgReadingsAccessor, probably coreDataManager is not yet assigned", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info)
                 return
             }
             
@@ -251,7 +251,7 @@ public final class GlucoseChartManager {
     
     public func didReceiveMemoryWarning() {
         
-        trace("in didReceiveMemoryWarning, Purging chart data in response to memory warning", log: self.oslog, type: .error)
+        trace("in didReceiveMemoryWarning, Purging chart data in response to memory warning", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .error)
 
         glucoseChartPoints = []
         
@@ -261,7 +261,7 @@ public final class GlucoseChartManager {
         
         if let chart = glucoseChart, chart.frame != frame {
 
-            trace("Glucose chart frame changed to %{public}@", log: self.oslog, type: .info,  String(describing: frame))
+            trace("Glucose chart frame changed to %{public}@", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info,  String(describing: frame))
 
             self.glucoseChart = nil
         }

@@ -159,12 +159,19 @@ extension UserDefaults {
         /// sensor Serial Number, for now only applicable to Libre
         case sensorSerialNumber = "sensorSerialNumber"
         
-        // development settings to test G6 scaling
+        // development settings
+        
         /// G6 factor1 - for testing G6 scaling
         case G6v2ScalingFactor1 = "G6v2ScalingFactor1"
 
         /// G6 factor2 - for testing G6 scaling
         case G6v2ScalingFactor2 = "G6v2ScalingFactor2"
+        
+        /// NSLog enabled or not
+        case NSLogEnabled = "NSLogEnabled"
+        
+        /// OSLogEnabled enabled or not
+        case OSLogEnabled = "OSLogEnabled"
         
     }
     
@@ -830,7 +837,26 @@ extension UserDefaults {
         }
     }
     
+    /// NSLogEnabled - default false
+    var NSLogEnabled: Bool {
+        get {
+            return bool(forKey: Key.NSLogEnabled.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.NSLogEnabled.rawValue)
+        }
+    }
     
+    /// OSLogEnabled - default false
+    var OSLogEnabled: Bool {
+        get {
+            return bool(forKey: Key.OSLogEnabled.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.OSLogEnabled.rawValue)
+        }
+    }
+
     
 }
 

@@ -66,20 +66,20 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
                             UserDefaults.standard.storeReadingsInHealthkitAuthorized = success
                             
                             if let error = error {
-                                trace("user did not authorize to store bg readings in  healthkit, error = %{public}@", log: self.log, type: .error, error.localizedDescription)
+                                trace("user did not authorize to store bg readings in  healthkit, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
                             }
                         })
                     case .sharingDenied:
                         UserDefaults.standard.storeReadingsInHealthkitAuthorized = false
                         // user must have removed the authorization in the healt app - when user tries to enable healthkit , user will not be informed that he should first go back to the healt app and allow upload bgreadings - let's do such info in a later phase, eg with an info button next to the setting
-                        trace("user removed authorization to store bgreadings in healthkit", log: self.log, type: .error)
+                        trace("user removed authorization to store bgreadings in healthkit", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error)
                     case .sharingAuthorized:
                         break
                     @unknown default:
-                        trace("unknown authorizationstatus for healthkit - SettingsViewHealthKitSettingsViewModel", log: self.log, type: .error)
+                        trace("unknown authorizationstatus for healthkit - SettingsViewHealthKitSettingsViewModel", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error)
                     }
                 } else {
-                    trace("User enabled HealthKit however failed to create bloodGlucoseType", log: self.log, type: .error)
+                    trace("User enabled HealthKit however failed to create bloodGlucoseType", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error)
                     return
                 }
                 
