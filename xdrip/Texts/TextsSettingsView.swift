@@ -41,7 +41,7 @@ class Texts_SettingsView {
     }()
     
     static let labelShowReadingInNotification: String = {
-        return NSLocalizedString("showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Reading on home screen", comment: "general settings, should reading be shown in notification yes or no")
+        return NSLocalizedString("showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Reading in notification", comment: "general settings, should reading be shown in notification yes or no")
     }()
     
     static let labelShowReadingInAppBadge: String = {
