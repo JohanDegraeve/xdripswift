@@ -1124,6 +1124,15 @@ final class RootViewController: UIViewController {
         
         // create and present new alertController of type actionsheet
         let actionSheet = UIAlertController(title: nil, message: nil, actions: listOfActions, cancelAction: (Texts_Common.Cancel, nil))
+        
+        // following is required for iPad, as explained here https://stackoverflow.com/questions/28089898/actionsheet-not-working-ipad
+        // otherwise it crashes on iPad when clicking transmitter button
+        if let popoverController = actionSheet.popoverPresentationController {
+            popoverController.sourceView = self.view
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+        
         self.present(actionSheet, animated: true)
     }
     
