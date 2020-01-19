@@ -27,14 +27,6 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func isEnabled(index: Int) -> Bool {
-        // in follower mode, then nightScoutAPIKey setting can be disabled, as it is not necessary
-        if !UserDefaults.standard.isMaster {
-
-            if index == Setting.nightScoutAPIKey.rawValue {
-                return false
-            }
-        }
-
         return true
     }
     
@@ -71,10 +63,19 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
         
         // if nightscout upload not enabled then only first row is shown
         if UserDefaults.standard.nightScoutEnabled {
+            
+            // in follower mode, only two first rows to be shown : nightscout enabled button and url
+            if !UserDefaults.standard.isMaster {
+                return 2
+            }
+            
+            // if schedule not enabled then show all rows except the last which is to edit the schedule
             if !UserDefaults.standard.nightScoutUseSchedule {
                 return Setting.allCases.count - 1
             }
+            
             return Setting.allCases.count
+            
         } else {
             return 1
         }
