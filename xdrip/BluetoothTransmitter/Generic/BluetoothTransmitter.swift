@@ -154,7 +154,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 centralManager.cancelPeripheralConnection(peripheral)
             }
         }
-        
+      
     }
     
     /// stops scanning
@@ -236,6 +236,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             trace("in writeDataToPeripheral, for peripheral with name %{public}@, failed because either peripheral or writeCharacteristic is nil or not connected", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, deviceName ?? "'unknown'")
             return false
         }
+    }
+    
+    /// calls peripheral?.readValue(for: characteristic)
+    func readValueForCharacteristic(for characteristic: CBCharacteristic) {
+        peripheral?.readValue(for: characteristic)
     }
 
     /// will write to characteristicToWriteTo
@@ -357,6 +362,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        
         timeStampLastStatusUpdate = Date()
         
         trace("connected to peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'")
@@ -369,6 +375,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        
         timeStampLastStatusUpdate = Date()
         
         if let error = error {
@@ -382,6 +389,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        
         timeStampLastStatusUpdate = Date()
         
         trace("in centralManagerDidUpdateState, for peripheral with name %{public}@, new state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", "\(central.state.toString())")
@@ -402,6 +410,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        
         timeStampLastStatusUpdate = Date()
         
         trace("    didDisconnect peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info , deviceName ?? "'unknown'")
@@ -434,9 +443,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        
         timeStampLastStatusUpdate = Date()
         
         trace("didDiscoverServices for peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'")
+        
         if let error = error {
             trace("    didDiscoverServices error: %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error ,  "\(error.localizedDescription)")
         }
@@ -452,6 +463,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        
         timeStampLastStatusUpdate = Date()
         
         trace("didDiscoverCharacteristicsFor for peripheral with name %{public}@, for service with uuid %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", String(describing:service.uuid))
@@ -479,6 +491,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        
         timeStampLastStatusUpdate = Date()
         
         if let error = error {
@@ -489,6 +502,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        
         timeStampLastStatusUpdate = Date()
         
         if let error = error {
@@ -498,6 +512,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        
         timeStampLastStatusUpdate = Date()
         
         if let error = error {

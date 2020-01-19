@@ -6,6 +6,9 @@ enum BluetoothPeripheralCategory: String, CaseIterable {
     /// this is the category for M5Stack ad M5StickC
     case M5Stack = "M5Stack"
     
+    /// category for watlaa, master and follower
+    case watlaa = "watlaa"
+    
     /// gets list of  categories in array of strings, user will see those strings when selecting a category
     static func listOfCategories() -> [String] {
         

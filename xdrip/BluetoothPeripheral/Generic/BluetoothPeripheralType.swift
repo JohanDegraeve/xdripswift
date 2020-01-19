@@ -13,6 +13,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// M5StickC
     case M5StickCType = "M5StickC"
     
+    /// watlaa master
+    case watlaaMaster = "Watlaa master"
+    
     /// - returns: the BluetoothPeripheralViewModel
     func viewModel() -> BluetoothPeripheralViewModel {
         
@@ -24,6 +27,8 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StickCType:
             return M5StickCBluetoothPeripheralViewModel()
             
+        case .watlaaMaster:
+            return WatlaaMasterBluetoothPeripheralViewModel()
         }
         
     }
@@ -47,6 +52,12 @@ enum BluetoothPeripheralType: String, CaseIterable {
 
             return newM5StickC
             
+        case .watlaaMaster:
+            
+            let newWatlaa = Watlaa(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
+            return newWatlaa
+            
         }
         
         
@@ -61,6 +72,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .M5StickCType:
             return .M5Stack
+            
+        case .watlaaMaster:
+            return .watlaa
+            
         }
     }
     

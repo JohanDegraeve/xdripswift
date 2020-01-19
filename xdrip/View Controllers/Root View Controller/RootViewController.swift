@@ -408,7 +408,12 @@ final class RootViewController: UIViewController {
         })
         
         // setup bluetoothPeripheralManager
-        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager)
+        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, onCGMTransmitterCreation: {
+            (cgmTransmitter: CGMTransmitter?) in
+            
+            self.cgmTransmitter = cgmTransmitter
+            
+        })
         
     }
     
@@ -813,6 +818,10 @@ final class RootViewController: UIViewController {
             case .blueReader:
                 cgmTransmitter = CGMBlueReaderTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self)
                 
+            case .watlaa:
+                // watlaa transmitter needs to be set through bluetooth devices tab
+                cgmTransmitter = nil
+                
             }
             
             // assign calibrator
@@ -820,7 +829,7 @@ final class RootViewController: UIViewController {
                 
             case .dexcomG4, .dexcomG5, .dexcomG6:
                 calibrator = DexcomCalibrator()
-            case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader:
+            case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa:
                 // for all transmitters used with Libre1, calibrator is either NoCalibrator or Libre1Calibrator, depending if oopWeb is supported by the transmitter and on value of webOOPEnabled in settings
                 calibrator = RootViewController.getCalibrator(transmitterType: selectedTransmitterType, webOOPEnabled: UserDefaults.standard.webOOPEnabled)
             }
@@ -1328,6 +1337,10 @@ final class RootViewController: UIViewController {
 
 /// conform to CGMTransmitterDelegate
 extension RootViewController:CGMTransmitterDelegate {
+    
+    func getCGMTransmitter() -> CGMTransmitter? {
+        return cgmTransmitter
+    }
     
     func error(message: String) {
         

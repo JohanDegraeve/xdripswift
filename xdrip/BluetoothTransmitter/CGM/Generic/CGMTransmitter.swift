@@ -6,7 +6,7 @@ import CoreBluetooth
 /// Most of the functions are already defined by BlueToothTransmitter.swift - so most of these functions don't need re-implementation in CGMTransmitter classes that conform to this protocol.
 ///
 /// An exception is for example initiatePairing, which is implemented in CGMG5Transmitter.swift, because that transmitter needs to send a message to the transmitter that will cause the app to request the user to accept the pairing
-protocol CGMTransmitter {
+protocol CGMTransmitter:AnyObject {
     
     /// get device address, cgmtransmitters should also derive from BlueToothTransmitter, hence no need to implement this function
     ///
@@ -85,6 +85,9 @@ enum CGMTransmitterType:String, CaseIterable {
     /// BlueReader
     case blueReader = "BlueReader"
     
+    /// watlaa
+    case watlaa = "Watlaa (under development)"
+    
     /// does the transmitter need a transmitter id ?
     ///
     /// can be used in UI stuff, if reset not possible then there's no need to show that option in the settings UI
@@ -110,6 +113,9 @@ enum CGMTransmitterType:String, CaseIterable {
             return false
             
         case .blueReader:
+            return false
+            
+        case .watlaa:
             return false
             
         }
@@ -145,6 +151,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .blueReader:
             return false
             
+        case .watlaa:
+            return false
         }
     }
     
@@ -177,6 +185,10 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .blueReader:
             return false
+            
+        case .watlaa:
+            return false
+            
         }
     }
     
@@ -216,6 +228,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .blueReader:
             return nil
             
+        case .watlaa:
+            return nil
         }
     }
     
@@ -246,6 +260,9 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .blueReader:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelBlueReader
+            
+        case .watlaa:
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelWatlaa
             
         }
     }
@@ -278,6 +295,9 @@ enum CGMTransmitterType:String, CaseIterable {
         case .blueReader:
             return false
             
+        case .watlaa:
+            return false
+            
         }
     }
     
@@ -306,6 +326,9 @@ enum CGMTransmitterType:String, CaseIterable {
         case .blueReader:
             return "%"
             
+        case .watlaa:
+            return "%"
+            
         }
     }
     
@@ -332,6 +355,9 @@ enum CGMTransmitterType:String, CaseIterable {
             return false
             
         case .blueReader:
+            return false
+            
+        case .watlaa:
             return false
             
         }
