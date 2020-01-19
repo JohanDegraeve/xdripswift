@@ -171,7 +171,7 @@ class NightScoutFollowManager:NSObject {
                 var followGlucoseDataArray = [NightScoutBgReading]()
                 self.processDownloadResponse(data: data, urlResponse: response, error: error, followGlucoseDataArray: &followGlucoseDataArray)
                 
-                trace("    finished download", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+                trace("    finished download,  %{public}@ readings", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info, followGlucoseDataArray.count.description)
                 
                 // call to delegate and rescheduling the timer must be done in main thread;
                 DispatchQueue.main.sync {

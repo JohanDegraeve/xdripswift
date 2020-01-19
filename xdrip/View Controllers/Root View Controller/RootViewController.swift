@@ -231,8 +231,6 @@ final class RootViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        trace("hello %{public}d, %{public}D, %{public}u, %{public}U, %{public}f, %{public}F, %{public}d, %{public}r", log: log, category: ConstantsLog.categoryRootView, type: .info, 0, -1, 123, 123, 234.4, "test")
-        
         // initialize glucoseChartManager
         glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet)
 
@@ -925,11 +923,13 @@ final class RootViewController: UIViewController {
         
         // if there's no reading for active sensor with calculated value , then no reason to continue
         if lastReading.count == 0 {
+            trace("in createBgReadingNotificationAndSetAppBadge, lastReading.count = 0", log: log, category: ConstantsLog.categoryRootView, type: .info)
             return
         }
         
         // if reading is older than 4.5 minutes, then also no reason to continue - this may happen eg in case of follower mode
         if Date().timeIntervalSince(lastReading[0].timeStamp) > 4.5 * 60 {
+            trace("in createBgReadingNotificationAndSetAppBadge, timestamp of last reading > 4.5 * 60", log: log, category: ConstantsLog.categoryRootView, type: .info)
             return
         }
         
@@ -1742,6 +1742,8 @@ extension RootViewController:NightScoutFollowerDelegate {
             }
             
             if newReadingCreated {
+                
+                trace("nightScoutFollowerInfoReceived, new reading(s) received", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                 
                 // save in core data
                 coreDataManager.saveChanges()
