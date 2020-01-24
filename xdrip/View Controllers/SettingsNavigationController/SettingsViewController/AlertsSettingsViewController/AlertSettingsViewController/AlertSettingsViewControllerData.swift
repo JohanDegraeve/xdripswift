@@ -220,10 +220,14 @@ extension AlertSettingsViewControllerData {
                         asdouble = asdouble.mmolToMgdl()
                     }
                     
-                    self.value = Int16(asdouble)
-                    tableView.reloadRows(at: [IndexPath(row: Setting.value.rawValue, section: 0)], with: .none)
-                    // checkIfPropertiesChanged
-                    self.checkIfPropertiesChanged()
+                    if asdouble < 32767.0 {
+
+                        self.value = Int16(asdouble)
+                        tableView.reloadRows(at: [IndexPath(row: Setting.value.rawValue, section: 0)], with: .none)
+                        // checkIfPropertiesChanged
+                        self.checkIfPropertiesChanged()
+
+                    }
                 }
                 
             }, cancelHandler: nil)
