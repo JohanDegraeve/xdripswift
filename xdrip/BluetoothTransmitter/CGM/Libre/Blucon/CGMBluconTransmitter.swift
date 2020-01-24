@@ -186,7 +186,10 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         return false
     }
     
-    private func blockNumberForNowGlucoseData(input:Data) -> String {
+    private func blockNumberForNowGlucoseData(input:Data) -> String? {
+        
+        // input should be minimu length 6
+        guard input.count >= 6 else {return nil}
         
         // caculate byte position in sensor body, decrement index to get the index where the last valid BG reading is stored
         var nowGlucoseIndex2 = input[5] * 6 + 4 - 6
@@ -454,8 +457,13 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     
                     if !waitingForGlucoseData {
                         
+                        guard let blockNumber = blockNumberForNowGlucoseData(input: value) else {
+                            trace("    failed to create blockNumber", log: log, category: ConstantsLog.categoryBlucon, type: .error)
+                            return
+                        }
+                        
                         // get blockNumber and compose command
-                        let commandToSend = BluconTransmitterOpCode.singleBlockInfoPrefix.rawValue + blockNumberForNowGlucoseData(input: value)
+                        let commandToSend = BluconTransmitterOpCode.singleBlockInfoPrefix.rawValue + blockNumber
                         
                         // convert command to hexstring, might fail if blockNumberForNowGlucoseData returned an invalid value
                         if let commandToSendAsData = Data(hexadecimalString: commandToSend) {
