@@ -124,6 +124,23 @@ extension UserDefaults {
         /// Password of wifi 3 to be configured in M5Stack
         case m5StackWiFiPassword3 = "m5StackWiFiPassword3"
         
+        // Apple Watch
+        
+        /// create calendar event yes or no
+        case createCalendarEvent = "createCalendarEvent"
+        
+        /// selected calender id (name of the calendar) in which the event should be created
+        case calenderId = "calenderId"
+        
+        /// should trend be displayed yes or no
+        case displayTrendInCalendarEvent = "displayTrend"
+        
+        /// should delta be displayed yes or no
+        case displayDeltaInCalendarEvent = "displayDelta"
+        
+        /// should units be displayed yes or no
+        case displayUnitInCalendarEvent = "displayUnits"
+        
         // Other Settings (not user configurable)
         
         // cgm Transmitter
@@ -705,6 +722,58 @@ extension UserDefaults {
         }
     }
     
+    // MARK: - Apple Watch
+    
+    /// create calendar event yes or no, default false
+    @objc dynamic var createCalendarEvent: Bool {
+        get {
+            return bool(forKey: Key.createCalendarEvent.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.createCalendarEvent.rawValue)
+        }
+    }
+
+    /// this is for showing readings on watch via the calendar. Selected calender id (name of the calendar) in which the event should be created
+    @objc dynamic var calenderId: String? {
+        get {
+            return string(forKey: Key.calenderId.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.calenderId.rawValue)
+        }
+    }
+    
+    /// this is for showing readings on watch via the calendar. Should trend be displayed  in calendar event, yes or no, default no
+    @objc dynamic var displayTrendInCalendarEvent: Bool {
+        get {
+            return bool(forKey: Key.displayTrendInCalendarEvent.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.displayTrendInCalendarEvent.rawValue)
+        }
+    }
+    
+    /// this is for showing readings on watch via the calendar. Should delta be displayed in calendar event, yes or no, default no
+    @objc dynamic var displayDeltaInCalendarEvent: Bool {
+        get {
+            return bool(forKey: Key.displayDeltaInCalendarEvent.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.displayDeltaInCalendarEvent.rawValue)
+        }
+    }
+    
+    /// this is for showing readings on watch via the calendar. Should unit be displayed in calendar event,  yes or no, default no
+    @objc dynamic var displayUnitInCalendarEvent: Bool {
+        get {
+            return bool(forKey: Key.displayUnitInCalendarEvent.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.displayUnitInCalendarEvent.rawValue)
+        }
+    }
+    
     // MARK: - =====  Other Settings ======
     
     var cgmTransmitterDeviceAddress: String? {
@@ -772,9 +841,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.transmitterResetRequired.rawValue)
         }
     }
-    
-
-  
+      
     /// did user authorize the storage of readings in healthkit or not - this setting is actually only used to allow the HealthKitManager to listen for changes in the authorization status
     var storeReadingsInHealthkitAuthorized:Bool {
         get {

@@ -19,7 +19,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>3235</string>
+	<string>3271</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -31,6 +31,8 @@
 	<string>Connect to CGM Transmitter and M5Stack</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Connect to CGM Transmitter and M5Stack</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>To create events with reading values as title, so that it can be viewed on Apple Watch</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Store bloodglucose readings</string>
 	<key>NSHealthUpdateUsageDescription</key>

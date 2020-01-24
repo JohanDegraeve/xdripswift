@@ -114,6 +114,10 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
         /// M5 stack settings
         case M5stack
         
+        
+        /// Apple Watch settings
+        case AppleWatch
+        
         /// info
         case info
 
@@ -143,6 +147,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
                 return SettingsViewInfoViewModel()
             case .developer:
                 return SettingsViewDevelopmentSettingsViewModel()
+            case .AppleWatch:
+                return SettingsViewAppleWatchSettingsViewModel()
             }
         }
 

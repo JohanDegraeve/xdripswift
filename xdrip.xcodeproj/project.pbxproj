@@ -191,6 +191,9 @@
 		F8BECB12235CEA9B0060DAE1 /* TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB11235CEA9B0060DAE1 /* TimeInterval.swift */; };
 		F8C5EBE722F38F0E00563B5F /* Trace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE622F38F0E00563B5F /* Trace.swift */; };
 		F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */; };
+		F8E3A2A523D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A423D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift */; };
+		F8E3A2A923D906C200E5E98A /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A823D906C200E5E98A /* WatchManager.swift */; };
+		F8E3A2AB23DA520B00E5E98A /* ConstantsWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */; };
 		F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */; };
 		F8E3C3AD21FE551C00907A04 /* DexcomCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */; };
 		F8EA6C8221B723BC0082976B /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C8121B723BC0082976B /* Date.swift */; };
@@ -598,6 +601,9 @@
 		F8C5EBED22F5A52400563B5F /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Common.strings"; sourceTree = "<group>"; };
 		F8C5EBEE22F5A52800563B5F /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Common.strings; sourceTree = "<group>"; };
 		F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		F8E3A2A423D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewAppleWatchSettingsViewModel.swift; sourceTree = "<group>"; };
+		F8E3A2A823D906C200E5E98A /* WatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
+		F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsWatch.swift; sourceTree = "<group>"; };
 		F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
 		F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomCalibrator.swift; sourceTree = "<group>"; };
 		F8EA6C8121B723BC0082976B /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
@@ -942,6 +948,7 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				F8E3A2A723D906B600E5E98A /* Watch */,
 				F8297F42238DC4AC00D74D66 /* BluetoothPeripheral */,
 				F8BECB03235CE5970060DAE1 /* Charts */,
 				F81D6D4622BD5F43005EFAE2 /* DexcomShare */,
@@ -1165,15 +1172,16 @@
 			isa = PBXGroup;
 			children = (
 				F8B3A838227F090D004BA588 /* SettingsViewAlertSettingsViewModel.swift */,
-				F8B3A839227F090D004BA588 /* SettingsViewDexcomSettingsViewModel.swift */,
-				F8B3A83A227F090D004BA588 /* SettingsViewTransmitterSettingsViewModel.swift */,
-				F8B3A83B227F090D004BA588 /* SettingsViewNightScoutSettingsViewModel.swift */,
-				F8B3A83C227F090D004BA588 /* SettingsViewHealthKitSettingsViewModel.swift */,
-				F8B3A83D227F090D004BA588 /* SettingsViewSpeakSettingsViewModel.swift */,
-				F8B3A83E227F090D004BA588 /* SettingsViewGeneralSettingsViewModel.swift */,
+				F8E3A2A423D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift */,
 				F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */,
+				F8B3A839227F090D004BA588 /* SettingsViewDexcomSettingsViewModel.swift */,
+				F8B3A83E227F090D004BA588 /* SettingsViewGeneralSettingsViewModel.swift */,
+				F8B3A83C227F090D004BA588 /* SettingsViewHealthKitSettingsViewModel.swift */,
 				F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */,
 				F8A389EA233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift */,
+				F8B3A83B227F090D004BA588 /* SettingsViewNightScoutSettingsViewModel.swift */,
+				F8B3A83D227F090D004BA588 /* SettingsViewSpeakSettingsViewModel.swift */,
+				F8B3A83A227F090D004BA588 /* SettingsViewTransmitterSettingsViewModel.swift */,
 			);
 			path = SettingsViewModels;
 			sourceTree = "<group>";
@@ -1251,6 +1259,14 @@
 			path = Charts;
 			sourceTree = "<group>";
 		};
+		F8E3A2A723D906B600E5E98A /* Watch */ = {
+			isa = PBXGroup;
+			children = (
+				F8E3A2A823D906C200E5E98A /* WatchManager.swift */,
+			);
+			path = Watch;
+			sourceTree = "<group>";
+		};
 		F8EA6C7D21B70DEA0082976B /* Constants */ = {
 			isa = PBXGroup;
 			children = (
@@ -1264,17 +1280,18 @@
 				F8A1586C22EDB9BE007F5B5D /* ConstantsDexcomFollower.swift */,
 				F8A1585A22EDB7EA007F5B5D /* ConstantsDexcomG5.swift */,
 				F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */,
+				F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */,
 				F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */,
 				F8EEDD5122FECE3800D2D610 /* ConstantsLibreOOP.swift */,
 				F8A1585E22EDB81E007F5B5D /* ConstantsLog.swift */,
 				F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */,
 				F8A1586A22EDB967007F5B5D /* ConstantsMaster.swift */,
+				F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */,
 				F8A1586022EDB844007F5B5D /* ConstantsNotifications.swift */,
 				F8A1586222EDB86E007F5B5D /* ConstantsSounds.swift */,
 				F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */,
 				F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */,
-				F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */,
-				F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */,
+				F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -1810,6 +1827,7 @@
 				F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */,
 				F8F9720523A5915900C3F17D /* TransmitterMessage.swift in Sources */,
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
+				F8E3A2A523D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */,
 				F81FA006228E09D40028C70F /* TextsCalibration.swift in Sources */,
 				F8F9721923A5915900C3F17D /* CGMGNSEntryTransmitter.swift in Sources */,
 				F8B3A84A227F090E004BA588 /* SettingsViewGeneralSettingsViewModel.swift in Sources */,
@@ -1937,6 +1955,7 @@
 				F8B3A783225D37F2004BA588 /* TextsNightScoutTestResult.swift in Sources */,
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
 				F8F9722723A5915900C3F17D /* CGMBluconTransmitter.swift in Sources */,
+				F8E3A2A923D906C200E5E98A /* WatchManager.swift in Sources */,
 				F8B3A80A227A3D11004BA588 /* TextsAlertTypeSettings.swift in Sources */,
 				F8F9721823A5915900C3F17D /* CGMBlueReaderTransmitter.swift in Sources */,
 				F8A1586D22EDB9BE007F5B5D /* ConstantsDexcomFollower.swift in Sources */,
@@ -1951,6 +1970,7 @@
 				F8F9721D23A5915900C3F17D /* LibreDerivedAlgorithmRunner.swift in Sources */,
 				F821CF5A229BF43A005C1E43 /* CoreDataManager.swift in Sources */,
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
+				F8E3A2AB23DA520B00E5E98A /* ConstantsWatch.swift in Sources */,
 				F821CF7B22A1D359005C1E43 /* NightScoutFollowerDelegate.swift in Sources */,
 				F8F9721523A5915900C3F17D /* PairRequestTxMessage.swift in Sources */,
 				F8BECB12235CEA9B0060DAE1 /* TimeInterval.swift in Sources */,
@@ -2435,7 +2455,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.7.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdriptest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -2463,7 +2483,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.7.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdriptest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";

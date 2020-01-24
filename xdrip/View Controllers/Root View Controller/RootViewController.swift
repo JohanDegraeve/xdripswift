@@ -171,6 +171,9 @@ final class RootViewController: UIViewController {
     /// dexcomShareUploadManager instance
     private var dexcomShareUploadManager:DexcomShareUploadManager?
     
+    /// WatchManager instance
+    private var watchManager: WatchManager?
+    
     /// timer used when asking the transmitter to initiate pairing. The user is waiting for the response, if the response from the transmitter doesn't come within a few seconds, then we'll inform the user
     private var transmitterPairingResponseTimer:Timer?
     
@@ -349,7 +352,7 @@ final class RootViewController: UIViewController {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, watchManager
     private func setupApplicationData() {
         
         // if coreDataManager is nil then there's no reason to continue
@@ -412,6 +415,9 @@ final class RootViewController: UIViewController {
             self.cgmTransmitter = cgmTransmitter
             
         })
+        
+        // setup watchmanager
+        watchManager = WatchManager(coreDataManager: coreDataManager)
         
     }
     
@@ -507,6 +513,8 @@ final class RootViewController: UIViewController {
                 dexcomShareUploadManager?.upload()
                 
                 bluetoothPeripheralManager?.sendLatestReading()
+                
+                watchManager?.processNewReading()
                 
             }
         }
@@ -758,6 +766,9 @@ final class RootViewController: UIViewController {
                         
                         // bluetoothPeripherals (M5Stack, ..) should receive latest reading with calculated value
                         self.bluetoothPeripheralManager?.sendLatestReading()
+                        
+                        // watchManager should process new reading
+                        self.watchManager?.processNewReading()
 
                     }
                 }

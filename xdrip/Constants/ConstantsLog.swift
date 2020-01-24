@@ -108,5 +108,12 @@ enum ConstantsLog {
 
     /// StatusChartsManager logging
     static let categoryGlucoseChartManager =         "GlucoseChartManager           "
+    
+    /// SettingsViewAppleWatchSettingsViewModel logging
+    static let categorySettingsViewAppleWatchSettingsViewModel =         "SettingsViewAppleWatchSettingsViewModel"
+    
+    /// WatchManager logging
+    static let categoryWatchManager =                "WatchManager                  "
+    
 }
 
