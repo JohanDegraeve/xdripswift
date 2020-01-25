@@ -725,7 +725,12 @@ final class RootViewController: UIViewController {
             if let coreDataManager = self.coreDataManager, let bgReadingsAccessor = self.bgReadingsAccessor {
                 if let textField = alert.textFields, let first = textField.first, let value = first.text {
                     
-                    let valueAsDouble = value.toDouble()!.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                    guard let valueAsDouble = value.toDouble() else {
+                        self.present(UIAlertController(title: Texts_Common.warning, message: Texts_Common.invalidValue, actionHandler: nil), animated: true, completion: nil)
+                        return
+                    }
+                    
+                    let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                     
                     var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
                     
@@ -734,12 +739,12 @@ final class RootViewController: UIViewController {
                     if let calibrator = self.calibrator {
                         if latestCalibrations.count == 0 {
                             // calling initialCalibration will create two calibrations, they are returned also but we don't need them
-                            _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDouble, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDouble, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                            _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDoubleConvertedToMgDl, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDoubleConvertedToMgDl, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                         } else {
                             // it's not the first calibration
                             if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
                                 // calling createNewCalibration will create a new  calibrations, it is returned but we don't need it
-                                _ = calibrator.createNewCalibration(bgValue: valueAsDouble, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                                _ = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                             }
                         }
                         

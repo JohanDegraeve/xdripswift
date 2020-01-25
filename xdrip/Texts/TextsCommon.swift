@@ -129,4 +129,8 @@ class Texts_Common {
         return NSLocalizedString("Delete", tableName: filename, bundle: Bundle.main, value: "Delete", comment: "Delete")
     }()
     
+    static let invalidValue = {
+        return NSLocalizedString("invalidValue", tableName: filename, bundle: Bundle.main, value: "Invalid Value", comment: "whenever invalid value is given by user somewhere in a field")
+    }()
+    
 }
