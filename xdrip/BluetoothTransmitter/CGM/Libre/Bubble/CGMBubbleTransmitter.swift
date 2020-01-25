@@ -156,7 +156,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                     case .dataInfo:
                         
                         // get hardware, firmware and batteryPercentage
-                        let hardware = value[2].description + ".0"
+                        let hardware = value[value.count-2].description + "." + value[value.count-1].description
                         let firmware = value[2].description + "." + value[3].description
                         let batteryPercentage = Int(value[4])
                         
