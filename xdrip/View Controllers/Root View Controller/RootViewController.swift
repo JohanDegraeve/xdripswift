@@ -373,7 +373,7 @@ final class RootViewController: UIViewController {
         calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         
         // setup nightscout synchronizer
-        nightScoutUploadManager = NightScoutUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
+        nightScoutUploadManager = NightScoutUploadManager(coreDataManager: coreDataManager, messageHandler: { (title:String, message:String) in
             
             let alert = UIAlertController(title: title, message: message, actionHandler: nil)
             

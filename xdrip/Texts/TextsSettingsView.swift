@@ -197,6 +197,10 @@ class Texts_SettingsView {
     static let timeScheduleViewTitle: String = {
         return NSLocalizedString("timeScheduleViewTitle", tableName: filename, bundle: Bundle.main, value: "On/Off time schedule for ", comment: "When creating schedule for Nightscout or Dexcom Share upload, this is the top label text")
     }()
+    
+    static let uploadSensorStartTime: String = {
+        return NSLocalizedString("uploadSensorStartTime", tableName: filename, bundle: Bundle.main, value: "Upload Sensor start time", comment: "nightscout settings, title of row")
+    }()
 
     // MARK: - Section Speak
     

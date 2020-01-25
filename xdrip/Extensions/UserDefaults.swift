@@ -48,10 +48,12 @@ extension UserDefaults {
         case nightScoutUrl = "nightScoutUrl"
         /// nightscout api key
         case nightScoutAPIKey = "nightScoutAPIKey"
-        /// should readings be uploaded to Dexcom share
+        /// send sensor start time to nightscout ?
+        case uploadSensorStartTimeToNS = "uploadSensorStartTimeToNS"
         
         // Dexcom Share
         
+        /// should readings be uploaded to Dexcom share
         case uploadReadingstoDexcomShare = "uploadReadingstoDexcomShare"
         /// dexcom share account name
         case dexcomShareAccountName = "dexcomShareAccountName"
@@ -414,7 +416,17 @@ extension UserDefaults {
             set(newValue, forKey: Key.nightScoutUseSchedule.rawValue)
         }
     }
-    
+
+    /// send sensor start time to nightscout ?
+    @objc dynamic var uploadSensorStartTimeToNS: Bool {
+        get {
+            return bool(forKey: Key.uploadSensorStartTimeToNS.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.uploadSensorStartTimeToNS.rawValue)
+        }
+    }
+
     /// the nightscout url - starts with http
     ///
     /// when assigning a new value, it will be checked if it starts with http, if not then automatically https:// will be added
