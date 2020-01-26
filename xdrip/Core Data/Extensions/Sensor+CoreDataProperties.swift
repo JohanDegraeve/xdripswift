@@ -13,6 +13,7 @@ extension Sensor {
     @NSManaged public var startDate: Date
     @NSManaged public var calibrations: NSSet?
     @NSManaged public var readings: NSSet?
+    @NSManaged public var uploadedToNS: Bool
 
 }
 

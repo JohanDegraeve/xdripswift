@@ -11,11 +11,14 @@ fileprivate enum Setting:Int, CaseIterable {
     /// nightscout api key
     case nightScoutAPIKey = 2
     
+    /// should sensor start time be uploaded to NS yes or no
+    case uploadSensorStartTime = 3
+    
     /// use nightscout schedule or not
-    case useSchedule = 3
+    case useSchedule = 4
     
     /// open uiviewcontroller to edit schedule
-    case schedule = 4
+    case schedule = 5
     
 }
 
@@ -51,6 +54,9 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
             
         case .schedule:
             return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToSchedule.rawValue, sender: self)
+            
+        case .uploadSensorStartTime:
+            return SettingsSelectedRowAction.nothing
             
         }
     }
@@ -96,6 +102,8 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.useSchedule
         case .schedule:
             return Texts_SettingsView.schedule
+        case .uploadSensorStartTime:
+            return Texts_SettingsView.uploadSensorStartTime
             
         }
     }
@@ -114,6 +122,8 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
             return UITableViewCell.AccessoryType.none
         case .schedule:
             return UITableViewCell.AccessoryType.disclosureIndicator
+        case .uploadSensorStartTime:
+            return UITableViewCell.AccessoryType.none
         }
     }
     
@@ -131,6 +141,9 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
             return nil
         case .schedule:
             return nil
+        case .uploadSensorStartTime:
+            return nil
+            
         }
     }
     
@@ -153,6 +166,9 @@ class SettingsViewNightScoutSettingsViewModel:SettingsViewModelProtocol {
             
         case .schedule:
             return nil
+            
+        case .uploadSensorStartTime:
+            return UISwitch(isOn: UserDefaults.standard.uploadSensorStartTimeToNS, action: {(isOn:Bool) in UserDefaults.standard.uploadSensorStartTimeToNS = isOn})
             
         }
     }
