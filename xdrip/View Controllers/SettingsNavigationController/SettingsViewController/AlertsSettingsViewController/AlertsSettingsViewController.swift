@@ -81,18 +81,21 @@ final class AlertsSettingsViewController: UIViewController {
             // function to run when unwinding from AlertSettingsViewController tp AlertsSettingsViewController occurs
             toDoWhenUnwinding = {self.tableView.reloadSections(IndexSet(integer: section), with: .none)}
             
-            // minimumStart should be 1 minute higher than start of prevous row, except if this is the first row, then minimumStart is 0
+            // do the mapping for section number. The sections in the view are ordered differently than the cases in AlertKind.
+            let mappedSectionNumber = AlertKind.alertKindRawValue(forSection: section)
+            
+            // minimumStart should be 1 minute higher than start of previous row, except if this is the first row, then minimumStart is 0
             var minimumStart:Int16 = 0
-            if row > 0 {minimumStart = alertEntriesPerAlertKind[section][row - 1].start + 1}
+            if row > 0 {minimumStart = alertEntriesPerAlertKind[mappedSectionNumber][row - 1].start + 1}
             
             // maximumStart is start of next row - 1 minute, except if this is the last row
             var maximumStart:Int16 = 24 * 60 - 1
-            if row < alertEntriesPerAlertKind[section].count - 1 {
-                maximumStart = alertEntriesPerAlertKind[section][row + 1].start - 1
+            if row < alertEntriesPerAlertKind[mappedSectionNumber].count - 1 {
+                maximumStart = alertEntriesPerAlertKind[mappedSectionNumber][row + 1].start - 1
             }
             
             // configure view controller
-            vc.configure(alertEntry: alertEntriesPerAlertKind[section][row], minimumStart: minimumStart, maximumStart: maximumStart, coreDataManager: coreDataManager )
+            vc.configure(alertEntry: alertEntriesPerAlertKind[mappedSectionNumber][row], minimumStart: minimumStart, maximumStart: maximumStart, coreDataManager: coreDataManager )
         default:
             // shouldn't happen because we're in alertssettings view here
             break
@@ -131,20 +134,20 @@ extension AlertsSettingsViewController:UITableViewDataSource, UITableViewDelegat
     // MARK: - UITableViewDataSource and UITableViewDelegate protocol Methods
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return alertEntriesPerAlertKind[section].count
+        return alertEntriesPerAlertKind[AlertKind.alertKindRawValue(forSection: section)].count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("Unexpected Table View Cell") }
         
-        // alertKind corresponds to the section number
-        guard let alertKind = AlertKind(rawValue: indexPath.section) else {
+        // alertKind corresponds to the section number, mapped to correct section
+        guard let alertKind = AlertKind(forSection: indexPath.section) else {
             fatalError("AlertsSettingsViewController, in cellForRowAt, failed to create alertKind")
         }
         
         // get the alertEntry
-        let alertEntry = alertEntriesPerAlertKind[indexPath.section][indexPath.row]
-        
+        let alertEntry = alertEntriesPerAlertKind[alertKind.rawValue][indexPath.row]
+
         // get alertValue as Double
         let alertValue = alertEntry.value
         
@@ -194,6 +197,6 @@ extension AlertsSettingsViewController:UITableViewDataSource, UITableViewDelegat
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return AlertKind(rawValue: section)?.alertTitle()
+        return AlertKind(forSection: section)?.alertTitle()
     }
 }

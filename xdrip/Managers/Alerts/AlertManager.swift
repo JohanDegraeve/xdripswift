@@ -138,16 +138,22 @@ public class AlertManager:NSObject {
                     lastButOneBgREading = latestBgReadings[1]
                 }
 
-                // TODO original implementation ignores isSnoozed for .calibration and .batterylow
-                // only raise first alert that's been tripped
-                let alertsByPreference : [AlertKind] = [.fastdrop, .verylow, .low, .fastrise, .veryhigh, .high, .calibration, .batterylow]
-                _ = alertsByPreference.first(where: { (alertKind:AlertKind) -> Bool in
-                    let isSnoozed = getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed
-                    return !isSnoozed && checkAlertAndFire(alertKind: alertKind, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
+                // alerts are checked in order of importance - there should be only one alert raised, except missed reading alert which will always be checked.
+                
+                // create helper to check and fire alerts
+                let checkAlertAndFireHelper = { (_ alertKind : AlertKind) -> Bool in self.checkAlertAndFire(alertKind: alertKind, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo) }
+                
+                // specify the order in which alerts should be checked and group those with related snoozes
+                let alertGroupsByPreference: [[AlertKind]] = [[.fastdrop], [.verylow, .low], [.fastrise], [.veryhigh, .high], [.calibration], [.batterylow]]
+                
+                // only raise first alert group that's been tripped
+                _ = alertGroupsByPreference.first(where: { (alertGroup:[AlertKind]) -> Bool in
+                    checkAlertGroupAndFire(alertGroup, checkAlertAndFireHelper)
                 })
-
+                
                 // the missed reading alert will be a future planned alert
-                _ = checkAlertAndFire(alertKind: .missedreading, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
+                _ = checkAlertAndFireHelper(.missedreading)
+                
             } else {
                 trace("in checkAlerts, latestBgReadings is older than %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, maxAgeOfLastBgReadingInSeconds.description)
             }
@@ -245,6 +251,25 @@ public class AlertManager:NSObject {
     }
     
     // MARK: - private helper functions
+    
+    /// Checks group of alerts
+    /// - parameters:
+    ///     - alertGroup : array of AlertKind, function loops through alerts, as soon as one of them is snoozed, returns false. This is for example to allow that low alert goes off while very low is snoozed. In this case the array will be .verylow, .low  .verylow will be checked first
+    ///     - checkAlertAndFireHelper : a function that will check the alert and if necessary fire (or plan it if for example missed reading alert)
+    /// - returns:
+    ///     - returns false early as soon as it finds a snoozed alert
+    ///     - if no alert is snoozed, then returns true if as soon as one of the  alerts in the array is triggered
+    private func checkAlertGroupAndFire(_ alertGroup:[AlertKind], _ checkAlertAndFireHelper: (_ : AlertKind) -> Bool) -> Bool {
+        
+        for(alertKind) in alertGroup {
+            let isSnoozed = getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed
+            if (isSnoozed) {return false}
+            if checkAlertAndFireHelper(alertKind) {return true}
+        }
+        
+        return false
+        
+    }
     
     /// will
     /// - remove any pending missed reading alert

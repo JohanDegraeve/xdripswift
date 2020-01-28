@@ -14,3 +14,5 @@
 "alerttype" = "Alert Type";
 "changealertvalue" = "Change Alert Value";
 "confirmdeletionalert" = "Do you want to delete the Alert ?";
+"alerts_fastdrop" = "Fast Drop Alert";
+"alerts_fastrise" = "Fast Rise Alert";
