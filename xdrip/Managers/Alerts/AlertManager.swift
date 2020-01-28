@@ -252,7 +252,7 @@ public class AlertManager:NSObject {
     
     // MARK: - private helper functions
     
-    /// Checks group of alerts
+    /// Checks group of alerts - Not to be used for alerts with delay (ie missedreading)
     /// - parameters:
     ///     - alertGroup : array of AlertKind, function loops through alerts, as soon as one of them is snoozed, returns false. This is for example to allow that low alert goes off while very low is snoozed. In this case the array will be .verylow, .low  .verylow will be checked first
     ///     - checkAlertAndFireHelper : a function that will check the alert and if necessary fire (or plan it if for example missed reading alert)
@@ -262,9 +262,13 @@ public class AlertManager:NSObject {
     private func checkAlertGroupAndFire(_ alertGroup:[AlertKind], _ checkAlertAndFireHelper: (_ : AlertKind) -> Bool) -> Bool {
         
         for(alertKind) in alertGroup {
-            let isSnoozed = getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed
-            if (isSnoozed) {return false}
+
+            // first check if the alert needs to fire, even if the alert would be snoozed, this will ensure logging.
             if checkAlertAndFireHelper(alertKind) {return true}
+            
+            // if alertKind is snoozed then we don't want to check the next alert (example if verylow is snoozed then don't check low)
+            if getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed {return false}
+            
         }
         
         return false
@@ -355,7 +359,7 @@ public class AlertManager:NSObject {
             // depending on alertKind, check if the alert is snoozed. For missedreading, behaviour for snoozed alert is different than for the other alerts
             switch alertKind {
                 
-            case .missedreading:// any alert type that would be configured with a delay
+            case .missedreading: // any alert type that would be configured with a delay
                 if let snoozePeriodInMinutes = getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes, let snoozeTimeStamp = getSnoozeParameters(alertKind: alertKind).snoozeTimeStamp {
                     
                     minimumDelayInSecondsToUse = -Int(Date().timeIntervalSince(Date(timeInterval: TimeInterval(snoozePeriodInMinutes * 60), since: snoozeTimeStamp)).rawValue)
