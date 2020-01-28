@@ -69,96 +69,88 @@ public class AlertManager:NSObject {
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.soundPlayer = soundPlayer
         self.uNUserNotificationCenter = UNUserNotificationCenter.current()
-        
+
         // call super.init
         super.init()
-        
+
         // initialize snoozeparameters
         for alertKind in AlertKind.allCases {
             snoozeParameters[alertKind.rawValue] = SnoozeParameters()
         }
-        
+
         // in snoozeValueStrings, replace all occurrences of minutes, minute, etc... by language dependent value
         for (index, _) in snoozeValueStrings.enumerated() {
             snoozeValueStrings[index] = snoozeValueStrings[index].replacingOccurrences(of: "minutes", with: Texts_Common.minutes).replacingOccurrences(of: "hour", with: Texts_Common.hour).replacingOccurrences(of: "hours", with: Texts_Common.hours).replacingOccurrences(of: "day", with: Texts_Common.day).replacingOccurrences(of: "week", with: Texts_Common.week)
         }
-        
+
         //  initialize array of alertNotifications
         initAlertNotificationIdentiferArray()
-        
+
         // need to set the alert notification categories, get the existing categories first, call setAlertNotificationCategories in competionhandler
         UNUserNotificationCenter.current().getNotificationCategories(completionHandler: setAlertNotificationCategories(_:))
-        
+
         // alertManager may have raised an alert with a sound played by soundplayer. If user brings the app to the foreground, the soundPlayer needs to stop playing
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStopPlayingSound, closure: {
             if let soundPlayer = soundPlayer {
                 soundPlayer.stopPlaying()
             }
-            
+
         })
-        
+
     }
-    
+
     // MARK: - public functions
-    
+
     /// check all alerts and fire if needed
     /// - parameters:
     ///     - maxAgeOfLastBgReadingInSeconds : for master mode max 1 minute should be ok, but for follower mode it could be interesting to take a higher value
     public func checkAlerts(maxAgeOfLastBgReadingInSeconds:Double) {
-        
+
         // first of all remove all existing notifications, there should be only one open alert on the home screen. The most relevant one will be reraised
         uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: alertNotificationIdentifers)
         uNUserNotificationCenter.removeAllPendingNotificationRequests()
-        
+
         // get last bgreading, ignore sensor, because it must also work for follower mode
         let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-        
+
         // get latest calibration
         var lastCalibration:Calibration?
         if let latestSensor = sensorsAccessor.fetchActiveSensor() {
             lastCalibration = calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: latestSensor)
         }
-        
+
         // get transmitterBatteryInfo
         let transmitterBatteryInfo = UserDefaults.standard.transmitterBatteryInfo
-        
+
         // all alerts will only be created if there's a reading, less than 60 seconds old
         // except for transmitterBatteryInfo alert
         if latestBgReadings.count > 0 {
-            
+
             let lastBgReading = latestBgReadings[0]
 
             if abs(lastBgReading.timeStamp.timeIntervalSinceNow) < maxAgeOfLastBgReadingInSeconds {
                 // reading is for an active sensor and is less than 60 seconds old, let's check the alerts
                 // need to call checkAlert
-                
+
                 // if latestBgReadings[1] exists then assign it to lastButOneBgREading
                 var lastButOneBgREading:BgReading?
                 if latestBgReadings.count > 1 {
                     lastButOneBgREading = latestBgReadings[1]
                 }
-                
-                
-                // alerts are checked in order of importance - there should be only one alert raised, except missed reading alert which will always be checked.
-                // first check very low alert
-                if (!checkAlertAndFire(alertKind: .verylow, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                    // very low not fired, check low alert - if very low alert snoozed, skip the check for low alert and continue to next step
-                    if getSnoozeParameters(alertKind: AlertKind.verylow).getSnoozeValue().isSnoozed || (!checkAlertAndFire(alertKind: .low, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                        //  low not fired, check very high alert
-                        if (!checkAlertAndFire(alertKind: .veryhigh, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                            // very high not fired, check high alert - if very high alert snoozed, skip the check for high alert and continue to next step
-                            if getSnoozeParameters(alertKind: AlertKind.veryhigh).getSnoozeValue().isSnoozed || (!checkAlertAndFire(alertKind: .high, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                                // very high not fired check calibration alert
-                                if (!checkAlertAndFire(alertKind: .calibration, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                                    // finally let's check the battery level alert
-                                    _ = checkAlertAndFire(alertKind: .batterylow, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
-                                }
-                            }
-                        }
-                    }
-                }
-                // set missed reading alert, this will be a future planned alert
-                _ = checkAlertAndFire(alertKind: .missedreading, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
+
+                // create helper to check and fire alerts
+                let checkAlertAndFireHelper = { (_ alertKind : AlertKind) -> Bool in self.checkAlertAndFire(alertKind: alertKind, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo) }
+
+                // specify the order in which alerts should be checked and group those with related snoozes
+                let alertGroupsByPreference : [[AlertKind]] = [[.fastdrop], [.verylow, .low], [.fastrise], [.veryhigh, .high], [.calibration], [.batterylow]]
+
+                // only raise first alert group that's been tripped
+                 _ = alertGroupsByPreference.first(where: { (alertGroup:[AlertKind]) -> Bool in
+                     checkAlertGroupAndFire(alertGroup, checkAlertAndFireHelper)
+                 })
+
+                // the missed reading alert will be a future planned alert
+                _ = checkAlertAndFireHelper(.missedreading)
             } else {
                 trace("in checkAlerts, latestBgReadings is older than %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, maxAgeOfLastBgReadingInSeconds.description)
             }
@@ -166,40 +158,54 @@ public class AlertManager:NSObject {
             trace("in checkAlerts, latestBgReadings.count == 0", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
         }
     }
-    
+
+    /// Checks group of alerts -
+    /// returns false early as soon as it finds a snoozed alert
+    /// returns true if any alert is triggered
+    /// - returns:
+    ///     - Bool : was any alert fired
+    private func checkAlertGroupAndFire(_ alertGroup:[AlertKind], _ checkAlertAndFireHelper: (_ : AlertKind) -> Bool) -> Bool {
+        for(alertKind) in alertGroup {
+            let isSnoozed = getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed
+            if (isSnoozed) {return false}
+            if checkAlertAndFireHelper(alertKind) {return true}
+        }
+        return false
+    }
+
     /// Function to be called that receives the notification actions. Will handle the response. - called when user clicks a notification
     ///
     /// this function looks very similar to the function with the same name defined in  UNUserNotificationCenterDelegate, difference is that it returns an optional instance of PickerViewData. This will have the snooze data, ie title, actionHandler, cancelHandler, list of values, etc.  Goal is not to have UI related stuff in AlertManager class. it's the caller that needs to decide how to present the data
     /// - returns:
     ///     - PickerViewData : contains data that user needs to pick from, nil means nothing to pick from
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) -> PickerViewData? {
-        
+
         // declare returnValue
         var returnValue:PickerViewData?
-        
+
         // loop through alertKinds to find matching notificationIdentifier
         loop: for alertKind in AlertKind.allCases {
-            
+
             if response.notification.request.identifier == alertKind.notificationIdentifier() {
-                
+
                 // user clicked an alert notification, time to stop playing if play
                 if let soundPlayer = soundPlayer {
                     soundPlayer.stopPlaying()
                 }
-                
+
                 switch response.actionIdentifier {
-                    
+
                 case snoozeActionIdentifier:
 
                     // get the appicable alertEntry so we can find the alertType and default snooze value
                     let (currentAlertEntry, _) = alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor)
-                    
+
                     trace("in userNotificationCenter, received actionIdentifier : snoozeActionIdentifier, snoozing alert %{public}@ for %{public}@ minutes (3)", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), Int(currentAlertEntry.alertType.snoozeperiod).description)
-                    
+
                     snooze(alertKind: alertKind, snoozePeriodInMinutes: Int(currentAlertEntry.alertType.snoozeperiod), response: response)
-                    
+
                 case UNNotificationDefaultActionIdentifier:
-                    
+
                     trace("in userNotificationCenter, received actionIdentifier : UNNotificationDefaultActionIdentifier (user clicked the notification which opens the app, but not the snooze action in this notification)", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
 
                     // create pickerViewData for the alertKind for which alert went off, and return it to the caller who in turn needs to allow the user to select a snoozeperiod
@@ -334,57 +340,57 @@ public class AlertManager:NSObject {
         ///
         /// will be initialized later
         var minimumDelayInSecondsToUse:Int?
-        
+
         // check if snoozed
         if getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed {
-            
+
             // depending on alertKind, check if the alert is snoozed. For missedreading, behaviour for snoozed alert is different than for the other alerts
             switch alertKind {
-                
+
             case .missedreading:// any alert type that would be configured with a delay
                 if let snoozePeriodInMinutes = getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes, let snoozeTimeStamp = getSnoozeParameters(alertKind: alertKind).snoozeTimeStamp {
-                    
+
                     minimumDelayInSecondsToUse = -Int(Date().timeIntervalSince(Date(timeInterval: TimeInterval(snoozePeriodInMinutes * 60), since: snoozeTimeStamp)).rawValue)
                     trace("in checkAlertAndFire, minimumDelayInSecondsToUse = %{public}@" , log: log, category: ConstantsLog.categoryAlertManager, type: .info, minimumDelayInSecondsToUse!.description)
 
                 } // if snoozePeriodInMinutes or snoozeTimeStamp is nil (which shouldn't be the case) continue without taking into account the snooze status
-                
-            case .calibration, .batterylow, .low, .high, .verylow, .veryhigh:
+
+            case .calibration, .batterylow, .low, .high, .verylow, .veryhigh, .fastdrop, .fastrise:
                 trace("in checkAlertAndFire, alert %{public}@ is currently snoozed", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
                 return false
             }
-            
+
         }
-        
+
 
         // get the applicable current and next alertType from core data
         let (currentAlertEntry, nextAlertEntry) = alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor)
-        
+
         // check if alert is required
         let (alertNeeded, alertBody, alertTitle, delayInSeconds) = alertKind.alertNeeded(currentAlertEntry: currentAlertEntry, nextAlertEntry: nextAlertEntry, lastBgReading: lastBgReading, lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
-        
+
         // create a new property for delayInSeconds, if it's nil then set to 0 - because returnvalue might either be nil or 0, to be treated in the same way
         var delayInSecondsToUse = delayInSeconds == nil ? 0 : delayInSeconds!
-        
+
         // if it's a delayed alert and if the alert is snoozed, then delay is either the momoment the alert expires, or the calculated delay, the maximu of the to values
         if let minimumDelayInSecondsToUse = minimumDelayInSecondsToUse {
-            
+
             if minimumDelayInSecondsToUse > delayInSecondsToUse {
                 trace("    increasing delayInSecondsToUse to %{public}@, because the alert is snoozed", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, minimumDelayInSecondsToUse.description)
                 delayInSecondsToUse = minimumDelayInSecondsToUse
             }
-            
+
         }
-        
+
         if alertNeeded {
             // alert needs to be raised
-            
+
             // the applicable alertentry
             var applicableAlertType = currentAlertEntry.alertType
-            
+
             // if delayInSecondsToUse > 0, then possibly we need to use another alertType
             if delayInSecondsToUse > 0, let nextAlertEntry = nextAlertEntry {
-                
+
                 // if start of nextAlertEntry < start of currentAlertEntry, then ad 24 hours, because it means the nextAlertEntry is actually the one of the day after
                 var nextAlertEntryStartValueToUse = nextAlertEntry.start
                 if nextAlertEntry.start < currentAlertEntry.start {

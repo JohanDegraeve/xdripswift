@@ -33,6 +33,14 @@ class Texts_Alerts {
         return NSLocalizedString("alerts_batterylow", tableName: filename, bundle: Bundle.main, value: "Battery Low Alert", comment: "transmitter battery low, this is the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
     
+    static let fastDropAlertTitle: String = {
+        return NSLocalizedString("alerts_fastdrop", tableName: filename, bundle: Bundle.main, value: "Fast Drop Alert", comment: "When fast drop alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert")
+    }()
+
+    static let fastRiseAlertTitle: String = {
+        return NSLocalizedString("alerts_fastrise", tableName: filename, bundle: Bundle.main, value: "Fast Rise Alert", comment: "When fast drop alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert")
+    }()
+    
     static let snooze: String = {
         return NSLocalizedString("alerts_snooze", tableName: filename, bundle: Bundle.main, value: "Snooze", comment: "Action text for alerts. This is the button that allows to snooze the alert")
     }()

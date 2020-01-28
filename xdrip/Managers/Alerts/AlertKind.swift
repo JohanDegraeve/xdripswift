@@ -13,13 +13,15 @@ public enum AlertKind:Int, CaseIterable {
     case missedreading = 4
     case calibration = 5
     case batterylow = 6
-    
+    case fastdrop = 7
+    case fastrise = 8
+
     /// example, low alert needs a value = value below which alert needs to fire - there's actually no alert right now that doesn't need a value, in iosxdrip there was the iphonemuted alert, but I removed this here. Function remains, never now it might come back
     ///
     /// probably only useful in UI - named AlertKind and not AlertType because there's already an AlertType which has a different goal
     func needsAlertValue() -> Bool {
         switch self {
-        case .low, .high, .verylow,.veryhigh,.missedreading,.calibration,.batterylow:
+        case .low, .high, .verylow,.veryhigh,.missedreading,.calibration,.batterylow,.fastdrop,.fastrise:
             return true
         }
     }
@@ -29,8 +31,8 @@ public enum AlertKind:Int, CaseIterable {
     /// will only be useful in UI
     func valueNeedsConversionToMmol() -> Bool {
         switch self {
-            
-        case .low, .high, .verylow, .veryhigh:
+
+        case .low, .high, .verylow, .veryhigh, .fastdrop, .fastrise:
             return true
         case .missedreading, .calibration, .batterylow:
             return false
@@ -59,6 +61,10 @@ public enum AlertKind:Int, CaseIterable {
             } else {
                 return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
             }
+        case .fastdrop:
+            return ConstantsDefaultAlertLevels.fastdrop;
+        case .fastrise:
+            return ConstantsDefaultAlertLevels.fastrise;
         }
     }
     
@@ -80,6 +86,10 @@ public enum AlertKind:Int, CaseIterable {
             return "calibration"
         case .batterylow:
             return "batterylow"
+        case .fastdrop:
+            return "fastdrop"
+        case .fastrise:
+            return "fastrise"
         }
     }
     
@@ -131,6 +141,32 @@ public enum AlertKind:Int, CaseIterable {
                     } else {return (false, nil, nil, nil)}
                 } else {return (false, nil, nil, nil)}
             
+        case .fastdrop:
+                // if alertEntry not enabled, return false
+                if !currentAlertEntry.alertType.enabled {return (false, nil, nil, nil)}
+
+                if let lastBgReading = lastBgReading, let lastButOneBgReading = lastButOneBgReading {
+                    // first check if calculatedValue > 0.0, never know that it's not been checked by caller
+                    if lastBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
+                    // now do the actual check if alert is applicable or not
+                    if lastButOneBgReading.calculatedValue - lastBgReading.calculatedValue > Double(currentAlertEntry.value) {
+                        return (true, lastBgReading.unitizedDeltaString(previousBgReading: lastButOneBgReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), createAlertTitleForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), nil)
+                    } else {return (false, nil, nil, nil)}
+                } else {return (false, nil, nil, nil)}
+
+        case .fastrise:
+                // if alertEntry not enabled, return false
+                if !currentAlertEntry.alertType.enabled {return (false, nil, nil, nil)}
+
+                if let lastBgReading = lastBgReading, let lastButOneBgReading = lastButOneBgReading {
+                    // first check if calculatedValue > 0.0, never know that it's not been checked by caller
+                    if lastBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
+                    // now do the actual check if alert is applicable or not
+                    if lastBgReading.calculatedValue - lastButOneBgReading.calculatedValue > Double(currentAlertEntry.value) {
+                        return (true, lastBgReading.unitizedDeltaString(previousBgReading: lastButOneBgReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), createAlertTitleForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), nil)
+                    } else {return (false, nil, nil, nil)}
+                } else {return (false, nil, nil, nil)}
+
         case .missedreading:
             // if no valid lastbgreading then there's definitely no need to plan an alert
             guard let lastBgReading = lastBgReading else {return (false, nil, nil, nil)}
@@ -267,6 +303,10 @@ public enum AlertKind:Int, CaseIterable {
             return ConstantsNotifications.NotificationIdentifiersForCalibration.subsequentCalibrationRequest
         case .batterylow:
             return ConstantsNotifications.NotificationIdentifiersForAlerts.batteryLow
+        case .fastdrop:
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.fastDropAlert
+        case .fastrise:
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.fastRiseAlert
         }
     }
     
@@ -288,6 +328,10 @@ public enum AlertKind:Int, CaseIterable {
             return Texts_Alerts.calibrationNeededAlertTitle
         case .batterylow:
             return Texts_Alerts.batteryLowAlertTitle
+        case .fastdrop:
+            return Texts_Alerts.fastDropAlertTitle
+        case .fastrise:
+            return Texts_Alerts.fastRiseAlertTitle
         }
     }
     
@@ -295,8 +339,8 @@ public enum AlertKind:Int, CaseIterable {
     /// What is this text ?
     func valueUnitText(transmitterType:CGMTransmitterType?) -> String {
         switch self {
-            
-        case .verylow, .low, .high, .veryhigh:
+
+        case .verylow, .low, .high, .veryhigh, .fastdrop, .fastrise:
             return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl:Texts_Common.mmol
         case .missedreading:
             return Texts_Common.minutes
@@ -327,6 +371,10 @@ fileprivate func createAlertTitleForBgReadingAlerts(bgReading:BgReading, alertKi
         returnValue = returnValue + Texts_Alerts.veryLowAlertTitle
     case .veryhigh:
         returnValue = returnValue + Texts_Alerts.veryHighAlertTitle
+    case .fastdrop:
+        returnValue = returnValue + Texts_Alerts.fastDropAlertTitle
+    case .fastrise:
+        returnValue = returnValue + Texts_Alerts.fastRiseAlertTitle
     default:
         return returnValue
     }
