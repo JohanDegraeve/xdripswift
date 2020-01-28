@@ -2,10 +2,11 @@ import Foundation
 
 /// low, high, very low, very high, ...
 public enum AlertKind:Int, CaseIterable {
-    // when adding alertkinds, try to add new cases at the end (ie 7, ...)
-    // if this is done in the middle ((eg rapid rise alert might seem better positioned after veryhigh), then a database migration would be required, because the rawvalue is stored as Int16 in the coredata, namely the alertkind
-    // the order of the alerts will also be the order in the settings
     
+    // when adding alertkinds, add new cases at the end (ie 9, ...)
+    // if this is done in the middle ((eg rapid rise alert might seem better positioned after veryhigh), then a database migration would be required, because the rawvalue is stored as Int16 in the coredata, namely the alertkind
+    // the order of the alerts will in the uiview is determined by the initializer init(forRowAt row: Int)
+
     case verylow = 0
     case low = 1
     case high = 2
@@ -13,13 +14,72 @@ public enum AlertKind:Int, CaseIterable {
     case missedreading = 4
     case calibration = 5
     case batterylow = 6
+    case fastdrop = 7
+    case fastrise = 8
+
+    /// this is used for presentation in UI table view. It allows to order the alert kinds in the view, different than they case ordering, and so allows to add new cases
+    init?(forSection section: Int) {
+        
+        switch section {
+            
+        case 0:
+            self = .verylow
+        case 1:
+            self = .low
+        case 2:
+            self = .fastdrop
+        case 3:
+            self = .high
+        case 4:
+            self = .veryhigh
+        case 5:
+            self = .fastrise
+        case 6:
+            self = .missedreading
+        case 7:
+            self = .calibration
+        case 8:
+            self = .batterylow
+            
+        default:
+            fatalError("in AlertKind initializer init(forRowAt row: Int), there's no case for the rownumber")
+        }
+        
+    }
     
+    /// gives the raw value of the alertkind for a specific section in a uitableview, is the opposite of the initializer
+    static func alertKindRawValue(forSection section: Int) -> Int {
+        
+        switch section {
+        case 0://very low
+            return 0
+        case 1:// low
+            return 1
+        case 2:// fast drop
+            return 7
+        case 3:// high
+            return 2
+        case 4://very high
+            return 3
+        case 5://fast rise
+            return 8
+        case 6://missed reading
+            return 4
+        case 7://calibration
+            return 5
+        case 8://battery low
+            return 6
+        default:
+            fatalError("in alertKindRawValue, unknown case")
+        }
+    }
+
     /// example, low alert needs a value = value below which alert needs to fire - there's actually no alert right now that doesn't need a value, in iosxdrip there was the iphonemuted alert, but I removed this here. Function remains, never now it might come back
     ///
     /// probably only useful in UI - named AlertKind and not AlertType because there's already an AlertType which has a different goal
     func needsAlertValue() -> Bool {
         switch self {
-        case .low, .high, .verylow,.veryhigh,.missedreading,.calibration,.batterylow:
+        case .low, .high, .verylow,.veryhigh,.missedreading,.calibration,.batterylow,.fastdrop,.fastrise:
             return true
         }
     }
@@ -29,8 +89,8 @@ public enum AlertKind:Int, CaseIterable {
     /// will only be useful in UI
     func valueNeedsConversionToMmol() -> Bool {
         switch self {
-            
-        case .low, .high, .verylow, .veryhigh:
+
+        case .low, .high, .verylow, .veryhigh, .fastdrop, .fastrise:
             return true
         case .missedreading, .calibration, .batterylow:
             return false
@@ -59,6 +119,10 @@ public enum AlertKind:Int, CaseIterable {
             } else {
                 return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
             }
+        case .fastdrop:
+            return ConstantsDefaultAlertLevels.fastdrop;
+        case .fastrise:
+            return ConstantsDefaultAlertLevels.fastrise;
         }
     }
     
@@ -80,6 +144,10 @@ public enum AlertKind:Int, CaseIterable {
             return "calibration"
         case .batterylow:
             return "batterylow"
+        case .fastdrop:
+            return "fastdrop"
+        case .fastrise:
+            return "fastrise"
         }
     }
     
@@ -131,6 +199,46 @@ public enum AlertKind:Int, CaseIterable {
                     } else {return (false, nil, nil, nil)}
                 } else {return (false, nil, nil, nil)}
             
+        case .fastdrop:
+                // if alertEntry not enabled, return false
+                if !currentAlertEntry.alertType.enabled {return (false, nil, nil, nil)}
+
+                if let lastBgReading = lastBgReading, let lastButOneBgReading = lastButOneBgReading {
+                    
+                    // lastbut one reading and last reading shoud be maximum 5 minutes apart
+                    if (lastBgReading.timeStamp.timeIntervalSince(lastButOneBgReading.timeStamp)) < 5 * 60 {
+                        
+                        // first check if calculatedValue > 0.0, never know that it's not been checked by caller
+                        if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
+                        // now do the actual check if alert is applicable or not
+                        if lastButOneBgReading.calculatedValue - lastBgReading.calculatedValue > Double(currentAlertEntry.value) {
+                            return (true, lastBgReading.unitizedDeltaString(previousBgReading: lastButOneBgReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), createAlertTitleForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), nil)
+                        } else {return (false, nil, nil, nil)}
+
+                    } else {return (false, nil, nil, nil)}
+                    
+                } else {return (false, nil, nil, nil)}
+
+        case .fastrise:
+                // if alertEntry not enabled, return false
+                if !currentAlertEntry.alertType.enabled {return (false, nil, nil, nil)}
+
+                if let lastBgReading = lastBgReading, let lastButOneBgReading = lastButOneBgReading {
+                    
+                    // lastbut one reading and last reading shoud be maximum 5 minutes apart
+                    if (lastBgReading.timeStamp.timeIntervalSince(lastButOneBgReading.timeStamp)) < 5 * 60 {
+
+                        // first check if calculatedValue > 0.0, never know that it's not been checked by caller
+                        if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
+                        // now do the actual check if alert is applicable or not
+                        if lastBgReading.calculatedValue - lastButOneBgReading.calculatedValue > Double(currentAlertEntry.value) {
+                            return (true, lastBgReading.unitizedDeltaString(previousBgReading: lastButOneBgReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), createAlertTitleForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), nil)
+                        } else {return (false, nil, nil, nil)}
+
+                    } else {return (false, nil, nil, nil)}
+                    
+                } else {return (false, nil, nil, nil)}
+
         case .missedreading:
             // if no valid lastbgreading then there's definitely no need to plan an alert
             guard let lastBgReading = lastBgReading else {return (false, nil, nil, nil)}
@@ -267,6 +375,10 @@ public enum AlertKind:Int, CaseIterable {
             return ConstantsNotifications.NotificationIdentifiersForCalibration.subsequentCalibrationRequest
         case .batterylow:
             return ConstantsNotifications.NotificationIdentifiersForAlerts.batteryLow
+        case .fastdrop:
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.fastDropAlert
+        case .fastrise:
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.fastRiseAlert
         }
     }
     
@@ -288,6 +400,10 @@ public enum AlertKind:Int, CaseIterable {
             return Texts_Alerts.calibrationNeededAlertTitle
         case .batterylow:
             return Texts_Alerts.batteryLowAlertTitle
+        case .fastdrop:
+            return Texts_Alerts.fastDropTitle
+        case .fastrise:
+            return Texts_Alerts.fastRiseTitle
         }
     }
     
@@ -295,8 +411,8 @@ public enum AlertKind:Int, CaseIterable {
     /// What is this text ?
     func valueUnitText(transmitterType:CGMTransmitterType?) -> String {
         switch self {
-            
-        case .verylow, .low, .high, .veryhigh:
+
+        case .verylow, .low, .high, .veryhigh, .fastdrop, .fastrise:
             return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl:Texts_Common.mmol
         case .missedreading:
             return Texts_Common.minutes
@@ -327,7 +443,12 @@ fileprivate func createAlertTitleForBgReadingAlerts(bgReading:BgReading, alertKi
         returnValue = returnValue + Texts_Alerts.veryLowAlertTitle
     case .veryhigh:
         returnValue = returnValue + Texts_Alerts.veryHighAlertTitle
-    default:
+    case .fastdrop:
+        returnValue = returnValue + Texts_Alerts.fastDropTitle
+    case .fastrise:
+        returnValue = returnValue + Texts_Alerts.fastRiseTitle
+        
+    case .missedreading, .calibration, .batterylow:
         return returnValue
     }
     

@@ -18,6 +18,8 @@ enum ConstantsNotifications {
         static let missedReadingAlert = "missedReadingAlert"
         /// battery low
         static let batteryLow = "batteryLow"
+        /// fast drop
+        static let fastdrop = "fastDrop"
     }
     
     /// identifiers for alert notifications
@@ -34,6 +36,10 @@ enum ConstantsNotifications {
         static let missedReadingAlert = "missedReadingAlert"
         /// battery low
         static let batteryLow = "batteryLow"
+        /// fast drop
+        static let fastDropAlert = "fastDropAlert"
+        /// fast rise
+        static let fastRiseAlert = "fastRiseAlert"
     }
     
     /// identifiers for calibration requests

@@ -137,28 +137,23 @@ public class AlertManager:NSObject {
                 if latestBgReadings.count > 1 {
                     lastButOneBgREading = latestBgReadings[1]
                 }
-                
-                
+
                 // alerts are checked in order of importance - there should be only one alert raised, except missed reading alert which will always be checked.
-                // first check very low alert
-                if (!checkAlertAndFire(alertKind: .verylow, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                    // very low not fired, check low alert - if very low alert snoozed, skip the check for low alert and continue to next step
-                    if getSnoozeParameters(alertKind: AlertKind.verylow).getSnoozeValue().isSnoozed || (!checkAlertAndFire(alertKind: .low, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                        //  low not fired, check very high alert
-                        if (!checkAlertAndFire(alertKind: .veryhigh, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                            // very high not fired, check high alert - if very high alert snoozed, skip the check for high alert and continue to next step
-                            if getSnoozeParameters(alertKind: AlertKind.veryhigh).getSnoozeValue().isSnoozed || (!checkAlertAndFire(alertKind: .high, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                                // very high not fired check calibration alert
-                                if (!checkAlertAndFire(alertKind: .calibration, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)) {
-                                    // finally let's check the battery level alert
-                                    _ = checkAlertAndFire(alertKind: .batterylow, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
-                                }
-                            }
-                        }
-                    }
-                }
-                // set missed reading alert, this will be a future planned alert
-                _ = checkAlertAndFire(alertKind: .missedreading, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
+                
+                // create helper to check and fire alerts
+                let checkAlertAndFireHelper = { (_ alertKind : AlertKind) -> Bool in self.checkAlertAndFire(alertKind: alertKind, lastBgReading: lastBgReading, lastButOneBgREading: lastButOneBgREading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo) }
+                
+                // specify the order in which alerts should be checked and group those with related snoozes
+                let alertGroupsByPreference: [[AlertKind]] = [[.fastdrop], [.verylow, .low], [.fastrise], [.veryhigh, .high], [.calibration], [.batterylow]]
+                
+                // only raise first alert group that's been tripped
+                _ = alertGroupsByPreference.first(where: { (alertGroup:[AlertKind]) -> Bool in
+                    checkAlertGroupAndFire(alertGroup, checkAlertAndFireHelper)
+                })
+                
+                // the missed reading alert will be a future planned alert
+                _ = checkAlertAndFireHelper(.missedreading)
+                
             } else {
                 trace("in checkAlerts, latestBgReadings is older than %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, maxAgeOfLastBgReadingInSeconds.description)
             }
@@ -257,6 +252,29 @@ public class AlertManager:NSObject {
     
     // MARK: - private helper functions
     
+    /// Checks group of alerts - Not to be used for alerts with delay (ie missedreading)
+    /// - parameters:
+    ///     - alertGroup : array of AlertKind, function loops through alerts, as soon as one of them is snoozed, returns false. This is for example to allow that low alert goes off while very low is snoozed. In this case the array will be .verylow, .low  .verylow will be checked first
+    ///     - checkAlertAndFireHelper : a function that will check the alert and if necessary fire (or plan it if for example missed reading alert)
+    /// - returns:
+    ///     - returns false early as soon as it finds a snoozed alert
+    ///     - if no alert is snoozed, then returns true if as soon as one of the  alerts in the array is triggered
+    private func checkAlertGroupAndFire(_ alertGroup:[AlertKind], _ checkAlertAndFireHelper: (_ : AlertKind) -> Bool) -> Bool {
+        
+        for(alertKind) in alertGroup {
+
+            // first check if the alert needs to fire, even if the alert would be snoozed, this will ensure logging.
+            if checkAlertAndFireHelper(alertKind) {return true}
+            
+            // if alertKind is snoozed then we don't want to check the next alert (example if verylow is snoozed then don't check low)
+            if getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed {return false}
+            
+        }
+        
+        return false
+        
+    }
+    
     /// will
     /// - remove any pending missed reading alert
     /// - create a new one repeating, repeat time will be equal to delay of first alert (that's what iOS allows us to do)
@@ -341,7 +359,7 @@ public class AlertManager:NSObject {
             // depending on alertKind, check if the alert is snoozed. For missedreading, behaviour for snoozed alert is different than for the other alerts
             switch alertKind {
                 
-            case .missedreading:// any alert type that would be configured with a delay
+            case .missedreading: // any alert type that would be configured with a delay
                 if let snoozePeriodInMinutes = getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes, let snoozeTimeStamp = getSnoozeParameters(alertKind: alertKind).snoozeTimeStamp {
                     
                     minimumDelayInSecondsToUse = -Int(Date().timeIntervalSince(Date(timeInterval: TimeInterval(snoozePeriodInMinutes * 60), since: snoozeTimeStamp)).rawValue)
@@ -349,7 +367,7 @@ public class AlertManager:NSObject {
 
                 } // if snoozePeriodInMinutes or snoozeTimeStamp is nil (which shouldn't be the case) continue without taking into account the snooze status
                 
-            case .calibration, .batterylow, .low, .high, .verylow, .veryhigh:
+            case .calibration, .batterylow, .low, .high, .verylow, .veryhigh, .fastdrop, .fastrise:
                 trace("in checkAlertAndFire, alert %{public}@ is currently snoozed", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
                 return false
             }

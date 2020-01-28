@@ -17,6 +17,12 @@ enum ConstantsDefaultAlertLevels {
     static let high = 170
     static let low = 70
     
+    // blood glucose fast drop delta alert in mgdl
+    static let fastdrop = 10
+
+    // blood glucose fast rise delta alert in mgdl
+    static let fastrise = 10
+    
     // in minutes, after how many minutes of now reading should alert be raised
     static let missedReading = 30
     
