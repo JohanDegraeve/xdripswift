@@ -169,7 +169,9 @@ public class BgReading: NSManagedObject {
             return "???";
         }
         
-        let value = currentSlope(previousBgReading: previousBgReading) * 5 * 60 * 1000;
+        // delta value recalculated aligned with time difference between previous and this reading
+        let value = currentSlope(previousBgReading: previousBgReading) * timeStamp.timeIntervalSince(previousBgReading.timeStamp) * 1000;
+
         if(abs(value) > 100){
             // a delta > 100 will not happen with real BG values -> problematic sensor data
             return "ERR";
