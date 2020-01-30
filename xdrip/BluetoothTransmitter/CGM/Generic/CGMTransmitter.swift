@@ -156,6 +156,25 @@ enum CGMTransmitterType:String, CaseIterable {
         }
     }
     
+    /// this function says if the user should be able to manually start the sensor.
+    ///
+    /// Would normally not be required, because if canDetectNewSensor returns true, then manual start shouldn't e necessary. However blucon automatic sensor start does not always work. So for this reason, this function is used.
+    func allowManualSensorStart() -> Bool {
+        
+        switch self {
+            
+        case .dexcomG4, .dexcomG5, .dexcomG6, .GNSentry, .Droplet1, .blueReader, .watlaa:
+            return true
+            
+        case .miaomiao, .Bubble:
+            return false
+        
+        case .Blucon:
+            return true
+            
+        }
+    }
+    
     func canWebOOP() -> Bool {
         
         //return false
