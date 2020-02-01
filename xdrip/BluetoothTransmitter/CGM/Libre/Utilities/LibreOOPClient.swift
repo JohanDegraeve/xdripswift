@@ -38,8 +38,11 @@ class LibreOOPClient {
             
             // define default result that will be returned in defer statement
             var finalResult:[GlucoseData] = []
+            
             let sensorTimeInMinutes:Int = 256 * (Int)(libreData.uint8(position: 317) & 0xFF) + (Int)(libreData.uint8(position: 316) & 0xFF)
             var errorDescription = errorDescription
+            
+            // before existing call callback function
             defer {
                 callback((finalResult, sensorState, sensorTimeInMinutes, errorDescription))
             }
@@ -53,31 +56,45 @@ class LibreOOPClient {
                 return
             }
             
-            //here we assume success, data is not changed,
-            //and we trust that the remote endpoint returns correct data for the sensor
-            let last16 = trendMeasurements(bytes: libreData, date: Date(), timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: libreDerivedAlgorithmParameters)
-            
-            let glucoseData = trendToLibreGlucose(last16)
+            // iterates through glucoseData, compares timestamp, if still higher than timeStampLastBgReading (+ 30 seconds) then adds it to finalResult
+            let processGlucoseData = { (glucoseData: [LibreRawGlucoseData], timeStampLastAddedGlucoseData: Date) in
                 
-            // return only readings that are at least 5 minutes away from each other, except the first, same approach as in LibreDataParser.parse
-            
-            // we will add the most recent readings, but then we'll only add the readings that are at least 5 minutes apart (giving 10 seconds spare)
-            // for that variable timeStampLastAddedGlucoseData is used. It's initially set to now + 5 minutes
-            var timeStampLastAddedGlucoseData = Date().toMillisecondsAsDouble() + 5 * 60 * 1000
-            
-            for glucose in glucoseData {
+                var timeStampLastAddedGlucoseDataAsDouble = timeStampLastAddedGlucoseData.toMillisecondsAsDouble()
                 
-                let timeStampOfNewGlucoseData = glucose.timeStamp
-                if timeStampOfNewGlucoseData.toMillisecondsAsDouble() > (timeStampLastBgReading.toMillisecondsAsDouble() + 30000.0) {
-                    if timeStampOfNewGlucoseData.toMillisecondsAsDouble() < timeStampLastAddedGlucoseData - (5 * 60 * 1000 - 10000) {
-                        timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData.toMillisecondsAsDouble()
-                        finalResult.append(glucose)
+                for glucose in glucoseData {
+                    
+                    let timeStampOfNewGlucoseData = glucose.timeStamp
+                    if timeStampOfNewGlucoseData.toMillisecondsAsDouble() > (timeStampLastBgReading.toMillisecondsAsDouble() + 30000.0) {
+
+                        // return only readings that are at least 5 minutes away from each other, except the first, same approach as in LibreDataParser.parse
+                        if timeStampOfNewGlucoseData.toMillisecondsAsDouble() < timeStampLastAddedGlucoseDataAsDouble - (5 * 60 * 1000 - 10000) {
+                            timeStampLastAddedGlucoseDataAsDouble = timeStampOfNewGlucoseData.toMillisecondsAsDouble()
+                            finalResult.append(glucose)
+                        }
+                        
+                    } else {
+                        break
                     }
-                } else {
-                    break
                 }
+                
             }
 
+            // get last16 from trend data
+            let last16 = trendMeasurements(bytes: libreData, date: Date(), timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: libreDerivedAlgorithmParameters)
+
+            // process last16, new readings should be smaller than now + 5 minutes
+            processGlucoseData(trendToLibreGlucose(last16), Date(timeIntervalSinceNow: 5 * 60))
+            
+            // get last 32 in history data, with date either again now = 5 minutes or timestamp of last reading in last16
+            var lastTimeStamp = Date(timeIntervalSinceNow: 5 * 60)
+            if finalResult.count > 0, let last = finalResult.last {
+                lastTimeStamp = last.timeStamp
+            }
+            let last32 = historyMeasurements(bytes: libreData, date: lastTimeStamp, LibreDerivedAlgorithmParameterSet: libreDerivedAlgorithmParameters)
+            
+            // process last 32
+            processGlucoseData(trendToLibreGlucose(last32), lastTimeStamp)
+            
         }
     }
 
@@ -238,7 +255,48 @@ class LibreOOPClient {
         return measurements
     }
     
+    private static func historyMeasurements(bytes: Data, date: Date, _ offset: Double = 0.0, slope: Double = 0.1, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameters?) -> [LibreMeasurement] {
+        //    let headerRange =   0..<24   //  24 bytes, i.e.  3 blocks a 8 bytes
+        let bodyRange   =  24..<320  // 296 bytes, i.e. 37 blocks a 8 bytes
+        //    let footerRange = 320..<344  //  24 bytes, i.e.  3 blocks a 8 bytes
+        
+        let body   = Array(bytes[bodyRange])
+        let nextHistoryBlock = Int(body[3])
+        let minutesSinceStart = Int(body[293]) << 8 + Int(body[292])
+        var measurements = [LibreMeasurement]()
+        // History data is stored in body from byte 100 to byte 100+192-1=291 in units of 6 bytes. Index on data such that most recent block is first.
+        for blockIndex in 0..<32 {
+            
+            var index = 100 + (nextHistoryBlock - 1 - blockIndex) * 6 // runs backwards
+            if index < 100 {
+                index = index + 192 // if end of ring buffer is reached shift to beginning of ring buffer
+            }
+            
+            let range = index..<index+6
+            let measurementBytes = Array(body[range])
+            //            let measurementDate = dateOfMostRecentHistoryValue().addingTimeInterval(Double(-900 * blockIndex)) // 900 = 60 * 15
+            //            let measurement = Measurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate)
+            let (date, counter) = dateOfMostRecentHistoryValue(minutesSinceStart: minutesSinceStart, nextHistoryBlock: nextHistoryBlock, date: date)
+            
+            let final = date.addingTimeInterval(Double(-900 * blockIndex))
+            let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, counter: counter - blockIndex * 15, date: final, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
+            measurements.append(measurement)
+        }
+        return measurements
+    }
     
+    private static func dateOfMostRecentHistoryValue(minutesSinceStart: Int, nextHistoryBlock: Int, date: Date) -> (date: Date, counter: Int) {
+        // Calculate correct date for the most recent history value.
+        //        date.addingTimeInterval( 60.0 * -Double( (minutesSinceStart - 3) % 15 + 3 ) )
+        let nextHistoryIndexCalculatedFromMinutesCounter = ( (minutesSinceStart - 3) / 15 ) % 32
+        let delay = (minutesSinceStart - 3) % 15 + 3 // in minutes
+        if nextHistoryIndexCalculatedFromMinutesCounter == nextHistoryBlock {
+            return (date: date.addingTimeInterval( 60.0 * -Double(delay) ), counter: minutesSinceStart - delay)
+        } else {
+            return (date: date.addingTimeInterval( 60.0 * -Double(delay - 15)), counter: minutesSinceStart - delay)
+        }
+    }
+
     private static func trendToLibreGlucose(_ measurements: [LibreMeasurement]) -> [LibreRawGlucoseData]{
         
         var origarr = [LibreRawGlucoseData]()
