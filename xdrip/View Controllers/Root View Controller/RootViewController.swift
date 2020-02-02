@@ -74,8 +74,9 @@ final class RootViewController: UIViewController {
                     // valuueLabel text should not be strikethrough (might still be strikethrough in case latest reading is older than 10 minutes
                     self.valueLabelOutlet.attributedText = nil
                     // set value to value of latest chartPoint
-                    self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                    
+
+                    self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+
                     // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
                     self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
                     self.minutesLabelOutlet.textColor = UIColor.red
