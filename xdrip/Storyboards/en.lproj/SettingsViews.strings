@@ -7,6 +7,7 @@
 "settingsviews_transmittertype" = "Transmitter Type";
 "settingsviews_transmitterid" = "Transmitter Id";
 "settingsviews_givetransmitterid" = "Enter Transmitter Id";
+"transmitterId8OrHigherNotSupported" = "Transmitters with id 8G or higher are not supported !";
 "settingsviews_sectiontitlealerting" = "Alerting";
 "settingsviews_row_alert_types" = "Alert Types";
 "settingsviews_row_alerts" = "Alerts";

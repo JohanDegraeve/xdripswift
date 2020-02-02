@@ -51,7 +51,23 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
                     self.setTransmitterIdAndDexcomShareSerialNumber(id: transmitterIdUpper)
                 }
                 
-            }, cancelHandler: nil, inputValidator: nil)
+            }, cancelHandler: nil, inputValidator: { (transmitterId) in
+                
+                if transmitterId.count >= 2 {
+                    // convert to upper
+                    let transmitterIdUpper = transmitterId.uppercased()
+                    
+                    if transmitterIdUpper.compare("8G") == .orderedAscending {
+                        return nil
+                    } else {
+                        return Texts_SettingsView.transmitterId8OrHigherNotSupported
+                    }
+                }
+                
+                // more checks can be added later , like length of transmitter id
+                return nil
+                
+            })
             
         case .transmitterType:
             var data = [String]()

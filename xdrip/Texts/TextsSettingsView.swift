@@ -98,6 +98,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "Web OOP", comment: "transmitter settings, title of the dialogs where site and token are asked")
     }()
     
+    static let transmitterId8OrHigherNotSupported: String = {
+        return NSLocalizedString("transmitterId8OrHigherNotSupported", tableName: filename, bundle: Bundle.main, value: "Transmitters with id 8G or higher are not supported !", comment: "User sets a transmitter id with id 8G or higher. This is not supported")
+    }()
+    
     // MARK: - Section Alerts
     
     static let sectionTitleAlerting: String = {
