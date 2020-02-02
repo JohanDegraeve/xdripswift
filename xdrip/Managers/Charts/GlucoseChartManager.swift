@@ -4,7 +4,7 @@ import SwiftCharts
 import os.log
 import UIKit
 
-public final class GlucoseChartManager {
+public final class GlucoseChartManager: NSObject {
     
     // MARK: - public properties
     
@@ -136,6 +136,12 @@ public final class GlucoseChartManager {
         // operationQueue will be queue of blocks that gets readings and updates glucoseChartPoints, startDate and endDate. To avoid race condition, the operations should be one after the other
         operationQueue.maxConcurrentOperationCount = 1
 
+        super.init()
+        
+        // update of unit requires glucoseChartPoints to be set to 0
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
+        
+
     }
     
     // MARK: - public functions
@@ -230,6 +236,7 @@ public final class GlucoseChartManager {
                 self.startDate = startDateToUse
                 self.glucoseChartPoints = newGlucoseChartPointsToPrepend + (reUseExistingChartPointList ? self.glucoseChartPoints : [ChartPoint]()) + newGlucoseChartPointsToAppend
                 
+
                 // update the chart outlet
                 chartOutlet.reloadChart()
                 
@@ -289,6 +296,28 @@ public final class GlucoseChartManager {
             
         }
         
+    }
+    
+    // MARK:- observe function
+    
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if let keyPath = keyPath {
+            
+            if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
+                
+                switch keyPathEnum {
+                    
+                case UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
+                    glucoseChartPoints = []
+                    
+                default:
+                    break
+                    
+                }
+            }
+            
+        }
     }
 
     // MARK: - private functions
