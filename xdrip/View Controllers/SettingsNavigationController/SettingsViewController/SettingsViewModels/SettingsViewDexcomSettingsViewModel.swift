@@ -57,10 +57,10 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
             return SettingsSelectedRowAction.nothing
             
         case .dexcomShareAccountName:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelDexcomShareAccountName, message: Texts_SettingsView.giveDexcomShareAccountName, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName.toNilIfLength0()}, cancelHandler: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelDexcomShareAccountName, message: Texts_SettingsView.giveDexcomShareAccountName, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .dexcomSharePassword:
-            return SettingsSelectedRowAction.askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password.toNilIfLength0()}, cancelHandler: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .useUSDexcomShareurl:
             return SettingsSelectedRowAction.nothing
@@ -80,7 +80,7 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
                     UserDefaults.standard.dexcomShareSerialNumber = serialNumberUpper.toNilIfLength0()
                 }
 
-            }, cancelHandler: nil)
+            }, cancelHandler: nil, inputValidator: nil)
             
         case .useSchedule:
             return .nothing

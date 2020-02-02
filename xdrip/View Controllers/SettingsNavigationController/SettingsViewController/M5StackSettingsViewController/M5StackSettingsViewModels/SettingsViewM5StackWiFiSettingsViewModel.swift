@@ -147,7 +147,7 @@ struct SettingsViewM5StackWiFiSettingsViewModel: SettingsViewModelProtocol {
             titlePart = Texts_Common.password
         }
         
-        return SettingsSelectedRowAction.askText(title: Texts_Common.WiFi + " " + titlePart + " " + wifiNumberAsInt!.description, message: nil, keyboardType: .default, text: text, placeHolder: "", actionTitle: nil, cancelTitle: nil, actionHandler: actionHandler!, cancelHandler: nil)
+        return SettingsSelectedRowAction.askText(title: Texts_Common.WiFi + " " + titlePart + " " + wifiNumberAsInt!.description, message: nil, keyboardType: .default, text: text, placeHolder: "", actionTitle: nil, cancelTitle: nil, actionHandler: actionHandler!, cancelHandler: nil, inputValidator: nil)
     }
     
 }

@@ -51,7 +51,7 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
                     self.setTransmitterIdAndDexcomShareSerialNumber(id: transmitterIdUpper)
                 }
                 
-            }, cancelHandler: nil)
+            }, cancelHandler: nil, inputValidator: nil)
             
         case .transmitterType:
             var data = [String]()
@@ -78,10 +78,10 @@ struct SettingsViewTransmitterSettingsViewModel:SettingsViewModelProtocol {
             return SettingsSelectedRowAction.nothing
 
         case .webOOPsite:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelWebOOP, message: Texts_SettingsView.labelWebOOPSiteExplainingText, keyboardType: .URL, text: UserDefaults.standard.webOOPSite, placeHolder: Texts_Common.default0, actionTitle: nil, cancelTitle: nil, actionHandler: {(oopwebsiteurl:String) in UserDefaults.standard.webOOPSite = oopwebsiteurl.toNilIfLength0()}, cancelHandler: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelWebOOP, message: Texts_SettingsView.labelWebOOPSiteExplainingText, keyboardType: .URL, text: UserDefaults.standard.webOOPSite, placeHolder: Texts_Common.default0, actionTitle: nil, cancelTitle: nil, actionHandler: {(oopwebsiteurl:String) in UserDefaults.standard.webOOPSite = oopwebsiteurl.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .webOOPtoken:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelWebOOP, message: Texts_SettingsView.labelWebOOPtokenExplainingText, keyboardType: .default, text: UserDefaults.standard.webOOPtoken, placeHolder: Texts_Common.default0, actionTitle: nil, cancelTitle: nil, actionHandler: {(oopwebtoken:String) in UserDefaults.standard.webOOPtoken = oopwebtoken.toNilIfLength0()}, cancelHandler: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelWebOOP, message: Texts_SettingsView.labelWebOOPtokenExplainingText, keyboardType: .default, text: UserDefaults.standard.webOOPtoken, placeHolder: Texts_Common.default0, actionTitle: nil, cancelTitle: nil, actionHandler: {(oopwebtoken:String) in UserDefaults.standard.webOOPtoken = oopwebtoken.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
 
         }
     }

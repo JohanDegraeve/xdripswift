@@ -68,12 +68,23 @@ class SettingsViewUtilities {
             
             switch selectedRowAction {
                 
-            case let .askText(title, message, keyboardType, text, placeHolder, actionTitle, cancelTitle, actionHandler, cancelHandler):
+            case let .askText(title, message, keyboardType, text, placeHolder, actionTitle, cancelTitle, actionHandler, cancelHandler, inputValidator):
                 
                 let alert = UIAlertController(title: title, message: message, keyboardType: keyboardType, text: text, placeHolder: placeHolder, actionTitle: actionTitle, cancelTitle: cancelTitle, actionHandler: { (text:String) in
                     
-                    // do the action
-                    actionHandler(text)
+                    if let inputValidator = inputValidator, let errorMessage = inputValidator(text) {
+                        
+                        // need to show the error message
+                        let alert = UIAlertController(title: Texts_Common.warning, message: errorMessage, actionHandler: nil)
+                        
+                        uIViewController.present(alert, animated: true, completion: nil)
+                        
+                    } else {
+
+                        // do the action
+                        actionHandler(text)
+
+                    }
                     
                     // check if refresh is needed, either complete settingsview or individual section
                     self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)

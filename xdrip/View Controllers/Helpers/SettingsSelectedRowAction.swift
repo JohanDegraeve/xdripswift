@@ -25,9 +25,10 @@ enum SettingsSelectedRowAction {
     /// - text to show in the textfield
     /// - actionTitle: text in the button that allows the user to confirm the input (Example 'Ok'), if nil then default value "Ok" will be used
     /// - cancelTitle: text in the button that allows the user to cancel the input (Example 'Cancel'), if nil then default value "Cancel" will be used
-    /// - actionHandler: code to execute when user confirms input, with text that was entered by user, text is not optional here
-    /// - cancelHandler: code to execute when user cancels input
-    case askText (title:String?, message:String?, keyboardType:UIKeyboardType?, text:String?, placeHolder:String?, actionTitle:String?, cancelTitle:String?, actionHandler: ((_ text: String) -> Void), cancelHandler: (() -> Void)?)
+    /// - actionHandler: code to execute when user confirms input, with text that was entered by user, text is not optional here - actionHandler will not be executed if there's an inputValidator and that inputValidator returns false
+    /// - cancelHandler: code to execute when user cancels input - if nil then no validation must be done
+    /// - inputValidator : closure to execute to validate the input, input a string and returns either nil if validation was ok or a string giving the error message to show to the user if validation fails - if inputValidator = nil then not validation is done
+    case askText (title:String?, message:String?, keyboardType:UIKeyboardType?, text:String?, placeHolder:String?, actionTitle:String?, cancelTitle:String?, actionHandler: ((_ text: String) -> Void), cancelHandler: (() -> Void)?, inputValidator: ((String) -> String?)?)
     
     /// when clicked, the function parameter needs to be called
     ///

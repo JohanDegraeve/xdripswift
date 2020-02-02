@@ -68,7 +68,7 @@ struct SettingsViewM5StackBluetoothSettingsViewModel: SettingsViewModelProtocol 
                         UserDefaults.standard.m5StackBlePassword = blepassword.toNilIfLength0()
                     }
                 
-            }, cancelHandler: nil)
+            }, cancelHandler: nil, inputValidator: nil)
         }
     }
     

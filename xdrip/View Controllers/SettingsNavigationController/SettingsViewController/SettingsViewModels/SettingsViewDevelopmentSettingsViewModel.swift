@@ -138,7 +138,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                     UserDefaults.standard.G6v2ScalingFactor1 = factorAsDouble.description
                 }
                 
-            }, cancelHandler: nil)
+            }, cancelHandler: nil, inputValidator: nil)
 
         case .G6v2ScalingFactor2:
             
@@ -150,7 +150,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                 }
                 
 
-            }, cancelHandler: nil)
+            }, cancelHandler: nil, inputValidator: nil)
 
         case .NSLogEnabled, .OSLogEnabled:
             return .nothing
