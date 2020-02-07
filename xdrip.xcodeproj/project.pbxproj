@@ -14,6 +14,26 @@
 		86B97E4223C3D18B0055F54C /* WebServicesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B97E4123C3D18B0055F54C /* WebServicesManager.swift */; };
 		86B97E4723C3D4270055F54C /* ca.der in Resources */ = {isa = PBXBuildFile; fileRef = 86B97E4523C3D4260055F54C /* ca.der */; };
 		86B97E4823C3D4270055F54C /* localhost.p12 in Resources */ = {isa = PBXBuildFile; fileRef = 86B97E4623C3D4270055F54C /* localhost.p12 */; };
+		86D3B96B23EDC434008F13E3 /* xdripKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 86D3B96923EDC434008F13E3 /* xdripKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		86D3B96F23EDC4C3008F13E3 /* BgReadingsAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A818227DEC92004BA588 /* BgReadingsAccessor.swift */; };
+		86D3B97023EDC4C3008F13E3 /* BgReading+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */; };
+		86D3B97123EDC4C3008F13E3 /* BgReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */; };
+		86D3B97223EDC4C3008F13E3 /* xdrip.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */; };
+		86D3B97323EDC616008F13E3 /* ConstantsCoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585622EDB754007F5B5D /* ConstantsCoreData.swift */; };
+		86D3B97423EDC616008F13E3 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF4E229BF43A005C1E43 /* CoreDataManager.swift */; };
+		86D3B97523EDC67B008F13E3 /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */; };
+		86D3B97623EDC67B008F13E3 /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */; };
+		86D3B97723EDC67B008F13E3 /* Sensor+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */; };
+		86D3B97823EDC67B008F13E3 /* Sensor+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */; };
+		86D3B97923EDC6F6008F13E3 /* UniqueId.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CA821BBE3010082976B /* UniqueId.swift */; };
+		86D3B97A23EDC746008F13E3 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C8121B723BC0082976B /* Date.swift */; };
+		86D3B97B23EDC7A5008F13E3 /* ConstantsLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585E22EDB81E007F5B5D /* ConstantsLog.swift */; };
+		86D3B97C23EDE048008F13E3 /* ApplicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF55229BF43A005C1E43 /* ApplicationManager.swift */; };
+		86D3B97D23EDE09B008F13E3 /* TextsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */; };
+		86D3B97E23EDE0D0008F13E3 /* Trace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C5EBE622F38F0E00563B5F /* Trace.swift */; };
+		86D3B97F23EDE10A008F13E3 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4D21ED450300ECF0C0 /* Double.swift */; };
+		86D3B98023EDE144008F13E3 /* ConstantsBGGraphBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */; };
+		86D3B98123EDE144008F13E3 /* ConstantsBloodGlucose.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585222EDB602007F5B5D /* ConstantsBloodGlucose.swift */; };
 		A48D2DE552F4A356AA32746A /* Pods_xdrip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */; };
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
 		F8025C1321DA683400ECF0C0 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1221DA683400ECF0C0 /* Data.swift */; };
@@ -268,6 +288,9 @@
 		86B97E4123C3D18B0055F54C /* WebServicesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebServicesManager.swift; sourceTree = "<group>"; };
 		86B97E4523C3D4260055F54C /* ca.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = ca.der; sourceTree = "<group>"; };
 		86B97E4623C3D4270055F54C /* localhost.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = localhost.p12; sourceTree = "<group>"; };
+		86D3B96723EDC434008F13E3 /* xdripKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = xdripKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		86D3B96923EDC434008F13E3 /* xdripKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xdripKit.h; sourceTree = "<group>"; };
+		86D3B96A23EDC434008F13E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E2648F65F347D56D7DFFFAB7 /* Pods-xdrip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.release.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.release.xcconfig"; sourceTree = "<group>"; };
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
 		F8025C1221DA683400ECF0C0 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
@@ -675,6 +698,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		86D3B96423EDC434008F13E3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8AC425721ADEBD60078C348 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -720,6 +750,15 @@
 				86B97E4623C3D4270055F54C /* localhost.p12 */,
 			);
 			path = Certificates;
+			sourceTree = "<group>";
+		};
+		86D3B96823EDC434008F13E3 /* xdripKit */ = {
+			isa = PBXGroup;
+			children = (
+				86D3B96923EDC434008F13E3 /* xdripKit.h */,
+				86D3B96A23EDC434008F13E3 /* Info.plist */,
+			);
+			path = xdripKit;
 			sourceTree = "<group>";
 		};
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
@@ -999,6 +1038,7 @@
 		F8AC425121ADEBD60078C348 = {
 			isa = PBXGroup;
 			children = (
+				86D3B96823EDC434008F13E3 /* xdripKit */,
 				F8AC425B21ADEBD60078C348 /* Products */,
 				F8AC425C21ADEBD60078C348 /* xdrip */,
 				F85DC29B21CFCEB800B9F74A /* Recovered References */,
@@ -1011,6 +1051,7 @@
 			isa = PBXGroup;
 			children = (
 				F8AC425A21ADEBD60078C348 /* xdrip.app */,
+				86D3B96723EDC434008F13E3 /* xdripKit.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1601,7 +1642,36 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		86D3B96223EDC434008F13E3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				86D3B96B23EDC434008F13E3 /* xdripKit.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		86D3B96623EDC434008F13E3 /* xdripKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 86D3B96E23EDC434008F13E3 /* Build configuration list for PBXNativeTarget "xdripKit" */;
+			buildPhases = (
+				86D3B96223EDC434008F13E3 /* Headers */,
+				86D3B96323EDC434008F13E3 /* Sources */,
+				86D3B96423EDC434008F13E3 /* Frameworks */,
+				86D3B96523EDC434008F13E3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = xdripKit;
+			productName = xdripKit;
+			productReference = 86D3B96723EDC434008F13E3 /* xdripKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		F8AC425921ADEBD60078C348 /* xdrip */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F8AC426E21ADEBD70078C348 /* Build configuration list for PBXNativeTarget "xdrip" */;
@@ -1628,10 +1698,14 @@
 		F8AC425221ADEBD60078C348 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 1010;
 				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = "Johan Degraeve";
 				TargetAttributes = {
+					86D3B96623EDC434008F13E3 = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
 					F8AC425921ADEBD60078C348 = {
 						CreatedOnToolsVersion = 10.1;
 						LastSwiftMigration = 1030;
@@ -1672,11 +1746,19 @@
 			projectRoot = "";
 			targets = (
 				F8AC425921ADEBD60078C348 /* xdrip */,
+				86D3B96623EDC434008F13E3 /* xdripKit */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		86D3B96523EDC434008F13E3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8AC425821ADEBD60078C348 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1785,6 +1867,32 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		86D3B96323EDC434008F13E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				86D3B98023EDE144008F13E3 /* ConstantsBGGraphBuilder.swift in Sources */,
+				86D3B98123EDE144008F13E3 /* ConstantsBloodGlucose.swift in Sources */,
+				86D3B97F23EDE10A008F13E3 /* Double.swift in Sources */,
+				86D3B97E23EDE0D0008F13E3 /* Trace.swift in Sources */,
+				86D3B97D23EDE09B008F13E3 /* TextsCommon.swift in Sources */,
+				86D3B97C23EDE048008F13E3 /* ApplicationManager.swift in Sources */,
+				86D3B97B23EDC7A5008F13E3 /* ConstantsLog.swift in Sources */,
+				86D3B97A23EDC746008F13E3 /* Date.swift in Sources */,
+				86D3B97923EDC6F6008F13E3 /* UniqueId.swift in Sources */,
+				86D3B97523EDC67B008F13E3 /* Calibration+CoreDataClass.swift in Sources */,
+				86D3B97623EDC67B008F13E3 /* Calibration+CoreDataProperties.swift in Sources */,
+				86D3B97723EDC67B008F13E3 /* Sensor+CoreDataClass.swift in Sources */,
+				86D3B97823EDC67B008F13E3 /* Sensor+CoreDataProperties.swift in Sources */,
+				86D3B97323EDC616008F13E3 /* ConstantsCoreData.swift in Sources */,
+				86D3B97423EDC616008F13E3 /* CoreDataManager.swift in Sources */,
+				86D3B96F23EDC4C3008F13E3 /* BgReadingsAccessor.swift in Sources */,
+				86D3B97023EDC4C3008F13E3 /* BgReading+CoreDataClass.swift in Sources */,
+				86D3B97123EDC4C3008F13E3 /* BgReading+CoreDataProperties.swift in Sources */,
+				86D3B97223EDC4C3008F13E3 /* xdrip.xcdatamodeld in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8AC425621ADEBD60078C348 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2276,6 +2384,60 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		86D3B96C23EDC434008F13E3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = xdripKit/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = br.cfj.xdripKit;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		86D3B96D23EDC434008F13E3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = xdripKit/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = br.cfj.xdripKit;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 		F8AC426C21ADEBD70078C348 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2452,6 +2614,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		86D3B96E23EDC434008F13E3 /* Build configuration list for PBXNativeTarget "xdripKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				86D3B96C23EDC434008F13E3 /* Debug */,
+				86D3B96D23EDC434008F13E3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F8AC425521ADEBD60078C348 /* Build configuration list for PBXProject "xdrip" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
