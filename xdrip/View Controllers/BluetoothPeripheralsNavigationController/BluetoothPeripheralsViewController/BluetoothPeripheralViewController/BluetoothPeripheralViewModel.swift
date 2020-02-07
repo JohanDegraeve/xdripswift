@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
+protocol BluetoothPeripheralViewModel {
     
     /// to be called before opening the actual viewcontroller or after discovering a new bluetoothperipheral
     /// - parameters :
@@ -20,8 +20,8 @@ protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     /// updates the contents of a cell, for setting with rawValue withSettingRawValue
     func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem)
     
-    /// user clicked a row, this function does the necessary
-    func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem)
+    /// user clicked a row, this function returns an instance of SettingsSelectedRowAction, can be run with SettingsViewUtilities.runSelectedRowAction
+    func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem) -> SettingsSelectedRowAction
     
     /// - get number of settings in the viewmodel, in specified section number
     /// - this is the same as the number of rows in the section

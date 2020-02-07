@@ -37,6 +37,17 @@
         <relationship name="calibration" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Calibration" inverseName="bgreadings" inverseEntity="Calibration"/>
         <relationship name="sensor" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" inverseName="readings" inverseEntity="Sensor"/>
     </entity>
+    <entity name="BLEPeripheral" representedClassName=".BLEPeripheral" syncable="YES">
+        <attribute name="address" attributeType="String"/>
+        <attribute name="alias" optional="YES" attributeType="String"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="parameterUpdateNeededAtNextConnect" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="transmitterId" optional="YES" attributeType="String"/>
+        <relationship name="dexcomG5" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="DexcomG5" inverseName="blePeripheral" inverseEntity="DexcomG5"/>
+        <relationship name="m5Stack" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="M5Stack" inverseName="blePeripheral" inverseEntity="M5Stack"/>
+        <relationship name="watlaa" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="Watlaa" inverseName="blePeripheral" inverseEntity="Watlaa"/>
+    </entity>
     <entity name="Calibration" representedClassName=".Calibration" syncable="YES">
         <attribute name="adjustedRawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="bg" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -55,18 +66,19 @@
         <relationship name="bgreadings" toMany="YES" deletionRule="Deny" destinationEntity="BgReading" inverseName="calibration" inverseEntity="BgReading"/>
         <relationship name="sensor" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" inverseName="calibrations" inverseEntity="Sensor"/>
     </entity>
+    <entity name="DexcomG5" representedClassName=".DexcomG5" syncable="YES">
+        <attribute name="firmwareVersion" optional="YES" attributeType="String"/>
+        <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="dexcomG5" inverseEntity="BLEPeripheral"/>
+    </entity>
     <entity name="M5Stack" representedClassName=".M5Stack" syncable="YES">
-        <attribute name="address" attributeType="String"/>
-        <attribute name="alias" optional="YES" attributeType="String"/>
         <attribute name="backGroundColor" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="blepassword" optional="YES" attributeType="String"/>
         <attribute name="brightness" optional="YES" attributeType="Integer 16" defaultValueString="100" usesScalarValueType="YES"/>
         <attribute name="connectToWiFi" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="isM5StickC" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="name" attributeType="String"/>
         <attribute name="rotation" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="textcolor" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="m5Stack" inverseEntity="BLEPeripheral"/>
     </entity>
     <entity name="Sensor" representedClassName=".Sensor" syncable="YES">
         <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -77,18 +89,17 @@
         <relationship name="readings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BgReading" inverseName="sensor" inverseEntity="BgReading"/>
     </entity>
     <entity name="Watlaa" representedClassName=".Watlaa" syncable="YES">
-        <attribute name="address" attributeType="String"/>
-        <attribute name="alias" optional="YES" attributeType="String"/>
-        <attribute name="name" attributeType="String"/>
-        <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES"/>
+        <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="watlaa" inverseEntity="BLEPeripheral"/>
     </entity>
     <elements>
         <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
+        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="178"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
-        <element name="M5Stack" positionX="-657" positionY="180" width="128" height="208"/>
+        <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="73"/>
+        <element name="M5Stack" positionX="-657" positionY="180" width="128" height="163"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="133"/>
-        <element name="Watlaa" positionX="-639" positionY="207" width="128" height="103"/>
+        <element name="Watlaa" positionX="-639" positionY="207" width="128" height="58"/>
     </elements>
 </model>

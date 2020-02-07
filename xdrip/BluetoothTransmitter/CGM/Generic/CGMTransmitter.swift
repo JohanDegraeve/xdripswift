@@ -8,11 +8,6 @@ import CoreBluetooth
 /// An exception is for example initiatePairing, which is implemented in CGMG5Transmitter.swift, because that transmitter needs to send a message to the transmitter that will cause the app to request the user to accept the pairing
 protocol CGMTransmitter:AnyObject {
     
-    /// get device address, cgmtransmitters should also derive from BlueToothTransmitter, hence no need to implement this function
-    ///
-    /// this function is implemented in class BluetoothTransmitter.swift, it's not necessary for transmitter types to implement this function (as new transmitterType class conform to protocol CGMTransmitter but also extend the BluetoothTransmitter class
-    func getAddress() -> String?
-    
     /// get device name, cgmtransmitters should also derive from BlueToothTransmitter, hence no need to implement this function
     ///
     /// this function is implemented in class BluetoothTransmitter.swift, it's not necessary for transmitter types to implement this function (as new transmitterType class conform to protocol CGMTransmitter but also extend the BluetoothTransmitter class
@@ -53,6 +48,11 @@ protocol CGMTransmitter:AnyObject {
     /// ---  for transmitters who support webOOP (Bubble, MiaoMiao, ..) this should be implemented
     func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String)
 
+    /// get cgmTransmitterType
+    ///
+    /// return value optional because watlaa also conforms to protocol CGMTransmitter although it's not really a CGMTransmitter
+    func cgmTransmitterType() -> CGMTransmitterType?
+    
 }
 
 /// cgm transmitter types
@@ -205,47 +205,6 @@ enum CGMTransmitterType:String, CaseIterable {
         case .watlaa:
             return false
             
-        }
-    }
-    
-    /// returns nil if id to validate has expected length and type of characters etc.
-    func validateTransimtterId(idtovalidate:String) -> String? {
-        switch self {
-            
-        case .dexcomG5, .dexcomG6:
-            //verify allowed chars
-            let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
-            if !idtovalidate.validate(withRegex: regex) {
-                return Texts_ErrorMessages.DexcomTransmitterIDInvalidCharacters
-            }
-            if idtovalidate.count != 6 {
-                return Texts_ErrorMessages.TransmitterIDShouldHaveLength6
-            }
-            return nil
-            
-        case .dexcomG4:
-            //verify allowed chars
-            let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
-            if !idtovalidate.validate(withRegex: regex) {
-                return Texts_ErrorMessages.DexcomTransmitterIDInvalidCharacters
-            }
-            if idtovalidate.count != 5 {
-                return Texts_ErrorMessages.TransmitterIDShouldHaveLength5
-            }
-            return nil
-            
-        case .miaomiao, .GNSentry, .Bubble, .Droplet1:
-            return nil
-            
-        case .Blucon:
-            // todo: validate transmitter id for blucon
-            return nil
-            
-        case .blueReader:
-            return nil
-            
-        case .watlaa:
-            return nil
         }
     }
     

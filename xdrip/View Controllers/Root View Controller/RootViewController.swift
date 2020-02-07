@@ -817,12 +817,12 @@ final class RootViewController: UIViewController {
                 
             case .dexcomG5:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, delegate: self)
+                    cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, cGMTransmitterDelegate: self)
                 }
                 
             case .dexcomG6:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG6Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, delegate: self)
+                    cgmTransmitter = CGMG6Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, cGMTransmitterDelegate: self)
                 }
                 
             case .miaomiao:

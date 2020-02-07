@@ -154,4 +154,8 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// this transmitter does not support oop web
     func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
 
+    func cgmTransmitterType() -> CGMTransmitterType? {
+        return .Droplet1
+    }
+    
 }

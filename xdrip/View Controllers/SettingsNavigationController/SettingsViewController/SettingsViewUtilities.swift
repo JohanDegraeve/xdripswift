@@ -63,8 +63,7 @@ class SettingsViewUtilities {
     /// - parameters:
     ///     - withViewModel : need to know if refresh of the table is needed, can be nil in case a viewmodel is not used (eg M5StackViewController)
     ///     - tableView : need to know if refresh of the table is needed, can be nil in case a viewmodel is not used (eg M5StackViewController)
-    static func runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction, forRowWithIndex rowIndex: Int, forSectionWithIndex sectionIndex: Int, withViewModel viewModel: SettingsViewModelProtocol?, tableView: UITableView?, forUIViewController uIViewController: UIViewController) {
-        
+    static func runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction, forRowWithIndex rowIndex: Int, forSectionWithIndex sectionIndex: Int, withSettingsViewModel settingsViewModel: SettingsViewModelProtocol?, tableView: UITableView?, forUIViewController uIViewController: UIViewController) {
             
             switch selectedRowAction {
                 
@@ -87,7 +86,7 @@ class SettingsViewUtilities {
                     }
                     
                     // check if refresh is needed, either complete settingsview or individual section
-                    self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
+                    self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: settingsViewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
                     
                 }, cancelHandler: cancelHandler)
                 
@@ -103,7 +102,7 @@ class SettingsViewUtilities {
                 function()
                 
                 // check if refresh is needed, either complete settingsview or individual section
-                self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
+                self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: settingsViewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
                 
             case let .selectFromList(title, data, selectedRow, actionTitle, cancelTitle, actionHandler, cancelHandler, didSelectRowHandler):
                 
@@ -112,7 +111,7 @@ class SettingsViewUtilities {
                     actionHandler(index)
                     
                     // check if refresh is needed, either complete settingsview or individual section
-                    self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
+                    self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: settingsViewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
                     
                 }, onCancelClick: {
                     if let cancelHandler = cancelHandler { cancelHandler() }
@@ -137,8 +136,15 @@ class SettingsViewUtilities {
                 let alert = UIAlertController(title: title, message: message, actionHandler: nil)
                 
                 uIViewController.present(alert, animated: true, completion: nil)
+                
+            case let .askConfirmation(title, message, actionHandler, cancelHandler):
+                
+                // first ask user confirmation
+                let alert = UIAlertController(title: title, message: message, actionHandler: actionHandler, cancelHandler: cancelHandler)
+                
+                uIViewController.present(alert, animated: true, completion: nil)
+                
             }
-            
 
     }
 
@@ -157,6 +163,10 @@ class SettingsViewUtilities {
             if viewModel.completeSettingsViewRefreshNeeded(index: rowIndex) {
                 tableView.reloadSections(IndexSet(integersIn: 0..<tableView.numberOfSections), with: .none)
             } else {
+                tableView.reloadSections(IndexSet(integer: sectionIndex), with: .none)
+            }
+        } else {
+            if let tableView = tableView {
                 tableView.reloadSections(IndexSet(integer: sectionIndex), with: .none)
             }
         }

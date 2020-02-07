@@ -245,6 +245,24 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///
     /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
     func reset(requested:Bool) {}
+ 
+    /// this transmitter supports oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+        webOOPEnabled = enabled
+        
+        // immediately request a new reading
+        // there's no check here to see if peripheral, characteristic, connection, etc.. exists, but that's no issue. If anything's missing, write will simply fail,
+        _ = sendStartReadingCommand()
+    }
+    
+    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {
+        self.oopWebToken = oopWebToken
+        self.oopWebSite = oopWebSite
+    }
+
+    func cgmTransmitterType() -> CGMTransmitterType? {
+        return .miaomiao
+    }
     
     // MARK: - helpers
     
@@ -255,20 +273,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         resendPacketCounter = 0
     }
     
-    /// this transmitter supports oopWeb
-    func setWebOOPEnabled(enabled: Bool) {
-        webOOPEnabled = enabled
-        
-        // immediately request a new reading
-        // there's no check here to see if peripheral, characteristic, connection, etc.. exists, but that's no issue. If anything's missing, write will simply fail,
-        _ = sendStartReadingCommand()
-    }
-
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {
-        self.oopWebToken = oopWebToken
-        self.oopWebSite = oopWebSite
-    }
-
 }
 
 fileprivate enum MiaoMiaoResponseType: UInt8 {

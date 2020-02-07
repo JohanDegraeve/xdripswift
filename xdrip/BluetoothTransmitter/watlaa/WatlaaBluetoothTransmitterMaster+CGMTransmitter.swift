@@ -18,4 +18,8 @@ extension WatlaaBluetoothTransmitterMaster: CGMTransmitter {
         // no web oop for watlaa as sensorid detection not supported
     }
     
+    func cgmTransmitterType() -> CGMTransmitterType? {
+        return nil
+    }
+    
 }

@@ -18,10 +18,7 @@ public class Watlaa: NSManagedObject {
         
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         
-        self.address = address
-        self.name = name
-        self.shouldconnect = true
-        self.alias = alias
+        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
         
     }
 

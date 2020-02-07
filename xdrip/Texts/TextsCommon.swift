@@ -133,4 +133,7 @@ class Texts_Common {
         return NSLocalizedString("invalidValue", tableName: filename, bundle: Bundle.main, value: "Invalid Value", comment: "whenever invalid value is given by user somewhere in a field")
     }()
     
+    static let firmware = {
+        return NSLocalizedString("firmware", tableName: filename, bundle: Bundle.main, value: "Firmware", comment: "for settings row, literally firmware")
+    }()
 }

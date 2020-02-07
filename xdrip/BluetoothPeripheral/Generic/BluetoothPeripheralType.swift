@@ -16,6 +16,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// watlaa master
     case watlaaMaster = "Watlaa master"
     
+    /// DexcomG5
+    case DexcomG5Type = "Dexcom G5"
+    
     /// - returns: the BluetoothPeripheralViewModel
     func viewModel() -> BluetoothPeripheralViewModel {
         
@@ -29,6 +32,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .watlaaMaster:
             return WatlaaMasterBluetoothPeripheralViewModel()
+            
+        case .DexcomG5Type:
+            return DexcomG5BluetoothPeripheralViewModel()
+            
         }
         
     }
@@ -48,23 +55,23 @@ enum BluetoothPeripheralType: String, CaseIterable {
 
         case .M5StickCType:
             
-            let newM5StickC = M5StickC(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
-
-            return newM5StickC
+            return M5StickC(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .watlaaMaster:
             
-            let newWatlaa = Watlaa(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            return Watlaa(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
-            return newWatlaa
+        case .DexcomG5Type:
+            
+            return DexcomG5(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         }
-        
         
     }
 
     /// to which category of bluetoothperipherals does this type belong (M5Stack, CGM, ...)
     func category() -> BluetoothPeripheralCategory {
+        
         switch self {
             
         case .M5StackType:
@@ -76,7 +83,100 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaaMaster:
             return .watlaa
             
+        case .DexcomG5Type:
+            return .CGM
+            
         }
     }
     
+    /// does the device need a transmitterID (currently only Dexcom and Blucon)
+    func needsTransmitterId() -> Bool {
+        
+        switch self {
+            
+        case .M5StackType, .M5StickCType, .watlaaMaster:
+            return false
+            
+        case .DexcomG5Type:
+            return true
+
+        }
+    }
+    
+    /// if true, then there's no need to aks the user to start the scanning. Scanning will start as soon as the BluetoothTransmitter is created
+    func transmitterStartsScanningAfterInit() -> Bool {
+        
+        switch self {
+            
+        case .M5StackType, .M5StickCType, .watlaaMaster:
+            return false
+
+        case .DexcomG5Type:
+            return true
+
+        }
+        
+    }
+    
+    /// - returns nil if id to validate has expected length and type of characters etc.
+    /// - returns error text if transmitterId is not ok
+    func validateTransimtterId(transmitterId:String) -> String? {
+        
+        switch self {
+            
+        case .DexcomG5Type: //.dexcomG6:
+            
+            // length for G5 is 6
+            if transmitterId.count != 6 {
+                return Texts_ErrorMessages.TransmitterIDShouldHaveLength6
+            }
+            
+            //verify allowed chars
+            let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
+            if !transmitterId.validate(withRegex: regex) {
+                return Texts_ErrorMessages.DexcomTransmitterIDInvalidCharacters
+            }
+            
+            // reject transmitters with id in range 8G or higher. These are Firefly's
+            // convert to upper
+            let transmitterIdUpper = transmitterId.uppercased()
+            if transmitterIdUpper.compare("8G") == .orderedDescending {
+                return Texts_SettingsView.transmitterId8OrHigherNotSupported
+            }
+
+            // validation successful
+            return nil
+            
+        /*case .dexcomG4:
+            //verify allowed chars
+            let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
+            if !transmitterId.validate(withRegex: regex) {
+                return Texts_ErrorMessages.DexcomTransmitterIDInvalidCharacters
+            }
+            if transmitterId.count != 5 {
+                return Texts_ErrorMessages.TransmitterIDShouldHaveLength5
+            }
+            return nil
+            
+        case .miaomiao, .GNSentry, .Bubble, .Droplet1:
+            return nil
+            
+        case .Blucon:
+            // todo: validate transmitter id for blucon
+            return nil
+            
+        case .blueReader:
+            return nil
+            
+        case .watlaa:
+            return nil*/
+            
+        case .M5StackType, .M5StickCType, .watlaaMaster:
+            // no transmitter id means no validation to do
+            return nil
+            
+        }
+        
+    }
+
 }

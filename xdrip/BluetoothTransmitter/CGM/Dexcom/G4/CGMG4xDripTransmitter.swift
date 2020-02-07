@@ -179,6 +179,10 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// this transmitter does not support oop web
     func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
     
+    func cgmTransmitterType() -> CGMTransmitterType? {
+        return .dexcomG4
+    }
+    
     // MARK: helper functions
     
     private func processxBridgeDataPacket(value:Data) -> (glucoseData:GlucoseData?, batteryLevel:Int?, transmitterID:String?) {

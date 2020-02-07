@@ -274,6 +274,10 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// this transmitter does not support oop web
     func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
 
+    func cgmTransmitterType() -> CGMTransmitterType? {
+        return .GNSentry
+    }
+    
     // MARK: CBCentralManager overriden functions
     
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {

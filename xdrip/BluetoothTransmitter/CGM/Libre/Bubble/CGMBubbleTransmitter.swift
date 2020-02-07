@@ -232,6 +232,20 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
     func reset(requested:Bool) {}
     
+    /// this transmitter supports oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+        webOOPEnabled = enabled
+    }
+    
+    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {
+        self.oopWebToken = oopWebToken
+        self.oopWebSite = oopWebSite
+    }
+    
+    func cgmTransmitterType() -> CGMTransmitterType? {
+        return .Bubble
+    }
+    
     // MARK: - helpers
     
     /// reset rxBuffer, reset startDate, stop packetRxMonitorTimer, set resendPacketCounter to 0
@@ -240,17 +254,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         startDate = Date()
     }
     
-    /// this transmitter supports oopWeb
-    func setWebOOPEnabled(enabled: Bool) {
-        webOOPEnabled = enabled
-    }
-    
-
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {
-        self.oopWebToken = oopWebToken
-        self.oopWebSite = oopWebSite
-    }
-
 }
 
 fileprivate enum BubbleResponseType: UInt8 {
