@@ -17,6 +17,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// the current connection status
     case connectionStatus = 3
     
+    /// transmitterID, only for devices that need it
+    case transmitterId = 4
+    
 }
 
 /// base class for UIViewController's that allow to edit specific type of bluetooth transmitters to show 
@@ -96,6 +99,11 @@ class BluetoothPeripheralViewController: UIViewController {
     /// temp storage of value while user is editing the BluetoothPeripheral attributes
     private var aliasTemporaryValue: String?
     
+    /// temp storage of transmitterId value while user is creating the DexcomG5
+    ///
+    /// this value can only be set once by the user, ie it can change from nil to a value. As soon as a value is set by the user, and if transmitterStartsScanningAfterInit returns true, then a transmitter will be created and scanning will start. If transmitterStartsScanningAfterInit returns false, then the user needs to start the scanning (there are no transmitters for the moment that use transmitter id and that do have transmitterStartsScanningAfterInit = false)
+    private var transmitterIdTempValue: String?
+    
     /// needed to support the bluetooth peripheral type specific attributes
     private var bluetoothPeripheralViewModel: BluetoothPeripheralViewModel!
     
@@ -114,7 +122,10 @@ class BluetoothPeripheralViewController: UIViewController {
         if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
             
             // temporary store the alias, user can change this name via the view, it will be stored back in the bluetoothPeripheralASNSObject only after clicking 'done' button
-            aliasTemporaryValue = bluetoothPeripheralASNSObject.getAlias()
+            aliasTemporaryValue = bluetoothPeripheralASNSObject.blePeripheral.alias
+            
+            // temporary store the transmitterId, user can change this name via the view, it will be stored back in the bluetoothPeripheralASNSObject only after clicking 'done' button
+            transmitterIdTempValue = bluetoothPeripheralAsNSObject?.blePeripheral.transmitterId
             
             // don't delete the BluetoothPeripheral when going back to prevous viewcontroller
             deleteBluetoothPeripheralWhenClosingViewController = false
@@ -142,7 +153,7 @@ class BluetoothPeripheralViewController: UIViewController {
             
             // set bluetoothPeripheralViewModel as delegate in bluetoothTransmitter
             if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false) {
-                bluetoothTransmitter.variableBluetoothTransmitterDelegate = bluetoothPeripheralViewModel
+                bluetoothTransmitter.variableBluetoothTransmitterDelegate = self
             }
             
         }
@@ -186,6 +197,20 @@ class BluetoothPeripheralViewController: UIViewController {
             
             // connect button should be disabled, as there's nothing to connect to
             connectButtonOutlet.disable()
+            
+            // unwrap expectedBluetoothPeripheralType
+            guard let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType else {return}
+            
+            // if it's a bluetoothperipheraltype for which the bluetoothTransmitter starts scnanning as soon as it's created, then there's no need to let the user to the start scanning, so let's hide the button - this will only be the case for transmitters that need transmitterId
+            if expectedBluetoothPeripheralType.transmitterStartsScanningAfterInit() {
+                scanButtonOutlet.isHidden = true
+            } else if expectedBluetoothPeripheralType.needsTransmitterId() && transmitterIdTempValue == nil {
+
+                // if it's a bluetoothperipheraltype that needs a transmitterId but there's no transmitterId set, then disable the scanbutton
+                scanButtonOutlet.disable()
+                
+            }
+            
 
         } else {
             
@@ -233,8 +258,10 @@ class BluetoothPeripheralViewController: UIViewController {
             bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralAsNSObject, createANewOneIfNecesssary: false)?.variableBluetoothTransmitterDelegate = nil
             
             // set alias temp value, possibly this is a nil value
-            bluetoothPeripheralAsNSObject.setAlias(aliasTemporaryValue)
+            bluetoothPeripheralAsNSObject.blePeripheral.alias = aliasTemporaryValue
             
+            // set transmitterId temp value, possibly this is a nil value
+            bluetoothPeripheralAsNSObject.blePeripheral.transmitterId = transmitterIdTempValue
             
             // temp values stored by viewmodel needs to be written to bluetoothPeripheralASNSObject
             bluetoothPeripheralViewModel.writeTempValues(to: bluetoothPeripheralAsNSObject)
@@ -252,13 +279,15 @@ class BluetoothPeripheralViewController: UIViewController {
         
     }
     
-    /// user clicks scan button
     private func scanForBluetoothPeripheral(type: BluetoothPeripheralType) {
         
         // if bluetoothPeripheralASNSObject is not nil, then there's already a BluetoothPeripheral for which scanning has started or which is already known from a previous scan (either connected or not connected) (bluetoothPeripheralASNSObject should be nil because if it is not, the scanbutton should not even be enabled, anyway let's check).
         guard bluetoothPeripheralAsNSObject == nil else {return}
         
-        bluetoothPeripheralManager.startScanningForNewDevice(type: type, callback: { (bluetoothPeripheral) in
+        // if bluetoothPeripheralType needs transmitterId, then check that transmitterId is present
+        if type.needsTransmitterId() && transmitterIdTempValue == nil {return}
+        
+        bluetoothPeripheralManager.startScanningForNewDevice(type: type, transmitterId: transmitterIdTempValue, callback: { (bluetoothPeripheral) in
             
             // assign internal bluetoothPeripheralASNSObject to new bluetoothPeripheral
             self.bluetoothPeripheralAsNSObject = bluetoothPeripheral
@@ -272,7 +301,7 @@ class BluetoothPeripheralViewController: UIViewController {
             // enable the connect button
             self.connectButtonOutlet.enable()
             
-            // set right rext for connect button
+            // set right text for connect button
             self.setConnectButtonLabelText()
             
             // enable the trashbutton
@@ -285,7 +314,7 @@ class BluetoothPeripheralViewController: UIViewController {
             self.deleteBluetoothPeripheralWhenClosingViewController = true
             
             // set self as delegate in the bluetoothTransmitter
-            self.bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false)?.variableBluetoothTransmitterDelegate = self.bluetoothPeripheralViewModel
+            self.bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false)?.variableBluetoothTransmitterDelegate = self
 
             // reload the full screen , all rows in all sections in the tableView
             self.tableView.reloadData()
@@ -307,7 +336,7 @@ class BluetoothPeripheralViewController: UIViewController {
         guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject else {return}
 
         // textToAdd is either 'address' + the address, or 'alias' + the alias, depending if alias has a value
-        var textToAdd = Text_BluetoothPeripheralView.address + " " + bluetoothPeripheralASNSObject.getAddress()
+        var textToAdd = Text_BluetoothPeripheralView.address + " " + bluetoothPeripheralASNSObject.blePeripheral.address
         if let alias = aliasTemporaryValue {
             textToAdd = Text_BluetoothPeripheralView.bluetoothPeripheralAlias + " " + alias
         }
@@ -335,10 +364,10 @@ class BluetoothPeripheralViewController: UIViewController {
         // let's first check if bluetoothPeripheral exists, it should because otherwise connectButton should be disabled
         guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject else {return}
         
-        if bluetoothPeripheralASNSObject.shouldXdripTryToConnectToThisBluetoothPeripheral() {
+        if bluetoothPeripheralASNSObject.blePeripheral.shouldconnect {
             
             // device should not automaticaly connect, which means, each time the app restarts, it will not try to connect to this bluetoothPeripheral
-            bluetoothPeripheralASNSObject.dontTryToConnectToThisBluetoothPeripheral()
+            bluetoothPeripheralASNSObject.blePeripheral.shouldconnect = false
             
             // save the update in coredata
             coreDataManager?.saveChanges()
@@ -360,7 +389,7 @@ class BluetoothPeripheralViewController: UIViewController {
         } else {
             
             // device should automatically connect, this will be stored in coredata
-            bluetoothPeripheralASNSObject.alwaysTryToConnectToThisBluetoothPeripheral()
+            bluetoothPeripheralASNSObject.blePeripheral.shouldconnect = true
             
             // save the update in coredata
             coreDataManager?.saveChanges()
@@ -369,7 +398,7 @@ class BluetoothPeripheralViewController: UIViewController {
             if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: true) {
                 
                 // set delegate
-                bluetoothTransmitter.variableBluetoothTransmitterDelegate = bluetoothPeripheralViewModel
+                bluetoothTransmitter.variableBluetoothTransmitterDelegate = self
                 
                 // connect
                 bluetoothTransmitter.connect()
@@ -401,7 +430,7 @@ class BluetoothPeripheralViewController: UIViewController {
         if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
             
             // set label of connect button, according to curren status
-            connectButtonOutlet.setTitle(bluetoothPeripheralASNSObject.shouldXdripTryToConnectToThisBluetoothPeripheral() ? Text_BluetoothPeripheralView.donotconnect:Text_BluetoothPeripheralView.alwaysConnect, for: .normal)
+            connectButtonOutlet.setTitle(bluetoothPeripheralASNSObject.blePeripheral.shouldconnect ? Text_BluetoothPeripheralView.donotconnect:Text_BluetoothPeripheralView.alwaysConnect, for: .normal)
             
         } else {
             
@@ -425,7 +454,7 @@ class BluetoothPeripheralViewController: UIViewController {
     /// sets shouldconnect for bluetoothPeripheral to false
     public func setShouldConnectToFalse(for bluetoothPeripheral: BluetoothPeripheral) {
 
-        bluetoothPeripheral.dontTryToConnectToThisBluetoothPeripheral()
+        bluetoothPeripheral.blePeripheral.shouldconnect = false
         
         coreDataManager?.saveChanges()
         
@@ -454,6 +483,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         if section == 0 {
+            if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType, !expectedBluetoothPeripheralType.needsTransmitterId() {
+                return Setting.allCases.count - 1
+            }
             return Setting.allCases.count
         } else {
             // normally if bluetoothPeripheralViewModel would be nil, then there wouldn't be a second section, so normall bluetoothPeripheralViewModel is not nil here
@@ -492,12 +524,12 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             
         case .name:
             cell.textLabel?.text = Texts_Common.name
-            cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject?.getDeviceName()
+            cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject?.blePeripheral.name
             cell.accessoryType = .none
             
         case .address:
             cell.textLabel?.text = Text_BluetoothPeripheralView.address
-            cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject?.getAddress()
+            cell.detailTextLabel?.text = bluetoothPeripheralAsNSObject?.blePeripheral.address
             if cell.detailTextLabel?.text == nil {
                 cell.accessoryType = .none
             } else {
@@ -518,6 +550,14 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 cell.accessoryType = .disclosureIndicator
             }
 
+        case .transmitterId:
+            
+            cell.textLabel?.text = Texts_SettingsView.labelTransmitterId
+            cell.detailTextLabel?.text = transmitterIdTempValue
+            
+            // if transmitterId already has a value, then it can't be changed anymore. To change it, user must delete the transmitter and recreate one.
+            cell.accessoryType = transmitterIdTempValue == nil ? .disclosureIndicator : .none
+
         }
 
         return cell
@@ -535,8 +575,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
             if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let bluetoothPeripheral = bluetoothPeripheralAsNSObject {
 
-                bluetoothPeripheralViewModel.userDidSelectRow(withSettingRawValue: indexPath.row, forSection: indexPath.section, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet)
-                
+                // parameter withSettingsViewModel is set to nil here, is used in the general settings page, where a view model represents a specific section, not used here
+                SettingsViewUtilities.runSelectedRowAction(selectedRowAction: bluetoothPeripheralViewModel.userDidSelectRow(withSettingRawValue: indexPath.row, forSection: indexPath.section, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet), forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withSettingsViewModel: nil, tableView: tableView, forUIViewController: self)
+
             }
 
             return
@@ -550,7 +591,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         case .address:
             guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject else {return}
             
-            let alert = UIAlertController(title: Text_BluetoothPeripheralView.address, message: bluetoothPeripheralASNSObject.getAddress(), actionHandler: nil)
+            let alert = UIAlertController(title: Text_BluetoothPeripheralView.address, message: bluetoothPeripheralASNSObject.blePeripheral.address, actionHandler: nil)
             
             // present the alert
             self.present(alert, animated: true, completion: nil)
@@ -575,8 +616,8 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     for bluetoothPeripheral in self.bluetoothPeripheralManager.getBluetoothPeripherals() {
                         
                         // not checking address of bluetoothPeripheralASNSObject, because obviously that one could have the same alias
-                        if bluetoothPeripheral.getAddress() != bluetoothPeripheralASNSObject.getAddress() {
-                            if bluetoothPeripheral.getAlias() == text {
+                        if bluetoothPeripheral.blePeripheral.address != bluetoothPeripheralASNSObject.blePeripheral.address {
+                            if bluetoothPeripheral.blePeripheral.alias == text {
                                 
                                 // bluetoothperipheral userdefined name already exists
                                 let alreadyExistsAlert = UIAlertController(title: Texts_Common.warning, message: Text_BluetoothPeripheralView.aliasAlreadyExists, actionHandler: nil)
@@ -604,7 +645,46 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             
             // present the alert
             self.present(alert, animated: true, completion: nil)
+         
+        case .transmitterId:
             
+            // if transmitterId already has a value, then it can't be changed anymore. To change it, user must delete the transmitter and recreate one.
+            if transmitterIdTempValue != nil {return}
+            
+            SettingsViewUtilities.runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTransmitterId, message: Texts_SettingsView.labelGiveTransmitterId, keyboardType: UIKeyboardType.alphabet, text: transmitterIdTempValue, placeHolder: "00000", actionTitle: nil, cancelTitle: nil, actionHandler:
+                {(transmitterId:String) in
+                    
+                    // convert to uppercase
+                    let transmitterIdUpper = transmitterId.uppercased().toNilIfLength0()
+                    
+                    self.transmitterIdTempValue = transmitterIdUpper
+                    
+                    // reload the specific row in the table
+                    tableView.reloadRows(at: [IndexPath(row: Setting.transmitterId.rawValue, section: 0)], with: .none)
+                    
+                    // if transmitterId is not nil, and if user doesn't need to start the scanning, then start scanning automatically
+                    if self.transmitterIdTempValue != nil, let expectedBluetoothPeripheralType = self.expectedBluetoothPeripheralType {
+                        
+                        if expectedBluetoothPeripheralType.transmitterStartsScanningAfterInit() {
+
+                            // transmitterId presence will be checked in scanForBluetoothPeripheral
+                            self.scanForBluetoothPeripheral(type: expectedBluetoothPeripheralType)
+
+                        } else {
+                            
+                            // time to enable the scan button
+                            self.scanButtonOutlet.enable()
+                            
+                        }
+                        
+                    }
+                    
+            }, cancelHandler: nil, inputValidator: { (transmitterId) in
+                    
+                return self.expectedBluetoothPeripheralType?.validateTransimtterId(transmitterId: transmitterId)
+                
+            }), forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withSettingsViewModel: nil, tableView: tableView, forUIViewController: self)
+
         }
     }
 

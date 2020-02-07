@@ -188,7 +188,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     
     private func blockNumberForNowGlucoseData(input:Data) -> String? {
         
-        // input should be minimu length 6
+        // input should be minimum length 6
         guard input.count >= 6 else {return nil}
         
         // caculate byte position in sensor body, decrement index to get the index where the last valid BG reading is stored
@@ -227,9 +227,6 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         
         return(curGluc)
     }
-
-    /// this transmitter does not support oop web
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
 
     // MARK: - overriden  BluetoothTransmitter functions
     
@@ -559,5 +556,12 @@ extension CGMBluconTransmitter: CGMTransmitter {
     func setWebOOPEnabled(enabled: Bool) {
     }
 
+    /// this transmitter does not support oop web
+    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
+    
+    func cgmTransmitterType() -> CGMTransmitterType? {
+        return .Blucon
+    }
+    
 }
 

@@ -4,7 +4,9 @@ import Foundation
 protocol BluetoothPeripheralManaging: AnyObject {
     
     /// to scan for a new BluetoothPeripheral - callback will be called when a new BluetoothPeripheral is found and connected
-    func startScanningForNewDevice(type: BluetoothPeripheralType, callback: @escaping (BluetoothPeripheral) -> Void)
+    /// - parameters:
+    ///     - transmitterId : only for devices that need a transmitterID (currently only Dexcom and Blucon)
+func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, callback: @escaping (BluetoothPeripheral) -> Void)
     
     /// will stop scanning, this is again for the case where scanning for a new BluetoothPeripheral has started
     func stopScanningForNewDevice()

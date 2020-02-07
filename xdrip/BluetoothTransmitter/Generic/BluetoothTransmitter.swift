@@ -523,11 +523,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     // MARK: methods to get address and name
     
-    /// read device address
-    func getAddress() -> String? {
-        return deviceAddress
-    }
-    
     /// read device name
     func name() -> String? {
         return deviceName

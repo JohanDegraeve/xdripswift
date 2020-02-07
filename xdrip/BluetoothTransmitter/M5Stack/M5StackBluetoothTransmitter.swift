@@ -40,10 +40,12 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
-    ///     - delegate : the M5StackBluetoothTransmitterDelegate
+    ///     - m5StackBluetoothTransmitterDelegate : the M5StackBluetoothTransmitterDelegate
+    ///     - bluetoothTransmitterDelegate : BluetoothTransmitterDelegate
     ///     - blePassword : optional. If nil then xdrip will send a M5StackReadBlePassWordTxMessage to the M5Stack, so this would be a case where the M5Stack (all M5Stacks managed by xdrip) do not have a fixed blepassword
     ///     - bluetoothPeripheralType : M5Stack or M5StickC
-    init(address:String?, name: String?, delegate: M5StackBluetoothTransmitterDelegate, blePassword: String?, bluetoothPeripheralType: BluetoothPeripheralType) {
+    ///     - bluetoothTransmitterDelegate : BluetoothTransmitterDelegate
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, m5StackBluetoothTransmitterDelegate: M5StackBluetoothTransmitterDelegate, blePassword: String?, bluetoothPeripheralType: BluetoothPeripheralType) {
         
         // assign addressname and name, assume it's not been connected before
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "M5Stack")
@@ -60,7 +62,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         self.bluetoothPeripheralType = bluetoothPeripheralType
         
         // call super
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service)], CBUUID_ReceiveCharacteristic: CBUUID_TxRxCharacteristic, CBUUID_WriteCharacteristic: CBUUID_TxRxCharacteristic, startScanningAfterInit: false, bluetoothTransmitterDelegate: delegate)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service)], CBUUID_ReceiveCharacteristic: CBUUID_TxRxCharacteristic, CBUUID_WriteCharacteristic: CBUUID_TxRxCharacteristic, startScanningAfterInit: false, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
 
     }
     

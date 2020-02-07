@@ -16,15 +16,14 @@ extension M5Stack {
         return NSFetchRequest<M5Stack>(entityName: "M5Stack")
     }
 
-    @NSManaged public var address: String
-    @NSManaged public var alias: String?
+    // blePeripheral is required to conform to protocol BluetoothPeripheral
+    @NSManaged public var blePeripheral: BLEPeripheral
+
     @NSManaged public var backGroundColor: Int32
     @NSManaged public var blepassword: String?
     @NSManaged public var brightness: Int16
     @NSManaged public var isM5StickC: Bool
-    @NSManaged public var name: String
     @NSManaged public var rotation: Int32
-    @NSManaged public var shouldconnect: Bool
     @NSManaged public var textcolor: Int32
     @NSManaged public var connectToWiFi: Bool
 

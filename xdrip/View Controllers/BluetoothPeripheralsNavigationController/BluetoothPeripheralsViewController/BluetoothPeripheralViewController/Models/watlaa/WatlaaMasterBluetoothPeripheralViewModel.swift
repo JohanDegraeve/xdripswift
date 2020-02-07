@@ -66,7 +66,7 @@ extension WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel
     
     func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem) {
         
-        // verify that bluetoothPeripheralAsNSObject is an M5Stack
+        // verify that bluetoothPeripheral is an M5Stack
         guard let watlaa = bluetoothPeripheral as? Watlaa else {
             fatalError("WatlaaMasterBluetoothPeripheralViewModel update, bluetoothPeripheral is not Watlaa")
         }
@@ -97,7 +97,7 @@ extension WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel
         
     }
     
-    func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem) {
+    func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem) -> SettingsSelectedRowAction {
         
         switch section {
             
@@ -109,7 +109,7 @@ extension WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel
                 
             case .batteryLevel:
                 // user can't do anything by clicking on battery row
-                break
+                return .nothing
 
             }
             
@@ -132,25 +132,6 @@ extension WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel
     }
     
     func writeTempValues(to bluetoothPeripheral: BluetoothPeripheral) {
-    }
-    
-    
-}
-
-// MARK: - conform to BluetoothTransmitterDelegate
-
-extension WatlaaMasterBluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
-    
-    func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
-        bluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
-    }
-    
-    func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
-        bluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
-    }
-    
-    func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
-        bluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
     }
     
     

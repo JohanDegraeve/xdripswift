@@ -131,6 +131,22 @@ public final class CoreDataManager {
                 }
             } catch {
                 trace("in savechanges,  Unable to Save Changes of Main Managed Object Context, error.localizedDescription  = %{public}@", log: log, category: ConstantsLog.categoryCoreDataManager, type: .info, error.localizedDescription)
+                
+                let error = error as NSError
+                for (key,errors) in error.userInfo {
+                    if key == "NSDetailedErrors" {
+                        if let errors = (errors as? NSArray) {
+                            for error in errors {
+                                if let error = (error as? NSError) {
+                                    
+                                    trace("   error.localizedDescription = %{public}@", log: log, category: ConstantsLog.categoryCoreDataManager, type: .info, error.localizedDescription)
+                                    
+                                }
+                            }
+                            
+                        }
+                    }
+                }
             }
         }
         

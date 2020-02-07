@@ -1,9 +1,11 @@
 import Foundation
 
-extension Watlaa: BluetoothPeripheral {
+extension DexcomG5: BluetoothPeripheral {
     
     func bluetoothPeripheralType() -> BluetoothPeripheralType {
-        return .watlaaMaster
+        
+        return .DexcomG5Type
+        
     }
     
 }

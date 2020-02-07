@@ -100,20 +100,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - transmitterID: expected transmitterID, 6 characters
-    init?(address:String?, name: String?, transmitterID:String, delegate:CGMTransmitterDelegate) {
-        //verify if transmitterid is 6 chars and allowed chars
-        guard transmitterID.count == 6 else {
-            trace("transmitterID length not 6, init CGMG5Transmitter fails", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
-            return nil
-        }
-
-        //verify allowed chars
-        let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
-        guard transmitterID.validate(withRegex: regex) else {
-            trace("transmitterID has non-allowed characters a-zA-Z0-9", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
-            return nil
-        }
-
+    init(address:String?, name: String?, transmitterID:String, cGMTransmitterDelegate:CGMTransmitterDelegate) {
+        
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DEXCOM" + transmitterID[transmitterID.index(transmitterID.startIndex, offsetBy: 4)..<transmitterID.endIndex])
         if let address = address {
@@ -139,7 +127,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G5, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G5)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue, startScanningAfterInit: CGMTransmitterType.dexcomG5.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
 
         //assign CGMTransmitterDelegate
-        cgmTransmitterDelegate = delegate
+        self.cgmTransmitterDelegate = cGMTransmitterDelegate
         
         // start scanning
         _ = startScanning()
@@ -187,7 +175,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // if status changed to poweredon, and if address = nil then superclass will not start the scanning
         // but for DexcomG5 we can start scanning
         if central.state == .poweredOn {
-            if (getAddress() == nil) {
+            if (deviceAddress == nil) {
                 _ = startScanning()
             }
         }
@@ -518,6 +506,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// this transmitter does not support oop web
     func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
+    
+    func cgmTransmitterType() -> CGMTransmitterType? {
+        return .dexcomG5
+    }
     
     // MARK: helper functions
     

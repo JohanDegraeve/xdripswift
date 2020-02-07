@@ -93,7 +93,10 @@ final class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
-    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, bluetoothPeripheralType: BluetoothPeripheralType) {
+    ///     - cgmTransmitterDelegate : CGMTransmitterDelegate
+    ///     - watlaaBluetoothTransmitterDelegate : the WatlaaBluetoothTransmitterDelegate
+    ///     - bluetoothTransmitterDelegate : BluetoothTransmitterDelegate
+    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, bluetoothPeripheralType: BluetoothPeripheralType) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "watlaa")

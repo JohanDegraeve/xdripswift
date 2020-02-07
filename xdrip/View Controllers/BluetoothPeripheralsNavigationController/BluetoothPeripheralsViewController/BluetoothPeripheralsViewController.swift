@@ -141,7 +141,7 @@ final class BluetoothPeripheralsViewController: UIViewController {
     /// calls tableView.reloadRows for the row where bluetoothPeripheral is shown
     private func updateRow(for bluetoothPeripheral: BluetoothPeripheral) {
         
-        if let index = bluetoothPeripheralManager.getBluetoothPeripherals().firstIndex(where: {$0.getAddress() == bluetoothPeripheral.getAddress()}) {
+        if let index = bluetoothPeripheralManager.getBluetoothPeripherals().firstIndex(where: {$0.blePeripheral.address == bluetoothPeripheral.blePeripheral.address}) {
             tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
         }
 
@@ -176,9 +176,9 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("Unexpected Table View Cell") }
         
         // textLabel should be the user defined alias of the BluetoothPeripheral, or if user defined alias == nil, then the devicename
-        cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].getAlias()
+        cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].blePeripheral.alias
         if cell.textLabel?.text == nil {
-            cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].getDeviceName()
+            cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].blePeripheral.name
         }
         
         // detail is the connection status
