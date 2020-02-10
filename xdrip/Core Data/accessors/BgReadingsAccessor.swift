@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import os
 
-class BgReadingsAccessor {
+public class BgReadingsAccessor {
     
     // MARK: - Properties
     
@@ -18,12 +18,10 @@ class BgReadingsAccessor {
     // MARK: - initializer
     
     init(coreDataManager:CoreDataManager) {
-        
         self.coreDataManager = coreDataManager
         
         privateManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateManagedObjectContext.persistentStoreCoordinator = coreDataManager.mainManagedObjectContext.persistentStoreCoordinator
-        
     }
     
     // MARK: - public functions

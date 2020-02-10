@@ -11,6 +11,8 @@
 		860E156E23C7C90F00EA7F46 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 860E156D23C7C90F00EA7F46 /* logo.png */; };
 		86163BDC23C256EB00B56C09 /* SystemInfoHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 86163BDB23C256EB00B56C09 /* SystemInfoHelper.m */; };
 		86163BE923C25A8100B56C09 /* ConstantsWebServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86163BE823C25A8100B56C09 /* ConstantsWebServices.swift */; };
+		86A8CB2723F05EB600577E82 /* ConstantsAppGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A8CB2623F05EB600577E82 /* ConstantsAppGroups.swift */; };
+		86A8CB2823F06FA100577E82 /* ConstantsAppGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A8CB2623F05EB600577E82 /* ConstantsAppGroups.swift */; };
 		86B97E4223C3D18B0055F54C /* WebServicesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B97E4123C3D18B0055F54C /* WebServicesManager.swift */; };
 		86B97E4723C3D4270055F54C /* ca.der in Resources */ = {isa = PBXBuildFile; fileRef = 86B97E4523C3D4260055F54C /* ca.der */; };
 		86B97E4823C3D4270055F54C /* localhost.p12 in Resources */ = {isa = PBXBuildFile; fileRef = 86B97E4623C3D4270055F54C /* localhost.p12 */; };
@@ -285,6 +287,7 @@
 		86163BDA23C256EB00B56C09 /* SystemInfoHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemInfoHelper.h; sourceTree = "<group>"; };
 		86163BDB23C256EB00B56C09 /* SystemInfoHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SystemInfoHelper.m; sourceTree = "<group>"; };
 		86163BE823C25A8100B56C09 /* ConstantsWebServices.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsWebServices.swift; sourceTree = "<group>"; };
+		86A8CB2623F05EB600577E82 /* ConstantsAppGroups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsAppGroups.swift; sourceTree = "<group>"; };
 		86B97E4123C3D18B0055F54C /* WebServicesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebServicesManager.swift; sourceTree = "<group>"; };
 		86B97E4523C3D4260055F54C /* ca.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = ca.der; sourceTree = "<group>"; };
 		86B97E4623C3D4270055F54C /* localhost.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = localhost.p12; sourceTree = "<group>"; };
@@ -1302,6 +1305,7 @@
 				F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */,
 				86163BE823C25A8100B56C09 /* ConstantsWebServices.swift */,
 				F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */,
+				86A8CB2623F05EB600577E82 /* ConstantsAppGroups.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -1871,6 +1875,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				86A8CB2823F06FA100577E82 /* ConstantsAppGroups.swift in Sources */,
 				86D3B98023EDE144008F13E3 /* ConstantsBGGraphBuilder.swift in Sources */,
 				86D3B98123EDE144008F13E3 /* ConstantsBloodGlucose.swift in Sources */,
 				86D3B97F23EDE10A008F13E3 /* Double.swift in Sources */,
@@ -1946,6 +1951,7 @@
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
 				F8A1585122EDB597007F5B5D /* ConstantsBGGraphBuilder.swift in Sources */,
 				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
+				86A8CB2723F05EB600577E82 /* ConstantsAppGroups.swift in Sources */,
 				F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */,
 				F8F9723923A5928D00C3F17D /* M5StackBluetoothPeripheralViewModel.swift in Sources */,
 				F8F9722B23A5915900C3F17D /* CGMTransmitterDelegate.swift in Sources */,
@@ -2395,7 +2401,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = xdripKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2424,7 +2430,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = xdripKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

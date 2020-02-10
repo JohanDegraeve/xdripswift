@@ -18,7 +18,6 @@ public final class CoreDataManager {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillTerminate
     private let applicationManagerKeySaveChanges = "coredatamanagersavechanges"
 
-    
     // MARK: -
     
     private let completion: CoreDataManagerCompletion
@@ -67,10 +66,14 @@ public final class CoreDataManager {
         let storeName = "\(self.modelName).sqlite"
         
         // URL Documents Directory
-        let documentsDirectoryURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        //let documentsDirectoryURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        
+        // Shared App Groups URL
+        let sharedAppGroupsURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: ConstantsAppGroups.AppGroupIdentifier)
         
         // URL Persistent Store
-        let persistentStoreURL = documentsDirectoryURL.appendingPathComponent(storeName)
+        let persistentStoreURL = sharedAppGroupsURL!.appendingPathComponent(storeName)
+         //print("persistentStoreURL: \(persistentStoreURL)")
         
         do {
             let options = [
@@ -108,6 +111,9 @@ public final class CoreDataManager {
             fatalError("Unable to Set Up Core Data Stack")
         }
         
+        // Shared CoreData with App Groups
+        NotificationCenter.default.addObserver(self, selector: #selector(sendUpdatesFromContextSaved(saveNotification:)), name: .NSManagedObjectContextDidSave, object: mainManagedObjectContext)
+
         DispatchQueue.global().async {
             // Add Persistent Store
             self.addPersistentStore(to: persistentStoreCoordinator)
@@ -148,6 +154,9 @@ public final class CoreDataManager {
     /// to be used when app terminates, difference with savechanges is that it calls privateManagedObjectContext.save synchronously
     private func saveChangesAtTermination() {
         
+        // Shared CoreData with App Groups
+        NotificationCenter.default.removeObserver(self, name: .NSManagedObjectContextDidSave, object: mainManagedObjectContext)
+        
         mainManagedObjectContext.performAndWait {
             do {
                 if self.mainManagedObjectContext.hasChanges {
@@ -168,5 +177,51 @@ public final class CoreDataManager {
             }
         }
     }
+
+     // MARK: - Sending updates to other apps in the app group
+     
+    private func tickleURL() -> URL? {
+        var tickleURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: ConstantsAppGroups.AppGroupIdentifier)
+        tickleURL = tickleURL?.appendingPathComponent(ConstantsAppGroups.TickleFolderPath, isDirectory: true)
+        return tickleURL
+    }
+
+    // fake iCloud notification
+     @objc private func sendUpdatesFromContextSaved(saveNotification: NSNotification) {
+         var tickleURL = self.tickleURL()
+         do {
+             if let tickleURL = tickleURL {
+                 try FileManager.default.createDirectory(at: tickleURL, withIntermediateDirectories: true, attributes: nil)
+             }
+         } catch { }
+         let filename = UUID().uuidString
+         tickleURL = tickleURL?.appendingPathComponent(filename)
+         print("tickleURL: \(String(describing: tickleURL?.description))")
+         
+         let saveInfo = serializableDictionaryFromSaveNotification(saveNotification: saveNotification)
+
+         if let tickleURL = tickleURL {
+             let ret = (saveInfo! as NSDictionary).write(to: tickleURL, atomically: true)
+             print("Write Value: \(ret)")
+         }
+     }
+     
+    private func serializableDictionaryFromSaveNotification(saveNotification: NSNotification) -> [AnyHashable : Any]? {
+         var saveInfo: [AnyHashable : Any] = [:]
+         
+         guard let userInfo = saveNotification.userInfo else { return saveInfo }
+         
+         if let inserts = userInfo[NSInsertedObjectsKey] as? Set<NSManagedObject>, inserts.count > 0 {
+             var objectIDRepresentations: [AnyHashable] = []
+             for e in inserts {
+                 let objectID = e.objectID
+                 let URIRepresentation = objectID.uriRepresentation()
+                 let objectIDValue = URIRepresentation.absoluteString
+                 objectIDRepresentations.append(objectIDValue)
+             }
+             saveInfo[NSInsertedObjectsKey] = objectIDRepresentations
+         }
+         return saveInfo
+     }
 
 }

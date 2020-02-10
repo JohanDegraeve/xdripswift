@@ -91,7 +91,7 @@ public class BgReading: NSManagedObject {
         }
     }
     
-    func slopeOrdinal() -> Int {
+    public func slopeOrdinal() -> Int {
         let slope_by_minute = calculatedValueSlope * 60000
         var ordinal = 0
         if(!hideSlope) {
