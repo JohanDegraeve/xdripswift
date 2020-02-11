@@ -9,11 +9,14 @@
 import Foundation
 
 /// constants for Shared App Groups
-enum ConstantsAppGroups {
+public enum ConstantsAppGroups {
      
     /// xdrip x Loop shared coredata
-    static let AppGroupIdentifier = "group.xdriploop.sharedcoredata"
+    public static let AppGroupIdentifier = "group.xdriploop.sharedcoredata"
     
     /// ticket folder
-    static let TickleFolderPath = "ticketfolder"
+    public static let TickleFolderPath = "ticketfolder"
+    
+    /// store name
+    public static let StoreName = "xdrip.sqlite"
 }

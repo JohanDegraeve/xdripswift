@@ -63,7 +63,7 @@ public final class CoreDataManager {
     private func addPersistentStore(to persistentStoreCoordinator: NSPersistentStoreCoordinator) {
         // Helpers
         let fileManager = FileManager.default
-        let storeName = "\(self.modelName).sqlite"
+        //let storeName = "\(self.modelName).sqlite"
         
         // URL Documents Directory
         //let documentsDirectoryURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -72,7 +72,7 @@ public final class CoreDataManager {
         let sharedAppGroupsURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: ConstantsAppGroups.AppGroupIdentifier)
         
         // URL Persistent Store
-        let persistentStoreURL = sharedAppGroupsURL!.appendingPathComponent(storeName)
+        let persistentStoreURL = sharedAppGroupsURL!.appendingPathComponent(ConstantsAppGroups.StoreName)
          //print("persistentStoreURL: \(persistentStoreURL)")
         
         do {
