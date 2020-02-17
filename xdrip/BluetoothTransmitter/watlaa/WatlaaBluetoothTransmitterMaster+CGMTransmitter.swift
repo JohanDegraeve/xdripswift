@@ -2,10 +2,6 @@ import Foundation
 
 extension WatlaaBluetoothTransmitterMaster: CGMTransmitter {
     
-    func initiatePairing() {
-        // no pairing needed for watlaa
-    }
-    
     func reset(requested: Bool) {
         // no reset need for watlaa
     }

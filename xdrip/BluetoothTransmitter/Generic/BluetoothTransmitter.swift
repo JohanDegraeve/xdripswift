@@ -10,7 +10,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - public properties
     
     /// variable : it can get a new value during app run, will be used by rootviewcontroller's that want to receive info
-    public weak var variableBluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
+    public var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate
 
     // MARK: - private properties
     
@@ -65,9 +65,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// should the app try to reconnect after disconnect?
     private var reconnectAfterDisconnect:Bool = true
 
-    /// fixed : it will be set during init and  not change, there's also a variable one, named variableBluetoothTransmitterDelegate
-    private(set) weak var fixedBluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
-
     // MARK: - Initialization
     
     /// - parameters:
@@ -79,8 +76,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     ///     - servicesCBUUIDs: service uuid's
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
-    ///     - delegate : a
-    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID], CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, startScanningAfterInit:Bool, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?) {
+    ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
+    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID], CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, startScanningAfterInit:Bool, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
         
         switch addressAndName {
             
@@ -105,8 +102,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         //initialize timeStampLastStatusUpdate
         timeStampLastStatusUpdate = Date()
         
-        // assign delegate
-        self.fixedBluetoothTransmitterDelegate = bluetoothTransmitterDelegate
+        // assign bluetoothTransmitterDelegate
+        self.bluetoothTransmitterDelegate = bluetoothTransmitterDelegate
         
         super.init()
 
@@ -367,8 +364,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         trace("connected to peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'")
         
-        fixedBluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
-        variableBluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
+        bluetoothTransmitterDelegate.didConnectTo(bluetoothTransmitter: self)
 
         peripheral.discoverServices(servicesCBUUIDs)
         
@@ -394,8 +390,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         trace("in centralManagerDidUpdateState, for peripheral with name %{public}@, new state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", "\(central.state.toString())")
         
-        fixedBluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
-        variableBluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
+        bluetoothTransmitterDelegate.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
 
         /// in case status changed to powered on and if device address known then try either to retrieveperipherals, or if that doesn't succeed, start scanning
         if central.state == .poweredOn, reconnectAfterDisconnect {
@@ -415,8 +410,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         trace("    didDisconnect peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info , deviceName ?? "'unknown'")
         
-        fixedBluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: self)
-        variableBluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: self)
+        bluetoothTransmitterDelegate.didDisconnectFrom(bluetoothTransmitter: self)
 
         if let error = error {
             trace("    error: %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error , error.localizedDescription)
@@ -520,7 +514,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
         
     }
+
+    /// to ask transmitter that it initiates pairing
+    ///
+    /// to be overriden. For transmitter types that don't need pairing, or that don't need pairing initiated by user/view controller, this function does not need to be overriden
+    func initiatePairing() {return}
     
+
     // MARK: methods to get address and name
     
     /// read device name

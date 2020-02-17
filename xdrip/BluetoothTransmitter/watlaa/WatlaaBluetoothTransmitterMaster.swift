@@ -4,7 +4,11 @@ import CoreBluetooth
 
 final class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
     
-    // MARK: UUID's
+    // MARK: - public properties
+    
+    public weak var watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate?
+
+    // MARK: - UUID's
     
     /// Glucose Data Service UUID
     let CBUUID_Data_Service = "00001010-1212-EFDE-0137-875F45AC0113"
@@ -110,6 +114,9 @@ final class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
 
         //assign CGMTransmitterDelegate
         self.cgmTransmitterDelegate = cgmTransmitterDelegate
+        
+        // assign watlaaBluetoothTransmitterDelegate
+        self.watlaaBluetoothTransmitterDelegate = watlaaBluetoothTransmitterDelegate
         
         //initialize timeStampLastBgReading
         timeStampLastBgReading = Date(timeIntervalSince1970: 0)
@@ -243,8 +250,7 @@ final class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
         // Watlaa is sending batteryLevel, which is in the first byte
         let receivedBatteryLevel = Int(value[0])
         
-        (fixedBluetoothTransmitterDelegate as? WatlaaBluetoothTransmitterDelegate)?.receivedBattery(level: receivedBatteryLevel, watlaaBluetoothTransmitter: self)
-        (variableBluetoothTransmitterDelegate as? WatlaaBluetoothTransmitterDelegate)?.receivedBattery(level: receivedBatteryLevel, watlaaBluetoothTransmitter: self)
+        watlaaBluetoothTransmitterDelegate?.receivedBattery(level: receivedBatteryLevel, watlaaBluetoothTransmitter: self)
 
     }
     
@@ -271,8 +277,7 @@ final class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
         }
         
         // here all characteristics should be known, we can call isReadyToReceiveData
-        (fixedBluetoothTransmitterDelegate as? WatlaaBluetoothTransmitterDelegate)?.isReadyToReceiveData(watlaaBluetoothTransmitter: self)
-        (variableBluetoothTransmitterDelegate as? WatlaaBluetoothTransmitterDelegate)?.isReadyToReceiveData(watlaaBluetoothTransmitter: self)
+        watlaaBluetoothTransmitterDelegate?.isReadyToReceiveData(watlaaBluetoothTransmitter: self)
         
     }
     

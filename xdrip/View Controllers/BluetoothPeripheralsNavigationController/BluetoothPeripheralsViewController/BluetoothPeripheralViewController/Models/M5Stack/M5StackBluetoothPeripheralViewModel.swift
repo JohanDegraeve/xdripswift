@@ -111,7 +111,8 @@ class M5StackBluetoothPeripheralViewModel {
     /// reference to BluetoothPeripheralViewController that will own this M5StackBluetoothPeripheralViewModel - needed to present stuff etc
     private(set) weak var bluetoothPeripheralViewController: BluetoothPeripheralViewController?
     
-    private weak var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
+    /// temporary stores M5StackBluetoothTransmitterDelegate
+    private weak var previouslyAssignedM5StackBluetoothTransmitterDelegate: M5StackBluetoothTransmitterDelegate?
     
     // MARK: - public functions
     
@@ -497,20 +498,29 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     
     func receivedBattery(level: Int, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
+        previouslyAssignedM5StackBluetoothTransmitterDelegate?.receivedBattery(level: level, m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
+        
         // batteryLevel should get updated in M5Stack object by bluetoothPeripheralManager, here's the trigger to update the table
         tableView?.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.batteryLevel.rawValue, section: M5StackSections.allCases.count)], with: .none)
         
     }
     
     func isAskingForAllParameters(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        previouslyAssignedM5StackBluetoothTransmitterDelegate?.isAskingForAllParameters(m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
+        
         // viewcontroller doesn't use this
     }
     
     func isReadyToReceiveData(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
+        previouslyAssignedM5StackBluetoothTransmitterDelegate?.isReadyToReceiveData(m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
+        
         // viewcontroller doesn't use this
     }
     
     func newBlePassWord(newBlePassword: String, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
+        previouslyAssignedM5StackBluetoothTransmitterDelegate?.newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
         
         // note : blePassword is also saved in BluetoothPeripheralManager, it will be saved two times
         if let m5StackPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack {
@@ -524,6 +534,8 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     }
     
     func authentication(success: Bool, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
+        previouslyAssignedM5StackBluetoothTransmitterDelegate?.authentication(success: success, m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
         
         if !success, let m5StackPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack {
             
@@ -541,6 +553,8 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     
     func blePasswordMissing(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
+        previouslyAssignedM5StackBluetoothTransmitterDelegate?.blePasswordMissing(m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
+        
         guard let m5StackPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack else {return}
         
         // show warning, inform that user should set password
@@ -556,6 +570,8 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     }
     
     func m5StackResetRequired(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
+        previouslyAssignedM5StackBluetoothTransmitterDelegate?.m5StackResetRequired(m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
         
         guard let m5StackBluetoothPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack else {return}
         
@@ -573,9 +589,33 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     
 }
 
-// MARK: - extension BluetoothPeripheralViewModelProtocol
+// MARK: - conform to BluetoothPeripheralViewModel
 
 extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
+
+    func assignBluetoothTransmitterDelegate(to bluetoothTransmitter: BluetoothTransmitter) {
+        
+        guard let m5StackBluetoothTransmitter = bluetoothTransmitter as? M5StackBluetoothTransmitter else {fatalError("M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, assignBluetoothTransmitterDelegate, not a m5StackBluetoothTransmitter")}
+        
+        previouslyAssignedM5StackBluetoothTransmitterDelegate = m5StackBluetoothTransmitter.m5StackBluetoothTransmitterDelegate
+        
+        m5StackBluetoothTransmitter.m5StackBluetoothTransmitterDelegate = self
+        
+    }
+    
+    func reAssignBluetoothTransmitterDelegateToOriginal(for bluetoothTransmitter: BluetoothTransmitter) {
+        
+        guard let m5StackBluetoothTransmitter = bluetoothTransmitter as? M5StackBluetoothTransmitter else {fatalError("M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, not a m5StackBluetoothTransmitter")}
+        
+        guard let previouslyAssignedM5StackBluetoothTransmitter = previouslyAssignedM5StackBluetoothTransmitterDelegate else {
+            
+            fatalError("M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, previouslyAssignedM5StackBluetoothTransmitter is nil")
+            return
+        }
+        
+        m5StackBluetoothTransmitter.m5StackBluetoothTransmitterDelegate = previouslyAssignedM5StackBluetoothTransmitter
+        
+    }
 
     func numberOfSections() -> Int {
         return numberOfM5Sections()
@@ -720,15 +760,13 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     ///    - bluetoothPeripheralManager : reference to bluetoothPeripheralManaging object
     ///    - tableView : needed to intiate refresh of row
     ///    - bluetoothPeripheralViewController : BluetoothPeripheralViewController
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         
         self.tableView = tableView
         
         self.bluetoothPeripheralViewController = bluetoothPeripheralViewController
-        
-        self.bluetoothTransmitterDelegate = bluetoothTransmitterDelegate
         
         if let m5Stack = bluetoothPeripheral as? M5Stack  {
             

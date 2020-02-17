@@ -4,13 +4,16 @@ import os
 
 class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
-    // MARK: - properties
+    // MARK: - public properties
     
     /// G5 or G6 transmitter firmware version - only used internally, if nil then it was  never received
     ///
     /// created public because inheriting classes need it
-    var firmwareVersion:String?
+    var firmware:String?
     
+    /// CGMG5TransmitterDelegate
+    public weak var cGMG5TransmitterDelegate: CGMG5TransmitterDelegate?
+
     // MARK: UUID's
     
     // advertisement
@@ -100,7 +103,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - transmitterID: expected transmitterID, 6 characters
-    init(address:String?, name: String?, transmitterID:String, cGMTransmitterDelegate:CGMTransmitterDelegate) {
+    ///     - bluetoothTransmitterDelegate : a NluetoothTransmitterDelegate
+    ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
+    ///     - cGMG5TransmitterDelegate : a CGMG5TransmitterDelegate
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DEXCOM" + transmitterID[transmitterID.index(transmitterID.startIndex, offsetBy: 4)..<transmitterID.endIndex])
@@ -124,10 +130,13 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         self.G5ResetRequested = false
 
         // initialize - CBUUID_Receive_Authentication.rawValue and CBUUID_Write_Control.rawValue will probably not be used in the superclass
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G5, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G5)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue, startScanningAfterInit: CGMTransmitterType.dexcomG5.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G5, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G5)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue, startScanningAfterInit: CGMTransmitterType.dexcomG5.startScanningAfterInit(), bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
 
         //assign CGMTransmitterDelegate
         self.cgmTransmitterDelegate = cGMTransmitterDelegate
+        
+        // assign cGMG5TransmitterDelegate
+        self.cGMG5TransmitterDelegate = cGMG5TransmitterDelegate
         
         // start scanning
         _ = startScanning()
@@ -166,7 +175,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
     
-    // MARK: CBCentralManager overriden functions
+    // MARK: BluetoothTransmitter overriden functions
     
     override func centralManagerDidUpdateState(_ central: CBCentralManager) {
         
@@ -180,8 +189,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             }
         }
         
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
-
+    }
+    
+    /// to ask pairing
+    override func initiatePairing() {
+        // assuming that the transmitter is effectively awaiting the pairing, otherwise this obviously won't work
+        sendPairingRequest()
     }
 
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
@@ -193,11 +206,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             waitingPairingConfirmation = false
             
             // inform delegate
-            cgmTransmitterDelegate?.pairingFailed()
+            bluetoothTransmitterDelegate.pairingFailed()
+            
         }
-        
-        // inform delegate
-        cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
         
     }
 
@@ -282,7 +293,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                 sendKeepAliveMessage()
                                 
                                 // delegate needs to be informed that pairing is needed
-                                cgmTransmitterDelegate?.cgmTransmitterNeedsPairing()
+                                bluetoothTransmitterDelegate.transmitterNeedsPairing(bluetoothTransmitter: self)
                                 
                             } else {
                                 
@@ -319,12 +330,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         // if this is the first sensorDataRx after a successful pairing, then inform delegate that pairing is finished
                         if waitingPairingConfirmation {
                             waitingPairingConfirmation = false
-                            cgmTransmitterDelegate?.successfullyPaired()
+                            bluetoothTransmitterDelegate.successfullyPaired()
                         }
                         
                         if let sensorDataRxMessage = SensorDataRxMessage(data: value) {
                             
-                            if firmwareVersion != nil {
+                            if firmware != nil {
                                 
                                 // transmitterversion was already recceived, let's see if we need to get the batterystatus
                                 if Date() > Date(timeInterval: ConstantsDexcomG5.batteryReadPeriodInHours * 60 * 60, since: timeStampOfLastBatteryReading) {
@@ -359,7 +370,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                 } else {
                                     timeStampOfLastG5Reading = Date()
                                     
-                                    let glucoseData = GlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: scaleRawValue(firmwareVersion: firmwareVersion, rawValue: sensorDataRxMessage.unfiltered), glucoseLevelFiltered: scaleRawValue(firmwareVersion: firmwareVersion, rawValue: sensorDataRxMessage.unfiltered))
+                                    let glucoseData = GlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered), glucoseLevelFiltered: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered))
                                     
                                     var glucoseDataArray = [glucoseData]
                                     
@@ -489,12 +500,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: CGMTransmitter protocol functions
     
-    /// to ask pairing
-    func initiatePairing() {
-        // assuming that the transmitter is effectively awaiting the pairing, otherwise this obviously won't work
-        sendPairingRequest()
-    }
-    
     /// to ask transmitter reset
     func reset(requested:Bool) {
         G5ResetRequested = requested
@@ -548,10 +553,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         if let resetRxMessage = ResetRxMessage(data: value) {
             if resetRxMessage.status == 0 {
                 trace("resetRxMessage status is 0, considering reset successful", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                cgmTransmitterDelegate?.reset(successful: true)
+                bluetoothTransmitterDelegate.reset(successful: true)
             } else {
                 trace("resetRxMessage status is %{public}d, considering reset failed", log: log, category: ConstantsLog.categoryCGMG5, type: .info, resetRxMessage.status)
-                cgmTransmitterDelegate?.reset(successful: false)
+                bluetoothTransmitterDelegate.reset(successful: false)
             }
         } else {
             trace("resetRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
@@ -567,16 +572,23 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     private func processTransmitterVersionRxMessage(value:Data) {
+        
         if let transmitterVersionRxMessage = TransmitterVersionRxMessage(data: value) {
             
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: transmitterVersionRxMessage.firmwareVersion.hexEncodedString(), hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
-            
             // assign transmitterVersion
-            firmwareVersion = transmitterVersionRxMessage.firmwareVersion.hexEncodedString()
+            firmware = transmitterVersionRxMessage.firmwareVersion.hexEncodedString()
+            
+            // send to delegate
+            cGMG5TransmitterDelegate?.received(firmware: firmware!, cGMG5Transmitter: self)
+            
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: firmware, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+            
+            
             
         } else {
-            trace("transmitterVersionRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
+            trace("transmitterVersionRxMessage is nil or firmware to hex is  nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
         }
+        
     }
 
     /// calculates encryptionkey

@@ -57,7 +57,7 @@ class BluetoothPeripheralViewController: UIViewController {
 
     /// action for cancelbutton
     @IBAction func cancelButtonAction(_ sender: UIBarButtonItem) {
-        cancel()
+        cancelButtonAction()
     }
     
     /// outlet for scanButton, to set the text in the scanButton
@@ -107,7 +107,11 @@ class BluetoothPeripheralViewController: UIViewController {
     /// needed to support the bluetooth peripheral type specific attributes
     private var bluetoothPeripheralViewModel: BluetoothPeripheralViewModel!
     
+    /// BluetoothPeripheralType for which this viewcontroller is created
     private var expectedBluetoothPeripheralType: BluetoothPeripheralType?
+    
+    /// temp storage of assigned BluetoothTransmitterDelegate
+    private weak var previouslyAssignedBluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
 
     // MARK:- public functions
     
@@ -134,6 +138,17 @@ class BluetoothPeripheralViewController: UIViewController {
         
     }
     
+    /// sets shouldconnect for bluetoothPeripheral to false
+    public func setShouldConnectToFalse(for bluetoothPeripheral: BluetoothPeripheral) {
+        
+        bluetoothPeripheral.blePeripheral.shouldconnect = false
+        
+        coreDataManager?.saveChanges()
+        
+        self.setConnectButtonLabelText()
+        
+    }
+
     // MARK: - View Life Cycle
     
     override func viewDidLoad() {
@@ -146,21 +161,41 @@ class BluetoothPeripheralViewController: UIViewController {
         bluetoothPeripheralViewModel = expectedBluetoothPeripheralType?.viewModel()
 
         // configure the bluetoothPeripheralViewModel
-        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheralAsNSObject, bluetoothPeripheralManager: self.bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self, bluetoothTransmitterDelegate: self)
+        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheralAsNSObject, bluetoothPeripheralManager: self.bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self)
         
         // still need to assign the delegate in the transmitter object
-        if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject {
+        if let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject, let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false) {
             
-            // set bluetoothPeripheralViewModel as delegate in bluetoothTransmitter
-            if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false) {
-                bluetoothTransmitter.variableBluetoothTransmitterDelegate = self
-            }
+            // this will store the current value of the bluetoothTransitterDelegate, and assign self as new delegate
+            assignPreviouslyAssignedBluetoothTransmitterDelegateAndSetSelfAsDelegate(bluetoothTransmitter: bluetoothTransmitter, assignDelegateTo: self)
+            
+            // this will internally store the BluetoothTransmitter type specific delegate
+            bluetoothPeripheralViewModel.assignBluetoothTransmitterDelegate(to: bluetoothTransmitter)
             
         }
 
         setupView()
+        
     }
     
+    // MARK: - De-initialization
+    
+    deinit {
+        
+        // to be sure that previouslyAssignedBluetoothTransmitterDelegate is reassigned although it's probably already done for example in doneButtonHandler
+        
+        if let bluetoothPeripheralAsNSObject = bluetoothPeripheralAsNSObject, let previouslyAssignedBluetoothTransmitterDelegate = previouslyAssignedBluetoothTransmitterDelegate, let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralAsNSObject, createANewOneIfNecesssary: false) {
+            
+            // this will internally reset the BluetoothTransmitter delegate to the original value
+            bluetoothPeripheralViewModel.reAssignBluetoothTransmitterDelegateToOriginal(for: bluetoothTransmitter)
+            
+            // reassign delegate
+            bluetoothTransmitter.bluetoothTransmitterDelegate = previouslyAssignedBluetoothTransmitterDelegate
+
+        }
+        
+    }
+
     // MARK: - other overriden functions
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -253,10 +288,16 @@ class BluetoothPeripheralViewController: UIViewController {
     /// user cliks done button
     public func doneButtonHandler() {
         
-        if let bluetoothPeripheralAsNSObject = bluetoothPeripheralAsNSObject, let coreDataManager = coreDataManager {
+        if let bluetoothPeripheralAsNSObject = bluetoothPeripheralAsNSObject, let coreDataManager = coreDataManager, let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralAsNSObject, createANewOneIfNecesssary: false) {
             
-            // set variable delegate in bluetoothPeripheralASNSObject to nil,  no need anymore to receive info
-            bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralAsNSObject, createANewOneIfNecesssary: false)?.variableBluetoothTransmitterDelegate = nil
+            // no need anymore to receive info from BluetoothTransmitter, reassign previouslyAssignedBluetoothTransmitterDelegate
+            // previouslyAssignedBluetoothTransmitterDelegate must be non nil here. Otherwise there's a coding error.
+            guard let previouslyAssignedBluetoothTransmitterDelegate = previouslyAssignedBluetoothTransmitterDelegate else {
+                fatalError("BluetoothPeripheralViewController, doneButtonHandler, previouslyAssignedBluetoothTransmitterDelegate is nil")
+            }
+            
+            // reassign previouslyAssignedBluetoothTransmitterDelegate as delegate in BluetoothTransmitter
+            bluetoothTransmitter.bluetoothTransmitterDelegate = previouslyAssignedBluetoothTransmitterDelegate
             
             // set alias temp value, possibly this is a nil value
             bluetoothPeripheralAsNSObject.blePeripheral.alias = aliasTemporaryValue
@@ -266,13 +307,16 @@ class BluetoothPeripheralViewController: UIViewController {
             
             // temp values stored by viewmodel needs to be written to bluetoothPeripheralASNSObject
             bluetoothPeripheralViewModel.writeTempValues(to: bluetoothPeripheralAsNSObject)
-            
+
+            // this will internally reset the BluetoothTransmitter delegate to the original value
+            bluetoothPeripheralViewModel.reAssignBluetoothTransmitterDelegateToOriginal(for: bluetoothTransmitter)
+
             // save all changes now
             coreDataManager.saveChanges()
 
         }
         
-        // don't delete the BluetoothPeripheral when going back to prevous viewcontroller
+        // don't delete the BluetoothPeripheral when going back to previous viewcontroller
         self.deleteBluetoothPeripheralWhenClosingViewController = false
         
         // return to BluetoothPeripheralsViewController
@@ -314,8 +358,15 @@ class BluetoothPeripheralViewController: UIViewController {
             // if user goes back to previous screen via the back button, then delete the newly discovered BluetoothPeripheral
             self.deleteBluetoothPeripheralWhenClosingViewController = true
             
-            // set self as delegate in the bluetoothTransmitter
-            self.bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false)?.variableBluetoothTransmitterDelegate = self
+            // set self as delegate in the bluetoothTransmitter, and assign currently assigned BluetoothTransmitterDelegate to previouslyAssignedBluetoothTransmitterDelegate
+            if let bluetoothTransmitter = self.bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) {
+                
+                self.assignPreviouslyAssignedBluetoothTransmitterDelegateAndSetSelfAsDelegate(bluetoothTransmitter: bluetoothTransmitter, assignDelegateTo: self)
+                
+                // this will internally reset the BluetoothTransmitter delegate to the original value
+                self.bluetoothPeripheralViewModel.assignBluetoothTransmitterDelegate(to: bluetoothTransmitter)
+                
+            }
 
             // reload the full screen , all rows in all sections in the tableView
             self.tableView.reloadData()
@@ -365,9 +416,10 @@ class BluetoothPeripheralViewController: UIViewController {
         // let's first check if bluetoothPeripheral exists, it should because otherwise connectButton should be disabled
         guard let bluetoothPeripheralASNSObject = bluetoothPeripheralAsNSObject else {return}
         
+        // user clicked connectbutton. Check first the current value of shouldconnect and change
         if bluetoothPeripheralASNSObject.blePeripheral.shouldconnect {
             
-            // device should not automaticaly connect, which means, each time the app restarts, it will not try to connect to this bluetoothPeripheral
+            // device should not automaticaly connect in future, which means, each time the app restarts, it will not try to connect to this bluetoothPeripheral
             bluetoothPeripheralASNSObject.blePeripheral.shouldconnect = false
             
             // save the update in coredata
@@ -376,11 +428,14 @@ class BluetoothPeripheralViewController: UIViewController {
             // update the connect button text
             setConnectButtonLabelText()
 
-            // normally there should be a bluetoothTransmitter
-            if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false) {
+            // disconnecting means also deleting the bluetoothTransmitter (which as a consequence also disconnects). Also reassign previouslyAssignedBluetoothTransmitterDelegate, although this is probably not necessary as the bluetoothTransmitter will be set to nil
+            if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: false), let previouslyAssignedBluetoothTransmitterDelegate = previouslyAssignedBluetoothTransmitterDelegate {
                 
                 // set delegate in bluetoothtransmitter to nil, as we're going to disconnect permenantly, so not interested anymore to receive info
-                bluetoothTransmitter.variableBluetoothTransmitterDelegate = nil
+                bluetoothTransmitter.bluetoothTransmitterDelegate = previouslyAssignedBluetoothTransmitterDelegate
+                
+                // this will internally reset the BluetoothTransmitter delegate to the original value
+                self.bluetoothPeripheralViewModel.reAssignBluetoothTransmitterDelegateToOriginal(for: bluetoothTransmitter)
 
                 // this will also set bluetoothTransmitter to nil and also disconnect the peripheral
                 bluetoothPeripheralManager.setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheralASNSObject)
@@ -398,12 +453,14 @@ class BluetoothPeripheralViewController: UIViewController {
             // get bluetoothTransmitter
             if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralASNSObject, createANewOneIfNecesssary: true) {
                 
-                // set delegate
-                bluetoothTransmitter.variableBluetoothTransmitterDelegate = self
+                assignPreviouslyAssignedBluetoothTransmitterDelegateAndSetSelfAsDelegate(bluetoothTransmitter: bluetoothTransmitter, assignDelegateTo: self)
                 
                 // connect
                 bluetoothTransmitter.connect()
-                
+
+                // this will internally store the BluetoothTransmitter type specific delegate
+                bluetoothPeripheralViewModel.assignBluetoothTransmitterDelegate(to: bluetoothTransmitter)
+
             }
             
         }
@@ -442,7 +499,7 @@ class BluetoothPeripheralViewController: UIViewController {
     }
     
     /// user clicked cancel button
-    private func cancel() {
+    private func cancelButtonAction() {
         
         // just in case scanning for a new device is still ongoing, call stopscanning
         bluetoothPeripheralManager.stopScanningForNewDevice()
@@ -452,14 +509,14 @@ class BluetoothPeripheralViewController: UIViewController {
 
     }
 
-    /// sets shouldconnect for bluetoothPeripheral to false
-    public func setShouldConnectToFalse(for bluetoothPeripheral: BluetoothPeripheral) {
-
-        bluetoothPeripheral.blePeripheral.shouldconnect = false
+    /// assign current delegate in bluetoothTransmitter to previouslyAssignedBluetoothTransmitterDelegate, and set delegate in to to self
+    private func assignPreviouslyAssignedBluetoothTransmitterDelegateAndSetSelfAsDelegate(bluetoothTransmitter: BluetoothTransmitter, assignDelegateTo bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
         
-        coreDataManager?.saveChanges()
+        // assign previouslyAssignedBluetoothTransmitterDelegate
+        previouslyAssignedBluetoothTransmitterDelegate = bluetoothTransmitter.bluetoothTransmitterDelegate
         
-        self.setConnectButtonLabelText()
+        // assign self as BluetoothTransmitterDelegate
+        bluetoothTransmitter.bluetoothTransmitterDelegate = bluetoothTransmitterDelegate
 
     }
     
@@ -703,31 +760,77 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
     
 }
 
-// MARK: - extension BluetoothTransmitterDelegate
-
 extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
+    
+    func transmitterNeedsPairing(bluetoothTransmitter: BluetoothTransmitter) {
+        
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.transmitterNeedsPairing(bluetoothTransmitter: bluetoothTransmitter)
+
+        // handled in BluetoothPeripheralManager
+        
+    }
+    
+    func successfullyPaired() {
+        
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.successfullyPaired()
+        
+        // handled in BluetoothPeripheralManager
+        
+    }
+    
+    func pairingFailed() {
+
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.pairingFailed()
+
+        // handled in BluetoothPeripheralManager
+        
+    }
+    
+    func reset(successful: Bool) {
+
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.reset(successful: successful)
+        
+        // handled in BluetoothPeripheralManager
+        
+    }
     
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
         
-        tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
+        
+       tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
         
     }
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
         
-        tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
+        
+       tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
 
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
 
-        // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
+        
+      // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
         // do this whenever the bluetooth status changes
         tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
 
     }
     
     func error(message: String) {
+        
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.error(message: message)
         
         let alert = UIAlertController(title: Texts_Common.warning, message: message, actionHandler: nil)
         

@@ -5,12 +5,11 @@ protocol BluetoothPeripheralViewModel {
     
     /// to be called before opening the actual viewcontroller or after discovering a new bluetoothperipheral
     /// - parameters :
-    ///    - bluetoothTransmitterDelegate : usually the uiViewController
     ///    - bluetoothPeripheral : if nil then the viewcontroller is opened to scan for a new peripheral
     ///    - bluetoothPeripheralManager : reference to bluetoothPeripheralManaging object
     ///    - tableView : needed to intiate refresh of row
     ///    - bluetoothPeripheralViewController : BluetoothPeripheralViewController
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate)
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController)
     
     /// screen title for uiviewcontroller
     func screenTitle() -> String
@@ -37,4 +36,10 @@ protocol BluetoothPeripheralViewModel {
     /// used when user clicks done button in uiviewcontroller
     func writeTempValues(to bluetoothPeripheral: BluetoothPeripheral)
     
+    /// used in BluetoothPeripheralViewController which is unaware of types of transmitters (M5Stack, Watlaa, ...). This to handle that there can be multiple delegates listening for example M5StackBluetoothTransmitter changes. The function assignBluetoothTransmitterDelegate will temporary store the value of the existing delegate (example M5StackBluetoothTransmitterDelegate) and assign itself (ie the viewmodel) as delegate. It should also handle the calling of the functions in the stored delegate (look at an example to understand :) )
+    func assignBluetoothTransmitterDelegate(to bluetoothTransmitter: BluetoothTransmitter)
+
+    /// see explanation assignBluetoothTransmitterDelegate
+    func reAssignBluetoothTransmitterDelegateToOriginal(for bluetoothTransmitter: BluetoothTransmitter)
+
 }
