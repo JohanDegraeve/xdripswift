@@ -3,10 +3,9 @@ import CoreData
 import os
 import CoreBluetooth
 import UserNotifications
-import AVFoundation
-import AudioToolbox
 import SwiftCharts
 import HealthKitUI
+import AVFoundation
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController {
@@ -125,9 +124,6 @@ final class RootViewController: UIViewController {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - updateLabels
     private let applicationManagerKeyUpdateLabelsAndChart = "RootViewController-UpdateLabelsAndChart"
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initiate pairing
-    private let applicationManagerKeyInitiatePairing = "RootViewController-InitiatePairing"
-    
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initial calibration
     private let applicationManagerKeyInitialCalibration = "RootViewController-InitialCalibration"
     
@@ -175,23 +171,14 @@ final class RootViewController: UIViewController {
     /// WatchManager instance
     private var watchManager: WatchManager?
     
-    /// timer used when asking the transmitter to initiate pairing. The user is waiting for the response, if the response from the transmitter doesn't come within a few seconds, then we'll inform the user
-    private var transmitterPairingResponseTimer:Timer?
-    
     /// healthkit manager instance
     private var healthKitManager:HealthKitManager?
     
     /// reference to activeSensor
     private var activeSensor:Sensor?
     
-    /// if true, user manually started scanning for a device, when connection is made, we'll inform the user, see cgmTransmitterDidConnect
-    private var userDidInitiateScanning = false
-    
     /// reference to bgReadingSpeaker
     private var bgReadingSpeaker:BGReadingSpeaker?
-    
-    /// timestamp of last notification for pairing
-    private var timeStampLastNotificationForPairing:Date?
     
     /// manages bluetoothPeripherals that this app knows
     private var bluetoothPeripheralManager: BluetoothPeripheralManager?
@@ -410,7 +397,7 @@ final class RootViewController: UIViewController {
         })
         
         // setup bluetoothPeripheralManager
-        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, onCGMTransmitterCreation: {
+        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: self, onCGMTransmitterCreation: {
             (cgmTransmitter: CGMTransmitter?) in
             
             self.cgmTransmitter = cgmTransmitter
@@ -618,36 +605,11 @@ final class RootViewController: UIViewController {
     
     // MARK: - private helper functions
     
-    // inform user that pairing request timed out
-    @objc private func informUserThatPairingTimedOut() {
-        
-        let alert = UIAlertController(title: Texts_Common.warning, message: "time out", actionHandler: nil)
-        
-        self.present(alert, animated: true, completion: nil)
-        
-    }
-    
     /// will update the chart with endDate = currentDate
     private func updateChartWithResetEndDate() {
         
         glucoseChartManager.updateGlucoseChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, completionHandler: nil)
 
-    }
-    
-    /// will call cgmTransmitter.initiatePairing() - also sets timer, if no successful pairing within a few seconds, then info will be given to user asking to wait another few minutes
-    private func initiateTransmitterPairing() {
-        
-        // initiate the pairing
-        cgmTransmitter?.initiatePairing()
-        
-        // invalide the timer, if it exists
-        if let transmitterPairingResponseTimer = transmitterPairingResponseTimer {
-            transmitterPairingResponseTimer.invalidate()
-        }
-        
-        // create and schedule timer
-        transmitterPairingResponseTimer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(informUserThatPairingTimedOut), userInfo: nil, repeats: false)
-        
     }
     
     /// launches timer that will do regular screen updates - and adds closure to ApplicationManager : when going to background, stop the timer, when coming to foreground, restart the timer
@@ -800,35 +762,35 @@ final class RootViewController: UIViewController {
                 
             case .dexcomG4:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG4xDripTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, delegate:self)
+                    cgmTransmitter = CGMG4xDripTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId)
                 }
                 
             case .dexcomG5:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, cGMTransmitterDelegate: self)
+                    cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, bluetoothTransmitterDelegate: self, cGMTransmitterDelegate: self)
                 }
                 
             case .dexcomG6:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG6Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, cGMTransmitterDelegate: self)
+                    cgmTransmitter = CGMG6Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, bluetoothTransmitterDelegate: self, cGMTransmitterDelegate: self)
                 }
                 
             case .miaomiao:
-                cgmTransmitter = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
+                cgmTransmitter = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, bluetoothTransmitterDelegate: <#BluetoothTransmitterDelegate#>, timeStampLastBgReading: Date(timeIntervalSince1970: 0), webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
                 
             case .Bubble:
-                cgmTransmitter = CGMBubbleTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber, webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
+                cgmTransmitter = CGMBubbleTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, bluetoothTransmitterDelegate: <#BluetoothTransmitterDelegate#>, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber, webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
                 
             case .GNSentry:
-                cgmTransmitter = CGMGNSEntryTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
+                cgmTransmitter = CGMGNSEntryTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, bluetoothTransmitterDelegate: <#BluetoothTransmitterDelegate#>, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
                 
             case .Blucon:
                 if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, delegate: self, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber)
+                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, bluetoothTransmitterDelegate: <#BluetoothTransmitterDelegate#>, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber)
                 }
                 
             case .Droplet1:
-                cgmTransmitter = CGMDroplet1Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self)
+                cgmTransmitter = CGMDroplet1Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName)
                 
             case .blueReader:
                 cgmTransmitter = CGMBlueReaderTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self)
@@ -1364,186 +1326,6 @@ extension RootViewController:CGMTransmitterDelegate {
         let alert = UIAlertController(title: Texts_Common.warning, message: message, actionHandler: nil)
         
         self.present(alert, animated: true, completion: nil)
-        
-    }
-    
-    func reset(successful: Bool) {
-        
-        // reset setting to false
-        UserDefaults.standard.transmitterResetRequired = false
-        
-        // Create Notification Content to give info about reset result of reset attempt
-        let notificationContent = UNMutableNotificationContent()
-        
-        // Configure NnotificationContent title
-        notificationContent.title = successful ? Texts_HomeView.info : Texts_Common.warning
-        
-        notificationContent.body = Texts_HomeView.transmitterResetResult + " : " + (successful ? Texts_HomeView.success : Texts_HomeView.failed)
-        
-        // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifierForResetResult.transmitterResetResult, content: notificationContent, trigger: nil)
-        
-        // Add Request to User Notification Center
-        UNUserNotificationCenter.current().add(notificationRequest) { (error) in
-            if let error = error {
-                trace("Unable add notification request : transmitter reset result, error:  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
-            }
-        }
-        
-    }
-    
-    func pairingFailed() {
-        // this should be the consequence of the user not accepting the pairing request, there's no need to inform the user
-        // invalidate transmitterPairingResponseTimer
-        if let transmitterPairingResponseTimer = transmitterPairingResponseTimer {
-            transmitterPairingResponseTimer.invalidate()
-        }
-    }
-    
-    func successfullyPaired() {
-        
-        // remove existing notification if any
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
-        
-        // invalidate transmitterPairingResponseTimer
-        if let transmitterPairingResponseTimer = transmitterPairingResponseTimer {
-            transmitterPairingResponseTimer.invalidate()
-        }
-        
-        // inform user
-        let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterPairingSuccessful, actionHandler: nil)
-        
-        self.present(alert, animated: true, completion: nil)
-        
-    }
-    
-    func cgmTransmitterDidConnect(address:String?, name:String?) {
-        // store address and name, if this is the first connect to a specific device, then this address and name will be used in the future to reconnect to the same device, without having to scan
-        if let address = address, let name = name {
-            UserDefaults.standard.cgmTransmitterDeviceAddress = address
-            UserDefaults.standard.cgmTransmitterDeviceName =  name
-        }
-        
-        // if the connect is a result of a user initiated start scanning, then display message that connection was successful
-        if userDidInitiateScanning {
-            userDidInitiateScanning = false
-            // additional info for the user
-            let alert = UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: Texts_HomeView.bluetoothDeviceConnectedInfo, actionHandler: nil)
-            
-            self.present(alert, animated: true, completion: nil)
-            
-        }
-    }
-    
-    func cgmTransmitterDidDisconnect() {
-        // set disconnect timestamp
-        UserDefaults.standard.lastdisConnectTimestamp = Date()
-    }
-    
-    func deviceDidUpdateBluetoothState(state: CBManagerState) {
-        
-        switch state {
-            
-        case .unknown:
-            break
-        case .resetting:
-            break
-        case .unsupported:
-            break
-        case .unauthorized:
-            break
-        case .poweredOff:
-            UserDefaults.standard.lastdisConnectTimestamp = Date()
-        case .poweredOn:
-            // user changes device bluetooth status to on
-
-            if UserDefaults.standard.cgmTransmitterDeviceAddress == nil, let cgmTransmitter = cgmTransmitter, let transmitterType  = UserDefaults.standard.transmitterType, transmitterType.startScanningAfterInit() {
-                // bluetoothDeviceAddress = nil, means app hasn't connected before to the transmitter
-                // cgmTransmitter != nil, means user has configured transmitter type and transmitterid
-                // transmitterType.startScanningAfterInit() gives true, means it's ok to start the scanning
-                // possibly scanning is already running, but that's ok if we call the startScanning function again
-                _ = cgmTransmitter.startScanning()
-            }
-
-        @unknown default:
-            break
-        }
-        
-    }
-    
-    /// Transmitter is calling this delegate function to indicate that bluetooth pairing is needed. If the app is in the background, the user will be informed, after opening the app a pairing request will be initiated. if the app is in the foreground, the pairing request will be initiated immediately
-    func cgmTransmitterNeedsPairing() {
-        
-        trace("transmitter needs pairing", log: log, category: ConstantsLog.categoryRootView, type: .info)
-        
-        if let timeStampLastNotificationForPairing = timeStampLastNotificationForPairing {
-            
-            // check timestamp of last notification, if too soon then return
-            if Int(abs(timeStampLastNotificationForPairing.timeIntervalSinceNow)) < ConstantsBluetoothPairing.minimumTimeBetweenTwoPairingNotificationsInSeconds {
-                return
-            }
-        }
-        
-        // set timeStampLastNotificationForPairing
-        timeStampLastNotificationForPairing = Date()
-        
-        // remove existing notification if any
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
-        
-        // Create Notification Content
-        let notificationContent = UNMutableNotificationContent()
-        
-        // Configure NnotificationContent title
-        notificationContent.title = Texts_Common.warning
-        
-        notificationContent.body = Texts_HomeView.transmitterNotPaired
-        
-        // add sound
-        notificationContent.sound = UNNotificationSound.init(named: UNNotificationSoundName.init(""))
-        
-        // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing, content: notificationContent, trigger: nil)
-        
-        // Add Request to User Notification Center
-        UNUserNotificationCenter.current().add(notificationRequest) { (error) in
-            if let error = error {
-                trace("Unable add notification request : transmitter needs pairing Notification Request, error :  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
-            }
-        }
-        
-        // vibrate
-        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-        
-        // add closure to ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground so that if user opens the app, the pairing request will be initiated. This can be done only if the app is opened within 60 seconds.
-        // If the app is already in the foreground, then userNotificationCenter willPresent will be called, in this function the closure will be removed immediately, and the pairing request will be called. As a result, if the app is in the foreground, the user will not see (or hear) any notification, but the pairing will be initiated
-        
-        // max timestamp when notification was fired - connection stays open for 1 minute, taking 1 second as d
-        let maxTimeUserCanOpenApp = Date(timeIntervalSinceNow: TimeInterval(ConstantsDexcomG5.maxTimeToAcceptPairingInSeconds - 1))
-        
-        // we will not just count on it that the user will click the notification to open the app (assuming the app is in the background, if the app is in the foreground, then we come in another flow)
-        // whenever app comes from-back to foreground, updateLabelsAndChart needs to be called
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyInitiatePairing, closure: {
-            
-            // first of all reremove from application key manager
-            ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeyInitiatePairing)
-            
-            // first remove existing notification if any
-            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
-            
-            // if it was too long since notification was fired, then forget about it
-            if Date() > maxTimeUserCanOpenApp {
-                trace("in cgmTransmitterNeedsPairing, user opened the app too late", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-                let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.transmitterPairingTooLate, actionHandler: nil)
-                
-                self.present(alert, animated: true, completion: nil)
-                
-                return
-            }
-            
-            // initiate the pairing
-            self.cgmTransmitter?.initiatePairing()
-            
-        })
         
     }
     

@@ -29,6 +29,9 @@ final class BluetoothPeripheralsViewController: UIViewController {
     /// a bluetoothPeripheralManager
     private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging!
     
+    /// temp storage of assigned BluetoothTransmitterDelegate
+    private weak var previouslyAssignedBluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
+
     // MARK: public functions
     
     /// configure
@@ -38,6 +41,25 @@ final class BluetoothPeripheralsViewController: UIViewController {
         self.coreDataManager = coreDataManager
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         initializeBluetoothPeripherals()
+        
+    }
+
+    // MARK: - De-initialization
+    
+    deinit {
+        
+        // to be sure that previouslyAssignedBluetoothTransmitterDelegate is reassigned to every existing BluetoothTransmistter
+        
+        if let previouslyAssignedBluetoothTransmitterDelegate = previouslyAssignedBluetoothTransmitterDelegate {
+
+            for bluetoothTransmitter in bluetoothPeripheralManager.getBluetoothTransmitters() {
+                
+                // assign self as BluetoothTransmitterDelegate
+                bluetoothTransmitter.bluetoothTransmitterDelegate = previouslyAssignedBluetoothTransmitterDelegate
+                
+            }
+
+        }
         
     }
 
@@ -151,9 +173,14 @@ final class BluetoothPeripheralsViewController: UIViewController {
     /// - sets the delegates of each transmitter to self
     private func initializeBluetoothPeripherals() {
         
-        for bluetoothtTransmitter in bluetoothPeripheralManager.getBluetoothTransmitters() {
+        for bluetoothTransmitter in bluetoothPeripheralManager.getBluetoothTransmitters() {
             
-            bluetoothtTransmitter.variableBluetoothTransmitterDelegate = self
+            // assign previously assigned BluetoothTransmitterDelegate, we will still pass all info to that delegate also
+            // every bluetoothTransmitter may in theory have a different bluetoothTransmitterDelegate, so we should create an array of BluetoothTransmitterDelegate, however in practice it will always be the same bluetoothPeripheralManager
+            previouslyAssignedBluetoothTransmitterDelegate = bluetoothTransmitter.bluetoothTransmitterDelegate
+            
+            // assign self as BluetoothTransmitterDelegate
+            bluetoothTransmitter.bluetoothTransmitterDelegate = self
             
         }
         
@@ -216,20 +243,72 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
 
 extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
     
-    func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
+    func transmitterNeedsPairing(bluetoothTransmitter: BluetoothTransmitter) {
+       
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.transmitterNeedsPairing(bluetoothTransmitter: bluetoothTransmitter)
+
+        // handled in BluetoothPeripheralManager
         
+    }
+    
+    func successfullyPaired() {
+
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.successfullyPaired()
+
+        // handled in BluetoothPeripheralManager
+
+    }
+    
+    func pairingFailed() {
+
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.pairingFailed()
+
+        // handled in BluetoothPeripheralManager
+
+    }
+    
+    func reset(successful: Bool) {
+        
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.reset(successful: successful)
+        
+        // handled in BluetoothPeripheralManager
+    }
+    
+    func error(message: String) {
+        
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.error(message: message)
+
+        // handled in BluetoothPeripheralManager
+    }
+    
+    func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
+
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
+
         updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
         
     }
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
-        
+
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
+
         updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
         
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
-        
+
+        // need to inform also other delegates
+        previouslyAssignedBluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
+
         // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
         if state == CBManagerState.poweredOff {
             updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))

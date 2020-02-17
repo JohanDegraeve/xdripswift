@@ -22,8 +22,8 @@ class WatlaaMasterBluetoothPeripheralViewModel {
     /// reference to BluetoothPeripheralViewController that will own this WatlaaMasterBluetoothPeripheralViewModel - needed to present stuff etc
     private weak var bluetoothPeripheralViewController: BluetoothPeripheralViewController?
 
-    private weak var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
-    
+    /// temporary stores WatlaaBluetoothTransmitterDelegate
+    private weak var previouslyAssignedWatlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate?
 
 }
 
@@ -31,7 +31,31 @@ class WatlaaMasterBluetoothPeripheralViewModel {
 
 extension WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
+    func assignBluetoothTransmitterDelegate(to bluetoothTransmitter: BluetoothTransmitter) {
+        
+        guard let watlaaBluetoothTransmitter = bluetoothTransmitter as? WatlaaBluetoothTransmitterMaster else {fatalError("WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, assignBluetoothTransmitterDelegate, not a WatlaaBluetoothTransmitterMaster")}
+        
+        previouslyAssignedWatlaaBluetoothTransmitterDelegate = watlaaBluetoothTransmitter.watlaaBluetoothTransmitterDelegate
+        
+        watlaaBluetoothTransmitter.watlaaBluetoothTransmitterDelegate = self
+
+    }
+    
+    func reAssignBluetoothTransmitterDelegateToOriginal(for bluetoothTransmitter: BluetoothTransmitter) {
+        
+        guard let watlaaBluetoothTransmitter = bluetoothTransmitter as? WatlaaBluetoothTransmitterMaster else {fatalError("WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, not a WatlaaBluetoothTransmitterMaster")}
+        
+        guard let previouslyAssignedWatlaaBluetoothTransmitterDelegate = previouslyAssignedWatlaaBluetoothTransmitterDelegate else {
+            
+            fatalError("WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, previouslyAssignedWatlaaBluetoothTransmitterDelegate is nil")
+            return
+        }
+        
+        watlaaBluetoothTransmitter.watlaaBluetoothTransmitterDelegate = previouslyAssignedWatlaaBluetoothTransmitterDelegate
+
+    }
+    
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         
@@ -39,8 +63,6 @@ extension WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel
         
         self.bluetoothPeripheralViewController = bluetoothPeripheralViewController
         
-        self.bluetoothTransmitterDelegate = bluetoothTransmitterDelegate
-
         if let watlaaPeripheral = bluetoothPeripheral as? Watlaa  {
             
             storeTempValues(from: watlaaPeripheral)

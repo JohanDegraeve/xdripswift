@@ -56,12 +56,13 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
-    ///     - delegate : CGMTransmitterDelegate intance
     ///     - timeStampLastBgReading : timestamp of last bgReading
     ///     - webOOPEnabled : enabled or not
     ///     - oopWebSite : oop web site url to use, only used in case webOOPEnabled = true
     ///     - oopWebToken : oop web token to use, only used in case webOOPEnabled = true
-    init(address:String?, name: String?, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, webOOPEnabled: Bool, oopWebSite: String, oopWebToken: String) {
+    ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
+    ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, webOOPEnabled: Bool, oopWebSite: String, oopWebToken: String) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameMiaoMiao)
@@ -70,7 +71,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         }
 
         // assign CGMTransmitterDelegate
-        cgmTransmitterDelegate = delegate
+        self.cgmTransmitterDelegate = cGMTransmitterDelegate
         
         // initialize rxbuffer
         rxBuffer = Data()
@@ -86,7 +87,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         self.oopWebToken = oopWebToken
         self.oopWebSite = oopWebSite
 
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, startScanningAfterInit: CGMTransmitterType.miaomiao.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, startScanningAfterInit: CGMTransmitterType.miaomiao.startScanningAfterInit(), bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }
     
@@ -102,30 +103,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     // MARK: - overriden  BluetoothTransmitter functions
-    
-    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        
-        super.centralManager(central, didConnect: peripheral)
-        
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
-        
-    }
-    
-    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        
-        super.centralManagerDidUpdateState(central)
-        
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
-        
-    }
-    
-    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        
-        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
-        
-        cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
-        
-    }
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         
@@ -235,11 +212,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     // MARK: CGMTransmitter protocol functions
-    
-    /// to ask pairing - empty function because G4 doesn't need pairing
-    ///
-    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
-    func initiatePairing() {}
     
     /// to ask transmitter reset - empty function because MiaoMiao doesn't support reset
     ///

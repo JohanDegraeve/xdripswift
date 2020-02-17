@@ -93,7 +93,9 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name: if already connected before, then give here the name that was received during previous connect, if not give nil
-    init?(address:String?, name: String?, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date) {
+    ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
+    ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
+    init?(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "GNSentry")
@@ -105,38 +107,14 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
         self.timeStampLastBgReadingInMinutes = timeStampLastBgReading.toMillisecondsAsDouble()/1000/60
         
         // initialize
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_GNWService), CBUUID(string: CBUUID_BatteryService), CBUUID(string: CBUUID_DeviceInformationService)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Notify.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Write.rawValue, startScanningAfterInit: CGMTransmitterType.GNSentry.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_GNWService), CBUUID(string: CBUUID_BatteryService), CBUUID(string: CBUUID_DeviceInformationService)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Notify.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Write.rawValue, startScanningAfterInit: CGMTransmitterType.GNSentry.startScanningAfterInit(), bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
         //assign CGMTransmitterDelegate
-        cgmTransmitterDelegate = delegate
+        self.cgmTransmitterDelegate = cGMTransmitterDelegate
         
     }
     
     // MARK: - overriden  BluetoothTransmitter functions
-    
-    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        
-        super.centralManager(central, didConnect: peripheral)
-        
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
-        
-    }
-    
-    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        
-        super.centralManagerDidUpdateState(central)
-        
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
-        
-    }
-    
-    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        
-        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
-        
-        cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
-        
-    }
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         
@@ -257,11 +235,6 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     // MARK: CGMTransmitter protocol functions
-    
-    /// to ask pairing - empty function because GNSEntry doesn't need pairing
-    ///
-    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
-    func initiatePairing() {}
     
     /// to ask transmitter reset - empty function because GNSEntry doesn't support reset
     ///
