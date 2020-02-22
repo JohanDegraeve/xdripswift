@@ -266,6 +266,21 @@
 
 /* Begin PBXFileReference section */
 		148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.debug.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.debug.xcconfig"; sourceTree = "<group>"; };
+		2863879623FC7115000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		2863879723FC7117000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/Main.strings"; sourceTree = "<group>"; };
+		2863879823FC7118000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/Alerts.strings"; sourceTree = "<group>"; };
+		2863879923FC7118000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/AlertTypesSettingsView.strings"; sourceTree = "<group>"; };
+		2863879A23FC7119000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/CalibrationRequest.strings"; sourceTree = "<group>"; };
+		2863879B23FC711A000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/Common.strings"; sourceTree = "<group>"; };
+		2863879C23FC711B000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/DexcomShareTestResult.strings"; sourceTree = "<group>"; };
+		2863879D23FC711B000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/DexcomShareTestResults.strings"; sourceTree = "<group>"; };
+		2863879E23FC711C000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/ErrorMessages.strings"; sourceTree = "<group>"; };
+		2863879F23FC711C000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/HomeView.strings"; sourceTree = "<group>"; };
+		286387A023FC711D000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		286387A123FC711E000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/M5StackView.strings"; sourceTree = "<group>"; };
+		286387A223FC711E000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/NightScoutTestResult.strings"; sourceTree = "<group>"; };
+		286387A323FC711F000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/SettingsViews.strings"; sourceTree = "<group>"; };
+		286387A423FC711F000D00B8 /* fi-FI */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi-FI"; path = "fi-FI.lproj/SpeakReading.strings"; sourceTree = "<group>"; };
 		662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2648F65F347D56D7DFFFAB7 /* Pods-xdrip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.release.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.release.xcconfig"; sourceTree = "<group>"; };
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
@@ -1702,6 +1717,7 @@
 				zh,
 				pt,
 				de,
+				"fi-FI",
 			);
 			mainGroup = F8AC425121ADEBD60078C348;
 			productRefGroup = F8AC425B21ADEBD60078C348 /* Products */;
@@ -2050,6 +2066,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				F889CB70236D84AC00A81068 /* en */,
+				286387A123FC711E000D00B8 /* fi-FI */,
 			);
 			name = M5StackView.strings;
 			sourceTree = "<group>";
@@ -2070,6 +2087,7 @@
 				F889CB8B236D851600A81068 /* es-MX */,
 				F889CB8C236D851700A81068 /* es-ES */,
 				F889CB8F236D89C800A81068 /* de */,
+				2863879D23FC711B000D00B8 /* fi-FI */,
 			);
 			name = DexcomShareTestResults.strings;
 			sourceTree = "<group>";
@@ -2089,6 +2107,7 @@
 				F8B48AFC22B37C67009BCC01 /* fr */,
 				F8B48B0822B37C83009BCC01 /* zh */,
 				F889CB8E236D89C800A81068 /* de */,
+				2863879723FC7117000D00B8 /* fi-FI */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -2107,6 +2126,7 @@
 				F8B48AFB22B37C67009BCC01 /* fr */,
 				F8B48B0722B37C83009BCC01 /* zh */,
 				F889CB8D236D89C800A81068 /* de */,
+				2863879623FC7115000D00B8 /* fi-FI */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -2125,6 +2145,7 @@
 				F8B48B0522B37C67009BCC01 /* fr */,
 				F8B48B1122B37C84009BCC01 /* zh */,
 				F889CB9A236D89C800A81068 /* de */,
+				286387A223FC711E000D00B8 /* fi-FI */,
 			);
 			name = NightScoutTestResult.strings;
 			sourceTree = "<group>";
@@ -2143,6 +2164,7 @@
 				F8B48B0022B37C67009BCC01 /* fr */,
 				F8B48B0C22B37C83009BCC01 /* zh */,
 				F889CB90236D89C800A81068 /* de */,
+				2863879823FC7118000D00B8 /* fi-FI */,
 			);
 			name = Alerts.strings;
 			sourceTree = "<group>";
@@ -2161,6 +2183,7 @@
 				F8B48B0122B37C67009BCC01 /* fr */,
 				F8B48B0D22B37C84009BCC01 /* zh */,
 				F889CB91236D89C800A81068 /* de */,
+				2863879923FC7118000D00B8 /* fi-FI */,
 			);
 			name = AlertTypesSettingsView.strings;
 			sourceTree = "<group>";
@@ -2181,6 +2204,7 @@
 				F8B48B0B22B37C83009BCC01 /* zh */,
 				F81D6D4522B67F55005EFAE2 /* pt */,
 				F889CB9C236D89C800A81068 /* de */,
+				286387A423FC711F000D00B8 /* fi-FI */,
 			);
 			name = SpeakReading.strings;
 			sourceTree = "<group>";
@@ -2199,6 +2223,7 @@
 				F8B48AFE22B37C67009BCC01 /* fr */,
 				F8B48B0A22B37C83009BCC01 /* zh */,
 				F889CB96236D89C800A81068 /* de */,
+				2863879F23FC711C000D00B8 /* fi-FI */,
 			);
 			name = HomeView.strings;
 			sourceTree = "<group>";
@@ -2217,6 +2242,7 @@
 				F8B48AFD22B37C67009BCC01 /* fr */,
 				F8B48B0922B37C83009BCC01 /* zh */,
 				F889CB92236D89C800A81068 /* de */,
+				2863879A23FC7119000D00B8 /* fi-FI */,
 			);
 			name = CalibrationRequest.strings;
 			sourceTree = "<group>";
@@ -2235,6 +2261,7 @@
 				F8B48B0422B37C67009BCC01 /* fr */,
 				F8B48B1022B37C84009BCC01 /* zh */,
 				F889CB97236D89C800A81068 /* de */,
+				286387A023FC711D000D00B8 /* fi-FI */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2255,6 +2282,7 @@
 				F8C5EBED22F5A52400563B5F /* pt-BR */,
 				F8C5EBEE22F5A52800563B5F /* pt */,
 				F889CB93236D89C800A81068 /* de */,
+				2863879B23FC711A000D00B8 /* fi-FI */,
 			);
 			name = Common.strings;
 			sourceTree = "<group>";
@@ -2273,6 +2301,7 @@
 				F8B48B0322B37C67009BCC01 /* fr */,
 				F8B48B0F22B37C84009BCC01 /* zh */,
 				F889CB95236D89C800A81068 /* de */,
+				2863879E23FC711C000D00B8 /* fi-FI */,
 			);
 			name = ErrorMessages.strings;
 			sourceTree = "<group>";
@@ -2293,6 +2322,7 @@
 				F846CDD523046BAC00DCF016 /* pt-BR */,
 				F846CDD623046BAE00DCF016 /* pt */,
 				F889CB9B236D89C800A81068 /* de */,
+				286387A323FC711F000D00B8 /* fi-FI */,
 			);
 			name = SettingsViews.strings;
 			sourceTree = "<group>";
@@ -2313,6 +2343,7 @@
 				F8EEDD612300139800D2D610 /* zh */,
 				F8EEDD622300139A00D2D610 /* pt */,
 				F889CB94236D89C800A81068 /* de */,
+				2863879C23FC711B000D00B8 /* fi-FI */,
 			);
 			name = DexcomShareTestResult.strings;
 			sourceTree = "<group>";
