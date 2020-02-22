@@ -62,13 +62,13 @@ final class NewAlertSettingsViewController:UIViewController {
         // set toplabel text
         topLabelOutlet.text = Texts_Common.add + " " + AlertSettingsViewControllerData.getAlertKind(alertKind: alertSettingsViewControllerData.alertKind).alertTitle()
         
-        /// setup datasource, delegate, seperatorInset
+        /// setup tableView datasource, delegate, seperatorInset
         if let tableView = tableView {
-            tableView.separatorInset = UIEdgeInsets.zero
+            // insert slightly the separator text so that it doesn't touch the safe area limit
+            tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
             tableView.dataSource = alertSettingsViewControllerData
             tableView.delegate = alertSettingsViewControllerData
         }
-        
     }
     
     // MARK: - private helper functions
