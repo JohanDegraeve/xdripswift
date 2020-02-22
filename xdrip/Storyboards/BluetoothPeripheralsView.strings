@@ -1,4 +1,5 @@
-"screenTitle" = "Bluetooth Devices";
+// change "Bluetooth Devices" to "Bluetooth"
+"screenTitle" = "Bluetooth";
 "selectCategory" = "Select Category";
 "selectType" = "Select Type";
 "batteryLevel" = "Battery Level";

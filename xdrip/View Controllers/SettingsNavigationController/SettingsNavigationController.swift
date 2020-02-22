@@ -3,6 +3,11 @@ import UIKit
 // defining this class because I want to be able to setup the uiviewcontrollers that are  managed by this uinavigationcontroller
 final class SettingsNavigationController: UINavigationController {
     
+    // set the status bar content colour to light to match new darker theme
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
     // MARK:- private properties
     
     /// coredatamanager
