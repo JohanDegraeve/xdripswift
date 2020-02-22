@@ -7,7 +7,11 @@ extension UITabBarController {
             return
         }
         for item in items {
-            item.title = ""
+            
+            // show titles in Tab Bar items - in other words, don't clean them!
+            // it's easier to set globally here instead of removing each call
+            
+            // item.title = ""
             item.imageInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         }
     }
