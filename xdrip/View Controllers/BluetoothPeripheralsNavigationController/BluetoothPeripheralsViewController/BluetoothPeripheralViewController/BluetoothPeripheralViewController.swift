@@ -789,10 +789,10 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         
     }
     
-    func reset(successful: Bool) {
+    func reset(for bluetoothTransmitter: BluetoothTransmitter, successful: Bool) {
 
         // need to inform also other delegates
-        previouslyAssignedBluetoothTransmitterDelegate?.reset(successful: successful)
+        previouslyAssignedBluetoothTransmitterDelegate?.reset(for: bluetoothTransmitter, successful: successful)
         
         // handled in BluetoothPeripheralManager
         

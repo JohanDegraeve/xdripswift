@@ -93,7 +93,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         rxBuffer = Data()
 
         // initialize
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_BluconService)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Blucon, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Blucon, startScanningAfterInit: CGMTransmitterType.Blucon.startScanningAfterInit(), bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_BluconService)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Blucon, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Blucon, startScanningAfterInit: true, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
 
         //assign CGMTransmitterDelegate
         cgmTransmitterDelegate = cGMTransmitterDelegate
@@ -533,7 +533,7 @@ extension CGMBluconTransmitter: CGMTransmitter {
     /// this transmitter does not support oop web
     func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
     
-    func cgmTransmitterType() -> CGMTransmitterType? {
+    func cgmTransmitterType() -> CGMTransmitterType {
         return .Blucon
     }
     

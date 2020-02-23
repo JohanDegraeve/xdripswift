@@ -607,11 +607,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         guard let m5StackBluetoothTransmitter = bluetoothTransmitter as? M5StackBluetoothTransmitter else {fatalError("M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, not a m5StackBluetoothTransmitter")}
         
-        guard let previouslyAssignedM5StackBluetoothTransmitter = previouslyAssignedM5StackBluetoothTransmitterDelegate else {
-            
-            fatalError("M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, previouslyAssignedM5StackBluetoothTransmitter is nil")
-            return
-        }
+        guard let previouslyAssignedM5StackBluetoothTransmitter = previouslyAssignedM5StackBluetoothTransmitterDelegate else {fatalError("M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, previouslyAssignedM5StackBluetoothTransmitter is nil")}
         
         m5StackBluetoothTransmitter.m5StackBluetoothTransmitterDelegate = previouslyAssignedM5StackBluetoothTransmitter
         

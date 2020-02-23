@@ -519,15 +519,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     ///
     /// to be overriden. For transmitter types that don't need pairing, or that don't need pairing initiated by user/view controller, this function does not need to be overriden
     func initiatePairing() {return}
-    
 
-    // MARK: methods to get address and name
-    
-    /// read device name
-    func name() -> String? {
-        return deviceName
-    }
-    
     // MARK: - helpers
     
     private func initialize() {

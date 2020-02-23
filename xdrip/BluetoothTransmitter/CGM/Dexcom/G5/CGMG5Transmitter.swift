@@ -130,7 +130,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         self.G5ResetRequested = false
 
         // initialize - CBUUID_Receive_Authentication.rawValue and CBUUID_Write_Control.rawValue will probably not be used in the superclass
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G5, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G5)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue, startScanningAfterInit: CGMTransmitterType.dexcomG5.startScanningAfterInit(), bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G5, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G5)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue, startScanningAfterInit: true, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
 
         //assign CGMTransmitterDelegate
         self.cgmTransmitterDelegate = cGMTransmitterDelegate
@@ -512,7 +512,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// this transmitter does not support oop web
     func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
     
-    func cgmTransmitterType() -> CGMTransmitterType? {
+    func cgmTransmitterType() -> CGMTransmitterType {
         return .dexcomG5
     }
     
@@ -553,10 +553,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         if let resetRxMessage = ResetRxMessage(data: value) {
             if resetRxMessage.status == 0 {
                 trace("resetRxMessage status is 0, considering reset successful", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                bluetoothTransmitterDelegate.reset(successful: true)
+                bluetoothTransmitterDelegate.reset(for: self, successful: true)
             } else {
                 trace("resetRxMessage status is %{public}d, considering reset failed", log: log, category: ConstantsLog.categoryCGMG5, type: .info, resetRxMessage.status)
-                bluetoothTransmitterDelegate.reset(successful: false)
+                bluetoothTransmitterDelegate.reset(for: self, successful: false)
             }
         } else {
             trace("resetRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)

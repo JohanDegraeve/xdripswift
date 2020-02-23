@@ -17,9 +17,7 @@ protocol CGMTransmitter:AnyObject {
     func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String)
 
     /// get cgmTransmitterType
-    ///
-    /// return value optional because watlaa also conforms to protocol CGMTransmitter although it's not really a CGMTransmitter
-    func cgmTransmitterType() -> CGMTransmitterType?
+    func cgmTransmitterType() -> CGMTransmitterType
     
 }
 

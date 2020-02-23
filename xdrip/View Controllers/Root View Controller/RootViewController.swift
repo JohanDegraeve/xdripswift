@@ -15,7 +15,7 @@ final class RootViewController: UIViewController {
     
     @IBAction func calibrateButtonAction(_ sender: UIButton) {
         
-        if let transmitterType = UserDefaults.standard.transmitterType, transmitterType.canWebOOP(), UserDefaults.standard.webOOPEnabled {
+        if let cgmTransmitter = cgmTransmitter, cgmTransmitter.cgmTransmitterType().canWebOOP(), UserDefaults.standard.webOOPEnabled {
             
             let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil)
             
@@ -27,10 +27,10 @@ final class RootViewController: UIViewController {
         
     }
     
-    @IBOutlet weak var transmitterButtonOutlet: UIButton!
+    @IBOutlet weak var sensorButtonOutlet: UIButton!
     
-    @IBAction func transmitterButtonAction(_ sender: UIButton) {
-        createAndPresentTransmitterButtonActionSheet()
+    @IBAction func sensorButtonAction(_ sender: UIButton) {
+        createAndPresentSensorButtonActionSheet()
     }
     
     @IBOutlet weak var preSnoozeButtonOutlet: UIButton!
@@ -248,9 +248,6 @@ final class RootViewController: UIViewController {
             // update label texts, minutes ago, diff and value
             self.updateLabelsAndChart(overrideApplicationState: true)
             
-            // create transmitter based on UserDefaults
-            self.initializeCGMTransmitter()
-            
             // if licenseinfo not yet accepted, show license info with only ok button
             if !UserDefaults.standard.licenseInfoAccepted {
                 
@@ -276,15 +273,10 @@ final class RootViewController: UIViewController {
         setupView()
         
         // observe setting changes
-        // when user changes transmitter type or transmitter id, theThat's why observer for these settings is required
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterTypeAsString.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterId.rawValue, options: .new, context: nil)
-        // changing from follower to master or vice versa requires transmitter setup
+        // changing from follower to master or vice versa
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new
             , context: nil)
-        // need to prepare transmitter reset
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.transmitterResetRequired.rawValue, options: .new
-            , context: nil)
+
         // web oop
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPEnabled.rawValue, options: .new
             , context: nil)
@@ -411,7 +403,24 @@ final class RootViewController: UIViewController {
         bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: self, onCGMTransmitterCreation: {
             (cgmTransmitter: CGMTransmitter?) in
             
+            // reinitialize cgmTransmitter, possibily we assign cgmTransmitter to nil here (in case user deletes the active cgmTransmitter)
             self.cgmTransmitter = cgmTransmitter
+
+            //if cgmTransmitter not nil
+            if let cgmTransmitter = cgmTransmitter {
+
+                // reassign calibrator
+                self.calibrator = RootViewController.getCalibrator(transmitterType: cgmTransmitter.cgmTransmitterType(), webOOPEnabled: UserDefaults.standard.webOOPEnabled)
+                
+                UserDefaults.standard.transmitterTypeAsString = cgmTransmitter.cgmTransmitterType().rawValue
+
+            } else {
+                
+                UserDefaults.standard.transmitterTypeAsString = nil
+                
+            }
+            
+            
             
         })
         
@@ -427,13 +436,14 @@ final class RootViewController: UIViewController {
     private func processNewGlucoseData(glucoseData: inout [GlucoseData], sensorTimeInMinutes: Int?) {
         
         // check that calibrations and coredata manager is not nil
-        guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager else {
-            fatalError("in processNewCGMInfo, calibrations or coreDataManager is nil")
+        guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager, let cgmTransmitter = cgmTransmitter else {
+            fatalError("in processNewCGMInfo, calibrations or coreDataManager or cgmTransmitter is nil")
         }
         
         if activeSensor == nil {
             
-            if let sensorTimeInMinutes = sensorTimeInMinutes, UserDefaults.standard.transmitterType?.canDetectNewSensor() ?? false {
+            if let sensorTimeInMinutes = sensorTimeInMinutes, cgmTransmitter.cgmTransmitterType().canDetectNewSensor() {
+                
                 activeSensor = Sensor(startDate: Date(timeInterval: -Double(sensorTimeInMinutes * 60), since: Date()),nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                 if let activeSensor = activeSensor {
                     trace("created sensor with id : %{public}@ and startdate  %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, activeSensor.id, activeSensor.startDate.description)
@@ -469,7 +479,7 @@ final class RootViewController: UIViewController {
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 if glucose.timeStamp > timeStampLastBgReading {
                     
-                    _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
                     // save the newly created bgreading permenantly in coredata
                     coreDataManager.saveChanges()
@@ -530,29 +540,11 @@ final class RootViewController: UIViewController {
                 
                 switch keyPathEnum {
                     
-                // for these three settings, a forgetdevice can be done and reinitialize cgmTransmitter. In case of switching from master to follower, initializeCGMTransmitter will not initialize a cgmTransmitter, so it's ok to call that function
-                case UserDefaults.Key.transmitterTypeAsString, UserDefaults.Key.transmitterId, UserDefaults.Key.isMaster :
-                    
-                    // transmittertype change triggered by user, should not be done within 200 ms
-                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
-                        
-                        // there's no need to stop the sensor here, maybe the user is just switching from xdrip a to xdrip b
-                        // except if moving to follower
-                        if !UserDefaults.standard.isMaster {
-                            stopSensor()
-                        }
-                        
-                        // forget current device
-                        forgetDevice()
-                        
-                        // set up na transmitter
-                        initializeCGMTransmitter()
-                    }
-                    
-                case UserDefaults.Key.transmitterResetRequired :
-                    
-                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
-                        cgmTransmitter?.reset(requested: UserDefaults.standard.transmitterResetRequired)
+                case UserDefaults.Key.isMaster :
+
+                    // if switching to follower mode, then stop the sensor
+                    if !UserDefaults.standard.isMaster {
+                        stopSensor()
                     }
                     
                 case UserDefaults.Key.webOOPEnabled:
@@ -567,8 +559,8 @@ final class RootViewController: UIViewController {
                         
                         // reinitialize calibrator
                         // calling initializeCGMTransmitter is not a good idea here because that would mean set cgmTransmitter to nil, for some type of transmitters that would mean the user needs to scan again
-                        if let selectedTransmitterType = UserDefaults.standard.transmitterType {
-                            calibrator = RootViewController.getCalibrator(transmitterType: selectedTransmitterType, webOOPEnabled: UserDefaults.standard.webOOPEnabled)
+                        if let cgmTransmitter = cgmTransmitter {
+                            calibrator = RootViewController.getCalibrator(transmitterType: cgmTransmitter.cgmTransmitterType(), webOOPEnabled: UserDefaults.standard.webOOPEnabled)
                         }
                     }
                     
@@ -604,7 +596,7 @@ final class RootViewController: UIViewController {
         // set texts for buttons on top
         calibrateButtonOutlet.setTitle(Texts_HomeView.calibrationButton, for: .normal)
         preSnoozeButtonOutlet.setTitle(Texts_HomeView.snoozeButton, for: .normal)
-        transmitterButtonOutlet.setTitle(Texts_HomeView.transmitter, for: .normal)
+        sensorButtonOutlet.setTitle(Texts_HomeView.sensor, for: .normal)
         
         chartLongPressGestureRecognizerOutlet.delegate = self
         chartPanGestureRecognizerOutlet.delegate = self
@@ -662,10 +654,10 @@ final class RootViewController: UIViewController {
     private func requestCalibration(userRequested:Bool) {
         
         // check that calibrationsAccessor is not nil
-        guard let calibrationsAccessor = calibrationsAccessor else {
-            fatalError("in requestCalibration, calibrationsAccessor is nil")
+        guard let calibrationsAccessor = calibrationsAccessor, let cgmTransmitter = cgmTransmitter, let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter else {
+            fatalError("in requestCalibration, calibrationsAccessor or cgmTransmitter is nil")
         }
-        
+
         // check if sensor active and if not don't continue
         guard let activeSensor = activeSensor else {
             
@@ -713,12 +705,12 @@ final class RootViewController: UIViewController {
                     if let calibrator = self.calibrator {
                         if latestCalibrations.count == 0 {
                             // calling initialCalibration will create two calibrations, they are returned also but we don't need them
-                            _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDoubleConvertedToMgDl, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDoubleConvertedToMgDl, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                            _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDoubleConvertedToMgDl, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDoubleConvertedToMgDl, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                         } else {
                             // it's not the first calibration
                             if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
                                 // calling createNewCalibration will create a new  calibrations, it is returned but we don't need it
-                                _ = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: UserDefaults.standard.cgmTransmitterDeviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                                _ = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: bluetoothTransmitter.deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                             }
                         }
                         
@@ -754,77 +746,6 @@ final class RootViewController: UIViewController {
             }
         }))
         self.present(alert, animated: true)
-    }
-    
-    /// will set first cgmTransmitter to nil, reads transmittertype from userdefaults, if applicable also transmitterid and if available creates the property cgmTransmitter - if follower mode then cgmTransmitter is set to nil
-    ///
-    /// depending on transmitter type, scanning will automatically start as soon as cgmTransmitter is created
-    private func initializeCGMTransmitter() {
-        
-        // setting cgmTransmitter to nil, if currently cgmTransmitter is not nil, by assign to nil the deinit function of the currently used cgmTransmitter will be called, which will deconnect the device
-        // setting to nil is also done in other places, doing it again just to be 100% sure
-        cgmTransmitter = nil
-        
-        // if transmitter type is set and device is master
-        if let selectedTransmitterType = UserDefaults.standard.transmitterType, UserDefaults.standard.isMaster {
-            
-            // first create transmitter
-            switch selectedTransmitterType {
-                
-            case .dexcomG4:
-                if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG4xDripTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId)
-                }
-                
-            case .dexcomG5:
-                if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG5Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, bluetoothTransmitterDelegate: self, cGMTransmitterDelegate: self)
-                }
-                
-            case .dexcomG6:
-                if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMG6Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, bluetoothTransmitterDelegate: self, cGMTransmitterDelegate: self)
-                }
-                
-            case .miaomiao:
-                cgmTransmitter = CGMMiaoMiaoTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, bluetoothTransmitterDelegate: <#BluetoothTransmitterDelegate#>, timeStampLastBgReading: Date(timeIntervalSince1970: 0), webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
-                
-            case .Bubble:
-                cgmTransmitter = CGMBubbleTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, bluetoothTransmitterDelegate: <#BluetoothTransmitterDelegate#>, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber, webOOPEnabled: UserDefaults.standard.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
-                
-            case .GNSentry:
-                cgmTransmitter = CGMGNSEntryTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, bluetoothTransmitterDelegate: <#BluetoothTransmitterDelegate#>, timeStampLastBgReading: Date(timeIntervalSince1970: 0))
-                
-            case .Blucon:
-                if let currentTransmitterId = UserDefaults.standard.transmitterId {
-                    cgmTransmitter = CGMBluconTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, transmitterID: currentTransmitterId, bluetoothTransmitterDelegate: <#BluetoothTransmitterDelegate#>, timeStampLastBgReading: Date(timeIntervalSince1970: 0), sensorSerialNumber: UserDefaults.standard.sensorSerialNumber)
-                }
-                
-            case .Droplet1:
-                cgmTransmitter = CGMDroplet1Transmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName)
-                
-            case .blueReader:
-                cgmTransmitter = CGMBlueReaderTransmitter(address: UserDefaults.standard.cgmTransmitterDeviceAddress, name: UserDefaults.standard.cgmTransmitterDeviceName, delegate: self)
-                
-            case .watlaa:
-                // watlaa transmitter needs to be set through bluetooth devices tab
-                cgmTransmitter = nil
-                
-            }
-            
-            // assign calibrator
-            switch selectedTransmitterType {
-                
-            case .dexcomG4, .dexcomG5, .dexcomG6:
-                calibrator = DexcomCalibrator()
-            case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa:
-                // for all transmitters used with Libre1, calibrator is either NoCalibrator or Libre1Calibrator, depending if oopWeb is supported by the transmitter and on value of webOOPEnabled in settings
-                calibrator = RootViewController.getCalibrator(transmitterType: selectedTransmitterType, webOOPEnabled: UserDefaults.standard.webOOPEnabled)
-            }
-        }
-        
-        //reset UserDefaults.standard.transmitterResetRequired to false, might have been set to true.
-        UserDefaults.standard.transmitterResetRequired = false
     }
     
     /// if transmitterType.canWebOOP and UserDefaults.standard.webOOPEnabled then returns an instance of NoCalibrator otherwise returns an instance of Libre1Calibrator
@@ -1087,33 +1008,17 @@ final class RootViewController: UIViewController {
     }
     
     /// when user clicks transmitter button, this will create and present the actionsheet, contents depend on type of transmitter and sensor status
-    private func createAndPresentTransmitterButtonActionSheet() {
+    private func createAndPresentSensorButtonActionSheet() {
+        
         // initialize list of actions
         var listOfActions = [String : ((UIAlertAction) -> Void)]()
         
         // first action is to show the status
         listOfActions[Texts_HomeView.statusActionTitle] = {(UIAlertAction) in self.showStatus()}
         
-        // next action is scan device or forget device, can also be omitted depending on type of device
-        if cgmTransmitter != nil {
-            // cgmTransmitter is setup, means user has set transmittertype and transmitter id
-            // transmitterType should be not nil but we need to unwrap anyway
-            if let transmitterType = UserDefaults.standard.transmitterType {
-                if !transmitterType.startScanningAfterInit() {
-                    // it's a transmitter for which user needs to initiate the scanning
-                    // see if bluetoothDeviceAddress is known, results determines next action to add
-                    if UserDefaults.standard.cgmTransmitterDeviceAddress == nil {
-                        listOfActions[Texts_HomeView.scanBluetoothDeviceActionTitle] = {(UIAlertAction) in self.userInitiatesStartScanning()}
-                    } else {
-                        listOfActions[Texts_HomeView.forgetBluetoothDeviceActionTitle] = {(UIAlertAction) in self.forgetDevice()}
-                    }
-                }
-            }
-        }
-        
         // next action is to start or stop the sensor, can also be omitted depending on type of device - also not applicable for follower mode
-        if let transmitterType = UserDefaults.standard.transmitterType {
-            if transmitterType.allowManualSensorStart() && UserDefaults.standard.isMaster {
+        if let cgmTransmitter = cgmTransmitter {
+            if cgmTransmitter.cgmTransmitterType().allowManualSensorStart() && UserDefaults.standard.isMaster {
                 // user needs to start and stop the sensor manually
                 if activeSensor != nil {
                     listOfActions[Texts_HomeView.stopSensorActionTitle] = {(UIAlertAction) in self.stopSensor()}
@@ -1151,31 +1056,6 @@ final class RootViewController: UIViewController {
         // add 2 newlines
         textToShow += "\r\n\r\n"
         
-        // add transmitter info
-        // first the name
-        textToShow += Texts_HomeView.transmitter + " : "
-        if let deviceName = UserDefaults.standard.cgmTransmitterDeviceName {
-            textToShow += deviceName
-        } else {
-            textToShow += Texts_HomeView.notKnown
-        }
-        
-        // add 1 newline with last connection timestamp
-        textToShow += "\r\n\r\n"
-        
-        // check if connected, if not add last connection timestamp
-        if let connectionStatus = cgmTransmitter?.getConnectionStatus(), connectionStatus == CBPeripheralState.connected {
-            textToShow += Texts_HomeView.connected + "\r\n\r\n"
-        } else {
-            if let lastDisconnectTimestamp = UserDefaults.standard.lastdisConnectTimestamp {
-                textToShow += Texts_HomeView.lastConnection + " : " + lastDisconnectTimestamp.description(with: .current)
-                // add 1 newline with last connection timestamp
-                textToShow += "\r\n\r\n"
-            } else {
-                textToShow += Texts_HomeView.neverConnected + "\r\n\r\n"
-            }
-        }
-        
         // add transmitterBatteryInfo if known
         if let transmitterBatteryInfo = UserDefaults.standard.transmitterBatteryInfo {
             textToShow += Texts_HomeView.transmitterBatteryLevel + " : " + transmitterBatteryInfo.description
@@ -1187,72 +1067,6 @@ final class RootViewController: UIViewController {
         let alert = UIAlertController(title: Texts_HomeView.statusActionTitle, message: textToShow, actionHandler: nil)
         
         self.present(alert, animated: true, completion: nil)
-        
-    }
-    
-    /// user clicked start scanning action, this function will check if bluetooth is on (?) and if not yet scanning, start the scanning
-    private func userInitiatesStartScanning() {
-        
-        // start the scanning, result of the startscanning will be in startScanningResult - this is not the result of the scanning itself. Scanning may have started successfully but maybe the peripheral is not yet connected, maybe it is
-        if let startScanningResult = cgmTransmitter?.startScanning() {
-            trace("in userInitiatesStartScanning, startScanningResult = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, startScanningResult.description())
-            switch startScanningResult {
-            case .success:
-                // success : could be useful to display that scanning has started, however in most cases the connection will immediately happen, causing a second pop up to say that the transmitter is connected, let's not create to many pop ups
-                // we do mark that the user initiated the scanning. If connection is setup, we'll inform the user, see cgmTransmitterDidConnect
-                userDidInitiateScanning = true
-                break
-            case .alreadyConnected, .connecting:
-                // alreadyConnected : should not happen because that would mean we gave the user the option to start scanning, although there is already a connection
-                // connecting : same as for alreadyConnected
-                break
-            case .alreadyScanning:
-                // probably user started scanning two times, let's show a pop up that scanning is ongoing
-                let alert = UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: Texts_HomeView.scanBluetoothDeviceOngoing, actionHandler: nil)
-                
-                self.present(alert, animated: true, completion: nil)
-                
-            case .bluetoothNotPoweredOn( _):
-                // bluetooth is not on, user should switch it on
-                let alert = UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: Texts_HomeView.bluetoothIsNotOn, actionHandler: nil)
-                
-                self.present(alert, animated: true, completion: nil)
-                
-            case .other(let reason):
-                // other unknown error occured
-                let alert = UIAlertController(title: Texts_HomeView.scanBluetoothDeviceActionTitle, message: "Error while starting scanning. Reason : " + reason, actionHandler: nil)
-                
-                self.present(alert, animated: true, completion: nil)
-                
-            }
-        }
-    }
-    
-    ///     - cgmTransmitter to nil, this disconnects also the existing transmitter
-    ///     - UserDefaults.standard.transmitterBatteryInfo to nil
-    ///     - UserDefaults.standard.lastdisConnectTimestamp to nil
-    ///     - UserDefaults.standard.bluetoothDeviceAddress to nil
-    ///     - UserDefaults.standard.bluetoothDeviceName to nil
-    ///     -
-    ///     - calls also initializeCGMTransmitter which recreated the cgmTransmitter property, depending on settings
-    private func forgetDevice() {
-        
-        // set device address and name to nil in userdefaults
-        UserDefaults.standard.cgmTransmitterDeviceAddress = nil
-        UserDefaults.standard.cgmTransmitterDeviceName =  nil
-        
-        // setting cgmTransmitter to nil,  the deinit function of the currently used cgmTransmitter will be called, which will disconnect the device
-        // set cgmTransmitter to nil, this will call the deinit function which will disconnect first
-        cgmTransmitter = nil
-        
-        // by calling initializeCGMTransmitter, a new cgmTransmitter will be created, assuming it's not follower mode, and transmittertype is selected and if applicable transmitter id is set
-        initializeCGMTransmitter()
-        
-        // reset also UserDefaults.standard.transmitterBatteryInfo
-        UserDefaults.standard.transmitterBatteryInfo = nil
-        
-        // set lastdisconnecttimestamp to nil
-        UserDefaults.standard.lastdisConnectTimestamp = nil
         
     }
     
@@ -1323,12 +1137,22 @@ final class RootViewController: UIViewController {
         }
     }
     
+    private func getCGMTransmitterDeviceName(for cgmTransmitter: CGMTransmitter) -> String? {
+        
+        if let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter {
+            return bluetoothTransmitter.deviceName
+        }
+        
+        return nil
+        
+    }
+    
 }
 
 // MARK: - conform to CGMTransmitter protocol
 
 /// conform to CGMTransmitterDelegate
-extension RootViewController:CGMTransmitterDelegate {
+extension RootViewController: CGMTransmitterDelegate {
     
     func getCGMTransmitter() -> CGMTransmitter? {
         return cgmTransmitter
@@ -1425,10 +1249,8 @@ extension RootViewController: UITabBarControllerDelegate {
     
 }
 
-// MARK: - conform to UNUserNotificationCenterDelegate protocol
-
 /// conform to UNUserNotificationCenterDelegate, for notifications
-extension RootViewController:UNUserNotificationCenterDelegate {
+extension RootViewController: UNUserNotificationCenterDelegate {
     
     // called when notification created while app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
@@ -1457,10 +1279,8 @@ extension RootViewController:UNUserNotificationCenterDelegate {
             
             // so actually the app was in the foreground, at the  moment the Transmitter Class called the cgmTransmitterNeedsPairing function, there's no need to show the notification, we can immediately call back the cgmTransmitter initiatePairing function
             completionHandler([])
-            cgmTransmitter?.initiatePairing()
-            
-            /// remove applicationManagerKeyInitiatePairing from application key manager - there's no need to initiate the pairing via this closure
-            ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeyInitiatePairing)
+            bluetoothPeripheralManager?.initiatePairing()
+
             
         } else {
             

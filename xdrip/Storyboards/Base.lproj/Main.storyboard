@@ -29,7 +29,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="21"/>
                                 <state key="normal" title="Transmitter"/>
                                 <connections>
-                                    <action selector="transmitterButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="iJp-CH-PZa"/>
+                                    <action selector="sensorButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="iJp-CH-PZa"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fSY-nc-amN">
@@ -102,7 +102,7 @@
                         <outlet property="diffLabelOutlet" destination="7Wo-wd-80o" id="nnn-w9-1sX"/>
                         <outlet property="minutesLabelOutlet" destination="uyn-2k-K74" id="XXm-rq-Suy"/>
                         <outlet property="preSnoozeButtonOutlet" destination="fSY-nc-amN" id="T25-Z1-3Ad"/>
-                        <outlet property="transmitterButtonOutlet" destination="zWo-AR-qJE" id="uuB-WI-JKe"/>
+                        <outlet property="sensorButtonOutlet" destination="zWo-AR-qJE" id="uuB-WI-JKe"/>
                         <outlet property="valueLabelOutlet" destination="We3-bN-ffR" id="wtY-sZ-mev"/>
                     </connections>
                 </viewController>

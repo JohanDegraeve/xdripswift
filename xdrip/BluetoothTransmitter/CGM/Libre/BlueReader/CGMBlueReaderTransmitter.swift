@@ -41,7 +41,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
         // assign CGMTransmitterDelegate
         cgmTransmitterDelegate = cGMTransmitterDelegate
         
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_BlueReader)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_BlueReader, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_BlueReader, startScanningAfterInit: CGMTransmitterType.blueReader.startScanningAfterInit(), bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_BlueReader)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_BlueReader, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_BlueReader, startScanningAfterInit: false, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }
     
@@ -124,7 +124,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// this transmitter does not support oop web
     func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
     
-    func cgmTransmitterType() -> CGMTransmitterType? {
+    func cgmTransmitterType() -> CGMTransmitterType {
         return .blueReader
     }
     
