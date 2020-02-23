@@ -29,6 +29,9 @@ class BluetoothPeripheralManager: NSObject {
     /// will be used to present alerts, for example pairing failed
     public let uIViewController: UIViewController
     
+    /// bluetoothtransmitter may need pairing, but app is in background. Notification will be sent to user, user will open the app, at that moment pairing can happen. variable bluetoothTransmitterThatNeedsPairing will temporary store the BluetoothTransmitter that needs the pairing
+    public var bluetoothTransmitterThatNeedsPairing: BluetoothTransmitter?
+    
     // MARK: - private properties
     
     /// CoreDataManager to use
@@ -622,6 +625,15 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
             bluetoothTransmitters[index] = nil
             
         }
+    }
+    
+    func initiatePairing() {
+        
+        bluetoothTransmitterThatNeedsPairing?.initiatePairing()
+
+        /// remove applicationManagerKeyInitiatePairing from application key manager - there's no need to initiate the pairing via this closure
+        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: BluetoothPeripheralManager.applicationManagerKeyInitiatePairing)
+        
     }
     
 }

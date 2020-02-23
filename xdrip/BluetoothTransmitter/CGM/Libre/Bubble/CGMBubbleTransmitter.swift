@@ -89,7 +89,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         self.oopWebToken = oopWebToken
         self.oopWebSite = oopWebSite
         
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Bubble)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Bubble, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Bubble, startScanningAfterInit: CGMTransmitterType.Bubble.startScanningAfterInit(), bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Bubble)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Bubble, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Bubble, startScanningAfterInit: false, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }
     
@@ -215,7 +215,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         self.oopWebSite = oopWebSite
     }
     
-    func cgmTransmitterType() -> CGMTransmitterType? {
+    func cgmTransmitterType() -> CGMTransmitterType {
         return .Bubble
     }
     

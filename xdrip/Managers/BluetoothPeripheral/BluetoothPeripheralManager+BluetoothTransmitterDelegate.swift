@@ -4,7 +4,7 @@ import AVFoundation
 import AudioToolbox
 
 extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
-    
+
     /// because extension dont allow var's, this is a workaround as explained here https://medium.com/@valv0/computed-properties-and-extensions-a-pure-swift-approach-64733768112c
     private struct PropertyHolder {
         
@@ -14,10 +14,10 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         /// timer used when asking the transmitter to initiate pairing. The user is waiting for the response, if the response from the transmitter doesn't come within a few seconds, then we'll inform the user
         static var transmitterPairingResponseTimer:Timer?
 
-        /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initiate pairing
-        static let applicationManagerKeyInitiatePairing = "RootViewController-InitiatePairing"
-
     }
+    
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initiate pairing
+    static let applicationManagerKeyInitiatePairing = "RootViewController-InitiatePairing"
     
     /// Transmitter is calling this delegate function to indicate that bluetooth pairing is needed. If the app is in the background, the user will be informed, after opening the app a pairing request will be initiated. if the app is in the foreground, the pairing request will be initiated immediately
     func transmitterNeedsPairing(bluetoothTransmitter: BluetoothTransmitter) {
@@ -70,10 +70,10 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         // we will not just count on it that the user will click the notification to open the app (assuming the app is in the background, if the app is in the foreground, then we come in another flow)
         // whenever app comes from-back to foreground, updateLabelsAndChart needs to be called
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: PropertyHolder.applicationManagerKeyInitiatePairing, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: BluetoothPeripheralManager.applicationManagerKeyInitiatePairing, closure: {
             
             // first of all reremove from application key manager
-            ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: PropertyHolder.applicationManagerKeyInitiatePairing)
+            ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: BluetoothPeripheralManager.applicationManagerKeyInitiatePairing)
             
             // first remove existing notification if any
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
@@ -92,6 +92,9 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             self.initiateTransmitterPairing(bluetoothTransmitter: bluetoothTransmitter)
             
         })
+        
+        // need to temporary store the bluetooth transmitter that needs the pairing, user will now open the app, pairing will then be initiated
+        bluetoothTransmitterThatNeedsPairing = bluetoothTransmitter
         
     }
 
@@ -121,10 +124,10 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         }
     }
     
-    func reset(successful: Bool) {
+    func reset(for bluetoothTransmitter: BluetoothTransmitter, successful: Bool) {
         
-        // reset setting to false
-        UserDefaults.standard.transmitterResetRequired = false
+        // set resetrequired to false in coredata, there's no need to reset as it's just been done
+        getBluetoothPeripheral(for: bluetoothTransmitter).blePeripheral.resetrequired = false
         
         // Create Notification Content to give info about reset result of reset attempt
         let notificationContent = UNMutableNotificationContent()

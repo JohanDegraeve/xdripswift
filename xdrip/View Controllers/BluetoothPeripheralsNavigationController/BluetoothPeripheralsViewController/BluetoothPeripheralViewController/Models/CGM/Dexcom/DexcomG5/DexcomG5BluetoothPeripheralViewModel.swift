@@ -47,11 +47,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         guard let cGMG5Transmitter = bluetoothTransmitter as? CGMG5Transmitter else {fatalError("DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, not a WatlaaBluetoothTransmitterMaster")}
         
-        guard let previouslyAssignedcGMG5TransmitterDelegate = previouslyAssignedcGMG5TransmitterDelegate else {
-            
-            fatalError("DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, previouslyAssignedcGMG5TransmitterDelegate is nil")
-            return
-        }
+        guard let previouslyAssignedcGMG5TransmitterDelegate = previouslyAssignedcGMG5TransmitterDelegate else {fatalError("DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, previouslyAssignedcGMG5TransmitterDelegate is nil")}
         
         cGMG5Transmitter.cGMG5TransmitterDelegate = previouslyAssignedcGMG5TransmitterDelegate
         

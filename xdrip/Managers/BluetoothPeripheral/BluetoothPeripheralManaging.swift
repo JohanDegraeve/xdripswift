@@ -40,4 +40,7 @@ func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: Str
     /// bluetoothtransmitter for this bluetoothperiheral will be deleted, as a result this will also disconnect the bluetoothtransmitter
     func setBluetoothTransmitterToNil(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral)
     
+    /// bluetoothtransmitter may need pairing, but app is in background. Notification will be sent to user, user will open the app, at that moment initiatePairing will be called
+    func initiatePairing()
+    
 }

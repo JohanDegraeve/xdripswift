@@ -26,8 +26,6 @@ extension UserDefaults {
         
         /// transmitter type
         case transmitterTypeAsString = "transmitterTypeAsString"
-        /// transmitterid
-        case transmitterId = "transmitterId"
         /// is web OOP enabled or not
         case webOOPEnabled = "webOOPEnabled"
         /// if webOOP enabled, what site to use
@@ -145,14 +143,6 @@ extension UserDefaults {
         
         // Other Settings (not user configurable)
         
-        // cgm Transmitter
-        /// active transmitter address
-        case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
-        /// active transmitter name
-        case cgmTransmitterDeviceName = "cgmTransmitterDeviceName"
-        /// timestamp of last bluetooth disconnect to transmitter
-        case lastdisConnectTimestamp = "lastdisConnectTimestamp"
-        
         // Nightscout
         /// timestamp lastest reading uploaded to NightScout
         case timeStampLatestNSUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
@@ -160,8 +150,6 @@ extension UserDefaults {
         // Transmitter
         /// Transmitter Battery Level
         case transmitterBatteryInfo = "transmitterbatteryinfo"
-        /// Dexcom transmitter reset required
-        case transmitterResetRequired = "transmitterResetRequired"
         
         // HealthKit
         /// did user authorize the storage of readings in healthkit or not
@@ -323,7 +311,7 @@ extension UserDefaults {
 
     // MARK: Transmitter Settings
     
-    /// setting a new transmittertype will also set the transmitterid to nil
+    /// cgm ransmittertype currently active
     var transmitterType:CGMTransmitterType? {
         get {
             if let transmitterTypeAsString = transmitterTypeAsString {
@@ -343,21 +331,20 @@ extension UserDefaults {
             // if transmittertype has changed then also reset the transmitter id to nil
             // this is also a check to see if transmitterTypeAsString has really changed, because just calling a set without a new value may cause a transmittertype reset in other parts of the call (inclusive stopping sensor etc.)
             if newValue != string(forKey: Key.transmitterTypeAsString.rawValue) {
-                set(nil, forKey: Key.transmitterId.rawValue)
                 set(newValue, forKey: Key.transmitterTypeAsString.rawValue)
             }
         }
     }
     
-    /// transmitter id
-    @objc dynamic var transmitterId:String? {
+    /// NOT USED ANYMORE  transmitter id
+    /*@objc dynamic var transmitterId:String? {
         get {
             return string(forKey: Key.transmitterId.rawValue)
         }
         set {
             set(newValue, forKey: Key.transmitterId.rawValue)
         }
-    }
+    }*/
     
     /// web oop enabled
     @objc dynamic var webOOPEnabled: Bool {
@@ -788,33 +775,6 @@ extension UserDefaults {
     
     // MARK: - =====  Other Settings ======
     
-    var cgmTransmitterDeviceAddress: String? {
-        get {
-            return string(forKey: Key.cgmTransmitterDeviceAddress.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.cgmTransmitterDeviceAddress.rawValue)
-        }
-    }
-    
-    var cgmTransmitterDeviceName: String? {
-        get {
-            return string(forKey: Key.cgmTransmitterDeviceName.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.cgmTransmitterDeviceName.rawValue)
-        }
-    }
-
-    var lastdisConnectTimestamp:Date? {
-        get {
-            return object(forKey: Key.lastdisConnectTimestamp.rawValue) as? Date
-        }
-        set {
-            set(newValue, forKey: Key.lastdisConnectTimestamp.rawValue)
-        }
-    }
-    
     /// timestamp lastest reading uploaded to NightScout
     var timeStampLatestNightScoutUploadedBgReading:Date? {
         get {
@@ -825,7 +785,7 @@ extension UserDefaults {
         }
     }
     
-    /// transmitterBatteryInfo
+    /// transmitterBatteryInfo, this should be the transmitter battery info of the latest active cgmTransmitter
     var transmitterBatteryInfo:TransmitterBatteryInfo? {
         get {
             if let data = object(forKey: Key.transmitterBatteryInfo.rawValue) as? Data {
@@ -844,16 +804,6 @@ extension UserDefaults {
         }
     }
     
-    /// is transmitter reset required or not
-    @objc dynamic var transmitterResetRequired: Bool {
-        get {
-            return bool(forKey: Key.transmitterResetRequired.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.transmitterResetRequired.rawValue)
-        }
-    }
-      
     /// did user authorize the storage of readings in healthkit or not - this setting is actually only used to allow the HealthKitManager to listen for changes in the authorization status
     var storeReadingsInHealthkitAuthorized:Bool {
         get {

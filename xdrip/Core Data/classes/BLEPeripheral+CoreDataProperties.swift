@@ -16,6 +16,9 @@ extension BLEPeripheral {
     /// should app try to connect to the device yes or no
     @NSManaged public var shouldconnect: Bool
     
+    /// is a reset require or not (only applicable to transmitters for which reset is supported, like DexcomG5)
+    @NSManaged public var resetrequired: Bool
+    
     /// alias chosen by user, to recognize the device or to distinguish two devices that have the same name
     @NSManaged public var alias: String?
     

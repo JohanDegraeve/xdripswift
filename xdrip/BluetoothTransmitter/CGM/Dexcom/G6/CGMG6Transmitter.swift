@@ -23,7 +23,7 @@ class CGMG6Transmitter: CGMG5Transmitter {
                 
     }
     
-    override func cgmTransmitterType() -> CGMTransmitterType? {
+    override func cgmTransmitterType() -> CGMTransmitterType {
         return .dexcomG6
     }
     

@@ -42,6 +42,7 @@
         <attribute name="alias" optional="YES" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
         <attribute name="parameterUpdateNeededAtNextConnect" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="resetrequired" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="transmitterId" optional="YES" attributeType="String"/>
         <relationship name="dexcomG5" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="DexcomG5" inverseName="blePeripheral" inverseEntity="DexcomG5"/>
@@ -95,7 +96,7 @@
         <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
-        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="178"/>
+        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="193"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
         <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="73"/>
         <element name="M5Stack" positionX="-657" positionY="180" width="128" height="163"/>

@@ -8,8 +8,8 @@ enum Texts_HomeView {
         return NSLocalizedString("presnooze", tableName: filename, bundle: Bundle.main, value: "Snooze", comment: "Text in button on home screen")
     }()
     
-    static let transmitter:String = {
-        return NSLocalizedString("transmitter", tableName: filename, bundle: Bundle.main, value: "Transmitter", comment: "Literally 'Transmitter', used as name in the button in the home screen, but also in text in pop ups")
+    static let sensor:String = {
+        return NSLocalizedString("sensor", tableName: filename, bundle: Bundle.main, value: "Sensor", comment: "Literally 'Sensor', used as name in the button in the home screen, but also in text in pop ups")
     }()
     
     static let calibrationButton:String = {

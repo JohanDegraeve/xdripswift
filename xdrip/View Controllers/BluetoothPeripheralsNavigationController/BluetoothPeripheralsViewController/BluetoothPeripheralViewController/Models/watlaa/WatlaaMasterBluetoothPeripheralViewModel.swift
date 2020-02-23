@@ -45,11 +45,7 @@ extension WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel
         
         guard let watlaaBluetoothTransmitter = bluetoothTransmitter as? WatlaaBluetoothTransmitterMaster else {fatalError("WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, not a WatlaaBluetoothTransmitterMaster")}
         
-        guard let previouslyAssignedWatlaaBluetoothTransmitterDelegate = previouslyAssignedWatlaaBluetoothTransmitterDelegate else {
-            
-            fatalError("WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, previouslyAssignedWatlaaBluetoothTransmitterDelegate is nil")
-            return
-        }
+        guard let previouslyAssignedWatlaaBluetoothTransmitterDelegate = previouslyAssignedWatlaaBluetoothTransmitterDelegate else {fatalError("WatlaaMasterBluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, previouslyAssignedWatlaaBluetoothTransmitterDelegate is nil")}
         
         watlaaBluetoothTransmitter.watlaaBluetoothTransmitterDelegate = previouslyAssignedWatlaaBluetoothTransmitterDelegate
 

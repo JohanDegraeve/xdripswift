@@ -2,7 +2,7 @@ import Foundation
 
 extension WatlaaBluetoothTransmitterMaster: CGMTransmitter {
     
-    func reset(requested: Bool) {
+    func reset(for bluetoothTransmitter: BluetoothTransmitter, successful: Bool) {
         // no reset need for watlaa
     }
     
@@ -14,8 +14,8 @@ extension WatlaaBluetoothTransmitterMaster: CGMTransmitter {
         // no web oop for watlaa as sensorid detection not supported
     }
     
-    func cgmTransmitterType() -> CGMTransmitterType? {
-        return nil
+    func cgmTransmitterType() -> CGMTransmitterType {
+        return .watlaa
     }
     
 }
