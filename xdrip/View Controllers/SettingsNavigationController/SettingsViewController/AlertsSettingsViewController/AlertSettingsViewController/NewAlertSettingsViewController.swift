@@ -69,13 +69,6 @@ final class NewAlertSettingsViewController:UIViewController {
             tableView.dataSource = alertSettingsViewControllerData
             tableView.delegate = alertSettingsViewControllerData
         }
-/*
-        /// setup datasource, delegate, seperatorInset
-        if let tableView = tableView {
-            tableView.separatorInset = UIEdgeInsets.zero
-            tableView.dataSource = alertSettingsViewControllerData
-            tableView.delegate = alertSettingsViewControllerData
-        } */
     }
     
     // MARK: - private helper functions

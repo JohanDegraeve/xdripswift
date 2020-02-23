@@ -11,16 +11,7 @@ import HealthKitUI
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController {
     
-    // set the status bar content colour to light to match new darker theme
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-    
     // MARK: - Properties - Outlets and Actions for buttons and labels in home screen
-    
-    // app string outlet
-    
-    @IBOutlet weak var appInfoOutlet: UILabel!
     
     @IBOutlet weak var calibrateButtonOutlet: UIButton!
     
@@ -77,13 +68,13 @@ final class RootViewController: UIViewController {
 
             // user has been panning, if chart is panned backward, then need to set valueLabel to value of latest chartPoint shown in the chart, and minutesAgo text to timeStamp of latestChartPoint
             if self.glucoseChartManager.chartIsPannedBackward {
-                
+
                 if let lastChartPointEarlierThanEndDate = self.glucoseChartManager.lastChartPointEarlierThanEndDate, let chartAxisValueDate = lastChartPointEarlierThanEndDate.x as? ChartAxisValueDate  {
                     
                     // valuueLabel text should not be strikethrough (might still be strikethrough in case latest reading is older than 10 minutes
                     self.valueLabelOutlet.attributedText = nil
+                    
                     // set value to value of latest chartPoint
-
                     self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
 
                     // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
@@ -92,11 +83,8 @@ final class RootViewController: UIViewController {
                     self.valueLabelOutlet.textColor = UIColor.lightGray
 
                     // apply strikethrough to the BG value text format
-                    
                     let attributedString = NSMutableAttributedString(string: self.valueLabelOutlet.text!)
                 attributedString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributedString.length))
-                    
-                // attributedString.addAttribute(NSAttributedString.Key.strikethroughColor, value: UIColor.darkGray, range: NSMakeRange(0, attributedString.length))
                     
                     self.valueLabelOutlet.attributedText = attributedString
                     
@@ -227,6 +215,11 @@ final class RootViewController: UIViewController {
     }()
     
     // MARK: - View Life Cycle
+    
+    // set the status bar content colour to light to match new darker theme
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -1108,10 +1101,11 @@ final class RootViewController: UIViewController {
         }
         
         // set color, depending on value lower than low mark or higher than high mark
+        // set both HIGH and LOW BG values to red as previous yellow for hig is now not so obvious due to in-range colour of green.
         if lastReading.calculatedValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
             valueLabelOutlet.textColor = UIColor.red
         } else if lastReading.calculatedValue >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
-            valueLabelOutlet.textColor = "#a0b002".hexStringToUIColor()
+            valueLabelOutlet.textColor = UIColor.red
         } else {
             // keep text colour
             valueLabelOutlet.textColor = UIColor.green

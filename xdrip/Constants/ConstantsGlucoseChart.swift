@@ -34,7 +34,7 @@ enum ConstantsGlucoseChart {
     static let thirdGlucoseValueRangeInMmol = [21.0, 23.0]
     
     /// axis line color    (make white to match new dark UI theme)
-    static let axisLineColor = UIColor.white
+    static let axisLineColor = UIColor.gray
     
     /// axis line label    (make white to match new dark UI theme)
     static let axisLabelColor = UIColor.white
@@ -43,7 +43,7 @@ enum ConstantsGlucoseChart {
     static let gridColor = UIColor.gray
     
     /// glucose color
-    static let glucoseTintColor = UIColor.green
+    static let glucoseTintColor = UIColor.cyan
     
     /// labels width for vertical axis
     static let yAxisLabelsWidth: CGFloat = 30
