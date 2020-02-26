@@ -96,7 +96,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
             return
         }
         
-        // send all parameters, if successful,then for this m5Stack we can set parameterUpdateNeeded to false
+        // send all parameters, if successful, then for this m5Stack we can set parameterUpdateNeeded to false
         if sendAllParametersToM5Stack(to: m5StackBluetoothTransmitter) {
             (bluetoothPeripherals[index] as? M5Stack)?.blePeripheral.parameterUpdateNeededAtNextConnect = false
         } else {

@@ -93,9 +93,6 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
         ///General settings - language, glucose unit, high and low value
         case general
         
-        ///transmitter type and if applicable transmitter id
-        case transmitter
-
         /// alarms
         case alarms
 
@@ -129,8 +126,6 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
                 
             case .general:
                 return SettingsViewGeneralSettingsViewModel()
-            case .transmitter:
-                return SettingsViewTransmitterSettingsViewModel()
             case .alarms:
                 return SettingsViewAlertSettingsViewModel()
             case .nightscout:

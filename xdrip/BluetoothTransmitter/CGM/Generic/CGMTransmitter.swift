@@ -4,20 +4,30 @@ import CoreBluetooth
 /// defines functions that every cgm transmitter should conform to
 protocol CGMTransmitter:AnyObject {
     
-    /// to set webOOPEnabled - called when user change the setting
+    /// to set webOOPEnabled - called when user changes the setting
     ///
     /// for transmitters who don't support webOOP, there's no need to implemented this function<br>
     /// ---  for transmitters who support webOOP (Bubble, MiaoMiao, ..) this should be implemented
     func setWebOOPEnabled(enabled:Bool)
     
-    /// to set oopWebSite and oopWebToken - called when user change the setting
+    /// is the CGMTransmitter web oop enabled or not
+    func isWebOOPEnabled() -> Bool
+    
+    /// to set oopWebSite and
     ///
-    /// for transmitters who don't support webOOP, there's no need to implemented this function<br>
-    /// ---  for transmitters who support webOOP (Bubble, MiaoMiao, ..) this should be implemented
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String)
+    /// for transmitters that don't support webOOP, there's no need to implemented this function
+    /// ---  for transmitters that support webOOP (Bubble, MiaoMiao, ..) this should be implemented
+    func setWebOOPSite(oopWebSite: String)
 
+    /// for transmitters that don't support webOOP, there's no need to implemented this function
+    /// ---  for transmitters that support webOOP (Bubble, MiaoMiao, ..) this should be implemented
+    func setWebOOPToken(oopWebToken: String)
+    
     /// get cgmTransmitterType
     func cgmTransmitterType() -> CGMTransmitterType
+    
+    /// only applicable for Libre transmitters. To request a new reading.
+    func requestNewReading()
     
 }
 
@@ -100,7 +110,7 @@ enum CGMTransmitterType:String, CaseIterable {
             return true
             
         case .miaomiao, .Bubble:
-            return false
+            return true
         
         case .Blucon:
             return true
@@ -108,6 +118,7 @@ enum CGMTransmitterType:String, CaseIterable {
         }
     }
     
+    /// does the transmitter type support web oop (for Libre1) yes or no
     func canWebOOP() -> Bool {
         
         //return false

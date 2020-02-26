@@ -24,35 +24,17 @@ class DexcomG5BluetoothPeripheralViewModel {
     /// reference to BluetoothPeripheralViewController that will own this WatlaaMasterBluetoothPeripheralViewModel - needed to present stuff etc
     private weak var bluetoothPeripheralViewController: BluetoothPeripheralViewController?
     
-    /// temporary stores CGMG5TransmitterDelegate
-    private weak var previouslyAssignedcGMG5TransmitterDelegate: CGMG5TransmitterDelegate?
-
 }
 
 // MARK: - conform to BluetoothPeripheralViewModel
 
 extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     
-    func assignBluetoothTransmitterDelegate(to bluetoothTransmitter: BluetoothTransmitter) {
-        
-        guard let cGMG5Transmitter = bluetoothTransmitter as? CGMG5Transmitter else {fatalError("DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel, assignBluetoothTransmitterDelegate, not a CGMG5Transmitter")}
-        
-        previouslyAssignedcGMG5TransmitterDelegate = cGMG5Transmitter.cGMG5TransmitterDelegate
-        
-        cGMG5Transmitter.cGMG5TransmitterDelegate = self
-        
+    func canWebOOP() -> Bool {
+        // web oop only applicable to cgm transmitters and DexcomG5 is not a cgm transmitter
+        return false
     }
-    
-    func reAssignBluetoothTransmitterDelegateToOriginal(for bluetoothTransmitter: BluetoothTransmitter) {
-        
-        guard let cGMG5Transmitter = bluetoothTransmitter as? CGMG5Transmitter else {fatalError("DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, not a WatlaaBluetoothTransmitterMaster")}
-        
-        guard let previouslyAssignedcGMG5TransmitterDelegate = previouslyAssignedcGMG5TransmitterDelegate else {fatalError("DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel, reAssignBluetoothTransmitterDelegateToOriginal, previouslyAssignedcGMG5TransmitterDelegate is nil")}
-        
-        cGMG5Transmitter.cGMG5TransmitterDelegate = previouslyAssignedcGMG5TransmitterDelegate
-        
-    }
-    
+
     func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
@@ -61,12 +43,6 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         self.bluetoothPeripheralViewController = bluetoothPeripheralViewController
         
-        if let dexcomG5 = bluetoothPeripheral as? DexcomG5  {
-            
-            storeTempValues(from: dexcomG5)
-            
-        }
-
     }
     
     func screenTitle() -> String {
@@ -78,7 +54,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         return ""
     }
     
-    func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem) {
+    func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral) {
         
         // verify that bluetoothPeripheral is a DexcomG5
         guard let dexcomG5 = bluetoothPeripheral as? DexcomG5 else {
@@ -102,7 +78,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
     }
     
-    func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem) -> SettingsSelectedRowAction {
+    func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging) -> SettingsSelectedRowAction {
         
         // verify that bluetoothPeripheral is a DexcomG5
         /*guard let dexcomG5 = bluetoothPeripheral as? DexcomG5 else {
@@ -129,49 +105,13 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         return 1
     }
     
-    func storeTempValues(from bluetoothPeripheral: BluetoothPeripheral) {
-        
-        //guard let dexcomG5 = bluetoothPeripheral as? DexcomG5 else {return}
-        
-        // creating enum to make sure we don't forget new cases
-        for setting in Settings.allCases {
-           
-            switch setting {
-                
-            case .firmWareVersion:
-                // user doesn't change the firmware version
-                break
-
-            }
-        }
-    }
-    
-    func writeTempValues(to bluetoothPeripheral: BluetoothPeripheral) {
-        
-        //guard let dexcomG5 = bluetoothPeripheral as? DexcomG5 else {return}
-        
-        // creating enum to make sure we don't forget new cases
-        for setting in Settings.allCases {
-            
-            switch setting {
-                
-            case .firmWareVersion:
-                // user doesn't change the firmware version
-                break
-                
-            }
-            
-        }
-        
-    }
-    
 }
 
 extension DexcomG5BluetoothPeripheralViewModel: CGMG5TransmitterDelegate {
     
     func received(firmware: String, cGMG5Transmitter: CGMG5Transmitter) {
         
-        previouslyAssignedcGMG5TransmitterDelegate?.received(firmware: firmware, cGMG5Transmitter: cGMG5Transmitter)
+        (bluetoothPeripheralManager as? CGMG5TransmitterDelegate)?.received(firmware: firmware, cGMG5Transmitter: cGMG5Transmitter)
         
         // firmware should get updated in DexcomG5 object by bluetoothPeripheralManager, here's the trigger to update the table
         tableView?.reloadRows(at: [IndexPath(row: Settings.firmWareVersion.rawValue, section: 1)], with: .none)

@@ -138,7 +138,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
         
     }
     
-    // MARK: CGMTransmitter protocol functions
+    // MARK: -CGMTransmitter protocol functions
     
     /// to ask transmitter reset - empty function because G4 doesn't support reset
     ///
@@ -149,14 +149,23 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
     func setWebOOPEnabled(enabled: Bool) {
     }
     
-    /// this transmitter does not support oop web
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
+    func setWebOOPSite(oopWebSite: String) {}
     
+    func setWebOOPToken(oopWebToken: String) {}
+
     func cgmTransmitterType() -> CGMTransmitterType {
         return .dexcomG4
     }
     
-    // MARK: helper functions
+    func isWebOOPEnabled() -> Bool {
+        return false
+    }
+    
+    func requestNewReading() {
+        // not supported for blucon
+    }
+    
+    // MARK:- helper functions
     
     private func processxBridgeDataPacket(value:Data) -> (glucoseData:GlucoseData?, batteryLevel:Int?, transmitterID:String?) {
         guard value.count >= 10 else {

@@ -10,7 +10,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - public properties
     
     /// variable : it can get a new value during app run, will be used by rootviewcontroller's that want to receive info
-    public var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate
+    public weak var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
 
     // MARK: - private properties
     
@@ -364,7 +364,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         trace("connected to peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'")
         
-        bluetoothTransmitterDelegate.didConnectTo(bluetoothTransmitter: self)
+        bluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
 
         peripheral.discoverServices(servicesCBUUIDs)
         
@@ -390,7 +390,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         trace("in centralManagerDidUpdateState, for peripheral with name %{public}@, new state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", "\(central.state.toString())")
         
-        bluetoothTransmitterDelegate.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
+        bluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
 
         /// in case status changed to powered on and if device address known then try either to retrieveperipherals, or if that doesn't succeed, start scanning
         if central.state == .poweredOn, reconnectAfterDisconnect {
@@ -410,7 +410,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         trace("    didDisconnect peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info , deviceName ?? "'unknown'")
         
-        bluetoothTransmitterDelegate.didDisconnectFrom(bluetoothTransmitter: self)
+        bluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: self)
 
         if let error = error {
             trace("    error: %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error , error.localizedDescription)

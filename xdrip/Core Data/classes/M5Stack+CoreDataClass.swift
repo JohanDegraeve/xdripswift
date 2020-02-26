@@ -18,7 +18,7 @@ public class M5Stack: NSManagedObject {
     /// explanation, see function parameterUpdateNotNeededAtNextConnect in protocol BluetoothPeripheral
     public var parameterUpdateNeeded: Bool = false
     
-    /// batterylevel, not stored in coreData, will only be available after having received it form the M5Stack
+    /// batterylevel, not stored in coreData, will only be available after having received it from the M5Stack
     public var batteryLevel: Int = 0
     
     /// create M5Stack, shouldconnect default value = true
