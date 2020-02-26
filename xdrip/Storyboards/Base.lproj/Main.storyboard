@@ -17,17 +17,28 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mSJ-jy-nHJ">
+<<<<<<< HEAD
                                 <rect key="frame" x="238" y="44" width="82" height="38"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="21"/>
+=======
+                                <rect key="frame" x="207" y="0.0" width="86" height="39"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+>>>>>>> Bubble
                                 <state key="normal" title="Calibrate"/>
                                 <connections>
                                     <action selector="calibrateButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="JB2-Sk-Tge"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zWo-AR-qJE">
+<<<<<<< HEAD
                                 <rect key="frame" x="125" y="44" width="103" height="38"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="21"/>
                                 <state key="normal" title="Transmitter"/>
+=======
+                                <rect key="frame" x="130" y="0.0" width="67" height="39"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <state key="normal" title="Sensor"/>
+>>>>>>> Bubble
                                 <connections>
                                     <action selector="sensorButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="iJp-CH-PZa"/>
                                 </connections>
@@ -598,13 +609,18 @@
                         <viewLayoutGuide key="safeArea" id="jHe-GP-4Jf"/>
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="1DE-2P-Qfh">
+<<<<<<< HEAD
                         <barButtonItem key="backBarButtonItem" title="I" id="Fis-6U-di6"/>
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="yem-TU-Ica">
                             <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+=======
+                        <barButtonItem key="rightBarButtonItem" systemItem="trash" id="N7o-Nz-l8g">
+>>>>>>> Bubble
                             <connections>
-                                <action selector="cancelButtonAction:" destination="FJ0-eY-Fv0" id="wJ5-NV-3TH"/>
+                                <action selector="trashButtonAction:" destination="FJ0-eY-Fv0" id="trt-wt-QU4"/>
                             </connections>
                         </barButtonItem>
+<<<<<<< HEAD
                         <rightBarButtonItems>
                             <barButtonItem style="done" systemItem="done" id="CUr-JD-RwV">
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -619,18 +635,17 @@
                                 </connections>
                             </barButtonItem>
                         </rightBarButtonItems>
+=======
+>>>>>>> Bubble
                     </navigationItem>
                     <connections>
                         <outlet property="connectButtonOutlet" destination="WtR-0P-RyL" id="Sbx-db-Atn"/>
-                        <outlet property="doneButtonOutlet" destination="CUr-JD-RwV" id="6OJ-L9-Nnf"/>
                         <outlet property="scanButtonOutlet" destination="L9f-Ab-Egz" id="z68-tK-4ql"/>
                         <outlet property="tableView" destination="82M-Ti-NV0" id="RQy-kH-bnc"/>
                         <outlet property="trashButtonOutlet" destination="N7o-Nz-l8g" id="Sz3-nt-e7r"/>
-                        <segue destination="qbA-EA-RMD" kind="unwind" identifier="BluetoothPeripheralToBluetoothPeripheralsUnWindSegueIdentifier" unwindAction="unwindToBluetoothPeripheralsViewControllerWithSegue:" id="yPp-xT-8cB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kwG-Zz-t1q" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="qbA-EA-RMD" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2342" y="-155"/>
         </scene>

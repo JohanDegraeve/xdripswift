@@ -206,7 +206,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             waitingPairingConfirmation = false
             
             // inform delegate
-            bluetoothTransmitterDelegate.pairingFailed()
+            bluetoothTransmitterDelegate?.pairingFailed()
             
         }
         
@@ -293,7 +293,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                 sendKeepAliveMessage()
                                 
                                 // delegate needs to be informed that pairing is needed
-                                bluetoothTransmitterDelegate.transmitterNeedsPairing(bluetoothTransmitter: self)
+                                bluetoothTransmitterDelegate?.transmitterNeedsPairing(bluetoothTransmitter: self)
                                 
                             } else {
                                 
@@ -330,7 +330,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         // if this is the first sensorDataRx after a successful pairing, then inform delegate that pairing is finished
                         if waitingPairingConfirmation {
                             waitingPairingConfirmation = false
-                            bluetoothTransmitterDelegate.successfullyPaired()
+                            bluetoothTransmitterDelegate?.successfullyPaired()
                         }
                         
                         if let sensorDataRxMessage = SensorDataRxMessage(data: value) {
@@ -509,14 +509,23 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     func setWebOOPEnabled(enabled: Bool) {
     }
     
-    /// this transmitter does not support oop web
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
+    func setWebOOPSite(oopWebSite: String) {}
     
+    func setWebOOPToken(oopWebToken: String) {}
+
     func cgmTransmitterType() -> CGMTransmitterType {
         return .dexcomG5
     }
     
-    // MARK: helper functions
+    func isWebOOPEnabled() -> Bool {
+        return false
+    }
+    
+    func requestNewReading() {
+        // not supported for blucon
+    }
+    
+    // MARK:- helper functions
     
     /// sends SensorTxMessage to transmitter
     private func getSensorData() {
@@ -553,10 +562,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         if let resetRxMessage = ResetRxMessage(data: value) {
             if resetRxMessage.status == 0 {
                 trace("resetRxMessage status is 0, considering reset successful", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                bluetoothTransmitterDelegate.reset(for: self, successful: true)
+                bluetoothTransmitterDelegate?.reset(for: self, successful: true)
             } else {
                 trace("resetRxMessage status is %{public}d, considering reset failed", log: log, category: ConstantsLog.categoryCGMG5, type: .info, resetRxMessage.status)
-                bluetoothTransmitterDelegate.reset(for: self, successful: false)
+                bluetoothTransmitterDelegate?.reset(for: self, successful: false)
             }
         } else {
             trace("resetRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)

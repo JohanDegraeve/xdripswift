@@ -75,7 +75,7 @@ class Texts_SettingsView {
     }()
     
     static let labelWebOOPTransmitter:String = {
-        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Web OOP Enabled", comment: "transmitter settings, to enable or didsable web oop")
+        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Web OOP Enabled", comment: "web oop settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelWebOOPSite:String = {
@@ -95,7 +95,7 @@ class Texts_SettingsView {
     }()
     
     static let labelWebOOP:String = {
-        return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "Web OOP", comment: "transmitter settings, title of the dialogs where site and token are asked")
+        return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "Web OOP", comment: "weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the secxtion")
     }()
     
     static let transmitterId8OrHigherNotSupported: String = {

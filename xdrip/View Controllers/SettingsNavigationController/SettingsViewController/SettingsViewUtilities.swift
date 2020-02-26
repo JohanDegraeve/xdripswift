@@ -79,10 +79,10 @@ class SettingsViewUtilities {
                         uIViewController.present(alert, animated: true, completion: nil)
                         
                     } else {
-
+                        
                         // do the action
                         actionHandler(text)
-
+                        
                     }
                     
                     // check if refresh is needed, either complete settingsview or individual section

@@ -16,9 +16,12 @@ public final class CoreDataManager {
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCoreDataManager)
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillTerminate
-    private let applicationManagerKeySaveChanges = "coredatamanagersavechanges"
+    private let applicationManagerKeySaveChangesWhenAppTerminates = "applicationManagerKeySaveChangesWhenAppTerminates"
 
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillTerminate
+    private let applicationManagerKeySaveChangesWhenAppGoesToBackground = "applicationManagerKeySaveChangesWhenAppGoesToBackground"
     
+
     // MARK: -
     
     private let completion: CoreDataManagerCompletion
@@ -116,8 +119,12 @@ public final class CoreDataManager {
             DispatchQueue.main.async { self.completion() }
         }
         
-        // when app terminates, call saveChanges, just in case that somewhere in the code
-        ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeySaveChanges, closure: {self.saveChangesAtTermination()})
+        // when app terminates, call saveChangesAtTermination, just in case that somewhere in the code saveChanges is not called when needed
+        ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeySaveChangesWhenAppTerminates, closure: {self.saveChangesAtTermination()})
+        
+        // when app goes to background, call saveChanges, just in case that somewhere in the code saveChanges is not called when needed
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeySaveChangesWhenAppGoesToBackground, closure: {self.saveChanges()})
+        
     }
 
     // MARK: -
@@ -151,6 +158,7 @@ public final class CoreDataManager {
         }
         
         privateManagedObjectContext.perform {
+            
             do {
                 if self.privateManagedObjectContext.hasChanges {
                     try self.privateManagedObjectContext.save()
@@ -158,7 +166,9 @@ public final class CoreDataManager {
             } catch {
                 trace("in savechanges,  Unable to Save Changes of Private Managed Object Context, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryCoreDataManager, type: .info, error.localizedDescription)
             }
+            
         }
+        
     }
 
     /// to be used when app terminates, difference with savechanges is that it calls privateManagedObjectContext.save synchronously

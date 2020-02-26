@@ -12,58 +12,63 @@ final class BluetoothPeripheralsViewController: UIViewController {
         addButtonAction()
     }
     
-    @IBAction func unwindToBluetoothPeripheralsViewController (segue: UIStoryboardSegue) {
-        
-        // reinitialise bluetoothPeripherals because we're coming back from BluetoothPeripheralViewController where a BluetoothPeripheral may have been added or deleted
-        initializeBluetoothPeripherals()
-
-        // reload the table
-        tableView.reloadSections(IndexSet(integer: 0), with: .none)
-    }
- 
     // MARK:- private properties
     
     /// reference to coreDataManager
     private var coreDataManager:CoreDataManager?
     
     /// a bluetoothPeripheralManager
-    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging!
+    private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging?
     
-    /// temp storage of assigned BluetoothTransmitterDelegate
-    private weak var previouslyAssignedBluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
-
     // MARK: public functions
     
     /// configure
     public func configure(coreDataManager: CoreDataManager, bluetoothPeripheralManager: BluetoothPeripheralManaging) {
-        
+
         // initalize private properties
         self.coreDataManager = coreDataManager
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
-        initializeBluetoothPeripherals()
+        
+        // setup bluetoothperipherals
+        initializeBluetoothTransmitterDelegates()
         
     }
 
-    // MARK: - De-initialization
-    
-    deinit {
+    /// - iterate through the known BluetoothPeripheral's.
+    /// -  If there's one in the category CGM that has shouldConnect to true,
+    ///     - then return true
+    ///     - display alert that no more than one cgm should be connected
+    public static func otherCGMTransmitterHasShouldConnectTrue(bluetoothPeripheralManager: BluetoothPeripheralManaging?, uiViewController: UIViewController) -> Bool {
         
-        // to be sure that previouslyAssignedBluetoothTransmitterDelegate is reassigned to every existing BluetoothTransmistter
-        
-        if let previouslyAssignedBluetoothTransmitterDelegate = previouslyAssignedBluetoothTransmitterDelegate {
-
-            for bluetoothTransmitter in bluetoothPeripheralManager.getBluetoothTransmitters() {
-                
-                // assign self as BluetoothTransmitterDelegate
-                bluetoothTransmitter.bluetoothTransmitterDelegate = previouslyAssignedBluetoothTransmitterDelegate
-                
-            }
-
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
+            fatalError("in BluetoothPeripheralsViewController otherCGMTransmitterHasShouldConnectTrue, bluetoothPeripheralManager is nil")
         }
         
+        for bluetoothPeripheral in bluetoothPeripheralManager.getBluetoothPeripherals() {
+            
+            if bluetoothPeripheral.bluetoothPeripheralType().category() == .CGM && bluetoothPeripheral.blePeripheral.shouldconnect {
+                
+                uiViewController.present(UIAlertController(title: Texts_Common.warning, message: Texts_BluetoothPeripheralsView.noMultipleActiveCGMsAllowed, actionHandler: nil), animated: true, completion: nil)
+                
+                return true
+                
+            }
+        }
+        
+        return false
     }
 
-    // MARK: overrides
+    // MARK:- overrides
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
+        // reinitialise bluetoothPeripherals because we're coming back from BluetoothPeripheralViewController where a BluetoothPeripheral may have been added or deleted
+        initializeBluetoothTransmitterDelegates()
+        
+        // reload the table
+        tableView.reloadSections(IndexSet(integer: 0), with: .none)
+
+    }
     
     override func viewDidLoad() {
         
@@ -71,8 +76,7 @@ final class BluetoothPeripheralsViewController: UIViewController {
         
         title = Texts_BluetoothPeripheralsView.screenTitle
         
-        setupView()
-        
+        setupTableView()
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -101,6 +105,10 @@ final class BluetoothPeripheralsViewController: UIViewController {
 
             }
             
+            guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
+                fatalError("In BluetoothPeripheralsViewController, prepare for segue, bluetoothPeripheralManager is nil" )
+            }
+            
             vc.configure(bluetoothPeripheral: sender as? BluetoothPeripheral, coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager, expectedBluetoothPeripheralType: expectedBluetoothPeripheralType)
             
         }
@@ -118,7 +126,15 @@ final class BluetoothPeripheralsViewController: UIViewController {
         // configure PickerViewData to select category
         let pickerViewData = PickerViewData (withMainTitle: nil, withSubTitle: Texts_BluetoothPeripheralsView.selectCategory, withData: BluetoothPeripheralCategory.listOfCategories(), selectedRow: nil, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ categoryIndex: Int) in
                 
-            // user select category, now user needs to select type of bluetoothperipheral
+            // user selected category, now user needs to select type of bluetoothperipheral
+            // but before doing that, check if user tries to add a CGM
+            // if so, check that no other CGM has shouldconnect set to true
+            if let category = BluetoothPeripheralCategory(rawValue: BluetoothPeripheralCategory.listOfCategories()[categoryIndex]), category == .CGM, BluetoothPeripheralsViewController.self.otherCGMTransmitterHasShouldConnectTrue(bluetoothPeripheralManager: self.bluetoothPeripheralManager, uiViewController: self) {
+                
+                return
+                
+            }
+            
             let pickerViewData = PickerViewData (withMainTitle: nil, withSubTitle: Texts_BluetoothPeripheralsView.selectType, withData: BluetoothPeripheralCategory.listOfBluetoothPeripheralTypes(withCategory: BluetoothPeripheralCategory.listOfCategories()[categoryIndex]), selectedRow: nil, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ typeIndex: Int) in
                 
                 // go to screen to add a new BluetoothPeripheral
@@ -130,17 +146,13 @@ final class BluetoothPeripheralsViewController: UIViewController {
             }, onCancelClick: nil, didSelectRowHandler: nil)
             
             // create and present PickerViewController
-                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
             
         }, onCancelClick: nil, didSelectRowHandler: nil)
 
         // create and present PickerViewController
-            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+        PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
         
-    }
-    
-    private func setupView() {
-        setupTableView()
     }
     
     // setup datasource, delegate, seperatorInset
@@ -164,27 +176,27 @@ final class BluetoothPeripheralsViewController: UIViewController {
     /// calls tableView.reloadRows for the row where bluetoothPeripheral is shown
     private func updateRow(for bluetoothPeripheral: BluetoothPeripheral) {
         
-        if let index = bluetoothPeripheralManager.getBluetoothPeripherals().firstIndex(where: {$0.blePeripheral.address == bluetoothPeripheral.blePeripheral.address}) {
+        if let index = bluetoothPeripheralManager?.getBluetoothPeripherals().firstIndex(where: {$0.blePeripheral.address == bluetoothPeripheral.blePeripheral.address}) {
             tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
         }
 
     }
     
-    /// initializes bluetoothPeripherals
     /// - sets the delegates of each transmitter to self
-    private func initializeBluetoothPeripherals() {
+    /// - bluetoothPeripheralManager will also still receive delegate calls
+    private func initializeBluetoothTransmitterDelegates() {
         
-        for bluetoothTransmitter in bluetoothPeripheralManager.getBluetoothTransmitters() {
+        if let bluetoothPeripheralManager = bluetoothPeripheralManager  {
             
-            // assign previously assigned BluetoothTransmitterDelegate, we will still pass all info to that delegate also
-            // every bluetoothTransmitter may in theory have a different bluetoothTransmitterDelegate, so we should create an array of BluetoothTransmitterDelegate, however in practice it will always be the same bluetoothPeripheralManager
-            previouslyAssignedBluetoothTransmitterDelegate = bluetoothTransmitter.bluetoothTransmitterDelegate
-            
-            // assign self as BluetoothTransmitterDelegate
-            bluetoothTransmitter.bluetoothTransmitterDelegate = self
+            for bluetoothTransmitter in bluetoothPeripheralManager.getBluetoothTransmitters() {
+                
+                // assign self as BluetoothTransmitterDelegate
+                bluetoothTransmitter.bluetoothTransmitterDelegate = self
+                
+            }
             
         }
-        
+
     }
     
 }
@@ -196,14 +208,19 @@ final class BluetoothPeripheralsViewController: UIViewController {
 extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return bluetoothPeripheralManager.getBluetoothPeripherals().count
+        return bluetoothPeripheralManager?.getBluetoothPeripherals().count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("Unexpected Table View Cell") }
         
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
+            return cell
+        }
+
         // textLabel should be the user defined alias of the BluetoothPeripheral, or if user defined alias == nil, then the devicename
+
         cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].blePeripheral.alias
         if cell.textLabel?.text == nil {
             cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].blePeripheral.name
@@ -234,6 +251,8 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         
         tableView.deselectRow(at: indexPath, animated: true)
        
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
+        
         self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier.rawValue, sender: bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row])
 
     }
@@ -246,69 +265,75 @@ extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
     
     func transmitterNeedsPairing(bluetoothTransmitter: BluetoothTransmitter) {
        
-        // need to inform also other delegates
-        previouslyAssignedBluetoothTransmitterDelegate?.transmitterNeedsPairing(bluetoothTransmitter: bluetoothTransmitter)
-
-        // handled in BluetoothPeripheralManager
+        // forward this call to bluetoothPeripheralManager who will handle it
+        bluetoothPeripheralManager?.transmitterNeedsPairing(bluetoothTransmitter: bluetoothTransmitter)
         
     }
     
     func successfullyPaired() {
 
-        // need to inform also other delegates
-        previouslyAssignedBluetoothTransmitterDelegate?.successfullyPaired()
-
-        // handled in BluetoothPeripheralManager
+        // forward this call to bluetoothPeripheralManager who will handle it
+        bluetoothPeripheralManager?.successfullyPaired()
 
     }
     
     func pairingFailed() {
 
-        // need to inform also other delegates
-        previouslyAssignedBluetoothTransmitterDelegate?.pairingFailed()
-
-        // handled in BluetoothPeripheralManager
+        // forward this call to bluetoothPeripheralManager who will handle it
+        bluetoothPeripheralManager?.pairingFailed()
 
     }
     
     func reset(for bluetoothTransmitter: BluetoothTransmitter, successful: Bool) {
         
-        // need to inform also other delegates
-        previouslyAssignedBluetoothTransmitterDelegate?.reset(for: bluetoothTransmitter, successful: successful)
+        // forward this call to bluetoothPeripheralManager who will handle it
+        bluetoothPeripheralManager?.reset(for: bluetoothTransmitter, successful: successful)
         
-        // handled in BluetoothPeripheralManager
     }
     
     func error(message: String) {
         
-        // need to inform also other delegates
-        previouslyAssignedBluetoothTransmitterDelegate?.error(message: message)
+        // forward this call to bluetoothPeripheralManager who will handle it
+        bluetoothPeripheralManager?.error(message: message)
 
-        // handled in BluetoothPeripheralManager
     }
     
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
 
-        // need to inform also other delegates
-        previouslyAssignedBluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
+        // forward this call to bluetoothPeripheralManager who will handle it
+        bluetoothPeripheralManager?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
 
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
+            fatalError("in BluetoothPeripheralsViewController didConnectTo, bluetoothPeripheralManager is nil")
+        }
+        
+        // row with connection status in the view must be updated
         updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
         
     }
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
 
-        // need to inform also other delegates
-        previouslyAssignedBluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
+        // forward this call to bluetoothPeripheralManager who will handle it
+        bluetoothPeripheralManager?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
 
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
+            fatalError("in BluetoothPeripheralsViewController didDisconnectFrom, bluetoothPeripheralManager is nil")
+        }
+
+        // row with connection status in the view must be updated
         updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
         
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
 
-        // need to inform also other delegates
-        previouslyAssignedBluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
+        // forward this call to bluetoothPeripheralManager who will handle it
+        bluetoothPeripheralManager?.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
+
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
+            fatalError("in BluetoothPeripheralsViewController deviceDidUpdateBluetoothState, bluetoothPeripheralManager is nil")
+        }
 
         // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
         if state == CBManagerState.poweredOff {

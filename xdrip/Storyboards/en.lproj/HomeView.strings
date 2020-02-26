@@ -31,3 +31,4 @@
 "success" = "success";
 "failed" = "failed";
 "calibrationNotNecessary" = "With Web OOP enabled, calibration is not necessary for the selected type of transmitter";
+"theresNoCGMTransmitterActive" = "To calibrate you should have a CGM transmitter created with 'Always Connect'.";

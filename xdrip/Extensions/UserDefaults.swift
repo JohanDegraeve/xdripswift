@@ -26,12 +26,6 @@ extension UserDefaults {
         
         /// transmitter type
         case transmitterTypeAsString = "transmitterTypeAsString"
-        /// is web OOP enabled or not
-        case webOOPEnabled = "webOOPEnabled"
-        /// if webOOP enabled, what site to use
-        case webOOPsite = "webOOPsite"
-        /// if webOOP enabled, value of the token
-        case webOOPtoken = "webOOPtoken"
 
         // Nightscout
         
@@ -161,10 +155,6 @@ extension UserDefaults {
         // Dexcom Share
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
-        
-        // Sensor
-        /// sensor Serial Number, for now only applicable to Libre
-        case sensorSerialNumber = "sensorSerialNumber"
         
         // development settings
         
@@ -333,52 +323,6 @@ extension UserDefaults {
             if newValue != string(forKey: Key.transmitterTypeAsString.rawValue) {
                 set(newValue, forKey: Key.transmitterTypeAsString.rawValue)
             }
-        }
-    }
-    
-    /// NOT USED ANYMORE  transmitter id
-    /*@objc dynamic var transmitterId:String? {
-        get {
-            return string(forKey: Key.transmitterId.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.transmitterId.rawValue)
-        }
-    }*/
-    
-    /// web oop enabled
-    @objc dynamic var webOOPEnabled: Bool {
-        get {
-            return bool(forKey: Key.webOOPEnabled.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.webOOPEnabled.rawValue)
-        }
-    }
-    
-    /// web oop site
-    @objc dynamic var webOOPSite:String? {
-        get {
-            return string(forKey: Key.webOOPsite.rawValue)
-        }
-        set {
-            var value = newValue
-            if let newValue = newValue {
-                if !newValue.startsWith("http") {
-                    value = "https://" + newValue
-                }
-            }
-            set(value, forKey: Key.webOOPsite.rawValue)
-        }
-    }
-
-    /// web oop token
-    @objc dynamic var webOOPtoken:String? {
-        get {
-            return string(forKey: Key.webOOPtoken.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.webOOPtoken.rawValue)
         }
     }
     
@@ -831,16 +775,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.timeStampLatestDexcomShareUploadedBgReading.rawValue)
-        }
-    }
-    
-    /// sensor serial number, for now only useful for Libre sensor
-    var sensorSerialNumber:String? {
-        get {
-            return string(forKey: Key.sensorSerialNumber.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.sensorSerialNumber.rawValue)
         }
     }
     

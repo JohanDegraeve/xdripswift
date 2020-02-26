@@ -16,6 +16,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// expected device name
     let expectedDeviceNameBubble:String = "Bubble"
     
+    /// CGMBubbleTransmitterDelegate
+    public weak var cGMBubbleTransmitterDelegate: CGMBubbleTransmitterDelegate?
+
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
     
@@ -55,13 +58,14 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - delegate : CGMTransmitterDelegate intance
-    ///     - timeStampLastBgReading : timestamp of last bgReading
-    ///     - webOOPEnabled : enabled or not
-    ///     - oopWebSite : oop web site url to use, only used in case webOOPEnabled = true
-    ///     - oopWebToken : oop web token to use, only used in case webOOPEnabled = true
+    ///     - timeStampLastBgReading : timestamp of last bgReading, if nil then 1 1 1970 is used
+    ///     - webOOPEnabled : enabled or not, if nil then default false
+    ///     - oopWebSite : oop web site url to use, only used in case webOOPEnabled = true, if nil then default value is used (see Constants)
+    ///     - oopWebToken : oop web token to use, only used in case webOOPEnabled = true, if nil then default value is used (see Constants)
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, sensorSerialNumber:String?, webOOPEnabled: Bool, oopWebSite: String, oopWebToken: String) {
+    ///     - cGMBubbleTransmitterDelegate : a CGMBubbleTransmitterDelegate
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBubbleTransmitterDelegate: CGMBubbleTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameBubble)
@@ -75,19 +79,22 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         // assign CGMTransmitterDelegate
         self.cgmTransmitterDelegate = cGMTransmitterDelegate
         
+        // assign CGMBubbleTransmitterDelegate
+        self.cGMBubbleTransmitterDelegate = cGMBubbleTransmitterDelegate
+        
         // initialize rxbuffer
         rxBuffer = Data()
         startDate = Date()
         
-        //initialize timeStampLastBgReading
-        self.timeStampLastBgReading = timeStampLastBgReading
+        // initialize timeStampLastBgReading
+        self.timeStampLastBgReading = timeStampLastBgReading ?? Date(timeIntervalSince1970: 0)
         
         // initialize webOOPEnabled
-        self.webOOPEnabled = webOOPEnabled
+        self.webOOPEnabled = webOOPEnabled ?? false
         
         // initialize oopWebToken and oopWebSite
-        self.oopWebToken = oopWebToken
-        self.oopWebSite = oopWebSite
+        self.oopWebToken = oopWebToken ?? ConstantsLibreOOP.token
+        self.oopWebSite = oopWebSite ?? ConstantsLibreOOP.site
         
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Bubble)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Bubble, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Bubble, startScanningAfterInit: false, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
@@ -138,6 +145,11 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         let firmware = value[2].description + "." + value[3].description
                         let batteryPercentage = Int(value[4])
                         
+                        // send firmware, hardware and battery to delegeate
+                        cGMBubbleTransmitterDelegate?.received(firmware: firmware, from: self)
+                        cGMBubbleTransmitterDelegate?.received(hardware: hardware, from: self)
+                        cGMBubbleTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
+                        
                         // send hardware, firmware and batteryPercentage to delegate
                         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: nil, sensorTimeInMinutes: nil, firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
                         
@@ -166,6 +178,8 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                         
                                         // inform delegate about new sensor detected
                                         cgmTransmitterDelegate?.newSensorDetected()
+                                        
+                                        cGMBubbleTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
                                         
                                         // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
                                         timeStampLastBgReading = Date(timeIntervalSince1970: 0)
@@ -205,20 +219,42 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
     func reset(requested:Bool) {}
     
-    /// this transmitter supports oopWeb
+    /// set webOOPEnabled value
     func setWebOOPEnabled(enabled: Bool) {
-        webOOPEnabled = enabled
+        
+        if webOOPEnabled != enabled {
+            
+            webOOPEnabled = enabled
+            
+            // weboop value changed, reset timeStampLastBgReading so that all glucose values will be sent to delegate. This is simply to ensure at least one reading will be sent to the delegate immediately.
+            timeStampLastBgReading = Date(timeIntervalSince1970: 0)
+            
+        }
+        
     }
     
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {
-        self.oopWebToken = oopWebToken
+    func setWebOOPSite(oopWebSite: String) {
         self.oopWebSite = oopWebSite
+    }
+    
+    func setWebOOPToken(oopWebToken: String) {
+        self.oopWebToken = oopWebToken
     }
     
     func cgmTransmitterType() -> CGMTransmitterType {
         return .Bubble
     }
     
+    func isWebOOPEnabled() -> Bool {
+        return webOOPEnabled
+    }
+
+    func requestNewReading() {
+        
+        _ = sendStartReadingCommmand()
+        
+    }
+
     // MARK: - helpers
     
     /// reset rxBuffer, reset startDate, stop packetRxMonitorTimer, set resendPacketCounter to 0

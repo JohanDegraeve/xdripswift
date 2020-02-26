@@ -227,11 +227,22 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         _ = sendStartReadingCommand()
     }
     
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {
-        self.oopWebToken = oopWebToken
+    func isWebOOPEnabled() -> Bool {
+        return webOOPEnabled
+    }
+    
+    func setWebOOPSite(oopWebSite: String) {
         self.oopWebSite = oopWebSite
     }
-
+    
+    func setWebOOPToken(oopWebToken: String) {
+        self.oopWebToken = oopWebToken
+    }
+    
+    func requestNewReading() {
+        _ = sendStartReadingCommand()
+    }
+    
     func cgmTransmitterType() -> CGMTransmitterType {
         return .miaomiao
     }

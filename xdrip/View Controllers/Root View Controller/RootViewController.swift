@@ -15,7 +15,7 @@ final class RootViewController: UIViewController {
     
     @IBAction func calibrateButtonAction(_ sender: UIButton) {
         
-        if let cgmTransmitter = cgmTransmitter, cgmTransmitter.cgmTransmitterType().canWebOOP(), UserDefaults.standard.webOOPEnabled {
+        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.cgmTransmitterType().canWebOOP(), cgmTransmitter.isWebOOPEnabled() {
             
             let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil)
             
@@ -137,9 +137,6 @@ final class RootViewController: UIViewController {
     private let applicationManagerKeyIsIdleTimerDisabled = "RootViewController-isIdleTimerDisabled"
     
     // MARK: - Properties - other private properties
-    
-    /// a reference to the CGMTransmitter currently in use - nil means there's none, because user hasn't selected yet all required settings
-    private var cgmTransmitter:CGMTransmitter?
     
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryRootView)
@@ -277,13 +274,6 @@ final class RootViewController: UIViewController {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new
             , context: nil)
 
-        // web oop
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPEnabled.rawValue, options: .new
-            , context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPtoken.rawValue, options: .new
-            , context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPsite.rawValue, options: .new
-            , context: nil)
         // bg reading notification and badge, and multiplication factor
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showReadingInNotification.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showReadingInAppBadge.rawValue, options: .new, context: nil)
@@ -381,9 +371,6 @@ final class RootViewController: UIViewController {
         // setup nightscoutmanager
         nightScoutFollowManager = NightScoutFollowManager(coreDataManager: coreDataManager, nightScoutFollowerDelegate: self)
         
-        // setup alertmanager
-        alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
-        
         // setup healthkitmanager
         healthKitManager = HealthKitManager(coreDataManager: coreDataManager)
         
@@ -399,31 +386,35 @@ final class RootViewController: UIViewController {
             
         })
         
-        // setup bluetoothPeripheralManager
-        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: self, onCGMTransmitterCreation: {
-            (cgmTransmitter: CGMTransmitter?) in
+        // function to be used in BluetoothPeripheralManager init function, and also immediately after having initiliazed BluetoothPeripheralManager (it will not get called from within BluetoothPeripheralManager because didSet function is not called from init
+        let cgmTransmitterChanged = {
             
-            // reinitialize cgmTransmitter, possibily we assign cgmTransmitter to nil here (in case user deletes the active cgmTransmitter)
-            self.cgmTransmitter = cgmTransmitter
-
-            //if cgmTransmitter not nil
-            if let cgmTransmitter = cgmTransmitter {
-
-                // reassign calibrator
-                self.calibrator = RootViewController.getCalibrator(transmitterType: cgmTransmitter.cgmTransmitterType(), webOOPEnabled: UserDefaults.standard.webOOPEnabled)
+            // if cgmTransmitter not nil then reassign calibrator and set UserDefaults.standard.transmitterTypeAsString
+            if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
                 
+                // reassign calibrator
+                self.calibrator = RootViewController.getCalibrator(cgmTransmitter: cgmTransmitter)
+                
+                // change value of UserDefaults.standard.transmitterTypeAsString
                 UserDefaults.standard.transmitterTypeAsString = cgmTransmitter.cgmTransmitterType().rawValue
-
+                
             } else {
                 
                 UserDefaults.standard.transmitterTypeAsString = nil
                 
             }
             
-            
-            
-        })
+        }
         
+        // setup bluetoothPeripheralManager
+        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: self, cgmTransmitterChanged: cgmTransmitterChanged)
+    
+        // to initialize UserDefaults.standard.transmitterTypeAsString
+        cgmTransmitterChanged()
+        
+        // setup alertmanager
+        alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
+
         // setup watchmanager
         watchManager = WatchManager(coreDataManager: coreDataManager)
         
@@ -435,9 +426,13 @@ final class RootViewController: UIViewController {
     ///     - sensorTimeInMinutes : should be present only if it's the first reading(s) being processed for a specific sensor and is needed if it's a transmitterType that returns true to the function canDetectNewSensor
     private func processNewGlucoseData(glucoseData: inout [GlucoseData], sensorTimeInMinutes: Int?) {
         
-        // check that calibrations and coredata manager is not nil
-        guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager, let cgmTransmitter = cgmTransmitter else {
-            fatalError("in processNewCGMInfo, calibrations or coreDataManager or cgmTransmitter is nil")
+        // unwrap calibrationsAccessor and coreDataManager and cgmTransmitter
+        guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager, let cgmTransmitter = bluetoothPeripheralManager?.getCGMTransmitter() else {
+            
+            trace("in processNewGlucoseData, calibrationsAccessor or coreDataManager or cgmTransmitter is nil", log: log, category: ConstantsLog.categoryRootView, type: .error)
+            
+            return
+            
         }
         
         if activeSensor == nil {
@@ -479,7 +474,7 @@ final class RootViewController: UIViewController {
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 if glucose.timeStamp > timeStampLastBgReading {
                     
-                    _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
                     // save the newly created bgreading permenantly in coredata
                     coreDataManager.saveChanges()
@@ -489,14 +484,15 @@ final class RootViewController: UIViewController {
                     
                     // set timeStampLastBgReading to new timestamp
                     timeStampLastBgReading = glucose.timeStamp
+                    
                 }
             }
-            
+           
             // if a new reading is created, created either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
                 
-                // only for webOOPEnabled : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
-                if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && !UserDefaults.standard.webOOPEnabled {
+                // only if no webOOPEnabled : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
+                if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && !cgmTransmitter.isWebOOPEnabled() {
                     // there must be at least 2 readings
                     let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
                     
@@ -546,26 +542,6 @@ final class RootViewController: UIViewController {
                     if !UserDefaults.standard.isMaster {
                         stopSensor()
                     }
-                    
-                case UserDefaults.Key.webOOPEnabled:
-                    
-                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
-                        
-                        // set webOOPEnabled for transmitter to new value - there's no need to reinit the transmitter, values like device address, timstamp of last reading, connection status, ... can stay as is
-                        cgmTransmitter?.setWebOOPEnabled(enabled: UserDefaults.standard.webOOPEnabled)
-                        
-                        // call stopSensor which sets activeSensor to nil. Swapping from enabled to not enabled, requires that user will need to calibrate the sensor, it needs to be a new entry in the database. (it's probably nil anyway) - a  new sensor will be created as soon as a reading arrives
-                        stopSensor()
-                        
-                        // reinitialize calibrator
-                        // calling initializeCGMTransmitter is not a good idea here because that would mean set cgmTransmitter to nil, for some type of transmitters that would mean the user needs to scan again
-                        if let cgmTransmitter = cgmTransmitter {
-                            calibrator = RootViewController.getCalibrator(transmitterType: cgmTransmitter.cgmTransmitterType(), webOOPEnabled: UserDefaults.standard.webOOPEnabled)
-                        }
-                    }
-                    
-                case UserDefaults.Key.webOOPtoken, UserDefaults.Key.webOOPsite:
-                    cgmTransmitter?.setWebOOPSiteAndToken(oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibreOOP.site, oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibreOOP.token)
                     
                 case UserDefaults.Key.showReadingInNotification:
                     if !UserDefaults.standard.showReadingInNotification {
@@ -653,110 +629,130 @@ final class RootViewController: UIViewController {
     ///     - userRequested : if true, it's a requestCalibration initiated by user clicking on the calibrate button in the homescreen
     private func requestCalibration(userRequested:Bool) {
         
-        // check that calibrationsAccessor is not nil
-        guard let calibrationsAccessor = calibrationsAccessor, let cgmTransmitter = cgmTransmitter, let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter else {
-            fatalError("in requestCalibration, calibrationsAccessor or cgmTransmitter is nil")
+        // unwrap calibrationsAccessor, coreDataManager , bgReadingsAccessor
+        guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = self.coreDataManager, let bgReadingsAccessor = self.bgReadingsAccessor else {
+            
+            trace("in requestCalibration, calibrationsAccessor or coreDataManager or bgReadingsAccessor is nil, no further processing", log: log, category: ConstantsLog.categoryRootView, type: .error)
+            
+            return
+            
         }
-
+        
+        // check that there's an active cgmTransmitter (not necessarily connected, just one that is created and configured with shouldconnect = true)
+        guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter else {
+            
+            trace("in requestCalibration, calibrationsAccessor or cgmTransmitter is nil, no further processing", log: log, category: ConstantsLog.categoryRootView, type: .info)
+            
+            self.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.theresNoCGMTransmitterActive, actionHandler: nil), animated: true, completion: nil)
+            
+            return
+        }
+        
         // check if sensor active and if not don't continue
         guard let activeSensor = activeSensor else {
             
-            let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.startSensorBeforeCalibration, actionHandler: nil)
+            trace("in requestCalibration, there is no active sensor, no further processing", log: log, category: ConstantsLog.categoryRootView, type: .info)
             
-            self.present(alert, animated: true, completion: nil)
+            self.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.startSensorBeforeCalibration, actionHandler: nil), animated: true, completion: nil)
             
             return
+            
         }
         
         // if it's a user requested calibration, but there's no calibration yet, then give info and return - first calibration will be requested by app via notification
         if calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) == nil && userRequested {
             
-            let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.thereMustBeAreadingBeforeCalibration, actionHandler: nil)
-            
-            self.present(alert, animated: true, completion: nil)
+            self.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.thereMustBeAreadingBeforeCalibration, actionHandler: nil), animated: true, completion: nil)
             
             return
         }
         
-        let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: nil, preferredStyle: .alert)
+        // assign deviceName, needed in the closure when creating alert. As closures can create strong references (to bluetoothTransmitter in this case), I'm fetching the deviceName here
+        let deviceName = bluetoothTransmitter.deviceName
         
-        alert.addAction(UIAlertAction(title: Texts_Common.Cancel, style: .cancel, handler: nil))
-        
-        alert.addTextField(configurationHandler: { textField in
-            textField.keyboardType = UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad
-            textField.placeholder = "..."
-        })
-        
-        alert.addAction(UIAlertAction(title: Texts_Common.Ok, style: .default, handler: { action in
-            if let coreDataManager = self.coreDataManager, let bgReadingsAccessor = self.bgReadingsAccessor {
-                if let textField = alert.textFields, let first = textField.first, let value = first.text {
-                    
-                    guard let valueAsDouble = value.toDouble() else {
-                        self.present(UIAlertController(title: Texts_Common.warning, message: Texts_Common.invalidValue, actionHandler: nil), animated: true, completion: nil)
-                        return
-                    }
-                    
-                    let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                    
-                    var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
-                    
-                    var latestCalibrations = calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
-                    
-                    if let calibrator = self.calibrator {
-                        if latestCalibrations.count == 0 {
-                            // calling initialCalibration will create two calibrations, they are returned also but we don't need them
-                            _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDoubleConvertedToMgDl, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDoubleConvertedToMgDl, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                        } else {
-                            // it's not the first calibration
-                            if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
-                                // calling createNewCalibration will create a new  calibrations, it is returned but we don't need it
-                                _ = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: bluetoothTransmitter.deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                            }
-                        }
-                        
-                        // this will store the newly created calibration(s) in coredata
-                        coreDataManager.saveChanges()
-                        
-                        // initiate upload to NightScout, if needed
-                        if let nightScoutUploadManager = self.nightScoutUploadManager {
-                            nightScoutUploadManager.upload()
-                        }
-                        
-                        // initiate upload to Dexcom Share, if needed
-                        if let dexcomShareUploadManager = self.dexcomShareUploadManager {
-                            dexcomShareUploadManager.upload()
-                        }
-                        
-                        // check alerts
-                        if let alertManager = self.alertManager {
-                            alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
-                        }
-                        
-                        // update labels
-                        self.updateLabelsAndChart(overrideApplicationState: false)
-                        
-                        // bluetoothPeripherals (M5Stack, ..) should receive latest reading with calculated value
-                        self.bluetoothPeripheralManager?.sendLatestReading()
-                        
-                        // watchManager should process new reading
-                        self.watchManager?.processNewReading()
-
+        // let alert = UIAlertController(title: "test title", message: "test message", keyboardType: .numberPad, text: nil, placeHolder: "...", actionTitle: nil, cancelTitle: nil, actionHandler: {_ in }, cancelHandler: nil)
+        let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: nil, placeHolder: "...", actionTitle: nil, cancelTitle: nil, actionHandler: {
+            (text:String) in
+            
+            guard let valueAsDouble = text.toDouble() else {
+                self.present(UIAlertController(title: Texts_Common.warning, message: Texts_Common.invalidValue, actionHandler: nil), animated: true, completion: nil)
+                return
+            }
+            
+            let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            
+            var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
+            
+            var latestCalibrations = calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
+            
+            if let calibrator = self.calibrator {
+                
+                if latestCalibrations.count == 0 {
+                    // calling initialCalibration will create two calibrations, they are returned also but we don't need them
+                    _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDoubleConvertedToMgDl, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDoubleConvertedToMgDl, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                } else {
+                    // it's not the first calibration
+                    if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
+                        // calling createNewCalibration will create a new  calibration, it is returned but we don't need it
+                        _ = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     }
                 }
+                
+                // this will store the newly created calibration(s) in coredata
+                coreDataManager.saveChanges()
+                
+                // initiate upload to NightScout, if needed
+                if let nightScoutUploadManager = self.nightScoutUploadManager {
+                    nightScoutUploadManager.upload()
+                }
+                
+                // initiate upload to Dexcom Share, if needed
+                if let dexcomShareUploadManager = self.dexcomShareUploadManager {
+                    dexcomShareUploadManager.upload()
+                }
+                
+                // check alerts
+                if let alertManager = self.alertManager {
+                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
+                }
+                
+                // update labels
+                self.updateLabelsAndChart(overrideApplicationState: false)
+                
+                // bluetoothPeripherals (M5Stack, ..) should receive latest reading with calculated value
+                self.bluetoothPeripheralManager?.sendLatestReading()
+                
+                // watchManager should process new reading
+                self.watchManager?.processNewReading()
+                
             }
-        }))
-        self.present(alert, animated: true)
+            
+        }, cancelHandler: nil)
+        
+        // present the alert
+        self.present(alert, animated: true, completion: nil)
+
     }
     
-    /// if transmitterType.canWebOOP and UserDefaults.standard.webOOPEnabled then returns an instance of NoCalibrator otherwise returns an instance of Libre1Calibrator
-    ///
     /// this is just some functionality which is used frequently
-    private static func getCalibrator(transmitterType: CGMTransmitterType, webOOPEnabled: Bool) -> Calibrator {
+    private static func getCalibrator(cgmTransmitter: CGMTransmitter) -> Calibrator {
         
-        if transmitterType.canWebOOP() && UserDefaults.standard.webOOPEnabled {
-            return NoCalibrator()
-        } else {
-            return Libre1Calibrator()
+        let cgmTransmitterType = cgmTransmitter.cgmTransmitterType()
+        
+        switch cgmTransmitterType {
+            
+        case .dexcomG4, .dexcomG5, .dexcomG6:
+            
+            return DexcomCalibrator()
+            
+        case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa:
+            
+            if cgmTransmitter.cgmTransmitterType().canWebOOP() && cgmTransmitter.isWebOOPEnabled() {
+                return NoCalibrator()
+            } else {
+                return Libre1Calibrator()
+            }
+            
         }
         
     }
@@ -1017,7 +1013,7 @@ final class RootViewController: UIViewController {
         listOfActions[Texts_HomeView.statusActionTitle] = {(UIAlertAction) in self.showStatus()}
         
         // next action is to start or stop the sensor, can also be omitted depending on type of device - also not applicable for follower mode
-        if let cgmTransmitter = cgmTransmitter {
+        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
             if cgmTransmitter.cgmTransmitterType().allowManualSensorStart() && UserDefaults.standard.isMaster {
                 // user needs to start and stop the sensor manually
                 if activeSensor != nil {
@@ -1081,9 +1077,6 @@ final class RootViewController: UIViewController {
         coreDataManager?.saveChanges()
         
         activeSensor = nil
-        
-        // reset also serialNubmer to nil
-        UserDefaults.standard.sensorSerialNumber = nil
         
     }
     
@@ -1154,10 +1147,6 @@ final class RootViewController: UIViewController {
 /// conform to CGMTransmitterDelegate
 extension RootViewController: CGMTransmitterDelegate {
     
-    func getCGMTransmitter() -> CGMTransmitter? {
-        return cgmTransmitter
-    }
-    
     func error(message: String) {
         
         let alert = UIAlertController(title: Texts_Common.warning, message: message, actionHandler: nil)
@@ -1208,13 +1197,6 @@ extension RootViewController: CGMTransmitterDelegate {
         trace("transmitterBatteryInfo  %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, transmitterBatteryInfo?.description ?? 0)
         trace("sensor time in minutes  %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, sensorTimeInMinutes?.description ?? "not received")
         trace("glucoseData size = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, glucoseData.count.description)
-        
-        // if received sensorSerialNumber not nil, and if value different from currently stored value, then store it
-        if let sensorSerialNumber = sensorSerialNumber {
-            if sensorSerialNumber != UserDefaults.standard.sensorSerialNumber {
-                UserDefaults.standard.sensorSerialNumber = sensorSerialNumber
-            }
-        }
         
         // if received transmitterBatteryInfo not nil, then store it
         if let transmitterBatteryInfo = transmitterBatteryInfo {

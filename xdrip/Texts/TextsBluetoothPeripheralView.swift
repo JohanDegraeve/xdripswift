@@ -44,4 +44,7 @@ class Text_BluetoothPeripheralView {
         return NSLocalizedString("bluetoothPeripheralAlias", tableName: filename, bundle: Bundle.main, value: "Alias", comment: "BluetoothPeripheral view, this is a name of a BluetoothPeripheral assigned by the user, to recognize the device")
     }()
 
+    static let SensorSerialNumber: String = {
+        return NSLocalizedString("SensorSerialNumber", tableName: filename, bundle: Bundle.main, value: "Sensor Serial Number", comment: "BluetoothPeripheral view, text of the cell with the sensor serial number")
+    }()
 }

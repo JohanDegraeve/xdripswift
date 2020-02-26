@@ -248,14 +248,14 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                 
 
                 // inform delegate
-                bluetoothTransmitterDelegate.transmitterNeedsPairing(bluetoothTransmitter: self)
+                bluetoothTransmitterDelegate?.transmitterNeedsPairing(bluetoothTransmitter: self)
 
                 waitingSuccessfulPairing = true
             }
         } else {
             if waitingSuccessfulPairing {
                 // inform delegate
-                bluetoothTransmitterDelegate.pairingFailed()
+                bluetoothTransmitterDelegate?.pairingFailed()
                 waitingSuccessfulPairing = false
             }
         }
@@ -271,7 +271,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         
         // this is only applicable the very first time that blucon connects and pairing is done
         if waitingSuccessfulPairing {
-            bluetoothTransmitterDelegate.successfullyPaired()
+            bluetoothTransmitterDelegate?.successfullyPaired()
             waitingSuccessfulPairing = false
         }
         
@@ -521,6 +521,10 @@ class CGMBluconTransmitter: BluetoothTransmitter {
 
 extension CGMBluconTransmitter: CGMTransmitter {
     
+    func requestNewReading() {
+        // not supported for blucon
+    }
+    
     func reset(requested: Bool) {
         // no reset supported for blucon
         return
@@ -530,12 +534,17 @@ extension CGMBluconTransmitter: CGMTransmitter {
     func setWebOOPEnabled(enabled: Bool) {
     }
 
-    /// this transmitter does not support oop web
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
+    func setWebOOPSite(oopWebSite: String) {}
+    
+    func setWebOOPToken(oopWebToken: String) {}
     
     func cgmTransmitterType() -> CGMTransmitterType {
         return .Blucon
     }
     
+    func isWebOOPEnabled() -> Bool {
+        return false
+    }
+
 }
 

@@ -136,4 +136,13 @@ class Texts_Common {
     static let firmware = {
         return NSLocalizedString("firmware", tableName: filename, bundle: Bundle.main, value: "Firmware", comment: "for settings row, literally firmware")
     }()
+    
+    static let hardware = {
+        return NSLocalizedString("hardware", tableName: filename, bundle: Bundle.main, value: "Hardware", comment: "for settings row, literally hardware")
+    }()
+    
+    static let unknown = {
+        return NSLocalizedString("unknown", tableName: filename, bundle: Bundle.main, value: "unknown", comment: "general usage")
+    }()
+    
 }

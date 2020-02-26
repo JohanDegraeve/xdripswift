@@ -295,8 +295,6 @@ final class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
         
         guard let value = characteristic.value else {return}
         
-        debuglogging("Received value from Watlaa : " + value.hexEncodedString())
-        
         switch receivedCharacteristic {
             
         case .CBUUID_RawData_Characteristic:

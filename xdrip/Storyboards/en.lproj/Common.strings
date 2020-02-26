@@ -27,3 +27,5 @@
 "WiFi" = "WiFi";
 "invalidValue" = "Invalid Value";
 "firmware" = "Firmware";
+"firmware" = "Hardware";
+"unknown" = "unknown";

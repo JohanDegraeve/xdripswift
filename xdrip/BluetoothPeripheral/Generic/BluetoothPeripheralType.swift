@@ -19,6 +19,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// DexcomG5
     case DexcomG5Type = "Dexcom G5"
     
+    /// bubble
+    case BubbleType = "Bubble"
+    
     /// - returns: the BluetoothPeripheralViewModel
     func viewModel() -> BluetoothPeripheralViewModel {
         
@@ -36,6 +39,8 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .DexcomG5Type:
             return DexcomG5BluetoothPeripheralViewModel()
             
+        case .BubbleType:
+            return BubbleBluetoothPeripheralViewModel()
         }
         
     }
@@ -65,6 +70,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
             return DexcomG5(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
+        case .BubbleType:
+            
+            return Bubble(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
         }
         
     }
@@ -83,7 +92,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaaMaster:
             return .watlaa
             
-        case .DexcomG5Type:
+        case .DexcomG5Type, .BubbleType:
             return .CGM
             
         }
@@ -94,7 +103,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .watlaaMaster:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType:
             return false
             
         case .DexcomG5Type:
@@ -108,7 +117,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .watlaaMaster:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType:
             return false
 
         case .DexcomG5Type:
@@ -120,7 +129,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
     
     /// - returns nil if id to validate has expected length and type of characters etc.
     /// - returns error text if transmitterId is not ok
-    func validateTransimtterId(transmitterId:String) -> String? {
+    func validateTransmitterId(transmitterId:String) -> String? {
         
         switch self {
             
@@ -171,7 +180,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaa:
             return nil*/
             
-        case .M5StackType, .M5StickCType, .watlaaMaster:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType:
             // no transmitter id means no validation to do
             return nil
             
@@ -186,7 +195,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
 
-        case .M5StackType, .M5StickCType, .watlaaMaster:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType:
             return false
             
         case .DexcomG5Type:

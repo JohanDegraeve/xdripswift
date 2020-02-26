@@ -244,11 +244,20 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     func setWebOOPEnabled(enabled: Bool) {
     }
     
-    /// this transmitter does not support oop web
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
-
+    func setWebOOPSite(oopWebSite: String) {}
+    
+    func setWebOOPToken(oopWebToken: String) {}
+    
     func cgmTransmitterType() -> CGMTransmitterType {
         return .GNSentry
+    }
+    
+    func isWebOOPEnabled() -> Bool {
+        return false
+    }
+    
+    func requestNewReading() {
+        // not supported for blucon
     }
     
     // MARK: CBCentralManager overriden functions

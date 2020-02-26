@@ -100,6 +100,10 @@ enum Texts_HomeView {
         return NSLocalizedString("startsensorbeforecalibration", tableName: filename, bundle: Bundle.main, value: "You can not calibrate as long as there's no sensor started.", comment: "for home view, user clicks calibrate but there's no sensor started yet")
     }()
     
+    static let theresNoCGMTransmitterActive:String = {
+        return NSLocalizedString("theresNoCGMTransmitterActive", tableName: filename, bundle: Bundle.main, value: "To calibrate you should have a CGM transmitter created with 'Always Connect'.", comment: "When user has no CGM transmitter created with 'Always connect', and tries to calibrate, then this message is shown")
+    }()
+    
     static let thereMustBeAreadingBeforeCalibration:String = {
         return NSLocalizedString("theremustbeareadingbeforecalibration", tableName: filename, bundle: Bundle.main, value: "There must be at least two readings before you can calibrate. You will be requested to calibrate as soon as a reading arrives.", comment: "for home view, user clicks calibrate but there's no reading yet")
     }()
