@@ -107,10 +107,14 @@ class LibreOOPClient {
             do {
                 let data = try Data.init(contentsOf: url)
                 let libreDerivedAlgorithmParameters = try decoder.decode(LibreDerivedAlgorithmParameters.self, from: data)
-                if libreDerivedAlgorithmParameters.serialNumber == serialNumber {
+                
+                // there were cases where libreDerivedAlgorithmParameters.slope_slope was 0.0, in which case result glucose value would always be 0.0 That's probably an error that occurred during the initial download of the parameters. Therefore in that case, skip so that download re-occurs
+                if libreDerivedAlgorithmParameters.serialNumber == serialNumber && libreDerivedAlgorithmParameters.slope_slope != 0.0 {
                     // successfully retrieved libreDerivedAlgorithmParameters for current sensor, from disk
                     callback(libreDerivedAlgorithmParameters, nil)
                     return
+                } else if libreDerivedAlgorithmParameters.slope_slope == 0.0  {
+                    trace("in calibrateSensor, libreDerivedAlgorithmParameters.slope_slope == 0.0, will redownload libreDerivedAlgorithmParameters", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
                 }
             } catch {
                 // data  not found on disk, we need to continue
@@ -119,6 +123,8 @@ class LibreOOPClient {
         
         // get libreDerivedAlgorithmParameters from remote server
         post(bytes: bytes, site: site, token: token, { (data, errorDescription) in
+            
+            trace("in calibrateSensor, initiating download libreDerivedAlgorithmParameters", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
             
             // define default result that will be returned in defer statement
             var libreDerivedAlgorithmParameters:LibreDerivedAlgorithmParameters? = nil
