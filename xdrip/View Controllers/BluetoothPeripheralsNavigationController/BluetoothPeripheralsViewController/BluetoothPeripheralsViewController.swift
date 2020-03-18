@@ -40,9 +40,8 @@ final class BluetoothPeripheralsViewController: UIViewController {
     ///     - display alert that no more than one cgm should be connected
     public static func otherCGMTransmitterHasShouldConnectTrue(bluetoothPeripheralManager: BluetoothPeripheralManaging?, uiViewController: UIViewController) -> Bool {
         
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
-            fatalError("in BluetoothPeripheralsViewController otherCGMTransmitterHasShouldConnectTrue, bluetoothPeripheralManager is nil")
-        }
+        // unwrap bluetoothPeripheralManager
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return false}
         
         for bluetoothPeripheral in bluetoothPeripheralManager.getBluetoothPeripherals() {
             
@@ -57,16 +56,42 @@ final class BluetoothPeripheralsViewController: UIViewController {
         
         return false
     }
+    
+    /// gets index in bluetoothPeripherals (and bluetoothtransmitters) for indexPath
+    public func getIndexInTable(forRowAt indexPath: IndexPath) -> Int {
+        
+        // unwrap bluetoothPeripheralManager
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return 0}
+        
+        // start with 0
+        var index = 0
+        
+        // loop through bluetoothperipherals. increase index as long as section of found peripheral does not match section in indexPath
+        for bluetoothPeripheral in bluetoothPeripheralManager.getBluetoothPeripherals() {
+            if bluetoothPeripheral.bluetoothPeripheralType().category().index() < indexPath.section {
+                
+                index = index + 1
+                
+            } else {
+                
+                break
+                
+            }
+        }
+        
+        return index + indexPath.row
+        
+    }
 
     // MARK:- overrides
     
     override func viewDidAppear(_ animated: Bool) {
-        
+
         // reinitialise bluetoothPeripherals because we're coming back from BluetoothPeripheralViewController where a BluetoothPeripheral may have been added or deleted
         initializeBluetoothTransmitterDelegates()
         
         // reload the table
-        tableView.reloadSections(IndexSet(integer: 0), with: .none)
+        tableView.reloadSections(IndexSet(integersIn:  0..<tableView.numberOfSections), with: .none)
 
     }
     
@@ -105,9 +130,8 @@ final class BluetoothPeripheralsViewController: UIViewController {
 
             }
             
-            guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
-                fatalError("In BluetoothPeripheralsViewController, prepare for segue, bluetoothPeripheralManager is nil" )
-            }
+            // unwrap bluetoothPeripheralManager
+            guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
             
             vc.configure(bluetoothPeripheral: sender as? BluetoothPeripheral, coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager, expectedBluetoothPeripheralType: expectedBluetoothPeripheralType)
             
@@ -165,21 +189,41 @@ final class BluetoothPeripheralsViewController: UIViewController {
         }
     }
 
-    private func getCoreDataManager() -> CoreDataManager {
-        if let coreDataManager = coreDataManager {
-            return coreDataManager
-        } else {
-            fatalError("in BluetoothPeripheralsViewController, coreDataManager is nil")
-        }
-    }
-    
     /// calls tableView.reloadRows for the row where bluetoothPeripheral is shown
     private func updateRow(for bluetoothPeripheral: BluetoothPeripheral) {
         
-        if let index = bluetoothPeripheralManager?.getBluetoothPeripherals().firstIndex(where: {$0.blePeripheral.address == bluetoothPeripheral.blePeripheral.address}) {
-            tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
-        }
+        tableView.reloadRows(at: [IndexPath(row: getIndexInSection(for: bluetoothPeripheral), section: bluetoothPeripheral.bluetoothPeripheralType().category().index())], with: .none)
 
+    }
+    
+    /// for specific BluetoothPeripheral, finds the number of the row in the table in it's section
+    private func getIndexInSection(for bluetoothPeripheral: BluetoothPeripheral) -> Int
+    {
+        
+        // unwrap bluetoothPeripheralManager
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return 0}
+        
+        // start with 0
+        var rowNumber = 0
+        
+        // loop through all BluetoothPeripheral's, skip those that are not of the same category, continue until one is found with the same address, increase rowNumber each time one is found in same category
+        for peripheralInList in bluetoothPeripheralManager.getBluetoothPeripherals() {
+            
+            if peripheralInList.bluetoothPeripheralType().category() == bluetoothPeripheral.bluetoothPeripheralType().category() {
+                
+                if peripheralInList.blePeripheral.address == bluetoothPeripheral.blePeripheral.address {
+                    break
+                }
+                
+                rowNumber = rowNumber + 1
+                
+            }
+
+        }
+  
+        // we should not get here
+        return rowNumber
+        
     }
     
     /// - sets the delegates of each transmitter to self
@@ -199,36 +243,55 @@ final class BluetoothPeripheralsViewController: UIViewController {
 
     }
     
+    /// number of rows in section
+    private func numberOfRows(inSection section: Int) -> Int {
+        
+        // unwrap bluetoothPeripheralManager
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return 0}
+        
+        // initially set to 0
+        var numberOfRows = 0
+        
+        // loop through bluetoothPeripheralManager's and count amount that has a category matching the section number
+        for bluetoothPeripheral in bluetoothPeripheralManager.getBluetoothPeripherals() {
+            
+            if bluetoothPeripheral.bluetoothPeripheralType().category().index() == section {
+                numberOfRows = numberOfRows + 1
+            }
+        }
+        
+        return numberOfRows
+        
+    }
 }
-
-// MARK: - extensions
 
 // MARK: extension UITableViewDataSource and UITableViewDelegate
 
 extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return bluetoothPeripheralManager?.getBluetoothPeripherals().count ?? 0
+
+        return numberOfRows(inSection: section)
+        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("Unexpected Table View Cell") }
         
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
-            return cell
-        }
+        // unwrap bluetoothPeripheralManager
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return cell}
 
-        // textLabel should be the user defined alias of the BluetoothPeripheral, or if user defined alias == nil, then the devicename
+        // textLabel should be the user defined alias of the BluetotindeothPeripheral, or if user defined alias == nil, then the devicename
 
-        cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].blePeripheral.alias
+        cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[getIndexInTable(forRowAt: indexPath)].blePeripheral.alias
         if cell.textLabel?.text == nil {
-            cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row].blePeripheral.name
+            cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[getIndexInTable(forRowAt: indexPath)].blePeripheral.name
         }
         
         // detail is the connection status
         cell.detailTextLabel?.text = Text_BluetoothPeripheralView.notConnected // start with not connected
-        if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row], createANewOneIfNecesssary: false) {
+        if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralManager.getBluetoothPeripherals()[getIndexInTable(forRowAt: indexPath)], createANewOneIfNecesssary: false) {
             
             if let connectionStatus = bluetoothTransmitter.getConnectionStatus(), connectionStatus == CBPeripheralState.connected {
                 cell.detailTextLabel?.text = Text_BluetoothPeripheralView.connected
@@ -240,23 +303,36 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         cell.accessoryType = .disclosureIndicator
         
         return cell
+        
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        // only 1 section, namely the list of BluetoothPeripherals
-        return 1
+        // equal to the amount of BluetoothPeripheralCategory types
+        return BluetoothPeripheralCategory.allCases.count
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         tableView.deselectRow(at: indexPath, animated: true)
        
+        // unwrap bluetoothPeripheralManager
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
         
-        self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier.rawValue, sender: bluetoothPeripheralManager.getBluetoothPeripherals()[indexPath.row])
+        self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier.rawValue, sender: bluetoothPeripheralManager.getBluetoothPeripherals()[getIndexInTable(forRowAt: indexPath)])
 
     }
     
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        
+        guard section < BluetoothPeripheralCategory.allCases.count else {return nil}
+        
+        // if there's no bluetoothperipherals then show no title
+        if numberOfRows(inSection: section) == 0 {return nil}
+        
+        return BluetoothPeripheralCategory.allCases[section].rawValue
+        
+    }
+
 }
 
 // MARK: - extension BluetoothTransmitterDelegate
@@ -303,9 +379,8 @@ extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
         // forward this call to bluetoothPeripheralManager who will handle it
         bluetoothPeripheralManager?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
 
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
-            fatalError("in BluetoothPeripheralsViewController didConnectTo, bluetoothPeripheralManager is nil")
-        }
+        // unwrap bluetoothPeripheralManager
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
         
         // row with connection status in the view must be updated
         updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
@@ -317,9 +392,8 @@ extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
         // forward this call to bluetoothPeripheralManager who will handle it
         bluetoothPeripheralManager?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
 
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
-            fatalError("in BluetoothPeripheralsViewController didDisconnectFrom, bluetoothPeripheralManager is nil")
-        }
+        // unwrap bluetoothPeripheralManager
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
 
         // row with connection status in the view must be updated
         updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
@@ -331,9 +405,8 @@ extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
         // forward this call to bluetoothPeripheralManager who will handle it
         bluetoothPeripheralManager?.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
 
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
-            fatalError("in BluetoothPeripheralsViewController deviceDidUpdateBluetoothState, bluetoothPeripheralManager is nil")
-        }
+        // unwrap bluetoothPeripheralManager
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
 
         // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
         if state == CBManagerState.poweredOff {

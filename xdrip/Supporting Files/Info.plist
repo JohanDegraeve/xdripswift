@@ -19,11 +19,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-<<<<<<< HEAD
-	<string>3444</string>
-=======
-	<string>3475</string>
->>>>>>> Bubble
+	<string>3523</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

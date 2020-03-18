@@ -105,7 +105,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             // send to delegate
             var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawValueAsDouble)]
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: nil, sensorTimeInMinutes: sensorTimeInMinutes * 10, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: sensorTimeInMinutes * 10)
             
         } else {
             trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)

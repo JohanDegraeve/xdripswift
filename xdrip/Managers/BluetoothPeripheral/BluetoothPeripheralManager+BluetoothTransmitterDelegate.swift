@@ -221,8 +221,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         let newBluetoothPeripheral = getTransmitterType(for: tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral).createNewBluetoothPeripheral(withAddress: deviceAddressNewTransmitter, withName: deviceNameNewTransmitter, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
         
         // add new bluetoothPeripheral and bluetoothTransmitter to array of bluetoothPeripherals and bluetoothTransmitters
-        bluetoothPeripherals.append(newBluetoothPeripheral)
-        bluetoothTransmitters.append(bluetoothTransmitter)
+        bluetoothTransmitters.insert(bluetoothTransmitter, at: insertInBluetoothPeripherals(bluetoothPeripheral: newBluetoothPeripheral))
         
         // call the callback function
         if let callBackAfterDiscoveringDevice = callBackAfterDiscoveringDevice {

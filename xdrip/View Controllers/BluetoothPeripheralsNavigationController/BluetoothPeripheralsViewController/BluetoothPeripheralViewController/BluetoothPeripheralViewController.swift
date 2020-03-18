@@ -80,8 +80,6 @@ class BluetoothPeripheralViewController: UIViewController {
     /// outlet for topLabel, to show in what screen user is
     @IBOutlet weak var topLabel: UILabel!
     
-    // MARK: - public properties
-
     // MARK: - private properties
     
     /// the BluetoothPeripheral being edited
@@ -171,35 +169,20 @@ class BluetoothPeripheralViewController: UIViewController {
     }
     
     // MARK: - other overriden functions
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-
-        guard let segueIdentifier = segue.identifier else {
-            fatalError("In BluetoothPeripheralViewController, prepare for segue, Segue had no identifier")
-        }
+    override func viewWillDisappear(_ animated: Bool) {
         
-        guard let segueIdentifierAsCase = BluetoothPeripheralViewController.UnwindSegueIdentifiers(rawValue: segueIdentifier) else {
-            fatalError("In BluetoothPeripheralViewController, segueIdentifierAsCase could not be initialized")
-        }
+        // save any changes that are made
+        coreDataManager?.saveChanges()
         
-        switch segueIdentifierAsCase {
-            
-        case BluetoothPeripheralViewController.UnwindSegueIdentifiers.BluetoothPeripheralToBluetoothPeripheralsUnWindSegueIdentifier:
-            
-            // save any changes that are made
-            coreDataManager?.saveChanges()
-            
-            // reassign delegate in BluetoothTransmitter to bluetoothPeripheralManager
-            reassignBluetoothTransmitterDelegateToBluetoothPeripheralManager()
-            
-            // just in case scanning for a new device is still ongoing, call stopscanning
-            bluetoothPeripheralManager?.stopScanningForNewDevice()
-            
-            // set bluetoothPeripheralViewModel to nil, so it can change the delegates
-            bluetoothPeripheralViewModel = nil
-            
+        // reassign delegate in BluetoothTransmitter to bluetoothPeripheralManager
+        reassignBluetoothTransmitterDelegateToBluetoothPeripheralManager()
+        
+        // just in case scanning for a new device is still ongoing, call stopscanning
+        bluetoothPeripheralManager?.stopScanningForNewDevice()
+        
+        // set bluetoothPeripheralViewModel to nil, so it can change the delegates
+        bluetoothPeripheralViewModel = nil
 
-        }
     }
     
     // MARK: - View Methods
@@ -338,10 +321,12 @@ class BluetoothPeripheralViewController: UIViewController {
             
             // delete
             bluetoothPeripheralManager.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheral)
-
+            
             self.bluetoothPeripheral = nil
             
-            self.performSegue(withIdentifier: UnwindSegueIdentifiers.BluetoothPeripheralToBluetoothPeripheralsUnWindSegueIdentifier.rawValue, sender: self)
+            // close the viewcontroller
+            self.navigationController?.popViewController(animated: true)
+            self.dismiss(animated: true, completion: nil)
             
         }, cancelHandler: nil)
         
@@ -501,9 +486,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         } else if (section >= 1 && !bluetoothPeripheralViewModel.canWebOOP()) || (section >= 2) {
             
             // this is the section with the transmitter specific settings
-            
-            // normally if bluetoothPeripheralViewModel would be nil, then there wouldn't be a second section, so normally bluetoothPeripheralViewModel is not nil here
-            return bluetoothPeripheralViewModel.numberOfSettings(inSection: section) ?? 0
+            return bluetoothPeripheralViewModel.numberOfSettings(inSection: section)
             
         } else {
             
@@ -942,6 +925,7 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
 
 /// defines perform segue identifiers used within BluetoothPeripheralViewController
 extension BluetoothPeripheralViewController {
+    
     public enum SegueIdentifiers:String {
         
         /// to go from BluetoothPeripheralsViewController to BluetoothPeripheralViewController
@@ -949,9 +933,4 @@ extension BluetoothPeripheralViewController {
         
     }
     
-    private enum UnwindSegueIdentifiers:String {
-        
-        /// to go back from BluetoothPeripheralViewController to BluetoothPeripheralsViewController
-        case BluetoothPeripheralToBluetoothPeripheralsUnWindSegueIdentifier = "BluetoothPeripheralToBluetoothPeripheralsUnWindSegueIdentifier"
-    }
 }
