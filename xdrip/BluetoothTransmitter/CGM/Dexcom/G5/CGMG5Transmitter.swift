@@ -155,7 +155,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         let testdata = GlucoseData(timeStamp: Date(), glucoseLevelRaw: testAmount, glucoseLevelFiltered: testAmount)
         debuglogging("timestamp testdata = " + testdata.timeStamp.description + ", with amount = " + testAmount.description)
         var testdataasarray = [testdata]
-        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &testdataasarray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &testdataasarray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
         testAmount = testAmount + 1
     }
     
@@ -374,7 +374,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                     
                                     var glucoseDataArray = [glucoseData]
                                     
-                                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
                                 }
                             }
                             
@@ -574,7 +574,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     private func processBatteryStatusRxMessage(value:Data) {
         if let batteryStatusRxMessage = BatteryStatusRxMessage(data: value) {
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), sensorTimeInMinutes: nil)
         } else {
             trace("batteryStatusRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
         }
@@ -590,7 +590,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             // send to delegate
             cGMG5TransmitterDelegate?.received(firmware: firmware!, cGMG5Transmitter: self)
             
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: firmware, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
             
             
             

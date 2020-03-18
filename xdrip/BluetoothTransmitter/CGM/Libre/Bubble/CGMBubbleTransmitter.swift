@@ -151,7 +151,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         cGMBubbleTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
                         
                         // send hardware, firmware and batteryPercentage to delegate
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorState: nil, sensorTimeInMinutes: nil, firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
                         
                         // confirm receipt
                         _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
@@ -185,7 +185,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                         timeStampLastBgReading = Date(timeIntervalSince1970: 0)
                                         
                                         // inform delegate about new sensorSerialNumber
-                                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: sensorSerialNumber)
+                                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
                                         
                                     }
                                     

@@ -103,7 +103,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
             
             // send to delegate
             var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawDataAsDouble)]
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transMitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transMitterBatteryInfo, sensorTimeInMinutes: nil)
             
         } else {
             trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .error)

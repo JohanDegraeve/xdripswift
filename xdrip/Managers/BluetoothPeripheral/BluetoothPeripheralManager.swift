@@ -8,9 +8,10 @@ class BluetoothPeripheralManager: NSObject {
     
     // MARK: - public properties
     
-    /// all currently known BluetoothPeripheral's (MStacks, cgmtransmitters, watlaa , ...)
+    /// - all currently known BluetoothPeripheral's (MStacks, cgmtransmitters, watlaa , ...)
+    /// - stored by type of bluetoothperipherals. In BluetoothPeripheralType, if the first type is M5Stack, then the first set of peripherals in the array will be all M5Stacks, and so on
     public var bluetoothPeripherals: [BluetoothPeripheral] = []
-    
+
     /// the bluetoothTransmitter's, array must have the same size as bluetoothPeripherals. For each element in bluetoothPeripherals, there's an element at the same index in bluetoothTransmitters, which may be nil. nil value means user selected not to connect
     public var bluetoothTransmitters: [BluetoothTransmitter?] = []
     
@@ -97,18 +98,18 @@ class BluetoothPeripheralManager: NSObject {
                     if let m5Stack = blePeripheral.m5Stack {
                         
                         // add it to the list of bluetoothPeripherals
-                        bluetoothPeripherals.append(m5Stack)
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: m5Stack)
                         
                         if m5Stack.blePeripheral.shouldconnect {
                             
                             // create an instance of M5StackBluetoothTransmitter, M5StackBluetoothTransmitter will automatically try to connect to the M5Stack with the address that is stored in m5Stack
                             // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.append(M5StackBluetoothTransmitter(address: m5Stack.blePeripheral.address, name: m5Stack.blePeripheral.name, bluetoothTransmitterDelegate: self, m5StackBluetoothTransmitterDelegate: self, blePassword: m5Stack.blepassword, bluetoothPeripheralType: m5Stack.isM5StickC ? .M5StickCType : .M5StackType))
+                            bluetoothTransmitters.insert(M5StackBluetoothTransmitter(address: m5Stack.blePeripheral.address, name: m5Stack.blePeripheral.name, bluetoothTransmitterDelegate: self, m5StackBluetoothTransmitterDelegate: self, blePassword: m5Stack.blepassword, bluetoothPeripheralType: m5Stack.isM5StickC ? .M5StickCType : .M5StackType), at: index)
                             
                         } else {
                             
                             // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.append(nil)
+                            bluetoothTransmitters.insert(nil, at: index)
                             
                         }
                         
@@ -119,13 +120,13 @@ class BluetoothPeripheralManager: NSObject {
                     if let watlaa = blePeripheral.watlaa {
                         
                         // add it to the list of bluetoothPeripherals
-                        bluetoothPeripherals.append(watlaa)
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: watlaa)
                         
                         if watlaa.blePeripheral.shouldconnect {
                             
                             // create an instance of WatlaaBluetoothTransmitter, WatlaaBluetoothTransmitter will automatically try to connect to the watlaa with the address that is stored in watlaa
                             // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.append(WatlaaBluetoothTransmitterMaster(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, bluetoothPeripheralType: .watlaaMaster))
+                            bluetoothTransmitters.insert(WatlaaBluetoothTransmitterMaster(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, bluetoothPeripheralType: .watlaaMaster), at: index)
                             
                             // if watlaa is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                             if bluetoothPeripheralType.category() == .CGM {
@@ -135,7 +136,7 @@ class BluetoothPeripheralManager: NSObject {
                         } else {
                             
                             // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.append(nil)
+                            bluetoothTransmitters.insert(nil, at: index)
                             
                         }
 
@@ -146,7 +147,7 @@ class BluetoothPeripheralManager: NSObject {
                     if let dexcomG5 = blePeripheral.dexcomG5 {
                         
                         // add it to the list of bluetoothPeripherals
-                        bluetoothPeripherals.append(dexcomG5)
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG5)
                         
                         if dexcomG5.blePeripheral.shouldconnect {
                             
@@ -154,7 +155,7 @@ class BluetoothPeripheralManager: NSObject {
 
                                 // create an instance of WatlaaBluetoothTransmitter, WatlaaBluetoothTransmitter will automatically try to connect to the watlaa with the address that is stored in watlaa
                                 // add it to the array of bluetoothTransmitters
-                                bluetoothTransmitters.append(CGMG5Transmitter(address: dexcomG5.blePeripheral.address, name: dexcomG5.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate))
+                                bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5.blePeripheral.address, name: dexcomG5.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
 
                             }
                             
@@ -166,7 +167,7 @@ class BluetoothPeripheralManager: NSObject {
                         } else {
                             
                             // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.append(nil)
+                            bluetoothTransmitters.insert(nil, at: index)
                             
                         }
                         
@@ -177,13 +178,13 @@ class BluetoothPeripheralManager: NSObject {
                     if let bubble = blePeripheral.bubble {
                         
                         // add it to the list of bluetoothPeripherals
-                        bluetoothPeripherals.append(bubble)
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: bubble)
                         
                         if bubble.blePeripheral.shouldconnect {
                             
                             // create an instance of BubbleBluetoothTransmitter, BubbleBluetoothTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
                             // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.append(CGMBubbleTransmitter(address: bubble.blePeripheral.address, name: bubble.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: bubble.timeStampLastBgReading, sensorSerialNumber: bubble.blePeripheral.sensorSerialNumber, webOOPEnabled: bubble.blePeripheral.webOOPEnabled, oopWebSite: bubble.blePeripheral.oopWebSite, oopWebToken: bubble.blePeripheral.oopWebToken))
+                            bluetoothTransmitters.insert(CGMBubbleTransmitter(address: bubble.blePeripheral.address, name: bubble.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: bubble.timeStampLastBgReading, sensorSerialNumber: bubble.blePeripheral.sensorSerialNumber, webOOPEnabled: bubble.blePeripheral.webOOPEnabled, oopWebSite: bubble.blePeripheral.oopWebSite, oopWebToken: bubble.blePeripheral.oopWebToken), at: index)
                             
                             // if BubbleType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                             if bluetoothPeripheralType.category() == .CGM {
@@ -193,7 +194,7 @@ class BluetoothPeripheralManager: NSObject {
                         } else {
                             
                             // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.append(nil)
+                            bluetoothTransmitters.insert(nil, at: index)
                             
                         }
                         
@@ -443,6 +444,32 @@ class BluetoothPeripheralManager: NSObject {
         return bluetoothPeripherals.firstIndex(where: {$0.blePeripheral.address == bluetoothPeripheral.blePeripheral.address})
     }
 
+    /// - will insert bluetoothPeripheral in the array bluetoothPeripherals, and returns the index where it's been inserted.
+    /// - it will be inserted in the correct location, ie depending on the BluetoothPeripheralType
+    public func insertInBluetoothPeripherals(bluetoothPeripheral: BluetoothPeripheral) -> Int {
+        
+        /// start with assuming we'll insert at location 0
+        var insertAt = 0
+        
+        /// index of bluetoothPeripheral's type in the enum BluetoothPeripheralType
+        let typeIndex: Int =  bluetoothPeripheral.bluetoothPeripheralType().category().index()
+
+        /// search for the first category which is higher ranked in the list (ie higher index) than typeIndex
+        while insertAt < bluetoothPeripherals.count && typeIndex > bluetoothPeripherals[insertAt].bluetoothPeripheralType().category().index() {
+            
+            insertAt = insertAt + 1
+        }
+        
+        if insertAt == bluetoothPeripherals.count {
+            bluetoothPeripherals.append(bluetoothPeripheral)
+        } else {
+            bluetoothPeripherals.insert(bluetoothPeripheral, at: insertAt)
+        }
+        
+        return insertAt
+        
+    }
+
     // MARK: - private functions
     
     /// when user changes M5Stack related settings, then the transmitter need to get that info, add observers
@@ -496,7 +523,6 @@ class BluetoothPeripheralManager: NSObject {
         
     }
 
-    
     // MARK:- override observe function
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {

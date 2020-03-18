@@ -169,7 +169,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             var result = LibreDataParser.parse(libreData: rxBuffer, timeStampLastBgReading: timeStampLastBgReading)
             
             //TODO: sort glucosedata before calling newReadingsReceived
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)
             
             //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
             if result.glucoseData.count > 0 {
@@ -307,7 +307,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     sendCommandToBlucon(opcode: BluconTransmitterOpCode.getPatchInfoRequest)
                     
                     // by default set battery level to 100
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 100), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 100), sensorTimeInMinutes: nil)
                     
                     
                 case .error14:
@@ -366,7 +366,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     }
                     
                     // inform cGMTransmitterDelegate about sensorSerialNumber and sensorState
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: sensorState, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: sensorSerialNumber)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
                     
                     return
                     
@@ -401,7 +401,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     if valueAsString.startsWith(unknownCommand2BatteryLowIndicator) {
                         
                         // this is considered as battery level 5%
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 5), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 5),  sensorTimeInMinutes: nil)
                         
                     }
                     
@@ -489,7 +489,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                             
                             let glucoseData = GlucoseData(timeStamp: timeStampLastBgReading, glucoseLevelRaw: glucoseValue, glucoseLevelFiltered: glucoseValue)
                             var glucoseDataArray = [glucoseData]
-                            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil,  sensorTimeInMinutes: nil)
                             
                         }
                         
@@ -500,12 +500,12 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                 case .bluconBatteryLowIndication1:
                     
                     // this is considered as battery level 3%
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 3), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 3), sensorTimeInMinutes: nil)
                     
                 case .bluconBatteryLowIndication2:
                     
                     // this is considered as battery level 2%
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 2), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 2), sensorTimeInMinutes: nil)
                     
                 }
                 

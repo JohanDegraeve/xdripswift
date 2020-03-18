@@ -1173,14 +1173,8 @@ extension RootViewController: CGMTransmitterDelegate {
     
     /// - parameters:
     ///     - readings: first entry is the most recent
-    func cgmTransmitterInfoReceived(glucoseData: inout [GlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorState: LibreSensorState?, sensorTimeInMinutes: Int?, firmware: String?, hardware: String?, hardwareSerialNumber: String?, bootloader: String?, sensorSerialNumber:String?) {
+    func cgmTransmitterInfoReceived(glucoseData: inout [GlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
         
-        trace("sensorstate %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, sensorState?.description ?? "no sensor state found")
-        trace("firmware %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, firmware ?? "no firmware version found")
-        trace("bootloader %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, bootloader ?? "no bootloader  found")
-        trace("hardwareSerialNumber %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, hardwareSerialNumber ?? "no serialNumber  found")
-        trace("sensorSerialNumber %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, sensorSerialNumber ?? "no sensorSerialNumber  found")
-        trace("hardware %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, hardware ?? "no hardware version found")
         trace("transmitterBatteryInfo  %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, transmitterBatteryInfo?.description ?? 0)
         trace("sensor time in minutes  %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, sensorTimeInMinutes?.description ?? "not received")
         trace("glucoseData size = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, glucoseData.count.description)
@@ -1192,6 +1186,7 @@ extension RootViewController: CGMTransmitterDelegate {
         
         // process new readings
         processNewGlucoseData(glucoseData: &glucoseData, sensorTimeInMinutes: sensorTimeInMinutes)
+        
     }
     
     
