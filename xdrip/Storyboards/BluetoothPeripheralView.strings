@@ -9,3 +9,4 @@
 "confirmDeletionPeripheral" = "Do you want to delete Bluetooth Peripheral with ";
 "bluetoothPeripheralAlias" = "Alias";
 "SensorSerialNumber" = "Sensor Serial Number";
+"battery" = "Battery";

@@ -12,4 +12,16 @@ extension DexcomG5 {
     
     @NSManaged public var firmwareVersion: String?
     
+    @NSManaged public var batteryResist: Int32
+    
+    @NSManaged public var batteryRuntime: Int32
+    
+    @NSManaged public var batteryStatus: Int32
+    
+    @NSManaged public var batteryTemperature: Int32
+    
+    @NSManaged public var voltageA: Int32
+    
+    @NSManaged public var voltageB: Int32
+    
 }

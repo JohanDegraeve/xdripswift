@@ -1,6 +1,6 @@
 import Foundation
 
-class Text_BluetoothPeripheralView {
+class Texts_BluetoothPeripheralView {
     
     static private let filename = "BluetoothPeripheralView"
     
@@ -46,5 +46,9 @@ class Text_BluetoothPeripheralView {
 
     static let SensorSerialNumber: String = {
         return NSLocalizedString("SensorSerialNumber", tableName: filename, bundle: Bundle.main, value: "Sensor Serial Number", comment: "BluetoothPeripheral view, text of the cell with the sensor serial number")
+    }()
+    
+    static let battery: String = {
+        return NSLocalizedString("Battery", tableName: filename, bundle: Bundle.main, value: "Battery", comment: "BluetoothPeripheral view, section title with battery info")
     }()
 }

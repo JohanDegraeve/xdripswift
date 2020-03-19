@@ -573,11 +573,21 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     private func processBatteryStatusRxMessage(value:Data) {
+        
         if let batteryStatusRxMessage = BatteryStatusRxMessage(data: value) {
+            
+            // cGMG5TransmitterDelegate for showing info on bluetoothviewcontroller and store in coredata
+            cGMG5TransmitterDelegate?.received(transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), cGMG5Transmitter: self)
+            
+            // cgmTransmitterDelegate , because rootviewcontroller also shows battery info in home screen
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), sensorTimeInMinutes: nil)
+            
         } else {
+            
             trace("batteryStatusRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
+            
         }
+        
     }
     
     private func processTransmitterVersionRxMessage(value:Data) {
@@ -586,13 +596,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             // assign transmitterVersion
             firmware = transmitterVersionRxMessage.firmwareVersion.hexEncodedString()
-            
+
             // send to delegate
             cGMG5TransmitterDelegate?.received(firmware: firmware!, cGMG5Transmitter: self)
-            
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
-            
-            
             
         } else {
             trace("transmitterVersionRxMessage is nil or firmware to hex is  nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
