@@ -290,11 +290,11 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         }
         
         // detail is the connection status
-        cell.detailTextLabel?.text = Text_BluetoothPeripheralView.notConnected // start with not connected
+        cell.detailTextLabel?.text = Texts_BluetoothPeripheralView.notConnected // start with not connected
         if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralManager.getBluetoothPeripherals()[getIndexInTable(forRowAt: indexPath)], createANewOneIfNecesssary: false) {
             
             if let connectionStatus = bluetoothTransmitter.getConnectionStatus(), connectionStatus == CBPeripheralState.connected {
-                cell.detailTextLabel?.text = Text_BluetoothPeripheralView.connected
+                cell.detailTextLabel?.text = Texts_BluetoothPeripheralView.connected
             }
             
         }

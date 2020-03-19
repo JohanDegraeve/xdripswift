@@ -503,7 +503,7 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
         if !success, let m5StackPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack {
             
             // show warning, inform that user should set password or reset M5Stack
-            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
+            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_BluetoothPeripheralView.alwaysConnect, actionHandler: {
                 
                 // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
                 self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackPeripheral)
@@ -522,7 +522,7 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
         guard let m5StackPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack else {return}
         
         // show warning, inform that user should set password
-        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
+        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_BluetoothPeripheralView.alwaysConnect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
             self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackPeripheral)
@@ -541,7 +541,7 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
         guard let m5StackBluetoothPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack else {return}
         
         // show warning, inform that user should reset M5Stack
-        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.m5StackResetRequiredWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
+        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.m5StackResetRequiredWarning + " " + Texts_BluetoothPeripheralView.alwaysConnect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
             self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackBluetoothPeripheral)
