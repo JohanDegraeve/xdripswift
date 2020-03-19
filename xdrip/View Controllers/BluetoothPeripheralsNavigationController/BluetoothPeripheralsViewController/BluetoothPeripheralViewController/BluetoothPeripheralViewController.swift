@@ -1,6 +1,8 @@
 import UIKit
 import CoreBluetooth
 
+fileprivate let generalSettingSectionNumber = 0
+
 /// - a case per attribute that can be set in BluetoothPeripheralViewController
 /// - these are applicable to all types of bluetoothperipheral types (M5Stack ...)
 fileprivate enum Setting:Int, CaseIterable {
@@ -212,6 +214,11 @@ class BluetoothPeripheralViewController: UIViewController {
                 // if it's a bluetoothperipheraltype that needs a transmitterId but there's no transmitterId set, then disable the scanbutton
                 scanButtonOutlet.disable()
                 
+            }
+            
+            // if transmitterId needed, request for it now
+            if expectedBluetoothPeripheralType.needsTransmitterId() {
+                requestTransmitterId()
             }
             
 
@@ -426,6 +433,44 @@ class BluetoothPeripheralViewController: UIViewController {
             
         }
         
+    }
+    
+    private func requestTransmitterId() {
+        
+        SettingsViewUtilities.runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTransmitterId, message: Texts_SettingsView.labelGiveTransmitterId, keyboardType: UIKeyboardType.alphabet, text: transmitterIdTempValue, placeHolder: "00000", actionTitle: nil, cancelTitle: nil, actionHandler:
+            {(transmitterId:String) in
+                
+                // convert to uppercase
+                let transmitterIdUpper = transmitterId.uppercased().toNilIfLength0()
+                
+                self.transmitterIdTempValue = transmitterIdUpper
+                
+                // reload the specific row in the table
+                self.tableView.reloadRows(at: [IndexPath(row: Setting.transmitterId.rawValue, section: 0)], with: .none)
+                
+                // if transmitterId is not nil, and if user doesn't need to start the scanning, then start scanning automatically
+                if self.transmitterIdTempValue != nil, let expectedBluetoothPeripheralType = self.expectedBluetoothPeripheralType {
+                    
+                    if expectedBluetoothPeripheralType.transmitterStartsScanningAfterInit() {
+                        
+                        // transmitterId presence will be checked in scanForBluetoothPeripheral
+                        self.scanForBluetoothPeripheral(type: expectedBluetoothPeripheralType)
+                        
+                    } else {
+                        
+                        // time to enable the scan button
+                        self.scanButtonOutlet.enable()
+                        
+                    }
+                    
+                }
+                
+        }, cancelHandler: nil, inputValidator: { (transmitterId) in
+            
+            return self.expectedBluetoothPeripheralType?.validateTransmitterId(transmitterId: transmitterId)
+            
+        }), forRowWithIndex: Setting.transmitterId.rawValue, forSectionWithIndex: generalSettingSectionNumber, withSettingsViewModel: nil, tableView: tableView, forUIViewController: self)
+
     }
 
 }
@@ -727,41 +772,8 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 
                 // if transmitterId already has a value, then it can't be changed anymore. To change it, user must delete the transmitter and recreate one.
                 if transmitterIdTempValue != nil {return}
-                
-                SettingsViewUtilities.runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTransmitterId, message: Texts_SettingsView.labelGiveTransmitterId, keyboardType: UIKeyboardType.alphabet, text: transmitterIdTempValue, placeHolder: "00000", actionTitle: nil, cancelTitle: nil, actionHandler:
-                    {(transmitterId:String) in
-                        
-                        // convert to uppercase
-                        let transmitterIdUpper = transmitterId.uppercased().toNilIfLength0()
-                        
-                        self.transmitterIdTempValue = transmitterIdUpper
-                        
-                        // reload the specific row in the table
-                        tableView.reloadRows(at: [IndexPath(row: Setting.transmitterId.rawValue, section: 0)], with: .none)
-                        
-                        // if transmitterId is not nil, and if user doesn't need to start the scanning, then start scanning automatically
-                        if self.transmitterIdTempValue != nil, let expectedBluetoothPeripheralType = self.expectedBluetoothPeripheralType {
-                            
-                            if expectedBluetoothPeripheralType.transmitterStartsScanningAfterInit() {
-                                
-                                // transmitterId presence will be checked in scanForBluetoothPeripheral
-                                self.scanForBluetoothPeripheral(type: expectedBluetoothPeripheralType)
-                                
-                            } else {
-                                
-                                // time to enable the scan button
-                                self.scanButtonOutlet.enable()
-                                
-                            }
-                            
-                        }
-                        
-                }, cancelHandler: nil, inputValidator: { (transmitterId) in
-                    
-                    return self.expectedBluetoothPeripheralType?.validateTransmitterId(transmitterId: transmitterId)
-                    
-                }), forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withSettingsViewModel: nil, tableView: tableView, forUIViewController: self)
-                
+
+                requestTransmitterId()
             }
             
         } else {
