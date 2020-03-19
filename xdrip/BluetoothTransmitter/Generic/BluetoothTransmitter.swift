@@ -32,11 +32,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// write characteristic
     private let CBUUID_WriteCharacteristic:String
     
-    /// if true, then scanning can start automatically as soon as an instance of the BluetoothTransmitter is created. This is typical for eg Dexcom G5, where an individual transitter can be idenfied via the transmitter id. Also the case for Blucon. For MiaoMiao and G4 xdrip this is different.
-    ///
-    /// parameter needs to be set during initialisation
-    private let startScanningAfterInit:Bool
-
     // for trace,
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBlueToothTransmitter)
 
@@ -77,7 +72,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
-    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID], CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, startScanningAfterInit:Bool, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
+    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID], CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
         
         switch addressAndName {
             
@@ -95,9 +90,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         self.CBUUID_Advertisement = CBUUID_Advertisement
         self.CBUUID_WriteCharacteristic = CBUUID_WriteCharacteristic
         self.CBUUID_ReceiveCharacteristic = CBUUID_ReceiveCharacteristic
-        
-        // assign startScanningAfterInit
-        self.startScanningAfterInit = startScanningAfterInit
         
         //initialize timeStampLastStatusUpdate
         timeStampLastStatusUpdate = Date()
@@ -392,13 +384,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         bluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
 
-        /// in case status changed to powered on and if device address known then try either to retrieveperipherals, or if that doesn't succeed, start scanning
+        /// in case status changed to powered on and if device address known then try  to retrieveperipherals
         if central.state == .poweredOn, reconnectAfterDisconnect {
             if (deviceAddress != nil) {
-                /// try to connect to device to which connection was successfully done previously, this attempt is done by callling retrievePeripherals(central) - if that fails and if it's a device for which we can always scan (eg DexcomG5), then start scanning
-                if !retrievePeripherals(central) && startScanningAfterInit {
-                    _ = startScanning()
-                }
+                
+                /// try to connect to device to which connection was successfully done previously, this attempt is done by callling retrievePeripherals(central)
+                _ = retrievePeripherals(central)
+                
             }
         }
         
