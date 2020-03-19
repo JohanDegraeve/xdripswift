@@ -107,7 +107,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
         self.timeStampLastBgReadingInMinutes = timeStampLastBgReading.toMillisecondsAsDouble()/1000/60
         
         // initialize
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_GNWService), CBUUID(string: CBUUID_BatteryService), CBUUID(string: CBUUID_DeviceInformationService)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Notify.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Write.rawValue, startScanningAfterInit: false, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_GNWService), CBUUID(string: CBUUID_BatteryService), CBUUID(string: CBUUID_DeviceInformationService)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Notify.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Write.rawValue, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
         //assign CGMTransmitterDelegate
         self.cgmTransmitterDelegate = cGMTransmitterDelegate

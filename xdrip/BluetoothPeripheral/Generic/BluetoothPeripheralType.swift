@@ -112,21 +112,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
         }
     }
     
-    /// if true, then there's no need to aks the user to start the scanning. Scanning will start as soon as the BluetoothTransmitter is created
-    func transmitterStartsScanningAfterInit() -> Bool {
-        
-        switch self {
-            
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType:
-            return false
-
-        case .DexcomG5Type:
-            return true
-
-        }
-        
-    }
-    
     /// - returns nil if id to validate has expected length and type of characters etc.
     /// - returns error text if transmitterId is not ok
     func validateTransmitterId(transmitterId:String) -> String? {

@@ -95,7 +95,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                     
                     // set cGMG5Transmitter delegate to self.
                     cGMG5Transmitter.cGMG5TransmitterDelegate = self
-                    
+
                 }
                 
             } else {

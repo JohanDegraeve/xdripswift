@@ -705,13 +705,11 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         
         callBackAfterDiscoveringDevice = callback
         
+        // create a temporary transmitter of requested type
         tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = createNewTransmitter(type: type, transmitterId: transmitterId)
         
-        // example DexcomG5 starts scanning as soon as the transmitter is created, so there's no need to start it here.
-        // (actually transmitterStartsScanningAfterInit has become obsolete, or will be.  Because all transmitters should come here, this will be the only place where scanning starts and it will always be immediately after creating the transmitter
-        if !type.transmitterStartsScanningAfterInit() {
-            _ = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
-        }
+        // start scanning
+        _ = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
         
     }
     

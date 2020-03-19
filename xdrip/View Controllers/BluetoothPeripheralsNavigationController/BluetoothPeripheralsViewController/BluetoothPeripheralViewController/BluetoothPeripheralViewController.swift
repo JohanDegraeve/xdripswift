@@ -206,27 +206,14 @@ class BluetoothPeripheralViewController: UIViewController {
             // unwrap expectedBluetoothPeripheralType
             guard let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType else {return}
             
-            // if it's a bluetoothperipheraltype for which the bluetoothTransmitter starts scanning as soon as it's created, then there's no need to let the user do the start scanning, so let's hide the button - this will only be the case for transmitters that need transmitterId
-            if expectedBluetoothPeripheralType.transmitterStartsScanningAfterInit() {
-                scanButtonOutlet.isHidden = true
-            } else if expectedBluetoothPeripheralType.needsTransmitterId() && transmitterIdTempValue == nil {
-
-                // if it's a bluetoothperipheraltype that needs a transmitterId but there's no transmitterId set, then disable the scanbutton
-                scanButtonOutlet.disable()
+            // if transmitterId needed, request for it now and set button text
+            if expectedBluetoothPeripheralType.needsTransmitterId() {
+                
+                requestTransmitterId()
                 
             }
             
-            // if transmitterId needed, request for it now
-            if expectedBluetoothPeripheralType.needsTransmitterId() {
-                requestTransmitterId()
-            }
-            
 
-        } else {
-            
-            // there's already a known bluetoothperipheral, no need to scan for it
-            scanButtonOutlet.disable()
-            
         }
         
         // set title
@@ -448,22 +435,8 @@ class BluetoothPeripheralViewController: UIViewController {
                 // reload the specific row in the table
                 self.tableView.reloadRows(at: [IndexPath(row: Setting.transmitterId.rawValue, section: 0)], with: .none)
                 
-                // if transmitterId is not nil, and if user doesn't need to start the scanning, then start scanning automatically
-                if self.transmitterIdTempValue != nil, let expectedBluetoothPeripheralType = self.expectedBluetoothPeripheralType {
-                    
-                    if expectedBluetoothPeripheralType.transmitterStartsScanningAfterInit() {
-                        
-                        // transmitterId presence will be checked in scanForBluetoothPeripheral
-                        self.scanForBluetoothPeripheral(type: expectedBluetoothPeripheralType)
-                        
-                    } else {
-                        
-                        // time to enable the scan button
-                        self.scanButtonOutlet.enable()
-                        
-                    }
-                    
-                }
+                // as transmitter id has been set, connect button label text must change
+                self.setConnectButtonLabelText()
                 
         }, cancelHandler: nil, inputValidator: { (transmitterId) in
             
@@ -946,3 +919,27 @@ extension BluetoothPeripheralViewController {
     }
     
 }
+
+/* EXPLANATION
+ For new ble
+ - if needs transmitterId, but no transmitterId is given by user,
+ - status = "need transmitter id"
+ - button = "transmitter id" (same as text in cel)
+ - if transmitter id not needed or transmitter id needed and already given, but not yet scanning :
+ - status = "not scanning"
+ - button = "start scanning"
+ - if  scanning :
+ - status = "scanning"
+ - button = "scanning" but button disabled
+ 
+ Once BLE is known (mac address known)
+ - if connected
+ - status = connected
+ - button = "disconnect"
+ - if not connected, but shouldconnect = true
+ - status = "trying to connect"
+ - button = "do no try to connect"
+ - if not connected, but shouldconnect = false
+ - status = "not trying to connect"
+ - button = "try to connect"
+ */

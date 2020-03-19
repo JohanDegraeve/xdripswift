@@ -130,7 +130,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         self.G5ResetRequested = false
 
         // initialize - CBUUID_Receive_Authentication.rawValue and CBUUID_Write_Control.rawValue will probably not be used in the superclass
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G5, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G5)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue, startScanningAfterInit: true, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G5, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G5)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
 
         //assign CGMTransmitterDelegate
         self.cgmTransmitterDelegate = cGMTransmitterDelegate
@@ -138,8 +138,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // assign cGMG5TransmitterDelegate
         self.cGMG5TransmitterDelegate = cGMG5TransmitterDelegate
         
-        // start scanning
-        _ = startScanning()
     }
     
     /// for testing , make the function public and call it after having activate a sensor in rootviewcontroller
@@ -176,20 +174,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     // MARK: BluetoothTransmitter overriden functions
-    
-    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        
-        super.centralManagerDidUpdateState(central)
-        
-        // if status changed to poweredon, and if address = nil then superclass will not start the scanning
-        // but for DexcomG5 we can start scanning
-        if central.state == .poweredOn {
-            if (deviceAddress == nil) {
-                _ = startScanning()
-            }
-        }
-        
-    }
     
     /// to ask pairing
     override func initiatePairing() {
