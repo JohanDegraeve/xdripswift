@@ -216,13 +216,16 @@ class BluetoothPeripheralViewController: UIViewController {
     public func numberOfGeneralSections() -> Int {
         
         // bluetoothPeripheralViewModel should noramlly not be nil here
-        guard let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel else {return 0}
+        guard let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel else {
+            // creating a fatal error here because I had it at once that bluetoothPeripheralViewModel was nil. Took a long time to figure out why this resulted in crashes
+            fatalError("in BluetoothPeripheralViewController numberOfGeneralSections, bluetoothPeripheralViewModel is nil. It shouldn't")
+        }
         
         // if it's a cgm transmitter type that supports web op, then also show the web oop section
         if bluetoothPeripheralViewModel.canWebOOP() {
             return 2
         }
-        
+
         return 1
         
     }
@@ -256,9 +259,10 @@ class BluetoothPeripheralViewController: UIViewController {
         
     }
     
-    // MARK: - other overriden functions
-    override func viewWillDisappear(_ animated: Bool) {
-        
+    // MARK: - deinit
+    
+    deinit {
+
         // save any changes that are made
         coreDataManager?.saveChanges()
         
@@ -562,11 +566,10 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         if bluetoothPeripheral == nil {
             
             // no peripheral known yet, only the first, bluetooth transmitter related settings are shown
-
             return 1
             
         } else {
-            
+
             return bluetoothPeripheralViewModel.numberOfSections() + numberOfGeneralSections()
             
         }
