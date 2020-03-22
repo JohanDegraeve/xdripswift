@@ -9,7 +9,7 @@ protocol BluetoothPeripheralViewModel {
     ///    - bluetoothPeripheralManager : reference to bluetoothPeripheralManaging object
     ///    - tableView : needed to intiate refresh of row
     ///    - bluetoothPeripheralViewController : BluetoothPeripheralViewController
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController)
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView,  bluetoothPeripheralViewController: BluetoothPeripheralViewController)
     
     /// - for example  M5StackBluetoothTransmitter has a delegate of type M5StackBluetoothTransmitterDelegate.
     /// - in the configure function, this varaible will be assigned to the viewmodel itself (if there is a M5StackBluetoothTransmitter)

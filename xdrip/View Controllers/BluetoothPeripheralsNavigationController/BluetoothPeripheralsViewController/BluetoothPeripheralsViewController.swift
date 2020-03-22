@@ -282,22 +282,17 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         // unwrap bluetoothPeripheralManager
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return cell}
 
+        // get the bluetoothPeripheral
+        let bluetoothPeripheral = bluetoothPeripheralManager.getBluetoothPeripherals()[getIndexInTable(forRowAt: indexPath)]
+        
         // textLabel should be the user defined alias of the BluetotindeothPeripheral, or if user defined alias == nil, then the devicename
-
-        cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[getIndexInTable(forRowAt: indexPath)].blePeripheral.alias
+        cell.textLabel?.text = bluetoothPeripheral.blePeripheral.alias
         if cell.textLabel?.text == nil {
-            cell.textLabel?.text = bluetoothPeripheralManager.getBluetoothPeripherals()[getIndexInTable(forRowAt: indexPath)].blePeripheral.name
+            cell.textLabel?.text = bluetoothPeripheral.blePeripheral.name
         }
         
         // detail is the connection status
-        cell.detailTextLabel?.text = Texts_BluetoothPeripheralView.notConnected // start with not connected
-        if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheralManager.getBluetoothPeripherals()[getIndexInTable(forRowAt: indexPath)], createANewOneIfNecesssary: false) {
-            
-            if let connectionStatus = bluetoothTransmitter.getConnectionStatus(), connectionStatus == CBPeripheralState.connected {
-                cell.detailTextLabel?.text = Texts_BluetoothPeripheralView.connected
-            }
-            
-        }
+        cell.detailTextLabel?.text = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: false, connectButtonOutlet: nil, expectedBluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType(), transmitterId: nil, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
 
         // clicking the cell will always open a new screen which allows the user to edit the alert type
         cell.accessoryType = .disclosureIndicator

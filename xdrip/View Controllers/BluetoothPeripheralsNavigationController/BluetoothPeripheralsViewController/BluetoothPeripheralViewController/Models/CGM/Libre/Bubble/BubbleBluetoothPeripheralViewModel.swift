@@ -21,6 +21,9 @@ class BubbleBluetoothPeripheralViewModel {
         
     }
     
+    /// Bubble settings willb be in section 0 + numberOfGeneralSections
+    private let sectionNumberForBubbleSpecificSettings = 0
+    
     /// reference to bluetoothPeripheralManager
     private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging?
     
@@ -212,7 +215,7 @@ extension BubbleBluetoothPeripheralViewModel: CGMBubbleTransmitterDelegate {
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(batteryLevel: batteryLevel, from: cGMBubbleTransmitter)
         
         // here's the trigger to update the table
-        tableView?.reloadRows(at: [IndexPath(row: Settings.batteryLevel.rawValue, section: 1)], with: .none)
+        reloadRow(row: Settings.batteryLevel.rawValue)
 
     }
     
@@ -222,7 +225,7 @@ extension BubbleBluetoothPeripheralViewModel: CGMBubbleTransmitterDelegate {
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(serialNumber: serialNumber, from: cGMBubbleTransmitter)
      
         // here's the trigger to update the table
-        tableView?.reloadRows(at: [IndexPath(row: Settings.sensorSerialNumber.rawValue, section: 1)], with: .none)
+        reloadRow(row: Settings.sensorSerialNumber.rawValue)
 
     }
     
@@ -232,7 +235,7 @@ extension BubbleBluetoothPeripheralViewModel: CGMBubbleTransmitterDelegate {
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(firmware: firmware, from: cGMBubbleTransmitter)
         
         // here's the trigger to update the table
-        tableView?.reloadRows(at: [IndexPath(row: Settings.firmWare.rawValue, section: 1)], with: .none)
+        reloadRow(row: Settings.firmWare.rawValue)
         
     }
     
@@ -242,8 +245,17 @@ extension BubbleBluetoothPeripheralViewModel: CGMBubbleTransmitterDelegate {
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(hardware: hardware, from: cGMBubbleTransmitter)
         
         // here's the trigger to update the table
-        tableView?.reloadRows(at: [IndexPath(row: Settings.hardWare.rawValue, section: 1)], with: .none)
+        reloadRow(row: Settings.hardWare.rawValue)
         
+    }
+    
+    private func reloadRow(row: Int) {
+        
+        if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
+            
+            tableView?.reloadRows(at: [IndexPath(row: row, section: bluetoothPeripheralViewController.numberOfGeneralSections() + sectionNumberForBubbleSpecificSettings)], with: .none)
+        
+        }
     }
     
 }
