@@ -146,6 +146,7 @@ fileprivate func handleGlucoseData(result: (glucoseData:[GlucoseData], sensorSta
         cgmTransmitterDelegate?.error(message: "Web OOP : " + errorDescription)
     } else {
         var result = result
+
         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: transmitterBatteryInfo, sensorTimeInMinutes: result.sensorTimeInMinutes)
         
         //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings

@@ -86,7 +86,7 @@ final class WatlaaBluetoothTransmitterMaster: BluetoothTransmitter {
     /// used when processing Bubble data packet
     private var startDate:Date
     
-    // used in parsing packet
+    /// timestamp of last received reading. When a new packet is received, then only the more recent readings will be treated
     private var timeStampLastBgReading:Date
 
     /// battery level Characteristic, needed to be able to read value

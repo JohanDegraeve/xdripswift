@@ -522,6 +522,20 @@ class BluetoothPeripheralManager: NSObject {
         }
         
     }
+    
+    /// helper function for extension BluetoothPeripheralManaging
+    private func getCGMTransmitter(for bluetoothPeripheral: BluetoothPeripheral) -> CGMTransmitter? {
+        
+        if bluetoothPeripheral.bluetoothPeripheralType().category() == .CGM {
+            
+            if let cgmTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) as? CGMTransmitter {
+                return cgmTransmitter
+            }
+        }
+        
+        return nil
+        
+    }
 
     // MARK:- override observe function
     
@@ -676,7 +690,7 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
 
             cgmTransmitter.setWebOOPEnabled(enabled: webOOPEnabled)
             
-            // oop web enabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of webOOPEnabled
+            // webOOPEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of webOOPEnabled
             cgmTransmitter.requestNewReading()
 
         }
@@ -685,7 +699,7 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
     
     func receivedNewValue(oopWebSite: String?, for bluetoothPeripheral: BluetoothPeripheral) {
         
-        /// if oopWebSite is nil, then there's no need to send that value to the transmitter, because this should only be the case if oopwebenabled is false
+        /// if oopWebSite is nil, then there's no need to send that value to the transmitter, because this should only be the case if webOOPEnabled is false
         guard let oopWebSite = oopWebSite else {return}
         
         getCGMTransmitter(for: bluetoothPeripheral)?.setWebOOPSite(oopWebSite: oopWebSite)
@@ -826,22 +840,6 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
 
         /// remove applicationManagerKeyInitiatePairing from application key manager - there's no need to initiate the pairing via this closure
         ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: BluetoothPeripheralManager.applicationManagerKeyInitiatePairing)
-        
-    }
-    
-    // MARK:- helper function
-    
-    /// helper function for extension BluetoothPeripheralManaging
-    private func getCGMTransmitter(for bluetoothPeripheral: BluetoothPeripheral) -> CGMTransmitter? {
-        
-        if bluetoothPeripheral.bluetoothPeripheralType().category() == .CGM {
-            
-            if let cgmTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) as? CGMTransmitter {
-                return cgmTransmitter
-            }
-        }
-        
-        return nil
         
     }
     
