@@ -575,14 +575,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L9f-Ab-Egz">
-                                <rect key="frame" x="20" y="44" width="49" height="39"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
-                                <state key="normal" title="Scan"/>
-                                <connections>
-                                    <action selector="scanButtonAction:" destination="FJ0-eY-Fv0" eventType="touchUpInside" id="d3F-AM-pvG"/>
-                                </connections>
-                            </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="82M-Ti-NV0">
                                 <rect key="frame" x="0.0" y="83" width="320" height="436"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -614,7 +606,7 @@
                                 </prototypes>
                             </tableView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WtR-0P-RyL">
-                                <rect key="frame" x="218" y="44" width="82" height="39"/>
+                                <rect key="frame" x="20" y="44" width="82" height="39"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <state key="normal" title="Connect"/>
                                 <connections>
@@ -624,12 +616,10 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="L9f-Ab-Egz" firstAttribute="leading" secondItem="jHe-GP-4Jf" secondAttribute="leading" constant="20" id="8zf-zJ-HsA"/>
                             <constraint firstItem="WtR-0P-RyL" firstAttribute="top" secondItem="jHe-GP-4Jf" secondAttribute="top" id="Ej3-HQ-w2L"/>
-                            <constraint firstItem="jHe-GP-4Jf" firstAttribute="trailing" secondItem="WtR-0P-RyL" secondAttribute="trailing" constant="20" id="ed1-re-h1k"/>
-                            <constraint firstItem="82M-Ti-NV0" firstAttribute="top" secondItem="L9f-Ab-Egz" secondAttribute="bottom" id="n9y-ia-TyG"/>
+                            <constraint firstItem="82M-Ti-NV0" firstAttribute="top" secondItem="WtR-0P-RyL" secondAttribute="bottom" id="HKf-bv-uWX"/>
+                            <constraint firstItem="WtR-0P-RyL" firstAttribute="leading" secondItem="jHe-GP-4Jf" secondAttribute="leading" constant="20" id="cCh-06-vha"/>
                             <constraint firstItem="jHe-GP-4Jf" firstAttribute="bottom" secondItem="82M-Ti-NV0" secondAttribute="bottom" id="qBc-5d-R7l"/>
-                            <constraint firstItem="L9f-Ab-Egz" firstAttribute="top" secondItem="jHe-GP-4Jf" secondAttribute="top" id="tyR-sY-DG3"/>
                             <constraint firstItem="jHe-GP-4Jf" firstAttribute="trailing" secondItem="82M-Ti-NV0" secondAttribute="trailing" id="w0B-Wn-iY0"/>
                             <constraint firstItem="82M-Ti-NV0" firstAttribute="leading" secondItem="jHe-GP-4Jf" secondAttribute="leading" id="yg8-ad-aLX"/>
                         </constraints>
@@ -644,7 +634,6 @@
                     </navigationItem>
                     <connections>
                         <outlet property="connectButtonOutlet" destination="WtR-0P-RyL" id="Sbx-db-Atn"/>
-                        <outlet property="scanButtonOutlet" destination="L9f-Ab-Egz" id="z68-tK-4ql"/>
                         <outlet property="tableView" destination="82M-Ti-NV0" id="RQy-kH-bnc"/>
                         <outlet property="trashButtonOutlet" destination="N7o-Nz-l8g" id="Sz3-nt-e7r"/>
                     </connections>

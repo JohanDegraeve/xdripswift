@@ -47,15 +47,15 @@ class M5StackBluetoothPeripheralViewModel {
     }
     
     /// - list of sections available in M5Stack, the last section is only applicable to M5Stack, not M5Stick
-    /// - counting starts at 1
+    /// - counting starts at 0
     private enum M5StackSections: Int, CaseIterable {
         
         /// helptest, blepassword, rotation, color, ... settings applicable to both M5Stack and M5StickC
-        case commonM5Settings = 1
+        case commonM5Settings = 0
         
         /// - settings only applicable to M5Stack : battery level, brightness, power off
         /// - THIS SHOULD ALWAYS BE THE LAST SECTION - so if sections are added, add them before this setting and increase the number of this setting
-        case specificM5StackSettings = 2
+        case specificM5StackSettings = 1
         
         func sectionTitle() -> String {
             switch self {
@@ -67,9 +67,6 @@ class M5StackBluetoothPeripheralViewModel {
         }
         
     }
-    
-    /// section number for section with helpText, blePassword, textColor, backGroundColor, rotation, connectToWiFi
-    private let sectionNumberForM5StackCommonSettings = 1
     
     /// brightness to be used in M5Stack
     ///
@@ -164,7 +161,9 @@ class M5StackBluetoothPeripheralViewModel {
                         }
 
                         // reload table
-                        self.tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.textColor.rawValue, section: 1)], with: .none)
+                        if let bluetoothPeripheralViewController = self.bluetoothPeripheralViewController {
+                            self.tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.textColor.rawValue, section: bluetoothPeripheralViewController.numberOfGeneralSections() + M5StackSections.specificM5StackSettings.rawValue)], with: .none)
+                        }
                         
                     }
                     
@@ -607,7 +606,7 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     ///    - bluetoothPeripheralManager : reference to bluetoothPeripheralManaging object
     ///    - tableView : needed to initiate refresh of row
     ///    - bluetoothPeripheralViewController : BluetoothPeripheralViewController
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView,  bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         

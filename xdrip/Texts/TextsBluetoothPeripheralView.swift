@@ -25,7 +25,7 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let donotconnect: String = {
-        return NSLocalizedString("donotconnect", tableName: filename, bundle: Bundle.main, value: "Don't connect", comment: "text in button top right, this button will disable automatic connect")
+        return NSLocalizedString("donotconnect", tableName: filename, bundle: Bundle.main, value: "Don't try to connect", comment: "text in button top right, this button will disable automatic connect")
     }()
     
     static let selectAliasText: String = {
@@ -50,5 +50,37 @@ class Texts_BluetoothPeripheralView {
     
     static let battery: String = {
         return NSLocalizedString("Battery", tableName: filename, bundle: Bundle.main, value: "Battery", comment: "BluetoothPeripheral view, section title with battery info")
+    }()
+    
+    static let needsTransmitterId: String = {
+        return NSLocalizedString("needsTransmitterId", tableName: filename, bundle: Bundle.main, value: "Needs transmitter id", comment: "cell text, if user needs to set the transmitter id")
+    }()
+    
+    static let scan: String = {
+        return NSLocalizedString("scan", tableName: filename, bundle: Bundle.main, value: "Scan", comment: "text in button to start scanning")
+    }()
+    
+    static let readyToScan: String = {
+        return NSLocalizedString("readyToScan", tableName: filename, bundle: Bundle.main, value: "Ready to scan", comment: "text in status row, if ready to start scanning")
+    }()
+    
+    static let scanning: String = {
+        return NSLocalizedString("scanning", tableName: filename, bundle: Bundle.main, value: "Scanning", comment: "text in status row, if scanning ongoing")
+    }()
+    
+    static let disconnect: String = {
+        return NSLocalizedString("disconnect", tableName: filename, bundle: Bundle.main, value: "Disconnect", comment: "button text, to disconnect")
+    }()
+    
+    static let tryingToConnect: String = {
+        return NSLocalizedString("tryingToConnect", tableName: filename, bundle: Bundle.main, value: "Trying to connect", comment: "text in status rown, when not connect but app is trying to connect")
+    }()
+    
+    static let notTryingToConnect: String = {
+        return NSLocalizedString("notTryingToConnect", tableName: filename, bundle: Bundle.main, value: "Not trying to connect", comment: "text in status rown, when not connected and app is not trying to connect")
+    }()
+    
+    static let connect: String = {
+        return NSLocalizedString("connect", tableName: filename, bundle: Bundle.main, value: "Connect", comment: "button text, to connect")
     }()
 }
