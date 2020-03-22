@@ -25,7 +25,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMMiaoMiao)
     
-    // used in parsing packet
+    /// timestamp of last received reading. When a new packet is received, then only the more recent readings will be treated
     private var timeStampLastBgReading:Date
     
     /// counts number of times resend was requested due to crc error

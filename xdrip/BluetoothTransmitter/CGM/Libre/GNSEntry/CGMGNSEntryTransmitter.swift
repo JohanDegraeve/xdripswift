@@ -69,7 +69,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMGNSEntry)
     
-    /// used in parsing packet
+    /// timestamp of last received reading. When a new packet is received, then only the more recent readings will be treated
     private var timeStampLastBgReadingInMinutes:Double
     
     /// possible reading errors, as per GNSEntry documentation

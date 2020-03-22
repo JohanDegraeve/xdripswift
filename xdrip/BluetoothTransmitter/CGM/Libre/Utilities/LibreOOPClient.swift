@@ -84,7 +84,7 @@ class LibreOOPClient {
 
             // process last16, new readings should be smaller than now + 5 minutes
             processGlucoseData(trendToLibreGlucose(last16), Date(timeIntervalSinceNow: 5 * 60))
-            
+
             // get last 32 in history data, with date either again now = 5 minutes or timestamp of last reading in last16
             var lastTimeStamp = Date(timeIntervalSinceNow: 5 * 60)
             if finalResult.count > 0, let last = finalResult.last {
@@ -94,7 +94,7 @@ class LibreOOPClient {
             
             // process last 32
             processGlucoseData(trendToLibreGlucose(last32), lastTimeStamp)
-            
+
         }
     }
 
@@ -315,7 +315,6 @@ class LibreOOPClient {
         
         return LibreGlucoseSmoothing.CalculateSmothedData5Points(origtrends: origarr)
 
-        
     }
 
 }
