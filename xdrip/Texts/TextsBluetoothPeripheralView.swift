@@ -20,10 +20,6 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("notConnected", tableName: filename, bundle: Bundle.main, value: "Not Connected", comment: "when Bluetooth Peripheral is shown, connection status, not connected")
     }()
     
-    static let alwaysConnect: String = {
-        return NSLocalizedString("alwaysconnect", tableName: filename, bundle: Bundle.main, value: "Always Connect", comment: "text in button top right, by clicking, user says that device should always try to connect")
-    }()
-    
     static let donotconnect: String = {
         return NSLocalizedString("donotconnect", tableName: filename, bundle: Bundle.main, value: "Don't try to connect", comment: "text in button top right, this button will disable automatic connect")
     }()
@@ -83,4 +79,13 @@ class Texts_BluetoothPeripheralView {
     static let connect: String = {
         return NSLocalizedString("connect", tableName: filename, bundle: Bundle.main, value: "Connect", comment: "button text, to connect")
     }()
+    
+    static let connectedAt: String = {
+        return NSLocalizedString("connectedAt", tableName: filename, bundle: Bundle.main, value: "Connected At", comment: "cell text, where the connection timestamp is shown")
+    }()
+    
+    static let disConnectedAt: String = {
+        return NSLocalizedString("disConnectedAt", tableName: filename, bundle: Bundle.main, value: "Disconnected At", comment: "cell text, where the disconnection timestamp is shown")
+    }()
+    
 }

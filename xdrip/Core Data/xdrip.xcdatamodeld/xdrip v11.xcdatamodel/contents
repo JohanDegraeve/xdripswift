@@ -40,6 +40,7 @@
     <entity name="BLEPeripheral" representedClassName=".BLEPeripheral" syncable="YES">
         <attribute name="address" attributeType="String"/>
         <attribute name="alias" optional="YES" attributeType="String"/>
+        <attribute name="lastConnectionStatusChangeTimeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name" attributeType="String"/>
         <attribute name="oopWebSite" optional="YES" attributeType="String"/>
         <attribute name="oopWebToken" optional="YES" attributeType="String"/>
@@ -113,7 +114,7 @@
         <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
-        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="268"/>
+        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="283"/>
         <element name="Bubble" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
         <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="163"/>
