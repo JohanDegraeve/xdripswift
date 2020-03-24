@@ -197,6 +197,10 @@ final class RootViewController: UIViewController {
         return dateFormatter
     }()
     
+    /// current value of webOPEnabled, default false
+    /// - used to detect changes in the value
+    private var webOOPEnabled: Bool?
+    
     // MARK: - View Life Cycle
     
     // set the status bar content colour to light to match new darker theme
@@ -386,31 +390,51 @@ final class RootViewController: UIViewController {
             
         })
         
-        // function to be used in BluetoothPeripheralManager init function, and also immediately after having initiliazed BluetoothPeripheralManager (it will not get called from within BluetoothPeripheralManager because didSet function is not called from init
-        let cgmTransmitterChanged = {
+        /// will be called by BluetoothPeripheralManager if cgmTransmitterType changed and/or webOOPEnabled value changed
+        /// - function to be used in BluetoothPeripheralManager init function, and also immediately after having initiliazed BluetoothPeripheralManager (it will not get called from within BluetoothPeripheralManager because didSet function is not called from init
+        let cgmTransmitterInfoChanged = {
             
             // if cgmTransmitter not nil then reassign calibrator and set UserDefaults.standard.transmitterTypeAsString
             if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
                 
-                // reassign calibrator
+                // reassign calibrator, even if the type of calibrator would not change
                 self.calibrator = RootViewController.getCalibrator(cgmTransmitter: cgmTransmitter)
+                
+                // check if webOOPEnabled changed and if yes stop the sensor
+                if let webOOPEnabled = self.webOOPEnabled {
+                    
+                    if webOOPEnabled != cgmTransmitter.isWebOOPEnabled() {
+                        
+                        debuglogging("call stopsensor")
+                        self.stopSensor()
+                        
+                    }
+                    
+                }
+                
+                // check if the type of sensor supported by the cgmTransmitterType  has changed, if yes stop the sensor
+                if let currentTransmitterType = UserDefaults.standard.transmitterType, currentTransmitterType.sensorType() != cgmTransmitter.cgmTransmitterType().sensorType() {
+                    
+                    debuglogging("call stopsensor")
+                    self.stopSensor()
+                    
+                }
+                
+                // assign the new value of webOOPEnabled
+                self.webOOPEnabled = cgmTransmitter.isWebOOPEnabled()
                 
                 // change value of UserDefaults.standard.transmitterTypeAsString
                 UserDefaults.standard.transmitterTypeAsString = cgmTransmitter.cgmTransmitterType().rawValue
-                
-            } else {
-                
-                UserDefaults.standard.transmitterTypeAsString = nil
                 
             }
             
         }
         
         // setup bluetoothPeripheralManager
-        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: self, cgmTransmitterChanged: cgmTransmitterChanged)
+        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: self, cgmTransmitterInfoChanged: cgmTransmitterInfoChanged)
     
         // to initialize UserDefaults.standard.transmitterTypeAsString
-        cgmTransmitterChanged()
+        cgmTransmitterInfoChanged()
         
         // setup alertmanager
         alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)

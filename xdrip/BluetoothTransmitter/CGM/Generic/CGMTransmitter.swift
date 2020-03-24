@@ -64,6 +64,21 @@ enum CGMTransmitterType:String, CaseIterable {
     /// watlaa
     case watlaa = "Watlaa (under development)"
     
+    /// what sensorType does this CGMTransmitter type support
+    func sensorType() -> CGMSensorType {
+        
+        switch self {
+            
+        case .dexcomG4, .dexcomG5, .dexcomG6 :
+            return .Dexcom
+            
+        case .miaomiao, .Bubble, .GNSentry, .Droplet1, .blueReader, .watlaa, .Blucon :
+            return .Libre
+            
+        }
+        
+    }
+    
     /// if true, then a class conforming to the protocol CGMTransmitterDelegate will call newSensorDetected if it detects a new sensor is placed. Means there's no need to let the user start and stop a sensor
     ///
     /// example MiaoMiao can detect new sensor, implementation should return true, Dexcom transmitter's can't
