@@ -8,13 +8,13 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     ///     - transmitterId : only for devices that need a transmitterID (currently only Dexcom and Blucon)
     func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, callback: @escaping (BluetoothPeripheral) -> Void)
     
-    /// will stop scanning, this is again for the case where scanning for a new BluetoothPeripheral has started
+    /// stops scanning for new device
     func stopScanningForNewDevice()
     
     /// to know if bluetoothperipheralmanager is currently scanning for a new device
     func isScanning() -> Bool
     
-    /// try to connect to the BluetoothPeripheral
+    /// try to connect to the M5Stack
     func connect(to bluetoothPeripheral: BluetoothPeripheral)
     
     /// returns the BluetoothTransmitter for the specified bluetoothPeripheral
@@ -26,7 +26,9 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     /// returns the BluetoothPeripheral for the specified BluetoothTransmitter
     /// - parameters:
     ///     - for : the bluetoothTransmitter, for which BluetoothPeripheral should be returned
-    func getBluetoothPeripheral(for bluetoothTransmitter: BluetoothTransmitter) -> BluetoothPeripheral
+    /// - returns:
+    ///     - bluetoothPeripheral for the transmitter, can be nil (example if called while scanning)
+    func getBluetoothPeripheral(for bluetoothTransmitter: BluetoothTransmitter) -> BluetoothPeripheral?
     
     /// deletes the BluetoothPeripheral in coredata, and also the corresponding BluetoothTransmitter if there is one will be deleted
     func deleteBluetoothPeripheral(bluetoothPeripheral: BluetoothPeripheral)

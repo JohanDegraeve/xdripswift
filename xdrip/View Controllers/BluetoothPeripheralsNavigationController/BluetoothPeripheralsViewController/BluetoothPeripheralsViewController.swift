@@ -375,10 +375,10 @@ extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
         bluetoothPeripheralManager?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
 
         // unwrap bluetoothPeripheralManager
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager, let bluetoothPeripheral =  bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter) else {return}
         
         // row with connection status in the view must be updated
-        updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
+        updateRow(for: bluetoothPeripheral)
         
     }
     
@@ -388,10 +388,10 @@ extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
         bluetoothPeripheralManager?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
 
         // unwrap bluetoothPeripheralManager
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
-
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager, let bluetoothPeripheral =  bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter) else {return}
+        
         // row with connection status in the view must be updated
-        updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
+        updateRow(for: bluetoothPeripheral)
         
     }
     
@@ -401,11 +401,11 @@ extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
         bluetoothPeripheralManager?.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
 
         // unwrap bluetoothPeripheralManager
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager, let bluetoothPeripheral =  bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter) else {return}
 
         // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
         if state == CBManagerState.poweredOff {
-            updateRow(for: bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter))
+            updateRow(for: bluetoothPeripheral)
         }
         
     }

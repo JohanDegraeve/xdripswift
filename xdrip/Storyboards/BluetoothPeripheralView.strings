@@ -2,7 +2,6 @@
 "status" = "Status";
 "connected" = "connected";
 "notConnected" = "not connected";
-"alwaysconnect" = "Always Connect";
 "donotconnect" = "Don't try to connect";
 "selectAliasText" = "Choose an alias for this Bluetooth Peripheral, the name will be shown in the app and is easier for you to recognize";
 "aliasAlreadyExists" = "There is already a Bluetooth Peripheral with this alias";
@@ -17,3 +16,5 @@
 "tryingToConnect" = "Trying to connect";
 "connect" = "Connect";
 "notTryingToConnect" = "Not trying to connect";
+"disConnectedAt" = "Disconnected At";
+"connectedAt" = "Connected At";

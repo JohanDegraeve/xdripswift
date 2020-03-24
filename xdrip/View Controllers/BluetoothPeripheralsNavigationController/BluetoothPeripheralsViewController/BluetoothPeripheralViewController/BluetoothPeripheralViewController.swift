@@ -19,10 +19,13 @@ fileprivate enum Setting:Int, CaseIterable {
     /// the current connection status
     case connectionStatus = 3
     
+    /// timestamp when connection changed to connected or not connected
+    case connectOrDisconnectTimeStamp = 4
+    
     /// ANY NEW SETTINGS SHOULD BE INSERTED HERE
     
     /// transmitterID, only for devices that need it
-    case transmitterId = 4
+    case transmitterId = 5
 
 }
 
@@ -579,7 +582,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         // expectedBluetoothPeripheralType should not be nil here, unwrap it
-        guard let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType else {return 0}
+        guard let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType else {
+            fatalError("in tableView numberOfRowsInSection, expectedBluetoothPeripheralType is nil")
+        }
         
         if section == 0 {
 
@@ -597,31 +602,32 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             
         } else if section == 1  {
             
-            // this is the section with the web oop settings
-            
-            // if weboop not enabled then just one row
+            // if the bluetoothperipheral type supports oopweb then this is the oop web section
+            if bluetoothPeripheralViewModel?.canWebOOP() ?? false {
 
-            if let bluetoothPeripheral = bluetoothPeripheral {
-                
-                if bluetoothPeripheral.blePeripheral.webOOPEnabled {
-                    return WebOOPSettings.allCases.count
-                } else {
-                    return 1
+                // check if weboopenabled and if yes return the number of settings in that section
+                if let bluetoothPeripheral = bluetoothPeripheral {
+                    
+                    if bluetoothPeripheral.blePeripheral.webOOPEnabled {
+                        return WebOOPSettings.allCases.count
+                    }
                 }
-            } else {
+                
+                // weboop supported by the peripheral but not enabled
                 return 1
+
             }
             
+        }
+
+        // it's not section 0 and it's not section 1 && weboop supported
+        
+        // this is the section with the transmitter specific settings
+        // unwrap bluetoothPeripheralViewModel
+        if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel {
+            return bluetoothPeripheralViewModel.numberOfSettings(inSection: section)
         } else {
-
-            // this is the section with the transmitter specific settings
-            // unwrap bluetoothPeripheralViewModel
-            if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel {
-                return bluetoothPeripheralViewModel.numberOfSettings(inSection: section)
-            } else {
-                return 0
-            }
-
+                fatalError("in tableView numberOfRowsInSection, bluetoothPeripheralViewModel is nil")
         }
         
     }
@@ -629,7 +635,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("BluetoothPeripheralViewController cellforrowat, Unexpected Table View Cell ") }
-        
+
         // unwrap bluetoothPeripheralManager
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return cell}
         
@@ -705,13 +711,34 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 // if transmitterId already has a value, then it can't be changed anymore. To change it, user must delete the transmitter and recreate one.
                 cell.accessoryType = transmitterIdTempValue == nil ? .disclosureIndicator : .none
                 
+            case .connectOrDisconnectTimeStamp:
+                
+                if let bluetoothPeripheral = bluetoothPeripheral, let lastConnectionStatusChangeTimeStamp = bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp {
+                    
+                    if BluetoothPeripheralViewController.bluetoothPeripheralIsConnected(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager) {
+                        
+                        cell.textLabel?.text = Texts_BluetoothPeripheralView.connectedAt
+                        
+                    } else {
+                        
+                        cell.textLabel?.text = Texts_BluetoothPeripheralView.disConnectedAt
+                        
+                    }
+                    
+                    cell.detailTextLabel?.text = lastConnectionStatusChangeTimeStamp.toShortString()
+                    
+                } else {
+                    cell.textLabel?.text = Texts_BluetoothPeripheralView.connectedAt
+                    cell.detailTextLabel?.text = ""
+                }
+
             }
 
         }  else {
             
             // web oop settings
             
-            guard let setting = WebOOPSettings(rawValue: indexPath.row) else { fatalError("BluetoothPeripheralViewController cellForRowAt, Unexpected setting") }
+            guard let setting = WebOOPSettings(rawValue: indexPath.row) else { fatalError("BluetoothPeripheralViewController cellForRowAt, Unexpected setting, row = " + indexPath.row.description) }
             
             // configure the cell depending on setting
             switch setting {
@@ -853,6 +880,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 // present the alert
                 self.present(alert, animated: true, completion: nil)
                 
+            case .connectOrDisconnectTimeStamp:
+                break
+                
             case .transmitterId:
                 
                 // if transmitterId already has a value, then it can't be changed anymore. To change it, user must delete the transmitter and recreate one.
@@ -865,7 +895,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             
             // web oop settings
             
-            guard let setting = WebOOPSettings(rawValue: indexPath.row) else { fatalError("BluetoothPeripheralViewController cellForRowAt, Unexpected setting") }
+            guard let setting = WebOOPSettings(rawValue: indexPath.row) else { fatalError("BluetoothPeripheralViewController didSelectRowAt, Unexpected setting") }
             
             switch setting {
                 
@@ -979,7 +1009,11 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         // handled in BluetoothPeripheralManager
         bluetoothPeripheralManager?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
         
+        // refresh row with status
         tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+        
+        // refresh row with connection timestamp
+        tableView.reloadRows(at: [IndexPath(row: Setting.connectOrDisconnectTimeStamp.rawValue, section: 0)], with: .none)
         
     }
     
@@ -988,8 +1022,12 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         // handled in BluetoothPeripheralManager
         bluetoothPeripheralManager?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
         
+        // refresh row with status
         tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
 
+        // refresh row with connection timestamp
+         tableView.reloadRows(at: [IndexPath(row: Setting.connectOrDisconnectTimeStamp.rawValue, section: 0)], with: .none)
+        
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
@@ -1000,6 +1038,9 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
         // do this whenever the bluetooth status changes
         tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+        
+        // same explanation for connection timestamp
+        tableView.reloadRows(at: [IndexPath(row: Setting.connectOrDisconnectTimeStamp.rawValue, section: 0)], with: .none)
 
     }
     

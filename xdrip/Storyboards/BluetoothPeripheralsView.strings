@@ -3,4 +3,4 @@
 "selectCategory" = "Select Category";
 "selectType" = "Select Type";
 "batteryLevel" = "Battery Level";
-"noMultipleActiveCGMsAllowed" = "You can not have more than one CGM Transmitter which is connected or trying to connect.\nVerify your other CGM Transmitters and either click 'Don't connect' or delete it.";
+"noMultipleActiveCGMsAllowed" = "You can not have more than one CGM Transmitter which is connected or trying to connect.\nVerify your other CGM Transmitters and either click 'Don't try to connect' or delete it.";

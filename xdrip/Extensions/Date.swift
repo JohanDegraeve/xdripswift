@@ -47,6 +47,14 @@ extension Date {
         return dateFormatter.string(from: self).appending("Z")
     }
     
+    /// date to short string, according to locale
+    func toShortString() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .short
+        dateFormatter.dateStyle = .short
+        return dateFormatter.string(from: self)
+    }
+    
     /// returns seconds since 1.1.1970 local time for current timezone
     func toSecondsAsInt64Local() -> Int64 {
         let calendar = Calendar.current

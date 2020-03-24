@@ -31,7 +31,7 @@ class BluetoothPeripheralManager: NSObject {
     public var bluetoothTransmitterThatNeedsPairing: BluetoothTransmitter?
     
     /// when xdrip connects to a BluetoothTransmitter that is also CGMTransmitter, then we'll call this function with the BluetoothTransmitter as argument. This function is defined by RootViewController, it will allow the RootViewController to set the CGMTransmitter, calibrator ...
-    public var cgmTransmitterChanged: () -> ()
+    public var cgmTransmitterInfoChanged: () -> ()
     
     /// address of the last active cgmTransmitter
     ///
@@ -39,7 +39,7 @@ class BluetoothPeripheralManager: NSObject {
     public var currentCgmTransmitterAddress: String? {
         didSet(newValue) {
             if newValue != currentCgmTransmitterAddress {
-                cgmTransmitterChanged()
+                cgmTransmitterInfoChanged()
             }
         }
     }
@@ -64,14 +64,14 @@ class BluetoothPeripheralManager: NSObject {
     // MARK: - initializer
     
     /// - parameters:
-    ///     - cgmTransmitterChanged : to be called when currently used cgmTransmitter changes or is set to nil
-    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, uIViewController: UIViewController, cgmTransmitterChanged: @escaping () -> ()) {
+    ///     - cgmTransmitterInfoChanged : to be called when currently used cgmTransmitter changes or is set to nil
+    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, uIViewController: UIViewController, cgmTransmitterInfoChanged: @escaping () -> ()) {
         
         // initialize properties
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.cgmTransmitterDelegate = cgmTransmitterDelegate
-        self.cgmTransmitterChanged = cgmTransmitterChanged
+        self.cgmTransmitterInfoChanged = cgmTransmitterInfoChanged
         self.bLEPeripheralAccessor = BLEPeripheralAccessor(coreDataManager: coreDataManager)
         self.uIViewController = uIViewController
         
@@ -503,20 +503,20 @@ class BluetoothPeripheralManager: NSObject {
         
     }
     
-    private func  setTransmitterToNilAndCallCgmTransmitterChangedIfNecessary(indexInBluetoothTransmittersArray index: Int) {
+    private func  setTransmitterToNilAndCallcgmTransmitterInfoChangedIfNecessary(indexInBluetoothTransmittersArray index: Int) {
         
-        // check if transmitter being deleted is the currently assigned CGMTransmitter and if yes call
-        var callCgmTransmitterChanged = false
+        // check if transmitter being deleted is the currently assigned CGMTransmitter and if yes call cgmTransmitterInfoChanged after setting bluetoothTransmitter to nil
+        var callcgmTransmitterInfoChanged = false
         if transmitterIsCurrentlyUsedCGMTransmitter(bluetoothTransmitter: bluetoothTransmitters[index]) {
-            callCgmTransmitterChanged = true
+            callcgmTransmitterInfoChanged = true
         }
         
         // set bluetoothTransmitter to nil, this will also initiate a disconnect
         bluetoothTransmitters[index] = nil
         
-        if callCgmTransmitterChanged {
+        if callcgmTransmitterInfoChanged {
             
-            // set currentCgmTransmitterAddress to nil, this will implicitly call cgmTransmitterChanged
+            // set currentCgmTransmitterAddress to nil, this will implicitly call cgmTransmitterInfoChanged
             currentCgmTransmitterAddress = nil
             
         }
@@ -692,6 +692,9 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
             
             // webOOPEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of webOOPEnabled
             cgmTransmitter.requestNewReading()
+            
+            // call cgmTransmitterInfoChanged
+            cgmTransmitterInfoChanged()
 
         }
         
@@ -704,6 +707,15 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         
         getCGMTransmitter(for: bluetoothPeripheral)?.setWebOOPSite(oopWebSite: oopWebSite)
         
+        if let cgmTransmitter = getCGMTransmitter(for: bluetoothPeripheral) {
+
+            cgmTransmitter.setWebOOPSite(oopWebSite: oopWebSite)
+            
+            // oopWebSite changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of webOOPEnabled
+            cgmTransmitter.requestNewReading()
+
+        }
+
     }
     
     func receivedNewValue(oopWebToken: String?, for bluetoothPeripheral: BluetoothPeripheral) {
@@ -711,7 +723,14 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         /// if oopWebToken is nil, then there's no need to send that value to the transmitter, because this should only be the case if oopWebToken is false
         guard let oopWebToken = oopWebToken else {return}
         
-        getCGMTransmitter(for: bluetoothPeripheral)?.setWebOOPToken(oopWebToken: oopWebToken)
+        if let cgmTransmitter = getCGMTransmitter(for: bluetoothPeripheral) {
+            
+            cgmTransmitter.setWebOOPToken(oopWebToken: oopWebToken)
+            
+            // oopWebToken changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of webOOPEnabled
+            cgmTransmitter.requestNewReading()
+            
+        }
 
     }
     
@@ -727,7 +746,6 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         
     }
     
-    /// stops scanning for new device
     func stopScanningForNewDevice() {
         
         if let tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral {
@@ -753,7 +771,6 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         
     }
     
-    /// try to connect to the M5Stack
     func connect(to bluetoothPeripheral: BluetoothPeripheral) {
         
         // the trick : by calling bluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheral, createANewOneIfNecesssary: true), there's two cases
@@ -766,20 +783,14 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         
     }
     
-    /// returns the BluetoothPeripheral for the specified BluetoothTransmitter
-    /// - parameters:
-    ///     - for : the bluetoothTransmitter, for which BluetoothPeripheral should be returned
-    func getBluetoothPeripheral(for bluetoothTransmitter: BluetoothTransmitter) -> BluetoothPeripheral {
+    func getBluetoothPeripheral(for bluetoothTransmitter: BluetoothTransmitter) -> BluetoothPeripheral? {
         
-        guard let index = bluetoothTransmitters.firstIndex(of: bluetoothTransmitter) else {
-            fatalError("in BluetoothPeripheralManager, function getBluetoothPeripherals, could not find specified bluetoothTransmitter")
-        }
+        guard let index = bluetoothTransmitters.firstIndex(of: bluetoothTransmitter) else {return nil}
         
         return bluetoothPeripherals[index]
         
     }
     
-    /// deletes the BluetoothPeripheral in coredata, and also the corresponding BluetoothTransmitter if there is one will be deleted
     func deleteBluetoothPeripheral(bluetoothPeripheral: BluetoothPeripheral) {
         
         // find the bluetoothPeripheral in array bluetoothPeripherals, if it's not there then this looks like a coding error
@@ -788,7 +799,7 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
             return
         }
         
-        setTransmitterToNilAndCallCgmTransmitterChangedIfNecessary(indexInBluetoothTransmittersArray: index)
+        setTransmitterToNilAndCallcgmTransmitterInfoChangedIfNecessary(indexInBluetoothTransmittersArray: index)
         
         // delete in coredataManager
         coreDataManager.mainManagedObjectContext.delete(bluetoothPeripherals[index] as! NSManagedObject)
@@ -802,14 +813,12 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         
     }
     
-    /// - returns: the bluetoothPeripheral's managed by this BluetoothPeripheralManager
     func getBluetoothPeripherals() -> [BluetoothPeripheral] {
         
         return bluetoothPeripherals
         
     }
     
-    /// - returns: the bluetoothTransmitters managed by this BluetoothPeripheralManager
     func getBluetoothTransmitters() -> [BluetoothTransmitter] {
         
         var bluetoothTransmitters: [BluetoothTransmitter] = []
@@ -824,12 +833,11 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         
     }
     
-    /// bluetoothTransmitter for this bluetoothPeripheral will be deleted, as a result this will also disconnect the bluetoothPeripheral
     func setBluetoothTransmitterToNil(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral) {
         
         if let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral) {
             
-            setTransmitterToNilAndCallCgmTransmitterChangedIfNecessary(indexInBluetoothTransmittersArray: index)
+            setTransmitterToNilAndCallcgmTransmitterInfoChangedIfNecessary(indexInBluetoothTransmittersArray: index)
             
         }
     }

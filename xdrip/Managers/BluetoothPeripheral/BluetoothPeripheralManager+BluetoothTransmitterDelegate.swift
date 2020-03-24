@@ -127,7 +127,9 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     func reset(for bluetoothTransmitter: BluetoothTransmitter, successful: Bool) {
         
         // set resetrequired to false in coredata, there's no need to reset as it's just been done
-        getBluetoothPeripheral(for: bluetoothTransmitter).blePeripheral.resetrequired = false
+        if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
+            bluetoothPeripheral.blePeripheral.resetrequired = false
+        }
         
         // Create Notification Content to give info about reset result of reset attempt
         let notificationContent = UNMutableNotificationContent()
@@ -151,8 +153,13 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
         
-        /// if bluetoothTransmitter is a CGMTransmitter and if it's a new one (ie address is different than currentCgmTransmitterAddress then call cgmTransmitterChanged
-        let checkCurrentCGMTransmitterHelper = { (_ bluetoothTransmitter : BluetoothTransmitter) in
+        // before exiting save the changes
+        defer {
+            coreDataManager.saveChanges()
+        }
+
+        /// helper function : if bluetoothTransmitter is a CGMTransmitter and if it's a new one (ie address is different than currentCgmTransmitterAddress then call cgmTransmitterChanged
+        let checkCurrentCGMTransmitterHelper = {
             
             // if it's a CGMTransmitter and if it's a new one then call cgmTransmitterChanged,
             if bluetoothTransmitter is CGMTransmitter, bluetoothTransmitter.deviceAddress != self.currentCgmTransmitterAddress {
@@ -166,12 +173,18 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             
         }
         
-        // if tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil, then this is a connection to an already known/stored BluetoothTransmitter. BluetoothPeripheralManager is not interested in this info.
+        // if tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil, then this is a connection to an already known/stored BluetoothTransmitter.
         guard let tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral else {
             
             trace("    in didConnect, tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
             
-            checkCurrentCGMTransmitterHelper(bluetoothTransmitter)
+            // Need to call checkCurrentCGMTransmitterHelper
+            checkCurrentCGMTransmitterHelper()
+            
+            // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
+            if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
+                bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+            }
             
             return
             
@@ -191,7 +204,13 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             
             trace("in didConnect, tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is not nil and not equal to  bluetoothTransmitter", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
             
-            checkCurrentCGMTransmitterHelper(bluetoothTransmitter)
+            // Need to call checkCurrentCGMTransmitterHelper
+            checkCurrentCGMTransmitterHelper()
+            
+            // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
+            if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
+                bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+            }
             
             return
             
@@ -229,21 +248,39 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             self.callBackAfterDiscoveringDevice = nil
         }
         
-        checkCurrentCGMTransmitterHelper(bluetoothTransmitter)
+        // Need to call checkCurrentCGMTransmitterHelper
+        checkCurrentCGMTransmitterHelper()
+        
+        // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
+        if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
+            bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+        }
         
         // assign tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral to nil here
         self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
+        
+        coreDataManager.saveChanges()
         
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
         
-        trace("in deviceDidUpdateBluetoothState, no further action", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
+        trace("in deviceDidUpdateBluetoothState", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
         
         if bluetoothTransmitter.deviceAddress == nil {
-            /// this bluetoothTransmitter is created to start scanning for a new, unknown M5Stack, so start scanning
+            /// this bluetoothTransmitter is created to start scanning for a new, unknown bluetoothtransmitter, so start scanning
             _ = bluetoothTransmitter.startScanning()
         }
+        
+        // disconnect doesn't get triggered if status changes to off
+        // so if the device already has a lastConnectionStatusChangeTimeStamp and if new state = poweredoff then set lastConnectionStatusChangeTimeStamp to current date
+        if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
+            if bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp != nil && state == .poweredOff {
+                bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+            }
+        }
+        
+        coreDataManager.saveChanges()
         
     }
     
@@ -254,8 +291,15 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     }
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
-        // no further action, This is for UIViewcontroller's that also receive this info, means info can only be shown if this happens while user has one of the UIViewcontrollers open
+        
         trace("in didDisconnectFrom", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
+        
+        // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
+        if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
+            bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+        }
+
+        coreDataManager.saveChanges()
         
     }
     

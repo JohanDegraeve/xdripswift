@@ -21,6 +21,6 @@ class Texts_BluetoothPeripheralsView {
     }()
     
     static let noMultipleActiveCGMsAllowed: String = {
-        return NSLocalizedString("noMultipleActiveCGMsAllowed", tableName: filename, bundle: Bundle.main, value: "You can not have more than one CGM Transmitter which is connected or trying to connect.\nVerify your other CGM Transmitters and either click 'Don't connect' or delete it.", comment: "When adding a new cgm transmitter, but the user has another one already which is either connected or trying to connect")
+        return NSLocalizedString("noMultipleActiveCGMsAllowed", tableName: filename, bundle: Bundle.main, value: "You can not have more than one CGM Transmitter which is connected or trying to connect.\nVerify your other CGM Transmitters and either click 'Don't try to connect' or delete it.", comment: "When adding a new cgm transmitter, but the user has another one already which is either connected or trying to connect")
     }()
 }
