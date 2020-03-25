@@ -18,3 +18,4 @@
 "notTryingToConnect" = "Not trying to connect";
 "disConnectedAt" = "Disconnected At";
 "connectedAt" = "Connected At";
+"startScanningInfo" = "Scannnig Started.\n\nKeep xDrip open on the foreground until a connection is made. (there's no need to turn off Auto-Lock. Just don't press the home button and don't lock the iOS device.)";

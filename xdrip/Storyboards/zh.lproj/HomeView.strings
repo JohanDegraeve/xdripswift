@@ -9,7 +9,6 @@
 "startsensortimeinfo" = "在下一个对话框中，您需要设置传感器插入的日期和时间. 输入正确的日期和时间是非常重要的. 尤其是对数据的准确度.";
 "scanbluetoothdeviceongoing" = "正在扫描发射器";
 "bluetoothisnoton" = "蓝牙未打开. 打开蓝牙并再次尝试.不要从设备的设置里直接配对. 扫描和配对都应该在app上进行.";
-"bluetoothdeviceconnectedinfo" = "发射器已配对. 设备信息已保存. 再次配对会默认选择此发射器.要使用新的发射器，请先取消配对";
 "sensorstart" = "启动探头";
 "notstarted" = "未启动";
 "notknown" = "未知";

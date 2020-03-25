@@ -315,7 +315,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         }
         
         // create and schedule timer
-        PropertyHolder.transmitterPairingResponseTimer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(informUserThatPairingTimedOut), userInfo: nil, repeats: false)
+        PropertyHolder.transmitterPairingResponseTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(informUserThatPairingTimedOut), userInfo: nil, repeats: false)
         
     }
 

@@ -1,5 +1,6 @@
 import UIKit
 import CoreBluetooth
+import os
 
 fileprivate let generalSettingSectionNumber = 0
 
@@ -97,6 +98,12 @@ class BluetoothPeripheralViewController: UIViewController {
     /// in which section do we find the weboop settings, if enabled
     private let webOOPSettingsSectionNumber = 1
     
+    /// when user starts scanning, info will be shown in UIAlertController. This will be
+    private var infoAlertWhenScanningStarts: UIAlertController?
+    
+    /// for trace
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.bluetoothPeripheralViewController)
+
     // MARK:- public functions
     
     /// configure the viewController
@@ -349,7 +356,7 @@ class BluetoothPeripheralViewController: UIViewController {
         // if bluetoothPeripheralType needs transmitterId, then check that transmitterId is present
         if type.needsTransmitterId() && transmitterIdTempValue == nil {return}
         
-        bluetoothPeripheralManager.startScanningForNewDevice(type: type, transmitterId: transmitterIdTempValue, callback: { (bluetoothPeripheral) in
+        let startScanningResult = bluetoothPeripheralManager.startScanningForNewDevice(type: type, transmitterId: transmitterIdTempValue, callback: { (bluetoothPeripheral) in
             
             // set isScanning true
             self.isScanning = false
@@ -382,16 +389,51 @@ class BluetoothPeripheralViewController: UIViewController {
             // reload the full screen , all rows in all sections in the tableView
             self.tableView.reloadData()
             
+            // dismiss alert screen that shows info after cliking start scanning button
+            if let infoAlertWhenScanningStarts = self.infoAlertWhenScanningStarts {
+                infoAlertWhenScanningStarts.dismiss(animated: true, completion: nil)
+                self.infoAlertWhenScanningStarts = nil
+            }
+            
         })
         
-        // set isScanning true
-        isScanning = true
+        // check startScanningResult
+        switch startScanningResult {
+            
+        case .success:
         
-        // disable the connect button
-        self.connectButtonOutlet.disable()
-
-        // app should be scanning now, update of cell is needed
-        tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+            // set isScanning true
+            isScanning = true
+            
+            // disable the connect button
+            self.connectButtonOutlet.disable()
+            
+            // app should be scanning now, update of cell is needed
+            tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+            
+            self.infoAlertWhenScanningStarts = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.startScanningInfo, actionHandler: nil)
+            
+            self.present(self.infoAlertWhenScanningStarts!, animated:true)
+            
+        case .alreadyScanning, .alreadyConnected, .connecting :
+            trace("in scanForBluetoothPeripheral, scanning not started. Scanning result = %{public}@", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error, startScanningResult.description())
+            // no further processing, should normally not happen,
+            
+        case .bluetoothNotPoweredOn(let actualStateIs):
+            trace("in scanForBluetoothPeripheral, scanning not started. Bluetooth is not on, actual state = %{public}@", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error, actualStateIs)
+            self.infoAlertWhenScanningStarts = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.bluetoothIsNotOn, actionHandler: nil)
+            
+            self.present(self.infoAlertWhenScanningStarts!, animated:true)
+            
+        case .other(let reason):
+            trace("in scanForBluetoothPeripheral, scanning not started. Scanning result = %{public}@", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error, reason)
+            // no further processing, should normally not happen,
+            
+        /*@unknown default:
+            trace("in scanForBluetoothPeripheral, scanning not started. Scanning result = %{public}@", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error, startScanningResult.description())
+            // no further processing, should normally not happen,*/
+            
+        }
         
     }
     
@@ -425,7 +467,7 @@ class BluetoothPeripheralViewController: UIViewController {
         }, cancelHandler: nil)
         
         self.present(alert, animated:true)
-
+        
     }
     
     /// user clicked connect button
@@ -1013,6 +1055,12 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         
         // refresh row with connection timestamp
         tableView.reloadRows(at: [IndexPath(row: Setting.connectOrDisconnectTimeStamp.rawValue, section: 0)], with: .none)
+        
+        // dismiss alert screen that shows info after cliking start scanning button
+        if let infoAlertWhenScanningStarts = infoAlertWhenScanningStarts {
+            infoAlertWhenScanningStarts.dismiss(animated: true, completion: nil)
+            self.infoAlertWhenScanningStarts = nil
+        }
         
     }
     

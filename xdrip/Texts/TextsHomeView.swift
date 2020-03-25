@@ -45,13 +45,13 @@ enum Texts_HomeView {
     }()
     
     static let bluetoothIsNotOn:String = {
-        return NSLocalizedString("bluetoothisnoton", tableName: filename, bundle: Bundle.main, value: "Bluetooth is not on. Switch on Bluetooth first then try again.", comment: "when user manually starts scanning but bluetooth is not on")
-    }()
-   
-    static let bluetoothDeviceConnectedInfo:String = {
-        return NSLocalizedString("bluetoothdeviceconnectedinfo", tableName: filename, bundle: Bundle.main, value: "Connected to Transmitter. Device details are stored. Future connection attempts will only use this transmitter.\r\n\r\nTo use another transmitter, select first 'Forget Transmitter'", comment: "when user did manually start scanning, connection was successful")
+        return NSLocalizedString("bluetoothisnoton", tableName: filename, bundle: Bundle.main, value: "Bluetooth is not on. Switch on Bluetooth first then try again.", comment: "when user starts scanning but bluetooth is not on")
     }()
     
+    static let startScanningInfo: String = {
+        return NSLocalizedString("startScanningInfo", tableName: filename, bundle: Bundle.main, value: "Scannnig Started.\n\nKeep xDrip open on the foreground until a connection is made. (there's no need to turn off Auto-Lock. Just don't press the home button and don't lock the iOS device.)", comment: "After clicking scan button, this message will appear")
+    }()
+   
     static let sensorStart:String = {
         return NSLocalizedString("sensorstart", tableName: filename, bundle: Bundle.main, value: "Sensor Start", comment: "status info : literally 'Sensor Start'")
     }()
