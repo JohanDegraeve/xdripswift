@@ -19,6 +19,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
 
+    /// CGMMiaoMiaoTransmitterDelegate
+    public weak var cGMMiaoMiaoTransmitterDelegate: CGMMiaoMiaoTransmitterDelegate?
+
     // maximum times resend request due to crc error
     let maxPacketResendRequests = 3;
     
@@ -52,6 +55,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// oop token to use in case oop web would be enabled
     private var oopWebToken: String
         
+    // current sensor serial number, if nil then it's not known yet
+    private var sensorSerialNumber:String?
+
     // MARK: - Initialization
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
@@ -62,7 +68,8 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - oopWebToken : oop web token to use, only used in case webOOPEnabled = true
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, webOOPEnabled: Bool, oopWebSite: String, oopWebToken: String) {
+    ///     - cGMMiaoMiaoTransmitterDelegate : a CGMMiaoMiaoTransmitterDelegate
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMMiaoMiaoTransmitterDelegate : CGMMiaoMiaoTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading: Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameMiaoMiao)
@@ -73,19 +80,25 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         // assign CGMTransmitterDelegate
         self.cgmTransmitterDelegate = cGMTransmitterDelegate
         
+        // assign cGMMiaoMiaoTransmitterDelegate
+        self.cGMMiaoMiaoTransmitterDelegate = cGMMiaoMiaoTransmitterDelegate
+        
+        // initialize sensorSerialNumber
+        self.sensorSerialNumber = sensorSerialNumber
+
         // initialize rxbuffer
         rxBuffer = Data()
         timestampFirstPacketReception = Date()
         
-        //initialize timeStampLastBgReading
-        self.timeStampLastBgReading = timeStampLastBgReading
-        
-        // initialize webOOPEnabled
-        self.webOOPEnabled = webOOPEnabled
+        // initialize timeStampLastBgReading
+        self.timeStampLastBgReading = timeStampLastBgReading ?? Date(timeIntervalSince1970: 0)
 
+        // initialize webOOPEnabled
+        self.webOOPEnabled = webOOPEnabled ?? false
+        
         // initialize oopWebToken and oopWebSite
-        self.oopWebToken = oopWebToken
-        self.oopWebSite = oopWebSite
+        self.oopWebToken = oopWebToken ?? ConstantsLibreOOP.token
+        self.oopWebSite = oopWebSite ?? ConstantsLibreOOP.site
 
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
@@ -140,10 +153,34 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                             trace("in peripheral didUpdateValueFor, Buffer complete", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
                             
                             if (Crc.LibreCrc(data: &rxBuffer, headerOffset: miaoMiaoHeaderLength)) {
+                                
                                 //get MiaoMiao info from MiaoMiao header
                                 let firmware = String(describing: rxBuffer[14...15].hexEncodedString())
                                 let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
                                 let batteryPercentage = Int(rxBuffer[13])
+                                
+                                // get sensor serialNumber
+                                if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
+                                    
+                                    // verify serial number and if changed inform delegate
+                                    // (there will also be a seperate opcode form MiaoMiao because it's able to detect new sensor also)
+                                    if libreSensorSerialNumber.serialNumber != sensorSerialNumber {
+                                        
+                                        sensorSerialNumber = libreSensorSerialNumber.serialNumber
+                                        
+                                        trace("    new sensor detected :  %{public}@", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info, libreSensorSerialNumber.serialNumber)
+                                        
+                                        // inform delegate about new sensor detected
+                                        cgmTransmitterDelegate?.newSensorDetected()
+                                        
+                                        cGMMiaoMiaoTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
+                                        
+                                        // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
+                                        timeStampLastBgReading = Date(timeIntervalSince1970: 0)
+                                        
+                                    }
+
+                                }
                                 
                                 LibreDataParser.libreDataProcessor(sensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)))?.serialNumber, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
                                     self.timeStampLastBgReading = timeStampLastBgReading
