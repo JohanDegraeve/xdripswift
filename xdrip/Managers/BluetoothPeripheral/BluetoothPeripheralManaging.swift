@@ -6,7 +6,7 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     /// to scan for a new BluetoothPeripheral - callback will be called when a new BluetoothPeripheral is found and connected
     /// - parameters:
     ///     - transmitterId : only for devices that need a transmitterID (currently only Dexcom and Blucon)
-    func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, callback: @escaping (BluetoothPeripheral) -> Void)
+    func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, callback: @escaping (BluetoothPeripheral) -> Void) -> BluetoothTransmitter.startScanningResult
     
     /// stops scanning for new device
     func stopScanningForNewDevice()

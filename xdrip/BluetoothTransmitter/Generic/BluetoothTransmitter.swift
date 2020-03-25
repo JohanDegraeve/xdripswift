@@ -165,7 +165,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         trace("in startScanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         
         //assign default returnvalue
-        var returnValue = BluetoothTransmitter.startScanningResult.other(reason: "unknown")
+        var returnValue = BluetoothTransmitter.startScanningResult.success
         
         // first check if already connected or connecting and if so stop processing
         if let peripheral = peripheral {
@@ -199,12 +199,21 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             }
             switch centralManager.state {
             case .poweredOn:
+                
                 trace("    starting bluetooth scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
                 centralManager.scanForPeripherals(withServices: services, options: nil)
                 returnValue = .success
+                
+            case .poweredOff:
+                
+                trace("    bluetooth is not powered on", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
+                return .bluetoothNotPoweredOn(actualStateIs: "not powered on")
+            
             default:
-                trace("    bluetooth is not powered on, actual state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, "\(centralManager.state.toString())")
-                returnValue = .bluetoothNotPoweredOn(actualStateIs: centralManager.state.toString())
+                
+                trace("    assumed started scanning, actual state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, returnValue.description())
+                return returnValue
+                
             }
         } else {
             trace("    centralManager is nil, can not starting scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)

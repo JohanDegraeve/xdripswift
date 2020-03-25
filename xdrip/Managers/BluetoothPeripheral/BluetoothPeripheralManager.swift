@@ -453,7 +453,7 @@ class BluetoothPeripheralManager: NSObject {
 
     /// - parameters:
     ///     - transmitterId : only for transmitter types that need it (at the moment only Dexcom and Blucon)
-    public func createNewTransmitter(type: BluetoothPeripheralType, transmitterId: String?) -> BluetoothTransmitter? {
+    public func createNewTransmitter(type: BluetoothPeripheralType, transmitterId: String?) -> BluetoothTransmitter {
         
         switch type {
             
@@ -468,8 +468,7 @@ class BluetoothPeripheralManager: NSObject {
         case .DexcomG5Type:
             
             guard let transmitterId = transmitterId, let cgmTransmitterDelegate =  cgmTransmitterDelegate else {
-                trace("in createNewTransmitter, transmitterId is nil or cgmTransmitterDelegate is nil", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
-                return nil
+                fatalError("in createNewTransmitter, type DexcomG5Type, transmitterId is nil or cgmTransmitterDelegate is nil")
             }
             
             return CGMG5Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
@@ -477,8 +476,7 @@ class BluetoothPeripheralManager: NSObject {
         case .BubbleType:
             
             guard let cgmTransmitterDelegate =  cgmTransmitterDelegate else {
-                trace("in createNewTransmitter, cgmTransmitterDelegate is nil", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
-                return nil
+                fatalError("in createNewTransmitter, type DexcomG5Type, cgmTransmitterDelegate is nil")
             }
             
             return CGMBubbleTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil)
@@ -486,8 +484,7 @@ class BluetoothPeripheralManager: NSObject {
         case .MiaoMiaoType:
             
             guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
-                trace("in createNewTransmitter, cgmTransmitterDelegate is nil", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
-                return nil
+                fatalError("in createNewTransmitter, MiaoMiaoType, cgmTransmitterDelegate is nil")
             }
             
             return CGMMiaoMiaoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil)
@@ -794,15 +791,17 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
 
     }
     
-    func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, callback: @escaping (BluetoothPeripheral) -> Void) {
+    func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, callback: @escaping (BluetoothPeripheral) -> Void) -> BluetoothTransmitter.startScanningResult {
         
         callBackAfterDiscoveringDevice = callback
         
         // create a temporary transmitter of requested type
-        tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = createNewTransmitter(type: type, transmitterId: transmitterId)
+        let newBluetoothTranmsitter = createNewTransmitter(type: type, transmitterId: transmitterId)
+        
+        tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = newBluetoothTranmsitter
         
         // start scanning
-        _ = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
+        return newBluetoothTranmsitter.startScanning()
         
     }
     
