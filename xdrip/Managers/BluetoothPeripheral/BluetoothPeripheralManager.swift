@@ -200,6 +200,33 @@ class BluetoothPeripheralManager: NSObject {
                         
                     }
                     
+                case .MiaoMiaoType:
+                    
+                    if let miaoMiao = blePeripheral.miaoMiao {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: miaoMiao)
+                        
+                        if miaoMiao.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMMiaoMiaoTransmitter, BubbleBluetoothTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMMiaoMiaoTransmitter(address: miaoMiao.blePeripheral.address, name: miaoMiao.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: miaoMiao.timeStampLastBgReading, sensorSerialNumber: miaoMiao.blePeripheral.sensorSerialNumber, webOOPEnabled: miaoMiao.blePeripheral.webOOPEnabled, oopWebSite: miaoMiao.blePeripheral.oopWebSite, oopWebToken: miaoMiao.blePeripheral.oopWebToken), at: index)
+                            
+                            // if BubbleType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
                 }
 
             }
@@ -256,7 +283,7 @@ class BluetoothPeripheralManager: NSObject {
                     // no need to send reading to watlaa in master mode
                     break
                     
-                case .DexcomG5Type, .BubbleType:
+                case .DexcomG5Type, .BubbleType, .MiaoMiaoType:
                     // cgm's don't receive reading, they send it
                     break
                     
@@ -353,6 +380,21 @@ class BluetoothPeripheralManager: NSObject {
                         }
                     }
                     
+                case .MiaoMiaoType:
+                    
+                    if let miaoMiao = bluetoothPeripheral as? MiaoMiao {
+                        
+                        if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
+                            
+                            newTransmitter = CGMMiaoMiaoTransmitter(address: miaoMiao.blePeripheral.address, name: miaoMiao.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: miaoMiao.blePeripheral.sensorSerialNumber, webOOPEnabled: miaoMiao.blePeripheral.webOOPEnabled, oopWebSite: miaoMiao.blePeripheral.oopWebSite, oopWebToken: miaoMiao.blePeripheral.oopWebSite)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case MiaoMiaoType but cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+                    
                 }
                 
                 
@@ -395,6 +437,11 @@ class BluetoothPeripheralManager: NSObject {
                 if bluetoothTransmitter is CGMBubbleTransmitter {
                     return .BubbleType
                 }
+                
+            case .MiaoMiaoType:
+                if bluetoothTransmitter is CGMMiaoMiaoTransmitter {
+                    return .MiaoMiaoType
+                }
             }
             
         }
@@ -435,6 +482,15 @@ class BluetoothPeripheralManager: NSObject {
             }
             
             return CGMBubbleTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil)
+            
+        case .MiaoMiaoType:
+            
+            guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                trace("in createNewTransmitter, cgmTransmitterDelegate is nil", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                return nil
+            }
+            
+            return CGMMiaoMiaoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil)
             
         }
         
@@ -644,6 +700,10 @@ class BluetoothPeripheralManager: NSObject {
                 break
                 
             case .BubbleType:
+                // none of the observed values needs to be sent to the watlaa
+                break
+                
+            case .MiaoMiaoType:
                 // none of the observed values needs to be sent to the watlaa
                 break
                 

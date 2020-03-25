@@ -184,9 +184,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                         // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
                                         timeStampLastBgReading = Date(timeIntervalSince1970: 0)
                                         
-                                        // inform delegate about new sensorSerialNumber
-                                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
-                                        
                                     }
                                     
                                 }

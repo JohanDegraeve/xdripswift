@@ -22,6 +22,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// bubble
     case BubbleType = "Bubble"
     
+    /// MiaoMiao
+    case MiaoMiaoType = "MiaoMiao"
+    
     /// - returns: the BluetoothPeripheralViewModel
     func viewModel() -> BluetoothPeripheralViewModel {
         
@@ -41,6 +44,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .BubbleType:
             return BubbleBluetoothPeripheralViewModel()
+            
+        case .MiaoMiaoType:
+            return MiaoMiaoBluetoothPeripheralViewModel()
         }
         
     }
@@ -74,6 +80,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
             return Bubble(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
+        case .MiaoMiaoType:
+            
+            return MiaoMiao(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
         }
         
     }
@@ -92,7 +102,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaaMaster:
             return .watlaa
             
-        case .DexcomG5Type, .BubbleType:
+        case .DexcomG5Type, .BubbleType, .MiaoMiaoType:
             return .CGM
             
         }
@@ -103,7 +113,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType:
             return false
             
         case .DexcomG5Type:
@@ -165,7 +175,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaa:
             return nil*/
             
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType:
             // no transmitter id means no validation to do
             return nil
             
@@ -180,7 +190,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
 
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType:
             return false
             
         case .DexcomG5Type:
