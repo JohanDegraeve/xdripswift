@@ -269,10 +269,10 @@ class BluetoothPeripheralViewController: UIViewController {
         
     }
     
-    // MARK: - deinit
-    
-    deinit {
-
+    override func viewWillDisappear(_ animated: Bool) {
+        
+        super.viewWillDisappear(animated)
+        
         // save any changes that are made
         coreDataManager?.saveChanges()
         
@@ -361,6 +361,9 @@ class BluetoothPeripheralViewController: UIViewController {
             // set isScanning true
             self.isScanning = false
 
+            // enable screen lock
+            UIApplication.shared.isIdleTimerDisabled = false
+
             // assign internal bluetoothPeripheral to new bluetoothPeripheral
             self.bluetoothPeripheral = bluetoothPeripheral
 
@@ -400,8 +403,10 @@ class BluetoothPeripheralViewController: UIViewController {
         // check startScanningResult
         switch startScanningResult {
             
-        case .success:
+        case .success, .unknown:
         
+            // unknown is the initial status returned, although it will actually start scanning
+            
             // set isScanning true
             isScanning = true
             
@@ -410,28 +415,37 @@ class BluetoothPeripheralViewController: UIViewController {
             
             // app should be scanning now, update of cell is needed
             tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+
+            // disable screen lock
+            UIApplication.shared.isIdleTimerDisabled = true
             
+            // show info that user should keep the app in the foreground
             self.infoAlertWhenScanningStarts = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.startScanningInfo, actionHandler: nil)
-            
             self.present(self.infoAlertWhenScanningStarts!, animated:true)
             
         case .alreadyScanning, .alreadyConnected, .connecting :
+            
             trace("in scanForBluetoothPeripheral, scanning not started. Scanning result = %{public}@", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error, startScanningResult.description())
             // no further processing, should normally not happen,
             
-        case .bluetoothNotPoweredOn(let actualStateIs):
-            trace("in scanForBluetoothPeripheral, scanning not started. Bluetooth is not on, actual state = %{public}@", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error, actualStateIs)
-            self.infoAlertWhenScanningStarts = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.bluetoothIsNotOn, actionHandler: nil)
+            // set isScanning false, although it should already be false
+            isScanning = false
             
+        case .poweredOff:
+            
+            trace("in scanForBluetoothPeripheral, scanning not started. Bluetooth is not on", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error)
+            
+            // show info that user should switch on bluetooth
+            self.infoAlertWhenScanningStarts = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.bluetoothIsNotOn, actionHandler: nil)
             self.present(self.infoAlertWhenScanningStarts!, animated:true)
             
+            // it is not scanning but will start scanning if user switched on bluetooth so set isScanning true
+            isScanning = true
+            
         case .other(let reason):
+            
             trace("in scanForBluetoothPeripheral, scanning not started. Scanning result = %{public}@", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error, reason)
             // no further processing, should normally not happen,
-            
-        /*@unknown default:
-            trace("in scanForBluetoothPeripheral, scanning not started. Scanning result = %{public}@", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error, startScanningResult.description())
-            // no further processing, should normally not happen,*/
             
         }
         
