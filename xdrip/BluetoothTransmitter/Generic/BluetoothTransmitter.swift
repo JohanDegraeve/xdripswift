@@ -165,7 +165,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         trace("in startScanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         
         //assign default returnvalue
-        var returnValue = BluetoothTransmitter.startScanningResult.success
+        var returnValue = BluetoothTransmitter.startScanningResult.unknown
         
         // first check if already connected or connecting and if so stop processing
         if let peripheral = peripheral {
@@ -200,18 +200,23 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             switch centralManager.state {
             case .poweredOn:
                 
-                trace("    starting bluetooth scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                trace("    state is poweredOn", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
                 centralManager.scanForPeripherals(withServices: services, options: nil)
                 returnValue = .success
                 
             case .poweredOff:
                 
-                trace("    bluetooth is not powered on", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
-                return .bluetoothNotPoweredOn(actualStateIs: "not powered on")
+                trace("    state is poweredOff", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
+                return .poweredOff
             
+            case .unknown:
+                
+                trace("    state is unknown", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
+                return .unknown
+                
             default:
                 
-                trace("    assumed started scanning, actual state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, returnValue.description())
+                trace("    state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, centralManager.state.toString())
                 return returnValue
                 
             }
@@ -524,23 +529,32 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - helpers
     
     private func initialize() {
-        centralManager = CBCentralManager(delegate: self, queue: nil, options: nil)
+        centralManager = CBCentralManager(delegate: self, queue: nil, options: [CBCentralManagerOptionShowPowerAlertKey: true])
     }
     
     // MARK: - enum's
     
     /// result of call to startscanning
     enum startScanningResult {
-        //scanning started successfully
+        
+        /// scanning started successfully
         case success
-        // was already scanning, can be considred as successful
+        
+        /// was already scanning, can be considred as successful
         case alreadyScanning
-        // scanning ot started because bluetooth is not powered on, actual state of centralmanger is in response
-        case bluetoothNotPoweredOn(actualStateIs:String)
-        // in case peripheral is currently connected then it makes no sense to start scanning
+        
+        /// scanning ,ot started because bluetooth is not powered on,
+        case poweredOff
+        
+        /// in case peripheral is currently connected then it makes no sense to start scanning
         case alreadyConnected
-        // peripheral is currently connecting, it makes no sense to start scanning
+        
+        /// peripheral is currently connecting, it makes no sense to start scanning
         case connecting
+        
+        /// unknown state
+        case unknown
+        
         // any other, reason specified in text
         case other(reason:String)
         
@@ -549,17 +563,24 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 
             case .success:
                 return "success"
+                
             case .alreadyScanning:
                 return "alreadyScanning"
-            case .bluetoothNotPoweredOn(let actualState):
-                return "not powered on, actual status =" + actualState
+                
+            case .poweredOff:
+                return "poweredOff"
+                
             case .alreadyConnected:
                 return "alreadyConnected"
+                
             case .connecting:
                 return "connecting"
+                
             case .other(let reason):
                 return "other reason : " + reason
                 
+            case .unknown:
+                return "unknown"
             }
         }
     }
