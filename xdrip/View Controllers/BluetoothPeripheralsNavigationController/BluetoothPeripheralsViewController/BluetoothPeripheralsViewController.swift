@@ -161,10 +161,11 @@ final class BluetoothPeripheralsViewController: UIViewController {
             
             let pickerViewData = PickerViewData (withMainTitle: nil, withSubTitle: Texts_BluetoothPeripheralsView.selectType, withData: BluetoothPeripheralCategory.listOfBluetoothPeripheralTypes(withCategory: BluetoothPeripheralCategory.listOfCategories()[categoryIndex]), selectedRow: nil, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ typeIndex: Int) in
                 
-                // go to screen to add a new BluetoothPeripheral
-                // in the sender we add the selected bluetoothperipheraltype
+                // get the selected BluetoothPeripheralType
                 let type = BluetoothPeripheralType(rawValue: BluetoothPeripheralCategory.listOfBluetoothPeripheralTypes(withCategory: BluetoothPeripheralCategory.listOfCategories()[categoryIndex])[typeIndex])
                 
+                // go to screen to add a new BluetoothPeripheral
+                // in the sender we add the selected bluetoothperipheraltype
                 self.performSegue(withIdentifier: BluetoothPeripheralViewController.SegueIdentifiers.BluetoothPeripheralsToBluetoothPeripheralSegueIdentifier.rawValue, sender: type)
                 
             }, onCancelClick: nil, didSelectRowHandler: nil)
