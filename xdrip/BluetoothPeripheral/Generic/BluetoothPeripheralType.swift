@@ -106,6 +106,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
             return .CGM
             
         }
+        
     }
     
     /// does the device need a transmitterID (currently only Dexcom and Blucon)
@@ -120,6 +121,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
             return true
 
         }
+        
     }
     
     /// - returns nil if id to validate has expected length and type of characters etc.

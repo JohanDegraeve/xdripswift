@@ -100,6 +100,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         super.init()
 
         initialize()
+        
     }
     
     // MARK: - De-initialization
@@ -213,6 +214,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 
                 trace("    state is unknown", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
                 return .unknown
+                
+            case .unauthorized:
+                
+                trace("    state is unauthorized", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
+                return .unauthorized
                 
             default:
                 
@@ -535,7 +541,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - enum's
     
     /// result of call to startscanning
-    enum startScanningResult {
+    enum startScanningResult: Equatable {
         
         /// scanning started successfully
         case success
@@ -554,6 +560,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         /// unknown state
         case unknown
+        
+        /// unauthorized
+        case unauthorized
         
         // any other, reason specified in text
         case other(reason:String)
@@ -581,6 +590,10 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 
             case .unknown:
                 return "unknown"
+                
+            case .unauthorized:
+                return "unauthorized"
+                
             }
         }
     }

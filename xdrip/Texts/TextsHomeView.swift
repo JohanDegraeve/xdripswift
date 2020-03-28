@@ -48,6 +48,10 @@ enum Texts_HomeView {
         return NSLocalizedString("bluetoothisnoton", tableName: filename, bundle: Bundle.main, value: "Bluetooth is not on. Switch on Bluetooth first then try again.", comment: "when user starts scanning but bluetooth is not on")
     }()
     
+    static let bluetoothIsNotAuthorized: String = {
+        return NSLocalizedString("bluetoothIsNotAuthorized", tableName: filename, bundle: Bundle.main, value: "You did not authorize bluetooth access for xDrip. Go to the settings, find the xDrip app, and enable Bluetooth.", comment: "when user starts scanning for bluetooth device, but bluetooth is not authorized")
+    }()
+    
     static let startScanningInfo: String = {
         return NSLocalizedString("startScanningInfo", tableName: filename, bundle: Bundle.main, value: "Scannnig Started.\n\nKeep xDrip open on the foreground until a connection is made. (there's no need to turn off Auto-Lock. Just don't press the home button and don't lock the iOS device.)", comment: "After clicking scan button, this message will appear")
     }()
@@ -93,7 +97,7 @@ enum Texts_HomeView {
     }()
     
     static let transmitterInfo:String = {
-        return NSLocalizedString("transmitterinfo", tableName: filename, bundle: Bundle.main, value: "First go to the settings tab where you can select you transmitter type and (if applicable) transmitter id. Depending on device type, you will need to come back to this tab here (the Home) tab where you can start scanning.", comment: "for home view, Info how to start : set transmitter and id, then go back to home screen, start scanning")
+        return NSLocalizedString("transmitterinfo", tableName: filename, bundle: Bundle.main, value: "First go to the bluetooth tab where you can add and scan for your transmitter. Back in the home screen you can start your sensor.", comment: "for home view, Info how to start : set transmitter and id, then go back to home screen, start scanning")
     }()
     
     static let startSensorBeforeCalibration:String = {

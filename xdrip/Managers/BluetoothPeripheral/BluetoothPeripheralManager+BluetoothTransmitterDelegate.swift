@@ -268,8 +268,16 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         trace("in deviceDidUpdateBluetoothState", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
         
         if bluetoothTransmitter.deviceAddress == nil {
+            
             /// this bluetoothTransmitter is created to start scanning for a new, unknown bluetoothtransmitter, so start scanning
-            _ = bluetoothTransmitter.startScanning()
+            let scanningResult = bluetoothTransmitter.startScanning()
+            
+            if let callBackForScanningResult = self.callBackForScanningResult {
+                
+                callBackForScanningResult(scanningResult)
+                
+            }
+            
         }
         
         // disconnect doesn't get triggered if status changes to off

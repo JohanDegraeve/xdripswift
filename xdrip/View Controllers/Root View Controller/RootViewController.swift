@@ -394,7 +394,6 @@ final class RootViewController: UIViewController {
                     
                     if webOOPEnabled != cgmTransmitter.isWebOOPEnabled() {
                         
-                        debuglogging("call stopsensor")
                         self.stopSensor()
                         
                     }
@@ -402,9 +401,8 @@ final class RootViewController: UIViewController {
                 }
                 
                 // check if the type of sensor supported by the cgmTransmitterType  has changed, if yes stop the sensor
-                if let currentTransmitterType = UserDefaults.standard.transmitterType, currentTransmitterType.sensorType() != cgmTransmitter.cgmTransmitterType().sensorType() {
+                if let currentTransmitterType = UserDefaults.standard.cgmTransmitterType, currentTransmitterType.sensorType() != cgmTransmitter.cgmTransmitterType().sensorType() {
                     
-                    debuglogging("call stopsensor")
                     self.stopSensor()
                     
                 }
@@ -413,7 +411,7 @@ final class RootViewController: UIViewController {
                 self.webOOPEnabled = cgmTransmitter.isWebOOPEnabled()
                 
                 // change value of UserDefaults.standard.transmitterTypeAsString
-                UserDefaults.standard.transmitterTypeAsString = cgmTransmitter.cgmTransmitterType().rawValue
+                UserDefaults.standard.cgmTransmitterTypeAsString = cgmTransmitter.cgmTransmitterType().rawValue
                 
             }
             

@@ -62,7 +62,7 @@ enum CGMTransmitterType:String, CaseIterable {
     case blueReader = "BlueReader"
     
     /// watlaa
-    case watlaa = "Watlaa (under development)"
+    case watlaa = "Watlaa"
     
     /// what sensorType does this CGMTransmitter type support
     func sensorType() -> CGMSensorType {

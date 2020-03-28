@@ -21,6 +21,9 @@ class BluetoothPeripheralManager: NSObject {
     /// if scan is called, an instance of M5StackBluetoothTransmitter is created with address and name. The new instance will be assigned to this variable, temporary, until a connection is made
     public var tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral: BluetoothTransmitter?
 
+    /// to be called with result of StartScanning
+    public var callBackForScanningResult: ((BluetoothTransmitter.startScanningResult) -> Void)?
+    
     /// if scan is called, and a connection is successfully made to a new device, then a new M5Stack must be created, and this function will be called. It is owned by the UIViewController that calls the scan function
     public var callBackAfterDiscoveringDevice: ((BluetoothPeripheral) -> Void)?
 
@@ -791,7 +794,7 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
 
     }
     
-    func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, callback: @escaping (BluetoothPeripheral) -> Void) -> BluetoothTransmitter.startScanningResult {
+    func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, callBackForScanningResult: ((BluetoothTransmitter.startScanningResult) -> Void)?, callback: @escaping (BluetoothPeripheral) -> Void)  {
         
         callBackAfterDiscoveringDevice = callback
         
@@ -801,7 +804,18 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = newBluetoothTranmsitter
         
         // start scanning
-        return newBluetoothTranmsitter.startScanning()
+        let scanningResult = newBluetoothTranmsitter.startScanning()
+        
+        // temporary store callBackForScanningResult, will be used in deviceDidUpdateBluetoothState, when startScanning is called again
+        self.callBackForScanningResult = callBackForScanningResult
+        
+        if let callBackForScanningResult = callBackForScanningResult {
+            
+            self.callBackForScanningResult = callBackForScanningResult
+            
+            callBackForScanningResult(scanningResult)
+            
+        }
         
     }
     

@@ -114,7 +114,7 @@ public enum AlertKind:Int, CaseIterable {
         case .calibration:
             return ConstantsDefaultAlertLevels.calibration
         case .batterylow:
-            if let transmitterType = UserDefaults.standard.transmitterType {
+            if let transmitterType = UserDefaults.standard.cgmTransmitterType {
                 return transmitterType.defaultBatteryAlertLevel()
             } else {
                 return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao

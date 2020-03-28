@@ -302,9 +302,9 @@ extension UserDefaults {
     // MARK: Transmitter Settings
     
     /// cgm ransmittertype currently active
-    var transmitterType:CGMTransmitterType? {
+    var cgmTransmitterType:CGMTransmitterType? {
         get {
-            if let transmitterTypeAsString = transmitterTypeAsString {
+            if let transmitterTypeAsString = cgmTransmitterTypeAsString {
                 return CGMTransmitterType(rawValue: transmitterTypeAsString)
             } else {
                 return nil
@@ -313,7 +313,7 @@ extension UserDefaults {
     }
     
     /// transmittertype as String, just to be able to define dynamic dispatch and obj-c visibility
-    @objc dynamic var transmitterTypeAsString:String? {
+    @objc dynamic var cgmTransmitterTypeAsString:String? {
         get {
             return string(forKey: Key.transmitterTypeAsString.rawValue)
         }

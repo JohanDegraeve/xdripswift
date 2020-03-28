@@ -30,7 +30,7 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
         // if it's a G5 (or maybe later G6) , then user doesn't need to set the serial number, because value of transmitterId is used in that case
         if index == Setting.dexcomShareSerialNumber.rawValue {
             
-            if let transmitterType = UserDefaults.standard.transmitterType  {
+            if let transmitterType = UserDefaults.standard.cgmTransmitterType  {
                 switch transmitterType {
                     
                 case .dexcomG5, .dexcomG6:
