@@ -250,11 +250,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: CGMTransmitter protocol functions
     
-    /// to ask transmitter reset - empty function because MiaoMiao doesn't support reset
-    ///
-    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
-    func reset(requested:Bool) {}
- 
     /// this transmitter supports oopWeb
     func setWebOOPEnabled(enabled: Bool) {
         webOOPEnabled = enabled

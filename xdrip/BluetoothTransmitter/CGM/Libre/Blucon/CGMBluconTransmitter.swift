@@ -525,11 +525,6 @@ extension CGMBluconTransmitter: CGMTransmitter {
         // not supported for blucon
     }
     
-    func reset(requested: Bool) {
-        // no reset supported for blucon
-        return
-    }
-    
     /// this transmitter does not support oopWeb
     func setWebOOPEnabled(enabled: Bool) {
     }
