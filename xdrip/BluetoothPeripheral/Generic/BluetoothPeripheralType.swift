@@ -185,21 +185,4 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
     }
 
-    /// can a transmitter be reset ? For example Dexcom G5 (and G6) can be reset
-    ///
-    /// can be used in UI stuff, if reset not possible then there's no need to show that option in the settings UI
-    func resetPossible() -> Bool {
-        
-        switch self {
-
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType:
-            return false
-            
-        case .DexcomG5Type:
-            return true
-
-        }
-        
-    }
-    
 }
