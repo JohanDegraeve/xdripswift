@@ -27,7 +27,6 @@
 "transmitternotpaired" = "Transmitter is not paired with this iOS device. Open the application.";
 "transmitterpairingtoolate" = "Too late, the transmitter has disconnected now. You should get a new pairing request in a few minutes.";
 "transmitterpairingattempttimeout" = "Transmitter did not reply to pairing request.";
-"transmitterResultResult" = "Transmitter reset result";
 "success" = "success";
 "failed" = "failed";
 "calibrationNotNecessary" = "With Web OOP enabled, calibration is not necessary for the selected type of transmitter";

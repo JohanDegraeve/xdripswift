@@ -230,7 +230,7 @@ final class BluetoothPeripheralsViewController: UIViewController {
     /// - sets the delegates of each transmitter to self
     /// - bluetoothPeripheralManager will also still receive delegate calls
     private func initializeBluetoothTransmitterDelegates() {
-        
+
         if let bluetoothPeripheralManager = bluetoothPeripheralManager  {
             
             for bluetoothTransmitter in bluetoothPeripheralManager.getBluetoothTransmitters() {
@@ -354,13 +354,6 @@ extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
         // forward this call to bluetoothPeripheralManager who will handle it
         bluetoothPeripheralManager?.pairingFailed()
 
-    }
-    
-    func reset(for bluetoothTransmitter: BluetoothTransmitter, successful: Bool) {
-        
-        // forward this call to bluetoothPeripheralManager who will handle it
-        bluetoothPeripheralManager?.reset(for: bluetoothTransmitter, successful: successful)
-        
     }
     
     func error(message: String) {

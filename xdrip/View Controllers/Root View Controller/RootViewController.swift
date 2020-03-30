@@ -1270,10 +1270,6 @@ extension RootViewController: UNUserNotificationCenterDelegate {
             // call completionhandler to show the notification even though the app is in the foreground, without sound
             completionHandler([.alert])
             
-        } else if notification.request.identifier == ConstantsNotifications.NotificationIdentifierForResetResult.transmitterResetResult {
-            
-            completionHandler([.alert])
-            
         } else if notification.request.identifier == ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             
             // so actually the app was in the foreground, at the  moment the Transmitter Class called the cgmTransmitterNeedsPairing function, there's no need to show the notification, we can immediately call back the cgmTransmitter initiatePairing function
@@ -1318,10 +1314,6 @@ extension RootViewController: UNUserNotificationCenterDelegate {
         } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             
             // nothing required, the pairing function will be called as it's been added to ApplicationManager in function cgmTransmitterNeedsPairing
-            
-        } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForResetResult.transmitterResetResult {
-            
-            // nothing required
             
         } else {
             

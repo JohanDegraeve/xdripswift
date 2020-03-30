@@ -2,9 +2,24 @@ import Foundation
 
 extension BluetoothPeripheralManager: CGMG5TransmitterDelegate {
     
+    func reset(for cGMG5Transmitter: CGMG5Transmitter, successful: Bool) {
+        
+        guard let dexcomG5 = getDexcomG5(cGMG5Transmitter: cGMG5Transmitter) else {return}
+        
+        // as reset was done, set back to false
+        dexcomG5.resetRequired = false
+        
+        // only if successful, set the lastResetTimeStamp to now
+        if successful {
+            dexcomG5.lastResetTimeStamp = Date()
+            coreDataManager.saveChanges()
+        }
+        
+    }
+    
     func received(transmitterBatteryInfo: TransmitterBatteryInfo, cGMG5Transmitter: CGMG5Transmitter) {
         
-        guard let index = bluetoothTransmitters.firstIndex(of: cGMG5Transmitter), let dexcomG5 = bluetoothPeripherals[index] as? DexcomG5 else {return}
+        guard let dexcomG5 = getDexcomG5(cGMG5Transmitter: cGMG5Transmitter) else {return}
         
         guard case .DexcomG5(let voltA, let voltB, let res, let runt, let temp) = transmitterBatteryInfo else {return}
         
@@ -25,12 +40,20 @@ extension BluetoothPeripheralManager: CGMG5TransmitterDelegate {
 
     func received(firmware: String, cGMG5Transmitter: CGMG5Transmitter) {
         
-        guard let index = bluetoothTransmitters.firstIndex(of: cGMG5Transmitter), let dexcomG5 = bluetoothPeripherals[index] as? DexcomG5 else {return}
+        guard let dexcomG5 = getDexcomG5(cGMG5Transmitter: cGMG5Transmitter) else {return}
         
         dexcomG5.firmwareVersion = firmware
         
         coreDataManager.saveChanges()
 
+    }
+    
+    private func getDexcomG5(cGMG5Transmitter: CGMG5Transmitter) -> DexcomG5? {
+        
+        guard let index = bluetoothTransmitters.firstIndex(of: cGMG5Transmitter), let dexcomG5 = bluetoothPeripherals[index] as? DexcomG5 else {return nil}
+        
+        return dexcomG5
+        
     }
     
 }

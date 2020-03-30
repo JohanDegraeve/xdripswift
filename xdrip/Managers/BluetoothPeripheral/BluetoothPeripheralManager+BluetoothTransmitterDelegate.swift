@@ -124,33 +124,6 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         }
     }
     
-    func reset(for bluetoothTransmitter: BluetoothTransmitter, successful: Bool) {
-        
-        // set resetrequired to false in coredata, there's no need to reset as it's just been done
-        if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
-            bluetoothPeripheral.blePeripheral.resetrequired = false
-        }
-        
-        // Create Notification Content to give info about reset result of reset attempt
-        let notificationContent = UNMutableNotificationContent()
-        
-        // Configure NnotificationContent title
-        notificationContent.title = successful ? Texts_HomeView.info : Texts_Common.warning
-        
-        notificationContent.body = Texts_HomeView.transmitterResetResult + " : " + (successful ? Texts_HomeView.success : Texts_HomeView.failed)
-        
-        // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifierForResetResult.transmitterResetResult, content: notificationContent, trigger: nil)
-        
-        // Add Request to User Notification Center
-        UNUserNotificationCenter.current().add(notificationRequest) { (error) in
-            if let error = error {
-                trace("Unable add notification request : transmitter reset result, error:  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
-            }
-        }
-        
-    }
-    
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
         
         // before exiting save the changes

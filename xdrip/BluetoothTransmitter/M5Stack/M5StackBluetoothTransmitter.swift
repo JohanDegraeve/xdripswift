@@ -166,6 +166,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     func writeRotation(rotation: Int) -> Bool {
         
         trace("in writeRotation, attempting to send", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
+
         return writeDataToPeripheral(data: rotationValues[rotation].data, opCode: .writeRotationTx)
         
     }

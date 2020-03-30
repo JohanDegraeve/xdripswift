@@ -258,8 +258,8 @@ class M5StackBluetoothPeripheralViewModel {
                     
                     if index != selectedRow {
                         
-                        // set rotationTempValue to new rotation
-                        m5Stack.rotation = Int32(index * 10)
+                        // set brightness to new brightness
+                        m5Stack.brightness = Int16(index * 10)
                         
                         // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
                         if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5Stack, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.writeBrightness(brightness: index * 10) {
@@ -437,7 +437,6 @@ class M5StackBluetoothPeripheralViewModel {
     deinit {
         
         // when closing the viewModel, and if there's still a bluetoothTransmitter existing, then reset the specific delegate to BluetoothPeripheralManager
-        
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
         
         guard let m5Stack = m5Stack else {return}
@@ -445,7 +444,7 @@ class M5StackBluetoothPeripheralViewModel {
         guard let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5Stack, createANewOneIfNecesssary: false) else {return}
         
         guard let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter else {return}
-        
+
         m5StackBluetoothTransmitter.m5StackBluetoothTransmitterDelegate = bluetoothPeripheralManager as! BluetoothPeripheralManager
 
     }

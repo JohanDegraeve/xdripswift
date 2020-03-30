@@ -26,9 +26,6 @@ protocol BluetoothTransmitterDelegate: AnyObject {
     /// transmitter pairing failed
     func pairingFailed()
     
-    /// transmitter reset result
-    func reset(for bluetoothTransmitter: BluetoothTransmitter, successful: Bool)
-    
     /// to pass some text error message, delegate can decide to show to user, log, ...
     func error(message: String)
 
