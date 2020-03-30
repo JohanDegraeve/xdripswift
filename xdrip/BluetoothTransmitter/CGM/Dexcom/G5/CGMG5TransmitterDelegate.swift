@@ -6,5 +6,9 @@ protocol CGMG5TransmitterDelegate: AnyObject {
     func received(firmware: String, cGMG5Transmitter: CGMG5Transmitter)
     
     func received(transmitterBatteryInfo: TransmitterBatteryInfo, cGMG5Transmitter: CGMG5Transmitter)
+    
+    /// transmitter reset result
+    func reset(for cGMG5Transmitter: CGMG5Transmitter, successful: Bool)
+    
 }
 

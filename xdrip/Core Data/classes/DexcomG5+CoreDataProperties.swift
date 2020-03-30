@@ -24,4 +24,6 @@ extension DexcomG5 {
     
     @NSManaged public var voltageB: Int32
     
+    @NSManaged public var lastResetTimeStamp: Date?
+    
 }

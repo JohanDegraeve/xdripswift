@@ -45,7 +45,6 @@
         <attribute name="oopWebSite" optional="YES" attributeType="String"/>
         <attribute name="oopWebToken" optional="YES" attributeType="String"/>
         <attribute name="parameterUpdateNeededAtNextConnect" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="resetrequired" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="sensorSerialNumber" optional="YES" attributeType="String"/>
         <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="transmitterId" optional="YES" attributeType="String"/>
@@ -86,6 +85,7 @@
         <attribute name="batteryStatus" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="batteryTemperature" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="firmwareVersion" optional="YES" attributeType="String"/>
+        <attribute name="lastResetTimeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="voltageA" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="voltageB" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="dexcomG5" inverseEntity="BLEPeripheral"/>
@@ -121,13 +121,13 @@
         <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
-        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="298"/>
+        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="283"/>
         <element name="Bubble" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
-        <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="163"/>
+        <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="178"/>
         <element name="M5Stack" positionX="-657" positionY="180" width="128" height="163"/>
+        <element name="MiaoMiao" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="133"/>
         <element name="Watlaa" positionX="-639" positionY="207" width="128" height="58"/>
-        <element name="MiaoMiao" positionX="-657" positionY="189" width="128" height="103"/>
     </elements>
 </model>

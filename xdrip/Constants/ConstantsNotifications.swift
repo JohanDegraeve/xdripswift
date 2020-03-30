@@ -69,4 +69,5 @@ enum ConstantsNotifications {
         /// transmitter reset result
         static let transmitterResetResult = "transmitterResetResult"
     }
+    
 }

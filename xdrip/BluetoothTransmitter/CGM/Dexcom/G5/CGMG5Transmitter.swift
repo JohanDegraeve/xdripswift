@@ -523,7 +523,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// sends G5 reset to transmitter
     private func sendG5Reset() {
-        trace("sending G5Reset", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+        trace("in sendG5Reset", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
         if let writeControlCharacteristic = writeControlCharacteristic {
             _ = writeDataToPeripheral(data: ResetTxMessage().data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
             G5ResetRequested = false
@@ -544,13 +544,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     private func processResetRxMessage(value:Data) {
         if let resetRxMessage = ResetRxMessage(data: value) {
-            if resetRxMessage.status == 0 {
-                trace("resetRxMessage status is 0, considering reset successful", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                bluetoothTransmitterDelegate?.reset(for: self, successful: true)
-            } else {
-                trace("resetRxMessage status is %{public}d, considering reset failed", log: log, category: ConstantsLog.categoryCGMG5, type: .info, resetRxMessage.status)
-                bluetoothTransmitterDelegate?.reset(for: self, successful: false)
-            }
+
+            trace("in processResetRxMessage, considering reset successful = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, (resetRxMessage.status == 0).description)
+
+            cGMG5TransmitterDelegate?.reset(for: self, successful: resetRxMessage.status == 0 )
+            
         } else {
             trace("resetRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
         }

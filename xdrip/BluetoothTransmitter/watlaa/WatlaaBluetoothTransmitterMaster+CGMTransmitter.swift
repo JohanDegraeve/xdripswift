@@ -10,10 +10,6 @@ extension WatlaaBluetoothTransmitterMaster: CGMTransmitter {
         // no web oop for watlaa as sensorid detection not supported
     }
     
-    func reset(for bluetoothTransmitter: BluetoothTransmitter, successful: Bool) {
-        // no reset need for watlaa
-    }
-    
     func setWebOOPEnabled(enabled: Bool) {
         // no web oop for watlaa as sensorid detection not supported
     }

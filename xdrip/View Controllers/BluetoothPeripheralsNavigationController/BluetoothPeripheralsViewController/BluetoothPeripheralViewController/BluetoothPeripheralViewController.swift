@@ -272,21 +272,27 @@ class BluetoothPeripheralViewController: UIViewController {
         
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        
-        super.viewWillDisappear(animated)
+    override func willMove(toParent parent: UIViewController?) {
+
+        super.willMove(toParent: parent)
+
+        // willMove is called when BluetoothPeripheralViewController is added and when BluetoothPeripheralViewController is removed.
+        // It has no added value in the adding phase
+        // It doe shave an added value when being removed. bluetoothPeripheralViewModel must be assigned to nil. bluetoothPeripheralViewModel deinit will be called which should reassign the delegate to BluetoothPeripheralManager. Also here the bluetoothtransmitter delegate will be reassigned to BluetoothPeripheralManager
+        // and finally stopScanningForNewDevice will be called, for the case where scanning would still be ongoing
         
         // save any changes that are made
         coreDataManager?.saveChanges()
+        
+        // set bluetoothPeripheralViewModel to nil. The bluetoothPeripheralViewModel's deinit will be called, which will set the delegate in the model to BluetoothPeripheralManager
+
+        bluetoothPeripheralViewModel = nil
         
         // reassign delegate in BluetoothTransmitter to bluetoothPeripheralManager
         reassignBluetoothTransmitterDelegateToBluetoothPeripheralManager()
         
         // just in case scanning for a new device is still ongoing, call stopscanning
         bluetoothPeripheralManager?.stopScanningForNewDevice()
-        
-        // set bluetoothPeripheralViewModel to nil, so it can change the delegates
-        bluetoothPeripheralViewModel = nil
 
     }
     
@@ -1093,13 +1099,6 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         // need to inform also other delegates
         bluetoothPeripheralManager?.pairingFailed()
 
-    }
-    
-    func reset(for bluetoothTransmitter: BluetoothTransmitter, successful: Bool) {
-
-        // handled in BluetoothPeripheralManager
-        bluetoothPeripheralManager?.reset(for: bluetoothTransmitter, successful: successful)
-        
     }
     
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
