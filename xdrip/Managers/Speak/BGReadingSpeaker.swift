@@ -51,7 +51,7 @@ class BGReadingSpeaker:NSObject {
 
         // if first time app start, then UserDefaults.standard.speakRate needs to be set
         if UserDefaults.standard.speakRate == 0.0 {
-            UserDefaults.standard.speakRate = 5.1
+            UserDefaults.standard.speakRate = 0.51
         }
     }
     
