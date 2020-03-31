@@ -49,11 +49,16 @@
         <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="transmitterId" optional="YES" attributeType="String"/>
         <attribute name="webOOPEnabled" attributeType="Boolean" usesScalarValueType="YES"/>
+        <relationship name="blucon" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Blucon" inverseName="blePeripheral" inverseEntity="Blucon"/>
         <relationship name="bubble" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Bubble" inverseName="blePeripheral" inverseEntity="Bubble"/>
         <relationship name="dexcomG5" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="DexcomG5" inverseName="blePeripheral" inverseEntity="DexcomG5"/>
         <relationship name="m5Stack" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="M5Stack" inverseName="blePeripheral" inverseEntity="M5Stack"/>
         <relationship name="miaoMiao" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MiaoMiao" inverseName="blePeripheral" inverseEntity="MiaoMiao"/>
         <relationship name="watlaa" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="Watlaa" inverseName="blePeripheral" inverseEntity="Watlaa"/>
+    </entity>
+    <entity name="Blucon" representedClassName=".Blucon" syncable="YES">
+        <attribute name="timeStampLastBgReading" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="blucon" inverseEntity="BLEPeripheral"/>
     </entity>
     <entity name="Bubble" representedClassName=".Bubble" syncable="YES">
         <attribute name="firmware" optional="YES" attributeType="String"/>
@@ -121,7 +126,7 @@
         <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
-        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="283"/>
+        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="298"/>
         <element name="Bubble" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
         <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="178"/>
@@ -129,5 +134,6 @@
         <element name="MiaoMiao" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="133"/>
         <element name="Watlaa" positionX="-639" positionY="207" width="128" height="58"/>
+        <element name="Blucon" positionX="-657" positionY="189" width="128" height="73"/>
     </elements>
 </model>
