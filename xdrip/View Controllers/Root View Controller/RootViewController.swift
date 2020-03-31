@@ -70,10 +70,10 @@ final class RootViewController: UIViewController {
 
                 if let lastChartPointEarlierThanEndDate = self.glucoseChartManager.lastChartPointEarlierThanEndDate, let chartAxisValueDate = lastChartPointEarlierThanEndDate.x as? ChartAxisValueDate  {
                     
-                    // valuueLabel text should not be strikethrough (might still be strikethrough in case latest reading is older than 10 minutes
+                    // valueLabel text should not be strikethrough (might still be strikethrough in case latest reading is older than 10 minutes
                     self.valueLabelOutlet.attributedText = nil
+                    
                     // set value to value of latest chartPoint
-
                     self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
 
                     // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
@@ -982,10 +982,11 @@ final class RootViewController: UIViewController {
                 calculatedValueAsString = calculatedValueAsString + " " + lastReading.slopeArrow()
             }
             
-            // no strikethrough needed, but attributedText may still be set to strikethrough from previous period during which there was no recent reading. Always set it to nil here, this removes the strikethrough attribute
-            valueLabelOutlet.attributedText = nil
+            // no strikethrough needed, but attributedText may still be set to strikethrough from previous period during which there was no recent reading.
+            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
+            attributeString.addAttribute(.strikethroughStyle, value: NSUnderlineStyle.StyleNone, range: NSMakeRange(0, attributeString.length))
             
-            valueLabelOutlet.text = calculatedValueAsString
+            valueLabelOutlet.attributedText = attributeString
             
         }
         
