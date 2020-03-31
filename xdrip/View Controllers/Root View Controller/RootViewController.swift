@@ -984,7 +984,7 @@ final class RootViewController: UIViewController {
             
             // no strikethrough needed, but attributedText may still be set to strikethrough from previous period during which there was no recent reading.
             let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
-            attributeString.addAttribute(.strikethroughStyle, value: NSUnderlineStyle.StyleNone, range: NSMakeRange(0, attributeString.length))
+            attributeString.addAttribute(.strikethroughStyle, value: 0, range: NSMakeRange(0, attributeString.length))
             
             valueLabelOutlet.attributedText = attributeString
             
