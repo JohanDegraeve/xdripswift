@@ -6,6 +6,9 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     
     // MARK: - properties
     
+    /// CGMBubbleTransmitterDelegate
+    public weak var cGMBluconTransmitterDelegate: CGMBluconTransmitterDelegate?
+
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
@@ -73,7 +76,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     ///     - sensorSerialNumber : is needed to allow detection of a new sensor.
     ///     - bluetoothTransmitterDelegate : a NluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
-    init?(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, sensorSerialNumber:String?) {
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBluconTransmitterDelegate: CGMBluconTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date?, sensorSerialNumber:String?) {
         
         // assign addressname and name or expected devicename
         // start by using expected device name
@@ -84,10 +87,13 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         }
         
         // initialize timeStampLastBgReading
-        self.timeStampLastBgReading = timeStampLastBgReading
+        self.timeStampLastBgReading = timeStampLastBgReading ?? Date(timeIntervalSince1970: 0)
         
         // initialize sensorSerialNumber
         self.sensorSerialNumber = sensorSerialNumber
+        
+        // initialize cGMBluconTransmitterDelegate
+        self.cGMBluconTransmitterDelegate = cGMBluconTransmitterDelegate
         
         // initialize rxbuffer
         rxBuffer = Data()
@@ -309,7 +315,8 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     // by default set battery level to 100
                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 100), sensorTimeInMinutes: nil)
                     
-                    
+                    cGMBluconTransmitterDelegate?.received(batteryLevel: 100, from: self)
+
                 case .error14:
                     
                     // Blucon didn't receive the next command it was waiting for, need to wait 5 minutes
@@ -341,6 +348,8 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                         // inform cGMTransmitterDelegate about new sensor detected
                         cgmTransmitterDelegate?.newSensorDetected()
                         
+                        cGMBluconTransmitterDelegate?.received(serialNumber: sensorSerialNumber, from: self)
+
                         // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
                         timeStampLastBgReading = Date(timeIntervalSince1970: 0)
                         
@@ -402,6 +411,9 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                         
                         // this is considered as battery level 5%
                         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 5),  sensorTimeInMinutes: nil)
+                        
+                        cGMBluconTransmitterDelegate?.received(batteryLevel: 5, from: self)
+
                         
                     }
                     
@@ -502,10 +514,14 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     // this is considered as battery level 3%
                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 3), sensorTimeInMinutes: nil)
                     
+                    cGMBluconTransmitterDelegate?.received(batteryLevel: 3, from: self)
+
                 case .bluconBatteryLowIndication2:
                     
                     // this is considered as battery level 2%
                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 2), sensorTimeInMinutes: nil)
+                    
+                    cGMBluconTransmitterDelegate?.received(batteryLevel: 2, from: self)
                     
                 }
                 

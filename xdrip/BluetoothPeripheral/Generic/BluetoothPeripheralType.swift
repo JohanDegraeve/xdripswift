@@ -25,6 +25,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// MiaoMiao
     case MiaoMiaoType = "MiaoMiao"
     
+    /// Blucon
+    case BluconType = "Blucon"
+    
     /// - returns: the BluetoothPeripheralViewModel
     func viewModel() -> BluetoothPeripheralViewModel {
         
@@ -47,6 +50,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .MiaoMiaoType:
             return MiaoMiaoBluetoothPeripheralViewModel()
+            
+        case .BluconType:
+            return BluconBluetoothPeripheralViewModel()
         }
         
     }
@@ -84,6 +90,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
             return MiaoMiao(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
+        case .BluconType:
+            
+            return Blucon(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
         }
         
     }
@@ -102,7 +112,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaaMaster:
             return .watlaa
             
-        case .DexcomG5Type, .BubbleType, .MiaoMiaoType:
+        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType:
             return .CGM
             
         }
@@ -117,7 +127,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType:
             return false
             
-        case .DexcomG5Type:
+        case .DexcomG5Type, .BluconType:
             return true
 
         }
@@ -167,15 +177,15 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .miaomiao, .GNSentry, .Bubble, .Droplet1:
             return nil
             
-        case .Blucon:
-            // todo: validate transmitter id for blucon
-            return nil
-            
         case .blueReader:
             return nil
             
         case .watlaa:
             return nil*/
+            
+        case .BluconType:
+            // todo: validate transmitter id for blucon
+            return nil
             
         case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType:
             // no transmitter id means no validation to do
