@@ -15,6 +15,10 @@ enum Texts_ErrorMessages {
     static let TransmitterIDShouldHaveLength5:String = {
         return NSLocalizedString("error_message_transmitter_id_should_have_length_5", tableName: errorMessagesFileName, bundle: Bundle.main, value: "Transmitter id should have length 5", comment: "error message for the case where Dexcom G5 transmitter id given by user doesn't have 5 characters")
     }()
+    
+    static let TransmitterIdBluCon: String = {
+        return NSLocalizedString("TransmitterIdBluCon", tableName: errorMessagesFileName, bundle: Bundle.main, value: "Transmitter ID must use the following format: BLUXXXXX. XXXXX refers to the last 5 digits of the identifier written on the BluCon device (which starts with BLU).\n\nExample: If the BluCon identifier is BLU1742B01007, the Transmitter ID is BLU01007.", comment: "error message for the case where Blucon transmitter id is given by user, but expected format is not correct")
+    }()
 }
 
 

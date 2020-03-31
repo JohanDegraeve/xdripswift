@@ -183,14 +183,22 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaa:
             return nil*/
             
-        case .BluconType:
-            // todo: validate transmitter id for blucon
-            return nil
-            
         case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType:
             // no transmitter id means no validation to do
             return nil
             
+        case .BluconType:
+            
+            // length for blucon is 8
+            if transmitterId.count != 8 {
+                return Texts_ErrorMessages.TransmitterIdBluCon
+            }
+            
+            if !transmitterId.startsWith("BLU") {
+                return Texts_ErrorMessages.TransmitterIdBluCon
+            }
+            
+            return nil
         }
         
     }
