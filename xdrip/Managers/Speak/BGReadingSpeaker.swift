@@ -49,10 +49,6 @@ class BGReadingSpeaker:NSObject {
         // changing speakerLanguage code requires action
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.speakReadingLanguageCode.rawValue, options: .new, context: nil)
 
-        // if first time app start, then UserDefaults.standard.speakRate needs to be set
-        if UserDefaults.standard.speakRate == 0.0 {
-            UserDefaults.standard.speakRate = 0.51
-        }
     }
     
     // MARK: - public functions
@@ -164,7 +160,7 @@ class BGReadingSpeaker:NSObject {
         
         let syn = AVSpeechSynthesizer.init()
         let utterance = AVSpeechUtterance(string: text)
-        utterance.rate = Float(UserDefaults.standard.speakRate)
+        utterance.rate = 0.51
         utterance.pitchMultiplier = 1
         utterance.voice = AVSpeechSynthesisVoice(language: language)
         syn.speak(utterance)

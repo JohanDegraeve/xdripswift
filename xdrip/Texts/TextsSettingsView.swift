@@ -240,13 +240,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_speakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two readings, in minutes", comment: "When clicking the interval setting, a pop up asks for number of minutes between two spoken readings, this is the message displayed in the pop up")
     }()
     
-    static let labelSpeakRate = {
-        return NSLocalizedString("settingsviews_speakRate", tableName: filename, bundle: Bundle.main, value: "Speak Rate", comment: "speak settings, where user can set the speak rate")
-    }()
-    static let labelSpeakRateMessage = {
-        return NSLocalizedString("settingsviews_speakRateMessage", tableName: filename, bundle: Bundle.main, value: "Value between 0 and 1", comment: "When clicking the rate setting, a pop up asks for the rate, this is the message displayed in the pop up")
-    }()
-    
     // MARK: - Section Info
     
     static let version = {
