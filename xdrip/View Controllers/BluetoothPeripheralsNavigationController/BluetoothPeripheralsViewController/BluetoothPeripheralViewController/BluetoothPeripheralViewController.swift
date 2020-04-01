@@ -1184,9 +1184,9 @@ extension BluetoothPeripheralViewController {
     - status = connected
     - button = "disconnect"
  - if not connected, but shouldconnect = true
-    - status = "trying to connect"
+    - status = "trying to connect" (renamed to scanning)
     - button = "do no try to connect"
  - if not connected, but shouldconnect = false
-    - status = "not trying to connect"
+    - status = "not trying to connect" (not scanning)
     - button = "try to connect"
  */
