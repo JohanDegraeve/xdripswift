@@ -161,9 +161,7 @@ class M5StackBluetoothPeripheralViewModel {
                         }
 
                         // reload table
-                        if let bluetoothPeripheralViewController = self.bluetoothPeripheralViewController {
-                            self.tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.textColor.rawValue, section: bluetoothPeripheralViewController.numberOfGeneralSections() + M5StackSections.specificM5StackSettings.rawValue)], with: .none)
-                        }
+                        self.tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.textColor.rawValue, section: 1)], with: .none)
                         
                     }
                     

@@ -1,7 +1,7 @@
 "address" = "Address";
 "status" = "Status";
-"connected" = "connected";
-"notConnected" = "not connected";
+"connected" = "Connected";
+"notConnected" = "Not connected";
 "donotconnect" = "Stop scanning";
 "selectAliasText" = "Choose an alias for this Bluetooth Peripheral, the name will be shown in the app and is easier for you to recognize";
 "aliasAlreadyExists" = "There is already a Bluetooth Peripheral with this alias";
