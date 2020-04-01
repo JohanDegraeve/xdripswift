@@ -16,10 +16,6 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("connected", tableName: filename, bundle: Bundle.main, value: "connected", comment: "when Bluetooth Peripheral is shown, connection status, connected")
     }()
     
-    static let notConnected: String = {
-        return NSLocalizedString("notConnected", tableName: filename, bundle: Bundle.main, value: "Not Connected", comment: "when Bluetooth Peripheral is shown, connection status, not connected")
-    }()
-    
     static let donotconnect: String = {
         return NSLocalizedString("donotconnect", tableName: filename, bundle: Bundle.main, value: "Stop scanning", comment: "text in button top right, this button will disable automatic connect")
     }()
