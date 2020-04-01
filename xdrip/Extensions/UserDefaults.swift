@@ -78,8 +78,6 @@ extension UserDefaults {
         case speakTrend = "speakTrend"
         /// speak interval
         case speakInterval = "speakInterval"
-        /// speak rate
-        case speakRate = "speakRate"
         
         // Settings that Keep track of alert and info messages shown to the user ======
         
@@ -542,16 +540,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.speakInterval.rawValue)
-        }
-    }
-    
-    /// speak readings interval in minutes, if nil then default value to be used
-    @objc dynamic var speakRate: Double {
-        get {
-            return double(forKey: Key.speakRate.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.speakRate.rawValue)
         }
     }
     

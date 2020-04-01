@@ -12,5 +12,3 @@
 "currenttrend" = "It's trending";
 "deltanoncomputable" = "non computable";
 "currentdelta" = "Difference from last reading is";
-"settingsviews_speakRate" = "Speak Rate";
-"settingsviews_speakRateMessage" = "Value between 0 and 1";
