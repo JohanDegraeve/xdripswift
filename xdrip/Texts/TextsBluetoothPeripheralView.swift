@@ -21,7 +21,7 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let donotconnect: String = {
-        return NSLocalizedString("donotconnect", tableName: filename, bundle: Bundle.main, value: "Don't try to connect", comment: "text in button top right, this button will disable automatic connect")
+        return NSLocalizedString("donotconnect", tableName: filename, bundle: Bundle.main, value: "Stop scanning", comment: "text in button top right, this button will disable automatic connect")
     }()
     
     static let selectAliasText: String = {
@@ -69,11 +69,11 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let tryingToConnect: String = {
-        return NSLocalizedString("tryingToConnect", tableName: filename, bundle: Bundle.main, value: "Trying to connect", comment: "text in status rown, when not connect but app is trying to connect")
+        return NSLocalizedString("tryingToConnect", tableName: filename, bundle: Bundle.main, value: "Scanning", comment: "text in status rown, when not connect but app is trying to connect")
     }()
     
     static let notTryingToConnect: String = {
-        return NSLocalizedString("notTryingToConnect", tableName: filename, bundle: Bundle.main, value: "Not trying to connect", comment: "text in status rown, when not connected and app is not trying to connect")
+        return NSLocalizedString("notTryingToConnect", tableName: filename, bundle: Bundle.main, value: "Not scanning", comment: "text in status row, when not connected and app is not scanning")
     }()
     
     static let connect: String = {

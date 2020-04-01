@@ -2,7 +2,7 @@
 "status" = "Status";
 "connected" = "connected";
 "notConnected" = "not connected";
-"donotconnect" = "Don't try to connect";
+"donotconnect" = "Stop scanning";
 "selectAliasText" = "Choose an alias for this Bluetooth Peripheral, the name will be shown in the app and is easier for you to recognize";
 "aliasAlreadyExists" = "There is already a Bluetooth Peripheral with this alias";
 "confirmDeletionPeripheral" = "Do you want to delete Bluetooth Peripheral with ";
@@ -13,9 +13,9 @@
 "scan" = "Scan";
 "readyToScan" = "Ready to scan";
 "scanning" = "Scanning";
-"tryingToConnect" = "Trying to connect";
+"tryingToConnect" = "Scanning";
 "connect" = "Connect";
-"notTryingToConnect" = "Not trying to connect";
+"notTryingToConnect" = "Not scanning";
 "disConnectedAt" = "Disconnected At";
 "connectedAt" = "Connected At";
 "startScanningInfo" = "Scannnig Started.\n\nKeep xDrip open on the foreground until a connection is made. (there's no need to turn off Auto-Lock. Just don't press the home button and don't lock the iOS device.)";
