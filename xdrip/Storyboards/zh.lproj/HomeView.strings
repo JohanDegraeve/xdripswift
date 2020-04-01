@@ -14,8 +14,6 @@
 "notknown" = "未知";
 "lastconnection" = "上次连接";
 "transmitterbatterylevel" = "发射器电量";
-"connected" = "已连接";
-"neverconnected" = "未连接";
 "ago" = "之前";
 "licenseinfo" = "该程序是免费软件基金会发布的通用公共许可证条款下可使用的免费软件.包括第三版以及后续的新版本.这个程序的设计是希望会有用，但不做任何保证. 登录 http://www.gnu.org/licenses/gpl.txt 可获取更多详细信息 ";
 "transmitterinfo" = "首先进入设置选择你的发射器类型，并输入发射器ID.根据发射器类型, 返回主页扫描发射器.德康G5无需点击开始扫描.";

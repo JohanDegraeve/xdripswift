@@ -76,14 +76,6 @@ enum Texts_HomeView {
         return NSLocalizedString("transmitterbatterylevel", tableName: filename, bundle: Bundle.main, value: "Transmitter Battery Level", comment: "status info : literally 'Transmitter Battery Level', shows the battery level")
     }()
     
-    static let connected:String = {
-        return NSLocalizedString("connected", tableName: filename, bundle: Bundle.main, value: "Connected", comment: "status info : literally 'connected', if transmitter is currently connected")
-    }()
-    
-    static let neverConnected:String = {
-        return NSLocalizedString("neverconnected", tableName: filename, bundle: Bundle.main, value: "Didn't connect yet", comment: "status info : literally 'didn't connect yet', if it's a new transmitter that didn't connect before")
-    }()
-    
     static let ago:String = {
         return NSLocalizedString("ago", tableName: filename, bundle: Bundle.main, value: "ago", comment: "for home view, where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'")
     }()
