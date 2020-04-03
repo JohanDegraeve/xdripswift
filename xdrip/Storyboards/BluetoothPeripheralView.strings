@@ -23,3 +23,5 @@
 "lastReset" = "Last reset";
 "lastResetNotKnown" = "Last reset timestamp not known";
 "transmitterResultResult" = "Transmitter reset result";
+"bootLoader" = "Bootloader";
+"serialNumber" = "Serial Number";

@@ -676,7 +676,6 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             return 1
             
         } else {
-
             return bluetoothPeripheralViewModel.numberOfSections() + numberOfGeneralSections()
             
         }

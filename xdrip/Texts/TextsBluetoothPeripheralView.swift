@@ -36,8 +36,12 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("bluetoothPeripheralAlias", tableName: filename, bundle: Bundle.main, value: "Alias", comment: "BluetoothPeripheral view, this is a name of a BluetoothPeripheral assigned by the user, to recognize the device")
     }()
 
-    static let SensorSerialNumber: String = {
+    static let sensorSerialNumber: String = {
         return NSLocalizedString("SensorSerialNumber", tableName: filename, bundle: Bundle.main, value: "Sensor Serial Number", comment: "BluetoothPeripheral view, text of the cell with the sensor serial number")
+    }()
+    
+    static let serialNumber: String = {
+        return NSLocalizedString("serialNumber", tableName: filename, bundle: Bundle.main, value: "Serial Number", comment: "BluetoothPeripheral view, text of the cell with the serial number (this is not the sensor serial number")
     }()
     
     static let battery: String = {
@@ -96,8 +100,12 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("lastResetNotKnown", tableName: filename, bundle: Bundle.main, value: "Last reset timestamp not known", comment: "cell text, shows when last reset was done, if known. Only for Dexcom")
     }()
    
-    static let transmitterResetResult:String = {
+    static let transmitterResetResult: String = {
         return NSLocalizedString("transmitterResultResult", tableName: filename, bundle: Bundle.main, value: "Transmitter reset result", comment: "To give result about transitter result in notification body")
+    }()
+    
+    static let bootLoader: String = {
+        return NSLocalizedString("bootLoader", tableName: filename, bundle: Bundle.main, value: "Bootloader", comment: "row in bluetoothperipheral view, title")
     }()
 
 }

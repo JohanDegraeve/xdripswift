@@ -28,6 +28,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// Blucon
     case BluconType = "Blucon"
     
+    /// GNSentry
+    case GNSentryType = "GNSentry"
+    
     /// - returns: the BluetoothPeripheralViewModel
     func viewModel() -> BluetoothPeripheralViewModel {
         
@@ -53,6 +56,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .BluconType:
             return BluconBluetoothPeripheralViewModel()
+            
+        case .GNSentryType:
+            return GNSEntryBluetoothPeripheralViewModel()
+            
         }
         
     }
@@ -94,6 +101,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
             return Blucon(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
+        case .GNSentryType:
+            
+            return GNSEntry(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
         }
         
     }
@@ -112,7 +123,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaaMaster:
             return .watlaa
             
-        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType:
+        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType:
             return .CGM
             
         }
@@ -124,7 +135,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType:
             return false
             
         case .DexcomG5Type, .BluconType:
@@ -183,7 +194,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaa:
             return nil*/
             
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType:
             // no transmitter id means no validation to do
             return nil
             
