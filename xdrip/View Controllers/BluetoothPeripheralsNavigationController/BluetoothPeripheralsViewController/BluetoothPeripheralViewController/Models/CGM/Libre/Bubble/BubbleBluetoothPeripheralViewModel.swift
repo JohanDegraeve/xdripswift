@@ -145,7 +145,7 @@ extension BubbleBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
         case .sensorSerialNumber:
             
-            cell.textLabel?.text = Texts_BluetoothPeripheralView.SensorSerialNumber
+            cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
             cell.detailTextLabel?.text = bubble.blePeripheral.sensorSerialNumber
             cell.accessoryType = .disclosureIndicator
             
@@ -185,7 +185,7 @@ extension BubbleBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
             // serial text could be longer than screen width, clicking the row allows to see it in a pop up with more text place
             if let serialNumber = bubble.blePeripheral.sensorSerialNumber {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.SensorSerialNumber + " : " + serialNumber)
+                return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " : " + serialNumber)
             }
             
         }
