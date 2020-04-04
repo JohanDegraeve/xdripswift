@@ -38,7 +38,4 @@ protocol BluetoothPeripheralViewModel {
     
     /// as weboop is a general setting, but only applicable to specific types of transmitter, the model will need to be able to tell if it's supported or not
     ///
-    /// in the actualy implementation, it will only be used by CGM Transmitter types
-    func canWebOOP() -> Bool
-    
 }

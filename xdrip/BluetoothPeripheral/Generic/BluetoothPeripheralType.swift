@@ -31,8 +31,11 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// GNSentry
     case GNSentryType = "GNSentry"
     
-    /// - returns: the BluetoothPeripheralViewModel
-    func viewModel() -> BluetoothPeripheralViewModel {
+    /// BlueReader
+    case BlueReaderType = "BlueReader"
+    
+    /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
+    func viewModel() -> BluetoothPeripheralViewModel? {
         
         switch self {
             
@@ -59,6 +62,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .GNSentryType:
             return GNSEntryBluetoothPeripheralViewModel()
+         
+        case .BlueReaderType:
+            return nil
             
         }
         
@@ -104,6 +110,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .GNSentryType:
             
             return GNSEntry(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+  
+        case .BlueReaderType:
+            
+            return BlueReader(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         }
         
@@ -123,7 +133,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaaMaster:
             return .watlaa
             
-        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType:
+        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType:
             return .CGM
             
         }
@@ -135,7 +145,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType:
             return false
             
         case .DexcomG5Type, .BluconType:
@@ -194,7 +204,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaa:
             return nil*/
             
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType:
             // no transmitter id means no validation to do
             return nil
             
@@ -213,5 +223,41 @@ enum BluetoothPeripheralType: String, CaseIterable {
         }
         
     }
+    
+    /// is it web oop enabled or not
+    func canWebOOP() -> Bool {
+        
+        switch self {
+            
+        case .M5StackType:
+            return false
+            
+        case .M5StickCType:
+            return false
+            
+        case .watlaaMaster:
+            return false
+            
+        case .DexcomG5Type:
+            return false
+            
+        case .BubbleType:
+            return true
+            
+        case .MiaoMiaoType:
+            return true
+            
+        case .BluconType:
+            return false
+            
+        case .GNSentryType:
+            return false
+            
+        case .BlueReaderType:
+            return false
 
+        }
+        
+    }
+    
 }

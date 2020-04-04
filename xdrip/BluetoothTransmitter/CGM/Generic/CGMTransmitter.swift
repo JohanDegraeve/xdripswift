@@ -136,44 +136,7 @@ enum CGMTransmitterType:String, CaseIterable {
         
         }
     }
-    
-    /// does the transmitter type support web oop (for Libre1) yes or no
-    func canWebOOP() -> Bool {
         
-        //return false
-        
-        switch self {
-            
-        case .dexcomG4:
-            return false
-            
-        case .dexcomG5, .dexcomG6:
-            return false
-            
-        case .miaomiao:
-            return true
-            
-        case .Bubble:
-            return true
-            
-        case .GNSentry:
-            return false
-            
-        case .Blucon:
-            return false
-            
-        case .Droplet1:
-            return false
-            
-        case .blueReader:
-            return false
-            
-        case .watlaa:
-            return false
-            
-        }
-    }
-    
     /// returns default battery alert level, below this level an alert should be generated - this default value will be used when changing transmittertype
     func defaultBatteryAlertLevel() -> Int {
         switch self {

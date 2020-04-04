@@ -17,6 +17,9 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
+  
+    /// CGMBlueReaderTransmitterDelegate - not used used as there's no specific settings saved nor displayed for BlueReader
+    public weak var cGMBlueReaderTransmitterDelegate: CGMBlueReaderTransmitterDelegate?
     
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMBlueReader)
@@ -30,7 +33,8 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
+    ///     - cGMBlueReaderTransmitterDelegate : a CGMBlueReaderTransmitterDelegate
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBlueReaderTransmitterDelegate : CGMBlueReaderTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "blueReader")
@@ -41,6 +45,9 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
         // assign CGMTransmitterDelegate
         cgmTransmitterDelegate = cGMTransmitterDelegate
         
+        // assign cGMBlueReaderTransmitterDelegate
+        self.cGMBlueReaderTransmitterDelegate = cGMBlueReaderTransmitterDelegate
+
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_BlueReader)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_BlueReader, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_BlueReader, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }

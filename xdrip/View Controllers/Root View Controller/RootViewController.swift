@@ -15,7 +15,7 @@ final class RootViewController: UIViewController {
     
     @IBAction func calibrateButtonAction(_ sender: UIButton) {
         
-        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.cgmTransmitterType().canWebOOP(), cgmTransmitter.isWebOOPEnabled() {
+        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled() {
             
             let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil)
             
@@ -495,6 +495,9 @@ final class RootViewController: UIViewController {
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 if glucose.timeStamp > timeStampLastBgReading {
+
+                    debuglogging("glucose rawValue = " + glucose.glucoseLevelRaw.description)
+                    debuglogging("glucose glucoseLevelFiltered = " + glucose.glucoseLevelFiltered.description)
                     
                     _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
@@ -769,7 +772,7 @@ final class RootViewController: UIViewController {
             
         case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa:
             
-            if cgmTransmitter.cgmTransmitterType().canWebOOP() && cgmTransmitter.isWebOOPEnabled() {
+            if cgmTransmitter.isWebOOPEnabled() {
                 return NoCalibrator()
             } else {
                 return Libre1Calibrator()

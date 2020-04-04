@@ -225,18 +225,14 @@ class BluetoothPeripheralViewController: UIViewController {
         
     }
     
-    /// the BluetoothPeripheralViewController has already a few sections defined (eg bluetooth, weboop). This is the amount of sections defined in BluetoothPeripheralViewController. The bluetoothPeripheralViewModel can use this value to know the number of it's own section(s)
+    /// the BluetoothPeripheralViewController has already a few sections defined (eg bluetooth, weboop). This is the amount of sections defined in BluetoothPeripheralViewController. T
     public func numberOfGeneralSections() -> Int {
         
-        // bluetoothPeripheralViewModel should noramlly not be nil here
-        guard let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel else {
-            // creating a fatal error here because I had it at once that bluetoothPeripheralViewModel was nil. Took a long time to figure out why this resulted in crashes
-            fatalError("in BluetoothPeripheralViewController numberOfGeneralSections, bluetoothPeripheralViewModel is nil. It shouldn't")
-        }
-        
-        // if it's a cgm transmitter type that supports web op, then also show the web oop section
-        if bluetoothPeripheralViewModel.canWebOOP() {
+        // if it's a cgm transmitter type that supports web oop, and if bluetoothPeripheral already known, then show the webOOP section
+        if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType, expectedBluetoothPeripheralType.canWebOOP(), bluetoothPeripheral != nil {
+            
             return 2
+            
         }
 
         return 1
@@ -668,16 +664,24 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         
         // there is one general section with settings applicable for all peripheral types, one or more specific section(s) with settings specific to type of bluetooth peripheral
  
-        // unwrap bluetoothPeripheralViewModel
-        guard let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel else {return 0}
-
         if bluetoothPeripheral == nil {
             
             // no peripheral known yet, only the first, bluetooth transmitter related settings are shown
             return 1
             
         } else {
-            return bluetoothPeripheralViewModel.numberOfSections() + numberOfGeneralSections()
+            
+            // number of sections = number of general sections + number of sections specific for the type of bluetoothPeripheral
+            
+            var numberOfSections = numberOfGeneralSections()
+            
+            if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel {
+                
+                numberOfSections = numberOfSections + bluetoothPeripheralViewModel.numberOfSections()
+                
+            }
+
+            return numberOfSections
             
         }
         
@@ -707,7 +711,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         } else if section == 1  {
             
             // if the bluetoothperipheral type supports oopweb then this is the oop web section
-            if bluetoothPeripheralViewModel?.canWebOOP() ?? false {
+            if expectedBluetoothPeripheralType.canWebOOP() {
 
                 // check if weboopenabled and if yes return the number of settings in that section
                 if let bluetoothPeripheral = bluetoothPeripheral {
@@ -740,14 +744,11 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("BluetoothPeripheralViewController cellforrowat, Unexpected Table View Cell ") }
 
-        // unwrap bluetoothPeripheralManager
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return cell}
-        
-        // unwrap bluetoothPeripheralViewModel
-        guard let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel else {return cell}
+        // unwrap a few variables
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager, let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType else {return cell}
         
         // check if it's a Setting defined here in BluetoothPeripheralViewController, or a setting specific to the type of BluetoothPeripheral
-        if (indexPath.section >= 1 && !bluetoothPeripheralViewModel.canWebOOP()) || (indexPath.section >= 2) {
+        if (indexPath.section >= 1 && !expectedBluetoothPeripheralType.canWebOOP()) || (indexPath.section >= 2), let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel {
             
             // it's a setting not defined here but in a BluetoothPeripheralViewModel
             if let bluetoothPeripheral = bluetoothPeripheral {
@@ -898,14 +899,11 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         
         tableView.deselectRow(at: indexPath, animated: true)
         
-        // unwrap bluetoothPeripheralManager
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
+        // unwrap a few needed variables
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager, let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType else {return}
         
-        // unwrap bluetoothPeripheralViewModel
-        guard let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel else {return}
-
         // check if it's one of the common settings or one of the peripheral type specific settings
-        if (indexPath.section >= 1 && !bluetoothPeripheralViewModel.canWebOOP()) || (indexPath.section >= 2) {
+        if (indexPath.section >= 1 && !expectedBluetoothPeripheralType.canWebOOP()) || (indexPath.section >= 2) {
           
             // it's a setting not defined here but in a BluetoothPeripheralViewModel
             // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
@@ -1054,15 +1052,15 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         
-        // unwrap bluetoothPeripheralViewModel
-        guard let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel else {return nil}
+        // unwrap variables
+        guard let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType else {return nil}
 
         if section == 0 {
             
             // title for first section
             return Texts_SettingsView.m5StackSectionTitleBluetooth
             
-        } else if (section >= 1 && !bluetoothPeripheralViewModel.canWebOOP()) || (section >= 2) {
+        } else if (section >= 1 && !expectedBluetoothPeripheralType.canWebOOP()) || (section >= 2) {
             
             // title for bluetoothperipheral type section
             return bluetoothPeripheralViewModel.sectionTitle(forSection: section)

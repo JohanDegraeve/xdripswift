@@ -230,6 +230,33 @@ class BluetoothPeripheralManager: NSObject {
                         
                     }
                  
+                case .BlueReaderType:
+                    
+                    if let blueReader = blePeripheral.blueReader {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: blueReader)
+                        
+                        if blueReader.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMBlueReaderTransmitter, CGMBlueReaderTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMBlueReaderTransmitter(address: blueReader.blePeripheral.address, name: blueReader.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBlueReaderTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+                            
+                            // if BlueReaderType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which should have the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
                 case .GNSentryType:
                     
                     if let gNSEntry = blePeripheral.gNSEntry {
@@ -243,7 +270,7 @@ class BluetoothPeripheralManager: NSObject {
                             // add it to the array of bluetoothTransmitters
                             bluetoothTransmitters.insert(CGMGNSEntryTransmitter(address: gNSEntry.blePeripheral.address, name: gNSEntry.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: gNSEntry.timeStampLastBgReading), at: index)
                             
-                            // if BubbleType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            // if GNSentryType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                             if bluetoothPeripheralType.category() == .CGM {
                                 currentCgmTransmitterAddress = blePeripheral.address
                             }
@@ -343,7 +370,7 @@ class BluetoothPeripheralManager: NSObject {
                     // no need to send reading to watlaa in master mode
                     break
                     
-                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType:
+                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType:
                     // cgm's don't receive reading, they send it
                     break
                     
@@ -470,6 +497,21 @@ class BluetoothPeripheralManager: NSObject {
                         }
                     }
                     
+                case .BlueReaderType:
+                    
+                    if let blueReader = bluetoothPeripheral as? GNSEntry {
+                        
+                        if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
+                            
+                            newTransmitter = CGMBlueReaderTransmitter(address: blueReader.blePeripheral.address, name: blueReader.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBlueReaderTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case BlueReaderType but cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+                    
                 case .BluconType:
                     
                     if let blucon = bluetoothPeripheral as? Blucon {
@@ -543,6 +585,11 @@ class BluetoothPeripheralManager: NSObject {
                     return .GNSentryType
                 }
                 
+            case .BlueReaderType:
+                if bluetoothTransmitter is CGMBlueReaderTransmitter {
+                    return .BlueReaderType
+                }
+                
             }
             
         }
@@ -597,6 +644,15 @@ class BluetoothPeripheralManager: NSObject {
             }
             
             return CGMGNSEntryTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil)
+            
+        case .BlueReaderType:
+            
+            guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, BlueReaderType, cgmTransmitterDelegate is nil")
+            }
+            
+            
+            return CGMBlueReaderTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMBlueReaderTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
             
         case .BluconType:
             
@@ -826,6 +882,10 @@ class BluetoothPeripheralManager: NSObject {
                 break
                 
             case .GNSentryType:
+                // none of the observed values needs to be sent to the watlaa
+                break
+                
+            case .BlueReaderType:
                 // none of the observed values needs to be sent to the watlaa
                 break
                 

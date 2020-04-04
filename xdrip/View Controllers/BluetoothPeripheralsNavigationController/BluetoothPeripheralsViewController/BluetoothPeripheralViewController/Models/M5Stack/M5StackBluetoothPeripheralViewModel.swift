@@ -558,11 +558,6 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
 
 extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     
-    func canWebOOP() -> Bool {
-        // web oop only applicable to cgm transmitters and M5Stack is not a cgm transmitter
-        return false
-    }
-    
     func numberOfSections() -> Int {
         return numberOfM5Sections()
     }
