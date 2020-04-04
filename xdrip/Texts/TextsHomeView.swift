@@ -136,4 +136,7 @@ enum Texts_HomeView {
         return NSLocalizedString("calibrationNotNecessary", tableName: filename, bundle: Bundle.main, value: "With Web OOP enabled, calibration is not necessary for the selected type of transmitter", comment: "if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible")
     }()
  
+    static let dexcomBatteryTooLow: String = {
+        return NSLocalizedString("dexcomBatteryTooLow", tableName: filename, bundle: Bundle.main, value: "Transmitter battery too low !", comment: "Error message in case Dexcom G5 (and G6?) battery is too low. This is deteced by wrong G5 values 2096896")
+    }()
 }

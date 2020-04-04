@@ -349,16 +349,32 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                 //  trace("    sensorDataRxMessage.unfiltered = 0.0, ignoring this reading", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                             } else {
                                 if Date() < Date(timeInterval: 60, since: timeStampOfLastG5Reading) {
+                                    
                                     // should probably never come here because this check is already done at connection time
                                     trace("    last reading was less than 1 minute ago, ignoring", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                                    
                                 } else {
-                                    timeStampOfLastG5Reading = Date()
                                     
-                                    let glucoseData = GlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered), glucoseLevelFiltered: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered))
+                                    // check if rawValue equals 2096896, this indicates low battery, error message needs to be shown in that case
+                                    if sensorDataRxMessage.unfiltered == 2096896.0 {
+                                        
+                                        trace("    received unfiltered value 2096896.0, which is caused by low battery. Creating error message", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                                        
+                                        cgmTransmitterDelegate?.error(message: Texts_HomeView.dexcomBatteryTooLow)
+                                        
+                                    } else {
+
+                                        timeStampOfLastG5Reading = Date()
+                                        
+                                        let glucoseData = GlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered), glucoseLevelFiltered: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered))
+                                        
+                                        var glucoseDataArray = [glucoseData]
+                                        
+                                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
+
+                                    }
                                     
-                                    var glucoseDataArray = [glucoseData]
                                     
-                                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
                                 }
                             }
                             
