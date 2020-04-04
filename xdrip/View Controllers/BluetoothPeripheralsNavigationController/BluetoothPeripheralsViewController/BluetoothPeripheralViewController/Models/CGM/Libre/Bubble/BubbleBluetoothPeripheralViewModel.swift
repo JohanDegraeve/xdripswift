@@ -142,8 +142,18 @@ extension BubbleBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         case .sensorSerialNumber:
             
             cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
-            cell.detailTextLabel?.text = bubble.blePeripheral.sensorSerialNumber
-            cell.accessoryType = .disclosureIndicator
+            if let sensorSerialNumber = bubble.blePeripheral.sensorSerialNumber {
+
+                cell.detailTextLabel?.text = sensorSerialNumber
+                cell.accessoryType = .disclosureIndicator
+
+            } else {
+                
+                cell.detailTextLabel?.text = Texts_Common.unknown
+                cell.accessoryType = .none
+                
+            }
+            
             
         }
 
