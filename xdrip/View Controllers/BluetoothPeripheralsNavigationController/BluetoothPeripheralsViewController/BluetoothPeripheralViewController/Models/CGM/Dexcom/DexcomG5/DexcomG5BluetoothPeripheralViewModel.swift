@@ -120,11 +120,6 @@ class DexcomG5BluetoothPeripheralViewModel {
 
 extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
-    func canWebOOP() -> Bool {
-        // web oop only applicable to cgm transmitters and DexcomG5 is not a cgm transmitter
-        return false
-    }
-
     func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager

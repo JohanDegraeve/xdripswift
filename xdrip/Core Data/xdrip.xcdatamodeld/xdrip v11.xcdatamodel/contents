@@ -50,6 +50,7 @@
         <attribute name="transmitterId" optional="YES" attributeType="String"/>
         <attribute name="webOOPEnabled" attributeType="Boolean" usesScalarValueType="YES"/>
         <relationship name="blucon" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Blucon" inverseName="blePeripheral" inverseEntity="Blucon"/>
+        <relationship name="blueReader" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BlueReader" inverseName="blePeripheral" inverseEntity="BlueReader"/>
         <relationship name="bubble" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Bubble" inverseName="blePeripheral" inverseEntity="Bubble"/>
         <relationship name="dexcomG5" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="DexcomG5" inverseName="blePeripheral" inverseEntity="DexcomG5"/>
         <relationship name="gNSEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="GNSEntry" inverseName="blePeripheral" inverseEntity="GNSEntry"/>
@@ -60,6 +61,9 @@
     <entity name="Blucon" representedClassName=".Blucon" syncable="YES">
         <attribute name="timeStampLastBgReading" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="blucon" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="BlueReader" representedClassName=".BlueReader" syncable="YES">
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="blueReader" inverseEntity="BLEPeripheral"/>
     </entity>
     <entity name="Bubble" representedClassName=".Bubble" syncable="YES">
         <attribute name="firmware" optional="YES" attributeType="String"/>
@@ -134,7 +138,7 @@
         <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
-        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="313"/>
+        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="328"/>
         <element name="Bubble" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
         <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="178"/>
@@ -144,5 +148,6 @@
         <element name="Watlaa" positionX="-639" positionY="207" width="128" height="58"/>
         <element name="Blucon" positionX="-657" positionY="189" width="128" height="73"/>
         <element name="GNSEntry" positionX="-648" positionY="198" width="128" height="118"/>
+        <element name="BlueReader" positionX="-639" positionY="207" width="128" height="58"/>
     </elements>
 </model>

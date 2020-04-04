@@ -61,10 +61,6 @@ class BluconBluetoothPeripheralViewModel {
 
 extension BluconBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
-    func canWebOOP() -> Bool {
-        return CGMTransmitterType.Blucon.canWebOOP()
-    }
-    
     func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager

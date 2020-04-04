@@ -67,10 +67,6 @@ class BubbleBluetoothPeripheralViewModel {
 
 extension BubbleBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
-    func canWebOOP() -> Bool {
-        return CGMTransmitterType.Bubble.canWebOOP()
-    }
-    
     func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
