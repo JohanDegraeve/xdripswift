@@ -18,6 +18,9 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
     
+    /// CGMDropletTransmitterDelegate
+    public weak var cGMDropletTransmitterDelegate: CGMDropletTransmitterDelegate?
+    
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMDroplet1)
     
@@ -30,7 +33,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - bluetoothTransmitterDelegate : a NluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMDropletTransmitterDelegate : CGMDropletTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "limitter")
@@ -40,6 +43,9 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // assign CGMTransmitterDelegate
         self.cgmTransmitterDelegate = cGMTransmitterDelegate
+        
+        // assign cGMDropletTransmitterDelegate
+        self.cGMDropletTransmitterDelegate = cGMDropletTransmitterDelegate
         
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Droplet)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Droplet, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Droplet, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
@@ -103,10 +109,13 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
                 return
             }
             
-            // send to delegate
+            // send glucoseDataArray, transmitterBatteryInfo and sensorTimeInMinutes to cgmTransmitterDelegate
             var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawValueAsDouble)]
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: sensorTimeInMinutes * 10)
             
+            // send transmitterBatteryInfo to delegate
+            cGMDropletTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
+
         } else {
             trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)
         }
