@@ -34,6 +34,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// BlueReader
     case BlueReaderType = "BlueReader"
     
+    /// Droplet
+    case DropletType = "Droplet"
+    
     /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
     func viewModel() -> BluetoothPeripheralViewModel? {
         
@@ -65,6 +68,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
          
         case .BlueReaderType:
             return nil
+            
+        case .DropletType:
+            return DropletBluetoothPeripheralViewModel()
             
         }
         
@@ -115,6 +121,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
             return BlueReader(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
+        case .DropletType:
+            
+            return Droplet(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
         }
         
     }
@@ -133,7 +143,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaaMaster:
             return .watlaa
             
-        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType:
+        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType:
             return .CGM
             
         }
@@ -145,7 +155,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
             return false
             
         case .DexcomG5Type, .BluconType:
@@ -204,7 +214,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaa:
             return nil*/
             
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType:
+        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
             // no transmitter id means no validation to do
             return nil
             
@@ -256,6 +266,8 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .BlueReaderType:
             return false
 
+        case .DropletType:
+            return false
         }
         
     }

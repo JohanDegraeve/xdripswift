@@ -55,6 +55,12 @@ extension BLEPeripheral {
     /// a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...
     @NSManaged public var blueReader: BlueReader?
     
+    // a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...
+    @NSManaged public var droplet: Droplet?
+    
+    // a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...
+    @NSManaged public var blucon: Blucon?
+    
     /// sensorSerialNumber of last sensor that was read
     @NSManaged public var sensorSerialNumber: String?
 

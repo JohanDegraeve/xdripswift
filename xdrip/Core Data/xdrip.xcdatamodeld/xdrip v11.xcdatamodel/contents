@@ -53,6 +53,7 @@
         <relationship name="blueReader" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BlueReader" inverseName="blePeripheral" inverseEntity="BlueReader"/>
         <relationship name="bubble" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Bubble" inverseName="blePeripheral" inverseEntity="Bubble"/>
         <relationship name="dexcomG5" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="DexcomG5" inverseName="blePeripheral" inverseEntity="DexcomG5"/>
+        <relationship name="droplet" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Droplet" inverseName="blePeripheral" inverseEntity="Droplet"/>
         <relationship name="gNSEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="GNSEntry" inverseName="blePeripheral" inverseEntity="GNSEntry"/>
         <relationship name="m5Stack" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="M5Stack" inverseName="blePeripheral" inverseEntity="M5Stack"/>
         <relationship name="miaoMiao" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MiaoMiao" inverseName="blePeripheral" inverseEntity="MiaoMiao"/>
@@ -100,6 +101,9 @@
         <attribute name="voltageB" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="dexcomG5" inverseEntity="BLEPeripheral"/>
     </entity>
+    <entity name="Droplet" representedClassName=".Droplet" syncable="YES">
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="droplet" inverseEntity="BLEPeripheral"/>
+    </entity>
     <entity name="GNSEntry" representedClassName=".GNSEntry" syncable="YES">
         <attribute name="bootLoader" optional="YES" attributeType="String"/>
         <attribute name="firmwareVersion" optional="YES" attributeType="String"/>
@@ -138,16 +142,17 @@
         <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
-        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="328"/>
+        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="343"/>
+        <element name="Blucon" positionX="-657" positionY="189" width="128" height="73"/>
+        <element name="BlueReader" positionX="-639" positionY="207" width="128" height="58"/>
         <element name="Bubble" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
         <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="178"/>
+        <element name="GNSEntry" positionX="-648" positionY="198" width="128" height="118"/>
         <element name="M5Stack" positionX="-657" positionY="180" width="128" height="163"/>
         <element name="MiaoMiao" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="133"/>
         <element name="Watlaa" positionX="-639" positionY="207" width="128" height="58"/>
-        <element name="Blucon" positionX="-657" positionY="189" width="128" height="73"/>
-        <element name="GNSEntry" positionX="-648" positionY="198" width="128" height="118"/>
-        <element name="BlueReader" positionX="-639" positionY="207" width="128" height="58"/>
+        <element name="Droplet" positionX="-630" positionY="216" width="128" height="58"/>
     </elements>
 </model>
