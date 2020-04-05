@@ -18,7 +18,7 @@ public class BLEPeripheral: NSManagedObject {
         self.alias = alias
         self.parameterUpdateNeededAtNextConnect = false
      
-        webOOPEnabled = false
+        webOOPEnabled = ConstantsLibreOOP.defaultWebOOPEnabled
         
     }
     
