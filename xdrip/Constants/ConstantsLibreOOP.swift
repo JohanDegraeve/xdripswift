@@ -1,6 +1,9 @@
 /// constants related to Libre OOP
 enum ConstantsLibreOOP {
 
+    /// is web oop enabled by default yes or no
+    static let defaultWebOOPEnabled = false
+    
     /// site for libreOOP client
     static let site = "http://www.glucose.space/calibrateSensor"
     

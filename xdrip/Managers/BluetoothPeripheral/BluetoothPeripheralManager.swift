@@ -230,6 +230,37 @@ class BluetoothPeripheralManager: NSObject {
                         
                     }
                  
+                case .DexcomG4Type:
+                    
+                    if let dexcomG4 = blePeripheral.dexcomG4 {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG4)
+                        
+                        if dexcomG4.blePeripheral.shouldconnect {
+
+                            if let transmitterId = dexcomG4.blePeripheral.transmitterId {
+
+                                // create an instance of CGMDexcomG4Transmitter, CGMDexcomG4Transmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                                // add it to the array of bluetoothTransmitters
+                                bluetoothTransmitters.insert(CGMG4xDripTransmitter(address: dexcomG4.blePeripheral.address, name: dexcomG4.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMDexcomG4TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+                                
+                                // if DexcomG4Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                                if bluetoothPeripheralType.category() == .CGM {
+                                    currentCgmTransmitterAddress = blePeripheral.address
+                                }
+                                
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
                 case .DropletType:
                     
                     if let droplet = blePeripheral.droplet {
@@ -397,7 +428,7 @@ class BluetoothPeripheralManager: NSObject {
                     // no need to send reading to watlaa in master mode
                     break
                     
-                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType:
+                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type:
                     // cgm's don't receive reading, they send it
                     break
                     
@@ -475,6 +506,21 @@ class BluetoothPeripheralManager: NSObject {
                         } else {
                             
                             trace("in getBluetoothTransmitter, case DexcomG5Type but transmitterId is nil or cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+                    
+                case .DexcomG4Type:
+                    
+                    if let dexcomG4 = bluetoothPeripheral as? DexcomG4 {
+                        
+                        if let transmitterId = dexcomG4.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
+                            
+                            newTransmitter = CGMG4xDripTransmitter(address: dexcomG4.blePeripheral.address, name: dexcomG4.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMDexcomG4TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case DexcomG4Type but transmitterId is nil or cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
                             
                         }
                     }
@@ -636,6 +682,12 @@ class BluetoothPeripheralManager: NSObject {
                 if bluetoothTransmitter is CGMDroplet1Transmitter {
                     return .DropletType
                 }
+                
+            case .DexcomG4Type:
+                if bluetoothTransmitter is CGMG4xDripTransmitter {
+                    return .DexcomG4Type
+                }
+                
             }
             
         }
@@ -715,6 +767,14 @@ class BluetoothPeripheralManager: NSObject {
             }
             
             return CGMBluconTransmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: nil)
+
+        case .DexcomG4Type:
+            
+            guard let transmitterId = transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, type DexcomG4Type, transmitterId is nil or cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMG4xDripTransmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMDexcomG4TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
             
         }
         
@@ -915,7 +975,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .watlaaMaster, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType:
+            case .watlaaMaster, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type:
                 // none of the observed values needs to be sent to the watlaa
                 break
                 

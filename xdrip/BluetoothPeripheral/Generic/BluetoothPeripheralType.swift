@@ -19,6 +19,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// DexcomG5
     case DexcomG5Type = "Dexcom G5"
     
+    /// DexcomG4
+    case DexcomG4Type = "Dexcom G4 (bridge)"
+    
     /// bubble
     case BubbleType = "Bubble"
     
@@ -71,6 +74,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .DropletType:
             return DropletBluetoothPeripheralViewModel()
+            
+        case .DexcomG4Type:
+            return DexcomG4BluetoothPeripheralViewModel()
             
         }
         
@@ -125,6 +131,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
             return Droplet(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
+        case .DexcomG4Type:
+            
+            return DexcomG4(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
         }
         
     }
@@ -143,7 +153,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .watlaaMaster:
             return .watlaa
             
-        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType:
+        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type:
             return .CGM
             
         }
@@ -158,7 +168,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
             return false
             
-        case .DexcomG5Type, .BluconType:
+        case .DexcomG5Type, .BluconType, .DexcomG4Type:
             return true
 
         }
@@ -194,8 +204,8 @@ enum BluetoothPeripheralType: String, CaseIterable {
             // validation successful
             return nil
             
-        /*case .dexcomG4:
-            //verify allowed chars
+        case .DexcomG4Type:
+
             let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
             if !transmitterId.validate(withRegex: regex) {
                 return Texts_ErrorMessages.DexcomTransmitterIDInvalidCharacters
@@ -204,15 +214,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
                 return Texts_ErrorMessages.TransmitterIDShouldHaveLength5
             }
             return nil
-            
-        case .miaomiao, .GNSentry, .Bubble, .Droplet1:
-            return nil
-            
-        case .blueReader:
-            return nil
-            
-        case .watlaa:
-            return nil*/
             
         case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
             // no transmitter id means no validation to do
@@ -268,6 +269,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
 
         case .DropletType:
             return false
+            
+        case .DexcomG4Type:
+            return false
+            
         }
         
     }
