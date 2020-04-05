@@ -199,7 +199,7 @@ final class RootViewController: UIViewController {
     
     /// current value of webOPEnabled, default false
     /// - used to detect changes in the value
-    private var webOOPEnabled: Bool?
+    private var webOOPEnabled = ConstantsLibreOOP.defaultWebOOPEnabled
     
     // MARK: - View Life Cycle
     
@@ -401,16 +401,12 @@ final class RootViewController: UIViewController {
                 self.calibrator = RootViewController.getCalibrator(cgmTransmitter: cgmTransmitter)
                 
                 // check if webOOPEnabled changed and if yes stop the sensor
-                if let webOOPEnabled = self.webOOPEnabled {
+                if self.webOOPEnabled != cgmTransmitter.isWebOOPEnabled() {
                     
-                    if webOOPEnabled != cgmTransmitter.isWebOOPEnabled() {
-                        
-                        self.stopSensor()
-                        
-                    }
+                    self.stopSensor()
                     
                 }
-                
+
                 // check if the type of sensor supported by the cgmTransmitterType  has changed, if yes stop the sensor
                 if let currentTransmitterType = UserDefaults.standard.cgmTransmitterType, currentTransmitterType.sensorType() != cgmTransmitter.cgmTransmitterType().sensorType() {
                     
