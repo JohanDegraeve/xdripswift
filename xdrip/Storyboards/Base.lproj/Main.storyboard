@@ -598,11 +598,9 @@
                         <outlet property="connectButtonOutlet" destination="WtR-0P-RyL" id="Sbx-db-Atn"/>
                         <outlet property="tableView" destination="82M-Ti-NV0" id="RQy-kH-bnc"/>
                         <outlet property="trashButtonOutlet" destination="N7o-Nz-l8g" id="Sz3-nt-e7r"/>
-                        <segue destination="qbA-EA-RMD" kind="unwind" identifier="BluetoothPeripheralToBluetoothPeripheralsUnWindSegueIdentifier" unwindAction="unwindToBluetoothPeripheralsViewControllerWithSegue:" id="yPp-xT-8cB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kwG-Zz-t1q" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="qbA-EA-RMD" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2342" y="-155"/>
         </scene>
