@@ -124,15 +124,9 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG4, .dexcomG5, .dexcomG6, .GNSentry, .Droplet1, .blueReader, .watlaa:
             return true
             
-<<<<<<< HEAD
         case .miaomiao, .Bubble, .Blucon:
-=======
-        case .miaomiao, .Bubble:
             return true
         
-        case .Blucon:
->>>>>>> Bubble
-            return true
         
         }
     }

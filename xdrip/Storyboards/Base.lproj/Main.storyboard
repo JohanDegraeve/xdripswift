@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -29,7 +29,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="21"/>
                                 <state key="normal" title="Transmitter"/>
                                 <connections>
-                                    <action selector="transmitterButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="iJp-CH-PZa"/>
+                                    <action selector="sensorButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="iJp-CH-PZa"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fSY-nc-amN">
@@ -102,7 +102,7 @@
                         <outlet property="diffLabelOutlet" destination="7Wo-wd-80o" id="nnn-w9-1sX"/>
                         <outlet property="minutesLabelOutlet" destination="uyn-2k-K74" id="XXm-rq-Suy"/>
                         <outlet property="preSnoozeButtonOutlet" destination="fSY-nc-amN" id="T25-Z1-3Ad"/>
-                        <outlet property="transmitterButtonOutlet" destination="zWo-AR-qJE" id="uuB-WI-JKe"/>
+                        <outlet property="sensorButtonOutlet" destination="zWo-AR-qJE" id="uuB-WI-JKe"/>
                         <outlet property="valueLabelOutlet" destination="We3-bN-ffR" id="wtY-sZ-mev"/>
                     </connections>
                 </viewController>
@@ -533,16 +533,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L9f-Ab-Egz">
-                                <rect key="frame" x="20" y="88" width="46" height="38"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="21"/>
-                                <state key="normal" title="Scan">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </state>
-                                <connections>
-                                    <action selector="scanButtonAction:" destination="FJ0-eY-Fv0" eventType="touchUpInside" id="d3F-AM-pvG"/>
-                                </connections>
-                            </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="82M-Ti-NV0">
                                 <rect key="frame" x="0.0" y="126" width="414" height="687"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
@@ -574,7 +564,7 @@
                                 </prototypes>
                             </tableView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WtR-0P-RyL">
-                                <rect key="frame" x="316" y="88" width="78" height="38"/>
+                                <rect key="frame" x="20" y="88" width="78" height="38"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="21"/>
                                 <state key="normal" title="Connect">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -586,12 +576,10 @@
                         </subviews>
                         <color key="backgroundColor" white="0.29999999999999999" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="L9f-Ab-Egz" firstAttribute="leading" secondItem="jHe-GP-4Jf" secondAttribute="leading" constant="20" id="8zf-zJ-HsA"/>
                             <constraint firstItem="WtR-0P-RyL" firstAttribute="top" secondItem="jHe-GP-4Jf" secondAttribute="top" id="Ej3-HQ-w2L"/>
-                            <constraint firstItem="jHe-GP-4Jf" firstAttribute="trailing" secondItem="WtR-0P-RyL" secondAttribute="trailing" constant="20" id="ed1-re-h1k"/>
-                            <constraint firstItem="82M-Ti-NV0" firstAttribute="top" secondItem="L9f-Ab-Egz" secondAttribute="bottom" id="n9y-ia-TyG"/>
+                            <constraint firstItem="WtR-0P-RyL" firstAttribute="leading" secondItem="jHe-GP-4Jf" secondAttribute="leading" constant="20" id="ToR-DO-JrT"/>
+                            <constraint firstItem="82M-Ti-NV0" firstAttribute="top" secondItem="WtR-0P-RyL" secondAttribute="bottom" id="aP0-31-V6e"/>
                             <constraint firstItem="jHe-GP-4Jf" firstAttribute="bottom" secondItem="82M-Ti-NV0" secondAttribute="bottom" id="qBc-5d-R7l"/>
-                            <constraint firstItem="L9f-Ab-Egz" firstAttribute="top" secondItem="jHe-GP-4Jf" secondAttribute="top" id="tyR-sY-DG3"/>
                             <constraint firstItem="jHe-GP-4Jf" firstAttribute="trailing" secondItem="82M-Ti-NV0" secondAttribute="trailing" id="w0B-Wn-iY0"/>
                             <constraint firstItem="82M-Ti-NV0" firstAttribute="leading" secondItem="jHe-GP-4Jf" secondAttribute="leading" id="yg8-ad-aLX"/>
                         </constraints>
@@ -599,31 +587,15 @@
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="1DE-2P-Qfh">
                         <barButtonItem key="backBarButtonItem" title="I" id="Fis-6U-di6"/>
-                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="yem-TU-Ica">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="trash" id="N7o-Nz-l8g">
+                            <color key="tintColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
-                                <action selector="cancelButtonAction:" destination="FJ0-eY-Fv0" id="wJ5-NV-3TH"/>
+                                <action selector="trashButtonAction:" destination="FJ0-eY-Fv0" id="trt-wt-QU4"/>
                             </connections>
                         </barButtonItem>
-                        <rightBarButtonItems>
-                            <barButtonItem style="done" systemItem="done" id="CUr-JD-RwV">
-                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <connections>
-                                    <action selector="doneButtonAction:" destination="FJ0-eY-Fv0" id="ac9-M9-bFg"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem systemItem="trash" id="N7o-Nz-l8g">
-                                <color key="tintColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <connections>
-                                    <action selector="trashButtonAction:" destination="FJ0-eY-Fv0" id="trt-wt-QU4"/>
-                                </connections>
-                            </barButtonItem>
-                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="connectButtonOutlet" destination="WtR-0P-RyL" id="Sbx-db-Atn"/>
-                        <outlet property="doneButtonOutlet" destination="CUr-JD-RwV" id="6OJ-L9-Nnf"/>
-                        <outlet property="scanButtonOutlet" destination="L9f-Ab-Egz" id="z68-tK-4ql"/>
                         <outlet property="tableView" destination="82M-Ti-NV0" id="RQy-kH-bnc"/>
                         <outlet property="trashButtonOutlet" destination="N7o-Nz-l8g" id="Sz3-nt-e7r"/>
                         <segue destination="qbA-EA-RMD" kind="unwind" identifier="BluetoothPeripheralToBluetoothPeripheralsUnWindSegueIdentifier" unwindAction="unwindToBluetoothPeripheralsViewControllerWithSegue:" id="yPp-xT-8cB"/>

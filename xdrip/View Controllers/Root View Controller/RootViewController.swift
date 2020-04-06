@@ -5,6 +5,7 @@ import CoreBluetooth
 import UserNotifications
 import SwiftCharts
 import HealthKitUI
+import AVFoundation
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController {
