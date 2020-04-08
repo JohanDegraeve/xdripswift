@@ -30,3 +30,4 @@
 "calibrationNotNecessary" = "With Web OOP enabled, calibration is not necessary for the selected type of transmitter";
 "theresNoCGMTransmitterActive" = "To calibrate you should have a CGM transmitter created with 'Always Connect'.";
 "dexcomBatteryTooLow" = "Transmitter battery too low !";
+"sensorAge14Days" = "Sensor has reached maximum age.";
