@@ -97,8 +97,8 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         self.webOOPEnabled = webOOPEnabled ?? false
         
         // initialize oopWebToken and oopWebSite
-        self.oopWebToken = oopWebToken ?? ConstantsLibreOOP.token
-        self.oopWebSite = oopWebSite ?? ConstantsLibreOOP.site
+        self.oopWebToken = oopWebToken ?? ConstantsLibre.token
+        self.oopWebSite = oopWebSite ?? ConstantsLibre.site
 
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         

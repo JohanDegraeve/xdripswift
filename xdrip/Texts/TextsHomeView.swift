@@ -139,4 +139,9 @@ enum Texts_HomeView {
     static let dexcomBatteryTooLow: String = {
         return NSLocalizedString("dexcomBatteryTooLow", tableName: filename, bundle: Bundle.main, value: "Transmitter battery too low !", comment: "Error message in case Dexcom G5 (and G6?) battery is too low. This is deteced by wrong G5 values 2096896")
     }()
+    
+    static let sensorAge14Days: String = {
+        return NSLocalizedString("sensorAge14Days", tableName: filename, bundle: Bundle.main, value: "Sensor has reached maximum age.", comment: "Error message shown in pop up, when sensor age has reached 14.5 days")
+    }()
+    
 }

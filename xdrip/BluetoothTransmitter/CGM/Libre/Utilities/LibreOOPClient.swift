@@ -22,7 +22,7 @@ class LibreOOPClient {
     
     // MARK: - properties
     
-    private static let filePath: String = NSHomeDirectory() + ConstantsLibreOOP.filePathForParameterStorage
+    private static let filePath: String = NSHomeDirectory() + ConstantsLibre.filePathForParameterStorage
     
     /// for trace
     private static let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLibreOOPClient)
