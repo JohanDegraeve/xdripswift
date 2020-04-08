@@ -195,3 +195,32 @@ extension String {
         return dateFormatter.date(from: self)
     }
 }
+
+extension Optional where Wrapped == String {
+    
+    /// - if string doesn't start with http, then add https
+    /// - if ending with /, remove it
+    /// - convert to lowercase
+    /// - if string nil, then returnvalue is nil
+    func addHttpsIfNeeded() -> String? {
+        
+        // if self nil, then return nil
+        guard var returnValue = self else {return nil}
+        
+        // first convert to lowercase
+        returnValue = returnValue.lowercased()
+        
+        // if self doesn't start with http, then add https
+        if !returnValue.startsWith("http") {
+            returnValue = "https://" + returnValue
+        }
+        
+        // if url ends with /, remove it
+        if returnValue.last == "/" {
+            returnValue.removeLast()
+        }
+
+        return returnValue
+        
+    }
+}
