@@ -16,4 +16,12 @@ class Texts_NightScoutTestResult {
         return NSLocalizedString("nightscouttestresult_verificationerroralerttitle", tableName: filename, bundle: Bundle.main, value: "Verification Error", comment: "POP up after verifying nightscout credentials, to say that verification of url and api key was not successful - this is the title")
     }()
     
+    static let warningAPIKeyOrURLIsnil: String = {
+        
+        return NSLocalizedString("warningAPIKeyOrURLIsnil", tableName: filename, bundle: Bundle.main, value: "Url and API Key must be set", comment: "in settings screen, user tries to test url and API Key but one of them is not set")
+    }()
+    
+    static let nightScoutAPIKeyAndURLStarted : String = {
+        return NSLocalizedString("nightScoutAPIKeyAndURLStarted", tableName: filename, bundle: Bundle.main, value: "Test started", comment: "in settings screen, user clicked test button for nightscout url and apikey")
+    }()
 }

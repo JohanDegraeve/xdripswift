@@ -57,6 +57,13 @@ protocol SettingsViewModelProtocol {
     /// This function will verify if complete reload is needed or not
     func completeSettingsViewRefreshNeeded(index:Int) -> Bool
     
+    /// a view model may want to pass information back to the viewcontroller asynchronously. Example SettingsViewNightScoutSettingsViewModel will initiate a credential test. The response will come asynchronously and a text needs to return to the viewcontroller, to be shown to the user.
+    ///
+    /// The viewmodel must call the messageHandler on the main thread.
+    /// - parameters:
+    ///     - two strings, a title and a message.
+    func storeMessageHandler(messageHandler : @escaping ((String, String) -> Void))
+    
 }
 
 /// to make the coding a bit easier, just one function defined for now, which is to get the viewModel for a specific setting

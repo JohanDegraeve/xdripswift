@@ -30,6 +30,10 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
     /// used for requesting authorization to access calendar
     let eventStore = EKEventStore()
     
+    func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
+        // this ViewModel does need to send back messages to the viewcontroller asynchronously
+    }
+
     func sectionTitle() -> String? {
         return Texts_SettingsView.appleWatchSectionTitle
     }

@@ -12,6 +12,10 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
 
     // MARK: - functions in protocol SettingsViewModelProtocol
     
+    func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
+        // this ViewModel does need to send back messages to the viewcontroller asynchronously
+    }
+    
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
         return false
     }

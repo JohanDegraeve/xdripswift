@@ -9,6 +9,10 @@ fileprivate enum Setting:Int, CaseIterable {
 
 struct SettingsViewM5StackGeneralSettingsViewModel: SettingsViewModelProtocol {
     
+    func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
+        // this ViewModel does need to send back messages to the viewcontroller asynchronously
+    }
+    
     func sectionTitle() -> String? {
         return Texts_SettingsView.sectionTitleGeneral
     }

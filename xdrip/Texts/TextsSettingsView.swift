@@ -205,6 +205,10 @@ class Texts_SettingsView {
     static let uploadSensorStartTime: String = {
         return NSLocalizedString("uploadSensorStartTime", tableName: filename, bundle: Bundle.main, value: "Upload Sensor start time", comment: "nightscout settings, title of row")
     }()
+    
+    static let testUrlAndAPIKey: String = {
+        return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Url and API Key", comment: "nightscout settings, when clicking the cell, test the url and api key")
+    }()
 
     // MARK: - Section Speak
     

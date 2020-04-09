@@ -10,6 +10,10 @@ fileprivate enum Setting:Int, CaseIterable {
 /// conforms to SettingsViewModelProtocol for all alert settings in the first sections screen
 struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     
+    func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
+        // this ViewModel does need to send back messages to the viewcontroller asynchronously
+    }
+    
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
         return false
     }

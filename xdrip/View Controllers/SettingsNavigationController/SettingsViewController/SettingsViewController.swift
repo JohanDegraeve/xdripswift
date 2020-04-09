@@ -15,6 +15,12 @@ final class SettingsViewController: UIViewController {
     /// reference to soundPlayer
     private var soundPlayer:SoundPlayer?
     
+    /// will show pop up with title and message
+    private var messageHandler: ((String, String) -> Void)?
+    
+    /// UIAlertController used by messageHandler
+    private var messageHandlerUiAlertController: UIAlertController?
+    
     // MARK:- public functions
     
     /// configure
@@ -23,16 +29,49 @@ final class SettingsViewController: UIViewController {
         self.coreDataManager = coreDataManager
         self.soundPlayer = soundPlayer
         
+        // create messageHandler
+        messageHandler = {
+            (title, message) in
+             
+            // piece of code that we need two times
+            let createAndPresentMessageHandlerUIAlertController = {
+                
+                self.messageHandlerUiAlertController = UIAlertController(title: title, message: message, actionHandler: nil)
+                
+                if let messageHandlerUiAlertController = self.messageHandlerUiAlertController {
+                    self.present(messageHandlerUiAlertController, animated: true, completion: nil)
+                }
+                
+            }
+
+            // first check if messageHandlerUiAlertController is not nil and is presenting. If it is, dismiss it and when completed call createAndPresentMessageHandlerUIAlertController
+            if let messageHandlerUiAlertController = self.messageHandlerUiAlertController {
+                if messageHandlerUiAlertController.isBeingPresented {
+
+                    messageHandlerUiAlertController.dismiss(animated: true, completion: createAndPresentMessageHandlerUIAlertController)
+                    
+                    return
+                    
+                }
+            }
+            
+            // we're here which means there wasn't a messageHandlerUiAlertController being presented, so present it now
+            createAndPresentMessageHandlerUIAlertController()
+            
+        }
+        
     }
 
     // MARK: - View Life Cycle
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         
         title = Texts_SettingsView.screenTitle
         
         setupView()
+        
     }
     
     // MARK: - other overriden functions
@@ -84,7 +123,7 @@ final class SettingsViewController: UIViewController {
             tableView.delegate = self
         }
     }
-
+    
 }
 
 extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
@@ -194,6 +233,10 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
         guard let section = Section(rawValue: indexPath.section) else { fatalError("Unexpected Section") }
  
         let viewModel = section.viewModel()
+        
+        if let messageHandler = messageHandler {
+            viewModel.storeMessageHandler(messageHandler: messageHandler)
+        }
         
         if viewModel.isEnabled(index: indexPath.row) {
             

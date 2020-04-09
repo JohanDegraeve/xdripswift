@@ -124,5 +124,7 @@ enum ConstantsLog {
     /// bluetoothPeripheralViewController
     static let bluetoothPeripheralViewController =   "blePeripheralViewController   "
     
+    static let nightScoutSettingsViewModel =         "nightScoutSettingsViewModel   "
+    
 }
 

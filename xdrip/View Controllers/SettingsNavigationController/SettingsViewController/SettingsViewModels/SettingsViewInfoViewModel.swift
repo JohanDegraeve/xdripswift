@@ -15,6 +15,10 @@ fileprivate enum Setting:Int, CaseIterable {
 
 struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
     
+    func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
+        // this ViewModel does need to send back messages to the viewcontroller asynchronously
+    }
+    
     func sectionTitle() -> String? {
         return Texts_HomeView.info
     }
