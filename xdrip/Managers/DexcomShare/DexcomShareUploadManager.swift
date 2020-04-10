@@ -58,6 +58,8 @@ class DexcomShareUploadManager:NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.useUSDexcomShareurl.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.uploadReadingstoDexcomShare.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareSerialNumber.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareUseSchedule.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareSchedule.rawValue, options: .new, context: nil)
 
     }
     
@@ -104,7 +106,6 @@ class DexcomShareUploadManager:NSObject {
                         
                         if requiredSettingsAreNotNil() {
                             
-                            // check if required dexcom share settings are not nil
                             loginAndStoreSessionId { (success, error) in
                                 DispatchQueue.main.async {
                                     
@@ -113,7 +114,7 @@ class DexcomShareUploadManager:NSObject {
                                     if success {
                                         trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                                         
-                                        self.uploadBgReadingsToDexcomShare(firstAttempt: true)
+                                        self.upload()
                                         
                                     } else {
                                         trace("in observeValue, Dexcom Share credential check failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
@@ -125,7 +126,7 @@ class DexcomShareUploadManager:NSObject {
                         }
                     }
                     
-                case UserDefaults.Key.uploadReadingstoDexcomShare, UserDefaults.Key.dexcomShareSerialNumber, UserDefaults.Key.useUSDexcomShareurl :
+                case UserDefaults.Key.uploadReadingstoDexcomShare, UserDefaults.Key.dexcomShareSerialNumber, UserDefaults.Key.useUSDexcomShareurl, UserDefaults.Key.dexcomShareUseSchedule, UserDefaults.Key.dexcomShareSchedule :
                     
                     // if changing to enabled, then do a credentials test and if ok start upload, if fail don't give warning, that's the only difference with previous cases
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
@@ -142,7 +143,7 @@ class DexcomShareUploadManager:NSObject {
                                         if success {
                                             
                                             trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                                            self.uploadBgReadingsToDexcomShare(firstAttempt: true)
+                                            self.upload()
 
                                         } else {
                                             
