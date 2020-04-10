@@ -352,12 +352,46 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="reF-ln-Uja">
+                                <rect key="frame" x="0.0" y="131" width="414" height="673"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SettingsCell" textLabel="goS-0m-pgb" detailTextLabel="cVj-Us-dOZ" style="IBUITableViewCellStyleValue1" id="FDQ-j1-PHb" customClass="SettingsTableViewCell" customModule="xdrip" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="28" width="414" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="FDQ-j1-PHb" id="MjR-zz-9Ea">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="goS-0m-pgb">
+                                                    <rect key="frame" x="20" y="12" width="33.5" height="20.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="cVj-Us-dOZ">
+                                                    <rect key="frame" x="350" y="12" width="44" height="20.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
                         </subviews>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="NtP-hp-rpn" firstAttribute="trailing" secondItem="cFe-Nd-8MW" secondAttribute="trailing" id="9o8-Zx-WKt"/>
+                            <constraint firstItem="NtP-hp-rpn" firstAttribute="trailing" secondItem="reF-ln-Uja" secondAttribute="trailing" id="CIk-t1-U6f"/>
+                            <constraint firstItem="NtP-hp-rpn" firstAttribute="bottom" secondItem="reF-ln-Uja" secondAttribute="bottom" constant="9" id="CfX-4M-npj"/>
                             <constraint firstItem="cFe-Nd-8MW" firstAttribute="top" secondItem="NtP-hp-rpn" secondAttribute="top" constant="6" id="CuY-Ki-Tti"/>
+                            <constraint firstItem="reF-ln-Uja" firstAttribute="leading" secondItem="NtP-hp-rpn" secondAttribute="leading" id="aXs-Nw-Mw0"/>
                             <constraint firstItem="cFe-Nd-8MW" firstAttribute="leading" secondItem="NtP-hp-rpn" secondAttribute="leading" id="bTI-W5-Car"/>
+                            <constraint firstItem="reF-ln-Uja" firstAttribute="top" secondItem="cFe-Nd-8MW" secondAttribute="bottom" constant="8" symbolic="YES" id="fir-yp-EcY"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="NtP-hp-rpn"/>
                     </view>
@@ -370,7 +404,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="tableView" destination="CQK-Ik-UtJ" id="dyR-XP-5UY"/>
+                        <outlet property="tableView" destination="reF-ln-Uja" id="f5m-5t-HW2"/>
                         <outlet property="topLabelOutlet" destination="cFe-Nd-8MW" id="SRu-Q5-Hyy"/>
                     </connections>
                 </viewController>
