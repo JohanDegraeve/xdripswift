@@ -168,6 +168,9 @@ extension UserDefaults {
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
         
+        /// should libre oop value smoothing be done , default is on, means default libreValueSmoothingIsOff = false
+        case libreValueSmoothingIsOff = "libreValueSmoothingIsOff"
+        
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -794,6 +797,15 @@ extension UserDefaults {
         }
     }
 
+    /// should libre oop value smoothing be done , default is on, means default libreValueSmoothingIsOff = false
+    var libreValueSmoothingIsOff: Bool {
+        get {
+            return bool(forKey: Key.libreValueSmoothingIsOff.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.libreValueSmoothingIsOff.rawValue)
+        }
+    }
     
 }
 

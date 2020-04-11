@@ -8,6 +8,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// to enable OSLog
     case OSLogEnabled = 1
     
+    /// libreValueSmoothing
+    case libreValueSmoothing = 2
+    
 }
 
 struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
@@ -32,6 +35,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .OSLogEnabled:
             return "OSLog"
             
+        case .libreValueSmoothing:
+            return "smooth Libre OOP Values"
+            
         }
     }
     
@@ -41,7 +47,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled:
+        case .NSLogEnabled, .OSLogEnabled, .libreValueSmoothing:
             return UITableViewCell.AccessoryType.none
             
         }
@@ -54,10 +60,13 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         switch setting {
             
         case .NSLogEnabled:
-            return "NSLog"
+            return nil
             
         case .OSLogEnabled:
-            return "OSLog"
+            return nil
+            
+        case .libreValueSmoothing:
+            return nil
             
         }
         
@@ -85,6 +94,15 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                 
             })
             
+        case .libreValueSmoothing:
+            return UISwitch(isOn: !UserDefaults.standard.libreValueSmoothingIsOff, action: {
+                
+                (isOn:Bool) in
+                
+                UserDefaults.standard.libreValueSmoothingIsOff = !isOn
+                
+            })
+            
         }
         
     }
@@ -99,8 +117,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled:
+        case .NSLogEnabled, .OSLogEnabled, .libreValueSmoothing:
             return .nothing
+            
         }
     }
     
