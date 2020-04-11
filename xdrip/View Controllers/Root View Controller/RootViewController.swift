@@ -477,12 +477,6 @@ final class RootViewController: UIViewController {
             // assuming it's a 14 day sensor (as 10 day sensor is not supported), if it's a Libre sensor and age > 14.5 days, then don't process the readings
             if cgmTransmitter.cgmTransmitterType().sensorType() == .Libre{
                 
-                debuglogging("activeSensor.startDate = " + activeSensor.startDate.description(with: .current))
-                
-                debuglogging("activeSensor.startDate.timeIntervalSinceNow = " + activeSensor.startDate.timeIntervalSinceNow.description)
-
-                debuglogging(" ConstantsLibre.maximumAgeLibre1InMinutes * 60 " + (ConstantsLibre.maximumAgeLibre1InMinutes * 60).description)
-                
                 guard abs(activeSensor.startDate.timeIntervalSinceNow) < ConstantsLibre.maximumAgeLibre1InMinutes * 60 else {
                  
                     trace("sensor older than %{public}@ minutes. Readings will not be processed.", log: log, category: ConstantsLog.categoryRootView, type: .info, ConstantsLibre.maximumAgeLibre1InMinutes)
@@ -514,9 +508,6 @@ final class RootViewController: UIViewController {
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 if glucose.timeStamp > timeStampLastBgReading {
 
-                    debuglogging("glucose rawValue = " + glucose.glucoseLevelRaw.description)
-                    debuglogging("glucose glucoseLevelFiltered = " + glucose.glucoseLevelFiltered.description)
-                    
                     _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
                     // save the newly created bgreading permenantly in coredata
