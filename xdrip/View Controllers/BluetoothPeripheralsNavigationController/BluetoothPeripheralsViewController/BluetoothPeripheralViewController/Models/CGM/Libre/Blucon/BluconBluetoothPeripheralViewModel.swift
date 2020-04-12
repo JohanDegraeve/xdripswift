@@ -11,7 +11,7 @@ class BluconBluetoothPeripheralViewModel {
         case batteryLevel = 0
         
         /// Sensor serial number
-        case sensorSerialNumber = 2
+        case sensorSerialNumber = 1
         
     }
     
