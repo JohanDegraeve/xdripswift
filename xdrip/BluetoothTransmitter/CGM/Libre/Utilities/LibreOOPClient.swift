@@ -79,22 +79,22 @@ class LibreOOPClient {
                 
             }
 
-            // get last16 from trend data, with date > timeStampLastBgReading
-            let last16 = trendMeasurements(bytes: libreData, date: Date(), timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: libreDerivedAlgorithmParameters)
+            // get last16 from trend data
+            // latest reading will get date of now
+            let last16 = trendMeasurements(bytes: libreData, mostRecentReadingDate: Date(), timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: libreDerivedAlgorithmParameters)
 
             // process last16, new readings should be smaller than now + 5 minutes
             processGlucoseData(trendToLibreGlucose(last16), Date(timeIntervalSinceNow: 5 * 60))
 
-            // get last 32 in history data, date is eiether again earlier than now + 5 minutes (this probably will never be the case because there should always be a range in last16), or the  timestamp of last reading in last16
-            // (date parameter is not giving timeStamp of lastBgReading but is needed for the algorithm the calculated the timeStamp of the individual readings)
-            var lastTimeStamp = Date(timeIntervalSinceNow: 5 * 60)
-            if finalResult.count > 0, let last = finalResult.last {
-                lastTimeStamp = last.timeStamp
-            }
-            let last32 = historyMeasurements(bytes: libreData, date: lastTimeStamp, timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: libreDerivedAlgorithmParameters)
+            // get last32 from history data
+            let last32 = historyMeasurements(bytes: libreData, timeStampLastBgReading: timeStampLastBgReading, LibreDerivedAlgorithmParameterSet: libreDerivedAlgorithmParameters)
             
-            // process last 32
-            processGlucoseData(historyToLibreGlucose(last32), lastTimeStamp)
+            // process last 32 with date earlier than the earliest in last16
+            var timeStampLastAddedGlucoseData = Date()
+            if last16.count > 0, let last = last16.last {
+                timeStampLastAddedGlucoseData = last.date
+            }
+            processGlucoseData(historyToLibreGlucose(last32), timeStampLastAddedGlucoseData)
 
         }
     }
@@ -233,7 +233,7 @@ class LibreOOPClient {
         }
     }
 
-    private static func trendMeasurements(bytes: Data, date: Date, timeStampLastBgReading: Date, _ offset: Double = 0.0, slope: Double = 0.1, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameters?) -> [LibreMeasurement] {
+    private static func trendMeasurements(bytes: Data, mostRecentReadingDate: Date, timeStampLastBgReading: Date, _ offset: Double = 0.0, slope: Double = 0.1, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameters?) -> [LibreMeasurement] {
         
         //    let headerRange =   0..<24   //  24 bytes, i.e.  3 blocks a 8 bytes
         let bodyRange   =  24..<320  // 296 bytes, i.e. 37 blocks a 8 bytes
@@ -251,8 +251,8 @@ class LibreOOPClient {
             }
             let range = index..<index+6
             let measurementBytes = Array(body[range])
-            let measurementDate = date.addingTimeInterval(Double(-60 * blockIndex))
-            
+            let measurementDate = mostRecentReadingDate.addingTimeInterval(Double(-60 * blockIndex))
+
             if measurementDate > timeStampLastBgReading {
                 let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
                 measurements.append(measurement)
@@ -262,7 +262,7 @@ class LibreOOPClient {
         return measurements
     }
     
-    private static func historyMeasurements(bytes: Data, date: Date, timeStampLastBgReading: Date, _ offset: Double = 0.0, slope: Double = 0.1, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameters?) -> [LibreMeasurement] {
+    private static func historyMeasurements(bytes: Data, timeStampLastBgReading: Date, _ offset: Double = 0.0, slope: Double = 0.1, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameters?) -> [LibreMeasurement] {
         //    let headerRange =   0..<24   //  24 bytes, i.e.  3 blocks a 8 bytes
         let bodyRange   =  24..<320  // 296 bytes, i.e. 37 blocks a 8 bytes
         //    let footerRange = 320..<344  //  24 bytes, i.e.  3 blocks a 8 bytes
@@ -270,9 +270,14 @@ class LibreOOPClient {
         let body   = Array(bytes[bodyRange])
         let nextHistoryBlock = Int(body[3])
         let minutesSinceStart = Int(body[293]) << 8 + Int(body[292])
+        let sensorStartTimeInMilliseconds:Double = Date().toMillisecondsAsDouble() - (Double)(minutesSinceStart * 60 * 1000)
+        
         var measurements = [LibreMeasurement]()
+        
         // History data is stored in body from byte 100 to byte 100+192-1=291 in units of 6 bytes. Index on data such that most recent block is first.
         for blockIndex in 0..<32 {
+            
+            let timeInMinutes = max(0,(Double)(abs(minutesSinceStart - 3)/15)*15 - (Double)(blockIndex*15))
             
             var index = 100 + (nextHistoryBlock - 1 - blockIndex) * 6 // runs backwards
             if index < 100 {
@@ -281,15 +286,12 @@ class LibreOOPClient {
             
             let range = index..<index+6
             let measurementBytes = Array(body[range])
-            //            let measurementDate = dateOfMostRecentHistoryValue().addingTimeInterval(Double(-900 * blockIndex)) // 900 = 60 * 15
-            //            let measurement = Measurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate)
-            let (date, counter) = dateOfMostRecentHistoryValue(minutesSinceStart: minutesSinceStart, nextHistoryBlock: nextHistoryBlock, date: date)
-            
-            let measurementDate = date.addingTimeInterval(Double(-900 * blockIndex))
+
+            let measurementDate = Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60)
             
             if measurementDate > timeStampLastBgReading {
 
-                let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, counter: counter - blockIndex * 15, date: measurementDate, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
+                let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, minuteCounter: Int(timeInMinutes.rawValue), date: measurementDate, LibreDerivedAlgorithmParameterSet: LibreDerivedAlgorithmParameterSet)
                 measurements.append(measurement)
 
             } else {
@@ -301,18 +303,6 @@ class LibreOOPClient {
         return measurements
     }
     
-    private static func dateOfMostRecentHistoryValue(minutesSinceStart: Int, nextHistoryBlock: Int, date: Date) -> (date: Date, counter: Int) {
-        // Calculate correct date for the most recent history value.
-        //        date.addingTimeInterval( 60.0 * -Double( (minutesSinceStart - 3) % 15 + 3 ) )
-        let nextHistoryIndexCalculatedFromMinutesCounter = ( (minutesSinceStart - 3) / 15 ) % 32
-        let delay = (minutesSinceStart - 3) % 15 + 3 // in minutes
-        if nextHistoryIndexCalculatedFromMinutesCounter == nextHistoryBlock {
-            return (date: date.addingTimeInterval( 60.0 * -Double(delay) ), counter: minutesSinceStart - delay)
-        } else {
-            return (date: date.addingTimeInterval( 60.0 * -Double(delay - 15)), counter: minutesSinceStart - delay)
-        }
-    }
-
     private static func historyToLibreGlucose(_ measurements: [LibreMeasurement]) -> [LibreRawGlucoseData] {
         
         var origarr = [LibreRawGlucoseData]()

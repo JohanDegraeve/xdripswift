@@ -34,6 +34,7 @@ class LibreDataParser {
             if i < 0 {i += 16}
             timeInMinutes = max(0, (Double)(sensorTimeInMinutes - index))
             let timeStampOfNewGlucoseData = sensorStartTimeInMilliseconds + timeInMinutes * 60 * 1000
+            
             //new reading should be at least 30 seconds younger than timeStampLastBgReading
             if timeStampOfNewGlucoseData > (timeStampLastBgReading.toMillisecondsAsDouble() + 30000.0)
             {
@@ -43,7 +44,7 @@ class LibreDataParser {
                     byte.append(libreData[(i * 6 + 28)])
                     let glucoseLevelRaw = Double(getGlucoseRaw(bytes: byte))
                     if (glucoseLevelRaw > 0) {
-                        glucoseData = GlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * ConstantsBloodGlucose.libreMultiplier)
+                        glucoseData = GlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: glucoseLevelRaw * ConstantsBloodGlucose.libreMultiplier)
                         returnValue.append(glucoseData)
                         timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
                     }
@@ -52,13 +53,14 @@ class LibreDataParser {
                 break trendloop
             }
         }
-        
+
         // loads history values
         historyloop: for index in 0..<32 {
             i = indexHistory - index - 1
             if i < 0 {i += 32}
             timeInMinutes = max(0,(Double)(abs(sensorTimeInMinutes - 3)/15)*15 - (Double)(index*15))
             let timeStampOfNewGlucoseData = sensorStartTimeInMilliseconds + timeInMinutes * 60 * 1000
+            
             //new reading should be at least 30 seconds younger than timeStampLastBgReading
             if timeStampOfNewGlucoseData > (timeStampLastBgReading.toMillisecondsAsDouble() + 30000.0)
             {
@@ -68,7 +70,7 @@ class LibreDataParser {
                     byte.append(libreData[(i * 6 + 124)])
                     let glucoseLevelRaw = Double(getGlucoseRaw(bytes: byte))
                     if (glucoseLevelRaw > 0) {
-                        glucoseData = GlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: Double(getGlucoseRaw(bytes: byte)) * ConstantsBloodGlucose.libreMultiplier)
+                        glucoseData = GlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: glucoseLevelRaw * ConstantsBloodGlucose.libreMultiplier)
                         returnValue.append(glucoseData)
                         timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
                     }
@@ -77,7 +79,7 @@ class LibreDataParser {
                 break historyloop
             }
         }
-        
+
         return (returnValue, sensorState, sensorTimeInMinutes)
     }
     
