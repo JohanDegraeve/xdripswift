@@ -32,6 +32,7 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
         super.viewDidLoad()
         
         delegate = self
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {

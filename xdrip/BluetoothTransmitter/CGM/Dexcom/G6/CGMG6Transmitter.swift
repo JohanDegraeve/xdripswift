@@ -10,10 +10,10 @@ class CGMG6Transmitter: CGMG5Transmitter {
     ///     - transmitterID: expected transmitterID, 6 characters
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
-    override init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG6TransmitterDelegate: CGMG6TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
         
         // call super.init
-        super.init(address: address, name: name, transmitterID: transmitterID, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate, cGMG5TransmitterDelegate: cGMG5TransmitterDelegate, cGMTransmitterDelegate: cGMTransmitterDelegate)
+        super.init(address: address, name: name, transmitterID: transmitterID, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate, cGMG5TransmitterDelegate: cGMG6TransmitterDelegate, cGMTransmitterDelegate: cGMTransmitterDelegate)
         
     }
     

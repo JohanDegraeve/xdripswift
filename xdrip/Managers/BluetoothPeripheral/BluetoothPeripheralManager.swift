@@ -88,7 +88,7 @@ class BluetoothPeripheralManager: NSObject {
 
             // need to initialize all types of bluetoothperipheral
             // using enum here to make sure future types are not forgotten
-            for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
+            bluetoothPeripheralTypeLoop: for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
 
                 switch bluetoothPeripheralType {
                     
@@ -145,21 +145,29 @@ class BluetoothPeripheralManager: NSObject {
 
                     }
                     
-                case .DexcomG5Type:
+                case .DexcomG5Type, .DexcomG6Type:
                 
-                    if let dexcomG5 = blePeripheral.dexcomG5 {
+                    if let dexcomG5orG6 = blePeripheral.dexcomG5 {
                         
                         // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG5)
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG5orG6)
                         
-                        if dexcomG5.blePeripheral.shouldconnect {
+                        if dexcomG5orG6.blePeripheral.shouldconnect {
                             
-                            if let transmitterId = dexcomG5.blePeripheral.transmitterId {
+                            if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId {
 
-                                // create an instance of WatlaaBluetoothTransmitter, WatlaaBluetoothTransmitter will automatically try to connect to the watlaa with the address that is stored in watlaa
+                                // create an instance of CGMG5Transmitter (or CGMG6Transmitter), CGMG5Transmitter (or CGMG6Transmitter) will automatically try to connect to the dexcom with the address that is stored in dexcom
                                 // add it to the array of bluetoothTransmitters
-                                bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5.blePeripheral.address, name: dexcomG5.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+                                if bluetoothPeripheralType == .DexcomG5Type {
+                                    
+                                    bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+                                    
+                                } else {
+                                    
+                                    bluetoothTransmitters.insert(CGMG6Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
 
+                                }
+                                
                                 // if DexcomG5Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                                 if bluetoothPeripheralType.category() == .CGM {
                                     currentCgmTransmitterAddress = blePeripheral.address
@@ -173,6 +181,10 @@ class BluetoothPeripheralManager: NSObject {
                             bluetoothTransmitters.insert(nil, at: index)
                             
                         }
+                        
+                        // because two types are being handled here (DexcomG5Type and DexcomG6Type) we need to avoid that the same blePeripheral is added two times
+                        // this we do by breaking the bluetoothPeripheralTypeLoop
+                        break bluetoothPeripheralTypeLoop
                         
                     }
                     
@@ -428,7 +440,7 @@ class BluetoothPeripheralManager: NSObject {
                     // no need to send reading to watlaa in master mode
                     break
                     
-                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type:
+                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type:
                     // cgm's don't receive reading, they send it
                     break
                     
@@ -495,17 +507,26 @@ class BluetoothPeripheralManager: NSObject {
                         
                     }
                     
-                case .DexcomG5Type:
+                case .DexcomG5Type, .DexcomG6Type:
                     
-                    if let dexcomG5 = bluetoothPeripheral as? DexcomG5 {
+                    if let dexcomG5orG6 = bluetoothPeripheral as? DexcomG5 {
                         
-                        if let transmitterId = dexcomG5.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
+                        if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
                             
-                            newTransmitter = CGMG5Transmitter(address: dexcomG5.blePeripheral.address, name: dexcomG5.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+                            if bluetoothPeripheral.bluetoothPeripheralType() == .DexcomG5Type {
+
+                                newTransmitter = CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+
+                            } else {
+
+                                newTransmitter = CGMG6Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+
+                            }
+                            
                             
                         } else {
                             
-                            trace("in getBluetoothTransmitter, case DexcomG5Type but transmitterId is nil or cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            trace("in getBluetoothTransmitter, case DexcomG5Type or DexcomG6Type but transmitterId is nil or cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
                             
                         }
                     }
@@ -653,6 +674,11 @@ class BluetoothPeripheralManager: NSObject {
                     return .DexcomG5Type
                 }
                 
+            case .DexcomG6Type:
+                if bluetoothTransmitter is CGMG6Transmitter {
+                    return .DexcomG6Type
+                }
+                
             case .BubbleType:
                 if bluetoothTransmitter is CGMBubbleTransmitter {
                     return .BubbleType
@@ -718,6 +744,14 @@ class BluetoothPeripheralManager: NSObject {
             }
             
             return CGMG5Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+            
+        case .DexcomG6Type:
+            
+            guard let transmitterId = transmitterId, let cgmTransmitterDelegate =  cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, type DexcomG6Type, transmitterId is nil or cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMG6Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
             
         case .BubbleType:
             
@@ -975,7 +1009,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .watlaaMaster, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type:
+            case .watlaaMaster, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type:
                 // none of the observed values needs to be sent to the watlaa
                 break
                 

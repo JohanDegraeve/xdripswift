@@ -26,4 +26,6 @@ extension DexcomG5 {
     
     @NSManaged public var lastResetTimeStamp: Date?
     
+    @NSManaged public var isDexcomG6: Bool
+    
 }

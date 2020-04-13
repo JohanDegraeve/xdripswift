@@ -100,6 +100,7 @@
         <attribute name="batteryStatus" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="batteryTemperature" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="firmwareVersion" optional="YES" attributeType="String"/>
+        <attribute name="isDexcomG6" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="lastResetTimeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="voltageA" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="voltageB" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
@@ -151,13 +152,13 @@
         <element name="BlueReader" positionX="-639" positionY="207" width="128" height="58"/>
         <element name="Bubble" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
-        <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="178"/>
+        <element name="DexcomG4" positionX="-621" positionY="225" width="128" height="58"/>
+        <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="193"/>
+        <element name="Droplet" positionX="-630" positionY="216" width="128" height="58"/>
         <element name="GNSEntry" positionX="-648" positionY="198" width="128" height="118"/>
         <element name="M5Stack" positionX="-657" positionY="180" width="128" height="163"/>
         <element name="MiaoMiao" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="133"/>
         <element name="Watlaa" positionX="-639" positionY="207" width="128" height="58"/>
-        <element name="Droplet" positionX="-630" positionY="216" width="128" height="58"/>
-        <element name="DexcomG4" positionX="-621" positionY="225" width="128" height="58"/>
     </elements>
 </model>

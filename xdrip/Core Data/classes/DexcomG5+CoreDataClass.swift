@@ -1,6 +1,7 @@
 import Foundation
 import CoreData
 
+/// used for DexcomG5 and G6
 public class DexcomG5: NSManagedObject {
     
     /// should reset be done ? Not stored in coreData, means will be reset to false each time app is resarted

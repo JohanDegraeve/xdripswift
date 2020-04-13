@@ -3,7 +3,6 @@ import UIKit
 import CoreBluetooth
 
 class DexcomG5BluetoothPeripheralViewModel {
-    // 't is hier dat de transmitter id die gekozen werd door gebruiker, moet toegevoegd worden
     
     // MARK: - private properties
     
@@ -114,6 +113,13 @@ class DexcomG5BluetoothPeripheralViewModel {
         
     }
 
+    // MARK: - public functions
+    
+    /// screenTitle, can be overriden for G6
+    public func dexcomScreenTitle() -> String {
+        return BluetoothPeripheralType.DexcomG5Type.rawValue
+    }
+    
 }
 
 // MARK: - conform to BluetoothPeripheralViewModel
@@ -150,7 +156,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     }
     
     func screenTitle() -> String {
-        return BluetoothPeripheralType.DexcomG5Type.rawValue
+        return dexcomScreenTitle()
     }
     
     func sectionTitle(forSection section: Int) -> String {
