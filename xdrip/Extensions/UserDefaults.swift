@@ -171,6 +171,9 @@ extension UserDefaults {
         /// should libre oop value smoothing be done , default is on, means default libreValueSmoothingIsOff = false
         case libreValueSmoothingIsOff = "libreValueSmoothingIsOff"
         
+        /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
+        case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
+        
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -804,6 +807,17 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.libreValueSmoothingIsOff.rawValue)
+        }
+    }
+    
+    
+    /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
+    var cgmTransmitterDeviceAddress: String? {
+        get {
+            return string(forKey: Key.cgmTransmitterDeviceAddress.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.cgmTransmitterDeviceAddress.rawValue)
         }
     }
     

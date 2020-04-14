@@ -24,10 +24,10 @@ class BluetoothPeripheralManager: NSObject {
     /// to be called with result of StartScanning
     public var callBackForScanningResult: ((BluetoothTransmitter.startScanningResult) -> Void)?
     
-    /// if scan is called, and a connection is successfully made to a new device, then a new M5Stack must be created, and this function will be called. It is owned by the UIViewController that calls the scan function
+    /// if scan is called, and a connection is successfully made to a new device, then this function must be called
     public var callBackAfterDiscoveringDevice: ((BluetoothPeripheral) -> Void)?
 
-    /// will be used to present alerts, for example pairing failed
+    /// used to present alert messages
     public let uIViewController: UIViewController
     
     /// bluetoothtransmitter may need pairing, but app is in background. Notification will be sent to user, user will open the app, at that moment pairing can happen. variable bluetoothTransmitterThatNeedsPairing will temporary store the BluetoothTransmitter that needs the pairing
@@ -67,7 +67,8 @@ class BluetoothPeripheralManager: NSObject {
     // MARK: - initializer
     
     /// - parameters:
-    ///     - cgmTransmitterInfoChanged : to be called when currently used cgmTransmitter changes or is set to nil
+    ///     - cgmTransmitterInfoChanged : to be called when currently used cgmTransmitter changes
+    ///     - uIViewController : used to present alert messages
     init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, uIViewController: UIViewController, cgmTransmitterInfoChanged: @escaping () -> ()) {
         
         // initialize properties
@@ -161,7 +162,7 @@ class BluetoothPeripheralManager: NSObject {
                                 if bluetoothPeripheralType == .DexcomG5Type {
                                     
                                     bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
-                                    
+                                 
                                 } else {
                                     
                                     bluetoothTransmitters.insert(CGMG6Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
@@ -389,6 +390,19 @@ class BluetoothPeripheralManager: NSObject {
             }
             
         }
+        
+        
+        // CAN BE DELETED ONCE 3.X IS NOT USED ANYMORE
+        // if cgmTransUserDefaults.standard.cgmTransmitterTypemitterType is nil but UserDefaults.standard.cgmTransmitterDeviceAddress is not nil, then this is the first install of 4.x after 3.x
+        if UserDefaults.standard.cgmTransmitterType != nil &&  UserDefaults.standard.cgmTransmitterDeviceAddress != nil {
+            
+            uIViewController.present(UIAlertController(title: Texts_Common.warning, message: "Transmitters are now created in the bluetooth tab. You will need to recreate your transmitter first. Your sensor status will remain", actionHandler: nil), animated: true, completion: nil)
+            
+            UserDefaults.standard.cgmTransmitterDeviceAddress = nil
+            
+        }
+        // DELETE UP TO HERE
+        
         
         // when user changes any of the buetooth peripheral related settings, that need to be sent to the transmitter
         addObservers()
@@ -910,7 +924,7 @@ class BluetoothPeripheralManager: NSObject {
         return nil
         
     }
-
+    
     // MARK:- override observe function
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
