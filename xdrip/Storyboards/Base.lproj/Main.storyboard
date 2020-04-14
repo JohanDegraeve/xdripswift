@@ -130,64 +130,71 @@
             <objects>
                 <viewController storyboardIdentifier="PickerViewController" automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="overFullScreen" id="8gS-mJ-qrq" customClass="PickerViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="FhS-oK-gA5">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="500"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="370"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Obg-wT-x7O">
-                                <rect key="frame" x="0.0" y="142" width="320" height="216"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <rect key="frame" x="0.0" y="84" width="320" height="216"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="216" id="GHY-FH-oVO"/>
+                                </constraints>
                             </pickerView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0oo-Gz-k2G">
-                                <rect key="frame" x="15" y="363" width="67" height="39"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iIy-f4-6Ww">
+                                <rect key="frame" x="130.5" y="46" width="59" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0oo-Gz-k2G">
+                                <rect key="frame" x="8" y="308" width="70" height="40"/>
+                                <fontDescription key="fontDescription" name=".SFNSDisplay" family=".SF NS Display" pointSize="25"/>
                                 <state key="normal" title="Cancel">
-                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <connections>
                                     <action selector="cancelButtonPressed:" destination="8gS-mJ-qrq" eventType="touchUpInside" id="RXI-qo-VIp"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bT9-HM-Wcp">
-                                <rect key="frame" x="125" y="74" width="71" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="wDu-Ww-9fD"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uqL-UP-KZF">
-                                <rect key="frame" x="274" y="363" width="31" height="39"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
-                                <state key="normal" title="OK">
-                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <rect key="frame" x="248" y="308" width="64" height="40"/>
+                                <fontDescription key="fontDescription" name=".SFNSDisplay" family=".SF NS Display" pointSize="25"/>
+                                <state key="normal" title="Ok">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <connections>
                                     <action selector="addButtonPressed:" destination="8gS-mJ-qrq" eventType="touchUpInside" id="IgR-mY-OuN"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iIy-f4-6Ww">
-                                <rect key="frame" x="131" y="121" width="59.5" height="30"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                <nil key="textColor"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bT9-HM-Wcp">
+                                <rect key="frame" x="118.5" y="8" width="83" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="wDu-Ww-9fD"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="35"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="0oo-Gz-k2G" firstAttribute="top" secondItem="Obg-wT-x7O" secondAttribute="bottom" constant="5" id="MmB-80-bjr"/>
+                            <constraint firstItem="Obg-wT-x7O" firstAttribute="top" secondItem="iIy-f4-6Ww" secondAttribute="bottom" constant="8" id="BXm-QO-DsV"/>
+                            <constraint firstItem="iIy-f4-6Ww" firstAttribute="top" secondItem="bT9-HM-Wcp" secondAttribute="bottom" constant="8" id="Ecv-M2-lBk" userLabel="Picker View Sub Title.top = Picker View Main Title.bottom + 30"/>
                             <constraint firstItem="iIy-f4-6Ww" firstAttribute="centerX" secondItem="FhS-oK-gA5" secondAttribute="centerX" id="MqF-Fb-uay"/>
                             <constraint firstItem="bT9-HM-Wcp" firstAttribute="top" secondItem="EeK-ZH-OUl" secondAttribute="top" constant="8" id="NT8-5a-jNK"/>
-                            <constraint firstItem="0oo-Gz-k2G" firstAttribute="leading" secondItem="EeK-ZH-OUl" secondAttribute="leading" constant="15" id="Qtm-Zt-WvG"/>
-                            <constraint firstItem="uqL-UP-KZF" firstAttribute="top" secondItem="Obg-wT-x7O" secondAttribute="bottom" constant="5" id="X4Q-bm-aSx"/>
-                            <constraint firstItem="Obg-wT-x7O" firstAttribute="centerY" secondItem="FhS-oK-gA5" secondAttribute="centerY" id="gwA-Ak-Bsw"/>
-                            <constraint firstItem="EeK-ZH-OUl" firstAttribute="trailing" secondItem="uqL-UP-KZF" secondAttribute="trailing" constant="15" id="nMH-Lx-jWN"/>
-                            <constraint firstItem="Obg-wT-x7O" firstAttribute="centerX" secondItem="FhS-oK-gA5" secondAttribute="centerX" id="sx0-aj-Kak"/>
+                            <constraint firstItem="Obg-wT-x7O" firstAttribute="leading" secondItem="EeK-ZH-OUl" secondAttribute="leading" id="OdZ-8Q-Ejb"/>
+                            <constraint firstItem="Obg-wT-x7O" firstAttribute="trailing" secondItem="EeK-ZH-OUl" secondAttribute="trailing" id="WKt-Jy-Djx"/>
+                            <constraint firstItem="0oo-Gz-k2G" firstAttribute="leading" secondItem="EeK-ZH-OUl" secondAttribute="leading" constant="8" id="ZsA-c1-jos"/>
+                            <constraint firstItem="0oo-Gz-k2G" firstAttribute="top" secondItem="Obg-wT-x7O" secondAttribute="bottom" constant="8" id="cDx-iF-l0I"/>
+                            <constraint firstItem="EeK-ZH-OUl" firstAttribute="trailing" secondItem="uqL-UP-KZF" secondAttribute="trailing" constant="8" id="ftH-al-hrH"/>
+                            <constraint firstItem="uqL-UP-KZF" firstAttribute="baseline" secondItem="0oo-Gz-k2G" secondAttribute="baseline" id="je2-Ub-IFg"/>
+                            <constraint firstItem="uqL-UP-KZF" firstAttribute="leading" relation="lessThanOrEqual" secondItem="0oo-Gz-k2G" secondAttribute="trailing" constant="170" id="kaj-af-CvU"/>
                             <constraint firstItem="bT9-HM-Wcp" firstAttribute="centerX" secondItem="FhS-oK-gA5" secondAttribute="centerX" id="ugA-v5-U8o"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="EeK-ZH-OUl"/>
                     </view>
-                    <size key="freeformSize" width="320" height="500"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="320" height="370"/>
                     <connections>
                         <outlet property="addButton" destination="uqL-UP-KZF" id="42E-uh-8tE"/>
                         <outlet property="cancelButton" destination="0oo-Gz-k2G" id="gsF-Xf-Fwf"/>
@@ -205,60 +212,65 @@
             <objects>
                 <viewController storyboardIdentifier="DatePickerViewController" automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="overFullScreen" id="M2Y-H7-9FU" customClass="DatePickerViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Yuo-xZ-z1z">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="500"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="326"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="439-P7-OU7">
-                                <rect key="frame" x="0.0" y="142" width="320" height="216"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <rect key="frame" x="0.0" y="96" width="320" height="162"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </datePicker>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b1J-rJ-H3K" userLabel="Cancel Button">
-                                <rect key="frame" x="15" y="363" width="67" height="39"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
-                                <state key="normal" title="Cancel">
-                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b1J-rJ-H3K" userLabel="Cancel Button">
+                                <rect key="frame" x="8" y="266" width="72" height="42"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <state key="normal" title="Button">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <connections>
                                     <action selector="cancelButtonPressed:" destination="M2Y-H7-9FU" eventType="touchUpInside" id="rEM-Bz-awI"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Bd-7p-ZRp" userLabel="Picker View Sub Title">
-                                <rect key="frame" x="131" y="117" width="59.5" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N9b-EE-lZm" userLabel="Ok Button">
+                                <rect key="frame" x="240" y="266" width="72" height="42"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7NI-o7-nWK" userLabel="Picker View Main Title">
-                                <rect key="frame" x="125" y="63" width="71" height="36"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N9b-EE-lZm" userLabel="Ok Button">
-                                <rect key="frame" x="274" y="363" width="31" height="39"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
-                                <state key="normal" title="OK">
-                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Button">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <connections>
                                     <action selector="okButtonPressed:" destination="M2Y-H7-9FU" eventType="touchUpInside" id="sq2-Vg-LOV"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Bd-7p-ZRp" userLabel="Picker View Sub Title">
+                                <rect key="frame" x="130.5" y="58" width="59.5" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7NI-o7-nWK" userLabel="Picker View Main Title">
+                                <rect key="frame" x="119" y="8" width="82.5" height="42"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="35"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="8Bd-7p-ZRp" firstAttribute="centerX" secondItem="Yuo-xZ-z1z" secondAttribute="centerX" id="2sl-HH-sF0"/>
-                            <constraint firstItem="439-P7-OU7" firstAttribute="centerY" secondItem="Yuo-xZ-z1z" secondAttribute="centerY" id="Ky8-1d-Ruj"/>
-                            <constraint firstItem="b1J-rJ-H3K" firstAttribute="leading" secondItem="ebF-p9-ctE" secondAttribute="leading" constant="15" id="NO3-z9-hzW"/>
-                            <constraint firstItem="N9b-EE-lZm" firstAttribute="top" secondItem="439-P7-OU7" secondAttribute="bottom" constant="5" id="QHT-eN-3Yi"/>
-                            <constraint firstItem="ebF-p9-ctE" firstAttribute="trailing" secondItem="N9b-EE-lZm" secondAttribute="trailing" constant="15" id="WW5-sX-R4Y"/>
-                            <constraint firstItem="439-P7-OU7" firstAttribute="centerX" secondItem="Yuo-xZ-z1z" secondAttribute="centerX" id="gcx-4a-R25"/>
-                            <constraint firstItem="b1J-rJ-H3K" firstAttribute="top" secondItem="439-P7-OU7" secondAttribute="bottom" constant="5" id="uMI-gt-5yi"/>
+                            <constraint firstItem="ebF-p9-ctE" firstAttribute="trailing" secondItem="N9b-EE-lZm" secondAttribute="trailing" constant="8" id="KXF-jp-Zpw"/>
+                            <constraint firstItem="b1J-rJ-H3K" firstAttribute="top" secondItem="439-P7-OU7" secondAttribute="bottom" constant="8" id="N03-m2-XUE"/>
+                            <constraint firstItem="8Bd-7p-ZRp" firstAttribute="top" secondItem="7NI-o7-nWK" secondAttribute="bottom" constant="8" id="f17-PK-Tbk"/>
+                            <constraint firstItem="7NI-o7-nWK" firstAttribute="top" secondItem="ebF-p9-ctE" secondAttribute="top" constant="8" id="fQe-nX-8mm"/>
+                            <constraint firstItem="ebF-p9-ctE" firstAttribute="trailing" secondItem="439-P7-OU7" secondAttribute="trailing" id="gU4-ZL-rSD"/>
+                            <constraint firstItem="N9b-EE-lZm" firstAttribute="leading" relation="lessThanOrEqual" secondItem="b1J-rJ-H3K" secondAttribute="trailing" constant="170" id="kLZ-no-s9O"/>
+                            <constraint firstItem="439-P7-OU7" firstAttribute="leading" secondItem="Yuo-xZ-z1z" secondAttribute="leading" id="m8r-0m-JUa"/>
+                            <constraint firstItem="439-P7-OU7" firstAttribute="top" secondItem="8Bd-7p-ZRp" secondAttribute="bottom" constant="8" id="nde-C5-kYY"/>
+                            <constraint firstItem="N9b-EE-lZm" firstAttribute="firstBaseline" secondItem="b1J-rJ-H3K" secondAttribute="firstBaseline" id="qJR-qG-hsn"/>
+                            <constraint firstItem="b1J-rJ-H3K" firstAttribute="leading" secondItem="ebF-p9-ctE" secondAttribute="leading" constant="8" id="sEg-3i-j1b"/>
                             <constraint firstItem="7NI-o7-nWK" firstAttribute="centerX" secondItem="Yuo-xZ-z1z" secondAttribute="centerX" id="vQc-Pv-zCD"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ebF-p9-ctE"/>
                     </view>
-                    <size key="freeformSize" width="320" height="500"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="320" height="326"/>
                     <connections>
                         <outlet property="cancelButton" destination="b1J-rJ-H3K" id="wWx-aO-XAL"/>
                         <outlet property="datePickerView" destination="439-P7-OU7" id="xek-wS-yap"/>
@@ -269,7 +281,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="y9l-yM-uDB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="382.60869565217394" y="1214.7321428571429"/>
+            <point key="canvasLocation" x="704" y="1443"/>
         </scene>
         <!--Settings View Controller-->
         <scene sceneID="wg7-f3-ORb">
