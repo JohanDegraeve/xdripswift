@@ -163,6 +163,9 @@ final class RootViewController: UIViewController {
     /// AlerManager instance
     private var alertManager:AlertManager?
     
+    /// LoopManager instance
+    private var loopManager:LoopManager?
+    
     /// SoundPlayer instance
     private var soundPlayer:SoundPlayer?
     
@@ -382,6 +385,9 @@ final class RootViewController: UIViewController {
         // setup bgReadingSpeaker
         bgReadingSpeaker = BGReadingSpeaker(sharedSoundPlayer: soundPlayer, coreDataManager: coreDataManager)
         
+        // setup loopManager
+        loopManager = LoopManager(coreDataManager: coreDataManager)
+        
         // setup dexcomShareUploadManager
         dexcomShareUploadManager = DexcomShareUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
             
@@ -554,6 +560,8 @@ final class RootViewController: UIViewController {
                 bluetoothPeripheralManager?.sendLatestReading()
                 
                 watchManager?.processNewReading()
+                
+                loopManager?.share()
                 
             }
         }

@@ -251,6 +251,9 @@
 		F8E3A2AB23DA520B00E5E98A /* ConstantsWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */; };
 		F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */; };
 		F8E3C3AD21FE551C00907A04 /* DexcomCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */; };
+		F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D5C2448D8B5001C9E5A /* LoopManager.swift */; };
+		F8E51D5F2448E2E8001C9E5A /* ConstantsShareWithLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D5E2448E2E8001C9E5A /* ConstantsShareWithLoop.swift */; };
+		F8E51D612448E695001C9E5A /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D602448E695001C9E5A /* Bundle.swift */; };
 		F8EA6C8221B723BC0082976B /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C8121B723BC0082976B /* Date.swift */; };
 		F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CA821BBE3010082976B /* UniqueId.swift */; };
 		F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD5322FF685400D2D610 /* NSMutableURLRequest.swift */; };
@@ -716,6 +719,9 @@
 		F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsWatch.swift; sourceTree = "<group>"; };
 		F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
 		F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomCalibrator.swift; sourceTree = "<group>"; };
+		F8E51D5C2448D8B5001C9E5A /* LoopManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoopManager.swift; sourceTree = "<group>"; };
+		F8E51D5E2448E2E8001C9E5A /* ConstantsShareWithLoop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsShareWithLoop.swift; sourceTree = "<group>"; };
+		F8E51D602448E695001C9E5A /* Bundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bundle.swift; sourceTree = "<group>"; };
 		F8EA6C8121B723BC0082976B /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		F8EA6CA821BBE3010082976B /* UniqueId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniqueId.swift; sourceTree = "<group>"; };
 		F8EBB030239701DA0058B0D4 /* xdrip v6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v6.xcdatamodel"; sourceTree = "<group>"; };
@@ -853,6 +859,7 @@
 				F80859282364D61B00F3829D /* UserDefaults+charts.swift */,
 				F808592C23677D6A00F3829D /* ChartPoint.swift */,
 				F83098FD23AD3F84005741DF /* UITabBarController.swift */,
+				F8E51D602448E695001C9E5A /* Bundle.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1196,6 +1203,7 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				F8E51D5B2448D8A3001C9E5A /* Loop */,
 				F8E3A2A723D906B600E5E98A /* Watch */,
 				F8297F42238DC4AC00D74D66 /* BluetoothPeripheral */,
 				F8BECB03235CE5970060DAE1 /* Charts */,
@@ -1573,6 +1581,14 @@
 			path = Watch;
 			sourceTree = "<group>";
 		};
+		F8E51D5B2448D8A3001C9E5A /* Loop */ = {
+			isa = PBXGroup;
+			children = (
+				F8E51D5C2448D8B5001C9E5A /* LoopManager.swift */,
+			);
+			path = Loop;
+			sourceTree = "<group>";
+		};
 		F8EA6C7D21B70DEA0082976B /* Constants */ = {
 			isa = PBXGroup;
 			children = (
@@ -1598,6 +1614,7 @@
 				F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */,
 				F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */,
 				F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */,
+				F8E51D5E2448E2E8001C9E5A /* ConstantsShareWithLoop.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -2241,6 +2258,7 @@
 				F8C9785B242ABD9800A09483 /* BluetoothPeripheralManager+CGMMiaoMiaoTransmitterDelegate.swift in Sources */,
 				F8F9723523A5915900C3F17D /* BluetoothTransmitter.swift in Sources */,
 				F8F9721323A5915900C3F17D /* BatteryStatusRxMessage.swift in Sources */,
+				F8E51D612448E695001C9E5A /* Bundle.swift in Sources */,
 				F821CF61229BF4A2005C1E43 /* NightScoutUploadManager.swift in Sources */,
 				F8F9721023A5915900C3F17D /* TransmitterVersionRxMessage.swift in Sources */,
 				F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */,
@@ -2409,6 +2427,7 @@
 				F80859272364355F00F3829D /* ConstantsGlucoseChart.swift in Sources */,
 				F825286E2443C1000067AF77 /* BluetoothPeripheralManager+CGMG6TransmitterDelegate.swift in Sources */,
 				F816E10324367389009EE65B /* GNSEntryBluetoothPeripheralViewModel.swift in Sources */,
+				F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */,
 				F8DF766D23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 				F8297F56238ED07700D74D66 /* BluetoothPeripheralManager.swift in Sources */,
@@ -2418,6 +2437,7 @@
 				F816E12A2439DF3A009EE65B /* DexcomG4+CoreDataClass.swift in Sources */,
 				F8F9723E23A593C000C3F17D /* M5StickCBluetoothPeripheralViewModel.swift in Sources */,
 				F8F9722323A5915900C3F17D /* LibreDataParser.swift in Sources */,
+				F8E51D5F2448E2E8001C9E5A /* ConstantsShareWithLoop.swift in Sources */,
 				F816E0ED2432A55F009EE65B /* BluconBluetoothPeripheralViewModel.swift in Sources */,
 				F8F9722923A5915900C3F17D /* CGMTransmitter.swift in Sources */,
 				F8A389ED23342EB10010F405 /* ConstantsNightScout.swift in Sources */,
@@ -2831,6 +2851,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */;
 			buildSettings = {
+				APP_GROUP_IDENTIFIER = "group.com.$(TeamIdentifierPrefix)loopkit.LoopGroup";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
@@ -2845,7 +2866,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.10.6;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdriptest;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -2859,6 +2880,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E2648F65F347D56D7DFFFAB7 /* Pods-xdrip.release.xcconfig */;
 			buildSettings = {
+				APP_GROUP_IDENTIFIER = "group.com.$(TeamIdentifierPrefix)loopkit.LoopGroup";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
@@ -2873,7 +2895,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.10.6;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdriptest;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
