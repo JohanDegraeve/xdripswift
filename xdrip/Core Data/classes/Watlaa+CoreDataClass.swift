@@ -3,11 +3,11 @@ import CoreData
 
 public class Watlaa: NSManagedObject {
 
-    /// explanation, see function parameterUpdateNotNeededAtNextConnect in protocol BluetoothPeripheral
-    public var parameterUpdateNeeded: Bool = false
-    
     /// battery level , not stored in coredata,
-    public var batteryLevel: Int?
+    public var watlaaBatteryLevel: Int = 0
+    
+    /// transmitter battery level , not stored in coredata,
+    public var transmitterBatteryLevel: Int = 0
 
     /// create Watlaa, shouldconnect default value = true
     /// - parameters:

@@ -11,7 +11,7 @@ protocol CGMMiaoMiaoTransmitterDelegate: AnyObject {
     /// received sensor Serial Number
     func received(serialNumber: String, from cGMMiaoMiaoTransmitter: CGMMiaoMiaoTransmitter)
     
-    /// M5Stack is sending batteryLevel
+    /// MiaoMiao is sending batteryLevel
     func received(batteryLevel: Int, from cGMMiaoMiaoTransmitter: CGMMiaoMiaoTransmitter)
 
 }

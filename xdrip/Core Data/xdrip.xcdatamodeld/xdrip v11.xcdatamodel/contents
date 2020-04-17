@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="19C57" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="16119" systemVersion="19C57" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="AlertEntry" representedClassName=".AlertEntry" syncable="YES">
         <attribute name="alertkind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="start" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -141,6 +141,9 @@
         <relationship name="readings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BgReading" inverseName="sensor" inverseEntity="BgReading"/>
     </entity>
     <entity name="Watlaa" representedClassName=".Watlaa" syncable="YES">
+        <attribute name="firmware" optional="YES" attributeType="String"/>
+        <attribute name="hardware" optional="YES" attributeType="String"/>
+        <attribute name="timeStampLastBgReading" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="watlaa" inverseEntity="BLEPeripheral"/>
     </entity>
     <elements>
@@ -159,6 +162,6 @@
         <element name="M5Stack" positionX="-657" positionY="180" width="128" height="163"/>
         <element name="MiaoMiao" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="133"/>
-        <element name="Watlaa" positionX="-639" positionY="207" width="128" height="58"/>
+        <element name="Watlaa" positionX="-639" positionY="207" width="128" height="103"/>
     </elements>
 </model>

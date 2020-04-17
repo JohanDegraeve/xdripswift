@@ -1,17 +1,27 @@
 import Foundation
 
-extension WatlaaBluetoothTransmitterMaster: CGMTransmitter {
+extension WatlaaBluetoothTransmitter: CGMTransmitter {
 
     func setWebOOPSite(oopWebSite: String) {
-        // no web oop for watlaa as sensorid detection not supported
+        
+        self.oopWebSite = oopWebSite
+        
     }
     
     func setWebOOPToken(oopWebToken: String) {
-        // no web oop for watlaa as sensorid detection not supported
+        
+        self.oopWebToken = oopWebToken
+        
     }
     
     func setWebOOPEnabled(enabled: Bool) {
-        // no web oop for watlaa as sensorid detection not supported
+        
+        webOOPEnabled = enabled
+        
+        // immediately request a new reading
+        // there's no check here to see if peripheral, characteristic, connection, etc.. exists, but that's no issue. If anything's missing, write will simply fail,
+        _ = sendStartReadingCommand()
+        
     }
     
     func cgmTransmitterType() -> CGMTransmitterType {
@@ -19,11 +29,11 @@ extension WatlaaBluetoothTransmitterMaster: CGMTransmitter {
     }
     
     func isWebOOPEnabled() -> Bool {
-        return false
+        return webOOPEnabled
     }
 
     func requestNewReading() {
-        // not supported for blucon
+        _ = sendStartReadingCommand()
     }
     
 }

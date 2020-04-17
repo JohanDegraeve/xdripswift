@@ -159,10 +159,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
                                 let batteryPercentage = Int(rxBuffer[13])
                                 
-                                // get sensor serialNumber
+                                // get sensor serialNumber and if changed inform delegate
                                 if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
                                     
-                                    // verify serial number and if changed inform delegate
                                     // (there will also be a seperate opcode form MiaoMiao because it's able to detect new sensor also)
                                     if libreSensorSerialNumber.serialNumber != sensorSerialNumber {
                                         
@@ -181,6 +180,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                     }
 
                                 }
+                                
+                                // send battery level to delegate
+                                cGMMiaoMiaoTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
                                 
                                 LibreDataParser.libreDataProcessor(sensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)))?.serialNumber, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
                                     self.timeStampLastBgReading = timeStampLastBgReading
@@ -290,25 +292,5 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     
 }
 
-fileprivate enum MiaoMiaoResponseType: UInt8 {
-    case dataPacket = 0x28
-    case newSensor = 0x32
-    case noSensor = 0x34
-    case frequencyChangedResponse = 0xD1
-}
 
-extension MiaoMiaoResponseType: CustomStringConvertible {
-    public var description: String {
-        switch self {
-        case .dataPacket:
-            return "Data packet received"
-        case .newSensor:
-            return "New sensor detected"
-        case .noSensor:
-            return "No sensor detected"
-        case .frequencyChangedResponse:
-            return "Reading interval changed"
-        }
-    }
-}
 

@@ -30,7 +30,7 @@ class MiaoMiaoBluetoothPeripheralViewModel {
     /// reference to the tableView
     private weak var tableView: UITableView?
     
-    /// reference to BluetoothPeripheralViewController that will own this WatlaaMasterBluetoothPeripheralViewModel - needed to present stuff etc
+    /// reference to BluetoothPeripheralViewController that will own this MiaoMiaoBluetoothPeripheralViewModel - needed to present stuff etc
     private weak var bluetoothPeripheralViewController: BluetoothPeripheralViewController?
     
     /// temporary reference to bluetoothPerpipheral, will be set in configure function.
@@ -152,7 +152,7 @@ extension MiaoMiaoBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging) -> SettingsSelectedRowAction {
         
         // verify that bluetoothPeripheral is a MiaoMiao
-        guard let MiaoMiao = bluetoothPeripheral as? MiaoMiao else {
+        guard let miaoMiao = bluetoothPeripheral as? MiaoMiao else {
             fatalError("MiaoMiaoBluetoothPeripheralViewModel userDidSelectRow, bluetoothPeripheral is not MiaoMiao")
         }
         
@@ -166,21 +166,21 @@ extension MiaoMiaoBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         case .firmWare:
             
             // firmware text could be longer than screen width, clicking the row allos to see it in pop up with more text place
-            if let firmware = MiaoMiao.firmware {
+            if let firmware = miaoMiao.firmware {
                 return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.firmware + " : " + firmware)
             }
 
         case .hardWare:
 
             // hardware text could be longer than screen width, clicking the row allows to see it in pop up with more text place
-            if let hardware = MiaoMiao.hardware {
+            if let hardware = miaoMiao.hardware {
                 return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.hardware + " : " + hardware)
             }
             
         case .sensorSerialNumber:
             
             // serial text could be longer than screen width, clicking the row allows to see it in a pop up with more text place
-            if let serialNumber = MiaoMiao.blePeripheral.sensorSerialNumber {
+            if let serialNumber = miaoMiao.blePeripheral.sensorSerialNumber {
                 return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " : " + serialNumber)
             }
             

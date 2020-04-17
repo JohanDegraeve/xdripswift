@@ -30,7 +30,7 @@ class BubbleBluetoothPeripheralViewModel {
     /// reference to the tableView
     private weak var tableView: UITableView?
     
-    /// reference to BluetoothPeripheralViewController that will own this WatlaaMasterBluetoothPeripheralViewModel - needed to present stuff etc
+    /// reference to BluetoothPeripheralViewController that will own this BubbleBluetoothPeripheralViewModel - needed to present stuff etc
     private weak var bluetoothPeripheralViewController: BluetoothPeripheralViewController?
     
     /// temporary reference to bluetoothPerpipheral, will be set in configure function.

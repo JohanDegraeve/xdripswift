@@ -13,9 +13,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// M5StickC
     case M5StickCType = "M5StickC"
     
-    /// watlaa master
-    case watlaaMaster = "Watlaa master"
-    
     /// DexcomG4
     case DexcomG4Type = "Dexcom G4 (bridge)"
     
@@ -42,7 +39,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
     
     /// MiaoMiao
     case MiaoMiaoType = "MiaoMiao"
-        
+      
+    /// watlaa master
+    case WatlaaType = "Watlaa"
+
     /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
     func viewModel() -> BluetoothPeripheralViewModel? {
         
@@ -54,8 +54,8 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StickCType:
             return M5StickCBluetoothPeripheralViewModel()
             
-        case .watlaaMaster:
-            return WatlaaMasterBluetoothPeripheralViewModel()
+        case .WatlaaType:
+            return WatlaaBluetoothPeripheralViewModel()
             
         case .DexcomG5Type:
             return DexcomG5BluetoothPeripheralViewModel()
@@ -105,7 +105,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
             return M5StickC(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
-        case .watlaaMaster:
+        case .WatlaaType:
             
             return Watlaa(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
@@ -115,7 +115,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .DexcomG6Type:
             
-            // DexcomG6 is a DexcomG5 with isDexcomG6 set to trye
+            // DexcomG6 is a DexcomG5 with isDexcomG6 set to true
             let dexcomG6 = DexcomG5(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             dexcomG6.isDexcomG6 = true
             
@@ -158,16 +158,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType:
+        case .M5StackType, .M5StickCType:
             return .M5Stack
             
-        case .M5StickCType:
-            return .M5Stack
-            
-        case .watlaaMaster:
-            return .watlaa
-            
-        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type:
+        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .WatlaaType:
             return .CGM
             
         }
@@ -179,7 +173,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
+        case .M5StackType, .M5StickCType, .WatlaaType, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
             return false
             
         case .DexcomG5Type, .BluconType, .DexcomG4Type, .DexcomG6Type:
@@ -229,7 +223,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
             }
             return nil
             
-        case .M5StackType, .M5StickCType, .watlaaMaster, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
+        case .M5StackType, .M5StickCType, .WatlaaType, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
             // no transmitter id means no validation to do
             return nil
             
@@ -254,42 +248,12 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType:
+        case .M5StackType, .M5StickCType, .WatlaaType, .DexcomG4Type, .DexcomG5Type, .DexcomG6Type, .BluconType, .BlueReaderType, .DropletType , .GNSentryType:
             return false
             
-        case .M5StickCType:
-            return false
-            
-        case .watlaaMaster:
-            return false
-            
-        case .DexcomG5Type:
-            return false
-            
-        case .BubbleType:
+        case .BubbleType, .MiaoMiaoType:
             return true
-            
-        case .MiaoMiaoType:
-            return true
-            
-        case .BluconType:
-            return false
-            
-        case .GNSentryType:
-            return false
-            
-        case .BlueReaderType:
-            return false
-
-        case .DropletType:
-            return false
-            
-        case .DexcomG4Type:
-            return false
-            
-        case .DexcomG6Type:
-            return false
-            
+                        
         }
         
     }

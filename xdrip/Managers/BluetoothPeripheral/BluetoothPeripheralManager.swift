@@ -21,6 +21,9 @@ class BluetoothPeripheralManager: NSObject {
     /// if scan is called, an instance of M5StackBluetoothTransmitter is created with address and name. The new instance will be assigned to this variable, temporary, until a connection is made
     public var tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral: BluetoothTransmitter?
 
+    /// while scanning for transmitter, store the type of transmitter being scanned, will be needed in case tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is being recreated (search for transmitterTypeBeingScannedFor in BluetoothPeripheralManager+BluetoothTransmitterDelegate
+    public var transmitterTypeBeingScannedFor: BluetoothPeripheralType?
+
     /// to be called with result of StartScanning
     public var callBackForScanningResult: ((BluetoothTransmitter.startScanningResult) -> Void)?
     
@@ -119,7 +122,7 @@ class BluetoothPeripheralManager: NSObject {
                         
                     }
                     
-                case .watlaaMaster:
+                case .WatlaaType:
                     
                     if let watlaa = blePeripheral.watlaa {
                         
@@ -130,7 +133,7 @@ class BluetoothPeripheralManager: NSObject {
                             
                             // create an instance of WatlaaBluetoothTransmitter, WatlaaBluetoothTransmitter will automatically try to connect to the watlaa with the address that is stored in watlaa
                             // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(WatlaaBluetoothTransmitterMaster(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, bluetoothPeripheralType: .watlaaMaster), at: index)
+                            bluetoothTransmitters.insert(WatlaaBluetoothTransmitter(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, timeStampLastBgReading: watlaa.timeStampLastBgReading, sensorSerialNumber: watlaa.blePeripheral.sensorSerialNumber, webOOPEnabled: watlaa.blePeripheral.webOOPEnabled, oopWebSite: watlaa.blePeripheral.oopWebSite, oopWebToken: watlaa.blePeripheral.oopWebToken), at: index)
                             
                             // if watlaa is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                             if bluetoothPeripheralType.category() == .CGM {
@@ -148,6 +151,7 @@ class BluetoothPeripheralManager: NSObject {
                     
                 case .DexcomG5Type, .DexcomG6Type:
                 
+                    // both DexcomG5Type and DexcomG6Type are stored in blePeripheral as dexcomG5
                     if let dexcomG5orG6 = blePeripheral.dexcomG5 {
                         
                         // add it to the list of bluetoothPeripherals
@@ -159,7 +163,7 @@ class BluetoothPeripheralManager: NSObject {
 
                                 // create an instance of CGMG5Transmitter (or CGMG6Transmitter), CGMG5Transmitter (or CGMG6Transmitter) will automatically try to connect to the dexcom with the address that is stored in dexcom
                                 // add it to the array of bluetoothTransmitters
-                                if bluetoothPeripheralType == .DexcomG5Type {
+                                if !dexcomG5orG6.isDexcomG6 {
                                     
                                     bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
                                  
@@ -450,7 +454,7 @@ class BluetoothPeripheralManager: NSObject {
                         _ = m5StackBluetoothTransmitter.writeBgReadingInfo(bgReading: bgReadingToSend[0])
                     }
                     
-                case .watlaaMaster:
+                case .WatlaaType:
                     // no need to send reading to watlaa in master mode
                     break
                     
@@ -513,11 +517,11 @@ class BluetoothPeripheralManager: NSObject {
                         newTransmitter = M5StackBluetoothTransmitter(address: m5Stack.blePeripheral.address, name: m5Stack.blePeripheral.name, bluetoothTransmitterDelegate: self, m5StackBluetoothTransmitterDelegate: self, blePassword: blePassword, bluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType())
                     }
                     
-                case .watlaaMaster:
+                case .WatlaaType:
                     
                     if let watlaa = bluetoothPeripheral as? Watlaa {
                         
-                        newTransmitter = WatlaaBluetoothTransmitterMaster(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, bluetoothPeripheralType: .watlaaMaster)
+                        newTransmitter = WatlaaBluetoothTransmitter(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, timeStampLastBgReading: nil, sensorSerialNumber: watlaa.blePeripheral.sensorSerialNumber, webOOPEnabled: watlaa.blePeripheral.webOOPEnabled, oopWebSite: watlaa.blePeripheral.oopWebSite, oopWebToken: watlaa.blePeripheral.oopWebSite)
                         
                     }
                     
@@ -527,7 +531,7 @@ class BluetoothPeripheralManager: NSObject {
                         
                         if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
                             
-                            if bluetoothPeripheral.bluetoothPeripheralType() == .DexcomG5Type {
+                            if !dexcomG5orG6.isDexcomG6 {
 
                                 newTransmitter = CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
 
@@ -677,14 +681,15 @@ class BluetoothPeripheralManager: NSObject {
                     return bluetoothTransmitter.bluetoothPeripheralType
                 }
                 
-            case .watlaaMaster:
+            case .WatlaaType:
                 
-                if bluetoothTransmitter is WatlaaBluetoothTransmitterMaster {
-                    return .watlaaMaster
+                if bluetoothTransmitter is WatlaaBluetoothTransmitter {
+                    return .WatlaaType
                 }
                 
             case .DexcomG5Type:
-                if bluetoothTransmitter is CGMG5Transmitter {
+                // every CGMG6Transmitter is CGMG5Transmitter, we need to avoid that
+                if bluetoothTransmitter is CGMG5Transmitter && !(bluetoothTransmitter is CGMG6Transmitter) {
                     return .DexcomG5Type
                 }
                 
@@ -747,9 +752,9 @@ class BluetoothPeripheralManager: NSObject {
             
             return M5StackBluetoothTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, m5StackBluetoothTransmitterDelegate: self, blePassword: UserDefaults.standard.m5StackBlePassword, bluetoothPeripheralType: type)
             
-        case .watlaaMaster:
+        case .WatlaaType:
             
-            return WatlaaBluetoothTransmitterMaster(address: nil, name: nil, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, bluetoothPeripheralType: type)
+            return WatlaaBluetoothTransmitter(address: nil, name: nil, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, timeStampLastBgReading: nil, sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil )
             
         case .DexcomG5Type:
             
@@ -1023,7 +1028,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .watlaaMaster, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type:
+            case .WatlaaType, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type:
                 // none of the observed values needs to be sent to the watlaa
                 break
                 
@@ -1121,6 +1126,9 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         // create a temporary transmitter of requested type
         let newBluetoothTranmsitter = createNewTransmitter(type: type, transmitterId: transmitterId)
         
+        // assign transmitterTypeBeingScannedFor, will be needed in case tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is being recreated (search for transmitterTypeBeingScannedFor in BluetoothPeripheralManager+BluetoothTransmitterDelegate
+        transmitterTypeBeingScannedFor = type
+        
         tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = newBluetoothTranmsitter
         
         // start scanning
@@ -1166,9 +1174,9 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
     
     func connect(to bluetoothPeripheral: BluetoothPeripheral) {
         
-        // the trick : by calling bluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheral, createANewOneIfNecesssary: true), there's two cases
+        // the trick : by calling getBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheral, createANewOneIfNecesssary: true), there's two cases
         // - either the bluetoothTransmitter already exists but not connected, it will be found in the call to bluetoothTransmitter and returned, then we connect to it
-        // - either the bluetoothTransmitter doesn't exist yet. It will be created. We assum here that bluetoothPeripheral has a mac address, as a consequence the BluetoothTransmitter will automatically try to connect. Here we try to connect again, but that's no issue
+        // - either the bluetoothTransmitter doesn't exist yet. It will be created. We assum here that bluetoothPeripheral has a mac address, as a consequence the BluetoothTransmitter will automatically try to connect. Here we try to connect again, but that's ok that as well tue BluetoothTransmitter will try to connect and we do it again here
         
         let transmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: true)
         

@@ -10,4 +10,14 @@ extension Watlaa {
 
     // blePeripheral is required to conform to protocol BluetoothPeripheral
     @NSManaged public var blePeripheral: BLEPeripheral
+    
+    /// firmware
+    @NSManaged public var firmware: String?
+    
+    /// hardware
+    @NSManaged public var hardware: String?
+    
+    /// timestamp of last reading read with this transmitter
+    @NSManaged public var timeStampLastBgReading: Date?
+
 }

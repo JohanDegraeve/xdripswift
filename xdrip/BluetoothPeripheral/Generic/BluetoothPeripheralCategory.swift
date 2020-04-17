@@ -9,9 +9,6 @@ enum BluetoothPeripheralCategory: String, CaseIterable {
     /// this is the category for M5Stack ad M5StickC
     case M5Stack = "M5Stack"
     
-    /// category for watlaa, master and follower
-    case watlaa = "Watlaa"
-    
     /// returns index in list of BluetoothPeripheralCategory's
     func index() -> Int {
         

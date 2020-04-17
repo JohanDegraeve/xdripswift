@@ -149,8 +149,6 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         // if tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil, then this is a connection to an already known/stored BluetoothTransmitter.
         guard let tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral else {
             
-            trace("    in didConnect, tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
-            
             // Need to call checkCurrentCGMTransmitterHelper
             checkCurrentCGMTransmitterHelper()
             
@@ -197,12 +195,20 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
                 trace("in didConnect, transmitter address already known. This is not a new device, will disconnect", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
                 
                 // It's an already known BluetoothTransmitter, not storing this, on the contrary disconnecting because maybe it's a bluetoothTransmitter already known for which user has preferred not to connect to
-                // If we're actually waiting for a new scan result, then there's an instance of BluetoothTransmitter stored in tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral - but this one stopped scanning, so let's recreate an instance of BluetoothTransmitter
-                self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = createNewTransmitter(type: getTransmitterType(for: bluetoothTransmitter), transmitterId: buetoothPeripheral.blePeripheral.transmitterId)
+                bluetoothTransmitter.disconnect()
                 
-                _ = self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
+                // If we're actually waiting for a new scan result, then there's an instance of BluetoothTransmitter stored in tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral - but this one stopped scanning, so let's recreate an instance of BluetoothTransmitter
+                // transmitterTypeBeingScannedFor should be non nil here, unwrap
+                if let transmitterTypeBeingScannedFor = transmitterTypeBeingScannedFor {
+
+                    self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = createNewTransmitter(type: transmitterTypeBeingScannedFor, transmitterId: buetoothPeripheral.blePeripheral.transmitterId)
+                    
+                    _ = self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
+
+                }
                 
                 return
+                
             }
         }
         
@@ -231,8 +237,6 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         // assign tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral to nil here
         self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
-        
-        coreDataManager.saveChanges()
         
     }
     
