@@ -172,7 +172,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
         
     }
 
-    /// to ask for the first reading
+    /// to ask for the first reading - SEEMS NOT WORKING FOR WATLAA
     func sendStartReadingCommand() -> Bool {
         if writeDataToPeripheral(data: Data.init([0xF0]), type: .withoutResponse) {
             return true

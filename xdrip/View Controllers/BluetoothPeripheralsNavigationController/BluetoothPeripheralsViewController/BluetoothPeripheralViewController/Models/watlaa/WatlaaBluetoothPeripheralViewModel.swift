@@ -10,17 +10,8 @@ class WatlaaBluetoothPeripheralViewModel {
         /// battery level
         case watlaaBatteryLevel = 0
         
-        /// firmware version
-        case firmWare = 1
-        
-        /// hardware version
-        case hardWare = 2
-        
         /// transmitter battery level
-        case transmitterBatteryLevel = 3
-        
-        /// Sensor serial number
-        case sensorSerialNumber = 4
+        case transmitterBatteryLevel = 1
         
     }
     
@@ -130,24 +121,6 @@ extension WatlaaBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             }
             cell.accessoryType = .none
             
-        case .firmWare:
-            
-            cell.textLabel?.text = Texts_Common.firmware
-            cell.detailTextLabel?.text = watlaa.firmware
-            cell.accessoryType = .disclosureIndicator
-            
-        case .hardWare:
-            
-            cell.textLabel?.text = Texts_Common.hardware
-            cell.detailTextLabel?.text = watlaa.hardware
-            cell.accessoryType = .disclosureIndicator
-            
-        case .sensorSerialNumber:
-            
-            cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
-            cell.detailTextLabel?.text = watlaa.blePeripheral.sensorSerialNumber
-            cell.accessoryType = .disclosureIndicator
-            
         case .transmitterBatteryLevel:
             cell.textLabel?.text = Texts_SettingsView.sectionTitleTransmitter + " " + Texts_BluetoothPeripheralsView.batteryLevel
             if watlaa.transmitterBatteryLevel > 0 {
@@ -174,27 +147,6 @@ extension WatlaaBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
         case .watlaaBatteryLevel, .transmitterBatteryLevel:
             return .nothing
-            
-        case .firmWare:
-            
-            // firmware text could be longer than screen width, clicking the row allos to see it in pop up with more text place
-            if let firmware = Watlaa.firmware {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.firmware + " : " + firmware)
-            }
-            
-        case .hardWare:
-            
-            // hardware text could be longer than screen width, clicking the row allows to see it in pop up with more text place
-            if let hardware = Watlaa.hardware {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.hardware + " : " + hardware)
-            }
-            
-        case .sensorSerialNumber:
-            
-            // serial text could be longer than screen width, clicking the row allows to see it in a pop up with more text place
-            if let serialNumber = Watlaa.blePeripheral.sensorSerialNumber {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " : " + serialNumber)
-            }
             
         }
         
@@ -248,7 +200,7 @@ extension WatlaaBluetoothPeripheralViewModel: WatlaaBluetoothTransmitterDelegate
         (bluetoothPeripheralManager as? WatlaaBluetoothTransmitterDelegate)?.received(serialNumber: serialNumber, from: cGMWatlaaTransmitter)
         
         // here's the trigger to update the table
-        reloadRow(row: Settings.sensorSerialNumber.rawValue)
+        //reloadRow(row: Settings.sensorSerialNumber.rawValue)
         
     }
     
