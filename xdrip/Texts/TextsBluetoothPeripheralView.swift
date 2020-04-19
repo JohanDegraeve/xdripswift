@@ -13,23 +13,23 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let connected: String = {
-        return NSLocalizedString("connected", tableName: filename, bundle: Bundle.main, value: "connected", comment: "when Bluetooth Peripheral is shown, connection status, connected")
+        return NSLocalizedString("connected", tableName: filename, bundle: Bundle.main, value: "Connected", comment: "when Bluetooth Peripheral is shown, connection status, connected")
     }()
     
     static let donotconnect: String = {
-        return NSLocalizedString("donotconnect", tableName: filename, bundle: Bundle.main, value: "Stop scanning", comment: "text in button top right, this button will disable automatic connect")
+        return NSLocalizedString("donotconnect", tableName: filename, bundle: Bundle.main, value: "Stop Scanning", comment: "text in button top right, this button will disable automatic connect")
     }()
     
     static let selectAliasText: String = {
-        return NSLocalizedString("selectAliasText", tableName: filename, bundle: Bundle.main, value: "Choose an alias for this Bluetooth Peripheral, the name will be shown in the app and is easier for you to recognize", comment: "Bluetooth Peripheral view, when user clicks alias field")
+        return NSLocalizedString("selectAliasText", tableName: filename, bundle: Bundle.main, value: "Choose an alias for this bluetooth device, the name will be shown in the app and is easier for you to recognize", comment: "Bluetooth Peripheral view, when user clicks alias field")
     }()
     
     static let aliasAlreadyExists: String = {
-        return NSLocalizedString("aliasAlreadyExists", tableName: filename, bundle: Bundle.main, value: "There is already a Bluetooth Peripheral with this alias", comment: "Bluetooth Peripheral view, when user clicks alias field")
+        return NSLocalizedString("aliasAlreadyExists", tableName: filename, bundle: Bundle.main, value: "There is already a bluetooth device with this alias", comment: "Bluetooth Peripheral view, when user clicks alias field")
     }()
     
     static let confirmDeletionBluetoothPeripheral: String = {
-        return NSLocalizedString("confirmDeletionPeripheral", tableName: filename, bundle: Bundle.main, value: "Do you want to delete Bluetooth Peripheral with ", comment: "Bluetooth Peripheral view, when user clicks the trash button - this is not the complete sentence, it will be followed either by 'name' or 'alias', depending on the availability of an alias")
+        return NSLocalizedString("confirmDeletionPeripheral", tableName: filename, bundle: Bundle.main, value: "Do you want to delete bluetooth device: ", comment: "Bluetooth Peripheral view, when user clicks the trash button - this is not the complete sentence, it will be followed either by 'name' or 'alias', depending on the availability of an alias")
     }()
     
     static let bluetoothPeripheralAlias: String = {
@@ -49,7 +49,7 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let needsTransmitterId: String = {
-        return NSLocalizedString("needsTransmitterId", tableName: filename, bundle: Bundle.main, value: "Needs transmitter id", comment: "cell text, if user needs to set the transmitter id")
+        return NSLocalizedString("needsTransmitterId", tableName: filename, bundle: Bundle.main, value: "Missing Transmitter ID", comment: "cell text, if user needs to set the transmitter id")
     }()
     
     static let scan: String = {
@@ -57,7 +57,7 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let readyToScan: String = {
-        return NSLocalizedString("readyToScan", tableName: filename, bundle: Bundle.main, value: "Ready to scan", comment: "text in status row, if ready to start scanning")
+        return NSLocalizedString("readyToScan", tableName: filename, bundle: Bundle.main, value: "Ready to Scan", comment: "text in status row, if ready to start scanning")
     }()
     
     static let scanning: String = {
@@ -93,15 +93,15 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let lastResetTimeStamp: String = {
-        return NSLocalizedString("lastReset", tableName: filename, bundle: Bundle.main, value: "Last reset", comment: "cell text, shows when last reset was done, if known. Only for Dexcom")
+        return NSLocalizedString("lastReset", tableName: filename, bundle: Bundle.main, value: "Last Reset", comment: "cell text, shows when last reset was done, if known. Only for Dexcom")
     }()
     
     static let lastResetTimeStampNotKnown: String = {
-        return NSLocalizedString("lastResetNotKnown", tableName: filename, bundle: Bundle.main, value: "Last reset timestamp not known", comment: "cell text, shows when last reset was done, if known. Only for Dexcom")
+        return NSLocalizedString("lastResetNotKnown", tableName: filename, bundle: Bundle.main, value: "Last Reset Timestamp is not known", comment: "cell text, shows when last reset was done, if known. Only for Dexcom")
     }()
    
     static let transmitterResetResult: String = {
-        return NSLocalizedString("transmitterResultResult", tableName: filename, bundle: Bundle.main, value: "Transmitter reset result", comment: "To give result about transitter result in notification body")
+        return NSLocalizedString("transmitterResultResult", tableName: filename, bundle: Bundle.main, value: "Transmitter Reset Result", comment: "To give result about transitter result in notification body")
     }()
     
     static let bootLoader: String = {

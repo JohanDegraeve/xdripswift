@@ -1,6 +1,6 @@
 "high" = "high";
 "low" = "low";
-"currentglucose" = "Current blood glucose is";
+"currentglucose" = "Your current blood glucose is";
 "trendnoncomputable" = "non computable";
 "trenddoubledown" = "dramatically downward";
 "trendsingledown" = "significantly downward";

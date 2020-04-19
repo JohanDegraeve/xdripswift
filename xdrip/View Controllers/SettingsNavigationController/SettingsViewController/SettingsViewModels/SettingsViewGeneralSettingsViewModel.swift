@@ -96,7 +96,7 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
         switch setting {
             
         case .bloodGlucoseUnit:
-            return Texts_Common.bloodGLucoseUnit
+            return Texts_SettingsView.labelSelectBgUnit
             
         case .lowMarkValue:
             return Texts_SettingsView.labelLowValue

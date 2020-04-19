@@ -17,19 +17,19 @@ class Texts_SettingsView {
     }()
 
     static let labelSelectBgUnit:String = {
-        return NSLocalizedString("settingsviews_selectbgunit", tableName: filename, bundle: Bundle.main, value: "Select Unit", comment: "for text in pop up where user can select bg unit")
+        return NSLocalizedString("settingsviews_selectbgunit", tableName: filename, bundle: Bundle.main, value: "Blood Glucose Units:", comment: "for text in pop up where user can select bg unit")
     }()
     
     static let labelLowValue: String = {
-        return NSLocalizedString("settingsviews_lowValue", tableName: filename, bundle: Bundle.main, value: "Low Value", comment: "general settings, low value")
+        return NSLocalizedString("settingsviews_lowValue", tableName: filename, bundle: Bundle.main, value: "Low Value:", comment: "general settings, low value")
     }()
 
     static let labelHighValue: String = {
-        return NSLocalizedString("settingsviews_highValue", tableName: filename, bundle: Bundle.main, value: "High Value", comment: "general settings, high value")
+        return NSLocalizedString("settingsviews_highValue", tableName: filename, bundle: Bundle.main, value: "High Value:", comment: "general settings, high value")
     }()
     
     static let labelMasterOrFollower: String = {
-        return NSLocalizedString("settingsviews_masterorfollower", tableName: filename, bundle: Bundle.main, value: "Master or Follower ?", comment: "general settings, master or follower")
+        return NSLocalizedString("settingsviews_masterorfollower", tableName: filename, bundle: Bundle.main, value: "Use as Master or Follower?", comment: "general settings, master or follower")
     }()
     
     static let master: String = {
@@ -41,15 +41,15 @@ class Texts_SettingsView {
     }()
     
     static let labelShowReadingInNotification: String = {
-        return NSLocalizedString("showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Reading in notification", comment: "general settings, should reading be shown in notification yes or no")
+        return NSLocalizedString("showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Show BG in Notifications?", comment: "general settings, should reading be shown in notification yes or no")
     }()
     
     static let labelShowReadingInAppBadge: String = {
-        return NSLocalizedString("labelShowReadingInAppBadge", tableName: filename, bundle: Bundle.main, value: "Reading in app badge", comment: "general settings, should reading be shown in app badge yes or no")
+        return NSLocalizedString("labelShowReadingInAppBadge", tableName: filename, bundle: Bundle.main, value: "Show BG in the App Badge?", comment: "general settings, should reading be shown in app badge yes or no")
     }()
     
     static let multipleAppBadgeValueWith10: String = {
-        return NSLocalizedString("multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply reading by 10", comment: "general settings, should reading be multiplied with 10 yes or no")
+        return NSLocalizedString("multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10?", comment: "general settings, should reading be multiplied with 10 yes or no")
     }()
     
     // MARK: - Section Transmitter
@@ -59,15 +59,15 @@ class Texts_SettingsView {
     }()
     
     static let labelTransmitterType:String = {
-        return NSLocalizedString("settingsviews_transmittertype", tableName: filename, bundle: Bundle.main, value: "Transmitter Type", comment: "transmitter settings, just the words that explain that the settings is about transmitter type")
+        return NSLocalizedString("settingsviews_transmittertype", tableName: filename, bundle: Bundle.main, value: "Transmitter Type:", comment: "transmitter settings, just the words that explain that the settings is about transmitter type")
     }()
 
     static let labelTransmitterId:String = {
-        return NSLocalizedString("settingsviews_transmitterid", tableName: filename, bundle: Bundle.main, value: "Transmitter Id", comment: "transmitter settings, just the words that explain that the settings is about transmitter id")
+        return NSLocalizedString("settingsviews_transmitterid", tableName: filename, bundle: Bundle.main, value: "Transmitter ID:", comment: "transmitter settings, just the words that explain that the settings is about transmitter id")
     }()
     
     static let labelGiveTransmitterId:String = {
-        return NSLocalizedString("settingsviews_givetransmitterid", tableName: filename, bundle: Bundle.main, value: "Enter Transmitter Id", comment: "transmitter settings, pop up that asks user to inter transmitter id")
+        return NSLocalizedString("settingsviews_givetransmitterid", tableName: filename, bundle: Bundle.main, value: "Enter Transmitter ID", comment: "transmitter settings, pop up that asks user to inter transmitter id")
     }()
     
     static let labelResetTransmitter:String = {
@@ -75,55 +75,55 @@ class Texts_SettingsView {
     }()
     
     static let labelWebOOPTransmitter:String = {
-        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Web OOP Enabled", comment: "web oop settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use the OOPWeb Algorithm?", comment: "web oop settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelWebOOPSite:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPSite", tableName: filename, bundle: Bundle.main, value: "Web OOP site", comment: "transmitter settings, the web oop site url")
+        return NSLocalizedString("settingsviews_labelWebOOPSite", tableName: filename, bundle: Bundle.main, value: "OOPWeb Site URL:", comment: "transmitter settings, the web oop site url")
     }()
     
     static let labelWebOOPtoken:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPtoken", tableName: filename, bundle: Bundle.main, value: "Web OOP token", comment: "transmitter settings, the web oop token")
+        return NSLocalizedString("settingsviews_labelWebOOPtoken", tableName: filename, bundle: Bundle.main, value: "OOPWeb Token:", comment: "transmitter settings, the web oop token")
     }()
     
     static let labelWebOOPSiteExplainingText:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPSiteExplainingText", tableName: filename, bundle: Bundle.main, value: "Web OOP site (leave empty to use default value)", comment: "transmitter settings, the web oop site url, explaining text in dialog")
+        return NSLocalizedString("settingsviews_labelWebOOPSiteExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Site URL (leave blank to use the default):", comment: "transmitter settings, the web oop site url, explaining text in dialog")
     }()
     
     static let labelWebOOPtokenExplainingText:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPtokenExplainingText", tableName: filename, bundle: Bundle.main, value: "Web OOP token (leave empty to use default value)", comment: "transmitter settings, the web oop token, explaining text in dialog")
+        return NSLocalizedString("settingsviews_labelWebOOPtokenExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Token (leave blank to use default):", comment: "transmitter settings, the web oop token, explaining text in dialog")
     }()
     
     static let labelWebOOP:String = {
-        return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "Web OOP", comment: "weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the secxtion")
+        return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "OOPWeb Algorithm", comment: "weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section")
     }()
     
     static let transmitterId8OrHigherNotSupported: String = {
-        return NSLocalizedString("transmitterId8OrHigherNotSupported", tableName: filename, bundle: Bundle.main, value: "Transmitters with id 8G or higher are not supported !", comment: "User sets a transmitter id with id 8G or higher. This is not supported")
+        return NSLocalizedString("transmitterId8OrHigherNotSupported", tableName: filename, bundle: Bundle.main, value: "Transmitters with ID 8Gxxxx or newer are not currently supported!", comment: "User sets a transmitter id with id 8G or higher. This is not supported")
     }()
     
     // MARK: - Section Alerts
     
     static let sectionTitleAlerting: String = {
-        return NSLocalizedString("settingsviews_sectiontitlealerting", tableName: filename, bundle: Bundle.main, value: "Alerting", comment: "alerting settings, section title")
+        return NSLocalizedString("settingsviews_sectiontitlealerting", tableName: filename, bundle: Bundle.main, value: "Alarm", comment: "alerting settings, section title")
     }()
     
     static let labelAlertTypes: String = {
-        return NSLocalizedString("settingsviews_row_alert_types", tableName: filename, bundle: Bundle.main, value: "Alert Types", comment: "alerting settings, row alert types")
+        return NSLocalizedString("settingsviews_row_alert_types", tableName: filename, bundle: Bundle.main, value: "Alarm Types", comment: "alerting settings, row alert types")
     }()
     
     static let labelAlerts: String = {
-        return NSLocalizedString("settingsviews_row_alerts", tableName: filename, bundle: Bundle.main, value: "Alerts", comment: "alerting settings, row alerts")
+        return NSLocalizedString("settingsviews_row_alerts", tableName: filename, bundle: Bundle.main, value: "Alarms", comment: "alerting settings, row alerts")
     }()
     
     // MARK: - Section Healthkit
     
     static let sectionTitleHealthKit: String = {
-        return NSLocalizedString("settingsviews_sectiontitlehealthkit", tableName: filename, bundle: Bundle.main, value: "Healthkit", comment: "healthkit settings, section title")
+        return NSLocalizedString("settingsviews_sectiontitlehealthkit", tableName: filename, bundle: Bundle.main, value: "Apple Health Integration", comment: "healthkit settings, section title")
     }()
     
     static let labelHealthKit:String = {
-        return NSLocalizedString("settingsviews_healthkit", tableName: filename, bundle: Bundle.main, value: "HealthKit", comment: "healthkit settings, literally 'healthkit'")
+        return NSLocalizedString("settingsviews_healthkit", tableName: filename, bundle: Bundle.main, value: "Write Data to Apple Health?", comment: "healthkit settings, literally 'healthkit'")
     }()
     
     // MARK: - Section Dexcom Share
@@ -133,19 +133,19 @@ class Texts_SettingsView {
     }()
     
     static let labelUploadReadingstoDexcomShare = {
-        return NSLocalizedString("settingsviews_uploadReadingstoDexcomShare", tableName: filename, bundle: Bundle.main, value: "Dexcom Share Upload", comment: "dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no")
+        return NSLocalizedString("settingsviews_uploadReadingstoDexcomShare", tableName: filename, bundle: Bundle.main, value: "Upload to Dexcom Share?", comment: "dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no")
     }()
 
     static let labelDexcomShareSerialNumber = {
-        return NSLocalizedString("settingsviews_dexcomShareSerialNumber", tableName: filename, bundle: Bundle.main, value: "Serial", comment: "dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload")
+        return NSLocalizedString("settingsviews_dexcomShareSerialNumber", tableName: filename, bundle: Bundle.main, value: "Receiver Serial Number:", comment: "dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload")
     }()
     
     static let labelUseUSDexcomShareurl = {
-        return NSLocalizedString("settingsviews_useUSDexcomShareurl", tableName: filename, bundle: Bundle.main, value: "Use US url ?", comment: "dexcom share settings, where user can choose to use use url or not")
+        return NSLocalizedString("settingsviews_useUSDexcomShareurl", tableName: filename, bundle: Bundle.main, value: "Use Dexcom US Servers?", comment: "dexcom share settings, where user can choose to use US url or not")
     }()
     
     static let labelDexcomShareAccountName = {
-        return NSLocalizedString("settingsviews_dexcomShareAccountName", tableName: filename, bundle: Bundle.main, value: "Account", comment: "dexcom share settings, where user can set the dexcom share account name")
+        return NSLocalizedString("settingsviews_dexcomShareAccountName", tableName: filename, bundle: Bundle.main, value: "Account Name:", comment: "dexcom share settings, where user can set the dexcom share account name")
     }()
 
     static let giveDexcomShareAccountName = {
@@ -157,7 +157,7 @@ class Texts_SettingsView {
     }()
     
     static let giveDexcomShareSerialNumber = {
-        return NSLocalizedString("settingsviews_giveDexcomShareSerialNumber", tableName: filename, bundle: Bundle.main, value: "Enter Dexcom Share Serial Number", comment: "dexcom share settings, pop up that asks user to enter dexcom share serial number")
+        return NSLocalizedString("settingsviews_giveDexcomShareSerialNumber", tableName: filename, bundle: Bundle.main, value: "Enter the Dexcom Receiver Serial Number", comment: "dexcom share settings, pop up that asks user to enter dexcom share serial number")
     }()
     
     // MARK: - Section NightScout
@@ -167,61 +167,61 @@ class Texts_SettingsView {
     }()
     
     static let labelNightScoutEnabled = {
-        return NSLocalizedString("settingsviews_nightScoutEnabled", tableName: filename, bundle: Bundle.main, value: "Nightscout enabled", comment: "nightscout settings, where user can enable or disable nightscout")
+        return NSLocalizedString("settingsviews_nightScoutEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout?", comment: "nightscout settings, where user can enable or disable nightscout")
     }()
 
     static let labelNightScoutUrl = {
-        return NSLocalizedString("settingsviews_nightScoutUrl", tableName: filename, bundle: Bundle.main, value: "Url", comment: "nightscout settings, where user can set the nightscout url")
+        return NSLocalizedString("settingsviews_nightScoutUrl", tableName: filename, bundle: Bundle.main, value: "URL:", comment: "nightscout settings, where user can set the nightscout url")
     }()
     
     static let useSchedule = {
-        return NSLocalizedString("settingsviews_useSchedule", tableName: filename, bundle: Bundle.main, value: "Use schedule", comment: "nightscout settings, where user can select to use schedule or not")
+        return NSLocalizedString("settingsviews_useSchedule", tableName: filename, bundle: Bundle.main, value: "Use Upload Schedule?", comment: "nightscout settings, where user can select to use schedule or not")
     }()
     
     static let schedule = {
-        return NSLocalizedString("schedule", tableName: filename, bundle: Bundle.main, value: "Schedule", comment: "nightscout or dexcom share settings, where user can select to edit the schedule")
+        return NSLocalizedString("schedule", tableName: filename, bundle: Bundle.main, value: "Schedule:", comment: "nightscout or dexcom share settings, where user can select to edit the schedule")
     }()
     
     static let giveNightScoutUrl = {
-        return NSLocalizedString("settingsviews_giveNightScoutUrl", tableName: filename, bundle: Bundle.main, value: "Enter NightScout Url", comment: "nightscout  settings, pop up that asks user to enter nightscout url")
+        return NSLocalizedString("settingsviews_giveNightScoutUrl", tableName: filename, bundle: Bundle.main, value: "Enter your NightScout URL", comment: "nightscout  settings, pop up that asks user to enter nightscout url")
     }()
 
     static let labelNightScoutAPIKey = {
-        return NSLocalizedString("settingsviews_nightScoutAPIKey", tableName: filename, bundle: Bundle.main, value: "API Secret", comment: "nightscout settings, where user can set the nightscout api key")
+        return NSLocalizedString("settingsviews_nightScoutAPIKey", tableName: filename, bundle: Bundle.main, value: "API_SECRET:", comment: "nightscout settings, where user can set the nightscout api key")
     }()
     
     static let giveNightScoutAPIKey = {
-        return NSLocalizedString("settingsviews_giveNightScoutAPIKey", tableName: filename, bundle: Bundle.main, value: "Enter NightScout API Key", comment: "nightscout settings, pop up that asks user to enter nightscout api key")
+        return NSLocalizedString("settingsviews_giveNightScoutAPIKey", tableName: filename, bundle: Bundle.main, value: "Enter your API_SECRET", comment: "nightscout settings, pop up that asks user to enter nightscout api key")
     }()
     
     static let editScheduleTimePickerSubtitle: String = {
-        return NSLocalizedString("editScheduleTimePickerSubtitle", tableName: filename, bundle: Bundle.main, value: "change : ", comment: "used for editing schedule for NightScout upload and Dexcom Share upload")
+        return NSLocalizedString("editScheduleTimePickerSubtitle", tableName: filename, bundle: Bundle.main, value: "Change: ", comment: "used for editing schedule for NightScout upload and Dexcom Share upload")
     }()
     
     static let timeScheduleViewTitle: String = {
-        return NSLocalizedString("timeScheduleViewTitle", tableName: filename, bundle: Bundle.main, value: "On/Off time schedule for ", comment: "When creating schedule for Nightscout or Dexcom Share upload, this is the top label text")
+        return NSLocalizedString("timeScheduleViewTitle", tableName: filename, bundle: Bundle.main, value: "On/Off Time Schedule for ", comment: "When creating schedule for Nightscout or Dexcom Share upload, this is the top label text")
     }()
     
     static let uploadSensorStartTime: String = {
-        return NSLocalizedString("uploadSensorStartTime", tableName: filename, bundle: Bundle.main, value: "Upload Sensor start time", comment: "nightscout settings, title of row")
+        return NSLocalizedString("uploadSensorStartTime", tableName: filename, bundle: Bundle.main, value: "Upload Sensor Start Time", comment: "nightscout settings, title of row")
     }()
     
     static let testUrlAndAPIKey: String = {
-        return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Url and API Key", comment: "nightscout settings, when clicking the cell, test the url and api key")
+        return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Nightscout URL and API_SECRET", comment: "nightscout settings, when clicking the cell, test the url and api key")
     }()
 
     // MARK: - Section Speak
     
     static let sectionTitleSpeak: String = {
-        return NSLocalizedString("settingsviews_sectiontitlespeak", tableName: filename, bundle: Bundle.main, value: "Speak", comment: "speak settings, section title")
+        return NSLocalizedString("settingsviews_sectiontitlespeak", tableName: filename, bundle: Bundle.main, value: "Voice", comment: "speak settings, section title")
     }()
 
     static let labelSpeakBgReadings = {
-        return NSLocalizedString("settingsviews_speakBgReadings", tableName: filename, bundle: Bundle.main, value: "Speak BG Readings", comment: "speak settings, where user can enable or disable speak readings")
+        return NSLocalizedString("settingsviews_speakBgReadings", tableName: filename, bundle: Bundle.main, value: "Speak BG Readings?", comment: "speak settings, where user can enable or disable speak readings")
     }()
     
     static let labelSpeakLanguage = {
-        return NSLocalizedString("settingsviews_speakBgReadingslanguage", tableName: filename, bundle: Bundle.main, value: "Language", comment: "speak settings, where user can select the language")
+        return NSLocalizedString("settingsviews_speakBgReadingslanguage", tableName: filename, bundle: Bundle.main, value: "Language:", comment: "speak settings, where user can select the language")
     }()
     
     static let speakReadingLanguageSelection:String = {
@@ -229,29 +229,29 @@ class Texts_SettingsView {
     }()
     
     static let labelSpeakTrend = {
-        return NSLocalizedString("settingsviews_speakTrend", tableName: filename, bundle: Bundle.main, value: "Speak Trend", comment: "speak settings, where enable or disable speak trend")
+        return NSLocalizedString("settingsviews_speakTrend", tableName: filename, bundle: Bundle.main, value: "Speak Trend?", comment: "speak settings, where enable or disable speak trend")
     }()
     
     static let labelSpeakDelta = {
-        return NSLocalizedString("settingsviews_speakDelta", tableName: filename, bundle: Bundle.main, value: "Speak Delta", comment: "speak settings, where user can enable or disable speak delta")
+        return NSLocalizedString("settingsviews_speakDelta", tableName: filename, bundle: Bundle.main, value: "Speak Delta?", comment: "speak settings, where user can enable or disable speak delta")
     }()
 
     static let labelSpeakInterval = {
-        return NSLocalizedString("settingsviews_speakInterval", tableName: filename, bundle: Bundle.main, value: "Interval", comment: "speak settings, where user can set the speak interval, speak each reading, each two readings ...")
+        return NSLocalizedString("settingsviews_speakInterval", tableName: filename, bundle: Bundle.main, value: "Interval:", comment: "speak settings, where user can set the speak interval, speak each reading, each two readings ...")
     }()
     
     static let speakIntervalMessage = {
-        return NSLocalizedString("settingsviews_speakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two readings, in minutes", comment: "When clicking the interval setting, a pop up asks for number of minutes between two spoken readings, this is the message displayed in the pop up")
+        return NSLocalizedString("settingsviews_speakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two readings (mins)", comment: "When clicking the interval setting, a pop up asks for number of minutes between two spoken readings, this is the message displayed in the pop up")
     }()
     
     // MARK: - Section Info
     
     static let version = {
-        return NSLocalizedString("settingsviews_Version", tableName: filename, bundle: Bundle.main, value: "Version", comment: "used in settings, section Info, title of the version setting")
+        return NSLocalizedString("settingsviews_Version", tableName: filename, bundle: Bundle.main, value: "Version:", comment: "used in settings, section Info, title of the version setting")
     }()
 
     static let build = {
-        return NSLocalizedString("settingsviews_build", tableName: filename, bundle: Bundle.main, value: "Build", comment: "used in settings, section Info, title of the build setting")
+        return NSLocalizedString("settingsviews_build", tableName: filename, bundle: Bundle.main, value: "Build:", comment: "used in settings, section Info, title of the build setting")
     }()
     
     static let license = {
@@ -281,11 +281,11 @@ class Texts_SettingsView {
     }()
     
     static let giveBlueToothPassword: String = {
-        return NSLocalizedString("m5stack_settingsviews_giveBluetoothPassword", tableName: filename, bundle: Bundle.main, value: "Enter Bluetooth password", comment: "M5 stack bluetooth  settings, pop up that asks user to enter the password")
+        return NSLocalizedString("m5stack_settingsviews_giveBluetoothPassword", tableName: filename, bundle: Bundle.main, value: "Enter Bluetooth Password", comment: "M5 stack bluetooth  settings, pop up that asks user to enter the password")
     }()
 
     static let m5StackBrightness: String = {
-        return NSLocalizedString("m5stack_settingsviews_brightness", tableName: filename, bundle: Bundle.main, value: "Brightness", comment: "M5 stack setting, brightness")
+        return NSLocalizedString("m5stack_settingsviews_brightness", tableName: filename, bundle: Bundle.main, value: "Screen Brightness", comment: "M5 stack setting, brightness")
     }()
     
     // MARK: - Section Apple Watch
@@ -295,31 +295,31 @@ class Texts_SettingsView {
     }()
     
     static let createCalendarEvent: String = {
-        return NSLocalizedString("createCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Create event in Calendar", comment: "Apple Watch Settings - text in row where create event is enabled or disabled ")
+        return NSLocalizedString("createCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Create Calendar Events?", comment: "Apple Watch Settings - text in row where create event is enabled or disabled ")
     }()
 
     static let calenderId: String = {
-        return NSLocalizedString("calenderId", tableName: filename, bundle: Bundle.main, value: "Calendar", comment: "Apple Watch Settings - text in row where user needs to select a calendar")
+        return NSLocalizedString("calenderId", tableName: filename, bundle: Bundle.main, value: "Calendar To Use?", comment: "Apple Watch Settings - text in row where user needs to select a calendar")
     }()
 
     static let displayTrendInCalendarEvent: String = {
-        return NSLocalizedString("displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Trend", comment: "Apple Watch Settings - text in row where user needs to say if trend should be displayed or not")
+        return NSLocalizedString("displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Trend?", comment: "Apple Watch Settings - text in row where user needs to say if trend should be displayed or not")
     }()
     
     static let displayUnitInCalendarEvent: String = {
-        return NSLocalizedString("displayUnitInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Dispaly Unit", comment: "Apple Watch Settings - text in row where user needs to say if unit should be displayed or not")
+        return NSLocalizedString("displayUnitInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Dispaly Unit?", comment: "Apple Watch Settings - text in row where user needs to say if unit should be displayed or not")
     }()
     
     static let displayDeltaInCalendarEvent: String = {
-        return NSLocalizedString("displayDeltaInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Dispaly Delta", comment: "Apple Watch Settings - text in row where user needs to say if delta should be displayed or not")
+        return NSLocalizedString("displayDeltaInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Dispaly Delta?", comment: "Apple Watch Settings - text in row where user needs to say if delta should be displayed or not")
     }()
     
     static let infoCalendarAccessDeniedByUser: String = {
-        return NSLocalizedString("infoCalendarAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and turn on ", comment: "If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown")
+        return NSLocalizedString("infoCalendarAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it", comment: "If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown")
     }()
     
     static let infoCalendarAccessRestricted: String = {
-        return NSLocalizedString("infoCalendarAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You can not  authorization the app to access your Calendar, possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown")
+        return NSLocalizedString("infoCalendarAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to xDrip4iOS to access your calendar. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown")
     }()
     
 }
