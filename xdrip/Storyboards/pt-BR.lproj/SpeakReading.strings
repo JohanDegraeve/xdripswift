@@ -1,11 +1,11 @@
-"currentglucose" = "A sua glicose atual é";
-"currenttrend" = "Está tendendo";
-"trendflat" = "a reto";
+"currentglucose" = "A tua glicose actual é";
+"currenttrend" = "Está a tender";
 "currentdelta" = "A diferença desde a última leitura é de";
 "trendnoncomputable" = "de forma não calculável";
 "trenddoubledown" = "para baixo de forma acentuada";
 "trendsingledown" = "para baixo de forma significativa";
 "trendfortyfivedown" = "para baixo";
+"trendflat" = "a recto";
 "trendfortyfiveup" = "para cima";
 "trendsingleup" = "para cima de forma significativa";
 "trenddoubleup" = "para cirma de forma acentuada";

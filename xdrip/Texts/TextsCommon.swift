@@ -5,7 +5,7 @@ class Texts_Common {
     static private let filename = "Common"
     
     static let Ok = {
-        return NSLocalizedString("common_Ok", tableName: filename, bundle: Bundle.main, value: "Ok", comment: "literally 'Ok'")
+        return NSLocalizedString("common_Ok", tableName: filename, bundle: Bundle.main, value: "OK", comment: "literally 'OK'")
     }()
     
     //common_cancel
@@ -14,23 +14,23 @@ class Texts_Common {
     }()
     
     static let mgdl: String = {
-        return NSLocalizedString("common_mgdl", tableName: filename, bundle: Bundle.main, value: "mgdl", comment: "mgdl")
+        return NSLocalizedString("common_mgdl", tableName: filename, bundle: Bundle.main, value: "mg/dl", comment: "mg/dl")
     }()
 
     static let mmol: String = {
-        return NSLocalizedString("common_mmol", tableName: filename, bundle: Bundle.main, value: "mmol", comment: "mmol")
+        return NSLocalizedString("common_mmol", tableName: filename, bundle: Bundle.main, value: "mmol/l", comment: "mmol/l")
     }()
 
     static let bloodGLucoseUnit: String = {
-        return NSLocalizedString("common_bloodglucoseunit", tableName: filename, bundle: Bundle.main, value: "Bloodglucose unit", comment: "can be used in several screens, just the words Bloodglucose unit")
+        return NSLocalizedString("common_bloodglucoseunit", tableName: filename, bundle: Bundle.main, value: "Blood Glucose Unit", comment: "can be used in several screens, just the words Bloodglucose unit")
     }()
     
-    static let bloodGlucoxeUnitShort:String = {
-        return NSLocalizedString("common_bloodglucoseunit_short", tableName: filename, bundle: Bundle.main, value: "Bg Unit", comment: "blood glucose unit in short, for text field title")
+    static let bloodGlucoseUnitShort:String = {
+        return NSLocalizedString("common_bloodglucoseunit_short", tableName: filename, bundle: Bundle.main, value: "BG Unit", comment: "blood glucose unit in short, for text field title")
     }()
     
     static let password = {
-        return NSLocalizedString("common_password", tableName: filename, bundle: Bundle.main, value: "Password", comment: "literally password")
+        return NSLocalizedString("common_password", tableName: filename, bundle: Bundle.main, value: "Password:", comment: "literally password")
     }()
     
     static let default0 = {
@@ -54,11 +54,11 @@ class Texts_Common {
     }()
     
     static let minutes = {
-        return NSLocalizedString("common_minutes", tableName: filename, bundle: Bundle.main, value: "minutes", comment: "literal translation needed")
+        return NSLocalizedString("common_minutes", tableName: filename, bundle: Bundle.main, value: "mins", comment: "literal translation needed")
     }()
     
     static let minute = {
-        return NSLocalizedString("common_minute", tableName: filename, bundle: Bundle.main, value: "minute", comment: "literal translation needed")
+        return NSLocalizedString("common_minute", tableName: filename, bundle: Bundle.main, value: "min", comment: "literal translation needed")
     }()
     
     static let day = {
@@ -70,11 +70,11 @@ class Texts_Common {
     }()
     
     static let warning = {
-        return NSLocalizedString("warning", tableName: filename, bundle: Bundle.main, value: "Warning !", comment: "literally warning")
+        return NSLocalizedString("warning", tableName: filename, bundle: Bundle.main, value: "Warning!", comment: "literally warning")
     }()
  
     static let update = {
-        return NSLocalizedString("update", tableName: filename, bundle: Bundle.main, value: "Update", comment: "literally update")
+        return NSLocalizedString("update", tableName: filename, bundle: Bundle.main, value: "Edit", comment: "literally update")
     }()
 
     static let add = {
@@ -82,11 +82,11 @@ class Texts_Common {
     }()
     
     static let yes = {
-        return NSLocalizedString("yes", tableName: filename, bundle: Bundle.main, value: "yes", comment: "literally yes, without capital")
+        return NSLocalizedString("yes", tableName: filename, bundle: Bundle.main, value: "Yes", comment: "literally yes, without capital")
     }()
     
     static let no = {
-        return NSLocalizedString("no", tableName: filename, bundle: Bundle.main, value: "no", comment: "literally no, without capital")
+        return NSLocalizedString("no", tableName: filename, bundle: Bundle.main, value: "No", comment: "literally no, without capital")
     }()
     
     static let red = {
@@ -118,11 +118,11 @@ class Texts_Common {
     }()
     
     static let on = {
-        return NSLocalizedString("on", tableName: filename, bundle: Bundle.main, value: "on", comment: "on")
+        return NSLocalizedString("on", tableName: filename, bundle: Bundle.main, value: "On", comment: "on")
     }()
 
     static let off = {
-        return NSLocalizedString("off", tableName: filename, bundle: Bundle.main, value: "off", comment: "off")
+        return NSLocalizedString("Off", tableName: filename, bundle: Bundle.main, value: "off", comment: "off")
     }()
 
     static let delete = {
@@ -142,7 +142,7 @@ class Texts_Common {
     }()
     
     static let unknown = {
-        return NSLocalizedString("unknown", tableName: filename, bundle: Bundle.main, value: "unknown", comment: "general usage")
+        return NSLocalizedString("unknown", tableName: filename, bundle: Bundle.main, value: "Unknown", comment: "general usage")
     }()
     
 }

@@ -7,11 +7,11 @@ class Texts_AlertTypeSettingsView {
     // MARK: - Title of the screen
     
     static let alertTypesScreenTitle: String = {
-        return NSLocalizedString("alerttypessettingsview_screentitle", tableName: filename, bundle: Bundle.main, value: "Alert Types", comment: "shown on top of the screen that allows user to view all the alert types or add a new alert type")
+        return NSLocalizedString("alerttypessettingsview_screentitle", tableName: filename, bundle: Bundle.main, value: "Alarm Types", comment: "shown on top of the screen that allows user to view all the alert types or add a new alert type")
     }()
     
     static let editAlertTypeScreenTitle: String = {
-        return NSLocalizedString("alerttypesettingsview_screentitle", tableName: filename, bundle: Bundle.main, value: "Edit Alert Type", comment: "shown on top of the screen that allows user to edit an alert type")
+        return NSLocalizedString("alerttypesettingsview_screentitle", tableName: filename, bundle: Bundle.main, value: "Edit Alarm Type", comment: "shown on top of the screen that allows user to edit an alert type")
     }()
     
     static let alertTypeName: String = {
@@ -31,7 +31,7 @@ class Texts_AlertTypeSettingsView {
     }()
     
     static let alertTypeDefaultSnoozePeriod: String = {
-        return NSLocalizedString("alerttypesettingsview_defaultsnoozeperiod", tableName: filename, bundle: Bundle.main, value: "Default Snooze Period (min)", comment: "when editing an alert type, field title for Snooze Period")
+        return NSLocalizedString("alerttypesettingsview_defaultsnoozeperiod", tableName: filename, bundle: Bundle.main, value: "Default Snooze Time (mins)", comment: "when editing an alert type, field title for Snooze Period")
     }()
     
     static let alertTypeOverrideMute: String = {
@@ -47,15 +47,15 @@ class Texts_AlertTypeSettingsView {
     }()
     
     static let alertTypeGiveAName: String = {
-        return NSLocalizedString("alerttypesettingsview_givename", tableName: filename, bundle: Bundle.main, value: "Give a Name", comment: "when editing the name of an alert type, ")
+        return NSLocalizedString("alerttypesettingsview_givename", tableName: filename, bundle: Bundle.main, value: "Alarm Name", comment: "when editing the name of an alert type, ")
     }()
 
     static let alertTypeGiveSnoozePeriod: String = {
-        return NSLocalizedString("alerttypesettingsview_givesnoozeperiod", tableName: filename, bundle: Bundle.main, value: "Give Snooze Period in minutes", comment: "when editing the snoozeperiod of an alert type, ")
+        return NSLocalizedString("alerttypesettingsview_givesnoozeperiod", tableName: filename, bundle: Bundle.main, value: "Snooze Time in Minutes", comment: "when editing the snoozeperiod of an alert type, ")
     }()
     
     static let alertTypePickSoundName: String = {
-        return NSLocalizedString("alerttypesettingsview_picksoundname", tableName: filename, bundle: Bundle.main, value: "Pick Sound Name", comment: "when selecting the sound of an alert type, ")
+        return NSLocalizedString("alerttypesettingsview_picksoundname", tableName: filename, bundle: Bundle.main, value: "Sound Name", comment: "when selecting the sound of an alert type, ")
     }()
     
     static let alertTypeNoSound: String = {
@@ -63,11 +63,11 @@ class Texts_AlertTypeSettingsView {
     }()
     
     static let alertTypeNameAlreadyExistsMessage: String = {
-        return NSLocalizedString("alerttypenamealreadyexistsmessages", tableName: filename, bundle: Bundle.main, value: "An Alert Type with this name already exists. Change the name.", comment: "when adding a new alert type, but the name is already used for another alert type, this is the error messages")
+        return NSLocalizedString("alerttypenamealreadyexistsmessages", tableName: filename, bundle: Bundle.main, value: "An Alarm Type with this name already exists. Use a different name", comment: "when adding a new alert type, but the name is already used for another alert type, this is the error messages")
     }()
 
     static let confirmDeletionAlertType: String = {
-        return NSLocalizedString("confirmdeletionalerttype", tableName: filename, bundle: Bundle.main, value: "Do you want to delete Alert Type with name ", comment: "when trying to delete an alert type, user needs to confirm first, this is the message")
+        return NSLocalizedString("confirmdeletionalerttype", tableName: filename, bundle: Bundle.main, value: "Delete Alarm Type: ", comment: "when trying to delete an alert type, user needs to confirm first, this is the message")
     }()
     
 

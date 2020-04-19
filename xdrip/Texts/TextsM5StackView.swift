@@ -18,7 +18,7 @@ class Texts_M5StackView {
     }()
     
     static let blePasswordMissingWarning: String = {
-        return NSLocalizedString("blePasswordMissingWarning", tableName: filename, bundle: Bundle.main, value: "You need to set the password in the Settings", comment: "in case M5Stack authentication failed, and M5Stack is expecting user configured password")
+        return NSLocalizedString("blePasswordMissingWarning", tableName: filename, bundle: Bundle.main, value: "You need to set the password in Settings", comment: "in case M5Stack authentication failed, and M5Stack is expecting user configured password")
     }()
     
     static let m5StackResetRequiredWarning: String = {
@@ -26,15 +26,15 @@ class Texts_M5StackView {
     }()
     
     static let m5StackSoftWhereHelpCellText: String = {
-        return NSLocalizedString("m5StackSoftWhereHelpCellText", tableName: filename, bundle: Bundle.main, value: "Where to find M5Stack software ?", comment: "In m5Stack view, one line allows to show info where to find M5Stack software, this is the text in the cell")
+        return NSLocalizedString("m5StackSoftWhereHelpCellText", tableName: filename, bundle: Bundle.main, value: "Where to find the M5Stack software?", comment: "In m5Stack view, one line allows to show info where to find M5Stack software, this is the text in the cell")
     }()
     
     static let m5StickCSoftWhereHelpCellText: String = {
-        return NSLocalizedString("m5StickCSoftWhereHelpCellText", tableName: filename, bundle: Bundle.main, value: "Where to find M5StickC software ?", comment: "In m5StickC view, one line allows to show info where to find M5Stack software, this is the text in the cell")
+        return NSLocalizedString("m5StickCSoftWhereHelpCellText", tableName: filename, bundle: Bundle.main, value: "Where to find the M5StickC software?", comment: "In m5StickC view, one line allows to show info where to find M5Stack software, this is the text in the cell")
     }()
     
     static let m5StackSoftWareHelpText: String = {
-        return NSLocalizedString("m5StackSoftWareHelpText", tableName: filename, bundle: Bundle.main, value: "Go to", comment: "this is the text shown when clicking the cell 'where to find M5Stack software'")
+        return NSLocalizedString("m5StackSoftWareHelpText", tableName: filename, bundle: Bundle.main, value: "Go To", comment: "this is the text shown when clicking the cell 'where to find M5Stack software'")
     }()
 
     static let deviceMustBeConnectedToPowerOff: String = {
@@ -46,7 +46,7 @@ class Texts_M5StackView {
     }()
     
     static let powerOffConfirm: String = {
-        return NSLocalizedString("powerOffConfirm", tableName: filename, bundle: Bundle.main, value: "Are you sure you want to power off the M5Stack ?", comment: "user clicks power off in M5Stack view, confirmation is needed")
+        return NSLocalizedString("powerOffConfirm", tableName: filename, bundle: Bundle.main, value: "Are you sure you want to power off the M5Stack?", comment: "user clicks power off in M5Stack view, confirmation is needed")
     }()
     
     static let connectToWiFi: String = {

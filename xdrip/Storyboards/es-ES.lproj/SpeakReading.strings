@@ -1,14 +1,14 @@
 "currentglucose" = "Tu glucosa actual es";
-"currenttrend" = "Está tendiendo";
+"currenttrend" = "La tendencia ";
 "currentdelta" = "La diferencia desde la última lectura es de";
 "trendnoncomputable" = "de forma no calculable";
-"trenddoubledown" = "hacia abajo de forma acentuada";
+"trenddoubledown" = "hacia abajo de forma muy significative";
 "trendsingledown" = "hacia abajo de forma significativa";
 "trendfortyfivedown" = "hacia abajo";
 "trendflat" = "a recto";
 "trendfortyfiveup" = "hacia arriba";
 "trendsingleup" = "hacia arriba de forma significativa";
-"trenddoubleup" = "hacia arriba de forma acentuada";
+"trenddoubleup" = "hacia arriba de forma muy significativa";
 "deltanoncomputable" = "no calculable";
 "high" = "alta";
 "low" = "baja";

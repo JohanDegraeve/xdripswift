@@ -1,6 +1,6 @@
 // change "Bluetooth Devices" to "Bluetooth"
-"screenTitle" = "Bluetooth";
-"selectCategory" = "Select Category";
+"screenTitle" = "Bluetooth Devices";
+"selectCategory" = "Select Device Type";
 "selectType" = "Select Type";
 "batteryLevel" = "Battery Level";
-"noMultipleActiveCGMsAllowed" = "You can not have more than one CGM Transmitter which is connected or being scanned for.\nVerify your other CGM Transmitters and click 'Stop scanning', 'Disconnect' or delete it.";
+"noMultipleActiveCGMsAllowed" = "You cannot have more than one CGM Transmitter which is connected or being scanned for.\nVerify your other CGM Transmitters and click 'Stop Scanning', 'Disconnect' or just delete them";

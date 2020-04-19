@@ -84,7 +84,7 @@ public static func setLanguageCode(code:String?) {
     
     static var currentGlucose:String {
         get {
-            return NSLocalizedString("currentglucose", tableName: filename, bundle: bundle!, value: "Current blood glucose is", comment: "For speak reading functionality")
+            return NSLocalizedString("currentglucose", tableName: filename, bundle: bundle!, value: "Your current blood glucose is", comment: "For speak reading functionality")
         }
     }
     
