@@ -328,7 +328,11 @@ class NightScoutFollowManager:NSObject {
         // create playSoundTimer
         playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(ConstantsSuspensionPrevention.interval), eventHandler: {
                 // play the sound
+            
+             trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            
                 if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
+                    trace("playing audio", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
                     audioPlayer.play()
                 }
             })

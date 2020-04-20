@@ -878,6 +878,7 @@ class BluetoothPeripheralManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutAPIKey.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
 
     }
     
@@ -922,8 +923,11 @@ class BluetoothPeripheralManager: NSObject {
         if bluetoothPeripheral.bluetoothPeripheralType().category() == .CGM {
             
             if let cgmTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) as? CGMTransmitter {
+                
                 return cgmTransmitter
+                
             }
+            
         }
         
         return nil
@@ -953,6 +957,43 @@ class BluetoothPeripheralManager: NSObject {
             
         }
         
+        // if changed from master to follower, then check if any of the bluetoothperipherals of type .CGM has shouldconnect true, and if yes set to false and inform user
+        if keyPathEnum == .isMaster {
+            
+            if !UserDefaults.standard.isMaster {
+            
+                for bluetoothPeripheral in bluetoothPeripherals {
+                    
+                    if bluetoothPeripheral.bluetoothPeripheralType().category() == .CGM {
+                        
+                        /// it might be in future that multiple connected CGM's are allowed, and that case they will be all disconnected, but the warning will only be given once
+                        var warningGiven = false
+                        
+                        if bluetoothPeripheral.blePeripheral.shouldconnect {
+                                
+                            // force disconnect
+                            disconnect(fromBluetoothPeripheral: bluetoothPeripheral)
+                            
+                            // set bluetoothTransmitter to nil
+                            setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheral)
+                            
+                            if !warningGiven {
+
+                                uIViewController.present(UIAlertController(title: Texts_Common.warning, message: "NEW TEXT cgm disconnected", actionHandler: nil), animated: true, completion: nil)
+
+                                warningGiven = true
+                                
+                            }
+                            
+                        }
+                        
+                    }
+                }
+            }
+            
+        }
+        
+        // see for every bluetoothPeripheral, if the changed  UserDefaults value has impact on that bluetoothPeripheral
         for bluetoothPeripheral in bluetoothPeripherals {
             
             // if the there's no bluetoothTransmitter for this bluetoothPeripheral, then call parameterUpdateNeededAtNextConnect
@@ -965,7 +1006,8 @@ class BluetoothPeripheralManager: NSObject {
 
             }
             
-            // get the type
+            // go through all bluetoothPeripheralType's with switch statement - this is to ensure that future types are not forgotten
+            // for each of them see if any of the observed values needs to be sent to the peripheral
             switch bluetoothPeripheral.bluetoothPeripheralType() {
                 
             case .M5StackType, .M5StickCType:
@@ -1029,7 +1071,8 @@ class BluetoothPeripheralManager: NSObject {
                 }
              
             case .WatlaaType, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type:
-                // none of the observed values needs to be sent to the watlaa
+                
+                // none of the observed values needs to be sent to the peripheral
                 break
                 
             }

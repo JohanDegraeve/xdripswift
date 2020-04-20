@@ -238,6 +238,12 @@ final class RootViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // enable or disable the buttons 'sensor' and 'calibrate' on top, depending on master or follower
+        changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
+
+        // disable the presnooze button as it's not yet implemented
+        preSnoozeButtonOutlet.disable()
+        
         // initialize glucoseChartManager
         glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet)
 
@@ -572,31 +578,45 @@ final class RootViewController: UIViewController {
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
-        if let keyPath = keyPath {
+        guard let keyPath = keyPath else {return}
+        
+        guard let keyPathEnum = UserDefaults.Key(rawValue: keyPath) else {return}
+        
+        // first check keyValueObserverTimeKeeper
+        switch keyPathEnum {
             
-            if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
-                
-                switch keyPathEnum {
-                    
-                case UserDefaults.Key.isMaster :
-                    break
-                    
-                case UserDefaults.Key.showReadingInNotification:
-                    if !UserDefaults.standard.showReadingInNotification {
-                        // remove existing notification if any
-                        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest])
-
-                    }
-                    
-                case UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
-                    // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
-                    createBgReadingNotificationAndSetAppBadge()
-                    
-                default:
-                    break
-                }
+        case UserDefaults.Key.isMaster  :
+            
+            // transmittertype change triggered by user, should not be done within 200 ms
+            if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
+                return
             }
+            
+        default:
+            break
+            
         }
+        
+        switch keyPathEnum {
+            
+        case UserDefaults.Key.isMaster :
+            changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
+            
+        case UserDefaults.Key.showReadingInNotification:
+            if !UserDefaults.standard.showReadingInNotification {
+                // remove existing notification if any
+                UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest])
+                
+            }
+            
+        case UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
+            // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
+            createBgReadingNotificationAndSetAppBadge()
+            
+        default:
+            break
+        }
+        
     }
     
     // MARK: - View Methods
@@ -1176,6 +1196,19 @@ final class RootViewController: UIViewController {
         }
         
         return nil
+        
+    }
+    
+    /// enables or disables the buttons on top of the screen
+    private func changeButtonsStatusTo(enabled: Bool) {
+        
+        if enabled {
+            sensorButtonOutlet.enable()
+            calibrateButtonOutlet.enable()
+        } else {
+            sensorButtonOutlet.disable()
+            calibrateButtonOutlet.disable()
+        }
         
     }
     
