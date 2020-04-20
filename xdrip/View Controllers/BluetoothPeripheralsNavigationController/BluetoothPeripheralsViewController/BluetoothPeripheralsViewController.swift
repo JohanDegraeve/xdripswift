@@ -151,13 +151,30 @@ final class BluetoothPeripheralsViewController: UIViewController {
         let pickerViewData = PickerViewData (withMainTitle: nil, withSubTitle: Texts_BluetoothPeripheralsView.selectCategory, withData: BluetoothPeripheralCategory.listOfCategories(), selectedRow: nil, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ categoryIndex: Int) in
                 
             // user selected category, now user needs to select type of bluetoothperipheral
-            // but before doing that, check if user tries to add a CGM
-            // if so, check that no other CGM has shouldconnect set to true
-            if let category = BluetoothPeripheralCategory(rawValue: BluetoothPeripheralCategory.listOfCategories()[categoryIndex]), category == .CGM, BluetoothPeripheralsViewController.self.otherCGMTransmitterHasShouldConnectTrue(bluetoothPeripheralManager: self.bluetoothPeripheralManager, uiViewController: self) {
+            // but before doing that, check if user tries to add a CGM and if so two additional checks need to be done
+            if let category = BluetoothPeripheralCategory(rawValue: BluetoothPeripheralCategory.listOfCategories()[categoryIndex]), category == .CGM {
+
+                // check that no other CGM has shouldconnect set to true
+                // the function otherCGMTransmitterHasShouldConnectTrue will also create an alert with info that only one CGM can be active
+                // the function otherCGMTransmitterHasShouldConnectTrue will also create an alert with info that only one CGM can be active
+                if BluetoothPeripheralsViewController.self.otherCGMTransmitterHasShouldConnectTrue(bluetoothPeripheralManager: self.bluetoothPeripheralManager, uiViewController: self) {
+                    
+                    return
+
+                }
                 
-                return
+                // check that xdrip is in master mode
+                if !UserDefaults.standard.isMaster {
+                 
+                    self.present(UIAlertController(title: Texts_Common.warning, message: Texts_BluetoothPeripheralView.cannotActiveCGMInFollowerMode, actionHandler: nil), animated: true, completion: nil)
+
+                    return
+                    
+                }
+                
                 
             }
+            
             
             let pickerViewData = PickerViewData (withMainTitle: nil, withSubTitle: Texts_BluetoothPeripheralsView.selectType, withData: BluetoothPeripheralCategory.listOfBluetoothPeripheralTypes(withCategory: BluetoothPeripheralCategory.listOfCategories()[categoryIndex]), selectedRow: nil, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ typeIndex: Int) in
                 
