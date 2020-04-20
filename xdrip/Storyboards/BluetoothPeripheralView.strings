@@ -25,3 +25,5 @@
 "lastResetNotKnown" = "Last Reset Timestamp is not known";
 "transmitterResultResult" = "Transmitter Reset Result";
 "bootLoader" = "Bootloader";
+"cannotActiveCGMInFollowerMode" = "You can not activate a CGM in follower mode";
+"cgmDeActivateBecauseMovingToFollowerMode" = "The CGM has been deactivated as you can not have an active CGM in follower mode";

@@ -166,7 +166,7 @@ final class BluetoothPeripheralsViewController: UIViewController {
                 // check that xdrip is in master mode
                 if !UserDefaults.standard.isMaster {
                  
-                    self.present(UIAlertController(title: Texts_Common.warning, message: "NEW TEXT you can not add a CGM in follower mode ", actionHandler: nil), animated: true, completion: nil)
+                    self.present(UIAlertController(title: Texts_Common.warning, message: Texts_BluetoothPeripheralView.cannotActiveCGMInFollowerMode, actionHandler: nil), animated: true, completion: nil)
 
                     return
                     

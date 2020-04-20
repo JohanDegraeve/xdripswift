@@ -979,7 +979,7 @@ class BluetoothPeripheralManager: NSObject {
                             
                             if !warningGiven {
 
-                                uIViewController.present(UIAlertController(title: Texts_Common.warning, message: "NEW TEXT cgm disconnected", actionHandler: nil), animated: true, completion: nil)
+                                uIViewController.present(UIAlertController(title: Texts_Common.warning, message: Texts_BluetoothPeripheralView.cgmDeActivateBecauseMovingToFollowerMode, actionHandler: nil), animated: true, completion: nil)
 
                                 warningGiven = true
                                 

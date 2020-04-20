@@ -548,7 +548,7 @@ class BluetoothPeripheralViewController: UIViewController {
                 // check if it's a CGM being activated and if so that app is in master mode
                 if expectedBluetoothPeripheralType.category() == .CGM, !UserDefaults.standard.isMaster {
                     
-                    self.present(UIAlertController(title: Texts_Common.warning, message: "NEW TEXT you can not activate a CGM in follower mode ", actionHandler: nil), animated: true, completion: nil)
+                    self.present(UIAlertController(title: Texts_Common.warning, message: Texts_BluetoothPeripheralView.cannotActiveCGMInFollowerMode, actionHandler: nil), animated: true, completion: nil)
                     
                     return
                     
