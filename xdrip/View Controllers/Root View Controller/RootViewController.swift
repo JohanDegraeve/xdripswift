@@ -579,11 +579,7 @@ final class RootViewController: UIViewController {
                 switch keyPathEnum {
                     
                 case UserDefaults.Key.isMaster :
-
-                    // if switching to follower mode, then stop the sensor
-                    if !UserDefaults.standard.isMaster {
-                        stopSensor()
-                    }
+                    break
                     
                 case UserDefaults.Key.showReadingInNotification:
                     if !UserDefaults.standard.showReadingInNotification {
