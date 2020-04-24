@@ -97,6 +97,9 @@ public class AlertManager:NSObject {
             
         })
         
+        // add observer for changes in UserDefaults
+        addObservers()
+        
     }
     
     // MARK: - public functions
@@ -122,14 +125,13 @@ public class AlertManager:NSObject {
         // get transmitterBatteryInfo
         let transmitterBatteryInfo = UserDefaults.standard.transmitterBatteryInfo
         
-        // all alerts will only be created if there's a reading, less than 60 seconds old
-        // except for transmitterBatteryInfo alert
+        // all alerts will only be created if there's a reading, less than maxAgeOfLastBgReadingInSeconds seconds old
         if latestBgReadings.count > 0 {
             
             let lastBgReading = latestBgReadings[0]
 
             if abs(lastBgReading.timeStamp.timeIntervalSinceNow) < maxAgeOfLastBgReadingInSeconds {
-                // reading is for an active sensor and is less than 60 seconds old, let's check the alerts
+                // reading is maxAgeOfLastBgReadingInSeconds seconds old, let's check the alerts
                 // need to call checkAlert
                 
                 // if latestBgReadings[1] exists then assign it to lastButOneBgREading
@@ -250,6 +252,46 @@ public class AlertManager:NSObject {
         return returnValue
     }
     
+    // MARK: - overriden functions
+    
+    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if let keyPath = keyPath {
+            
+            if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
+                
+                switch keyPathEnum {
+                    
+                case UserDefaults.Key.missedReadingAlertChanged :
+                    
+                    // if missedReadingAlertChanged didn't change to true then no further processing
+                    guard UserDefaults.standard.missedReadingAlertChanged else {return}
+                    
+                    // user changed a missed reading alert setting, so we're going to call checkAlertAndFire for .missedreading, which will replan or cancel any existing missed reading alert
+                    
+                    // get last bgreading, ignore sensor, because it must also work for follower mode
+                    // to check missed reading alert, we only need one reading
+                    let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 1, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                    
+                    if latestBgReadings.count > 0 {
+
+                        // first of all remove all existing missedreading notifications
+                        uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
+                        uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
+                        
+                        _ = checkAlertAndFire(alertKind: .missedreading, lastBgReading: latestBgReadings[0], lastButOneBgREading: nil, lastCalibration: nil, transmitterBatteryInfo: nil)
+
+                    }
+                    
+                    UserDefaults.standard.missedReadingAlertChanged = false
+                    
+                default:
+                    break
+                }
+            }
+        }
+    }
+
     // MARK: - private helper functions
     
     /// Checks group of alerts - Not to be used for alerts with delay (ie missedreading)
@@ -590,6 +632,13 @@ public class AlertManager:NSObject {
         
         // get UNUserNotificationCenter and set new list of categories
         UNUserNotificationCenter.current().setNotificationCategories(mutableExistingCategories)
+        
+    }
+
+    /// when user changes M5Stack related settings, then the transmitter need to get that info, add observers
+    private func addObservers() {
+        
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.missedReadingAlertChanged.rawValue, options: .new, context: nil)
         
     }
 

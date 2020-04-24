@@ -135,6 +135,10 @@ extension UserDefaults {
         
         // Other Settings (not user configurable)
         
+        /// - in case missed reading alert settings are changed by user, this value will be set to true
+        /// - alertmanager will observe that value and when changed, verify if missed reading alert needs to be changed
+        case missedReadingAlertChanged = "missedReadingAlertChanged"
+        
         // Nightscout
         /// timestamp lastest reading uploaded to NightScout
         case timeStampLatestNSUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
@@ -699,6 +703,17 @@ extension UserDefaults {
     
     // MARK: - =====  Other Settings ======
     
+    /// - in case missed reading alert settings are changed by user, this value will be set to true
+    /// - alertmanager will observe that value and when changed, verify if missed reading alert needs to be changed
+    @objc dynamic var missedReadingAlertChanged: Bool {
+        get {
+            return bool(forKey: Key.missedReadingAlertChanged.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.missedReadingAlertChanged.rawValue)
+        }
+    }
+
     /// timestamp lastest reading uploaded to NightScout
     var timeStampLatestNightScoutUploadedBgReading:Date? {
         get {

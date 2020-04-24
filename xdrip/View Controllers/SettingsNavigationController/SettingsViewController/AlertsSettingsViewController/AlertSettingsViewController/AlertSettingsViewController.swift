@@ -25,8 +25,17 @@ final class AlertSettingsViewController: UIViewController {
         // save the alertentry
         alertSettingsViewControllerData.coreDataManager.saveChanges()
         
+        // if it's a missed reading alert, then set UserDefaults.standard.missedReadingAlertChanged
+        // this will trigger the AlertManager to check if missed reading alert needs to be replanned
+        if alertEntryAsNSObject.alertkind == AlertKind.missedreading.rawValue {
+            
+            UserDefaults.standard.missedReadingAlertChanged = true
+            
+        }
+        
         // go back to the alerts settings screen
         performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
+        
     }
     
     @IBOutlet weak var doneButtonOutlet: UIBarButtonItem!

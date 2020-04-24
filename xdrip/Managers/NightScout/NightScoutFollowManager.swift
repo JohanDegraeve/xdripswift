@@ -377,9 +377,8 @@ class NightScoutFollowManager:NSObject {
         }
     }
     
-    // MARK:- observe function
+    // MARK:- overriden function
     
-    /// when user changes from master to follower or vice versa, processing is needed
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
         if let keyPath = keyPath {
