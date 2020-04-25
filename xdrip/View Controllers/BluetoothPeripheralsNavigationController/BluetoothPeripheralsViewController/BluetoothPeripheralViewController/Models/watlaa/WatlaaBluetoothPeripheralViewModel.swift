@@ -135,21 +135,8 @@ extension WatlaaBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     }
     
     func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging) -> SettingsSelectedRowAction {
-        
-        // verify that bluetoothPeripheral is a Watlaa
-        guard let Watlaa = bluetoothPeripheral as? Watlaa else {
-            fatalError("WatlaaBluetoothPeripheralViewModel userDidSelectRow, bluetoothPeripheral is not Watlaa")
-        }
-        
-        guard let setting = Settings(rawValue: rawValue) else { fatalError("WatlaaBluetoothPeripheralViewModel userDidSelectRow, unexpected setting") }
-        
-        switch setting {
-            
-        case .watlaaBatteryLevel, .transmitterBatteryLevel:
-            return .nothing
-            
-        }
-        
+
+        // for the moment none of the watlaa settings rows react on clicking
         return .nothing
         
     }
