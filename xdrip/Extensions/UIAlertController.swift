@@ -51,7 +51,7 @@ extension UIAlertController {
         }))
         
         // add action for when user clicks cancel
-        addAction(UIAlertAction(title: Texts_Common.Cancel, style: .default, handler: { (action:UIAlertAction) in
+        addAction(UIAlertAction(title: Texts_Common.Cancel, style: .cancel, handler: { (action:UIAlertAction) in
             if let cancelHandler = cancelHandler {cancelHandler()}
         }))
     }
