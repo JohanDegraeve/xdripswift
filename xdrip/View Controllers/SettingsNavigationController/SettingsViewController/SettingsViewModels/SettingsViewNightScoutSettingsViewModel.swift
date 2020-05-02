@@ -64,7 +64,7 @@ class SettingsViewNightScoutSettingsViewModel {
                 
                 if let error = error {
                     
-                    trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.nightScoutSettingsViewModel, type: .info, error.localizedDescription)
+                    trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, error.localizedDescription)
                     
                     self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationErrorAlertTitle, message: error.localizedDescription)
                     
@@ -77,20 +77,20 @@ class SettingsViewNightScoutSettingsViewModel {
                     
                     let errorMessage = String(data: data, encoding: String.Encoding.utf8)!
                     
-                    trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.nightScoutSettingsViewModel, type: .info, errorMessage)
+                    trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, errorMessage)
                     
                    self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationErrorAlertTitle, message: errorMessage)
                     
                 } else {
                     
-                    trace("in testNightScoutCredentials, successful", log: self.log, category: ConstantsLog.nightScoutSettingsViewModel, type: .info)
+                    trace("in testNightScoutCredentials, successful", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
                     
                     self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationSuccessFulAlertTitle, message: Texts_NightScoutTestResult.verificationSuccessFulAlertBody)
                     
                 }
             })
             
-            trace("in testNightScoutCredentials, url and apikey test started", log: log, category: ConstantsLog.nightScoutSettingsViewModel, type: .info)
+            trace("in testNightScoutCredentials, url and apikey test started", log: log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
             task.resume()
             
         }
@@ -112,6 +112,10 @@ class SettingsViewNightScoutSettingsViewModel {
 /// conforms to SettingsViewModelProtocol for all nightscout settings in the first sections screen
 extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
     
+    func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
+    
+    func storeUIViewController(uIViewController: UIViewController) {}
+
     func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {
         self.messageHandler = messageHandler
     }

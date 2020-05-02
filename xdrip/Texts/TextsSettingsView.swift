@@ -322,5 +322,37 @@ class Texts_SettingsView {
         return NSLocalizedString("infoCalendarAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to xDrip4iOS to access your calendar. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown")
     }()
     
+    static let writeTraceToFile: String = {
+        return NSLocalizedString("writeTraceToFile", tableName: filename, bundle: Bundle.main, value: "Write trace to file", comment: "Should write trace to file be enabled or not")
+    }()
+    
+    static let sectionTitleTrace: String = {
+        return NSLocalizedString("sectionTitleTrace", tableName: filename, bundle: Bundle.main, value: "Trace", comment: "in Settings, section title for Trace")
+    }()
+    
+    static let sendTraceFile: String = {
+        return NSLocalizedString("sendTraceFile", tableName: filename, bundle: Bundle.main, value: "Send trace file", comment: "in Settings, row title to send settings")
+    }()
+    
+    static let warningWriteTraceToFile: String = {
+        return NSLocalizedString("warningWriteTraceToFile", tableName: filename, bundle: Bundle.main, value: "Write trace to file is not enabled. Enable this first, then do your test, then send trace file", comment: "in Settings, when user clicks send trace to file, but write trace to file is not enabled")
+    }()
+    
+    static let describeProblem: String = {
+        return NSLocalizedString("describeProblem", tableName: filename, bundle: Bundle.main, value: "Explain why you send the trace file as detailed as possible. If you have reported your problem on facebook group 'Xdrip for IOS', then mention your facebook name in the e-mail", comment: "Text in pop up shown when user wants to send the trace file")
+    }()
+    
+    static let emailNotConfigured: String = {
+        return NSLocalizedString("emailNotConfigured", tableName: filename, bundle: Bundle.main, value: "You must configure an e-mail account on your iOS device.", comment: "user tries to send trace file but there's no native email account configured")
+    }()
+    
+    static let emailbodyText: String = {
+        return NSLocalizedString("emailbodyText", tableName: filename, bundle: Bundle.main, value: "Problem description: ", comment: "default text in email body, when user wants to send trace file.")
+    }()
+    
+    static let failedToSendEmail: String = {
+        return NSLocalizedString("failedToSendEmail", tableName: filename, bundle: Bundle.main, value: "Failed to send email", comment: "In case user tries to send trace file via email but error occurs.")
+    }()
+    
 }
 

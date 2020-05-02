@@ -139,6 +139,9 @@ extension UserDefaults {
         /// - alertmanager will observe that value and when changed, verify if missed reading alert needs to be changed
         case missedReadingAlertChanged = "missedReadingAlertChanged"
         
+        /// when was the app launched, used in trace info that is sent via email. Just to be able to see afterwards if the app ever crashed. Because sometimes users say it crashed, but maybe it just stopped receiving readings and restarted by opening the app, but didn't really crash
+        case timeStampAppLaunch = "timeStampAppLaunch"
+        
         // Nightscout
         /// timestamp lastest reading uploaded to NightScout
         case timeStampLatestNSUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
@@ -171,6 +174,9 @@ extension UserDefaults {
         
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
+        
+        /// write trace to file enabled or not
+        case writeTraceToFile = "writeTraceToFile"
         
         /// should libre oop value smoothing be done , default is on, means default libreValueSmoothingIsOff = false
         case libreValueSmoothingIsOff = "libreValueSmoothingIsOff"
@@ -714,6 +720,16 @@ extension UserDefaults {
         }
     }
 
+    /// when was the app launched, used in trace info that is sent via email. Just to be able to see afterwards if the app ever crashed. Because sometimes users say it crashed, but maybe it just stopped receiving readings and restarted by opening the app, but didn't really crash
+    var timeStampAppLaunch:Date? {
+        get {
+            return object(forKey: Key.timeStampAppLaunch.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampAppLaunch.rawValue)
+        }
+    }
+    
     /// timestamp lastest reading uploaded to NightScout
     var timeStampLatestNightScoutUploadedBgReading:Date? {
         get {
@@ -812,6 +828,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.OSLogEnabled.rawValue)
+        }
+    }
+    
+    /// write trace to file enabled or not
+    var writeTraceToFile: Bool {
+        get {
+            return bool(forKey: Key.writeTraceToFile.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.writeTraceToFile.rawValue)
         }
     }
 

@@ -64,6 +64,14 @@ protocol SettingsViewModelProtocol {
     ///     - two strings, a title and a message.
     func storeMessageHandler(messageHandler : @escaping ((String, String) -> Void))
     
+    /// store uiviewcontroller that created the model, in case it's needed
+    func storeUIViewController(uIViewController: UIViewController)
+    
+    /// closure to call to reload a row specified by index in the section that the viewmodel is implementing (ie not in another section)
+    ///
+    /// just an additional method to force row reloads, (there's also the method completeSettingsViewRefreshNeeded which may return true or false depending on row number and which will be called from within the SettingsViewController. The rowReloadClosure is useful when the reload needs to be handled asynchronously
+    func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void))
+    
 }
 
 /// to make the coding a bit easier, just one function defined for now, which is to get the viewModel for a specific setting
