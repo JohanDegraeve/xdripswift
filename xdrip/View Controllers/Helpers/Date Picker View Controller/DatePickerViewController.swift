@@ -125,9 +125,6 @@ final class DatePickerViewController: UIViewController {
             pickerViewSubTitle.text = subTitle
         }
         
-        // set background color to white, doesn't seem to work when doing it in the interface builder
-        //datePickerView.backgroundColor = .white
-        
     }
     
     // MARK: - Public Methods

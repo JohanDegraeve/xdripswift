@@ -75,7 +75,6 @@ final class PickerViewController : UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
     }
     
     override func viewWillAppear(_ animated: Bool) {
