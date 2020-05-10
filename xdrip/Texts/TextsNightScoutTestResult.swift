@@ -18,7 +18,7 @@ class Texts_NightScoutTestResult {
     
     static let warningAPIKeyOrURLIsnil: String = {
         
-        return NSLocalizedString("warningAPIKeyOrURLIsnil", tableName: filename, bundle: Bundle.main, value: "Your Nightscout URL and API_SERET must be set before you can run the test", comment: "in settings screen, user tries to test url and API Key but one of them is not set")
+        return NSLocalizedString("warningAPIKeyOrURLIsnil", tableName: filename, bundle: Bundle.main, value: "Your Nightscout URL and API_SECRET must be set before you can run the test", comment: "in settings screen, user tries to test url and API Key but one of them is not set")
     }()
     
     static let nightScoutAPIKeyAndURLStarted : String = {
