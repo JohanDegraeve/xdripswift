@@ -23,7 +23,7 @@
 "green" = "green";
 "white" = "white";
 "yellow" = "yellow";
-"name" = "Name";
+"name" = "Name:";
 "WiFi" = "WiFi";
 "on" = "On";
 "off" = "Off";

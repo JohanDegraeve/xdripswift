@@ -47,7 +47,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.build
             
         case .icons8:
-            return "Icons by Icons8"
+            return "Icons By icons8.com"
 
         }
         

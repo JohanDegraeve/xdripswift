@@ -5,11 +5,11 @@ class Texts_BluetoothPeripheralView {
     static private let filename = "BluetoothPeripheralView"
     
     static let address: String = {
-        return NSLocalizedString("address", tableName: filename, bundle: Bundle.main, value: "Address", comment: "when M5Stack is shown, title of the cell with the address")
+        return NSLocalizedString("address", tableName: filename, bundle: Bundle.main, value: "Address:", comment: "when M5Stack is shown, title of the cell with the address")
     }()
 
     static let status: String = {
-        return NSLocalizedString("status", tableName: filename, bundle: Bundle.main, value: "Status", comment: "when Bluetooth Peripheral is shown, title of the cell with the status")
+        return NSLocalizedString("status", tableName: filename, bundle: Bundle.main, value: "Status:", comment: "when Bluetooth Peripheral is shown, title of the cell with the status")
     }()
     
     static let connected: String = {
@@ -33,19 +33,19 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let bluetoothPeripheralAlias: String = {
-        return NSLocalizedString("bluetoothPeripheralAlias", tableName: filename, bundle: Bundle.main, value: "Alias", comment: "BluetoothPeripheral view, this is a name of a BluetoothPeripheral assigned by the user, to recognize the device")
+        return NSLocalizedString("bluetoothPeripheralAlias", tableName: filename, bundle: Bundle.main, value: "Alias:", comment: "BluetoothPeripheral view, this is a name of a BluetoothPeripheral assigned by the user, to recognize the device")
     }()
 
     static let sensorSerialNumber: String = {
-        return NSLocalizedString("SensorSerialNumber", tableName: filename, bundle: Bundle.main, value: "Sensor Serial Number", comment: "BluetoothPeripheral view, text of the cell with the sensor serial number")
+        return NSLocalizedString("SensorSerialNumber", tableName: filename, bundle: Bundle.main, value: "Sensor Serial Number:", comment: "BluetoothPeripheral view, text of the cell with the sensor serial number")
     }()
     
     static let serialNumber: String = {
-        return NSLocalizedString("serialNumber", tableName: filename, bundle: Bundle.main, value: "Serial Number", comment: "BluetoothPeripheral view, text of the cell with the serial number (this is not the sensor serial number")
+        return NSLocalizedString("serialNumber", tableName: filename, bundle: Bundle.main, value: "Serial Number:", comment: "BluetoothPeripheral view, text of the cell with the serial number (this is not the sensor serial number")
     }()
     
     static let battery: String = {
-        return NSLocalizedString("Battery", tableName: filename, bundle: Bundle.main, value: "Battery", comment: "BluetoothPeripheral view, section title with battery info")
+        return NSLocalizedString("Battery", tableName: filename, bundle: Bundle.main, value: "Battery:", comment: "BluetoothPeripheral view, section title with battery info")
     }()
     
     static let needsTransmitterId: String = {
@@ -73,7 +73,7 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let notTryingToConnect: String = {
-        return NSLocalizedString("notTryingToConnect", tableName: filename, bundle: Bundle.main, value: "Not scanning", comment: "text in status row, when not connected and app is not scanning")
+        return NSLocalizedString("notTryingToConnect", tableName: filename, bundle: Bundle.main, value: "Not Scanning", comment: "text in status row, when not connected and app is not scanning")
     }()
     
     static let connect: String = {
@@ -81,11 +81,11 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let connectedAt: String = {
-        return NSLocalizedString("connectedAt", tableName: filename, bundle: Bundle.main, value: "Connected At", comment: "cell text, where the connection timestamp is shown")
+        return NSLocalizedString("connectedAt", tableName: filename, bundle: Bundle.main, value: "Connected At:", comment: "cell text, where the connection timestamp is shown")
     }()
     
     static let disConnectedAt: String = {
-        return NSLocalizedString("disConnectedAt", tableName: filename, bundle: Bundle.main, value: "Disconnected At", comment: "cell text, where the disconnection timestamp is shown")
+        return NSLocalizedString("disConnectedAt", tableName: filename, bundle: Bundle.main, value: "Disconnected At:", comment: "cell text, where the disconnection timestamp is shown")
     }()
     
     static let resetRequired: String = {

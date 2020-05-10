@@ -42,8 +42,8 @@
 "settingsviews_giveNightScoutAPIKey" = "Entrar tu API_SECRET";
 "editScheduleTimePickerSubtitle" = "Cambiar: ";
 "timeScheduleViewTitle" = "Fijar horario para ";
-"uploadSensorStartTime" = "Subir Hora de Inicio de Sensor";
-"testUrlAndAPIKey" = "Comprobar URL Nightscout y API_SECRET";
+"uploadSensorStartTime" = "Subir Hora de Inicio de Sensor?";
+"testUrlAndAPIKey" = "Comprobar URL Nightscout y API_SECRET?";
 "settingsviews_sectiontitlespeak" = "Voz";
 "settingsviews_speakBgReadings" = "Anunciar Lecturas Glucemia";
 "settingsviews_speakBgReadingslanguage" = "Idioma";
@@ -69,3 +69,9 @@
 "displayDeltaInCalendarEvent" = "Mostrar Delta?";
 "infoCalendarAccessDeniedByUser" = "Has denegado previamente permiso para acceder al calendario.\n\nPara habilitarlo de nuevo, ir a Configuración en tu iPhone, Privacidad, Calendarios y habilitarlo.";
 "infoCalendarAccessRestricted" = "No se puede autorizar a que xDrip4iOS tenga acceso a tu calendario. Podría ser debido a que restricciones tipo Controles Parentales o similares lo están impidiendo.";
+"writeTraceToFile" = "Crear Archivo de Rastreo?";
+"sectionTitleTrace" = "Rastrear";
+"sendTraceFile" = "Enviar Archivo de Rastreo";
+"describeProblem" = "Explicar en detalle porqué es necesario enviar este archivo de rastreo. Si ya has reportando previamente este problema en el grupo de Facebook 'xDrip4iOS', confirmar tu Nombre en Facebook dentro del cuerpo del correo";
+"emailbodyText" = "Problem Description: ";
+"failedToSendEmail" = "Error al Enviar Correo";

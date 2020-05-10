@@ -44,8 +44,8 @@
 "settingsviews_giveNightScoutAPIKey" = "Enter your API_SECRET";
 "editScheduleTimePickerSubtitle" = "Change: ";
 "timeScheduleViewTitle" = "On/Off Time Schedule for ";
-"uploadSensorStartTime" = "Upload Sensor Start Time";
-"testUrlAndAPIKey" = "Test Nightscout URL and API_SECRET";
+"uploadSensorStartTime" = "Upload Sensor Start Time?";
+"testUrlAndAPIKey" = "Test Nightscout URL and API_SECRET?";
 "settingsviews_sectiontitlespeak" = "Voice";
 "settingsviews_speakBgReadings" = "Speak BG Readings?";
 "settingsviews_speakBgReadingslanguage" = "Language:";
@@ -71,9 +71,9 @@
 "displayDeltaInCalendarEvent" = "Display Delta?";
 "infoCalendarAccessDeniedByUser" = "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it.";
 "infoCalendarAccessRestricted" = "You cannot give authorization to xDrip4iOS to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
-"writeTraceToFile" = "Write trace to file";
+"writeTraceToFile" = "Write Trace to File?";
 "sectionTitleTrace" = "Trace";
-"sendTraceFile" = "Send trace file";
-"describeProblem" = "Explain why you send the trace file as detailed as possible. If you have reported your problem on facebook group 'Xdrip for IOS', then mention your facebook name in the e-mail";
-"emailbodyText" = "Problem description: ";
-"failedToSendEmail" = "In case user tries to send trace file via email but error occurs.";
+"sendTraceFile" = "Send Trace File";
+"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group 'xDrip4iOS', then mention your facebook name in the e-mail";
+"emailbodyText" = "Problem Description: ";
+"failedToSendEmail" = "Failed to Send Email";

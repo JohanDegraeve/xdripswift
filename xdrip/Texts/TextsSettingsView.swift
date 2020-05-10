@@ -203,11 +203,11 @@ class Texts_SettingsView {
     }()
     
     static let uploadSensorStartTime: String = {
-        return NSLocalizedString("uploadSensorStartTime", tableName: filename, bundle: Bundle.main, value: "Upload Sensor Start Time", comment: "nightscout settings, title of row")
+        return NSLocalizedString("uploadSensorStartTime", tableName: filename, bundle: Bundle.main, value: "Upload Sensor Start Time?", comment: "nightscout settings, title of row")
     }()
     
     static let testUrlAndAPIKey: String = {
-        return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Nightscout URL and API_SECRET", comment: "nightscout settings, when clicking the cell, test the url and api key")
+        return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Nightscout URL and API_SECRET?", comment: "nightscout settings, when clicking the cell, test the url and api key")
     }()
 
     // MARK: - Section Speak
@@ -323,7 +323,7 @@ class Texts_SettingsView {
     }()
     
     static let writeTraceToFile: String = {
-        return NSLocalizedString("writeTraceToFile", tableName: filename, bundle: Bundle.main, value: "Write trace to file", comment: "Should write trace to file be enabled or not")
+        return NSLocalizedString("writeTraceToFile", tableName: filename, bundle: Bundle.main, value: "Write Trace to File?", comment: "Should write trace to file be enabled or not")
     }()
     
     static let sectionTitleTrace: String = {
@@ -331,15 +331,15 @@ class Texts_SettingsView {
     }()
     
     static let sendTraceFile: String = {
-        return NSLocalizedString("sendTraceFile", tableName: filename, bundle: Bundle.main, value: "Send trace file", comment: "in Settings, row title to send settings")
+        return NSLocalizedString("sendTraceFile", tableName: filename, bundle: Bundle.main, value: "Send Trace File", comment: "in Settings, row title to send settings")
     }()
     
     static let warningWriteTraceToFile: String = {
-        return NSLocalizedString("warningWriteTraceToFile", tableName: filename, bundle: Bundle.main, value: "Write trace to file is not enabled. Enable this first, then do your test, then send trace file", comment: "in Settings, when user clicks send trace to file, but write trace to file is not enabled")
+        return NSLocalizedString("warningWriteTraceToFile", tableName: filename, bundle: Bundle.main, value: "Write trace to file is not enabled. Enable this first, perform your tests and then send the trace file", comment: "in Settings, when user clicks send trace to file, but write trace to file is not enabled")
     }()
     
     static let describeProblem: String = {
-        return NSLocalizedString("describeProblem", tableName: filename, bundle: Bundle.main, value: "Explain why you send the trace file as detailed as possible. If you have reported your problem on facebook group 'Xdrip for IOS', then mention your facebook name in the e-mail", comment: "Text in pop up shown when user wants to send the trace file")
+        return NSLocalizedString("describeProblem", tableName: filename, bundle: Bundle.main, value: "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group 'xDrip4iOS', then mention your facebook name in the e-mail", comment: "Text in pop up shown when user wants to send the trace file")
     }()
     
     static let emailNotConfigured: String = {
@@ -347,11 +347,11 @@ class Texts_SettingsView {
     }()
     
     static let emailbodyText: String = {
-        return NSLocalizedString("emailbodyText", tableName: filename, bundle: Bundle.main, value: "Problem description: ", comment: "default text in email body, when user wants to send trace file.")
+        return NSLocalizedString("emailbodyText", tableName: filename, bundle: Bundle.main, value: "Problem Description: ", comment: "default text in email body, when user wants to send trace file.")
     }()
     
     static let failedToSendEmail: String = {
-        return NSLocalizedString("failedToSendEmail", tableName: filename, bundle: Bundle.main, value: "Failed to send email", comment: "In case user tries to send trace file via email but error occurs.")
+        return NSLocalizedString("failedToSendEmail", tableName: filename, bundle: Bundle.main, value: "Failed to Send Email", comment: "In case user tries to send trace file via email but error occurs.")
     }()
     
 }

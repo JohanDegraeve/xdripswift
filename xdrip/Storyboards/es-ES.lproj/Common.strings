@@ -19,3 +19,6 @@
 "add" = "Añadir";
 "yes" = "Sí";
 "no" = "No";
+"name" = "Nombre:";
+"delete" = "Borrar";
+"unknown" = "Desconocido";
