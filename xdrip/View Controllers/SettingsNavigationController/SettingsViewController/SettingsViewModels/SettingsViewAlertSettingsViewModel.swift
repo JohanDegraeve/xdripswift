@@ -10,6 +10,8 @@ fileprivate enum Setting:Int, CaseIterable {
 /// conforms to SettingsViewModelProtocol for all alert settings in the first sections screen
 struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     
+    func storeUIViewController(uIViewController: UIViewController) {}
+
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
     }
@@ -32,6 +34,8 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToAlertSettings.rawValue, sender: nil)
         }
     }
+    
+    func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func sectionTitle() -> String? {
         return Texts_SettingsView.sectionTitleAlerting

@@ -102,7 +102,7 @@ class BluetoothPeripheralViewController: UIViewController {
     private var infoAlertWhenScanningStarts: UIAlertController?
     
     /// for trace
-    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.bluetoothPeripheralViewController)
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBluetoothPeripheralViewController)
 
     /// to keep track of scanning result
     private var previousScanningResult: BluetoothTransmitter.startScanningResult?
@@ -450,7 +450,7 @@ class BluetoothPeripheralViewController: UIViewController {
             
         case .alreadyScanning, .alreadyConnected, .connecting :
             
-            trace("in handleScanningResult, scanning not started. Scanning result = %{public}@", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error, startScanningResult.description())
+            trace("in handleScanningResult, scanning not started. Scanning result = %{public}@", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .error, startScanningResult.description())
             // no further processing, should normally not happen,
             
             // set isScanning false, although it should already be false
@@ -458,7 +458,7 @@ class BluetoothPeripheralViewController: UIViewController {
             
         case .poweredOff:
             
-            trace("in handleScanningResult, scanning not started. Bluetooth is not on", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error)
+            trace("in handleScanningResult, scanning not started. Bluetooth is not on", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .error)
             
             // show info that user should switch on bluetooth
             self.infoAlertWhenScanningStarts = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.bluetoothIsNotOn, actionHandler: nil)
@@ -466,12 +466,12 @@ class BluetoothPeripheralViewController: UIViewController {
             
         case .other(let reason):
             
-            trace("in handleScanningResult, scanning not started. Scanning result = %{public}@", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error, reason)
+            trace("in handleScanningResult, scanning not started. Scanning result = %{public}@", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .error, reason)
             // no further processing, should normally not happen,
             
         case .unauthorized:
             
-            trace("in handleScanningResult, scanning not started. Scanning result = unauthorized", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .error)
+            trace("in handleScanningResult, scanning not started. Scanning result = unauthorized", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .error)
             
             // show info that user should switch on bluetooth
             self.infoAlertWhenScanningStarts = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.bluetoothIsNotAuthorized, actionHandler: nil)
@@ -479,7 +479,7 @@ class BluetoothPeripheralViewController: UIViewController {
             
         case .unknown:
             
-            trace("in handleScanningResult, scanning not started. Scanning result = unknown - this is always occuring when a BluetoothTransmitter starts scanning the first time. You should see now a new call to handleScanningResult", log: log, category: ConstantsLog.bluetoothPeripheralViewController, type: .info)
+            trace("in handleScanningResult, scanning not started. Scanning result = unknown - this is always occuring when a BluetoothTransmitter starts scanning the first time. You should see now a new call to handleScanningResult", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info)
             
         }
 

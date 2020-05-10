@@ -350,6 +350,9 @@ final class RootViewController: UIViewController {
     // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, watchManager
     private func setupApplicationData() {
         
+        // setup Trace
+        Trace.initialize(coreDataManager: coreDataManager)
+
         // if coreDataManager is nil then there's no reason to continue
         guard let coreDataManager = coreDataManager else {
             fatalError("In setupApplicationData but coreDataManager == nil")
@@ -653,6 +656,9 @@ final class RootViewController: UIViewController {
     ///
     /// should be called only once immediately after app start, ie in viewdidload
     private func setupUpdateLabelsAndChartTimer() {
+        
+        // set timeStampAppLaunch to now
+        UserDefaults.standard.timeStampAppLaunch = Date()
         
         // this is the actual timer
         var updateLabelsAndChartTimer:Timer?

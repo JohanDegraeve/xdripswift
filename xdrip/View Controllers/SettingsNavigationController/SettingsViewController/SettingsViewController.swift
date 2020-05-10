@@ -21,6 +21,76 @@ final class SettingsViewController: UIViewController {
     /// UIAlertController used by messageHandler
     private var messageHandlerUiAlertController: UIAlertController?
     
+    /// array of viewmodels, one per section
+    private var viewModels = [SettingsViewModelProtocol]()
+    
+    private enum Section: Int, CaseIterable, SettingsProtocol {
+        
+        ///General settings - language, glucose unit, high and low value
+        case general
+        
+        /// alarms
+        case alarms
+        
+        ///nightscout settings
+        case nightscout
+        
+        ///dexcom share settings
+        case dexcom
+        
+        /// healthkit
+        case healthkit
+        
+        /// store bg values in healthkit
+        case speak
+        
+        /// M5 stack settings
+        case M5stack
+        
+        /// Apple Watch settings
+        case AppleWatch
+        
+        /// tracing
+        case trace
+        
+        /// info
+        case info
+        
+        /// developper settings
+        case developer
+        
+        func viewModel() -> SettingsViewModelProtocol {
+            switch self {
+                
+            case .general:
+                return SettingsViewGeneralSettingsViewModel()
+            case .alarms:
+                return SettingsViewAlertSettingsViewModel()
+            case .nightscout:
+                return SettingsViewNightScoutSettingsViewModel()
+            case .dexcom:
+                return SettingsViewDexcomSettingsViewModel()
+            case .healthkit:
+                return SettingsViewHealthKitSettingsViewModel()
+            case .speak:
+                return SettingsViewSpeakSettingsViewModel()
+            case .M5stack:
+                return SettingsViewM5StackSettingsViewModel()
+            case .info:
+                return SettingsViewInfoViewModel()
+            case .developer:
+                return SettingsViewDevelopmentSettingsViewModel()
+            case .AppleWatch:
+                return SettingsViewAppleWatchSettingsViewModel()
+            case .trace:
+                return SettingsViewTraceSettingsViewModel()
+                
+            }
+        }
+        
+    }
+    
+
     // MARK:- public functions
     
     /// configure
@@ -28,6 +98,32 @@ final class SettingsViewController: UIViewController {
         
         self.coreDataManager = coreDataManager
         self.soundPlayer = soundPlayer
+        
+        // initialize viewModels
+        for section in Section.allCases {
+
+            // get a viewModel for the section
+            let viewModel = section.viewModel()
+            
+            // unwrap messageHandler and store in the viewModel
+            if let messageHandler = messageHandler {
+                viewModel.storeMessageHandler(messageHandler: messageHandler)
+            }
+            
+            // store self as uiViewController in the viewModel
+            viewModel.storeUIViewController(uIViewController: self)
+            
+            // store reload closure in the viewModel
+            viewModel.storeRowReloadClosure(rowReloadClosure: {row in
+                
+                self.tableView.reloadRows(at: [IndexPath(row: row, section: section.rawValue)], with: .none)
+                
+            })
+
+            // store the viewModel
+            self.viewModels.append(viewModel)
+            
+        }
         
         // create messageHandler
         messageHandler = {
@@ -128,74 +224,11 @@ final class SettingsViewController: UIViewController {
 
 extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
     
-    private enum Section: Int, CaseIterable, SettingsProtocol {
-        
-        ///General settings - language, glucose unit, high and low value
-        case general
-        
-        /// alarms
-        case alarms
-
-        ///nightscout settings
-        case nightscout
-
-        ///dexcom share settings
-        case dexcom
-
-        /// healthkit
-        case healthkit
-
-        /// store bg values in healthkit
-        case speak
-
-        /// M5 stack settings
-        case M5stack
-        
-        
-        /// Apple Watch settings
-        case AppleWatch
-        
-        /// info
-        case info
-
-        /// developper settings
-        case developer
-        
-        func viewModel() -> SettingsViewModelProtocol {
-            switch self {
-                
-            case .general:
-                return SettingsViewGeneralSettingsViewModel()
-            case .alarms:
-                return SettingsViewAlertSettingsViewModel()
-            case .nightscout:
-                return SettingsViewNightScoutSettingsViewModel()
-            case .dexcom:
-                return SettingsViewDexcomSettingsViewModel()
-            case .healthkit:
-                return SettingsViewHealthKitSettingsViewModel()
-            case .speak:
-                return SettingsViewSpeakSettingsViewModel()
-            case .M5stack:
-                return SettingsViewM5StackSettingsViewModel()
-            case .info:
-                return SettingsViewInfoViewModel()
-            case .developer:
-                return SettingsViewDevelopmentSettingsViewModel()
-            case .AppleWatch:
-                return SettingsViewAppleWatchSettingsViewModel()
-            }
-        }
-
-    }
-    
     // MARK: - UITableViewDataSource protocol Methods
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         
-        guard let section = Section(rawValue: section) else { fatalError("Unexpected Section") }
-        
-        return section.viewModel().sectionTitle()
+        return viewModels[section].sectionTitle()
 
     }
     
@@ -205,21 +238,17 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        guard let section = Section(rawValue: section) else { fatalError("Unexpected Section") }
-        
-        return section.viewModel().numberOfRows()
+        return viewModels[section].numberOfRows()
         
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        guard let section = Section(rawValue: indexPath.section) else { fatalError("Unexpected Section") }
-        
         guard var cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("Unexpected Table View Cell") }
         
         // Configure Cell
 
-        SettingsViewUtilities.configureSettingsCell(cell: &cell, forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withViewModel: section.viewModel(), tableView: tableView)
+        SettingsViewUtilities.configureSettingsCell(cell: &cell, forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withViewModel: viewModels[indexPath.section], tableView: tableView)
         
         return cell
     }
@@ -230,13 +259,7 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
         
         tableView.deselectRow(at: indexPath, animated: true)
         
-        guard let section = Section(rawValue: indexPath.section) else { fatalError("Unexpected Section") }
- 
-        let viewModel = section.viewModel()
-        
-        if let messageHandler = messageHandler {
-            viewModel.storeMessageHandler(messageHandler: messageHandler)
-        }
+        let viewModel = viewModels[indexPath.section]
         
         if viewModel.isEnabled(index: indexPath.row) {
             

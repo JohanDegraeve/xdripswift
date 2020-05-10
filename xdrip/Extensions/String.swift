@@ -224,3 +224,13 @@ extension Optional where Wrapped == String {
         
     }
 }
+
+extension String {
+    
+    mutating func appendStringAndNewLine(_ stringToAdd: String) {
+        
+        self = self + stringToAdd + "\n"
+        
+    }
+
+}

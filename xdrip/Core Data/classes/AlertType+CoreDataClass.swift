@@ -45,4 +45,8 @@ public class AlertType: NSManagedObject {
         super.init(entity: entity, insertInto: context)
     }
     
+    public override var description: String {
+        return name
+    }
+    
 }

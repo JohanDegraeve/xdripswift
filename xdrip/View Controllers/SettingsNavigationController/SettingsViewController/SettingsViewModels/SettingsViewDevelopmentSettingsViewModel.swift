@@ -15,6 +15,10 @@ fileprivate enum Setting:Int, CaseIterable {
 
 struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
     
+    func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
+    
+    func storeUIViewController(uIViewController: UIViewController) {}
+    
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
     }

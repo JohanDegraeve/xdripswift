@@ -122,9 +122,10 @@ enum ConstantsLog {
     static let categoryWatchManager =                "WatchManager                  "
     
     /// bluetoothPeripheralViewController
-    static let bluetoothPeripheralViewController =   "blePeripheralViewController   "
+    static let categoryBluetoothPeripheralViewController =   "blePeripheralViewController   "
     
-    static let nightScoutSettingsViewModel =         "nightScoutSettingsViewModel   "
+    static let categoryNightScoutSettingsViewModel =         "nightScoutSettingsViewModel   "
     
+    static let categoryTraceSettingsViewModel =      "TraceSettingsViewModel"
 }
 

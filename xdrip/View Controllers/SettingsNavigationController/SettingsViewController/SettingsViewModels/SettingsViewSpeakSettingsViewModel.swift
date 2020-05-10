@@ -22,6 +22,10 @@ fileprivate enum Setting:Int, CaseIterable {
 /// conforms to SettingsViewModelProtocol for all speak settings in the first sections screen
 class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
     
+    func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
+    
+    func storeUIViewController(uIViewController: UIViewController) {}
+    
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
     }
