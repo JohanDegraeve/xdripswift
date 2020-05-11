@@ -178,9 +178,6 @@ extension UserDefaults {
         /// write trace to file enabled or not
         case writeTraceToFile = "writeTraceToFile"
         
-        /// should libre oop value smoothing be done , default is on, means default libreValueSmoothingIsOff = false
-        case libreValueSmoothingIsOff = "libreValueSmoothingIsOff"
-        
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
         
@@ -841,17 +838,6 @@ extension UserDefaults {
         }
     }
 
-    /// should libre oop value smoothing be done , default is on, means default libreValueSmoothingIsOff = false
-    var libreValueSmoothingIsOff: Bool {
-        get {
-            return bool(forKey: Key.libreValueSmoothingIsOff.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.libreValueSmoothingIsOff.rawValue)
-        }
-    }
-    
-    
     /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
     var cgmTransmitterDeviceAddress: String? {
         get {

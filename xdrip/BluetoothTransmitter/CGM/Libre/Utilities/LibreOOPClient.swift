@@ -325,11 +325,7 @@ class LibreOOPClient {
             origarr.append(glucose)
         }
         
-        if UserDefaults.standard.libreValueSmoothingIsOff {
-            return origarr
-        } else {
-            return LibreGlucoseSmoothing.CalculateSmothedData5Points(origtrends: origarr)
-        }
+        return LibreGlucoseSmoothing.CalculateSmothedData5Points(origtrends: origarr)
         
     }
 
