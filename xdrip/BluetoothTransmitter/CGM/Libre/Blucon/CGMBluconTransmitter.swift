@@ -194,10 +194,30 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         return false
     }
     
+    /*public static func test(input:Data) {
+        
+        // input should be minimum length 6
+        guard input.count >= 6 else {return }
+        
+        // input[5] * 6 + 4 - 6 should be uint
+        debuglogging("description input[5] = " + input[5].description)
+        guard input[5] * 6 >= 2 else {return }
+        
+        // caculate byte position in sensor body, decrement index to get the index where the last valid BG reading is stored
+        var nowGlucoseIndex2 = input[5] * 6 + 4 - 6
+        
+    }*/
+    
     private func blockNumberForNowGlucoseData(input:Data) -> String? {
         
         // input should be minimum length 6
         guard input.count >= 6 else {return nil}
+        
+        // input[5] * 6 + 4 - 6 should be uint
+        guard input[5] * 6 >= 2 else {
+            trace("in blockNumberForNowGlucoseData, input[5] * 6 < 2, this would result in a crash, returning nil", log: log, category: ConstantsLog.categoryBlucon, type: .info)
+            return nil
+        }
         
         // caculate byte position in sensor body, decrement index to get the index where the last valid BG reading is stored
         var nowGlucoseIndex2 = input[5] * 6 + 4 - 6
