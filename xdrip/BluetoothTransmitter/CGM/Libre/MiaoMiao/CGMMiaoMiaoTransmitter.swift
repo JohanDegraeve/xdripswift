@@ -158,6 +158,10 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 let firmware = String(describing: rxBuffer[14...15].hexEncodedString())
                                 let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
                                 let batteryPercentage = Int(rxBuffer[13])
+
+                                // send firmware and hardware to delegate
+                                cGMMiaoMiaoTransmitterDelegate?.received(firmware: firmware, from: self)
+                                cGMMiaoMiaoTransmitterDelegate?.received(hardware: hardware, from: self)
                                 
                                 // get sensor serialNumber and if changed inform delegate
                                 if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
