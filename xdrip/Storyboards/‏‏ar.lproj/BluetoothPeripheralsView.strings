@@ -1,5 +1,5 @@
-"screenTitle" = "Bluetooth";
-"selectCategory" = "Select Device Type";
-"selectType" = "Select Type";
-"batteryLevel" = "Battery Level";
-"noMultipleActiveCGMsAllowed" = "You cannot have more than one CGM Transmitter which is connected or being scanned for.\nVerify your other CGM Transmitters and click 'Stop Scanning', 'Disconnect' or just delete them";
+"screenTitle" = "البلوتوث";
+"selectCategory" = "حدد نوع الجهاز";
+"selectType" = "حدد النوع";
+"batteryLevel" = "مستوى البطارية";
+"noMultipleActiveCGMsAllowed" = "لا يمكن أن يكون لديك أكثر من جهاز ارسال متصل.\nحدد أجهزة الارسال الأخرى وضغط على إيقاف البحث أو قطع الاتصال أو فقط قم بحذف الأجهزة الأخرى";
