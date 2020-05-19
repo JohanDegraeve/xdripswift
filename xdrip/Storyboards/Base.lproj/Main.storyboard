@@ -416,7 +416,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="N9L-gP-riy">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="Da1-3C-BuR">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="addButtonAction:" destination="Yrn-pr-SQ1" id="OOj-gc-b4q"/>
                             </connections>
@@ -561,7 +561,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="IRh-fS-FQG">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="Vzx-sW-4v4">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="addButtonAction:" destination="E45-Z1-hcE" id="FHj-U1-3eb"/>
                             </connections>
@@ -618,7 +618,7 @@
                                 <rect key="frame" x="20" y="0.0" width="78" height="38"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="21"/>
                                 <state key="normal" title="Connect">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <connections>
                                     <action selector="connectButtonAction:" destination="FJ0-eY-Fv0" eventType="touchUpInside" id="fQK-fo-hqh"/>
@@ -727,7 +727,7 @@
                                 </connections>
                             </barButtonItem>
                             <barButtonItem systemItem="add" id="ywX-on-I6d">
-                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="addButtonAction:" destination="Lnd-QQ-8Lc" id="e0q-ay-41d"/>
                                 </connections>
@@ -798,7 +798,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="etA-fM-tGh">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="wox-Vn-EKP">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="addButtonAction:" destination="eUt-Xg-tDZ" id="pEw-ak-Nmt"/>
                             </connections>
