@@ -1,5 +1,5 @@
-"nightscouttestresult_verificationsuccessfulalerttitle" = "Verification Successful";
-"nightscouttestresult_verificationsuccessfulalertbody" = "Your Nightscout site was verified successfully";
-"nightscouttestresult_verificationerroralerttitle" = "Verification Error";
-"warningAPIKeyOrURLIsnil" = "Your Nightscout URL and API_SECRET must be set before you can run the test";
-"nightScoutAPIKeyAndURLStarted" = "Test Started";
+"nightscouttestresult_verificationsuccessfulalerttitle" = "تم التحقق بنجاح";
+"nightscouttestresult_verificationsuccessfulalertbody" = "تم التحقق من منصة نايسكاوت بنجاح";
+"nightscouttestresult_verificationerroralerttitle" = "خطأ في التحقق";
+"warningAPIKeyOrURLIsnil" = "يجب تعيين عنوان URL الخاص بـمنصة نايتسكاوت و API_SECRET قبل أن تتمكن من عمل الاختبار";
+"nightScoutAPIKeyAndURLStarted" = "بدأ الاختبار";
