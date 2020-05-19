@@ -229,16 +229,16 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .BluconType:
             
-            // length for blucon is 8
-            if transmitterId.count != 8 {
+            let regex = try! NSRegularExpression(pattern: "^[0-9]{1,5}$", options: .caseInsensitive)
+            if !transmitterId.validate(withRegex: regex) {
                 return Texts_ErrorMessages.TransmitterIdBluCon
             }
             
-            if !transmitterId.startsWith("BLU") {
+            if transmitterId.count != 5 {
                 return Texts_ErrorMessages.TransmitterIdBluCon
             }
-            
             return nil
+            
         }
         
     }
