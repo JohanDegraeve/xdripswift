@@ -17,20 +17,20 @@ struct GetCalibrationStatus: Codable, CustomStringConvertible {
     
     var description: String {
         return """
-        slope_slope = \(slope?.slopeSlope ?? "")
-        slope_offset = \(slope?.slopeOffset ?? "")
-        offset_slope = \(slope?.offsetSlope ?? "")
-        offset_offset = \(slope?.offsetOffset ?? "")
+        slope_slope = \(slope?.slopeSlope ?? 0)
+        slope_offset = \(slope?.slopeOffset ?? 0)
+        offset_slope = \(slope?.offsetSlope ?? 0)
+        offset_offset = \(slope?.offsetOffset ?? 0)
         """
     }
 }
 
 struct GetCalibrationStatusResult: Codable {
     var status: String?
-    var slopeSlope: String?
-    var slopeOffset: String?
-    var offsetOffset: String?
-    var offsetSlope: String?
+    var slopeSlope: Double?
+    var slopeOffset: Double?
+    var offsetOffset: Double?
+    var offsetSlope: Double?
     var uuid: String?
     var isValidForFooterWithReverseCRCs: Double?
     
