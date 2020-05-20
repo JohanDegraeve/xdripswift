@@ -3,7 +3,7 @@
 "settingsviews_selectbgunit" = "وحدة قايس السكر:";
 "settingsviews_lowValue" = "القيمة الدنيا:";
 "settingsviews_highValue" = "القيمة العليا:";
-"settingsviews_masterorfollower" = "الاستخدام كتطبيقى رئيسي أو للمتابعة؟";
+"settingsviews_masterorfollower" = "الاستخدام كتطبيق رئيسي أو للمتابعة؟";
 "settingsviews_master" = "رئيسي";
 "settingsviews_follower" = "متابعة";
 "showReadingInNotification" = "عرض قراءات السكر في الإشعارات؟";
