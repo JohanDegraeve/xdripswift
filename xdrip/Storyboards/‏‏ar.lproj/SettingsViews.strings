@@ -1,8 +1,8 @@
 "settingsviews_settingstitle" = "الإعدادات";
 "settingsviews_sectiontitlegeneral" = "عام";
-"settingsviews_selectbgunit" = "وحدات قايس السكر:";
-"settingsviews_lowValue" = "القمة الدنيا:";
-"settingsviews_highValue" = "القبمة العليا:";
+"settingsviews_selectbgunit" = "وحدة قايس السكر:";
+"settingsviews_lowValue" = "القيمة الدنيا:";
+"settingsviews_highValue" = "القيمة العليا:";
 "settingsviews_masterorfollower" = "الاستخدام كتطبيقى رئيسي أو للمتابعة؟";
 "settingsviews_master" = "رئيسي";
 "settingsviews_follower" = "متابعة";
