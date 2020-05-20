@@ -100,13 +100,11 @@ class LibreDataParser {
     ///     - completionHandler : will be called when glucose data is read with as parameter the timestamp of the last reading. Goal is that caller an set timeStampLastBgReading to the new value
     ///
     /// parameter values that are not known, simply ignore them, if they are not known then they are probably not important, or they've already been passed to the delegate before. 
-    public static func libreDataProcessor(sensorSerialNumber: String?, webOOPEnabled: Bool, oopWebSite: String?, oopWebToken: String?, libreData: Data, cgmTransmitterDelegate : CGMTransmitterDelegate?, transmitterBatteryInfo:TransmitterBatteryInfo?, firmware: String?, hardware: String?, hardwareSerialNumber: String?, bootloader:String?, timeStampLastBgReading: Date, completionHandler:@escaping ((_ timeStampLastBgReading: Date) -> ())) {
+    public static func libreDataProcessor(sensorSerialNumber: String?, patchUid: String? = nil, patchInfo: String? = nil, webOOPEnabled: Bool, oopWebSite: String?, oopWebToken: String?, libreData: Data, cgmTransmitterDelegate : CGMTransmitterDelegate?, transmitterBatteryInfo:TransmitterBatteryInfo?, firmware: String?, hardware: String?, hardwareSerialNumber: String?, bootloader:String?, timeStampLastBgReading: Date, completionHandler:@escaping ((_ timeStampLastBgReading: Date) -> ())) {
 
         if let sensorSerialNumber = sensorSerialNumber, let oopWebSite = oopWebSite, let oopWebToken = oopWebToken, webOOPEnabled {
-            LibreOOPClient.handleLibreData(libreData: libreData, timeStampLastBgReading: timeStampLastBgReading, serialNumber: sensorSerialNumber, oopWebSite: oopWebSite, oopWebToken: oopWebToken) {
-                (result) in
-                    handleGlucoseData(result: result, cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: transmitterBatteryInfo, firmware: firmware, hardware: hardware, hardwareSerialNumber: hardwareSerialNumber, bootloader: bootloader, sensorSerialNumber: sensorSerialNumber, completionHandler: completionHandler)
-
+            LibreOOPClient.handleLibreData(libreData: libreData, patchUid: patchUid, patchInfo: patchInfo, timeStampLastBgReading: timeStampLastBgReading, serialNumber: sensorSerialNumber, oopWebSite: oopWebSite, oopWebToken: oopWebToken) { (result) in
+                handleGlucoseData(result: result, cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: transmitterBatteryInfo, firmware: firmware, hardware: hardware, hardwareSerialNumber: hardwareSerialNumber, bootloader: bootloader, sensorSerialNumber: sensorSerialNumber, completionHandler: completionHandler)
             }
         } else if !webOOPEnabled {
             // use local parser

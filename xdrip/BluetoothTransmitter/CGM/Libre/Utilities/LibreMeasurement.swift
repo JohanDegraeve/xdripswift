@@ -62,21 +62,29 @@ struct LibreMeasurement {
         self.counter = minuteCounter
         
         self.temperatureAlgorithmParameterSet = LibreDerivedAlgorithmParameterSet
-        if let LibreDerivedAlgorithmParameterSet = self.temperatureAlgorithmParameterSet {
-            self.oopSlope = LibreDerivedAlgorithmParameterSet.slope_slope * Double(rawTemperature) + LibreDerivedAlgorithmParameterSet.offset_slope
-            self.oopOffset = LibreDerivedAlgorithmParameterSet.slope_offset * Double(rawTemperature) + LibreDerivedAlgorithmParameterSet.offset_offset
-            //        self.oopSlope = slope_slope * Double(rawTemperature) + slope_offset
-            //        self.oopOffset = offset_slope * Double(rawTemperature) + offset_offset
-            let oopGlucose = oopSlope * Double(rawGlucose) + oopOffset
+        if let parameterSet = self.temperatureAlgorithmParameterSet {
+            self.oopSlope = parameterSet.slope_slope * Double(self.rawTemperature) + parameterSet.offset_slope
+            self.oopOffset = parameterSet.slope_offset * Double(self.rawTemperature) + parameterSet.offset_offset
+            
+            var glucose = parameterSet.slope_slope * Double(self.rawGlucose) + parameterSet.offset_slope * Double(self.rawTemperature)
+            glucose += parameterSet.slope_offset * Double(self.rawGlucose) * Double(self.rawTemperature) + parameterSet.offset_offset
+            
+            if glucose < 39 {
+                glucose = 39
+            }
+            
+            if glucose > 501 {
+                glucose = 501
+            }
+            
             //self.temperatureAlgorithmGlucose = oopGlucose
             // Final correction, if sensor values are very low and need to be compensated
-            self.temperatureAlgorithmGlucose = oopGlucose * LibreDerivedAlgorithmParameterSet.extraSlope + LibreDerivedAlgorithmParameterSet.extraOffset
+            self.temperatureAlgorithmGlucose = glucose
         } else {
             self.oopSlope = 0
             self.oopOffset = 0
             self.temperatureAlgorithmGlucose = 0
         }
-        
     }
     
     

@@ -10,18 +10,29 @@ import Foundation
 
 // MARK: Encode/decode helpers
 
-struct GetCalibrationStatus: Codable {
-    let error: Bool?
-    let command: String?
-    let slope: GetCalibrationStatusResult?
-    let result: GetCalibrationStatusResult?
+struct GetCalibrationStatus: Codable, CustomStringConvertible {
+    var error: Bool?
+    var command: String?
+    var slope: GetCalibrationStatusResult?
+    
+    var description: String {
+        return """
+        slope_slope = \(slope?.slopeSlope ?? "")
+        slope_offset = \(slope?.slopeOffset ?? "")
+        offset_slope = \(slope?.offsetSlope ?? "")
+        offset_offset = \(slope?.offsetOffset ?? "")
+        """
+    }
 }
 
-struct GetCalibrationStatusResult: Codable, CustomStringConvertible{
-    let status: String?
-    let slopeSlope, slopeOffset, offsetOffset, offsetSlope: Double?
-    let uuid: String?
-    let isValidForFooterWithReverseCRCs: Double?
+struct GetCalibrationStatusResult: Codable {
+    var status: String?
+    var slopeSlope: String?
+    var slopeOffset: String?
+    var offsetOffset: String?
+    var offsetSlope: String?
+    var uuid: String?
+    var isValidForFooterWithReverseCRCs: Double?
     
     enum CodingKeys: String, CodingKey {
         case status
@@ -32,6 +43,7 @@ struct GetCalibrationStatusResult: Codable, CustomStringConvertible{
         case uuid
         case isValidForFooterWithReverseCRCs  = "isValidForFooterWithReverseCRCs"
     }
+    
     var description: String {
         return "calibrationparams:: slopeslope: \(String(describing: slopeSlope)), slopeoffset: \(String(describing: slopeOffset)), offsetoffset: \(String(describing: offsetOffset)), offsetSlope: \(String(describing: offsetSlope)), isValidForFooterWithReverseCRCs: \(String(describing: isValidForFooterWithReverseCRCs))"
     }

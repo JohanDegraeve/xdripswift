@@ -18,6 +18,13 @@ public struct LibreDerivedAlgorithmParameters: Codable, CustomStringConvertible 
     public var extraOffset: Double = 0
     public var serialNumber: String
     
+    var isErrorParameters: Bool {
+        return slope_slope == 0 &&
+            slope_offset == 0 &&
+            offset_slope == 0 &&
+            offset_offset == 0
+    }
+    
     public var description: String {
         return "LibreDerivedAlgorithmParameters:: slopeslope: \(slope_slope), slopeoffset: \(slope_offset), offsetoffset: \(offset_offset), offsetSlope: \(offset_slope), extraSlope: \(extraSlope), extraOffset: \(extraOffset), isValidForFooterWithReverseCRCs: \(isValidForFooterWithReverseCRCs)"
     }
