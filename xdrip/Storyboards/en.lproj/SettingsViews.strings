@@ -74,5 +74,6 @@
 "sectionTitleTrace" = "Trace";
 "sendTraceFile" = "Send Trace File";
 "describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group 'xDrip4iOS', then mention your facebook name in the e-mail";
+"emailNotConfigured" = "You must configure an e-mail account on your iOS device."
 "emailbodyText" = "Problem Description: ";
 "failedToSendEmail" = "Failed to Send Email";

@@ -72,5 +72,6 @@
 "sectionTitleTrace" = "Rastrear";
 "sendTraceFile" = "Enviar Archivo de Rastreo";
 "describeProblem" = "Explicar en detalle porqué es necesario enviar este archivo de rastreo. Si ya has reportando previamente este problema en el grupo de Facebook 'xDrip4iOS', confirmar tu Nombre en Facebook dentro del cuerpo del correo";
+"emailNotConfigured" = "Deberías tener configurado una cuenta de correo antes de enviar el archivo."
 "emailbodyText" = "Problem Description: ";
 "failedToSendEmail" = "Error al Enviar Correo";
