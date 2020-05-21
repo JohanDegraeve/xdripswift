@@ -4,11 +4,8 @@ import os
 
 fileprivate enum Setting:Int, CaseIterable {
     
-    /// write trace to file enabled or not
-    case writeTraceToFile = 0
-    
     /// to send trace file
-    case sendTraceFile = 1
+    case sendTraceFile = 0
     
 }
 
@@ -16,9 +13,6 @@ class SettingsViewTraceSettingsViewModel: NSObject {
     
     /// need to present MFMailComposeViewController
     private var uIViewController: UIViewController?
-    
-    /// to force a row reload
-    private var rowReloadClosure: ((Int) -> Void)?
     
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryTraceSettingsViewModel)
@@ -35,9 +29,7 @@ class SettingsViewTraceSettingsViewModel: NSObject {
 
 extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
     
-    func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {
-        self.rowReloadClosure = rowReloadClosure
-    }
+    func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
     
     func storeUIViewController(uIViewController: UIViewController) {
         self.uIViewController = uIViewController
@@ -57,9 +49,6 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .writeTraceToFile:
-            return Texts_SettingsView.writeTraceToFile
-            
         case .sendTraceFile:
             return Texts_SettingsView.sendTraceFile
             
@@ -71,9 +60,6 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
-        case .writeTraceToFile:
-            return .none
             
         case .sendTraceFile:
             return .disclosureIndicator
@@ -87,9 +73,6 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .writeTraceToFile:
-            return nil
-            
         case .sendTraceFile:
             return nil
             
@@ -102,31 +85,6 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
-        case .writeTraceToFile:
-            return UISwitch(isOn: UserDefaults.standard.writeTraceToFile, action: {
-                
-                (isOn:Bool) in
-                
-                if isOn {
-                    
-                    // set writeTraceToFile to true before logging in trace that it is enabled
-                    UserDefaults.standard.writeTraceToFile = true
-                    
-                    trace("Trace to file enabled", log: self.log, category: ConstantsLog.categoryTraceSettingsViewModel, type: .info)
-                    
-                } else {
-                    
-                    trace("Trace to file disabled", log: self.log, category: ConstantsLog.categoryTraceSettingsViewModel, type: .info)
-
-                    // set writeTraceToFile to false after logging in trace that it is enabled
-                    UserDefaults.standard.writeTraceToFile = false
-                    
-                }
-                
-                
-                
-            })
             
         case .sendTraceFile:
             return nil
@@ -145,59 +103,40 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .writeTraceToFile:
-            return .nothing
-            
         case .sendTraceFile:
-    
-            if !UserDefaults.standard.writeTraceToFile {
-                
-                    return .showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.warningWriteTraceToFile)
 
-            } else {
-
-                guard let uIViewController = uIViewController else {fatalError("in SettingsViewTraceSettingsViewModel, onRowSelect, uIViewController is nil")}
-                
-                do {
+            guard let uIViewController = uIViewController else {fatalError("in SettingsViewTraceSettingsViewModel, onRowSelect, uIViewController is nil")}
+            
+                // check if iOS device can send email, this depends of an email account is configured
+                if MFMailComposeViewController.canSendMail() {
                     
-                    // create traceFile info as data
-                    let fileData = try Data(contentsOf: traceFileName)
-
-                    // create app info as data
-                    Trace.createAppInfoFile()
-                    let appInfoData = try Data(contentsOf: appInfoFileName)
-
-                    if MFMailComposeViewController.canSendMail() {
+                    return .askConfirmation(title: Texts_HomeView.info, message: Texts_SettingsView.describeProblem, actionHandler: {
                         
-                        return .askConfirmation(title: Texts_HomeView.info, message: Texts_SettingsView.describeProblem, actionHandler: {
-                            
-                            let mail = MFMailComposeViewController()
-                            mail.mailComposeDelegate = self
-                            mail.setToRecipients([ConstantsTrace.traceFileDestinationAddress])
-                            mail.setMessageBody(Texts_SettingsView.emailbodyText, isHTML: true)
-                            
-                            mail.addAttachmentData(fileData as Data, mimeType: "text/txt", fileName: ConstantsTrace.traceFileName)
-                            
-                            mail.addAttachmentData(appInfoData as Data, mimeType: "text/txt", fileName: ConstantsTrace.appInfoFileName)
-                            
-                            uIViewController.present(mail, animated: true)
-                            
-                        }, cancelHandler: nil)
+                        let mail = MFMailComposeViewController()
+                        mail.mailComposeDelegate = self
+                        mail.setToRecipients([ConstantsTrace.traceFileDestinationAddress])
+                        mail.setMessageBody(Texts_SettingsView.emailbodyText, isHTML: true)
                         
+                        // add all trace files as attachment
+                        let traceFilesInData = Trace.getTraceFilesInData()
+                        for (index, traceFileInData) in traceFilesInData.0.enumerated() {
+                            mail.addAttachmentData(traceFileInData as Data, mimeType: "text/txt", fileName: traceFilesInData.1[index])
+                        }
                         
-                    } else {
-
-                        return .showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.emailNotConfigured)
+                        if let appInfoAsData = Trace.getAppInfoFileAsData().0 {
+                            mail.addAttachmentData(appInfoAsData as Data, mimeType: "text/txt", fileName: Trace.getAppInfoFileAsData().1)
+                        }
                         
-                    }
-
-                } catch {
-                    // should never get here ?
-                    return .showInfoText(title: Texts_Common.warning, message: "Failed to create attachment")
+                        uIViewController.present(mail, animated: true)
+                        
+                    }, cancelHandler: nil)
+                    
+                    
+                } else {
+                    
+                    return .showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.emailNotConfigured)
                     
                 }
-                
-            }
             
         }
     }
@@ -226,18 +165,8 @@ extension SettingsViewTraceSettingsViewModel: MFMailComposeViewControllerDelegat
             break
             
         case .sent, .saved:
-
-            // delete the file as it's been sent successfully
-            deleteTraceFile()
+            break
             
-            // disable tracing, to avoid user forgets turning it off
-            UserDefaults.standard.writeTraceToFile = false
-            
-            // as setting writeTraceToFile has been changed to false, the row with that setting needs to be reloaded
-            if let rowReloadClosure = rowReloadClosure {
-                rowReloadClosure(Setting.writeTraceToFile.rawValue)
-            }
-
         case .failed:
             if let messageHandler = messageHandler {
                 messageHandler(Texts_Common.warning, Texts_SettingsView.failedToSendEmail)
