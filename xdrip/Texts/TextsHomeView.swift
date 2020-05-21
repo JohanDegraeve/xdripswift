@@ -97,7 +97,7 @@ enum Texts_HomeView {
     }()
     
     static let theresNoCGMTransmitterActive:String = {
-        return NSLocalizedString("theresNoCGMTransmitterActive", tableName: filename, bundle: Bundle.main, value: "To calibrate you should have a CGM Transmitter created with 'Always Connect'.", comment: "When user has no CGM transmitter created with 'Always connect', and tries to calibrate, then this message is shown")
+        return NSLocalizedString("theresNoCGMTransmitterActive", tableName: filename, bundle: Bundle.main, value: "You cannot calibrate unless you have a transmitter connected.", comment: "When user has no CGM transmitter created with 'Always connect', and tries to calibrate, then this message is shown")
     }()
     
     static let thereMustBeAreadingBeforeCalibration:String = {
