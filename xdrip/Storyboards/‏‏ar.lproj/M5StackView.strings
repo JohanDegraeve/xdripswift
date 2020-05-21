@@ -1,0 +1,13 @@
+"screenTitle" = "M5Stack";
+"authenticationFailureWarning" = "فشل المصادقة على M5Stack ، إما تعيين كلمة المرور المكونة مسبقًا في الإعدادات ، أو إذا لم يكن M5Stack يحتوي على كلمة مرور مكونة مسبقًا ، فقم بإعادة تعيين M5Stack. سيتم قطع اتصال M5Stack الآن. يمكنك القيام بمحاولة جديدة بالنقر ";
+"blePasswordMissingWarning" = "تحتاج إلى تعيين كلمة المرور في الإعدادات";
+"m5StackResetRequiredWarning" = "يجب إعادة ضبط M5Stack لتتمكن من إنشاء كلمة مرور مؤقتة جديدة. عند الانتهاء انقر فوق ";
+"m5StackSoftWhereHelpCellText" = "أين تجد برنامج M5Stack؟";
+"m5StickCSoftWhereHelpCellText" = "أين تجد برنامج M5StickC؟";
+"m5StackSoftWareHelpText" = "إذهب إلى";
+"m5StackViewscreenTitle" = "M5Stack";
+"m5StickCViewscreenTitle" = "M5StickC";
+"deviceMustBeConnectedToPowerOff" = "يجب توصيل M5Stack لتتمكن من إيقاف تشغيله";
+"powerOffConfirm" = "هل أنت متأكد أنك تريد إيقاف تشغيل M5Stack؟";
+"powerOff" = "إيقاف التشغيل";
+"connectToWiFi" = "اتصل بشبكة WiFi";

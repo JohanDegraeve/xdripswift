@@ -1,0 +1,14 @@
+"high" = "مرتفع";
+"low" = "منخفض";
+"currentglucose" = "قراءة السكر لديك الآن هي";
+"trendnoncomputable" = "غير محسوب";
+"trenddoubledown" = "نزول بشكل كبير";
+"trendsingledown" = "نزول بشكل ملحوظ";
+"trendfortyfivedown" = "نزول";
+"trendflat" = "مستقر";
+"trendfortyfiveup" = "ارتفاع";
+"trendsingleup" = "ارتفاع بشكل ملحوظ";
+"trenddoubleup" = "ارتفاع  بشكل كبير";
+"currenttrend" = "تتجه";
+"deltanoncomputable" = "غير محسوب";
+"currentdelta" = "الفرق عن القراءة السابقة هو";
