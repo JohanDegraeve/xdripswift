@@ -454,6 +454,22 @@
 		F889CB8E236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
 		F889CB97236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F889CB9D236D8EEC00A81068 /* xdrip v4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v4.xcdatamodel"; sourceTree = "<group>"; };
+		F890E07B247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		F890E07C247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Main.strings; sourceTree = "<group>"; };
+		F890E07D247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Alerts.strings; sourceTree = "<group>"; };
+		F890E07E247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
+		F890E07F247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
+		F890E080247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
+		F890E081247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/CalibrationRequest.strings; sourceTree = "<group>"; };
+		F890E082247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Common.strings; sourceTree = "<group>"; };
+		F890E083247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F890E084247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/ErrorMessages.strings; sourceTree = "<group>"; };
+		F890E085247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/HomeView.strings; sourceTree = "<group>"; };
+		F890E086247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
+		F890E087247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/M5StackView.strings; sourceTree = "<group>"; };
+		F890E088247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/NightScoutTestResult.strings; sourceTree = "<group>"; };
+		F890E089247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/SettingsViews.strings; sourceTree = "<group>"; };
+		F890E08A247705EC008FB2EC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
 		F897AAFA2201018800CDDD10 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		F897E24A23FC86CF0075E0E8 /* CGMG5TransmitterDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMG5TransmitterDelegate.swift; sourceTree = "<group>"; };
@@ -1996,6 +2012,7 @@
 				zh,
 				pt,
 				de,
+				ar,
 			);
 			mainGroup = F8AC425121ADEBD60078C348;
 			productRefGroup = F8AC425B21ADEBD60078C348 /* Products */;
@@ -2405,6 +2422,7 @@
 				470CE1FD246802EB00D5CB74 /* es-ES */,
 				470CE1FF246802F400D5CB74 /* en */,
 				470CE200246803B100D5CB74 /* es-MX */,
+				F890E07F247705EC008FB2EC /* ar */,
 			);
 			name = BluetoothPeripheralsView.strings;
 			sourceTree = "<group>";
@@ -2415,6 +2433,7 @@
 				47503383247420A200D2260B /* en */,
 				47503385247420B000D2260B /* es-ES */,
 				47503387247420BA00D2260B /* es-MX */,
+				F890E080247705EC008FB2EC /* ar */,
 			);
 			name = BluetoothPeripheralView.strings;
 			sourceTree = "<group>";
@@ -2423,6 +2442,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				F889CB70236D84AC00A81068 /* en */,
+				F890E087247705EC008FB2EC /* ar */,
 			);
 			name = M5StackView.strings;
 			sourceTree = "<group>";
@@ -2442,6 +2462,7 @@
 				F8B48AFC22B37C67009BCC01 /* fr */,
 				F8B48B0822B37C83009BCC01 /* zh */,
 				F889CB8E236D89C800A81068 /* de */,
+				F890E07C247705EC008FB2EC /* ar */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -2460,6 +2481,7 @@
 				F8B48AFB22B37C67009BCC01 /* fr */,
 				F8B48B0722B37C83009BCC01 /* zh */,
 				F889CB8D236D89C800A81068 /* de */,
+				F890E07B247705EC008FB2EC /* ar */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -2471,6 +2493,7 @@
 				F8B48AB022B2FF24009BCC01 /* es-MX */,
 				F8B48ABC22B2FF36009BCC01 /* es-ES */,
 				F8B48B1122B37C84009BCC01 /* zh */,
+				F890E088247705EC008FB2EC /* ar */,
 			);
 			name = NightScoutTestResult.strings;
 			sourceTree = "<group>";
@@ -2483,6 +2506,7 @@
 				F8B48AB722B2FF35009BCC01 /* es-ES */,
 				F8B48B0C22B37C83009BCC01 /* zh */,
 				475DED96244AF92A00F78473 /* en */,
+				F890E07D247705EC008FB2EC /* ar */,
 			);
 			name = Alerts.strings;
 			sourceTree = "<group>";
@@ -2495,6 +2519,7 @@
 				F8B48AAC22B2FF24009BCC01 /* es-MX */,
 				F8B48AB822B2FF35009BCC01 /* es-ES */,
 				F8B48B0D22B37C84009BCC01 /* zh */,
+				F890E07E247705EC008FB2EC /* ar */,
 			);
 			name = AlertTypesSettingsView.strings;
 			sourceTree = "<group>";
@@ -2514,6 +2539,7 @@
 				F8B48AFF22B37C67009BCC01 /* fr */,
 				F8B48B0B22B37C83009BCC01 /* zh */,
 				F81D6D4522B67F55005EFAE2 /* pt */,
+				F890E08A247705EC008FB2EC /* ar */,
 			);
 			name = SpeakReading.strings;
 			sourceTree = "<group>";
@@ -2525,6 +2551,7 @@
 				F8B48AA922B2FF23009BCC01 /* es-MX */,
 				F8B48AB522B2FF35009BCC01 /* es-ES */,
 				F8B48B0A22B37C83009BCC01 /* zh */,
+				F890E085247705EC008FB2EC /* ar */,
 			);
 			name = HomeView.strings;
 			sourceTree = "<group>";
@@ -2536,6 +2563,7 @@
 				F8B48AA822B2FF23009BCC01 /* es-MX */,
 				F8B48AB422B2FF35009BCC01 /* es-ES */,
 				F8B48B0922B37C83009BCC01 /* zh */,
+				F890E081247705EC008FB2EC /* ar */,
 			);
 			name = CalibrationRequest.strings;
 			sourceTree = "<group>";
@@ -2554,6 +2582,7 @@
 				F8B48B0422B37C67009BCC01 /* fr */,
 				F8B48B1022B37C84009BCC01 /* zh */,
 				F889CB97236D89C800A81068 /* de */,
+				F890E086247705EC008FB2EC /* ar */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2568,6 +2597,7 @@
 				F8B48B0E22B37C84009BCC01 /* zh */,
 				F8C5EBED22F5A52400563B5F /* pt-BR */,
 				F8C5EBEE22F5A52800563B5F /* pt */,
+				F890E082247705EC008FB2EC /* ar */,
 			);
 			name = Common.strings;
 			sourceTree = "<group>";
@@ -2579,6 +2609,7 @@
 				F8B48AAE22B2FF24009BCC01 /* es-MX */,
 				F8B48ABA22B2FF35009BCC01 /* es-ES */,
 				F8B48B0F22B37C84009BCC01 /* zh */,
+				F890E084247705EC008FB2EC /* ar */,
 			);
 			name = ErrorMessages.strings;
 			sourceTree = "<group>";
@@ -2593,6 +2624,7 @@
 				F8B48B1222B37C84009BCC01 /* zh */,
 				F846CDD523046BAC00DCF016 /* pt-BR */,
 				F846CDD623046BAE00DCF016 /* pt */,
+				F890E089247705EC008FB2EC /* ar */,
 			);
 			name = SettingsViews.strings;
 			sourceTree = "<group>";
@@ -2606,6 +2638,7 @@
 				F8EEDD5D2300139500D2D610 /* pt-BR */,
 				F8EEDD612300139800D2D610 /* zh */,
 				F8EEDD622300139A00D2D610 /* pt */,
+				F890E083247705EC008FB2EC /* ar */,
 			);
 			name = DexcomShareTestResult.strings;
 			sourceTree = "<group>";
