@@ -175,9 +175,6 @@ extension UserDefaults {
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
         
-        /// write trace to file enabled or not
-        case writeTraceToFile = "writeTraceToFile"
-        
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
         
@@ -828,16 +825,6 @@ extension UserDefaults {
         }
     }
     
-    /// write trace to file enabled or not
-    var writeTraceToFile: Bool {
-        get {
-            return bool(forKey: Key.writeTraceToFile.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.writeTraceToFile.rawValue)
-        }
-    }
-
     /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
     var cgmTransmitterDeviceAddress: String? {
         get {

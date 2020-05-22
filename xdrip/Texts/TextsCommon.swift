@@ -110,7 +110,7 @@ class Texts_Common {
     }()
     
     static let name = {
-        return NSLocalizedString("Name", tableName: filename, bundle: Bundle.main, value: "Name:", comment: "name")
+        return NSLocalizedString("name", tableName: filename, bundle: Bundle.main, value: "Name:", comment: "name")
     }()
     
     static let WiFi = {

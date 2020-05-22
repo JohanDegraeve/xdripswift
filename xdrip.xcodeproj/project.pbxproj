@@ -118,6 +118,7 @@
 		F869188C23A044340065B607 /* TextsM5StackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F869188B23A044340065B607 /* TextsM5StackView.swift */; };
 		F878FA7D2405B3CF00BC6DA6 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F878FA7C2405B3CF00BC6DA6 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift */; };
 		F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F889CB71236D84AC00A81068 /* M5StackView.strings */; };
+		F890E07A247687AE008FB2EC /* URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = F890E079247687AE008FB2EC /* URL.swift */; };
 		F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */; };
 		F897AAFB2201018800CDDD10 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAFA2201018800CDDD10 /* String.swift */; };
 		F897E24B23FC86CF0075E0E8 /* CGMG5TransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897E24A23FC86CF0075E0E8 /* CGMG5TransmitterDelegate.swift */; };
@@ -448,12 +449,29 @@
 		F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Calibration+CoreDataProperties.swift"; path = "xdrip/Core Data/extensions/Calibration+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		F8691887239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
 		F869188B23A044340065B607 /* TextsM5StackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsM5StackView.swift; sourceTree = "<group>"; };
+		F86A3C6B247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Alerts.strings; sourceTree = "<group>"; };
+		F86A3C6C247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
+		F86A3C6D247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
+		F86A3C6E247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
+		F86A3C6F247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/CalibrationRequest.strings; sourceTree = "<group>"; };
+		F86A3C70247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Common.strings; sourceTree = "<group>"; };
+		F86A3C71247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F86A3C72247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/ErrorMessages.strings; sourceTree = "<group>"; };
+		F86A3C73247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/HomeView.strings; sourceTree = "<group>"; };
+		F86A3C74247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
+		F86A3C75247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/M5StackView.strings; sourceTree = "<group>"; };
+		F86A3C76247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/NightScoutTestResult.strings; sourceTree = "<group>"; };
+		F86A3C77247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/SettingsViews.strings; sourceTree = "<group>"; };
+		F86A3C78247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/SpeakReading.strings; sourceTree = "<group>"; };
+		F86A3C79247718C800EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		F86A3C7A247718C800EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Main.strings; sourceTree = "<group>"; };
 		F878FA7C2405B3CF00BC6DA6 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift"; sourceTree = "<group>"; };
 		F889CB70236D84AC00A81068 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/M5StackView.strings; sourceTree = "<group>"; };
 		F889CB8D236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F889CB8E236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
 		F889CB97236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F889CB9D236D8EEC00A81068 /* xdrip v4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v4.xcdatamodel"; sourceTree = "<group>"; };
+		F890E079247687AE008FB2EC /* URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URL.swift; sourceTree = "<group>"; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
 		F897AAFA2201018800CDDD10 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		F897E24A23FC86CF0075E0E8 /* CGMG5TransmitterDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMG5TransmitterDelegate.swift; sourceTree = "<group>"; };
@@ -799,6 +817,7 @@
 				F83098FD23AD3F84005741DF /* UITabBarController.swift */,
 				F8E51D602448E695001C9E5A /* Bundle.swift */,
 				F8AF361A245D93ED00B5977B /* Int16.swift */,
+				F890E079247687AE008FB2EC /* URL.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1996,6 +2015,7 @@
 				zh,
 				pt,
 				de,
+				ar,
 			);
 			mainGroup = F8AC425121ADEBD60078C348;
 			productRefGroup = F8AC425B21ADEBD60078C348 /* Products */;
@@ -2385,6 +2405,7 @@
 				F816E0ED2432A55F009EE65B /* BluconBluetoothPeripheralViewModel.swift in Sources */,
 				F8F9722923A5915900C3F17D /* CGMTransmitter.swift in Sources */,
 				F8A389ED23342EB10010F405 /* ConstantsNightScout.swift in Sources */,
+				F890E07A247687AE008FB2EC /* URL.swift in Sources */,
 				F8B3A856227F28DC004BA588 /* AlertTypeSettingsViewController.swift in Sources */,
 				F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */,
 				F8B3A845227F090E004BA588 /* SettingsViewDexcomSettingsViewModel.swift in Sources */,
@@ -2405,6 +2426,7 @@
 				470CE1FD246802EB00D5CB74 /* es-ES */,
 				470CE1FF246802F400D5CB74 /* en */,
 				470CE200246803B100D5CB74 /* es-MX */,
+				F86A3C6D247718C700EE7E46 /* ar */,
 			);
 			name = BluetoothPeripheralsView.strings;
 			sourceTree = "<group>";
@@ -2415,6 +2437,7 @@
 				47503383247420A200D2260B /* en */,
 				47503385247420B000D2260B /* es-ES */,
 				47503387247420BA00D2260B /* es-MX */,
+				F86A3C6E247718C700EE7E46 /* ar */,
 			);
 			name = BluetoothPeripheralView.strings;
 			sourceTree = "<group>";
@@ -2423,6 +2446,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				F889CB70236D84AC00A81068 /* en */,
+				F86A3C75247718C700EE7E46 /* ar */,
 			);
 			name = M5StackView.strings;
 			sourceTree = "<group>";
@@ -2442,6 +2466,7 @@
 				F8B48AFC22B37C67009BCC01 /* fr */,
 				F8B48B0822B37C83009BCC01 /* zh */,
 				F889CB8E236D89C800A81068 /* de */,
+				F86A3C7A247718C800EE7E46 /* ar */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -2460,6 +2485,7 @@
 				F8B48AFB22B37C67009BCC01 /* fr */,
 				F8B48B0722B37C83009BCC01 /* zh */,
 				F889CB8D236D89C800A81068 /* de */,
+				F86A3C79247718C800EE7E46 /* ar */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -2471,6 +2497,7 @@
 				F8B48AB022B2FF24009BCC01 /* es-MX */,
 				F8B48ABC22B2FF36009BCC01 /* es-ES */,
 				F8B48B1122B37C84009BCC01 /* zh */,
+				F86A3C76247718C700EE7E46 /* ar */,
 			);
 			name = NightScoutTestResult.strings;
 			sourceTree = "<group>";
@@ -2483,6 +2510,7 @@
 				F8B48AB722B2FF35009BCC01 /* es-ES */,
 				F8B48B0C22B37C83009BCC01 /* zh */,
 				475DED96244AF92A00F78473 /* en */,
+				F86A3C6B247718C700EE7E46 /* ar */,
 			);
 			name = Alerts.strings;
 			sourceTree = "<group>";
@@ -2495,6 +2523,7 @@
 				F8B48AAC22B2FF24009BCC01 /* es-MX */,
 				F8B48AB822B2FF35009BCC01 /* es-ES */,
 				F8B48B0D22B37C84009BCC01 /* zh */,
+				F86A3C6C247718C700EE7E46 /* ar */,
 			);
 			name = AlertTypesSettingsView.strings;
 			sourceTree = "<group>";
@@ -2514,6 +2543,7 @@
 				F8B48AFF22B37C67009BCC01 /* fr */,
 				F8B48B0B22B37C83009BCC01 /* zh */,
 				F81D6D4522B67F55005EFAE2 /* pt */,
+				F86A3C78247718C700EE7E46 /* ar */,
 			);
 			name = SpeakReading.strings;
 			sourceTree = "<group>";
@@ -2525,6 +2555,7 @@
 				F8B48AA922B2FF23009BCC01 /* es-MX */,
 				F8B48AB522B2FF35009BCC01 /* es-ES */,
 				F8B48B0A22B37C83009BCC01 /* zh */,
+				F86A3C73247718C700EE7E46 /* ar */,
 			);
 			name = HomeView.strings;
 			sourceTree = "<group>";
@@ -2536,6 +2567,7 @@
 				F8B48AA822B2FF23009BCC01 /* es-MX */,
 				F8B48AB422B2FF35009BCC01 /* es-ES */,
 				F8B48B0922B37C83009BCC01 /* zh */,
+				F86A3C6F247718C700EE7E46 /* ar */,
 			);
 			name = CalibrationRequest.strings;
 			sourceTree = "<group>";
@@ -2554,6 +2586,7 @@
 				F8B48B0422B37C67009BCC01 /* fr */,
 				F8B48B1022B37C84009BCC01 /* zh */,
 				F889CB97236D89C800A81068 /* de */,
+				F86A3C74247718C700EE7E46 /* ar */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2568,6 +2601,7 @@
 				F8B48B0E22B37C84009BCC01 /* zh */,
 				F8C5EBED22F5A52400563B5F /* pt-BR */,
 				F8C5EBEE22F5A52800563B5F /* pt */,
+				F86A3C70247718C700EE7E46 /* ar */,
 			);
 			name = Common.strings;
 			sourceTree = "<group>";
@@ -2579,6 +2613,7 @@
 				F8B48AAE22B2FF24009BCC01 /* es-MX */,
 				F8B48ABA22B2FF35009BCC01 /* es-ES */,
 				F8B48B0F22B37C84009BCC01 /* zh */,
+				F86A3C72247718C700EE7E46 /* ar */,
 			);
 			name = ErrorMessages.strings;
 			sourceTree = "<group>";
@@ -2593,6 +2628,7 @@
 				F8B48B1222B37C84009BCC01 /* zh */,
 				F846CDD523046BAC00DCF016 /* pt-BR */,
 				F846CDD623046BAE00DCF016 /* pt */,
+				F86A3C77247718C700EE7E46 /* ar */,
 			);
 			name = SettingsViews.strings;
 			sourceTree = "<group>";
@@ -2606,6 +2642,7 @@
 				F8EEDD5D2300139500D2D610 /* pt-BR */,
 				F8EEDD612300139800D2D610 /* zh */,
 				F8EEDD622300139A00D2D610 /* pt */,
+				F86A3C71247718C700EE7E46 /* ar */,
 			);
 			name = DexcomShareTestResult.strings;
 			sourceTree = "<group>";
@@ -2749,7 +2786,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.0.0;
+				MARKETING_VERSION = 4.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2778,7 +2815,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.0.0;
+				MARKETING_VERSION = 4.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
