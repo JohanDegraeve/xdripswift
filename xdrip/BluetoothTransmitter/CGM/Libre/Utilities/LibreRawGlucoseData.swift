@@ -21,7 +21,16 @@ class LibreRawGlucoseData: GlucoseData {
 
 }
 
-class LibreRawGlucoseOOPData: NSObject, Codable {
+protocol LibreRawGlucoseWeb {
+    var isError: Bool { get }
+    var sensorTime: Int? { get }
+    var canGetParameters: Bool { get }
+    var sensorState: LibreSensorState { get }
+    var valueError: Bool { get }
+    func glucoseData(date: Date) ->(LibreRawGlucoseData?, [LibreRawGlucoseData])
+}
+
+public class LibreRawGlucoseOOPData: NSObject, Codable, LibreRawGlucoseWeb {
     var alarm : String?
     var esaMinutesToWait : Int?
     var historicGlucose : [HistoricGlucose]?
@@ -164,4 +173,100 @@ class HistoricGlucose: NSObject, Codable {
     let dataQuality : Int?
     let id: Int?
     let value : Double?
+}
+
+
+public class LibreRawGlucoseOOPA2Data: NSObject, Codable, LibreRawGlucoseWeb {
+    var errcode: Int?
+    var list: [LibreRawGlucoseOOPA2List]?
+    
+    var content: LibreRawGlucoseOOPA2Cotent? {
+        return list?.first?.content
+    }
+    
+    var isError: Bool {
+        if content?.currentBg ?? 0 <= 10 {
+            return true
+        }
+        return list?.first?.content?.historicBg?.isEmpty ?? true
+    }
+    
+    var sensorTime: Int? {
+        return content?.currentTime
+    }
+    
+    var canGetParameters: Bool {
+        if let id = content?.currentTime {
+            if id >= 60 {
+                return true
+            }
+        }
+        return false
+    }
+    
+    var sensorState: LibreSensorState {
+        if let id = content?.currentTime {
+            if id < 60 {
+                return LibreSensorState.starting
+            } else if id >= 20880 {
+                return LibreSensorState.expired
+            }
+        }
+        
+        let state = LibreSensorState.ready
+        return state
+    }
+    
+    func glucoseData(date: Date) ->(LibreRawGlucoseData?, [LibreRawGlucoseData]) {
+        var current: LibreRawGlucoseData?
+        guard !isError else { return(nil, []) }
+        current = LibreRawGlucoseData.init(timeStamp: date, glucoseLevelRaw: content?.currentBg ?? 0)
+        var array = [LibreRawGlucoseData]()
+        let gap: TimeInterval = 60 * 15
+        var date = date
+        if var history = content?.historicBg {
+            if (history.first?.time ?? 0) < (history.last?.time ?? 0) {
+                history = history.reversed()
+            }
+            
+            for g in history {
+                date = date.addingTimeInterval(-gap)
+                if g.quality != 0 { continue }
+                let glucose = LibreRawGlucoseData.init(timeStamp: date, glucoseLevelRaw: g.bg ?? 0)
+                array.insert(glucose, at: 0)
+            }
+        }
+        return (current ,array)
+    }
+    
+    var valueError: Bool {
+        if let id = content?.currentTime, id < 60 {
+            return false
+        }
+        
+        if content?.currentBg ?? 0 <= 10 {
+            return true
+        }
+        return false
+    }
+}
+
+class LibreRawGlucoseOOPA2List: NSObject, Codable {
+    var content: LibreRawGlucoseOOPA2Cotent?
+    var timestamp: Int?
+}
+
+class LibreRawGlucoseOOPA2Cotent: NSObject, Codable {
+    var currentTime: Int?
+    var currenTrend: Int?
+    var serialNumber: String?
+    var historicBg: [HistoricGlucoseA2]?
+    var currentBg: Double?
+    var timestamp: Int?
+}
+
+class HistoricGlucoseA2: NSObject, Codable {
+    let quality : Int?
+    let time: Int?
+    let bg : Double?
 }
