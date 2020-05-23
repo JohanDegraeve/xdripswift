@@ -1021,7 +1021,7 @@ final class RootViewController: UIViewController {
         // start creating text for valueLabelOutlet, first the calculated value
         var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         
-        // if latestReading older dan 11 minutes, then it should be strikethrough
+        // if latestReading is older than 11 minutes, then it should be strikethrough
         if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
             
             let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
@@ -1043,9 +1043,12 @@ final class RootViewController: UIViewController {
             
         }
         
-        // set color, depending on value lower than low mark or higher than high mark
+        // if data is stale (over 11 minutes old), show it as gray colour to indicate that it isn't current
+        // if not, then set color, depending on value lower than low mark or higher than high mark
         // set both HIGH and LOW BG values to red as previous yellow for hig is now not so obvious due to in-range colour of green.
-        if lastReading.calculatedValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+        if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
+            valueLabelOutlet.textColor = UIColor.lightGray
+        } else if lastReading.calculatedValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
             valueLabelOutlet.textColor = UIColor.red
         } else if lastReading.calculatedValue >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
             valueLabelOutlet.textColor = UIColor.red
