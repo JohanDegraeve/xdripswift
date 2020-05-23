@@ -242,8 +242,7 @@ public class LibreOOPClient {
                                                                  offset_offset: slope.offsetOffset ?? 0,
                                                                  isValidForFooterWithReverseCRCs: Int(slope.isValidForFooterWithReverseCRCs ?? 1),
                                                                  extraSlope: 1.0,
-                                                                 extraOffset: 0.0,
-                                                                 sensorSerialNumber: serialNumber)
+                                                                 extraOffset: 0.0)
                     p.serialNumber = serialNumber
                     if p.slope_slope != 0 ||
                         p.slope_offset != 0 ||
