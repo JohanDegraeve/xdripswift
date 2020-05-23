@@ -223,10 +223,10 @@ public class LibreOOPClient {
         }
         
         /// default parameters
-        let params = LibreDerivedAlgorithmParameters.init(slope_slope: 0.00001729,
-                                                          slope_offset: -0.0006316,
-                                                          offset_slope: 0.002080,
-                                                          offset_offset: -20.15,
+        let params = LibreDerivedAlgorithmParameters.init(slope_slope: 0.00001816666666666667,
+                                                          slope_offset: -0.00016666666666666666,
+                                                          offset_slope: 0.007499999999999993,
+                                                          offset_offset: -21.5,
                                                           isValidForFooterWithReverseCRCs: 1,
                                                           extraSlope: 1.0,
                                                           extraOffset: 0.0,
@@ -242,7 +242,8 @@ public class LibreOOPClient {
                                                                  offset_offset: slope.offsetOffset ?? 0,
                                                                  isValidForFooterWithReverseCRCs: Int(slope.isValidForFooterWithReverseCRCs ?? 1),
                                                                  extraSlope: 1.0,
-                                                                 extraOffset: 0.0)
+                                                                 extraOffset: 0.0,
+                                                                 sensorSerialNumber: serialNumber)
                     p.serialNumber = serialNumber
                     if p.slope_slope != 0 ||
                         p.slope_offset != 0 ||
