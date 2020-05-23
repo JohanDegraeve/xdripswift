@@ -2779,7 +2779,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3009;
-				DEVELOPMENT_TEAM = RNX44PP998;
+				DEVELOPMENT_TEAM = 92C77A2942;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2787,7 +2787,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.paulplant.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -2808,7 +2808,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3009;
-				DEVELOPMENT_TEAM = RNX44PP998;
+				DEVELOPMENT_TEAM = 92C77A2942;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2816,7 +2816,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.paulplant.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
