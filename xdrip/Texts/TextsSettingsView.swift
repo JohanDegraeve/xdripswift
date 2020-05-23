@@ -322,20 +322,12 @@ class Texts_SettingsView {
         return NSLocalizedString("infoCalendarAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to xDrip4iOS to access your calendar. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown")
     }()
     
-    static let writeTraceToFile: String = {
-        return NSLocalizedString("writeTraceToFile", tableName: filename, bundle: Bundle.main, value: "Write Trace to File?", comment: "Should write trace to file be enabled or not")
-    }()
-    
     static let sectionTitleTrace: String = {
         return NSLocalizedString("sectionTitleTrace", tableName: filename, bundle: Bundle.main, value: "Trace", comment: "in Settings, section title for Trace")
     }()
     
     static let sendTraceFile: String = {
         return NSLocalizedString("sendTraceFile", tableName: filename, bundle: Bundle.main, value: "Send Trace File", comment: "in Settings, row title to send settings")
-    }()
-    
-    static let warningWriteTraceToFile: String = {
-        return NSLocalizedString("warningWriteTraceToFile", tableName: filename, bundle: Bundle.main, value: "Write trace to file is not enabled. Enable this first, perform your tests and then send the trace file", comment: "in Settings, when user clicks send trace to file, but write trace to file is not enabled")
     }()
     
     static let describeProblem: String = {

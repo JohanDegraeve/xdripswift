@@ -30,5 +30,5 @@
 "delete" = "Delete";
 "invalidValue" = "Invalid Value";
 "firmware" = "Firmware";
-"firmware" = "Hardware";
+"hardware" = "Hardware";
 "unknown" = "Unknown";
