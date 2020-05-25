@@ -86,6 +86,8 @@ class LibreDataParser {
     /// Function which groups common functionality used for transmitters that support the 344 Libre block. It checks if webOOP is enabled, if yes tries to use the webOOP, response is processed and delegate is called. If webOOP is not enabled, then local parsing is done.
     /// - parameters:
     ///     - sensorSerialNumber : if nil, then webOOP will not be used and local parsing will be done
+    ///     - patchUid : sensor sn hex string
+    ///     - patchInfo : will be used by server to out the glucose data
     ///     - libreData : the 344 bytes from Libre sensor
     ///     - timeStampLastBgReading : timestamp of last reading, older readings will be ignored
     ///     - webOOPEnabled : is webOOP enabled or not, if not enabled, local parsing is used

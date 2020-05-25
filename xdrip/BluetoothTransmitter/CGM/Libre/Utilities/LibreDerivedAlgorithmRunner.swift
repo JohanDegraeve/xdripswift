@@ -8,6 +8,8 @@
 // adapted by Johan Degraeve for xdrip ios
 import Foundation
 
+
+/// local algorithm use this
 public struct LibreDerivedAlgorithmParameters: Codable, CustomStringConvertible {
     public var slope_slope: Double
     public var slope_offset: Double
@@ -18,6 +20,7 @@ public struct LibreDerivedAlgorithmParameters: Codable, CustomStringConvertible 
     public var extraOffset: Double = 0
     public var serialNumber: String
     
+    /// if values all 0, is wrong parameters 
     var isErrorParameters: Bool {
         return slope_slope == 0 &&
             slope_offset == 0 &&

@@ -10,6 +10,8 @@ import Foundation
 
 // MARK: Encode/decode helpers
 
+
+/// the parameters from server
 struct GetCalibrationStatus: Codable, CustomStringConvertible {
     var error: Bool?
     var command: String?

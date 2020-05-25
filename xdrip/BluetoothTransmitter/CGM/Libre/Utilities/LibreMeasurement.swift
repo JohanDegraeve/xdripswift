@@ -61,6 +61,7 @@ struct LibreMeasurement {
         self.date = date
         self.counter = minuteCounter
         
+        // local algorithm
         self.temperatureAlgorithmParameterSet = LibreDerivedAlgorithmParameterSet
         if let LibreDerivedAlgorithmParameterSet = self.temperatureAlgorithmParameterSet {
             self.oopSlope = LibreDerivedAlgorithmParameterSet.slope_slope * Double(rawTemperature) + LibreDerivedAlgorithmParameterSet.offset_slope
