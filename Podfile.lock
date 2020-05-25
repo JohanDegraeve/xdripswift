@@ -9,7 +9,7 @@ DEPENDENCIES:
   - SwiftCharts (~> 0.6.5)
 
 SPEC REPOS:
-  trunk:
+  https://github.com/CocoaPods/Specs.git:
     - CryptoSwift
     - SwiftCharts
 
@@ -29,4 +29,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 53c167b7f8be72aa4e6d555f141e0b6d33700680
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.8.0.beta.1

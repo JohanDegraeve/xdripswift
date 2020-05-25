@@ -296,7 +296,6 @@
 		F8F9721D23A5915900C3F17D /* LibreDerivedAlgorithmRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971E323A5915900C3F17D /* LibreDerivedAlgorithmRunner.swift */; };
 		F8F9721E23A5915900C3F17D /* LibreSensorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971E423A5915900C3F17D /* LibreSensorState.swift */; };
 		F8F9721F23A5915900C3F17D /* LibreOOPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971E523A5915900C3F17D /* LibreOOPClient.swift */; };
-		F8F9722023A5915900C3F17D /* LibreGlucoseSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971E623A5915900C3F17D /* LibreGlucoseSmoothing.swift */; };
 		F8F9722123A5915900C3F17D /* LibreSensorSerialNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971E723A5915900C3F17D /* LibreSensorSerialNumber.swift */; };
 		F8F9722223A5915900C3F17D /* CRC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971E823A5915900C3F17D /* CRC.swift */; };
 		F8F9722323A5915900C3F17D /* LibreDataParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971E923A5915900C3F17D /* LibreDataParser.swift */; };
@@ -729,7 +728,6 @@
 		F8F971E323A5915900C3F17D /* LibreDerivedAlgorithmRunner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreDerivedAlgorithmRunner.swift; sourceTree = "<group>"; };
 		F8F971E423A5915900C3F17D /* LibreSensorState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreSensorState.swift; sourceTree = "<group>"; };
 		F8F971E523A5915900C3F17D /* LibreOOPClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreOOPClient.swift; sourceTree = "<group>"; };
-		F8F971E623A5915900C3F17D /* LibreGlucoseSmoothing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreGlucoseSmoothing.swift; sourceTree = "<group>"; };
 		F8F971E723A5915900C3F17D /* LibreSensorSerialNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreSensorSerialNumber.swift; sourceTree = "<group>"; };
 		F8F971E823A5915900C3F17D /* CRC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRC.swift; sourceTree = "<group>"; };
 		F8F971E923A5915900C3F17D /* LibreDataParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreDataParser.swift; sourceTree = "<group>"; };
@@ -1850,7 +1848,6 @@
 				F8F971E323A5915900C3F17D /* LibreDerivedAlgorithmRunner.swift */,
 				F8F971E423A5915900C3F17D /* LibreSensorState.swift */,
 				F8F971E523A5915900C3F17D /* LibreOOPClient.swift */,
-				F8F971E623A5915900C3F17D /* LibreGlucoseSmoothing.swift */,
 				F8F971E723A5915900C3F17D /* LibreSensorSerialNumber.swift */,
 				F8F971E823A5915900C3F17D /* CRC.swift */,
 				F8F971E923A5915900C3F17D /* LibreDataParser.swift */,
@@ -2386,7 +2383,6 @@
 				F808D2D2240329E80084B5DB /* Bubble+BluetoothPeripheral.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
 				F825286A2443AE190067AF77 /* DexcomG6BluetoothPeripheralViewModel.swift in Sources */,
-				F8F9722023A5915900C3F17D /* LibreGlucoseSmoothing.swift in Sources */,
 				F80859272364355F00F3829D /* ConstantsGlucoseChart.swift in Sources */,
 				F825286E2443C1000067AF77 /* BluetoothPeripheralManager+CGMG6TransmitterDelegate.swift in Sources */,
 				F816E10324367389009EE65B /* GNSEntryBluetoothPeripheralViewModel.swift in Sources */,

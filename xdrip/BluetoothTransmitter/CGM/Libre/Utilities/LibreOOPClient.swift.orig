@@ -294,11 +294,19 @@ public class LibreOOPClient {
             }
         }
         
+<<<<<<< HEAD
+        // default parameters
+        let params = LibreDerivedAlgorithmParameters.init(slope_slope: 0.00001729,
+                                                          slope_offset: -0.0006316,
+                                                          offset_slope: 0.002080,
+                                                          offset_offset: -20.15,
+=======
         /// default parameters
         let params = LibreDerivedAlgorithmParameters.init(slope_slope: 0.00001816666666666667,
                                                           slope_offset: -0.00016666666666666666,
                                                           offset_slope: 0.007499999999999993,
                                                           offset_offset: -21.5,
+>>>>>>> 74e797ad31f6fadf1504e2ab9c1a54d9489f3c85
                                                           isValidForFooterWithReverseCRCs: 1,
                                                           extraSlope: 1.0,
                                                           extraOffset: 0.0,

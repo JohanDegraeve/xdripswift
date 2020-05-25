@@ -86,6 +86,8 @@ class LibreDataParser {
     /// Function which groups common functionality used for transmitters that support the 344 Libre block. It checks if webOOP is enabled, if yes tries to use the webOOP, response is processed and delegate is called. If webOOP is not enabled, then local parsing is done.
     /// - parameters:
     ///     - sensorSerialNumber : if nil, then webOOP will not be used and local parsing will be done
+    ///     - patchUid : sensor sn hex string
+    ///     - patchInfo : will be used by server to out the glucose data
     ///     - libreData : the 344 bytes from Libre sensor
     ///     - timeStampLastBgReading : timestamp of last reading, older readings will be ignored
     ///     - webOOPEnabled : is webOOP enabled or not, if not enabled, local parsing is used
@@ -100,13 +102,11 @@ class LibreDataParser {
     ///     - completionHandler : will be called when glucose data is read with as parameter the timestamp of the last reading. Goal is that caller an set timeStampLastBgReading to the new value
     ///
     /// parameter values that are not known, simply ignore them, if they are not known then they are probably not important, or they've already been passed to the delegate before. 
-    public static func libreDataProcessor(sensorSerialNumber: String?, webOOPEnabled: Bool, oopWebSite: String?, oopWebToken: String?, libreData: Data, cgmTransmitterDelegate : CGMTransmitterDelegate?, transmitterBatteryInfo:TransmitterBatteryInfo?, firmware: String?, hardware: String?, hardwareSerialNumber: String?, bootloader:String?, timeStampLastBgReading: Date, completionHandler:@escaping ((_ timeStampLastBgReading: Date) -> ())) {
+    public static func libreDataProcessor(sensorSerialNumber: String?, patchUid: String? = nil, patchInfo: String? = nil, webOOPEnabled: Bool, oopWebSite: String?, oopWebToken: String?, libreData: Data, cgmTransmitterDelegate : CGMTransmitterDelegate?, transmitterBatteryInfo:TransmitterBatteryInfo?, firmware: String?, hardware: String?, hardwareSerialNumber: String?, bootloader:String?, timeStampLastBgReading: Date, completionHandler:@escaping ((_ timeStampLastBgReading: Date) -> ())) {
 
         if let sensorSerialNumber = sensorSerialNumber, let oopWebSite = oopWebSite, let oopWebToken = oopWebToken, webOOPEnabled {
-            LibreOOPClient.handleLibreData(libreData: libreData, timeStampLastBgReading: timeStampLastBgReading, serialNumber: sensorSerialNumber, oopWebSite: oopWebSite, oopWebToken: oopWebToken) {
-                (result) in
-                    handleGlucoseData(result: result, cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: transmitterBatteryInfo, firmware: firmware, hardware: hardware, hardwareSerialNumber: hardwareSerialNumber, bootloader: bootloader, sensorSerialNumber: sensorSerialNumber, completionHandler: completionHandler)
-
+            LibreOOPClient.handleLibreData(libreData: libreData, patchUid: patchUid, patchInfo: patchInfo, timeStampLastBgReading: timeStampLastBgReading, serialNumber: sensorSerialNumber, oopWebSite: oopWebSite, oopWebToken: oopWebToken) { (result) in
+                handleGlucoseData(result: result, cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: transmitterBatteryInfo, firmware: firmware, hardware: hardware, hardwareSerialNumber: hardwareSerialNumber, bootloader: bootloader, sensorSerialNumber: sensorSerialNumber, completionHandler: completionHandler)
             }
         } else if !webOOPEnabled {
             // use local parser
