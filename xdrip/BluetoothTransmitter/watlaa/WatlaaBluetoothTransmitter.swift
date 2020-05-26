@@ -119,6 +119,9 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     // current sensor serial number, if nil then it's not known yet
     private var sensorSerialNumber:String?
 
+    /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
+    var emptyArray: [GlucoseData] = []
+
     // MARK: - public functions
     
     /// - parameters:
@@ -288,10 +291,8 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                         trace("in peripheral didUpdateValueFor, Buffer complete", log: log, category: ConstantsLog.categoryWatlaa, type: .info)
                         
                         if (Crc.LibreCrc(data: &rxBuffer, headerOffset: miaoMiaoHeaderLength)) {
-                            
-                            //get MiaoMiao info from MiaoMiao header
-                            let firmware = String(describing: rxBuffer[14...15].hexEncodedString())
-                            let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
+
+                            // get batteryPercentage
                             let batteryPercentage = Int(rxBuffer[13])
                             
                             // get sensor serialNumber and if changed inform delegate
@@ -320,11 +321,17 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                             // send battery level to delegate
                             watlaaBluetoothTransmitterDelegate?.received(transmitterBatteryLevel: batteryPercentage, watlaaBluetoothTransmitter: self)
                             
-                            LibreDataParser.libreDataProcessor(sensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)))?.serialNumber, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
-                                self.timeStampLastBgReading = timeStampLastBgReading
-                                
-                            })
+                            // send batteryPercentage to delegate
+                            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
                             
+                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: nil, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading, completionHandler:  { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?) in
+                                
+                                if let timeStampLastBgReading = timeStampLastBgReading {
+                                    self.timeStampLastBgReading = timeStampLastBgReading
+                                }
+                            }
+                            )
+
                             //reset the buffer
                             resetRxBuffer()
                             

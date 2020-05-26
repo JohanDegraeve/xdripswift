@@ -172,7 +172,8 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             }
 
             //get readings from buffer and send to cGMTransmitterDelegate
-            var result = LibreDataParser.parse(libreData: rxBuffer, timeStampLastBgReading: timeStampLastBgReading)
+            // TODO: use LibreDataParser.libreDataProcessor and make parseLibre1DataWithoutCalibration private to LibreDataParser
+            var result = LibreDataParser.parseLibre1DataWithoutCalibration(libreData: rxBuffer, timeStampLastBgReading: timeStampLastBgReading)
             
             //TODO: sort glucosedata before calling newReadingsReceived
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)

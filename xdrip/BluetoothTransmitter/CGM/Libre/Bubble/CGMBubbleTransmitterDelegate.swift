@@ -11,8 +11,14 @@ protocol CGMBubbleTransmitterDelegate: AnyObject {
     /// received sensor Serial Number
     func received(serialNumber: String, from cGMBubbleTransmitter: CGMBubbleTransmitter)
     
-    /// M5Stack is sending batteryLevel
+    /// Bubble is sending batteryLevel
     func received(batteryLevel: Int, from cGMBubbleTransmitter: CGMBubbleTransmitter)
 
+    /// Bubble is sending type of transmitter
+    func received(libreSensorType: LibreSensorType, from cGMBubbleTransmitter: CGMBubbleTransmitter)
+    
+    /// bubble is sending sensorStatus
+    func received(sensorStatus: LibreSensorState, from cGMBubbleTransmitter: CGMBubbleTransmitter)
+    
 }
 

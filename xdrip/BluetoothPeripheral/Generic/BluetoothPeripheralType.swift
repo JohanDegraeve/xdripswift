@@ -243,7 +243,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
     }
     
-    /// is it web oop enabled or not
+    /// is it web oop supported or not.
     func canWebOOP() -> Bool {
         
         switch self {

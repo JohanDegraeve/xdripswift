@@ -10,7 +10,7 @@ import Foundation
 
 
 /// local algorithm use this
-public struct LibreDerivedAlgorithmParameters: Codable, CustomStringConvertible {
+public struct Libre1DerivedAlgorithmParameters: Codable, CustomStringConvertible {
     public var slope_slope: Double
     public var slope_offset: Double
     public var offset_slope: Double
@@ -20,19 +20,18 @@ public struct LibreDerivedAlgorithmParameters: Codable, CustomStringConvertible 
     public var extraOffset: Double = 0
     public var serialNumber: String
     
-    /// if values all 0, is wrong parameters 
-    var isErrorParameters: Bool {
-        return slope_slope == 0 &&
-            slope_offset == 0 &&
-            offset_slope == 0 &&
-            offset_offset == 0
-    }
-    
     public var description: String {
         return "LibreDerivedAlgorithmParameters:: slopeslope: \(slope_slope), slopeoffset: \(slope_offset), offsetoffset: \(offset_offset), offsetSlope: \(offset_slope), extraSlope: \(extraSlope), extraOffset: \(extraOffset), isValidForFooterWithReverseCRCs: \(isValidForFooterWithReverseCRCs)"
     }
     
-    public init(slope_slope: Double, slope_offset:Double, offset_slope: Double, offset_offset: Double, isValidForFooterWithReverseCRCs: Int, extraSlope: Double, extraOffset: Double, sensorSerialNumber:String) {
+    /// init will fail if slope_slope == 0 && slope_offset == 0 && offset_slope == 0 && offset_offset == 0
+    public init?(slope_slope: Double, slope_offset:Double, offset_slope: Double, offset_offset: Double, isValidForFooterWithReverseCRCs: Int, extraSlope: Double, extraOffset: Double, sensorSerialNumber:String) {
+        
+        guard slope_slope == 0 &&
+            slope_offset == 0 &&
+            offset_slope == 0 &&
+            offset_offset == 0 else {return nil}
+        
         self.slope_slope = slope_slope
         self.slope_offset = slope_offset
         self.offset_slope = offset_slope
@@ -41,6 +40,7 @@ public struct LibreDerivedAlgorithmParameters: Codable, CustomStringConvertible 
         self.extraSlope = extraSlope
         self.extraOffset = extraOffset
         self.serialNumber = sensorSerialNumber
+        
     }
 }
 

@@ -13,6 +13,33 @@ extension BluetoothPeripheralManager: CGMBubbleTransmitterDelegate {
         
     }
     
+    func received(sensorStatus: LibreSensorState, from cGMBubbleTransmitter: CGMBubbleTransmitter) {
+        
+        guard let bubble = findTransmitter(cGMBubbleTransmitter: cGMBubbleTransmitter) else {return}
+        
+        // store serial number in bubble object
+        bubble.sensorState = sensorStatus
+        
+        // no coredatamanager savechanges needed because batterylevel is not stored in coredata
+        
+    }
+    
+    func received(libreSensorType: LibreSensorType, from cGMBubbleTransmitter: CGMBubbleTransmitter) {
+        
+        guard let bubble = findTransmitter(cGMBubbleTransmitter: cGMBubbleTransmitter) else {return}
+        
+        // store serial number in bubble.blePeripheral object
+        bubble.blePeripheral.libreSensorType = libreSensorType
+        
+        // if the libreSensorType needs oopweb, then enable oopweb. (User may have set it to false, but if it's one that requires oopweb, then we force to true)
+        if libreSensorType.needsWebOOP() {
+            bubble.blePeripheral.webOOPEnabled = true
+        }
+        
+        // coredatamanager savechanges needed because webOOPEnabled is stored in coredata
+        coreDataManager.saveChanges()
+        
+    }
     
     func received(serialNumber: String, from cGMBubbleTransmitter: CGMBubbleTransmitter) {
         

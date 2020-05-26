@@ -12,10 +12,10 @@ import Foundation
 
 
 /// the parameters from server
-struct GetCalibrationStatus: Codable, CustomStringConvertible {
+struct OopWebCalibrationStatus: Codable, CustomStringConvertible {
     var error: Bool?
     var command: String?
-    var slope: GetCalibrationStatusResult?
+    var slope: OopWebCalibrationStatusResult?
     
     var description: String {
         return """
@@ -27,7 +27,7 @@ struct GetCalibrationStatus: Codable, CustomStringConvertible {
     }
 }
 
-struct GetCalibrationStatusResult: Codable {
+struct OopWebCalibrationStatusResult: Codable {
     var status: String?
     var slopeSlope: Double?
     var slopeOffset: Double?

@@ -8,6 +8,7 @@
 "confirmDeletionPeripheral" = "Do you want to delete bluetooth device: ";
 "bluetoothPeripheralAlias" = "Alias:";
 "SensorSerialNumber" = "Sensor Serial Number:";
+"sensorType" = "Sensor Type:";
 "serialNumber" = "Serial Number:";
 "battery" = "Battery:";
 "needsTransmitterId" = "Missing Transmitter ID";
