@@ -51,10 +51,13 @@ enum SettingsSelectedRowAction {
     /// (it's not the right place to define this, not a clear split view/model)
     case performSegue(withIdentifier: String, sender: Any?)
     
-    /// to show Info to user, eg licenseInfo, with a title and a message
-    ///
+    /// to show Info to user, eg licenseInfo, with a title and a message. If Ok is clicked, optional actionHandler is executed
+    /// - parameters:
+    ///     - title : pop up title
+    ///     - message : pop up message
+    ///     - actionHandler : will be executed when ok buttin is clicked
     /// typical a pop up with a title and the message
-    case showInfoText(title: String, message: String)
+    case showInfoText(title: String, message: String, actionHandler: (() -> Void)? = nil)
     
     /// user confirmation is required to perform the actionHandler
     case askConfirmation(title: String?, message: String?, actionHandler: (() -> Void), cancelHandler: (() -> Void)?)

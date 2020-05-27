@@ -1353,15 +1353,17 @@ extension RootViewController: UNUserNotificationCenterDelegate {
             completionHandler([])
             bluetoothPeripheralManager?.initiatePairing()
 
-            
-        } else {
-            
             // this will verify if it concerns an alert notification, if not pickerviewData will be nil
-            if let pickerViewData = alertManager?.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler) {
-                
-                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
-                
-            }
+        } else if let pickerViewData = alertManager?.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler) {
+            
+            
+            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+            
+        }  else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForVolumeTest {
+            
+            // user is testing iOS Sound volume in the settings. Only the sound should be played, the alert itself will not be shown
+            completionHandler([.sound])
+            
         }
     }
     
