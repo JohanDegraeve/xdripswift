@@ -137,6 +137,15 @@ final class RootViewController: UIViewController {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground -  isIdleTimerDisabled
     private let applicationManagerKeyIsIdleTimerDisabled = "RootViewController-isIdleTimerDisabled"
     
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - trace that app goes to background
+    private let applicationManagerKeyTraceAppGoesToBackGround = "applicationManagerKeyTraceAppGoesToBackGround"
+    
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - trace that app goes to background
+    private let applicationManagerKeyTraceAppGoesToForeground = "applicationManagerKeyTraceAppGoesToForeground"
+    
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillTerminate - trace that app goes to background
+    private let applicationManagerKeyTraceAppWillTerminate = "applicationManagerKeyTraceAppWillTerminate"
+    
     // MARK: - Properties - other private properties
     
     /// for logging
@@ -320,7 +329,7 @@ final class RootViewController: UIViewController {
         
         // whenever app comes from-back to foreground, updateLabelsAndChart needs to be called
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {self.updateLabelsAndChart(overrideApplicationState: true)})
-        
+         
         // setup AVAudioSession
         setupAVAudioSession()
         
@@ -333,6 +342,15 @@ final class RootViewController: UIViewController {
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyIsIdleTimerDisabled, closure: {
             UIApplication.shared.isIdleTimerDisabled = false
         })
+        
+        // add tracing when app goes from foreground to background
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyTraceAppGoesToBackGround, closure: {trace("Application did enter background", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
+        
+        // add tracing when app comes to foreground
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyTraceAppGoesToForeground, closure: {trace("Application will enter foreground", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
+
+        // add tracing when app will terminaten - this only works for non-suspended apps, probably (not tested) also works for apps that crash in the background
+        ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeyTraceAppWillTerminate, closure: {trace("Application will terminate", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
 
     }
     
@@ -494,7 +512,7 @@ final class RootViewController: UIViewController {
                 
                 guard abs(activeSensor.startDate.timeIntervalSinceNow) < ConstantsLibre.maximumAgeLibre1InMinutes * 60 else {
                  
-                    trace("sensor older than %{public}@ minutes. Readings will not be processed.", log: log, category: ConstantsLog.categoryRootView, type: .info, ConstantsLibre.maximumAgeLibre1InMinutes)
+                    trace("sensor older than %{public}@ minutes. Readings will not be processed.", log: log, category: ConstantsLog.categoryRootView, type: .info, ConstantsLibre.maximumAgeLibre1InMinutes.description)
                     
                     self.present(UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.sensorAge14Days, actionHandler: nil), animated: true, completion: nil)
                     

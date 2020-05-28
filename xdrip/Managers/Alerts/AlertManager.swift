@@ -564,7 +564,7 @@ public class AlertManager:NSObject {
             // log the result
             trace("in checkAlert, raising alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             if delayInSecondsToUse > 0 {
-                trace("   delay = %{public}@ seconds, = %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, delayInSecondsToUse.description, ((round(Double(delayInSecondsToUse)/60*10))/10).description)
+                trace("   delay = %{public}@ seconds, = %{public}@ minutes - which means this is a future planned alert, it will not go off now", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, delayInSecondsToUse.description, ((round(Double(delayInSecondsToUse)/60*10))/10).description)
             }
 
             return true
