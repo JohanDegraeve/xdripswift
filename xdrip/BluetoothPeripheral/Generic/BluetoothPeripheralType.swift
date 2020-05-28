@@ -252,7 +252,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
             return false
             
         case .BubbleType, .MiaoMiaoType:
-            return true
+            return false
                         
         }
         
