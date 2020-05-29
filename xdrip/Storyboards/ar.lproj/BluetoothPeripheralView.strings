@@ -11,7 +11,7 @@
 "serialNumber" = "الرقم التسلسلي:";
 "battery" = "البطارية:";
 "needsTransmitterId" = "رمز الهوية لجهاز الإرسال مفقود";
-"scan" = "بحث";
+"scan" = "بدء البحث";
 "readyToScan" = "جاهز للبحث";
 "scanning" = "يتم البحث";
 "disconnect" = "قطع الاتصال";
