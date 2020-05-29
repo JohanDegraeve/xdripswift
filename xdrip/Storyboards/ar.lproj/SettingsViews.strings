@@ -46,7 +46,7 @@
 "timeScheduleViewTitle" = "جدولة وقت تفعيل/إغلاق لـ";
 "uploadSensorStartTime" = "تحميل بداية وقت الحساس؟";
 "testUrlAndAPIKey" = "اختبار رابط منصة نايتسكاوت و API_SECRET؟ ";
-"settingsviews_sectiontitlespeak" = "الصوت";
+"settingsviews_sectiontitlespeak" = "النطق";
 "settingsviews_speakBgReadings" = "نطق قراءات السكر؟";
 "settingsviews_speakBgReadingslanguage" = "اللغة:";
 "settingsviews_speakreadingslanguageselection" = "اختر اللغة";
