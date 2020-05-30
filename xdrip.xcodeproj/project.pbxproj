@@ -384,6 +384,7 @@
 		F816E12B2439DFBA009EE65B /* DexcomG4+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DexcomG4+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F816E12D2439E06E009EE65B /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift"; sourceTree = "<group>"; };
 		F816E1302439E2DD009EE65B /* DexcomG4BluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG4BluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
+		F817702A2491860F00AA3600 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F81D6D4522B67F55005EFAE2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareUploadManager.swift; sourceTree = "<group>"; };
 		F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsDexcomShareTestResult.swift; sourceTree = "<group>"; };
@@ -2629,6 +2630,7 @@
 				F846CDD523046BAC00DCF016 /* pt-BR */,
 				F846CDD623046BAE00DCF016 /* pt */,
 				F86A3C77247718C700EE7E46 /* ar */,
+				F817702A2491860F00AA3600 /* fr */,
 			);
 			name = SettingsViews.strings;
 			sourceTree = "<group>";
@@ -2787,7 +2789,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdriptest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -2816,7 +2818,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdriptest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
