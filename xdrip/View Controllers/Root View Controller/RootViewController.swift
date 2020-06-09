@@ -1043,12 +1043,14 @@ final class RootViewController: UIViewController {
             
         }
         
-        // set color, depending on value lower than low mark or higher than high mark
-        // set both HIGH and LOW BG values to red as previous yellow for hig is now not so obvious due to in-range colour of green.
-        if lastReading.calculatedValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+        // set BG value label color, depending on value
+        // if below urgentLow or above urgentHigh, set to red
+        // if between urgentLow/urgentHigh and target, set to yellow
+        // if between low and high, set/keep to green
+        if lastReading.calculatedValue > UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) || lastReading.calculatedValue < UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl){
             valueLabelOutlet.textColor = UIColor.red
-        } else if lastReading.calculatedValue >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
-            valueLabelOutlet.textColor = UIColor.red
+        } else if ( lastReading.calculatedValue <= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) && lastReading.calculatedValue > UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) || ( lastReading.calculatedValue >= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) && lastReading.calculatedValue < UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
+            valueLabelOutlet.textColor = UIColor.yellow
         } else {
             // keep text colour
             valueLabelOutlet.textColor = UIColor.green
