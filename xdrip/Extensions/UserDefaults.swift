@@ -9,10 +9,16 @@ extension UserDefaults {
         
         /// bloodglucose  unit
         case bloodGlucoseUnitIsMgDl = "bloodGlucoseUnit"
-        /// low value
-        case lowMarkValue = "lowMarkValue"
+        /// urgent high value
+        case urgentHighMarkValue = "urgentHighMarkValue"
         /// high value
         case highMarkValue = "highMarkValue"
+        /// target value
+        case targetMarkValue = "targetMarkValue"
+        /// low value
+        case lowMarkValue = "lowMarkValue"
+        /// urgent low value
+        case urgentLowMarkValue = "urgentLowMarkValue"
         /// master or follower
         case isMaster = "isMaster"
         /// should notification be shown with reading yes or no
@@ -198,6 +204,66 @@ extension UserDefaults {
         }
     }
     
+    /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var urgentHighMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.urgentHighMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentHighMarkValue.rawValue)
+        }
+    }
+    
+    /// the highmarkvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var highMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.highMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultHighMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
+        }
+    }
+    
+    /// the targetvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var targetMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.targetMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultTargetMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.targetMarkValue.rawValue)
+        }
+    }
+    
     /// the lowmarkvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var lowMarkValueInUserChosenUnit:Double {
         get {
@@ -218,14 +284,14 @@ extension UserDefaults {
         }
     }
     
-    /// the highmarkvalue in unit selected by user ie, mgdl or mmol
-    @objc dynamic var highMarkValueInUserChosenUnit:Double {
+    /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var urgentLowMarkValueInUserChosenUnit:Double {
         get {
             //read currentvalue in mgdl
-            var returnValue = double(forKey: Key.highMarkValue.rawValue)
+            var returnValue = double(forKey: Key.urgentLowMarkValue.rawValue)
             // if 0 set to defaultvalue
             if returnValue == 0.0 {
-                returnValue = ConstantsBGGraphBuilder.defaultHighMmarkInMgdl
+                returnValue = ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
                 returnValue = returnValue.mgdlToMmol()
@@ -234,7 +300,7 @@ extension UserDefaults {
         }
         set {
             // store in mgdl
-            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentLowMarkValue.rawValue)
         }
     }
     
@@ -246,6 +312,20 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.isMaster.rawValue)
+        }
+    }
+    
+    /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var urgentHighMarkValueInUserChosenUnitRounded:String {
+        get {
+            return urgentHighMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.urgentHighMarkValue.rawValue)
         }
     }
     
@@ -262,7 +342,21 @@ extension UserDefaults {
             set(value, forKey: Key.highMarkValue.rawValue)
         }
     }
-
+    
+    /// the targetmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var targetMarkValueInUserChosenUnitRounded:String {
+        get {
+            return targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.targetMarkValue.rawValue)
+        }
+    }
+    
     /// the lowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var lowMarkValueInUserChosenUnitRounded:String {
         get {
@@ -274,6 +368,20 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.lowMarkValue.rawValue)
+        }
+    }
+    
+    /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var urgentLowMarkValueInUserChosenUnitRounded:String {
+        get {
+            return urgentLowMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.urgentLowMarkValue.rawValue)
         }
     }
     

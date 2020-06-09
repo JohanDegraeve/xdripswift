@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		470CE1FC246802EB00D5CB74 /* BluetoothPeripheralsView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 470CE1FE246802EB00D5CB74 /* BluetoothPeripheralsView.strings */; };
+		4737B7CC248FEE8B00621FCF /* SettingsViewHomeScreenSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4737B7CB248FEE8B00621FCF /* SettingsViewHomeScreenSettingsViewModel.swift */; };
 		A48D2DE552F4A356AA32746A /* Pods_xdrip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */; };
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
 		F8025C1321DA683400ECF0C0 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1221DA683400ECF0C0 /* Data.swift */; };
@@ -328,6 +329,7 @@
 		470CE1FD246802EB00D5CB74 /* es-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-ES"; path = "es-ES.lproj/BluetoothPeripheralsView.strings"; sourceTree = "<group>"; };
 		470CE1FF246802F400D5CB74 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
 		470CE200246803B100D5CB74 /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/BluetoothPeripheralsView.strings"; sourceTree = "<group>"; };
+		4737B7CB248FEE8B00621FCF /* SettingsViewHomeScreenSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewHomeScreenSettingsViewModel.swift; sourceTree = "<group>"; };
 		475DED96244AF92A00F78473 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
 		662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2648F65F347D56D7DFFFAB7 /* Pods-xdrip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.release.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.release.xcconfig"; sourceTree = "<group>"; };
@@ -1367,6 +1369,7 @@
 				F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */,
 				F8B3A839227F090D004BA588 /* SettingsViewDexcomSettingsViewModel.swift */,
 				F8B3A83E227F090D004BA588 /* SettingsViewGeneralSettingsViewModel.swift */,
+				4737B7CB248FEE8B00621FCF /* SettingsViewHomeScreenSettingsViewModel.swift */,
 				F8B3A83C227F090D004BA588 /* SettingsViewHealthKitSettingsViewModel.swift */,
 				F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */,
 				F8A389EA233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift */,
@@ -2345,6 +2348,7 @@
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				F816E12C2439DFBA009EE65B /* DexcomG4+CoreDataProperties.swift in Sources */,
 				F897E25123FC871C0075E0E8 /* BluetoothPeripheralManager+M5StackBluetoothTransmitterDelegate.swift in Sources */,
+				4737B7CC248FEE8B00621FCF /* SettingsViewHomeScreenSettingsViewModel.swift in Sources */,
 				F8B3A820227DEC92004BA588 /* AlertTypesAccessor.swift in Sources */,
 				F8F9720623A5915900C3F17D /* AuthRequestTxMessage.swift in Sources */,
 				F8F9721123A5915900C3F17D /* KeepAliveTxMessage.swift in Sources */,
@@ -2730,7 +2734,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3009;
-				DEVELOPMENT_TEAM = RNX44PP998;
+				DEVELOPMENT_TEAM = 92C77A2942;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2738,7 +2742,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.paulplant.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -2759,7 +2763,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3009;
-				DEVELOPMENT_TEAM = RNX44PP998;
+				DEVELOPMENT_TEAM = 92C77A2942;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2767,7 +2771,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.paulplant.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";

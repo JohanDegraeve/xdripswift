@@ -33,6 +33,11 @@ enum ConstantsGlucoseChart {
     /// if the maximum in initialGlucoseValueRangeInMgDl isn't enough to show all values, if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
     static let thirdGlucoseValueRangeInMmol = [21.0, 23.0]
     
+    /// objective/target range guidelines
+    static let guidelineUrgentHighLowColor = UIColor.red
+    static let guidelineHighLowColor = UIColor.yellow
+    static let guidelineTargetColor = UIColor.green
+    
     /// axis line color    (make white to match new dark UI theme)
     static let axisLineColor = UIColor.gray
     
