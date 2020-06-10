@@ -1,1 +1,19 @@
+"alertsettingsview_screentitle" = "Alerte";
+"alertssettingsview_screentitle" = "Editer l'alerte";
+"alerts_highalerttitle" = "Valeur haute";
+"alerts_veryhighalerttitle" = "Valeur très haute";
+"alerts_lowalerttitle" = "Valeur faible ";
+"alerts_verylowalerttitle" = "Valeur très faible ";
+"alerts_snooze" = "Snooze";
+"alerts_select_snooze_time" = "Choix de l'heure Snooze";
+"alerts_missedreadingalerttitle" = "Lecture manquante";
+"alerts_calibrationneeded" = "Calibration nécessaire ";
+"alerts_batterylow" = "Batterie faible du transmetteur";
+"alertstart" = "Appliquer à :";
+"alertvalue" = "Valeur";
+"alerttype" = "Type d'Alarme";
+"changealertvalue" = "Changer la valeur de l'alerte";
+"confirmdeletionalert" = "Supprimer Alerte?";
+"alerts_fastdrop" = "Chute rapide";
+"alerts_fastrise" = "Augmentation rapide";
 
