@@ -626,7 +626,7 @@ class BluetoothPeripheralManager: NSObject {
                     
                 case .BlueReaderType:
                     
-                    if let blueReader = bluetoothPeripheral as? GNSEntry {
+                    if let blueReader = bluetoothPeripheral as? BlueReader {
                         
                         if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
                             
