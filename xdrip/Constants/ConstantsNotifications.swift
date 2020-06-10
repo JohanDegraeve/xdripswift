@@ -70,4 +70,7 @@ enum ConstantsNotifications {
         static let transmitterResetResult = "transmitterResetResult"
     }
     
+    /// notification identifier for  volume test notification
+    static let notificationIdentifierForVolumeTest = "notificationIdentifierForVolumeTest"
+    
 }

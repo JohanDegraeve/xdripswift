@@ -131,9 +131,9 @@ class SettingsViewUtilities {
             case .performSegue(let withIdentifier, let sender):
                 uIViewController.performSegue(withIdentifier: withIdentifier, sender: sender)
                 
-            case let .showInfoText(title, message):
+            case let .showInfoText(title, message, actionHandler):
                 
-                let alert = UIAlertController(title: title, message: message, actionHandler: nil)
+                let alert = UIAlertController(title: title, message: message, actionHandler: actionHandler)
                 
                 uIViewController.present(alert, animated: true, completion: nil)
                 

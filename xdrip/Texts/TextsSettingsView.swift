@@ -346,5 +346,21 @@ class Texts_SettingsView {
         return NSLocalizedString("failedToSendEmail", tableName: filename, bundle: Bundle.main, value: "Failed to Send Email", comment: "In case user tries to send trace file via email but error occurs.")
     }()
     
+    static let volumeTestSoundPlayerExplanation: String = {
+        return NSLocalizedString("volumeTestSoundPlayerExplanation", tableName: filename, bundle: Bundle.main, value: "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' on - except for missed reading alerts which always use the iOS volume", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test")
+    }()
+    
+    static let volumeTestSoundPlayer: String = {
+        return NSLocalizedString("volumeTestSoundPlayer", tableName: filename, bundle: Bundle.main, value: "Volume test sound player", comment: "In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row")
+    }()
+    
+    static let volumeTestiOSSound: String = {
+        return NSLocalizedString("volumeTestiOSSound", tableName: filename, bundle: Bundle.main, value: "Volume test iOS sound", comment: "In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row")
+    }()
+
+    static let volumeTestiOSSoundExplanation: String = {
+        return NSLocalizedString("volumeTestiOSSoundExplanation", tableName: filename, bundle: Bundle.main, value: "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' off - and for missed reading alerts which always use the iOS volume", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test")
+    }()
+    
 }
 

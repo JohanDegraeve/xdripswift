@@ -616,7 +616,7 @@ public class AlertManager:NSObject {
     /// adds the alert notification categories to the existing categories
     /// - parameters:
     ///     - existingCategories : notification categories that currently exist
-    func setAlertNotificationCategories(_ existingCategories: Set<UNNotificationCategory>) {
+    private func setAlertNotificationCategories(_ existingCategories: Set<UNNotificationCategory>) {
         
         // create var equal to existingCategories so we can add new categories
         var mutableExistingCategories = existingCategories
