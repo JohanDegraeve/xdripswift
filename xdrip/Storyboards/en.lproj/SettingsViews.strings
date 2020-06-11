@@ -77,7 +77,7 @@
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
 "emailbodyText" = "Problem Description: ";
 "failedToSendEmail" = "Failed to Send Email";
-"volumeTestSoundPlayerExplanation" = "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' on - except for missed reading alerts which always use the iOS volume";
-"volumeTestiOSSoundExplanation" = "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' off - and for missed reading alerts which always use the iOS volume";
+"volumeTestSoundPlayerExplanation" = "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' on - except for missed reading alerts which always use the iOS volume.\n\nChange the volume with the volume buttons and press Ok";
+"volumeTestiOSSoundExplanation" = "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' off - and for missed reading alerts which always use the iOS volume.\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons and try again.";
 "volumeTestSoundPlayer" = "Volume test sound player";
 "volumeTestiOSSound" = "Volume test iOS sound";

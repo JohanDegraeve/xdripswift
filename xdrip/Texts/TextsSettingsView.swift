@@ -347,7 +347,7 @@ class Texts_SettingsView {
     }()
     
     static let volumeTestSoundPlayerExplanation: String = {
-        return NSLocalizedString("volumeTestSoundPlayerExplanation", tableName: filename, bundle: Bundle.main, value: "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' on - except for missed reading alerts which always use the iOS volume", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test")
+        return NSLocalizedString("volumeTestSoundPlayerExplanation", tableName: filename, bundle: Bundle.main, value: "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' on - except for missed reading alerts which always use the iOS volume.\n\nChange the volume with the volume buttons and press Ok", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test")
     }()
     
     static let volumeTestSoundPlayer: String = {
@@ -359,7 +359,7 @@ class Texts_SettingsView {
     }()
 
     static let volumeTestiOSSoundExplanation: String = {
-        return NSLocalizedString("volumeTestiOSSoundExplanation", tableName: filename, bundle: Bundle.main, value: "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' off - and for missed reading alerts which always use the iOS volume", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test")
+        return NSLocalizedString("volumeTestiOSSoundExplanation", tableName: filename, bundle: Bundle.main, value: "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' off - and for missed reading alerts which always use the iOS volume.\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons and try again.", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test")
     }()
     
 }
