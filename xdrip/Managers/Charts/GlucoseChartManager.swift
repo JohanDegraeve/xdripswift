@@ -28,6 +28,15 @@ public final class GlucoseChartManager: NSObject {
         }
     }
     
+    /// chartpoint array with glucose values and timestamp
+    ///
+    /// Whenever glucoseChartPoints is assigned a new value, glucoseChart is set to nil
+    private var glucoseColoredChartPoints: ([ChartPoint], [ChartPoint], [ChartPoint]) = ([], [], []) {
+        didSet {
+            glucoseChart = nil
+        }
+    }
+    
     /// for logging
     private var oslog = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
 
@@ -235,7 +244,6 @@ public final class GlucoseChartManager: NSObject {
                 self.endDate = endDate
                 self.startDate = startDateToUse
                 self.glucoseChartPoints = newGlucoseChartPointsToPrepend + (reUseExistingChartPointList ? self.glucoseChartPoints : [ChartPoint]()) + newGlucoseChartPointsToAppend
-                
 
                 // update the chart outlet
                 chartOutlet.reloadChart()
@@ -487,6 +495,30 @@ public final class GlucoseChartManager: NSObject {
     
     private func generateGlucoseChartWithFrame(_ frame: CGRect) -> Chart? {
         
+        //let readings = bgReadingsAccessor.getBgReadingsOnPrivateManagedObjectContext(from: startDate, to: endDate)
+        
+        for reading in glucoseChartPoints {
+            
+            //if let chartPoint = ChartPoint(bgReading: reading, formatter: self.chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+            
+            let bgReadingValue = reading.y
+            
+                // red reading
+                if ((bgReadingValue.scalar > UserDefaults.standard.urgentHighMarkValueInUserChosenUnit) || (bgReadingValue.scalar < UserDefaults.standard.urgentLowMarkValueInUserChosenUnit)) {
+                    
+                    glucoseColoredChartPoints.0.append(reading)
+                    
+                    } else if (((bgReadingValue.scalar <= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit) && (bgReadingValue.scalar > UserDefaults.standard.highMarkValueInUserChosenUnit)) || ((bgReadingValue.scalar >= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit) && (bgReadingValue.scalar < UserDefaults.standard.lowMarkValueInUserChosenUnit))) {
+                
+                    // yellow reading
+                    glucoseColoredChartPoints.1.append(reading)
+                
+                } else {
+                    // green value
+                    glucoseColoredChartPoints.2.append(reading)
+                }
+        }
+        
         // first calculate necessary values by looping through all chart points
         loopThroughGlucoseChartPointsAndFindValues()
         
@@ -566,7 +598,11 @@ public final class GlucoseChartManager: NSObject {
         let urgentLowLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: urgentHighLowLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.urgentLowMarkValueInUserChosenUnit)])
         
         
-        let circles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseTintColor, optimized: true)
+        let redCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseColoredChartPoints.0, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: UIColor.red, optimized: true)
+            
+        let yellowCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseColoredChartPoints.1, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: UIColor.yellow, optimized: true)
+
+        let greenCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseColoredChartPoints.2, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: UIColor.green, optimized: true)
         
         let layers: [ChartLayer?] = [
             gridLayer,
@@ -577,7 +613,9 @@ public final class GlucoseChartManager: NSObject {
             targetLayer,
             lowLayer,
             urgentLowLayer,
-            circles
+            redCircles,
+            yellowCircles,
+            greenCircles
         ]
         
         return Chart(
@@ -627,6 +665,7 @@ public final class GlucoseChartManager: NSObject {
             
         }
     }
+
     
     /// function to be called when glucoseChartPoints array is updated, as first function in generateGlucoseChartWithFrame. Will loop through glucoseChartPoints and find :
     /// - the maximum bg value of the chartPoints between start and end date
