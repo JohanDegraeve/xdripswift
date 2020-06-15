@@ -714,7 +714,7 @@ class BluetoothPeripheralManager: NSObject {
                 }
                 
             case .GNSentryType:
-                if bluetoothTransmitter is CGMBluconTransmitter {
+                if bluetoothTransmitter is CGMGNSEntryTransmitter {
                     return .GNSentryType
                 }
                 
