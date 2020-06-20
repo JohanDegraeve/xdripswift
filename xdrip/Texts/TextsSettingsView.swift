@@ -330,6 +330,10 @@ class Texts_SettingsView {
         return NSLocalizedString("sendTraceFile", tableName: filename, bundle: Bundle.main, value: "Send Trace File", comment: "in Settings, row title to send settings")
     }()
     
+    static let debugLevel: String = {
+        return NSLocalizedString("debugLevel", tableName: filename, bundle: Bundle.main, value: "Include debug level", comment: "in Settings, to enable debug level in trace file")
+    }()
+    
     static let describeProblem: String = {
         return NSLocalizedString("describeProblem", tableName: filename, bundle: Bundle.main, value: "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group 'xDrip4iOS', then mention your facebook name in the e-mail", comment: "Text in pop up shown when user wants to send the trace file")
     }()

@@ -175,6 +175,9 @@ extension UserDefaults {
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
         
+        /// should debug level logs be added in trace file or not, and also in NSLog
+        case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
+        
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
         
@@ -822,6 +825,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.OSLogEnabled.rawValue)
+        }
+    }
+    
+    /// OSLogEnabled - default false
+    var addDebugLevelLogsInTraceFileAndNSLog: Bool {
+        get {
+            return bool(forKey: Key.addDebugLevelLogsInTraceFileAndNSLog.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.addDebugLevelLogsInTraceFileAndNSLog.rawValue)
         }
     }
     

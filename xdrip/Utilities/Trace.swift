@@ -146,34 +146,39 @@ func trace(_ message: StaticString, log:OSLog, category: String, type: OSLogType
     // create timeStamp to use in NSLog and tracefile
     let timeStamp = dateFormatNSLog.string(from: Date())
     
-    // nslog if enabled
-    if UserDefaults.standard.NSLogEnabled {
+    // nslog if enabled and if type = debug, then check also if debug logging is required
+    if UserDefaults.standard.NSLogEnabled && (type != .debug || (type == .debug && UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog)) {
         
         NSLog("%@", ConstantsLog.tracePrefix + " " + timeStamp + " " + category + " " + actualMessage)
         
     }
     
-    // write trace to file
-    do {
-        
-        let textToWrite = timeStamp + " " + category + " " + actualMessage + "\n"
-        
-        if let fileHandle = FileHandle(forWritingAtPath: traceFileName.path) {
+    // write trace to file, only if type is not .debug or type is .debug and addDebugLevelLogsInTraceFileAndNSLog is true
+    if type != .debug || (type == .debug && UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog) {
+       
+        do {
             
-            // file already exists, go to end of file and append text
-            fileHandle.seekToEndOfFile()
-            fileHandle.write(textToWrite.data(using: .utf8)!)
-
-        } else {
+            let textToWrite = timeStamp + " " + category + " " + actualMessage + "\n"
             
-            // file doesn't exist yet
-            try textToWrite.write(to: traceFileName, atomically: true, encoding: String.Encoding.utf8)
+            if let fileHandle = FileHandle(forWritingAtPath: traceFileName.path) {
+                
+                // file already exists, go to end of file and append text
+                fileHandle.seekToEndOfFile()
+                fileHandle.write(textToWrite.data(using: .utf8)!)
+                
+            } else {
+                
+                // file doesn't exist yet
+                try textToWrite.write(to: traceFileName, atomically: true, encoding: String.Encoding.utf8)
+                
+            }
             
+        } catch {
+            NSLog("%@", ConstantsLog.tracePrefix + " " + dateFormatNSLog.string(from: Date()) + " write trace to file failed")
         }
         
-    } catch {
-        NSLog("%@", ConstantsLog.tracePrefix + " " + dateFormatNSLog.string(from: Date()) + " write trace to file failed")
     }
+   
     
     // check if tracefile has reached limit size and if yes rotate the files
     if traceFileName.fileSize > ConstantsTrace.maximumFileSizeInMB * 1024 * 1024 {

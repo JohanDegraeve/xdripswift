@@ -81,3 +81,4 @@
 "volumeTestiOSSoundExplanation" = "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' off - and for missed reading alerts which always use the iOS volume.\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons and try again.";
 "volumeTestSoundPlayer" = "Volume test sound player";
 "volumeTestiOSSound" = "Volume test iOS sound";
+"debugLevel" = "Include debug level";

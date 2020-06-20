@@ -7,6 +7,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// to send trace file
     case sendTraceFile = 0
     
+    /// should debug level logs be stored in trace file yes or no
+    case debugLevel = 1
+    
 }
 
 class SettingsViewTraceSettingsViewModel: NSObject {
@@ -52,6 +55,9 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         case .sendTraceFile:
             return Texts_SettingsView.sendTraceFile
             
+        case .debugLevel:
+            return Texts_SettingsView.debugLevel
+            
         }
     }
     
@@ -64,6 +70,9 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         case .sendTraceFile:
             return .disclosureIndicator
             
+        case .debugLevel:
+            return .none
+            
         }
     }
     
@@ -74,6 +83,9 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         switch setting {
             
         case .sendTraceFile:
+            return nil
+            
+        case .debugLevel:
             return nil
             
         }
@@ -88,7 +100,10 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
             
         case .sendTraceFile:
             return nil
-                
+            
+        case .debugLevel:
+            return UISwitch(isOn: UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog, action: {(isOn:Bool) in UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog = isOn})
+            
         }
         
     }
@@ -137,6 +152,9 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
                     return .showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.emailNotConfigured)
                     
                 }
+            
+        case .debugLevel:
+            return .nothing
             
         }
     }
