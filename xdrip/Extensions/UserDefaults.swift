@@ -146,6 +146,9 @@ extension UserDefaults {
         /// timestamp lastest reading uploaded to NightScout
         case timeStampLatestNSUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
         
+        /// timestamp latest calibration uploaded to NightScout
+        case timeStampLatestNSUploadedCalibrationToNightScout = "timeStampLatestUploadedCalibration"
+        
         // Transmitter
         /// Transmitter Battery Level
         case transmitterBatteryInfo = "transmitterbatteryinfo"
@@ -731,6 +734,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.timeStampLatestNSUploadedBgReadingToNightScout.rawValue)
+        }
+    }
+    
+    /// timestamp latest calibration uploaded to NightScout
+    var timeStampLatestNightScoutUploadedCalibration:Date? {
+        get {
+            return object(forKey: Key.timeStampLatestNSUploadedCalibrationToNightScout.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestNSUploadedCalibrationToNightScout.rawValue)
         }
     }
     
