@@ -23,8 +23,6 @@ fileprivate enum Setting:Int, CaseIterable {
     /// timestamp when connection changed to connected or not connected
     case connectOrDisconnectTimeStamp = 4
     
-    /// ANY NEW SETTINGS SHOULD BE INSERTED HERE
-    
     /// transmitterID, only for devices that need it
     case transmitterId = 5
 
@@ -859,15 +857,36 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 
             case .webOOPEnabled:
                 
+                // set row text and set default row label to nil
                 cell.textLabel?.text = Texts_SettingsView.labelWebOOPTransmitter
                 cell.detailTextLabel?.text = nil
                 
-                var currentStatus = false
+                // get current value of webOOPEnabled, default false
+                var currentWebOOPEnabledValue = false
                 if let bluetoothPeripheral = bluetoothPeripheral {
-                    currentStatus = bluetoothPeripheral.blePeripheral.webOOPEnabled
+                    
+                    currentWebOOPEnabledValue = bluetoothPeripheral.blePeripheral.webOOPEnabled
+                    
                 }
                 
-                cell.accessoryView = UISwitch(isOn: currentStatus, action: { (isOn:Bool) in
+                // set accessoryView to UISwitch with currentWebOOPEnabledValue assigned
+                
+                let test = UISwitch(isOn: currentWebOOPEnabledValue, action: { (isOn:Bool) in
+                    
+                    self.bluetoothPeripheral?.blePeripheral.webOOPEnabled = isOn
+                    
+                    // send info to bluetoothPeripheralManager
+                    if let bluetoothPeripheral = self.bluetoothPeripheral {
+                        
+                        bluetoothPeripheralManager.receivedNewValue(webOOPEnabled: isOn, for: bluetoothPeripheral)
+                        
+                        tableView.reloadSections(IndexSet(integer: self.webOOPSettingsSectionNumber), with: .none)
+                        
+                    }
+                    
+                })
+                
+                cell.accessoryView = UISwitch(isOn: currentWebOOPEnabledValue, action: { (isOn:Bool) in
                     
                     self.bluetoothPeripheral?.blePeripheral.webOOPEnabled = isOn
                     
@@ -882,6 +901,15 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     
                 })
                 
+                // if it's a bluetoothPeripheral that supports libre and if it's a libre sensor type that needs oopWeb, then value can not be changed,
+                if let bluetoothPeripheral = self.bluetoothPeripheral, let libreSensorType = bluetoothPeripheral.blePeripheral.libreSensorType {
+                    if libreSensorType.needsWebOOP() {
+
+                        cell.accessoryView?.isUserInteractionEnabled = false
+                        
+                    }
+                }
+
                 cell.accessoryType = .none
                 
             case .webOOPsite:

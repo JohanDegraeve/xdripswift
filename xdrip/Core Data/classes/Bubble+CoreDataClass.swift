@@ -3,8 +3,11 @@ import CoreData
 
 public class Bubble: NSManagedObject {
     
-    /// batterylevel, not stored in coreData, will only be available after having received it from the M5Stack
+    /// batterylevel, not stored in coreData, will only be available after having received it from the Bubble
     public var batteryLevel: Int = 0
+    
+    // sensorState
+    public var sensorState: LibreSensorState = .unknown
     
     /// create Bubble
     /// - parameters:

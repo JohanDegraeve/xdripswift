@@ -21,8 +21,11 @@
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>3889</string>
-	<string>3882</string>
+<<<<<<< HEAD
+	<string>3884</string>
+=======
+	<string>3881</string>
+>>>>>>> 74e797ad31f6fadf1504e2ab9c1a54d9489f3c85
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

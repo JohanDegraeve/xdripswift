@@ -35,7 +35,7 @@ public class BgReading: NSManagedObject {
         c = 0
         ra = 0
         rb = 0
-        rc = 0
+        rc = 0 
         hideSlope = false
         id = UniqueId.createEventId()
     }

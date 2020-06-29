@@ -36,6 +36,4 @@ protocol BluetoothPeripheralViewModel {
     /// how many sections does this viewmodel define, in addition to the section already defined in BluetoothPeripheralViewController
     func numberOfSections() -> Int
     
-    /// as weboop is a general setting, but only applicable to specific types of transmitter, the model will need to be able to tell if it's supported or not
-    ///
 }

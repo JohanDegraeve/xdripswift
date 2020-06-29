@@ -17,7 +17,7 @@ import Foundation
 /// - shutdown:      0x05 sensor stops operation after 15d after start
 /// - failure:       0x06 sensor has an error
 /// - unknown:       any other state
-enum LibreSensorState {
+public enum LibreSensorState {
     case notYetStarted
     case starting
     case ready

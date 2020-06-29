@@ -507,6 +507,8 @@ final class RootViewController: UIViewController {
         // also for cases where calibration is not needed, we go through this code
         if let activeSensor = activeSensor, let calibrator = calibrator, let bgReadingsAccessor = bgReadingsAccessor {
             
+            // TODO : check on sensorage should be done in another way, because 10 day sensors will now also be supported
+            
             // assuming it's a 14 day sensor (as 10 day sensor is not supported), if it's a Libre sensor and age > 14.5 days, then don't process the readings
             if cgmTransmitter.cgmTransmitterType().sensorType() == .Libre{
                 

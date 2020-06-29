@@ -12,6 +12,7 @@ class LibreRawGlucoseData: GlucoseData {
     }
     
     convenience init(timeStamp:Date, glucoseLevelRaw:Double) {
+        debuglogging("creating LibreRawGlucoseData with timestamp " + timeStamp.description(with: .current) + " and glucoseLevelRaw = " + glucoseLevelRaw.description)
         self.init(timeStamp: timeStamp, glucoseLevelRaw: glucoseLevelRaw, glucoseLevelFiltered: glucoseLevelRaw)
     }
     
@@ -19,4 +20,11 @@ class LibreRawGlucoseData: GlucoseData {
         self.init(timeStamp: timeStamp, glucoseLevelRaw: unsmoothedGlucose, glucoseLevelFiltered: unsmoothedGlucose, unsmoothedGlucose: unsmoothedGlucose)
     }
 
+    /// description
+    override var description: String {
+        
+        return "\nLibreRawGlucoseData\nunsmoothedGlucose = " + unsmoothedGlucose.description + "\n" + "GlucoseData = \n" + super.description
+        
+    }
+    
 }

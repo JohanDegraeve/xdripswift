@@ -181,6 +181,9 @@ extension UserDefaults {
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
         
+        /// web oop parameters, only for Libre 1
+        case libre1DerivedAlgorithmParameters = "algorithmParameters"
+        
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -845,6 +848,22 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.cgmTransmitterDeviceAddress.rawValue)
+        }
+    }
+    
+    /// web oop parameters, only for bubble
+    var libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters? {
+        get {
+            guard let jsonString = string(forKey: Key.libre1DerivedAlgorithmParameters.rawValue) else { return nil }
+            guard let jsonData = jsonString.data(using: .utf8) else { return nil }
+            guard let value = try? JSONDecoder().decode(Libre1DerivedAlgorithmParameters.self, from: jsonData) else { return nil }
+            return value
+        }
+        set {
+            let encoder = JSONEncoder()
+            guard let jsonData = try? encoder.encode(newValue) else { return }
+            let jsonString = String(bytes: jsonData, encoding: .utf8)
+            set(jsonString, forKey: Key.libre1DerivedAlgorithmParameters.rawValue)
         }
     }
     
