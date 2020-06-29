@@ -58,11 +58,9 @@ class LibreOOPClient {
                         return
                     }
                     
-                    // trace the data as String, level debug
+                    // trace data as string in debug mode
                     if let dataAsString = String(bytes: data, encoding: .utf8) {
-                        
                         trace("in getLibreRawGlucoseOOPData, data received frop oop web server = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug, dataAsString)
-                        
                     }
                     
                     let decoder = JSONDecoder()
@@ -130,6 +128,12 @@ class LibreOOPClient {
                         guard let data = data else {
                             trace("in getLibreRawGlucoseOOPOA2Data, data is nil", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
                             return
+                        }
+                        
+                        // trace data as string in debug mode
+                        if let dataAsString = String(bytes: data, encoding: .utf8) {
+                            trace("in getOopWebCalibrationStatus, data as string", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug)
+                            debuglogging("dataastring = " + dataAsString)
                         }
                         
                         let decoder = JSONDecoder()
@@ -224,8 +228,18 @@ class LibreOOPClient {
                         
                     }
                     
+                    if let dataAsString = String(bytes: data, encoding: .utf8) {
+                        trace("in getOopWebCalibrationStatus, data as string", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug)
+                        debuglogging("dataastring = " + dataAsString)
+                    }
+
+                    // trace data as string in debug mode
+                    if let dataAsString = String(bytes: data, encoding: .utf8) {
+                        trace("in getOopWebCalibrationStatus, data as string", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug)
+                        debuglogging("dataastring = " + dataAsString)
+                    }
+
                     // data is not nil, let's try to do json decoding
-                    
                     let decoder = JSONDecoder()
                     
                     do {
