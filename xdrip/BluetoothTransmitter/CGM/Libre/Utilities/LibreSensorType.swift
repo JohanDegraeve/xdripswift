@@ -4,8 +4,6 @@ import Foundation
 
 public enum LibreSensorType: String {
     
-    // TODO: can this be improved ? raw type UInt8 iso String ? in which case all patchInfo variables would need to become of type LibreSensorType in stead of a String. In the bluetooth transmitters, then when assigning a value, immediately set to LibreSensorType iso patchInfo
-    
     // Libre 1
     case libre1    = "DF"
     
