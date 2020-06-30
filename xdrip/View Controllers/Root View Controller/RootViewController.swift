@@ -507,23 +507,6 @@ final class RootViewController: UIViewController {
         // also for cases where calibration is not needed, we go through this code
         if let activeSensor = activeSensor, let calibrator = calibrator, let bgReadingsAccessor = bgReadingsAccessor {
             
-            // TODO : check on sensorage should be done in another way, because 10 day sensors will now also be supported
-            
-            // assuming it's a 14 day sensor (as 10 day sensor is not supported), if it's a Libre sensor and age > 14.5 days, then don't process the readings
-            if cgmTransmitter.cgmTransmitterType().sensorType() == .Libre{
-                
-                guard abs(activeSensor.startDate.timeIntervalSinceNow) < ConstantsLibre.maximumAgeLibre1InMinutes * 60 else {
-                 
-                    trace("sensor older than %{public}@ minutes. Readings will not be processed.", log: log, category: ConstantsLog.categoryRootView, type: .info, ConstantsLibre.maximumAgeLibre1InMinutes.description)
-                    
-                    self.present(UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.sensorAge14Days, actionHandler: nil), animated: true, completion: nil)
-                    
-                    return
-                    
-                }
-                
-            }
-            
             // initialize help variables
             var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
             var lastCalibrationsForActiveSensorInLastXDays = calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)

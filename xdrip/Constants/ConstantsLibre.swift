@@ -13,9 +13,4 @@ enum ConstantsLibre {
     /// calibration parameters will be stored locally on disk, this is the path
     static let filePathForParameterStorage = "/Documents/LibreSensorParameters"
     
-    /// maximum age Libre 1
-    ///
-    /// taking one hour spare. To avoid that there's a wrong value used eg in case the user manually starts the sensor and doesn't set the time correctly
-    static let maximumAgeLibre1InMinutes: Double = 20880.0 - 60.0
-    
 }

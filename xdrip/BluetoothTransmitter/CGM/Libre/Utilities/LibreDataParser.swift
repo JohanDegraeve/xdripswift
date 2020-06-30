@@ -152,7 +152,7 @@ class LibreDataParser {
                     handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
                     
                 }
-                todo
+                
             case .libre2:
                 
                 LibreOOPClient.getLibreRawGlucoseOOPData(libreData: libreData, libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, oopWebSite: oopWebSite, oopWebToken: oopWebToken) { (libreRawGlucoseOOPData) in
@@ -348,13 +348,16 @@ fileprivate func historyToLibreGlucose(_ measurements: [LibreMeasurement]) -> [L
 ///     - array of libreRawGlucoseData, first is the most recent. Only returns recent readings, ie not the ones that are older than timeStampLastBgReading. 30 seconds are added here, meaning, new reading should be at least 30 seconds more recent than timeStampLastBgReading
 ///     - sensorState: status of the sensor
 ///     - sensorTimeInMinutes: age of sensor in minutes
-fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters, timeStampLastBgReading: Date) -> (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int) {
-    
+fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters, timeStampLastBgReading: Date) -> (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
+
     // initialise returnvalue, array of LibreRawGlucoseData
     var finalResult:[LibreRawGlucoseData] = []
     
     // calculate sensorState
     let sensorState = LibreSensorState(stateByte: libreData[4])
+    
+    // if sensorState is not .ready, then return empty array
+    if sensorState != .ready { return (finalResult, sensorState, nil)  }
     
     let sensorTimeInMinutes:Int = 256 * (Int)(libreData.uint8(position: 317) & 0xFF) + (Int)(libreData.uint8(position: 316) & 0xFF)
     
