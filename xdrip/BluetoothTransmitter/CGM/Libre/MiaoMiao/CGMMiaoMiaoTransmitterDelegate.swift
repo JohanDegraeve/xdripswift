@@ -14,5 +14,11 @@ protocol CGMMiaoMiaoTransmitterDelegate: AnyObject {
     /// MiaoMiao is sending batteryLevel
     func received(batteryLevel: Int, from cGMMiaoMiaoTransmitter: CGMMiaoMiaoTransmitter)
 
+    /// miaomiao is sending type of transmitter
+    func received(libreSensorType: LibreSensorType, from cGMMiaoMiaoTransmitter: CGMMiaoMiaoTransmitter)
+    
+    /// miaomiao is sending sensorStatus
+    func received(sensorStatus: LibreSensorState, from cGMMiaoMiaoTransmitter: CGMMiaoMiaoTransmitter)
+
 }
 
