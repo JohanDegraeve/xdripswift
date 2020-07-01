@@ -189,7 +189,10 @@ class LibreOOPClient {
         if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters {
             if libre1DerivedAlgorithmParameters.serialNumber == libreSensorSerialNumber.serialNumber {
                 
+                trace("in getLibre1DerivedAlgorithmParameters, found libre1DerivedAlgorithmParameters in UserDefaults", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
+                
                 callback(libre1DerivedAlgorithmParameters)
+                
                 return
                 
             }
@@ -214,7 +217,7 @@ class LibreOOPClient {
                     
                     if let error = error {
                         
-                        trace("in getOopWebCalibrationStatus, received error : %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, error.localizedDescription)
+                        trace("in getLibre1DerivedAlgorithmParameters, received error : %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, error.localizedDescription)
                         
                         return
                         
@@ -222,21 +225,17 @@ class LibreOOPClient {
                     
                     guard let data = data else {
                         
-                        trace("in getOopWebCalibrationStatus, data is nil", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
+                        trace("in getLibre1DerivedAlgorithmParameters, data is nil", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
                         
                         return
                         
                     }
                     
+                    // if debug level tracing, then log the data as String
                     if let dataAsString = String(bytes: data, encoding: .utf8) {
-                        trace("in getOopWebCalibrationStatus, data as string", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug)
-                        debuglogging("dataastring = " + dataAsString)
-                    }
-
-                    // trace data as string in debug mode
-                    if let dataAsString = String(bytes: data, encoding: .utf8) {
-                        trace("in getOopWebCalibrationStatus, data as string", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug)
-                        debuglogging("dataastring = " + dataAsString)
+                        
+                        trace("in getLibre1DerivedAlgorithmParameters, data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug, dataAsString)
+                        
                     }
 
                     // data is not nil, let's try to do json decoding
@@ -250,6 +249,8 @@ class LibreOOPClient {
                             
                             if let libreDerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(slope_slope: slope.slopeSlope ?? 0, slope_offset: slope.slopeOffset ?? 0, offset_slope: slope.offsetSlope ?? 0, offset_offset: slope.offsetOffset ?? 0, isValidForFooterWithReverseCRCs: Int(slope.isValidForFooterWithReverseCRCs ?? 1), extraSlope: 1.0, extraOffset: 0.0, sensorSerialNumber: libreSensorSerialNumber.serialNumber) {
                                 
+                                trace("in getLibre1DerivedAlgorithmParameters, successfully created libreDerivedAlgorithmParameters", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
+                                
                                 // store result in UserDefaults, next time, server will not be used anymore, we will use the stored value
                                 UserDefaults.standard.libre1DerivedAlgorithmParameters = libreDerivedAlgorithmParameters
                                 
@@ -260,7 +261,7 @@ class LibreOOPClient {
                     } catch {
                         
                         // json parsing failed
-                        trace("in calibrateSensor, could not do json parsing", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
+                        trace("in getLibre1DerivedAlgorithmParameters, could not do json parsing", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
                         
                         // if response is not nil then trace
                         if let response = String(data: data, encoding: String.Encoding.utf8) {

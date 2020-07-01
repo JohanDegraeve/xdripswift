@@ -102,6 +102,10 @@ class LibreDataParser {
     ///     - completionHandler : will be called when glucose data is read with as parameter the timestamp of the last reading. Goal is that caller can set timeStampLastBgReading to the new value. Also the LibreSensorState if found.
     public static func libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber?, patchInfo: String?, webOOPEnabled: Bool, oopWebSite: String?, oopWebToken: String?, libreData: Data, cgmTransmitterDelegate : CGMTransmitterDelegate?, timeStampLastBgReading: Date, completionHandler:@escaping ((_ timeStampLastBgReading: Date?, _ sensorState: LibreSensorState?) -> ())) {
 
+        if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
+            trace("in libreDataProcessor, sensortype = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, libreSensorType.description)
+        }
+        
         // get libreSensorType, if this fails then it must be an unknown Libre sensor type in which case we don't proceed
         guard let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) else {
 

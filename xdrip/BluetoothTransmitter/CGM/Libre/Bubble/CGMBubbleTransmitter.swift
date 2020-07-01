@@ -193,21 +193,30 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 
                             }
 
-                            // function used two times in next statements
-                            let checkCrc = { guard Crc.LibreCrc(data: &self.rxBuffer, headerOffset: self.bubbleHeaderLength) else {
-                                trace("    Libre 1 sensor, CRC check failed", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
-                                return
-                                } }
-                            
-                            // if patchInfo != nil, then this is a Bubble that sends patchInfo.
-                            // libre1 patchinfo first byte is "70" or "E5" - other case no CRC check required
-                            if let patchInfo = patchInfo, patchInfo.contains(find: "70")  || patchInfo.contains(find: "E5") {
-                                checkCrc()
-                            } else if patchInfo == nil {
-                                // must be a Bubble that doesn't support patchInfo, so it must be a Libre1, CRC check required
-                                checkCrc()
+                            // get sensortype
+                            if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
+                                
+                                // crc check only for Libre 1 (is this the right thing to do ?)
+                                if libreSensorType == .libre1 {
+                                    
+                                    guard Crc.LibreCrc(data: &self.rxBuffer, headerOffset: self.bubbleHeaderLength) else {
+                                        trace("    Libre 1 sensor, CRC check failed, no further processing", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                                        return
+                                    }
+                                    
+                                }
+                                
+                                // do this for tracing only, not processing will continue if crc check fails
+                                if libreSensorType == .libreProH || libreSensorType == .libreUS {
+                                    
+                                    if !Crc.LibreCrc(data: &self.rxBuffer, headerOffset: self.bubbleHeaderLength) {
+                                        trace("    libreProH or libreProH sensor, CRC check failed - will continue processing anyway", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                                    }
+                                    
+                                }
+                                
                             }
-                            
+
                             LibreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading, completionHandler: { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?) in
                                 
                                 if let timeStampLastBgReading = timeStampLastBgReading {
