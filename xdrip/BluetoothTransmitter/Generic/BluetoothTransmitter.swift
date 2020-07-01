@@ -287,7 +287,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         self.peripheral = peripheral
         
         //in Spike a check is done to see if state is disconnected, this is code from the MiaoMiao developers, not sure if this is needed or not because normally the device should be disconnected
-        trace("in stopScanAndconnect, status = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, peripheral.state.description())
+        trace("in stopScanAndconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, peripheral.state.description())
         if peripheral.state == .disconnected {
             trace("    trying to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
             centralManager?.connect(peripheral, options: nil)

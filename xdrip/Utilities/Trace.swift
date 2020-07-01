@@ -288,6 +288,9 @@ class Trace {
             traceInfo.appendStringAndNewLine(paragraphSeperator)
         }
         
+        // is showReadingInNotification on or off
+        traceInfo.appendStringAndNewLine("bgReading in notification is on = " + UserDefaults.standard.showReadingInNotification.description + "\n")
+        
         // Info from coredata
         
         if let coreDataManager = coreDataManager {
@@ -307,6 +310,10 @@ class Trace {
                     traceInfo.appendStringAndNewLine("    Alias : " + alias)
                 }
                 traceInfo.appendStringAndNewLine("    xDrip will " + (blePeripheral.shouldconnect ? "try ":"not try") + " to connect to this peripheral")
+                
+                if let libreSensorType = blePeripheral.libreSensorType {
+                    traceInfo.appendStringAndNewLine("last known libreSensorType = " + libreSensorType.description)
+                }
 
                 for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
                     
@@ -319,7 +326,7 @@ class Trace {
                             traceInfo.appendStringAndNewLine("    battery level = " + m5Stack.batteryLevel.description)
                             
                             // if needed additional specific info can be added
-                            
+      
                         }
                         
                     case .M5StickCType:
