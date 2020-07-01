@@ -80,10 +80,6 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
             return
         }
         
-        //only for logging
-        let data = value.hexEncodedString()
-        trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMxDripG4, type: .debug, data)
-        
         switch XdripResponseType(rawValue: value[1]) {
         case .dataPacket?:
             //process value and get result

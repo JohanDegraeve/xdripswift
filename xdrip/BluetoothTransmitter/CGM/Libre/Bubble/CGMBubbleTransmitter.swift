@@ -132,9 +132,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let value = characteristic.value {
             
-            // trace the contents, as we'll probably do much troubleshooting still
-            trace("in didUpdateValueFor, received data as hexstring :  %{public}@", log: log, category: ConstantsLog.categoryCGMBubble, type: .info, value.hexEncodedString())
-
             //check if buffer needs to be reset
             if (Date() > startDate.addingTimeInterval(CGMBubbleTransmitter.maxWaitForpacketInSeconds - 1)) {
                 trace("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMBubble, type: .info, CGMBubbleTransmitter.maxWaitForpacketInSeconds)

@@ -255,10 +255,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let value = characteristic.value {
             
-            //only for logging
-            let data = value.hexEncodedString()
-            trace("    data = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, data)
-            
             //check type of message and process according to type
             if let firstByte = value.first {
                 if let opCode = DexcomTransmitterOpCode(rawValue: firstByte) {

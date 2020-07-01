@@ -312,8 +312,6 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             // convert to string and log the value
             let valueAsString = value.hexEncodedString()
             
-            trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryBlucon, type: .info, valueAsString)
-            
             // get Opcode
             if let opCode = BluconTransmitterOpCode(withOpCodeValue: valueAsString) {
                 

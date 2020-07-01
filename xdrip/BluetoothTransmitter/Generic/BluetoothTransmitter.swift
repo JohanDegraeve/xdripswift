@@ -516,8 +516,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
         
     }
-    
+
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+
+        // if debug level tracing enabled, then trace the received value
+        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog, let value = characteristic.value {
+            trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, value.hexEncodedString())
+        }
         
         timeStampLastStatusUpdate = Date()
         

@@ -73,8 +73,6 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
                 return
             }
             
-            trace("    value = %{public}@", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .info, valueAsString)
-            
             //find indexes of " "
             let indexesOfSplitter = valueAsString.indexes(of: " ")
             

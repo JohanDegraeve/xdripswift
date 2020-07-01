@@ -66,8 +66,6 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
                 return
             }
             
-            trace("    value = %{public}@", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .info, valueAsString)
-            
             //find indexes of " "
             let indexesOfSplitter = valueAsString.indexes(of: " ")
             

@@ -179,9 +179,6 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
                 // decode as explained in GNSEntry documentation
                 var valueDecoded = XORENC(inD: [UInt8](value))
                 
-                let valueDecodedAsHexString = Data(valueDecoded).hexEncodedString()
-                trace("   in peripheralDidUpdateValueFor, GNW Notify with hex value = %{public}@", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info , valueDecodedAsHexString)
-                
                 // reading status, as per GNSEntry documentation
                 let readingStatus = getIntAtPosition(numberOfBytes: 1, position: 0, data: &valueDecoded)
                 
