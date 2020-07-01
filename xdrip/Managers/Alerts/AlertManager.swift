@@ -567,6 +567,25 @@ public class AlertManager:NSObject {
                 trace("   delay = %{public}@ seconds, = %{public}@ minutes - which means this is a future planned alert, it will not go off now", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, delayInSecondsToUse.description, ((round(Double(delayInSecondsToUse)/60*10))/10).description)
             }
 
+            // check if app is allowed to send local notification and if not write info to trace
+            UNUserNotificationCenter.current().getNotificationSettings { (notificationSettings) in
+                
+                switch notificationSettings.authorizationStatus {
+                case .denied:
+                    trace("   notificationSettings.authorizationStatus = denied", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
+                case .notDetermined:
+                    trace("   notificationSettings.authorizationStatus = notDetermined", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
+                case .authorized:
+                    break
+                case .provisional:
+                    trace("   notificationSettings.authorizationStatus = provisional", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
+
+                @unknown default:
+                    fatalError("unsupported authorizationStatus in AlertManager")
+                    
+                }
+            }
+            
             return true
             
         } else {
