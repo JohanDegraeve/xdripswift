@@ -43,10 +43,10 @@ public enum LibreSensorType: String {
         
         switch self {
             
-        case .libre1:
+        case .libre1, .libreUS, .libreProH:
             return false
             
-        case .libre1A2, .libre2, .libreUS, .libreProH :
+        case .libre1A2, .libre2 :
             return true
             
         }
