@@ -23,7 +23,7 @@ public enum LibreSensorType: String {
             return "Libre 1"
             
         case .libre1A2:
-            return "Libre 1"
+            return "Libre 1 A2"
             
         case .libre2:
             return "Libre 2"
