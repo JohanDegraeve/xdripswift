@@ -291,6 +291,14 @@ fileprivate func historyMeasurements(bytes: Data, timeStampLastBgReading: Date, 
 /// if result.errorDescription not nil, then delegate function error will be called
 fileprivate func handleGlucoseData(result: (glucoseData:[GlucoseData], sensorTimeInMinutes:Int?, sensorState: LibreSensorState?, errorDescription: String?), cgmTransmitterDelegate : CGMTransmitterDelegate?, libreSensorSerialNumber:LibreSensorSerialNumber?, completionHandler:((_ timeStampLastBgReading: Date?, _ sensorState: LibreSensorState?) -> ())) {
     
+    // trace the sensor state
+    // TODO : delete once everything works fine ?
+    if let sensorState = result.sensorState {
+        trace("in libreDataProcessor, sensor state = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, sensorState.description)
+    } else {
+        trace("in libreDataProcessor, sensor state is unknown", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+    }
+
     // if result.errorDescription not nil, then send it to the delegate
     guard result.errorDescription == nil else {
         
@@ -304,6 +312,8 @@ fileprivate func handleGlucoseData(result: (glucoseData:[GlucoseData], sensorTim
     if let sensorTimeInMinutes = result.sensorTimeInMinutes {
 
         guard sensorTimeInMinutes >= 60 else {
+            
+            trace("in handleGlucoseData, sensorTimeInMinutes < 60 minutes, no further processing", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
             
             var emptyArray = [GlucoseData]()
             
@@ -367,10 +377,14 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
     // calculate sensorState
     let sensorState = LibreSensorState(stateByte: libreData[4])
     
+    trace("in libreDataProcessor, for debugging purposes, 1", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+    
     // if sensorState is not .ready, then return empty array
     if sensorState != .ready { return (finalResult, sensorState, nil)  }
     
     let sensorTimeInMinutes:Int = 256 * (Int)(libreData.uint8(position: 317) & 0xFF) + (Int)(libreData.uint8(position: 316) & 0xFF)
+    
+    trace("in libreDataProcessor, for debugging purposes, 2", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
     
     // iterates through glucoseData, compares timestamp, if still higher than timeStampLastBgReading (+ 30 seconds) then adds it to finalResult
     let processGlucoseData = { (glucoseData: [LibreRawGlucoseData], timeStampLastAddedGlucoseData: Date) in
@@ -379,6 +393,8 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
         
         for glucose in glucoseData {
             
+            trace("in libreDataProcessor, for debugging purposes, 7", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+
             let timeStampOfNewGlucoseData = glucose.timeStamp
             if timeStampOfNewGlucoseData.toMillisecondsAsDouble() > (timeStampLastBgReading.toMillisecondsAsDouble() + 30000.0) {
                 
@@ -399,11 +415,17 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
     // latest reading will get date of now
     let last16 = trendMeasurements(bytes: libreData, mostRecentReadingDate: Date(), timeStampLastBgReading: timeStampLastBgReading, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
     
+    trace("in libreDataProcessor, for debugging purposes, 3", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+
     // process last16, new readings should be smaller than now + 5 minutes
     processGlucoseData(trendToLibreGlucose(last16), Date(timeIntervalSinceNow: 5 * 60))
     
+    trace("in libreDataProcessor, for debugging purposes, 4", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+    
     // get last32 from history data
     let last32 = historyMeasurements(bytes: libreData, timeStampLastBgReading: timeStampLastBgReading, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
+    
+    trace("in libreDataProcessor, for debugging purposes, 5", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
     
     // process last 32 with date earlier than the earliest in last16
     var timeStampLastAddedGlucoseData = Date()
@@ -411,8 +433,12 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
         timeStampLastAddedGlucoseData = last.date
     }
     
+    trace("in libreDataProcessor, for debugging purposes, 6", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+
     processGlucoseData(historyToLibreGlucose(last32), timeStampLastAddedGlucoseData)
     
+    trace("in libreDataProcessor, for debugging purposes, last", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+
     return (finalResult, sensorState, sensorTimeInMinutes)
     
 }
