@@ -119,18 +119,24 @@ class LibreDataParser {
         
         trace("in libreDataProcessor, sensortype = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, libreSensorType.description)
         
+        trace("in libreDataProcessor, for debugging purposes, 8", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+        
         // unwrap patchInfo, patchInfo must be non nill as we've already tested that
         guard let patchInfo = patchInfo else {
             trace("in libreDataProcessor, patchinfo is nil (which looks here like a coding error? )", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
             return
         }
 
-        // let's see if we can and must use web oop
+        trace("in libreDataProcessor, for debugging purposes, 9", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+
+        // let's see if we must use webOOP (if webOOPEnabled is true) and if so if we have all required info (libreSensorSerialNumber, oopWebSite and oopWebToken)
         if let libreSensorSerialNumber = libreSensorSerialNumber, let oopWebSite = oopWebSite, let oopWebToken = oopWebToken, webOOPEnabled {
             
             switch libreSensorType {
                 
             case .libre1, .libreUS, .libreProH:// these types are all Libre 1
+                
+                trace("in libreDataProcessor, for debugging purposes, 10", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
                 
                 // get LibreDerivedAlgorithmParameters and parse using the libre1DerivedAlgorithmParameters
                 LibreOOPClient.getLibre1DerivedAlgorithmParameters(bytes: libreData, libreSensorSerialNumber: libreSensorSerialNumber, oopWebSite: oopWebSite, oopWebToken: oopWebToken) { (libre1DerivedAlgorithmParameters) in
@@ -180,7 +186,6 @@ class LibreDataParser {
                     
                     handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
                     
-                    
                 }
             }
             
@@ -194,6 +199,7 @@ class LibreDataParser {
             
             
         } else {
+            
             // it's not a libre 1 and oop web is enabled, so there's nothing we can do
             trace("in libreDataProcessor, can not continue - web oop is enabled, but there's missing info in the request", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
         }
