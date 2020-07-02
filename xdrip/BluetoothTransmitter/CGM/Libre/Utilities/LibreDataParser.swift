@@ -102,13 +102,9 @@ class LibreDataParser {
     ///     - completionHandler : will be called when glucose data is read with as parameter the timestamp of the last reading. Goal is that caller can set timeStampLastBgReading to the new value. Also the LibreSensorState if found.
     public static func libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber?, patchInfo: String?, webOOPEnabled: Bool, oopWebSite: String?, oopWebToken: String?, libreData: Data, cgmTransmitterDelegate : CGMTransmitterDelegate?, timeStampLastBgReading: Date, completionHandler:@escaping ((_ timeStampLastBgReading: Date?, _ sensorState: LibreSensorState?) -> ())) {
 
-        if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
-            trace("in libreDataProcessor, sensortype = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, libreSensorType.description)
-        }
-        
         // get libreSensorType, if this fails then it must be an unknown Libre sensor type in which case we don't proceed
         guard let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) else {
-
+            
             // unwrap patchInfo, although it can't be nil here because LibreSensorType.type would have returned .libre1 otherwise
             if let patchInfo = patchInfo {
                 
@@ -116,13 +112,18 @@ class LibreDataParser {
                 trace("in libreDataProcessor, failed to create libreSensorType, patchInfo = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, patchInfo)
                 
             }
-
+            
             return
-
+            
         }
-
+        
+        trace("in libreDataProcessor, sensortype = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, libreSensorType.description)
+        
         // unwrap patchInfo, patchInfo must be non nill as we've already tested that
-        guard let patchInfo = patchInfo else {return}
+        guard let patchInfo = patchInfo else {
+            trace("in libreDataProcessor, patchinfo is nil (which looks here like a coding error? )", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+            return
+        }
 
         // let's see if we can and must use web oop
         if let libreSensorSerialNumber = libreSensorSerialNumber, let oopWebSite = oopWebSite, let oopWebToken = oopWebToken, webOOPEnabled {
@@ -134,9 +135,15 @@ class LibreDataParser {
                 // get LibreDerivedAlgorithmParameters and parse using the libre1DerivedAlgorithmParameters
                 LibreOOPClient.getLibre1DerivedAlgorithmParameters(bytes: libreData, libreSensorSerialNumber: libreSensorSerialNumber, oopWebSite: oopWebSite, oopWebToken: oopWebToken) { (libre1DerivedAlgorithmParameters) in
                     
+                    // can be deleted once all libre types work well
+                    trace("in libreDataProcessor, received libre1DerivedAlgorithmParameters", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug)
+                    
                     // parse the data using oop web algorithm
                     let parsedResult = parseLibre1DataWithOOPWebCalibration(libreData: libreData, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters, timeStampLastBgReading: timeStampLastBgReading)
 
+                    // can be deleted once all libre types work well
+                    trace("in libreDataProcessor, processed libre1DerivedAlgorithmParameters", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug)
+                    
                     handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
                     
                 }

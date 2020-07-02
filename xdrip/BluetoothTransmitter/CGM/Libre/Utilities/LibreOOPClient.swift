@@ -53,6 +53,8 @@ class LibreOOPClient {
                 
                 DispatchQueue.main.async {
 
+                    trace("in getLibreRawGlucoseOOPData, finished task", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
+                    
                     guard let data = data else {
                         trace("in getLibreRawGlucoseOOPData, data is nil", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
                         return
@@ -89,6 +91,7 @@ class LibreOOPClient {
 
             }
             
+            trace("in getLibreRawGlucoseOOPData, calling task.resume", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
             task.resume()
             
         } else {
@@ -119,6 +122,8 @@ class LibreOOPClient {
                     data, response, error in
                     
                     DispatchQueue.main.async {
+                        
+                        trace("in getLibreRawGlucoseOOPOA2Data, finished task", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
                         
                         if let error = error {
                             trace("in getLibreRawGlucoseOOPOA2Data, error is not nil, error = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, error.localizedDescription)
@@ -165,6 +170,7 @@ class LibreOOPClient {
                     
                 }
                 
+                trace("in getLibreRawGlucoseOOPOA2Data, calling task.resume", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
                 task.resume()
                 
             } catch let error {
@@ -214,6 +220,8 @@ class LibreOOPClient {
             let task = URLSession.shared.dataTask(with: request as URLRequest) { data, response, error in
                 
                 DispatchQueue.main.async {
+                    
+                    trace("in getLibre1DerivedAlgorithmParameters, finished task", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
                     
                     if let error = error {
                         
@@ -276,7 +284,12 @@ class LibreOOPClient {
                 
             }
             
+            trace("in getLibre1DerivedAlgorithmParameters, calling task.resume", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
             task.resume()
+            
+        } else {
+            
+            trace("in getLibre1DerivedAlgorithmParameters, failed to create uploadURL", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
             
         }
 

@@ -62,6 +62,8 @@ class SettingsViewNightScoutSettingsViewModel {
             
             let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
                 
+                trace("in testNightScoutCredentials, finished task", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
+                
                 if let error = error {
                     
                     trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, error.localizedDescription)
@@ -90,7 +92,7 @@ class SettingsViewNightScoutSettingsViewModel {
                 }
             })
             
-            trace("in testNightScoutCredentials, url and apikey test started", log: log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
+            trace("in testNightScoutCredentials, calling task.resume", log: log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
             task.resume()
             
         }

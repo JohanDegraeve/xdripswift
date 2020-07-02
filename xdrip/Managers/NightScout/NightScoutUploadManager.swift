@@ -246,9 +246,6 @@ public class NightScoutUploadManager:NSObject {
             // transform dataToUpload to json
             let dateToUploadAsJSON = try JSONSerialization.data(withJSONObject: dataToUpload, options: [])
             
-            // get shared URLSession
-            let sharedSession = URLSession.shared
-            
             if let url = URL(string: siteURL) {
                 
                 // create upload url
@@ -262,9 +259,9 @@ public class NightScoutUploadManager:NSObject {
                 request.setValue(apiKey.sha1(), forHTTPHeaderField: "api-secret")
                 
                 // Create upload Task
-                let dataTask = sharedSession.uploadTask(with: request, from: dateToUploadAsJSON, completionHandler: { (data, response, error) -> Void in
+                let task = URLSession.shared.uploadTask(with: request, from: dateToUploadAsJSON, completionHandler: { (data, response, error) -> Void in
                     
-                    trace("    in upload, %{public}@, uploadTask completionHandler", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, traceString)
+                    trace("in uploadData, finished task", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
                     
                     // if ends without success then log the data
                     var success = false
@@ -303,7 +300,10 @@ public class NightScoutUploadManager:NSObject {
                     }
                     
                 })
-                dataTask.resume()
+                
+                trace("in uploadData, calling task.resume", log: oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+                task.resume()
+                
             }
             
         } catch let error {
@@ -323,6 +323,9 @@ public class NightScoutUploadManager:NSObject {
             request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
             
             let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
+                
+                trace("in testNightScoutCredentials, finished task", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+                
                 if let error = error {
                     completion(false, error)
                     return
@@ -335,7 +338,10 @@ public class NightScoutUploadManager:NSObject {
                     completion(true, nil)
                 }
             })
+            
+            trace("in testNightScoutCredentials, calling task.resume", log: oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
             task.resume()
+            
         }
     }
     
