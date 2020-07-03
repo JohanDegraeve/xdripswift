@@ -32,4 +32,4 @@
 "firmware" = "Firmware";
 "hardware" = "Hardware";
 "unknown" = "Unknown";
-"sensorStatus" = "Sensor status";
+"sensorStatus" = "Sensor status:";

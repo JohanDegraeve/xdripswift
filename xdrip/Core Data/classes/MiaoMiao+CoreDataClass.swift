@@ -6,7 +6,10 @@ public class MiaoMiao: NSManagedObject {
     /// batterylevel, not stored in coreData, will only be available after having received it from the M5Stack
     public var batteryLevel: Int = 0
     
-    /// create MiaoMiao
+    // sensorState
+    public var sensorState: LibreSensorState = .unknown
+    
+  /// create MiaoMiao
     /// - parameters:
     init(address: String, name: String, alias: String?, nsManagedObjectContext:NSManagedObjectContext) {
         

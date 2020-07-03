@@ -146,7 +146,7 @@ class Texts_Common {
     }()
     
     static let sensorStatus = {
-        return NSLocalizedString("sensorStatus", tableName: filename, bundle: Bundle.main, value: "Sensor status", comment: "to show the sensor status")
+        return NSLocalizedString("sensorStatus", tableName: filename, bundle: Bundle.main, value: "Sensor status:", comment: "to show the sensor status")
     }()
     
 }
