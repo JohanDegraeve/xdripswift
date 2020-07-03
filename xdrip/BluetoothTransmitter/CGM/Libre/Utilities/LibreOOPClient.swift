@@ -191,8 +191,6 @@ class LibreOOPClient {
     ///   - callback: takes LibreDerivedAlgorithmParameters`as parameter, will not be called if there's no result for instance because oop web server can not be reached
     static func getLibre1DerivedAlgorithmParameters(bytes: Data, libreSensorSerialNumber: LibreSensorSerialNumber, oopWebSite: String, oopWebToken: String, callback: @escaping (Libre1DerivedAlgorithmParameters) -> Void) {
         
-        trace("in getLibre1DerivedAlgorithmParameters, for debugging purposes, 11", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-        
         // the parameters of one sensor will not be changed, if the values are already available in userdefaults , then use those values
         if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters {
             if libre1DerivedAlgorithmParameters.serialNumber == libreSensorSerialNumber.serialNumber {
@@ -206,8 +204,6 @@ class LibreOOPClient {
             }
         }
 
-        trace("in getLibre1DerivedAlgorithmParameters, for debugging purposes, 12", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-
         // calibration parameters not available yet, get them from oopWebSite
         let json: [String: String] = [
             "token": oopWebToken,
@@ -215,8 +211,6 @@ class LibreOOPClient {
             "timestamp": "\(Date().toMillisecondsAsInt64())",
         ]
 
-        trace("in getLibre1DerivedAlgorithmParameters, for debugging purposes, 13", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-        
         if let uploadURL = URL(string: "\(oopWebSite)/calibrateSensor") {
             var request = URLRequest(url: uploadURL)
             request.httpMethod = "POST"
@@ -229,8 +223,6 @@ class LibreOOPClient {
                     
                     trace("in getLibre1DerivedAlgorithmParameters, finished task", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
                     
-                    trace("in getLibre1DerivedAlgorithmParameters, for debugging purposes, 14", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-
                     if let error = error {
                         
                         trace("in getLibre1DerivedAlgorithmParameters, received error : %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, error.localizedDescription)
@@ -239,8 +231,6 @@ class LibreOOPClient {
                         
                     }
                     
-                    trace("in getLibre1DerivedAlgorithmParameters, for debugging purposes, 15", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-
                     guard let data = data else {
                         
                         trace("in getLibre1DerivedAlgorithmParameters, data is nil", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
@@ -259,8 +249,6 @@ class LibreOOPClient {
                     // data is not nil, let's try to do json decoding
                     let decoder = JSONDecoder()
                     
-                    trace("in getLibre1DerivedAlgorithmParameters, for debugging purposes, 16", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-
                     do {
                         
                         let response = try decoder.decode(OopWebCalibrationStatus.self, from: data)
@@ -276,11 +264,8 @@ class LibreOOPClient {
                                 
                                 callback(libreDerivedAlgorithmParameters)
                                 
-                            } else {
-                                trace("in getLibre1DerivedAlgorithmParameters, for debugging purposes, 17", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-                                
-
                             }
+                            
                         }
                     } catch {
                         
