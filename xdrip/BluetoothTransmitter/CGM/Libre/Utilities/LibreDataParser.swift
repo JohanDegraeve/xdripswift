@@ -119,14 +119,6 @@ class LibreDataParser {
         
         trace("in libreDataProcessor, sensortype = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, libreSensorType.description)
         
-        trace("in libreDataProcessor, for debugging purposes, 8", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-        
-        // unwrap patchInfo, patchInfo must be non nill as we've already tested that
-        guard let patchInfo = patchInfo else {
-            trace("in libreDataProcessor, patchinfo is nil (which looks here like a coding error? )", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-            return
-        }
-
         trace("in libreDataProcessor, for debugging purposes, 9", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
 
         // let's see if we must use webOOP (if webOOPEnabled is true) and if so if we have all required info (libreSensorSerialNumber, oopWebSite and oopWebToken)
@@ -141,6 +133,12 @@ class LibreDataParser {
                 // get LibreDerivedAlgorithmParameters and parse using the libre1DerivedAlgorithmParameters
                 LibreOOPClient.getLibre1DerivedAlgorithmParameters(bytes: libreData, libreSensorSerialNumber: libreSensorSerialNumber, oopWebSite: oopWebSite, oopWebToken: oopWebToken) { (libre1DerivedAlgorithmParameters) in
                     
+                    // if debug level logging enabled, than add full dump of libre1DerivedAlgorithmParameters in the trace (checking here to save some processing time if it's not needed
+                    if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                        trace("in libreDataProcessor, received libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, libre1DerivedAlgorithmParameters.description)
+                        
+                    }
+
                     // can be deleted once all libre types work well
                     trace("in libreDataProcessor, received libre1DerivedAlgorithmParameters", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug)
                     
@@ -172,6 +170,12 @@ class LibreDataParser {
                 
             case .libre2:
                 
+                // patchInfo must be non nil to handle libre 2
+                guard let patchInfo = patchInfo else {
+                    trace("in libreDataProcessor, handling libre 2 but patchInfo is nil", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+                    return
+                }
+                
                 LibreOOPClient.getLibreRawGlucoseOOPData(libreData: libreData, libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, oopWebSite: oopWebSite, oopWebToken: oopWebToken) { (libreRawGlucoseOOPData) in
                     
                     // if debug level logging enabled, than add full dump of libreRawGlucoseOOPA2Data in the trace (checking here to save some processing time if it's not needed
@@ -187,6 +191,7 @@ class LibreDataParser {
                     handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
                     
                 }
+                
             }
             
         } else if !webOOPEnabled {
