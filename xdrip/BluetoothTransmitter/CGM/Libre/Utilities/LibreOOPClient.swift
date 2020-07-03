@@ -61,7 +61,7 @@ class LibreOOPClient {
                     }
                     
                     // trace data as string in debug mode
-                    if let dataAsString = String(bytes: data, encoding: .utf8) {
+                    if let dataAsString = String(bytes: data, encoding: .utf8), UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
                         trace("in getLibreRawGlucoseOOPData, data received frop oop web server = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug, dataAsString)
                     }
                     
@@ -136,7 +136,7 @@ class LibreOOPClient {
                         }
                         
                         // trace data as string in debug mode
-                        if let dataAsString = String(bytes: data, encoding: .utf8) {
+                        if let dataAsString = String(bytes: data, encoding: .utf8), UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
                             trace("in getOopWebCalibrationStatus, data as string", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug)
                             debuglogging("dataastring = " + dataAsString)
                         }
@@ -250,7 +250,7 @@ class LibreOOPClient {
                     }
                     
                     // if debug level tracing, then log the data as String
-                    if let dataAsString = String(bytes: data, encoding: .utf8) {
+                    if let dataAsString = String(bytes: data, encoding: .utf8), UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
                         
                         trace("in getLibre1DerivedAlgorithmParameters, data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug, dataAsString)
                         
