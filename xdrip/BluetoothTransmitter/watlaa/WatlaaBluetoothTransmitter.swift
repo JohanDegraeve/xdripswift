@@ -78,6 +78,9 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     /// is the transmitter oop web enabled or not
     public var webOOPEnabled: Bool
     
+    /// is nonFixed enabled for the transmitter or not
+    public var nonFixedSlopeEnabled: Bool
+    
     /// oop website url to use in case oop web would be enabled
     public var oopWebSite: String
     
@@ -130,7 +133,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     ///     - cgmTransmitterDelegate : CGMTransmitterDelegate
     ///     - watlaaBluetoothTransmitterDelegate : the WatlaaBluetoothTransmitterDelegate
     ///     - bluetoothTransmitterDelegate : BluetoothTransmitterDelegate
-    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, timeStampLastBgReading: Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?) {
+    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, timeStampLastBgReading: Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "watlaa")
@@ -153,6 +156,9 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
         
         // initialize webOOPEnabled
         self.webOOPEnabled = webOOPEnabled ?? false
+
+        // initialize nonFixedSlopeEnabled
+        self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
         
         // initialize oopWebToken and oopWebSite
         self.oopWebToken = oopWebToken ?? ConstantsLibre.token

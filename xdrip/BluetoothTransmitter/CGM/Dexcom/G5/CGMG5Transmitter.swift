@@ -500,7 +500,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     func reset(requested:Bool) {
         G5ResetRequested = requested
     }
-    
+
+    /// this transmitter does not support Libre non fixed slopes
+    func setNonFixedSlopeEnabled(enabled: Bool) {    
+    }
+
     /// this transmitter does not support oopWeb
     func setWebOOPEnabled(enabled: Bool) {
     }
@@ -511,6 +515,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
     func cgmTransmitterType() -> CGMTransmitterType {
         return .dexcomG5
+    }
+
+    func isNonFixedSlopeEnabled() -> Bool {
+        return false
     }
     
     func isWebOOPEnabled() -> Bool {

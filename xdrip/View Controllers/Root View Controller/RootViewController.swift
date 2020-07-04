@@ -213,6 +213,10 @@ final class RootViewController: UIViewController {
     /// current value of webOPEnabled, default false
     /// - used to detect changes in the value
     private var webOOPEnabled = ConstantsLibre.defaultWebOOPEnabled
+
+    /// current value of nonFixedSlopeEnabled, default false
+    /// - used to detect changes in the value
+    private var nonFixedSlopeEnabled = ConstantsLibre.defaultNonFixedSlopeEnabled
     
     // MARK: - View Life Cycle
     
@@ -440,6 +444,12 @@ final class RootViewController: UIViewController {
                     self.stopSensor()
                     
                 }
+                
+                if self.nonFixedSlopeEnabled != cgmTransmitter.isNonFixedSlopeEnabled() {
+                    
+                    self.stopSensor()
+                    
+                }
 
                 // check if the type of sensor supported by the cgmTransmitterType  has changed, if yes stop the sensor
                 if let currentTransmitterType = UserDefaults.standard.cgmTransmitterType, currentTransmitterType.sensorType() != cgmTransmitter.cgmTransmitterType().sensorType() {
@@ -450,6 +460,9 @@ final class RootViewController: UIViewController {
                 
                 // assign the new value of webOOPEnabled
                 self.webOOPEnabled = cgmTransmitter.isWebOOPEnabled()
+                
+                // assign the new value of nonFixedSlopeEnabled
+                self.nonFixedSlopeEnabled = cgmTransmitter.isNonFixedSlopeEnabled()
                 
                 // change value of UserDefaults.standard.transmitterTypeAsString
                 UserDefaults.standard.cgmTransmitterTypeAsString = cgmTransmitter.cgmTransmitterType().rawValue
@@ -849,6 +862,8 @@ final class RootViewController: UIViewController {
             
             if cgmTransmitter.isWebOOPEnabled() {
                 return NoCalibrator()
+            } else if cgmTransmitter.isNonFixedSlopeEnabled() {
+                return Libre1NonFixedSlopeCalibrator()
             } else {
                 return Libre1Calibrator()
             }

@@ -21,6 +21,9 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// CGMDropletTransmitterDelegate
     public weak var cGMDropletTransmitterDelegate: CGMDropletTransmitterDelegate?
     
+    /// is nonFixed enabled for the transmitter or not
+    private var nonFixedSlopeEnabled: Bool
+    
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMDroplet1)
     
@@ -33,7 +36,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - bluetoothTransmitterDelegate : a NluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMDropletTransmitterDelegate : CGMDropletTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMDropletTransmitterDelegate : CGMDropletTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "limitter")
@@ -46,6 +49,9 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // assign cGMDropletTransmitterDelegate
         self.cGMDropletTransmitterDelegate = cGMDropletTransmitterDelegate
+        
+        // initialize nonFixedSlopeEnabled
+        self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
         
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Droplet)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Droplet, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Droplet, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
@@ -122,6 +128,10 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: CGMTransmitter protocol functions
     
+    func setNonFixedSlopeEnabled(enabled: Bool) {
+        nonFixedSlopeEnabled = enabled
+    }
+
     /// this transmitter does not support oopWeb
     func setWebOOPEnabled(enabled: Bool) {
     }
@@ -136,6 +146,10 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     func isWebOOPEnabled() -> Bool {
         return false
+    }
+
+    func isNonFixedSlopeEnabled() -> Bool {
+        return nonFixedSlopeEnabled
     }
 
     func requestNewReading() {

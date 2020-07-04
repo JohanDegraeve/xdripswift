@@ -98,6 +98,14 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "OOPWeb Algorithm", comment: "weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section")
     }()
     
+    static let labelNonFixedTransmitter:String = {
+        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Use non-fixed slopes?", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
+    }()
+    
+    static let labelNonFixed:String = {
+        return NSLocalizedString("settingsviews_labelNonFixed", tableName: filename, bundle: Bundle.main, value: "Non-fixed calibration slopes", comment: "non fixed settings, title of the section")
+    }()
+    
     static let transmitterId8OrHigherNotSupported: String = {
         return NSLocalizedString("transmitterId8OrHigherNotSupported", tableName: filename, bundle: Bundle.main, value: "Transmitters with ID 8Gxxxx or newer are not currently supported!", comment: "User sets a transmitter id with id 8G or higher. This is not supported")
     }()

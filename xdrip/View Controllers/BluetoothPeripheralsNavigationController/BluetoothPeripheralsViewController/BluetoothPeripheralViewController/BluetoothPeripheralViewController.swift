@@ -41,6 +41,13 @@ fileprivate enum WebOOPSettings: Int, CaseIterable {
 
 }
 
+fileprivate enum NonFixedCalibrationSlopesSettings: Int, CaseIterable {
+    
+    /// is non fixed slope enabled or not
+    case nonFixedSlopeEnabled = 0
+
+}
+
 /// base class for UIViewController's that allow to edit specific type of bluetooth transmitters to show 
 class BluetoothPeripheralViewController: UIViewController {
     
@@ -94,7 +101,10 @@ class BluetoothPeripheralViewController: UIViewController {
     private var isScanning: Bool = false
     
     /// in which section do we find the weboop settings, if enabled
-    private let webOOPSettingsSectionNumber = 1
+    private let webOOPSettingsSectionNumber = 2
+    
+    /// in which section do we find the non fixed calibration slopes setting, if enabled
+    private let nonFixedSettingsSectionNumber = 1
     
     /// when user starts scanning, info will be shown in UIAlertController. This will be
     private var infoAlertWhenScanningStarts: UIAlertController?
@@ -226,8 +236,17 @@ class BluetoothPeripheralViewController: UIViewController {
     /// the BluetoothPeripheralViewController has already a few sections defined (eg bluetooth, weboop). This is the amount of sections defined in BluetoothPeripheralViewController. T
     public func numberOfGeneralSections() -> Int {
         
-        // if it's a cgm transmitter type that supports web oop, and if bluetoothPeripheral already known, then show the webOOP section
-        if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType, expectedBluetoothPeripheralType.canWebOOP(), bluetoothPeripheral != nil {
+        // if bluetoothPeripheral already known,
+        // and it's a cgm transmitter type that supports web oop and non fixed slopes
+        // then show the webOOP section and nonFixed section
+        if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType, expectedBluetoothPeripheralType.canWebOOP(), expectedBluetoothPeripheralType.canUseNonFixedSlope(), bluetoothPeripheral != nil {
+            
+            return 3
+        
+        // if bluetoothPeripheral already known,
+        // and it's a cgm transmitter type that supports non fixed slopes but doesn't support weboop
+        // then show the nonFixed section
+        } else if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType, expectedBluetoothPeripheralType.canUseNonFixedSlope(), bluetoothPeripheral != nil {
             
             return 2
             
@@ -715,7 +734,12 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             
             return numberOfRows
             
-        } else if section == 1  {
+        } else if section == 1 {
+            // if the bluetoothperipheral type supports non fixed then this is the non fixed
+            if expectedBluetoothPeripheralType.canUseNonFixedSlope() {
+                return 1;
+            }
+        } else if section == 2  {
             
             // if the bluetoothperipheral type supports oopweb then this is the oop web section
             if expectedBluetoothPeripheralType.canWebOOP() {
@@ -735,7 +759,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             
         }
 
-        // it's not section 0 and it's not section 1 && weboop supported
+        // it's not section 0 and it's not section 2 && weboop supported and it's not section 1 && nonfixed supported
         
         // this is the section with the transmitter specific settings
         // unwrap bluetoothPeripheralViewModel
@@ -755,7 +779,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager, let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType else {return cell}
         
         // check if it's a Setting defined here in BluetoothPeripheralViewController, or a setting specific to the type of BluetoothPeripheral
-        if (indexPath.section >= 1 && !expectedBluetoothPeripheralType.canWebOOP()) || (indexPath.section >= 2), let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel {
+        if (indexPath.section >= 1 && !expectedBluetoothPeripheralType.canWebOOP() && !expectedBluetoothPeripheralType.canUseNonFixedSlope()) || (indexPath.section >= 2 && !expectedBluetoothPeripheralType.canWebOOP() && expectedBluetoothPeripheralType.canUseNonFixedSlope()) || (indexPath.section >= 3), let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel {
             
             // it's a setting not defined here but in a BluetoothPeripheralViewModel
             if let bluetoothPeripheral = bluetoothPeripheral {
@@ -846,7 +870,41 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
 
             }
 
-        }  else {
+        } else if indexPath.section == 1 {
+            // non fixed calibration slope settings
+            
+            guard let setting = NonFixedCalibrationSlopesSettings(rawValue: indexPath.row) else { fatalError("BluetoothPeripheralViewController cellForRowAt, Unexpected setting, row = " + indexPath.row.description) }
+            switch setting {
+                
+            case .nonFixedSlopeEnabled:
+                
+                cell.textLabel?.text = Texts_SettingsView.labelNonFixedTransmitter
+                cell.detailTextLabel?.text = nil
+                
+                var currentStatus = false
+                if let bluetoothPeripheral = bluetoothPeripheral {
+                    currentStatus = bluetoothPeripheral.blePeripheral.nonFixedSlopeEnabled
+                }
+                
+                cell.accessoryView = UISwitch(isOn: currentStatus, action: { (isOn:Bool) in
+                    
+                    self.bluetoothPeripheral?.blePeripheral.nonFixedSlopeEnabled = isOn
+                    
+                    // send info to bluetoothPeripheralManager
+                    if let bluetoothPeripheral = self.bluetoothPeripheral {
+
+                        bluetoothPeripheralManager.receivedNewValue(nonFixedSlopeEnabled: isOn, for: bluetoothPeripheral)
+
+                        tableView.reloadSections(IndexSet(integer: self.nonFixedSettingsSectionNumber), with: .none)
+
+                    }
+                    
+                })
+                
+                cell.accessoryType = .none
+                
+            }
+        }  else if indexPath.section == 2 {
             
             // web oop settings
             
@@ -940,7 +998,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager, let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel, let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType else {return}
         
         // check if it's one of the common settings or one of the peripheral type specific settings
-        if (indexPath.section >= 1 && !expectedBluetoothPeripheralType.canWebOOP()) || (indexPath.section >= 2) {
+        if (indexPath.section >= 1 && !expectedBluetoothPeripheralType.canWebOOP() && !expectedBluetoothPeripheralType.canUseNonFixedSlope()) || (indexPath.section >= 2 && !expectedBluetoothPeripheralType.canWebOOP() && expectedBluetoothPeripheralType.canUseNonFixedSlope()) || (indexPath.section >= 3) {
           
             // it's a setting not defined here but in a BluetoothPeripheralViewModel
             // bluetoothPeripheralViewModel should not be nil here, otherwise user wouldn't be able to click a row which is higher than maximum
@@ -1030,7 +1088,18 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 requestTransmitterId()
             }
             
-        } else {
+        } else if indexPath.section == 1 {
+            // non fixed slopes settings
+            
+            guard let setting = NonFixedCalibrationSlopesSettings(rawValue: indexPath.row) else { fatalError("BluetoothPeripheralViewController didSelectRowAt, Unexpected setting") }
+            
+            switch setting {
+                
+            case .nonFixedSlopeEnabled:
+                // this is a uiswitch, user needs to click the uiswitch, not just the row
+                return
+            }
+        } else if indexPath.section == 2 {
             
             // web oop settings
             
@@ -1097,18 +1166,22 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             // title for first section
             return Texts_SettingsView.m5StackSectionTitleBluetooth
             
-        } else if (section >= 1 && !expectedBluetoothPeripheralType.canWebOOP()) || (section >= 2) {
+        } else if (section >= 1 && !expectedBluetoothPeripheralType.canWebOOP() && !expectedBluetoothPeripheralType.canUseNonFixedSlope()) || (section >= 2 && !expectedBluetoothPeripheralType.canWebOOP() && expectedBluetoothPeripheralType.canUseNonFixedSlope()) || (section >= 3) {
             
             // title for bluetoothperipheral type section
             return bluetoothPeripheralViewModel.sectionTitle(forSection: section)
 
-        } else {
+        } else if section == 2 {
             
             // web oop section
             return Texts_SettingsView.labelWebOOP
             
+        } else { //if section == 1
+            
+            // non fixed section
+            return Texts_SettingsView.labelNonFixed
+            
         }
-        
     }
     
 }

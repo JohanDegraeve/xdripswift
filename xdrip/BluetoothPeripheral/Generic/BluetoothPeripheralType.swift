@@ -258,4 +258,19 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
     }
     
+    /// can use non fixed slopes or not
+    func canUseNonFixedSlope() -> Bool {
+       
+       switch self {
+           
+       case .M5StackType, .M5StickCType, .DexcomG4Type, .DexcomG5Type, .DexcomG6Type:
+           return false
+           
+       case .BubbleType, .MiaoMiaoType, .WatlaaType, .BluconType, .BlueReaderType, .DropletType , .GNSentryType:
+           return true
+                       
+       }
+       
+    }
+    
 }

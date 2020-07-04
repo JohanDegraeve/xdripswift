@@ -39,6 +39,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
    
     /// is the transmitter oop web enabled or not
     private var webOOPEnabled: Bool
+
+    /// is nonFixed enabled for the transmitter or not
+    private var nonFixedSlopeEnabled: Bool
     
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
     var emptyArray: [GlucoseData] = []
@@ -68,7 +71,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     ///     - cGMBubbleTransmitterDelegate : a CGMBubbleTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBubbleTransmitterDelegate: CGMBubbleTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?) {
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBubbleTransmitterDelegate: CGMBubbleTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameBubble)
@@ -91,6 +94,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         
         // initialize timeStampLastBgReading
         self.timeStampLastBgReading = timeStampLastBgReading ?? Date(timeIntervalSince1970: 0)
+        
+        // initialize nonFixedSlopeEnabled
+        self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
         
         // initialize webOOPEnabled
         self.webOOPEnabled = webOOPEnabled ?? false
@@ -264,6 +270,17 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         
     // MARK: CGMTransmitter protocol functions
     
+    func setNonFixedSlopeEnabled(enabled: Bool) {
+        if nonFixedSlopeEnabled != enabled {
+            
+            nonFixedSlopeEnabled = enabled
+            
+            // nonFixed value changed, reset timeStampLastBgReading so that all glucose values will be sent to delegate. This is simply to ensure at least one reading will be sent to the delegate immediately.
+            timeStampLastBgReading = Date(timeIntervalSince1970: 0)
+            
+        }
+    }
+    
     /// set webOOPEnabled value
     func setWebOOPEnabled(enabled: Bool) {
         
@@ -289,7 +306,11 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     func cgmTransmitterType() -> CGMTransmitterType {
         return .Bubble
     }
-    
+
+    func isNonFixedSlopeEnabled() -> Bool {
+        return nonFixedSlopeEnabled
+    }
+
     func isWebOOPEnabled() -> Bool {
         return webOOPEnabled
     }

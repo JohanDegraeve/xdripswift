@@ -49,6 +49,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// is the transmitter oop web enabled or not
     private var webOOPEnabled: Bool
     
+    /// is nonFixed enabled for the transmitter or not
+    private var nonFixedSlopeEnabled: Bool
+    
     /// oop website url to use in case oop web would be enabled
     private var oopWebSite: String
     
@@ -72,7 +75,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     ///     - cGMMiaoMiaoTransmitterDelegate : a CGMMiaoMiaoTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMMiaoMiaoTransmitterDelegate : CGMMiaoMiaoTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading: Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?) {
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMMiaoMiaoTransmitterDelegate : CGMMiaoMiaoTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading: Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameMiaoMiao)
@@ -102,6 +105,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         // initialize oopWebToken and oopWebSite
         self.oopWebToken = oopWebToken ?? ConstantsLibre.token
         self.oopWebSite = oopWebSite ?? ConstantsLibre.site
+        
+        // initialize nonFixedSlopeEnabled
+        self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
 
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
@@ -305,6 +311,18 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     func isWebOOPEnabled() -> Bool {
         return webOOPEnabled
+    }
+    
+    func setNonFixedSlopeEnabled(enabled: Bool) {
+        nonFixedSlopeEnabled = enabled
+        
+        // immediately request a new reading
+        // there's no check here to see if peripheral, characteristic, connection, etc.. exists, but that's no issue. If anything's missing, write will simply fail,
+       _ = sendStartReadingCommand()
+    }
+    
+    func isNonFixedSlopeEnabled() -> Bool {
+        return nonFixedSlopeEnabled
     }
     
     func setWebOOPSite(oopWebSite: String) {

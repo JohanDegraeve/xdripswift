@@ -1,7 +1,7 @@
 import Foundation
 
 extension WatlaaBluetoothTransmitter: CGMTransmitter {
-
+ 
     func setWebOOPSite(oopWebSite: String) {
         
         self.oopWebSite = oopWebSite
@@ -23,6 +23,14 @@ extension WatlaaBluetoothTransmitter: CGMTransmitter {
         _ = sendStartReadingCommand()
         
     }
+
+    func setNonFixedSlopeEnabled(enabled: Bool) {
+        nonFixedSlopeEnabled = enabled
+        
+        // immediately request a new reading
+        // there's no check here to see if peripheral, characteristic, connection, etc.. exists, but that's no issue. If anything's missing, write will simply fail,
+        _ = sendStartReadingCommand()
+    }
     
     func cgmTransmitterType() -> CGMTransmitterType {
         return .watlaa
@@ -30,6 +38,10 @@ extension WatlaaBluetoothTransmitter: CGMTransmitter {
     
     func isWebOOPEnabled() -> Bool {
         return webOOPEnabled
+    }
+
+        func isNonFixedSlopeEnabled() -> Bool {
+        return nonFixedSlopeEnabled
     }
 
     func requestNewReading() {

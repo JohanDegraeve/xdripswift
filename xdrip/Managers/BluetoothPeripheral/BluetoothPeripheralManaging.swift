@@ -45,6 +45,11 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     
     /// bluetoothtransmitter may need pairing, but app is in background. Notification will be sent to user, user will open the app, at that moment initiatePairing will be called
     func initiatePairing()
+    
+    /// to pass new value off nonFixedSlopeEnabled
+    ///
+    /// when user changes the nonFixed value in BluetoothPeripheralViewController, this function will be called
+    func receivedNewValue(nonFixedSlopeEnabled: Bool, for bluetoothPeripheral: BluetoothPeripheral)
 
     /// to pass new value off webOOPEnabled
     ///

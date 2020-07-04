@@ -68,6 +68,9 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// CGMGNSEntryTransmitterDelegate
     public weak var cGMGNSEntryTransmitterDelegate: CGMGNSEntryTransmitterDelegate?
+    
+    /// is nonFixed enabled for the transmitter or not
+    public var nonFixedSlopeEnabled: Bool
 
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMGNSEntry)
@@ -99,7 +102,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     ///     - cGMGNSEntryTransmitterDelegate : a CGMGNSEntryTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMGNSEntryTransmitterDelegate : CGMGNSEntryTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading: Date?) {
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMGNSEntryTransmitterDelegate : CGMGNSEntryTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading: Date?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "GNSentry")
@@ -110,6 +113,9 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
         //initialize timeStampLastBgReading
         self.timeStampLastBgReadingInMinutes = timeStampLastBgReading != nil ? timeStampLastBgReading!.toMillisecondsAsDouble()/1000/60 : Date(timeIntervalSince1970: 0).toMillisecondsAsDouble()/1000/60
         
+        // initialize nonFixedSlopeEnabled
+        self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
+        
         // initialize
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_GNWService), CBUUID(string: CBUUID_BatteryService), CBUUID(string: CBUUID_DeviceInformationService)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Notify.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_GNW_Write.rawValue, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
@@ -118,6 +124,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
         
         // assign cGMGNSEntryTransmitterDelegate
         self.cGMGNSEntryTransmitterDelegate = cGMGNSEntryTransmitterDelegate
+        
         
     }
     
@@ -251,6 +258,10 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     func setWebOOPEnabled(enabled: Bool) {
     }
+
+    func setNonFixedSlopeEnabled(enabled: Bool) {
+        nonFixedSlopeEnabled = enabled
+    }
     
     func setWebOOPSite(oopWebSite: String) {}
     
@@ -262,6 +273,10 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     func isWebOOPEnabled() -> Bool {
         return false
+    }
+
+    func isNonFixedSlopeEnabled() -> Bool {
+        return nonFixedSlopeEnabled
     }
     
     func requestNewReading() {
