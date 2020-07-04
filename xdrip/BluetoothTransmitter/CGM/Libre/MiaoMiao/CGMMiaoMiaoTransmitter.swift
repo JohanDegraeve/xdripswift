@@ -171,7 +171,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 cGMMiaoMiaoTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
                                 
                                 // do CRC Check only for libre1
-                                // TODO : check if this also required for other types of libre sensor
+                                // TODO : check if this also required for other LibreH
                                 if libreSensorType == .libre1 {
                                     
                                     guard Crc.LibreCrc(data: &rxBuffer, headerOffset: miaoMiaoHeaderLength) else {

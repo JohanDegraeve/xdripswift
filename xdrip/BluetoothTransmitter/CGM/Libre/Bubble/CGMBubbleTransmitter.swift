@@ -212,10 +212,10 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 }
                                 
                                 // do this for tracing only, not processing will continue if crc check fails
-                                if libreSensorType == .libreProH || libreSensorType == .libreUS {
+                                if libreSensorType == .libreProH {
                                     
                                     if !Crc.LibreCrc(data: &self.rxBuffer, headerOffset: self.bubbleHeaderLength) {
-                                        trace("    libreProH or libreUS sensor, CRC check failed - will continue processing anyway", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                                        trace("    libreProH sensor, CRC check failed - will continue processing anyway", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
                                     }
                                     
                                 }

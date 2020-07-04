@@ -124,7 +124,7 @@ class LibreDataParser {
             
             switch libreSensorType {
                 
-            case .libre1, .libreUS, .libreProH:// these types are all Libre 1
+            case .libre1, .libreProH:// these types are all Libre 1
                 
                 // get LibreDerivedAlgorithmParameters and parse using the libre1DerivedAlgorithmParameters
                 LibreOOPClient.getLibre1DerivedAlgorithmParameters(bytes: libreData, libreSensorSerialNumber: libreSensorSerialNumber, oopWebSite: oopWebSite, oopWebToken: oopWebToken) { (libre1DerivedAlgorithmParameters) in
@@ -135,20 +135,14 @@ class LibreDataParser {
                         
                     }
 
-                    // can be deleted once all libre types work well
-                    trace("in libreDataProcessor, received libre1DerivedAlgorithmParameters", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug)
-                    
                     // parse the data using oop web algorithm
                     let parsedResult = parseLibre1DataWithOOPWebCalibration(libreData: libreData, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters, timeStampLastBgReading: timeStampLastBgReading)
 
-                    // can be deleted once all libre types work well
-                    trace("in libreDataProcessor, processed libre1DerivedAlgorithmParameters", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug)
-                    
                     handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
                     
                 }
                 
-            case .libre1A2:
+            case .libre1A2, .libreUS:
                 
                 LibreOOPClient.getLibreRawGlucoseOOPOA2Data(libreData: libreData, oopWebSite: oopWebSite) { (libreRawGlucoseOOPA2Data) in
                     
@@ -182,8 +176,6 @@ class LibreDataParser {
                     // convert libreRawGlucoseOOPData to (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?)
                     let parsedResult = libreRawGlucoseOOPData.glucoseData(timeStampLastBgReading: timeStampLastBgReading)
                     
-                    debuglogging("in libreDataProcessor, parsedResult.gluosedata size = " + parsedResult.libreRawGlucoseData.count.description)
-                    
                     handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
                     
                 }
@@ -198,11 +190,11 @@ class LibreDataParser {
             // handle the result
             handleGlucoseData(result: (parsedLibre1Data.glucoseData, parsedLibre1Data.sensorTimeInMinutes, parsedLibre1Data.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
             
-            
         } else {
             
             // it's not a libre 1 and oop web is enabled, so there's nothing we can do
             trace("in libreDataProcessor, can not continue - web oop is enabled, but there's missing info in the request", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+            
         }
 
     }
