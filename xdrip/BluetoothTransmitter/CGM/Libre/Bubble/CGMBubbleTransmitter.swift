@@ -163,13 +163,18 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                     case .serialNumber:
                         
                         guard value.count >= 10 else { return }
+                        
+                        // this is actually the sensor serial number, adding it to rxBuffer, although it could as wel be calculated here.
                         rxBuffer.append(value.subdata(in: 2..<10))
                         
                     case .dataPacket:
                         
+                        
                         rxBuffer.append(value.suffix(from: 4))
+                        
                         if rxBuffer.count >= 352 {
                             
+                            // libreSensorSerialNumber has been added to rxBuffer when receving .serialNumber (0xC0), it's the first 8 bytes
                             guard let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8))) else {
                                 trace("    could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
                                 return
@@ -193,7 +198,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 
                             }
 
-                            // get sensortype
+                            // get sensortype, and dependent on sensortype get crc
                             if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
                                 
                                 // crc check only for Libre 1 (is this the right thing to do ?)
@@ -210,7 +215,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 if libreSensorType == .libreProH || libreSensorType == .libreUS {
                                     
                                     if !Crc.LibreCrc(data: &self.rxBuffer, headerOffset: self.bubbleHeaderLength) {
-                                        trace("    libreProH or libreProH sensor, CRC check failed - will continue processing anyway", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                                        trace("    libreProH or libreUS sensor, CRC check failed - will continue processing anyway", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
                                     }
                                     
                                 }
