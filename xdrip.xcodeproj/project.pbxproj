@@ -391,11 +391,11 @@
 		F816E12B2439DFBA009EE65B /* DexcomG4+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DexcomG4+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F816E12D2439E06E009EE65B /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift"; sourceTree = "<group>"; };
 		F816E1302439E2DD009EE65B /* DexcomG4BluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG4BluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
-		F817702A2491860F00AA3600 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F8177022248CF78300AA3600 /* LibreSensorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreSensorType.swift; sourceTree = "<group>"; };
 		F8177024248ED4DE00AA3600 /* Libre1DerivedAlgorithmParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre1DerivedAlgorithmParameters.swift; sourceTree = "<group>"; };
 		F8177026248ED57000AA3600 /* LibreRawGlucoseOOPA2Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreRawGlucoseOOPA2Data.swift; sourceTree = "<group>"; };
 		F8177028248ED6E600AA3600 /* LibreRawGlucoseOOPData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreRawGlucoseOOPData.swift; sourceTree = "<group>"; };
+		F817702A2491860F00AA3600 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F81D6D4522B67F55005EFAE2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareUploadManager.swift; sourceTree = "<group>"; };
 		F81D6D4D22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsDexcomShareTestResult.swift; sourceTree = "<group>"; };
@@ -2816,7 +2816,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.1.2;
+				MARKETING_VERSION = 4.1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2845,7 +2845,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.1.2;
+				MARKETING_VERSION = 4.1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
