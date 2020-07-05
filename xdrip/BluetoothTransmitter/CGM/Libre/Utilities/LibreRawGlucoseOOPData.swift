@@ -2,7 +2,7 @@
 
 import Foundation
 
-public class LibreRawGlucoseOOPData: NSObject, Decodable, LibreRawGlucoseWeb {
+public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebServerResponseData {
     
     /// histories by server
     var historicGlucose : [LibreRawGlucoseOOPGlucose]?

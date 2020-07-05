@@ -648,6 +648,39 @@ final class RootViewController: UIViewController {
     
     // MARK: - private helper functions
     
+    /// creates notification
+    private func createNotification(title: String?, body: String?, identifier: String, sound: UNNotificationSound?) {
+        
+        // Create Notification Content
+        let notificationContent = UNMutableNotificationContent()
+        
+        // Configure NotificationContent title
+        if let title = title {
+            notificationContent.title = title
+        }
+        
+        // Configure NotificationContent body
+        if let body = body {
+            notificationContent.body = body
+        }
+        
+        // configure sound
+        if let sound = sound {
+            notificationContent.sound = sound
+        }
+        
+        // Create Notification Request
+        let notificationRequest = UNNotificationRequest(identifier: identifier, content: notificationContent, trigger: nil)
+        
+        // Add Request to User Notification Center
+        UNUserNotificationCenter.current().add(notificationRequest) { (error) in
+            if let error = error {
+                trace("Unable to create notification %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
+            }
+        }
+        
+    }
+
     /// will update the chart with endDate = currentDate
     private func updateChartWithResetEndDate() {
         
@@ -842,27 +875,7 @@ final class RootViewController: UIViewController {
         // first remove existing notification if any
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest])
         
-        // Create Notification Content
-        let notificationContent = UNMutableNotificationContent()
-        
-        // Configure NotificationContent title
-        notificationContent.title = Texts_Calibrations.calibrationNotificationRequestTitle
-        
-        // Configure NotificationContent body
-        notificationContent.body = Texts_Calibrations.calibrationNotificationRequestBody
-        
-        // Configure NotificationContent sound with defalt sound
-        notificationContent.sound = UNNotificationSound.init(named: UNNotificationSoundName.init(""))
-        
-        // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest, content: notificationContent, trigger: nil)
-        
-        // Add Request to User Notification Center
-        UNUserNotificationCenter.current().add(notificationRequest) { (error) in
-            if let error = error {
-                trace("Unable to Add Notification Request : %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
-            }
-        }
+        createNotification(title: Texts_Calibrations.calibrationNotificationRequestTitle, body: Texts_Calibrations.calibrationNotificationRequestBody, identifier: ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest, sound: UNNotificationSound(named: UNNotificationSoundName("")))
         
         // we will not just count on it that the user will click the notification to open the app (assuming the app is in the background, if the app is in the foreground, then we come in another flow)
         // whenever app comes from-back to foreground, requestCalibration needs to be called
@@ -1231,45 +1244,18 @@ final class RootViewController: UIViewController {
 /// conform to CGMTransmitterDelegate
 extension RootViewController: CGMTransmitterDelegate {
     
-    func error(message: String) {
-        
-        let alert = UIAlertController(title: Texts_Common.warning, message: message, actionHandler: nil)
-        
-        self.present(alert, animated: true, completion: nil)
-        
-    }
-    
-    // Only MioaMiao will call this
     func newSensorDetected() {
         trace("new sensor detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
         stopSensor()
     }
     
-    // MioaMiao and Bubble will call this (and Blucon, maybe others in the future)
     func sensorNotDetected() {
         trace("sensor not detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
         
-        // Create Notification Content
-        let notificationContent = UNMutableNotificationContent()
+        createNotification(title: Texts_Common.warning, body: Texts_HomeView.sensorNotDetected, identifier: ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected, sound: nil)
         
-        // Configure NnotificationContent title
-        notificationContent.title = Texts_Common.warning
-        
-        notificationContent.body = Texts_HomeView.sensorNotDetected
-        
-        // Create Notification Request
-        let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected, content: notificationContent, trigger: nil)
-        
-        // Add Request to User Notification Center
-        UNUserNotificationCenter.current().add(notificationRequest) { (error) in
-            if let error = error {
-                trace("Unable to Add sensor not detected Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
-            }
-        }
     }
     
-    /// - parameters:
-    ///     - readings: first entry is the most recent
     func cgmTransmitterInfoReceived(glucoseData: inout [GlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
         
         trace("transmitterBatteryInfo  %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, transmitterBatteryInfo?.description ?? 0)
@@ -1286,7 +1272,15 @@ extension RootViewController: CGMTransmitterDelegate {
         
     }
     
-    
+    func errorOccurred(xDripError: XdripError) {
+        
+        if xDripError.priority == .HIGH {
+
+            createNotification(title: Texts_Common.warning, body: xDripError.errorDescription, identifier: ConstantsNotifications.notificationIdentifierForxCGMTransmitterDelegatexDripError, sound: nil)
+
+        }
+    }
+   
 }
 
 // MARK: - conform to UITabBarControllerDelegate protocol
@@ -1309,6 +1303,8 @@ extension RootViewController: UITabBarControllerDelegate {
     }
     
 }
+
+// MARK: - conform to UNUserNotificationCenterDelegate protocol
 
 /// conform to UNUserNotificationCenterDelegate, for notifications
 extension RootViewController: UNUserNotificationCenterDelegate {
@@ -1348,6 +1344,11 @@ extension RootViewController: UNUserNotificationCenterDelegate {
             
             // user is testing iOS Sound volume in the settings. Only the sound should be played, the alert itself will not be shown
             completionHandler([.sound])
+            
+        } else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForxCGMTransmitterDelegatexDripError {
+            
+            // call completionhandler to show the notification even though the app is in the foreground, without sound
+            completionHandler([.alert])
             
         }
     }

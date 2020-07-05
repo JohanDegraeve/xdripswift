@@ -222,7 +222,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 
                             }
 
-                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading, completionHandler: { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?) in
+                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading, completionHandler: { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 if let timeStampLastBgReading = timeStampLastBgReading {
                                     self.timeStampLastBgReading = timeStampLastBgReading
@@ -231,6 +231,8 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 if let sensorState = sensorState {
                                     self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
                                 }
+                                
+                                // TODO : xDripError could be used to show latest errors in bluetoothPeripheralView
                                 
                             })
                             

@@ -7,7 +7,7 @@ protocol CGMTransmitterDelegate:AnyObject {
     /// only for transmitters that can detect new sensor id
     func newSensorDetected()
     
-    /// only for transmitters that can detect sensor
+    /// only for transmitters that can detect missing sensor
     func sensorNotDetected()
     
     /// to pass back transmitter data from cgmtransmitter
@@ -23,7 +23,7 @@ protocol CGMTransmitterDelegate:AnyObject {
     func cgmTransmitterInfoReceived(glucoseData:inout [GlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorTimeInMinutes:Int?)
     
     /// to pass some text error message, delegate can decide to show to user, log, ...
-    func error(message: String)
+    func errorOccurred(xDripError: XdripError)
     
 }
 

@@ -12,7 +12,7 @@ import Foundation
 
 
 /// the parameters from server
-struct OopWebCalibrationStatus: Codable, CustomStringConvertible {
+struct OopWebCalibrationStatus: Codable, CustomStringConvertible, LibreOOPWebServerResponseData {
     var error: Bool?
     var command: String?
     var slope: OopWebCalibrationStatusResult?

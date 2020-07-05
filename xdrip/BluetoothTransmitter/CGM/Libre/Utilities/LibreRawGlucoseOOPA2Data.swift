@@ -10,7 +10,7 @@
 
 import Foundation
 
-public class LibreRawGlucoseOOPA2Data: NSObject, Decodable, LibreRawGlucoseWeb {
+public class LibreRawGlucoseOOPA2Data: NSObject, LibreRawGlucoseWeb, LibreOOPWebServerResponseData {
     
     var errcode: Int?
     

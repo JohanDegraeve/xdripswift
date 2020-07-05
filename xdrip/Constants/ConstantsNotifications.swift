@@ -73,4 +73,7 @@ enum ConstantsNotifications {
     /// notification identifier for  volume test notification
     static let notificationIdentifierForVolumeTest = "notificationIdentifierForVolumeTest"
     
+    /// notification identifier for xDripErrors received in RootViewController's cgmTransmitterDelegate
+    static let notificationIdentifierForxCGMTransmitterDelegatexDripError = "notificationIdentifierForxCGMTransmitterDelegatexDripError"
+    
 }

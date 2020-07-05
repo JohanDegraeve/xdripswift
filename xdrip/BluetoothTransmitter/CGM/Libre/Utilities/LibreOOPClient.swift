@@ -25,6 +25,8 @@ class LibreOOPClient {
     /// for trace
     private static let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLibreOOPClient)
     
+    // MARK: - public functions
+    
     /// get the libre glucose data by server
     /// - Parameters:
     ///   - libreData: the 344 bytes from Libre sensor
@@ -32,8 +34,8 @@ class LibreOOPClient {
     ///   - patchInfo : will be used by server to out the glucose data
     ///   - oopWebSite: the site url to use if oop web would be enabled
     ///   - oopWebToken: the token to use if oop web would be enabled
-    ///   - callback: server data that contains the 344 bytes details, is called in DispatchQueue.main.async
-    static func getLibreRawGlucoseOOPData(libreData: Data, libreSensorSerialNumber: LibreSensorSerialNumber, patchInfo: String, oopWebSite: String, oopWebToken: String, callback:@escaping (LibreRawGlucoseOOPData) -> Void) {
+    ///   - callback: LibreRawGlucoseOOPData and/or error
+    static func getLibreRawGlucoseOOPData(libreData: Data, libreSensorSerialNumber: LibreSensorSerialNumber, patchInfo: String, oopWebSite: String, oopWebToken: String, callback:@escaping (LibreOOPWebServerResponseData?, _ xDripError: XdripError?) -> Void) {
         
         let item = URLQueryItem(name: "accesstoken", value: oopWebToken)
         let item1 = URLQueryItem(name: "patchUid", value: libreSensorSerialNumber.uidString.uppercased())
@@ -44,56 +46,14 @@ class LibreOOPClient {
         
         urlComponents.queryItems = [item, item1, item2, item3]
         
-        if let uploadURL = URL.init(string: urlComponents.url?.absoluteString.removingPercentEncoding ?? "") {
+        if let uploadURL = URL(string: urlComponents.url?.absoluteString.removingPercentEncoding ?? "") {
+            
             let request = NSMutableURLRequest(url: uploadURL)
             request.httpMethod = "POST"
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            let task = URLSession.shared.dataTask(with: request as URLRequest) {
-                data, response, error in
-                
-                DispatchQueue.main.async {
-
-                    trace("in getLibreRawGlucoseOOPData, finished task", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
-                    
-                    guard let data = data else {
-                        trace("in getLibreRawGlucoseOOPData, data is nil", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
-                        return
-                    }
-                    
-                    // trace data as string in debug mode
-                    if let dataAsString = String(bytes: data, encoding: .utf8), UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-                        trace("in getLibreRawGlucoseOOPData, data received frop oop web server = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug, dataAsString)
-                    }
-                    
-                    let decoder = JSONDecoder()
-                    
-                    if let oopValue = try? decoder.decode(LibreRawGlucoseOOPData.self, from: data) {
-                        
-                        callback(oopValue)
-                        
-                    } else {
-                        
-                        // json parsing failed
-                        trace("in getLibreRawGlucoseOOPData, could not do json parsing", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
-                        
-                        // if response is not nil then trace
-                        if let response = String(data: data, encoding: String.Encoding.utf8) {
-                            
-                            trace("in getLibreRawGlucoseOOPData,    data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, response)
-                            
-                        }
-                        
-                        return
-                        
-                    }
-
-                }
-
-            }
             
-            trace("in getLibreRawGlucoseOOPData, calling task.resume", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
-            task.resume()
-            
+            createDataTaskAndHandleResponse(LibreRawGlucoseOOPData.self, request: request as URLRequest, callback: callback)
+
         } else {
             
             return
@@ -105,8 +65,8 @@ class LibreOOPClient {
     /// - Parameters:
     ///   - libreData: the 344 bytes from Libre sensor
     ///   - oopWebSite: the site url to use if oop web would be enabled
-    ///   - callback: server data that contains the 344 bytes details
-    static func getLibreRawGlucoseOOPOA2Data (libreData: Data, oopWebSite: String,  callback:@escaping (LibreRawGlucoseOOPA2Data) -> Void) {
+    ///   - callback: LibreRawGlucoseOOPA2Data and/or error
+    static func getLibreRawGlucoseOOPOA2Data (libreData: Data, oopWebSite: String,  callback:@escaping (LibreOOPWebServerResponseData?, _ xDripError: XdripError?) -> Void) {
 
         if let uploadURL = URL(string: "\(oopWebSite)/callnox") {
             do {
@@ -118,60 +78,8 @@ class LibreOOPClient {
                 let json: [String: String] = ["userId": "1",
                                            "list": string!]
                 request.setBodyContent(contentMap: json)
-                let task = URLSession.shared.dataTask(with: request as URLRequest) {
-                    data, response, error in
-                    
-                    DispatchQueue.main.async {
-                        
-                        trace("in getLibreRawGlucoseOOPOA2Data, finished task", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
-                        
-                        if let error = error {
-                            trace("in getLibreRawGlucoseOOPOA2Data, error is not nil, error = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, error.localizedDescription)
-                            return
-                        }
-                        
-                        guard let data = data else {
-                            trace("in getLibreRawGlucoseOOPOA2Data, data is nil", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
-                            return
-                        }
-                        
-                        // trace data as string in debug mode
-                        if let dataAsString = String(bytes: data, encoding: .utf8), UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-                            trace("in getOopWebCalibrationStatus, data as string", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug)
-                            debuglogging("dataastring = " + dataAsString)
-                        }
-                        
-                        let decoder = JSONDecoder()
-                        
-                        do {
-                            
-                            
-                            let oopValue = try decoder.decode(LibreRawGlucoseOOPA2Data.self, from: data)
-                            
-                            callback(oopValue)
-                            
-                        } catch {
-                            
-                            // json parsing failed
-                            trace("in getLibreRawGlucoseOOPOA2Data, could not do json parsing", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
-                            
-                            // if response is not nil then trace
-                            if let response = String(data: data, encoding: String.Encoding.utf8) {
-                                
-                                trace("in getLibreRawGlucoseOOPOA2Data,    data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, response)
-                                
-                            }
-                            
-                            return
-                            
-                        }
-
-                    }
-                    
-                }
                 
-                trace("in getLibreRawGlucoseOOPOA2Data, calling task.resume", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
-                task.resume()
+                createDataTaskAndHandleResponse(LibreRawGlucoseOOPA2Data.self, request: request, callback: callback)
                 
             } catch let error {
                 
@@ -188,22 +96,9 @@ class LibreOOPClient {
     ///   - libreSensorSerialNumber: LibreSensorSerialNumber is a structure that hold the serial number
     ///   - oopWebSite: the site url to use if oop web would be enabled
     ///   - oopWebToken: the token to use if oop web would be enabled
-    ///   - callback: takes LibreDerivedAlgorithmParameters`as parameter, will not be called if there's no result for instance because oop web server can not be reached
-    static func getLibre1DerivedAlgorithmParameters(bytes: Data, libreSensorSerialNumber: LibreSensorSerialNumber, oopWebSite: String, oopWebToken: String, callback: @escaping (Libre1DerivedAlgorithmParameters) -> Void) {
+    ///   - callback: takes OopWebCalibrationStatus`as parameter, and/or error
+    static func getOopWebCalibrationStatus(bytes: Data, libreSensorSerialNumber: LibreSensorSerialNumber, oopWebSite: String, oopWebToken: String, callback: @escaping (_ oopWebCalibrationStatus: LibreOOPWebServerResponseData?, _ xDripError: XdripError?) -> Void) {
         
-        // the parameters of one sensor will not be changed, if the values are already available in userdefaults , then use those values
-        if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters {
-            if libre1DerivedAlgorithmParameters.serialNumber == libreSensorSerialNumber.serialNumber {
-                
-                trace("in getLibre1DerivedAlgorithmParameters, found libre1DerivedAlgorithmParameters in UserDefaults", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
-                
-                callback(libre1DerivedAlgorithmParameters)
-                
-                return
-                
-            }
-        }
-
         // calibration parameters not available yet, get them from oopWebSite
         let json: [String: String] = [
             "token": oopWebToken,
@@ -217,83 +112,90 @@ class LibreOOPClient {
             request.setBodyContent(contentMap: json)
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
             
-            let task = URLSession.shared.dataTask(with: request as URLRequest) { data, response, error in
+            createDataTaskAndHandleResponse(OopWebCalibrationStatus.self, request: request, callback: callback)
                 
-                DispatchQueue.main.async {
-                    
-                    trace("in getLibre1DerivedAlgorithmParameters, finished task", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
-                    
-                    if let error = error {
-                        
-                        trace("in getLibre1DerivedAlgorithmParameters, received error : %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, error.localizedDescription)
-                        
-                        return
-                        
-                    }
-                    
-                    guard let data = data else {
-                        
-                        trace("in getLibre1DerivedAlgorithmParameters, data is nil", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
-                        
-                        return
-                        
-                    }
-                    
-                    // if debug level tracing, then log the data as String
-                    if let dataAsString = String(bytes: data, encoding: .utf8), UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-                        
-                        trace("in getLibre1DerivedAlgorithmParameters, data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug, dataAsString)
-                        
-                    }
-
-                    // data is not nil, let's try to do json decoding
-                    let decoder = JSONDecoder()
-                    
-                    do {
-                        
-                        let response = try decoder.decode(OopWebCalibrationStatus.self, from: data)
-                        
-                        if let slope = response.slope {
-                            
-                            if let libreDerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(slope_slope: slope.slopeSlope ?? 0, slope_offset: slope.slopeOffset ?? 0, offset_slope: slope.offsetSlope ?? 0, offset_offset: slope.offsetOffset ?? 0, isValidForFooterWithReverseCRCs: Int(slope.isValidForFooterWithReverseCRCs ?? 1), extraSlope: 1.0, extraOffset: 0.0, sensorSerialNumber: libreSensorSerialNumber.serialNumber) {
-                                
-                                trace("in getLibre1DerivedAlgorithmParameters, successfully created libreDerivedAlgorithmParameters", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
-                                
-                                // store result in UserDefaults, next time, server will not be used anymore, we will use the stored value
-                                UserDefaults.standard.libre1DerivedAlgorithmParameters = libreDerivedAlgorithmParameters
-                                
-                                callback(libreDerivedAlgorithmParameters)
-                                
-                            }
-                            
-                        }
-                    } catch {
-                        
-                        // json parsing failed
-                        trace("in getLibre1DerivedAlgorithmParameters, could not do json parsing", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
-                        
-                        // if response is not nil then trace
-                        if let response = String(data: data, encoding: String.Encoding.utf8) {
-                            
-                            trace("    data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, response)
-                            
-                        }
-                        
-                    }
-
-                }
-                
-            }
-            
-            trace("in getLibre1DerivedAlgorithmParameters, calling task.resume", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
-            task.resume()
             
         } else {
             
-            trace("in getLibre1DerivedAlgorithmParameters, failed to create uploadURL", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
+            trace("in getOopWebCalibrationStatus, failed to create uploadURL", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
             
         }
 
     }
 
+    /// checks the error, response and data, makes json decoding to type, calls callback with result
+    ///
+    /// grouping common functionality in functions that make a post to the oop web server and need to analyse the respone. This analyses is done by this function here. It also calls the callback.
+    /// LibreOOPWebServerResponseData is just a do nothing protocol to which a few specific classes conform. The calling function will use one of those classes as type parameter.
+    private static func createDataTaskAndHandleResponse<T:LibreOOPWebServerResponseData>(_ type: T.Type, request: URLRequest, callback:@escaping ((_ libreOOPWebServerResponseData: LibreOOPWebServerResponseData?, _ xDripError: XdripError?) -> Void)) {
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            
+            DispatchQueue.main.async {
+                
+                trace("in createDataTaskAndHandleResponse, finished task", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
+                
+                if let error = error {
+                    
+                    trace("in createDataTaskAndHandleResponse, received error : %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, error.localizedDescription)
+                    
+                    callback(nil, LibreOOPWebError.genericError(error.localizedDescription))
+                    
+                    return
+                    
+                }
+                
+                guard let data = data else {
+                    
+                    trace("in createDataTaskAndHandleResponse, data is nil", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
+                    
+                    callback(nil, LibreOOPWebError.receivedDataIsNil)
+                    
+                    return
+                    
+                }
+                
+                // if debug level tracing, then log the data as String
+                if let dataAsString = String(bytes: data, encoding: .utf8), UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                    trace("in createDataTaskAndHandleResponse, data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug, dataAsString)
+                }
+                
+                // data is not nil, let's try to do json decoding
+                let decoder = JSONDecoder()
+                
+                do {
+                    
+                    let response = try decoder.decode(type.self, from: data)
+                    
+                    callback(response, nil)
+                    
+                    return
+                    
+                } catch {
+                    
+                    // json parsing failed
+                    trace("in createDataTaskAndHandleResponse, could not do json parsing", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error)
+                    
+                    // if response is not nil then trace
+                    if let response = String(data: data, encoding: String.Encoding.utf8) {
+                        
+                        trace("    data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .error, response)
+                        
+                    }
+                    
+                    callback(nil, LibreOOPWebError.jsonParsingFailed)
+                    
+                    return
+                    
+                }
+                
+            }
+            
+        }
+        
+        trace("in createDataTaskAndHandleResponse, calling task.resume", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
+        task.resume()
+        
+    }
+    
 }

@@ -356,7 +356,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                         
                                         trace("    received unfiltered value 2096896.0, which is caused by low battery. Creating error message", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                                         
-                                        cgmTransmitterDelegate?.error(message: Texts_HomeView.dexcomBatteryTooLow)
+                                        cgmTransmitterDelegate?.errorOccurred(xDripError: DexcomError.receivedEnfilteredValue2096896)
                                         
                                     } else {
 

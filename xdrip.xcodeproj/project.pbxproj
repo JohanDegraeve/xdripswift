@@ -171,6 +171,12 @@
 		F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */; };
 		F8AC42A121B31F170078C348 /* xdrip.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */; };
+		F8AF11F124B11FD400AE5BA2 /* LibreOOPWebError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AF11F024B11FD400AE5BA2 /* LibreOOPWebError.swift */; };
+		F8AF11F324B1279500AE5BA2 /* TextsLibreErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AF11F224B1279500AE5BA2 /* TextsLibreErrors.swift */; };
+		F8AF11F524B128B200AE5BA2 /* LibreErrors.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8AF11F424B128B200AE5BA2 /* LibreErrors.strings */; };
+		F8AF11F824B1E6EE00AE5BA2 /* XdripError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AF11F724B1E6EE00AE5BA2 /* XdripError.swift */; };
+		F8AF11FA24B1FB3500AE5BA2 /* DexcomError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AF11F924B1FB3500AE5BA2 /* DexcomError.swift */; };
+		F8AF11FC24B27A6D00AE5BA2 /* LibreOOPWebServerResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AF11FB24B27A6C00AE5BA2 /* LibreOOPWebServerResponse.swift */; };
 		F8AF36152455C6F700B5977B /* ConstantsTrace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AF36142455C6F700B5977B /* ConstantsTrace.swift */; };
 		F8AF361B245D93EE00B5977B /* Int16.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AF361A245D93ED00B5977B /* Int16.swift */; };
 		F8B3A783225D37F2004BA588 /* TextsNightScoutTestResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A782225D37F2004BA588 /* TextsNightScoutTestResult.swift */; };
@@ -536,6 +542,12 @@
 		F8AC426921ADEBD70078C348 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F8AC426B21ADEBD70078C348 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F8AC42A021B31F160078C348 /* xdrip.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = xdrip.xcdatamodel; sourceTree = "<group>"; };
+		F8AF11F024B11FD400AE5BA2 /* LibreOOPWebError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreOOPWebError.swift; sourceTree = "<group>"; };
+		F8AF11F224B1279500AE5BA2 /* TextsLibreErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsLibreErrors.swift; sourceTree = "<group>"; };
+		F8AF11F424B128B200AE5BA2 /* LibreErrors.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = LibreErrors.strings; sourceTree = "<group>"; };
+		F8AF11F724B1E6EE00AE5BA2 /* XdripError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XdripError.swift; sourceTree = "<group>"; };
+		F8AF11F924B1FB3500AE5BA2 /* DexcomError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomError.swift; sourceTree = "<group>"; };
+		F8AF11FB24B27A6C00AE5BA2 /* LibreOOPWebServerResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreOOPWebServerResponse.swift; sourceTree = "<group>"; };
 		F8AF36142455C6F700B5977B /* ConstantsTrace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsTrace.swift; sourceTree = "<group>"; };
 		F8AF361A245D93ED00B5977B /* Int16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Int16.swift; sourceTree = "<group>"; };
 		F8B3A782225D37F2004BA588 /* TextsNightScoutTestResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsNightScoutTestResult.swift; sourceTree = "<group>"; };
@@ -1211,6 +1223,7 @@
 				F8BDD457221DEF22006EAB84 /* SettingsViews.strings */,
 				F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */,
 				F830992923C32A98005741DF /* WatlaaView.strings */,
+				F8AF11F424B128B200AE5BA2 /* LibreErrors.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -1297,6 +1310,14 @@
 			name = "Core Data";
 			path = "xdrip/Core Data";
 			sourceTree = SOURCE_ROOT;
+		};
+		F8AF11F624B1E6D700AE5BA2 /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				F8AF11F724B1E6EE00AE5BA2 /* XdripError.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
 		};
 		F8B3A7B7226CC0B7004BA588 /* sounds */ = {
 			isa = PBXGroup;
@@ -1466,6 +1487,7 @@
 				F8B48A9322B2A705009BCC01 /* TextsSpeakReading.swift */,
 				F869188B23A044340065B607 /* TextsM5StackView.swift */,
 				F830992723C32A13005741DF /* TextsWatlaaView.swift */,
+				F8AF11F224B1279500AE5BA2 /* TextsLibreErrors.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -1597,6 +1619,7 @@
 		F8EA6C8021B723A80082976B /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				F8AF11F624B1E6D700AE5BA2 /* Errors */,
 				F8C5EBE622F38F0E00563B5F /* Trace.swift */,
 				F821CF69229FC22D005C1E43 /* Network */,
 				F8B3A7DD226E48C1004BA588 /* SoundPlayer */,
@@ -1740,6 +1763,7 @@
 				F8F971BC23A5915900C3F17D /* G6 */,
 				F8F971BE23A5915900C3F17D /* G5 */,
 				F8F971D423A5915900C3F17D /* G4 */,
+				F8AF11F924B1FB3500AE5BA2 /* DexcomError.swift */,
 			);
 			path = Dexcom;
 			sourceTree = "<group>";
@@ -1878,6 +1902,8 @@
 				F8F971E723A5915900C3F17D /* LibreSensorSerialNumber.swift */,
 				F8F971E423A5915900C3F17D /* LibreSensorState.swift */,
 				F8177022248CF78300AA3600 /* LibreSensorType.swift */,
+				F8AF11F024B11FD400AE5BA2 /* LibreOOPWebError.swift */,
+				F8AF11FB24B27A6C00AE5BA2 /* LibreOOPWebServerResponse.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -2055,6 +2081,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */,
+				F8AF11F524B128B200AE5BA2 /* LibreErrors.strings in Resources */,
 				F8BDD442221C9D0D006EAB84 /* Common.strings in Resources */,
 				F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */,
 				F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */,
@@ -2207,6 +2234,7 @@
 				F816E11C2439243B009EE65B /* Droplet+CoreDataProperties.swift in Sources */,
 				F821CF56229BF43A005C1E43 /* AlertKind.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
+				F8AF11FC24B27A6D00AE5BA2 /* LibreOOPWebServerResponse.swift in Sources */,
 				F8F9723123A5915900C3F17D /* M5StackAuthenticateTXMessage.swift in Sources */,
 				F8F9721223A5915900C3F17D /* FirmwareVersionTxMessage.swift in Sources */,
 				F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */,
@@ -2307,6 +2335,7 @@
 				F897E25223FC871C0075E0E8 /* BluetoothPeripheralManager+BluetoothTransmitterDelegate.swift in Sources */,
 				F821CF8E22AB090C005C1E43 /* DatePickerViewController.swift in Sources */,
 				F816E12E2439E06E009EE65B /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift in Sources */,
+				F8AF11F324B1279500AE5BA2 /* TextsLibreErrors.swift in Sources */,
 				F8691888239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift in Sources */,
 				F8297F4F238DCAD800D74D66 /* BluetoothPeripheralNavigationController.swift in Sources */,
 				F8A1585322EDB602007F5B5D /* ConstantsBloodGlucose.swift in Sources */,
@@ -2316,6 +2345,7 @@
 				F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */,
 				F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */,
 				F8B3A858227F6971004BA588 /* UISwitch.swift in Sources */,
+				F8AF11F824B1E6EE00AE5BA2 /* XdripError.swift in Sources */,
 				F830990523B94ED7005741DF /* TimeScheduleViewController.swift in Sources */,
 				F8F9722123A5915900C3F17D /* LibreSensorSerialNumber.swift in Sources */,
 				F8A1586722EDB8BF007F5B5D /* ConstantsHomeView.swift in Sources */,
@@ -2371,6 +2401,7 @@
 				F8177027248ED57000AA3600 /* LibreRawGlucoseOOPA2Data.swift in Sources */,
 				F8F9724723A69A8000C3F17D /* BluetoothPeripheralCategory.swift in Sources */,
 				F8B3A79522635A25004BA588 /* AlertType+CoreDataProperties.swift in Sources */,
+				F8AF11FA24B1FB3500AE5BA2 /* DexcomError.swift in Sources */,
 				F8B3A84C227F090E004BA588 /* SettingsViewController.swift in Sources */,
 				F8F9720B23A5915900C3F17D /* SensorDataRxMessage.swift in Sources */,
 				F816E10C2437EA8E009EE65B /* BlueReader+CoreDataClass.swift in Sources */,
@@ -2413,6 +2444,7 @@
 				F821CF5E229BF43A005C1E43 /* BgReading+NightScout.swift in Sources */,
 				F8A389EB233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift in Sources */,
 				F816E1242439DB63009EE65B /* DexcomG4+BluetoothPeripheral.swift in Sources */,
+				F8AF11F124B11FD400AE5BA2 /* LibreOOPWebError.swift in Sources */,
 				F808D2D2240329E80084B5DB /* Bubble+BluetoothPeripheral.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
 				F825286A2443AE190067AF77 /* DexcomG6BluetoothPeripheralViewModel.swift in Sources */,
@@ -2817,7 +2849,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.1.7;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdriptest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -2846,7 +2878,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.1.7;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdriptest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
