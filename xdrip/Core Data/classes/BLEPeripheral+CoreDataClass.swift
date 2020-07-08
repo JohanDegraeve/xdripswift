@@ -24,6 +24,7 @@ public class BLEPeripheral: NSManagedObject {
         self.parameterUpdateNeededAtNextConnect = false
      
         webOOPEnabled = ConstantsLibre.defaultWebOOPEnabled
+        
         nonFixedSlopeEnabled = ConstantsLibre.defaultNonFixedSlopeEnabled
         
     }

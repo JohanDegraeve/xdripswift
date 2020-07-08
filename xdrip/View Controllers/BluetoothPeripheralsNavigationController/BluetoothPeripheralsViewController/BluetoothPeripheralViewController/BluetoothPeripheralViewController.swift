@@ -901,6 +901,15 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     
                 })
                 
+                // if it's a bluetoothPeripheral that uses oop web, then the setting can not be changed
+                if let bluetoothPeripheral = self.bluetoothPeripheral {
+                    if bluetoothPeripheral.blePeripheral.webOOPEnabled {
+                        
+                        cell.accessoryView?.isUserInteractionEnabled = false
+                        
+                    }
+                }
+
                 cell.accessoryType = .none
                 
             }
@@ -927,23 +936,6 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     
                 }
                 
-                // set accessoryView to UISwitch with currentWebOOPEnabledValue assigned
-                
-                let test = UISwitch(isOn: currentWebOOPEnabledValue, action: { (isOn:Bool) in
-                    
-                    self.bluetoothPeripheral?.blePeripheral.webOOPEnabled = isOn
-                    
-                    // send info to bluetoothPeripheralManager
-                    if let bluetoothPeripheral = self.bluetoothPeripheral {
-                        
-                        bluetoothPeripheralManager.receivedNewValue(webOOPEnabled: isOn, for: bluetoothPeripheral)
-                        
-                        tableView.reloadSections(IndexSet(integer: self.webOOPSettingsSectionNumber), with: .none)
-                        
-                    }
-                    
-                })
-                
                 cell.accessoryView = UISwitch(isOn: currentWebOOPEnabledValue, action: { (isOn:Bool) in
                     
                     self.bluetoothPeripheral?.blePeripheral.webOOPEnabled = isOn
@@ -954,6 +946,19 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                         bluetoothPeripheralManager.receivedNewValue(webOOPEnabled: isOn, for: bluetoothPeripheral)
                         
                         tableView.reloadSections(IndexSet(integer: self.webOOPSettingsSectionNumber), with: .none)
+                        
+                        
+                        // if user switches on web oop, then we need to force also use of non-fixed slopes to off
+                        if isOn {
+
+                            bluetoothPeripheral.blePeripheral.nonFixedSlopeEnabled = false
+                            
+                            bluetoothPeripheralManager.receivedNewValue(nonFixedSlopeEnabled: false, for: bluetoothPeripheral)
+                            
+                        }
+
+                        // reload the section for nonFixedSettingsSectionNumber, even though the value may not have changed, because possibly isUserInteractionEnabled needs to be set to false for the nonFixedSettingsSectionNumber UISwitch
+                        tableView.reloadSections(IndexSet(integer: self.nonFixedSettingsSectionNumber), with: .none)
 
                     }
                     
@@ -1013,8 +1018,8 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             
         }
         
-        //it's a Setting defined here in BluetoothPeripheralViewController
-        // is it a bluetooth setting or web oop setting ?
+        // it's a Setting defined here in BluetoothPeripheralViewController
+        // is it a bluetooth setting or web oop setting  or non-fixed calibration slopes setting ?
         
         if indexPath.section == 0 {
             

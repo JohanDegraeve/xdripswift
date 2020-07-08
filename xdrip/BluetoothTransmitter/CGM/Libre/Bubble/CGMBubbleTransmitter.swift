@@ -271,13 +271,14 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     // MARK: CGMTransmitter protocol functions
     
     func setNonFixedSlopeEnabled(enabled: Bool) {
+        
         if nonFixedSlopeEnabled != enabled {
             
             nonFixedSlopeEnabled = enabled
             
             // nonFixed value changed, reset timeStampLastBgReading so that all glucose values will be sent to delegate. This is simply to ensure at least one reading will be sent to the delegate immediately.
             timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-            
+          
         }
     }
     
