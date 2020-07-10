@@ -180,6 +180,11 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         
                         if rxBuffer.count >= 352 {
                             
+                            // crc check only for Libre 1
+                            guard crcIsOk(rxBuffer: &self.rxBuffer, patchInfo: patchInfo, bubbleHeaderLength: bubbleHeaderLength, log: log) else {
+                                return
+                            }
+                            
                             // libreSensorSerialNumber has been added to rxBuffer when receving .serialNumber (0xC0), it's the first 8 bytes
                             guard let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8))) else {
                                 trace("    could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
@@ -201,30 +206,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 
                                 // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
                                 timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-                                
-                            }
-
-                            // get sensortype, and dependent on sensortype get crc
-                            if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
-                                
-                                // crc check only for Libre 1 (is this the right thing to do ?)
-                                if libreSensorType == .libre1 {
-                                    
-                                    guard Crc.LibreCrc(data: &self.rxBuffer, headerOffset: self.bubbleHeaderLength) else {
-                                        trace("    Libre 1 sensor, CRC check failed, no further processing", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
-                                        return
-                                    }
-                                    
-                                }
-                                
-                                // do this for tracing only, not processing will continue if crc check fails
-                                if libreSensorType == .libreProH {
-                                    
-                                    if !Crc.LibreCrc(data: &self.rxBuffer, headerOffset: self.bubbleHeaderLength) {
-                                        trace("    libreProH sensor, CRC check failed - will continue processing anyway", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
-                                    }
-                                    
-                                }
                                 
                             }
 
@@ -338,6 +319,36 @@ fileprivate enum BubbleResponseType: UInt8 {
     case noSensor = 191 //0xBF
     case serialNumber = 192 //0xC0
     case patchInfo = 193 //0xC1
+}
+
+fileprivate func crcIsOk(rxBuffer:inout Data, patchInfo: String?, bubbleHeaderLength: Int, log: OSLog) -> Bool {
+    
+    // get sensortype, and dependent on sensortype get crc
+    if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {// should always return a value
+        
+        // crc check only for Libre 1 (is this the right thing to do ?)
+        if libreSensorType == .libre1 {
+            
+            guard Crc.LibreCrc(data: &rxBuffer, headerOffset: bubbleHeaderLength) else {
+                trace("    Libre 1 sensor, CRC check failed, no further processing", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                return false
+            }
+            
+        }
+        
+        // do this for tracing only, not processing will continue if crc check fails
+        if libreSensorType == .libreProH {
+            
+            if !Crc.LibreCrc(data: &rxBuffer, headerOffset: bubbleHeaderLength) {
+                trace("    libreProH sensor, CRC check failed - will continue processing anyway", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+            }
+            
+        }
+        
+    }
+
+    return true
+
 }
 
 extension BubbleResponseType: CustomStringConvertible {
