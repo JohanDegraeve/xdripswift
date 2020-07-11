@@ -28,15 +28,6 @@ public final class GlucoseChartManager: NSObject {
         }
     }
     
-    /// chartpoint array with glucose values and timestamp
-    ///
-    /// Whenever glucoseChartPoints is assigned a new value, glucoseChart is set to nil
-    private var glucoseColoredChartPoints: ([ChartPoint], [ChartPoint], [ChartPoint]) = ([], [], []) {
-        didSet {
-            glucoseChart = nil
-        }
-    }
-    
     /// for logging
     private var oslog = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
 
@@ -128,7 +119,7 @@ public final class GlucoseChartManager: NSObject {
             fontColor: ConstantsGlucoseChart.axisLabelColor
         )
         
-        chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: ConstantsGlucoseChart.gridColor,  linesWidth: 0.5)
+        chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: UserDefaults.standard.useObjectives ? ConstantsGlucoseChart.gridColorObjectives : ConstantsGlucoseChart.gridColor,  linesWidth: 0.5)
         
         // initialize enddate
         endDate = Date()
@@ -555,35 +546,33 @@ public final class GlucoseChartManager: NSObject {
         // now that we know innerFrame we can set innerFrameWidth
         innerFrameWidth = Double(innerFrame.width)
         
+        
+        chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: UserDefaults.standard.useObjectives ? ConstantsGlucoseChart.gridColorObjectives : ConstantsGlucoseChart.gridColor,  linesWidth: 0.5)
+        
         // Grid lines
         let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: chartGuideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: yAxisValues)
         
         // high/low/target guideline layer settings and styles
-        let urgentHighLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelinesShowColored ? ConstantsGlucoseChart.guidelineUrgentHighLowColor : ConstantsGlucoseChart.guidelineDefaultColor, linesWidth: 1, dotWidth: 2, dotSpacing: 5)
+        let urgentHighLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: UserDefaults.standard.showColoredObjectives ? ConstantsGlucoseChart.guidelineUrgentHighLowColor : ConstantsGlucoseChart.guidelineUrgentHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 2, dotSpacing: 5)
         
-        let highLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelinesShowColored ? ConstantsGlucoseChart.guidelineHighLowColor : ConstantsGlucoseChart.guidelineDefaultColor, linesWidth: 1, dotWidth: 4, dotSpacing: 2)
+        let highLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: UserDefaults.standard.showColoredObjectives ? ConstantsGlucoseChart.guidelineHighLowColor : ConstantsGlucoseChart.guidelineHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 4, dotSpacing: 2)
         
-        let tagretLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineTargetColor, linesWidth: ConstantsGlucoseChart.showTargetLine ? 1 : 0, dotWidth: 4, dotSpacing: 0)
-        
+        let targetLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineTargetColor, linesWidth: UserDefaults.standard.useObjectives ? (UserDefaults.standard.showTarget ? 1 : 0) : 0, dotWidth: 4, dotSpacing: 0)
         
         // high/low/target guidelines
         let urgentHighLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: urgentHighLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.urgentHighMarkValueInUserChosenUnit)])
 
         let highLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: highLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.highMarkValueInUserChosenUnit)])
         
-        let targetLineLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: tagretLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.targetMarkValueInUserChosenUnit)])
+        let targetLineLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: targetLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.targetMarkValueInUserChosenUnit)])
 
         let lowLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: highLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.lowMarkValueInUserChosenUnit)])
 
         let urgentLowLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: urgentHighLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.urgentLowMarkValueInUserChosenUnit)])
         
         // red/yellow/green circle layers
-        let redCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseColoredChartPoints.0, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseUrgentHighLowTintColor, optimized: true)
+        let glucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseTintColor, optimized: true)
             
-        let yellowCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseColoredChartPoints.1, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseHighLowTintColor, optimized: true)
-
-        let greenCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseColoredChartPoints.2, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseTargetColor, optimized: true)
-        
         let layers: [ChartLayer?] = [
             gridLayer,
             xAxisLayer,
@@ -594,10 +583,8 @@ public final class GlucoseChartManager: NSObject {
             targetLineLayer,
             lowLineLayer,
             urgentLowLineLayer,
-            // glucose circle layers
-            redCircles,
-            yellowCircles,
-            greenCircles
+            // glucosePoint layer(s)
+            glucoseCircles,
         ]
         
         return Chart(
@@ -676,24 +663,6 @@ public final class GlucoseChartManager: NSObject {
                 
             }
             
-            // use this iteration loop to also sort through each glucoseChartPoint and, based upon it's value, assign
-            // it to either the red, yellow or green array within the glucoseColoredChartPoints tuple
-            let bgReadingValue = glucoseChartPoint.y
-            
-                // red reading
-                if ((bgReadingValue.scalar > UserDefaults.standard.urgentHighMarkValueInUserChosenUnit) || (bgReadingValue.scalar < UserDefaults.standard.urgentLowMarkValueInUserChosenUnit)) {
-                    
-                    glucoseColoredChartPoints.0.append(glucoseChartPoint)
-                    
-                    } else if (((bgReadingValue.scalar <= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit) && (bgReadingValue.scalar > UserDefaults.standard.highMarkValueInUserChosenUnit)) || ((bgReadingValue.scalar >= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit) && (bgReadingValue.scalar < UserDefaults.standard.lowMarkValueInUserChosenUnit))) {
-                
-                    // yellow reading
-                    glucoseColoredChartPoints.1.append(glucoseChartPoint)
-                
-                } else {
-                    // green value
-                    glucoseColoredChartPoints.2.append(glucoseChartPoint)
-                }
         }
         
     }

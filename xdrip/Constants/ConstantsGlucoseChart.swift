@@ -32,12 +32,6 @@ enum ConstantsGlucoseChart {
     /// if the maximum in initialGlucoseValueRangeInMgDl isn't enough to show all values, if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
     static let thirdGlucoseValueRangeInMmol = [21.0, 23.0]
     
-    /// grid and guideline constants
-    /// these variables must be moved to UserDefaults when testing is finished
-//  static let useUserRangesForYAxis = false <- not ready yet
-    static let guidelinesShowColored = false
-    static let showTargetLine = false
-    
     /// axis line color    (make white to match new dark UI theme)
     static let axisLineColor = UIColor.darkGray
     
@@ -45,19 +39,19 @@ enum ConstantsGlucoseChart {
     static let axisLabelColor = UIColor.white
     
     /// grid color
-    static let gridColor = UIColor.darkGray.withAlphaComponent(0.6)
+    static let gridColor = UIColor.darkGray
+    static let gridColorObjectives = UIColor.darkGray.withAlphaComponent(0.4)
     
     /// objective/target range guidelines. Will use either standard gray or colored lines
     /// make use alpha components to make the perceived brightness of each line be the same to the user (otherwise red appears washed out)
-    static let guidelineDefaultColor = UIColor.lightGray
-    static let guidelineUrgentHighLowColor = UIColor.red.withAlphaComponent(1)
-    static let guidelineHighLowColor = UIColor.yellow.withAlphaComponent(0.8)
-    static let guidelineTargetColor = UIColor.green.withAlphaComponent(0.6)
+    static let guidelineUrgentHighLow = UIColor.lightGray.withAlphaComponent(0.8)
+    static let guidelineHighLow = UIColor.lightGray.withAlphaComponent(1)
+    static let guidelineUrgentHighLowColor = UIColor.red.withAlphaComponent(0.8)
+    static let guidelineHighLowColor = UIColor.yellow.withAlphaComponent(0.7)
+    static let guidelineTargetColor = UIColor.green.withAlphaComponent(0.5)
     
     /// glucose colors
-    static let glucoseUrgentHighLowTintColor = UIColor.red
-    static let glucoseHighLowTintColor = UIColor.yellow
-    static let glucoseTargetColor = UIColor.green
+    static let glucoseTintColor = UIColor.cyan
     
     /// labels width for vertical axis
     static let yAxisLabelsWidth: CGFloat = 30

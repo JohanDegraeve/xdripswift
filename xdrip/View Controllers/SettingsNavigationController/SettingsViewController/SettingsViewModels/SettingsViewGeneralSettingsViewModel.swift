@@ -33,7 +33,7 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
         
         // changing follower to master or master to follower requires changing ui for nightscout settings and transmitter type settings
-        if index == Setting.masterFollower.rawValue {return true}
+        if (index == Setting.masterFollower.rawValue || index == Setting.bloodGlucoseUnit.rawValue) {return true}
         
         return false
     }
@@ -48,7 +48,11 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
         switch setting {
             
         case .bloodGlucoseUnit:
-            return SettingsSelectedRowAction.callFunction(function: {UserDefaults.standard.bloodGlucoseUnitIsMgDl ? (UserDefaults.standard.bloodGlucoseUnitIsMgDl) = false : (UserDefaults.standard.bloodGlucoseUnitIsMgDl = true)})
+            return SettingsSelectedRowAction.callFunction(function: {
+                
+                UserDefaults.standard.bloodGlucoseUnitIsMgDl ? (UserDefaults.standard.bloodGlucoseUnitIsMgDl) = false : (UserDefaults.standard.bloodGlucoseUnitIsMgDl = true)
+                
+            })
 
         case .masterFollower:
             

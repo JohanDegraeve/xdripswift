@@ -10,16 +10,6 @@ extension UserDefaults {
         /// bloodglucose  unit
         case bloodGlucoseUnitIsMgDl = "bloodGlucoseUnit"
         /// urgent high value
-        case urgentHighMarkValue = "urgentHighMarkValue"
-        /// high value
-        case highMarkValue = "highMarkValue"
-        /// target value
-        case targetMarkValue = "targetMarkValue"
-        /// low value
-        case lowMarkValue = "lowMarkValue"
-        /// urgent low value
-        case urgentLowMarkValue = "urgentLowMarkValue"
-        /// master or follower
         case isMaster = "isMaster"
         /// should notification be shown with reading yes or no
         case showReadingInNotification = "showReadingInNotification"
@@ -27,6 +17,25 @@ extension UserDefaults {
         case showReadingInAppBadge = "showReadingInAppBadge"
         /// should reading by multiplied by 10
         case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
+        
+        // Home Screen and graph settings
+        
+        /// show the objectives and make them display on the graph? Or just hide it all because it's too complicated to waste time with?
+        case useObjectives = "useObjectives"
+        /// show the objective lines in color or grey?
+        case urgentHighMarkValue = "urgentHighMarkValue"
+        /// high value
+        case highMarkValue = "highMarkValue"
+        /// low value
+        case lowMarkValue = "lowMarkValue"
+        /// urgent low value
+        case urgentLowMarkValue = "urgentLowMarkValue"
+        /// master or follower
+        case showColoredObjectives = "showColoredObjectives"
+        /// show the target line or hide it?
+        case showTarget = "showTarget"
+        /// target value
+        case targetMarkValue = "targetMarkValue"
         
         // Transmitter
         
@@ -204,6 +213,52 @@ extension UserDefaults {
         }
     }
     
+    /// true if device is master, false if follower
+    @objc dynamic var isMaster: Bool {
+        // default value for bool in userdefaults is false, false is for master, true is for follower
+        get {
+            return !bool(forKey: Key.isMaster.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.isMaster.rawValue)
+        }
+    }
+    
+    /// should notification be shown with reading yes or no
+    @objc dynamic var showReadingInNotification: Bool {
+        // default value for bool in userdefaults is false, as default we want readings to be shown
+        get {
+            return !bool(forKey: Key.showReadingInNotification.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showReadingInNotification.rawValue)
+        }
+    }
+
+    /// should reading be shown in app badge yes or no
+    @objc dynamic var showReadingInAppBadge: Bool {
+        // default value for bool in userdefaults is false, as default we want readings not to be shown in app badge
+        get {
+            return bool(forKey: Key.showReadingInAppBadge.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.showReadingInAppBadge.rawValue)
+        }
+    }
+    
+    /// should reading be multiplied by 10 or not
+    @objc dynamic var multipleAppBadgeValueWith10: Bool {
+        // default value for bool in userdefaults is false, as default we want readings not to be multiplied by 10
+        get {
+            return !bool(forKey: Key.multipleAppBadgeValueWith10.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.multipleAppBadgeValueWith10.rawValue)
+        }
+    }
+    
+    // MARK: Home Screen Settings
+    
     /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var urgentHighMarkValueInUserChosenUnit:Double {
         get {
@@ -304,17 +359,6 @@ extension UserDefaults {
         }
     }
     
-    /// true if device is master, false if follower
-    @objc dynamic var isMaster: Bool {
-        // default value for bool in userdefaults is false, false is for master, true is for follower
-        get {
-            return !bool(forKey: Key.isMaster.rawValue)
-        }
-        set {
-            set(!newValue, forKey: Key.isMaster.rawValue)
-        }
-    }
-    
     /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var urgentHighMarkValueInUserChosenUnitRounded:String {
         get {
@@ -385,39 +429,40 @@ extension UserDefaults {
         }
     }
     
-    /// should notification be shown with reading yes or no
-    @objc dynamic var showReadingInNotification: Bool {
-        // default value for bool in userdefaults is false, as default we want readings to be shown
+    /// should we use objectives for the BG values and graph lines etc?
+    @objc dynamic var useObjectives: Bool {
+        // default value for bool in userdefaults is false, by default we want the objective-based graph to be disabled so as not to scare anybody. They can enable it when they have time to understand it.
         get {
-            return !bool(forKey: Key.showReadingInNotification.rawValue)
+            return !bool(forKey: Key.useObjectives.rawValue)
         }
         set {
-            set(!newValue, forKey: Key.showReadingInNotification.rawValue)
-        }
-    }
-
-    /// should reading be shown in app badge yes or no
-    @objc dynamic var showReadingInAppBadge: Bool {
-        // default value for bool in userdefaults is false, as default we want readings not to be shown in app badge
-        get {
-            return bool(forKey: Key.showReadingInAppBadge.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.showReadingInAppBadge.rawValue)
+            set(!newValue, forKey: Key.useObjectives.rawValue)
         }
     }
     
-    /// should reading be multiplied by 10 or not
-    @objc dynamic var multipleAppBadgeValueWith10: Bool {
-        // default value for bool in userdefaults is false, as default we want readings not to be multiplied by 10
+    /// should the Guidelines be shown in color (yellow/red) on the graph?
+    @objc dynamic var showColoredObjectives: Bool {
+        // default value for bool in userdefaults is false, by default we want the guidelines to be shown in grey as per Nightscout
         get {
-            return !bool(forKey: Key.multipleAppBadgeValueWith10.rawValue)
+            return !bool(forKey: Key.showColoredObjectives.rawValue)
         }
         set {
-            set(!newValue, forKey: Key.multipleAppBadgeValueWith10.rawValue)
+            set(!newValue, forKey: Key.showColoredObjectives.rawValue)
         }
     }
-
+    
+    /// should the target line (always shown in green) be shown on the graph?
+    @objc dynamic var showTarget: Bool {
+        // default value for bool in userdefaults is false, by default we will hide the target line as it could confuse users
+        get {
+            return !bool(forKey: Key.showTarget.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showTarget.rawValue)
+        }
+    }
+    
+    
     // MARK: Transmitter Settings
     
     /// cgm ransmittertype currently active
