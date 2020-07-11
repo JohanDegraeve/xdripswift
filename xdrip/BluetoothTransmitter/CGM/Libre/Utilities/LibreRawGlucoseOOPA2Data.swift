@@ -12,6 +12,9 @@ import Foundation
 
 public class LibreRawGlucoseOOPA2Data: NSObject, LibreRawGlucoseWeb, LibreOOPWebServerResponseData {
     
+    // if received from server, probably always nil ?
+    var msg: String?
+    
     var errcode: Int?
     
     var list: [LibreRawGlucoseOOPA2List]?

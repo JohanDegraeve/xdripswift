@@ -162,12 +162,21 @@ class LibreOOPClient {
                 
                 // data is not nil, let's try to do json decoding
                 let decoder = JSONDecoder()
-                
+               
                 do {
                     
                     let response = try decoder.decode(type.self, from: data)
                     
-                    callback(response, nil)
+                    if response.isError {
+
+                        // if response isError is true, then still send the response, but also the msg, which should contain the error description
+                        callback(response, LibreOOPWebError.jsonResponseHasError(msg: response.msg, errcode: response.errcode))
+                        
+                    } else {
+
+                        callback(response, nil)
+
+                    }
                     
                     return
                     

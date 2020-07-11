@@ -219,8 +219,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                     self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
                                 }
                                 
-                                // TODO : xDripError could be used to show latest errors in bluetoothPeripheralView
-                                
                             })
                             
                             //reset the buffer
