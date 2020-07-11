@@ -41,7 +41,7 @@ class LibreOOPClient {
         let item1 = URLQueryItem(name: "patchUid", value: libreSensorSerialNumber.uidString.uppercased())
         let item2 = URLQueryItem(name: "patchInfo", value: patchInfo)
         let item3 = URLQueryItem(name: "content", value: libreData.hexEncodedString())
-        
+
         var urlComponents = URLComponents(string: "\(oopWebSite)/libreoop2")!
         
         urlComponents.queryItems = [item, item1, item2, item3]

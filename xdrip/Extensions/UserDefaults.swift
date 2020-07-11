@@ -164,6 +164,14 @@ extension UserDefaults {
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
         
+        // Trace
+        /// should debug level logs be added in trace file or not, and also in NSLog
+        case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
+        
+        // non fixed slope values for oop web Libre
+        /// web oop parameters, only for Libre 1
+        case libre1DerivedAlgorithmParameters = "algorithmParameters"
+
         // development settings
         
         /// G6 factor1 - for testing G6 scaling
@@ -178,14 +186,13 @@ extension UserDefaults {
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
         
-        /// should debug level logs be added in trace file or not, and also in NSLog
-        case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
+        /// if webOOP enabled, what site to use
+        case webOOPsite = "webOOPsite"
+        /// if webOOP enabled, value of the token
+        case webOOPtoken = "webOOPtoken"
         
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
-        
-        /// web oop parameters, only for Libre 1
-        case libre1DerivedAlgorithmParameters = "algorithmParameters"
         
     }
     
@@ -851,6 +858,32 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.addDebugLevelLogsInTraceFileAndNSLog.rawValue)
+        }
+    }
+    
+    /// web oop site
+    @objc dynamic var webOOPSite:String? {
+        get {
+            return string(forKey: Key.webOOPsite.rawValue)
+        }
+        set {
+            var value = newValue
+            if let newValue = newValue {
+                if !newValue.startsWith("http") {
+                    value = "https://" + newValue
+                }
+            }
+            set(value, forKey: Key.webOOPsite.rawValue)
+        }
+    }
+    
+    /// web oop token
+    @objc dynamic var webOOPtoken:String? {
+        get {
+            return string(forKey: Key.webOOPtoken.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.webOOPtoken.rawValue)
         }
     }
     

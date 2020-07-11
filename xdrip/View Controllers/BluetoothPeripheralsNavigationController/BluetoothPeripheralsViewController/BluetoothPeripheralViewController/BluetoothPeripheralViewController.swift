@@ -33,12 +33,6 @@ fileprivate enum WebOOPSettings: Int, CaseIterable {
     /// is web OOP enabled or not
     case webOOPEnabled = 0
     
-    /// if webOOP enabled, what site to use
-    case webOOPsite = 1
-    
-    /// if webOOP enabled, value of the token
-    case webOOPtoken = 2
-
 }
 
 fileprivate enum NonFixedCalibrationSlopesSettings: Int, CaseIterable {
@@ -1001,18 +995,6 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
 
                 cell.accessoryType = .none
                 
-            case .webOOPsite:
-                
-                cell.textLabel?.text = Texts_SettingsView.labelWebOOPSite
-                cell.detailTextLabel?.text = bluetoothPeripheral?.blePeripheral.oopWebSite
-                cell.accessoryType = .disclosureIndicator
-                
-            case .webOOPtoken:
-                
-                cell.textLabel?.text = Texts_SettingsView.labelWebOOPtoken
-                cell.detailTextLabel?.text = bluetoothPeripheral?.blePeripheral.oopWebToken
-                cell.accessoryType = .disclosureIndicator
-                
             }
             
         }
@@ -1142,45 +1124,6 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 // this is a uiswitch, user needs to click the uiswitch, not just the row
                 return
                 
-            case .webOOPsite:
-                
-                // this option should only be shown if there's already a bluetoothPeripheral assigned
-                guard let bluetoothPeripheral = bluetoothPeripheral else {return}
-                
-                SettingsViewUtilities.runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelWebOOP, message: Texts_SettingsView.labelWebOOPSiteExplainingText, keyboardType: .URL, text: bluetoothPeripheral.blePeripheral.oopWebSite, placeHolder: Texts_Common.default0, actionTitle: nil, cancelTitle: nil, actionHandler: {(oopwebsiteurl:String) in
-                    
-                    if oopwebsiteurl != bluetoothPeripheral.blePeripheral.oopWebSite {
-                        
-                        // store in nsobject
-                        bluetoothPeripheral.blePeripheral.oopWebSite = oopwebsiteurl.toNilIfLength0()
-                        
-                        // send new value to bluetoothPeripheralManager
-                        bluetoothPeripheralManager.receivedNewValue(oopWebSite: oopwebsiteurl.toNilIfLength0(), for: bluetoothPeripheral)
-                        
-                    }
-                    
-                }, cancelHandler: nil, inputValidator: nil), forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withSettingsViewModel: nil, tableView: tableView, forUIViewController: self)
-                
-            case .webOOPtoken:
-                
-                // this option should only be shown if there's already a bluetoothPeripheral assigned
-                guard let bluetoothPeripheral = bluetoothPeripheral else {return}
-                
-                SettingsViewUtilities.runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelWebOOP, message: Texts_SettingsView.labelWebOOPtokenExplainingText, keyboardType: .default, text: bluetoothPeripheral.blePeripheral.oopWebToken, placeHolder: Texts_Common.default0, actionTitle: nil, cancelTitle: nil, actionHandler: {(oopwebsitetoken:String) in
-                    
-                    if oopwebsitetoken != bluetoothPeripheral.blePeripheral.oopWebToken {
-                        
-                        // store in nsobject
-                        bluetoothPeripheral.blePeripheral.oopWebToken = oopwebsitetoken.toNilIfLength0()
-                        
-                        // send new value to bluetoothPeripheralManager
-                        bluetoothPeripheralManager.receivedNewValue(oopWebToken: oopwebsitetoken.toNilIfLength0(), for: bluetoothPeripheral)
-                        
-                    }
-                    
-                }, cancelHandler: nil, inputValidator: nil), forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withSettingsViewModel: nil, tableView: tableView, forUIViewController: self)
-                
-
             }
         
         }
