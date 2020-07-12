@@ -9,7 +9,7 @@ DEPENDENCIES:
   - SwiftCharts (~> 0.6.5)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  trunk:
     - CryptoSwift
     - SwiftCharts
 
