@@ -20,14 +20,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_selectbgunit", tableName: filename, bundle: Bundle.main, value: "Blood Glucose Units:", comment: "for text in pop up where user can select bg unit")
     }()
     
-    static let labelLowValue: String = {
-        return NSLocalizedString("settingsviews_lowValue", tableName: filename, bundle: Bundle.main, value: "Low Value:", comment: "general settings, low value")
-    }()
-
-    static let labelHighValue: String = {
-        return NSLocalizedString("settingsviews_highValue", tableName: filename, bundle: Bundle.main, value: "High Value:", comment: "general settings, high value")
-    }()
-    
     static let labelMasterOrFollower: String = {
         return NSLocalizedString("settingsviews_masterorfollower", tableName: filename, bundle: Bundle.main, value: "Use as Master or Follower?", comment: "general settings, master or follower")
     }()
@@ -51,6 +43,45 @@ class Texts_SettingsView {
     static let multipleAppBadgeValueWith10: String = {
         return NSLocalizedString("multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10?", comment: "general settings, should reading be multiplied with 10 yes or no")
     }()
+    
+    // MARK: - Section Home Screen
+    
+    static let sectionTitleHomeScreen: String = {
+        return NSLocalizedString("settingsviews_sectiontitlehomescreen", tableName: filename, bundle: Bundle.main, value: "Home Screen", comment: "home screen settings, section title")
+    }()
+
+    static let labelUseObjectives: String = {
+        return NSLocalizedString("settingsviews_useobjectives", tableName: filename, bundle: Bundle.main, value: "Use Objectives?", comment: "home screen settings, use objectives")
+    }()
+
+    static let labelUrgentHighValue: String = {
+        return NSLocalizedString("settingsviews_urgenthighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value:", comment: "home screen settings, urgent high value")
+    }()
+    
+    static let labelHighValue: String = {
+        return NSLocalizedString("settingsviews_highValue", tableName: filename, bundle: Bundle.main, value: "High Value:", comment: "home screen settings, high value")
+    }()
+    
+    static let labelTargetValue: String = {
+        return NSLocalizedString("settingsviews_targetValue", tableName: filename, bundle: Bundle.main, value: "Target Value:", comment: "home screen settings, target value")
+    }()
+    
+    static let labelLowValue: String = {
+        return NSLocalizedString("settingsviews_lowValue", tableName: filename, bundle: Bundle.main, value: "Low Value:", comment: "home screen settings, low value")
+    }()
+    
+    static let labelUrgentLowValue: String = {
+        return NSLocalizedString("settingsviews_urgentlowValue", tableName: filename, bundle: Bundle.main, value: "Urgent Low Value:", comment: "home screen settings, urgent low value")
+    }()
+    
+    static let labelShowColoredObjectives: String = {
+        return NSLocalizedString("settingsviews_showcoloredobjectives", tableName: filename, bundle: Bundle.main, value: "Show Colored Objective Lines?", comment: "home screen settings, show colored objectives")
+    }()
+    
+    static let labelShowTarget: String = {
+        return NSLocalizedString("settingsviews_showtarget", tableName: filename, bundle: Bundle.main, value: "Show Target Line?", comment: "home screen settings, show target line")
+    }()
+    
     
     // MARK: - Section Transmitter
     
