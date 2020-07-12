@@ -106,11 +106,11 @@ class Texts_SettingsView {
     }()
     
     static let labelWebOOPTransmitter:String = {
-        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use the OOPWeb Algorithm?", comment: "web oop settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use the OOPWeb Service?", comment: "web oop settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelWebOOPSite:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPSite", tableName: filename, bundle: Bundle.main, value: "OOPWeb Site URL:", comment: "transmitter settings, the web oop site url")
+        return NSLocalizedString("settingsviews_labelWebOOPSite", tableName: filename, bundle: Bundle.main, value: "OOPWeb Server URL:", comment: "transmitter settings, the web oop site url")
     }()
     
     static let labelWebOOPtoken:String = {
@@ -118,23 +118,23 @@ class Texts_SettingsView {
     }()
     
     static let labelWebOOPSiteExplainingText:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPSiteExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Site URL (leave blank to use the default):", comment: "transmitter settings, the web oop site url, explaining text in dialog")
+        return NSLocalizedString("settingsviews_labelWebOOPSiteExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Server URL (optional):", comment: "transmitter settings, the web oop server url, explaining text in dialog")
     }()
     
     static let labelWebOOPtokenExplainingText:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPtokenExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Token (leave blank to use default):", comment: "transmitter settings, the web oop token, explaining text in dialog")
+        return NSLocalizedString("settingsviews_labelWebOOPtokenExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Token (optional):", comment: "transmitter settings, the web oop token, explaining text in dialog")
     }()
     
     static let labelWebOOP:String = {
-        return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "OOPWeb Algorithm", comment: "weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section")
+        return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "OOPWeb Service", comment: "weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section")
     }()
     
     static let labelNonFixedTransmitter:String = {
-        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Use non-fixed slopes?", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Use Non-Fixed Calibration Slopes?", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelNonFixed:String = {
-        return NSLocalizedString("settingsviews_labelNonFixed", tableName: filename, bundle: Bundle.main, value: "Non-fixed calibration slopes", comment: "non fixed settings, title of the section")
+        return NSLocalizedString("settingsviews_labelNonFixed", tableName: filename, bundle: Bundle.main, value: "Non-Fixed Calibration Slopes", comment: "non fixed settings, title of the section")
     }()
     
     static let transmitterId8OrHigherNotSupported: String = {
@@ -370,7 +370,7 @@ class Texts_SettingsView {
     }()
     
     static let debugLevel: String = {
-        return NSLocalizedString("debugLevel", tableName: filename, bundle: Bundle.main, value: "Include debug level", comment: "in Settings, to enable debug level in trace file")
+        return NSLocalizedString("debugLevel", tableName: filename, bundle: Bundle.main, value: "Include Debug Level", comment: "in Settings, to enable debug level in trace file")
     }()
     
     static let describeProblem: String = {
@@ -390,19 +390,19 @@ class Texts_SettingsView {
     }()
     
     static let volumeTestSoundPlayerExplanation: String = {
-        return NSLocalizedString("volumeTestSoundPlayerExplanation", tableName: filename, bundle: Bundle.main, value: "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' on - except for missed reading alerts which always use the iOS volume.\n\nChange the volume with the volume buttons and press Ok", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test")
+        return NSLocalizedString("volumeTestSoundPlayerExplanation", tableName: filename, bundle: Bundle.main, value: "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test")
     }()
     
     static let volumeTestSoundPlayer: String = {
-        return NSLocalizedString("volumeTestSoundPlayer", tableName: filename, bundle: Bundle.main, value: "Volume test sound player", comment: "In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row")
+        return NSLocalizedString("volumeTestSoundPlayer", tableName: filename, bundle: Bundle.main, value: "Volume Test (with Override Mute On)", comment: "In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row")
     }()
     
     static let volumeTestiOSSound: String = {
-        return NSLocalizedString("volumeTestiOSSound", tableName: filename, bundle: Bundle.main, value: "Volume test iOS sound", comment: "In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row")
+        return NSLocalizedString("volumeTestiOSSound", tableName: filename, bundle: Bundle.main, value: "Volume Test (Current iPhone Volume)", comment: "In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row")
     }()
 
     static let volumeTestiOSSoundExplanation: String = {
-        return NSLocalizedString("volumeTestiOSSoundExplanation", tableName: filename, bundle: Bundle.main, value: "A sound is played now with the same volume as will be used for an alarm that would have an alarm type with 'override mute' off - and for missed reading alerts which always use the iOS volume.\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons and try again.", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test")
+        return NSLocalizedString("volumeTestiOSSoundExplanation", tableName: filename, bundle: Bundle.main, value: "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test")
     }()
     
 }
