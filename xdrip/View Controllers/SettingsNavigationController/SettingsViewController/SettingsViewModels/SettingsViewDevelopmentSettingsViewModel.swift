@@ -14,6 +14,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// if webOOP enabled, value of the token
     case webOOPtoken = 3
 
+    /// in case Libre 2 users want to use the local calibration algorithm
+    case overrideWebOOPCalibration = 4
+    
 }
 
 struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
@@ -50,6 +53,10 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
             return Texts_SettingsView.labelWebOOPtoken
             
+        case .overrideWebOOPCalibration:
+            
+            return "Override Web OOP Calibration"
+            
         }
     }
     
@@ -59,7 +66,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled:
+        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration:
             return UITableViewCell.AccessoryType.none
             
         case .webOOPsite:
@@ -96,6 +103,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                 return Texts_Common.default0
             }
 
+        case .overrideWebOOPCalibration:
+            return nil
+            
         }
         
     }
@@ -127,7 +137,15 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
         case .webOOPtoken:
             return nil
-            
+           
+        case .overrideWebOOPCalibration:
+            return UISwitch(isOn: UserDefaults.standard.overrideWebOOPCalibration, action: {
+                (isOn:Bool) in
+                
+                UserDefaults.standard.overrideWebOOPCalibration = isOn
+                
+            })
+
         }
         
     }
@@ -142,7 +160,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled:
+        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration:
             return .nothing
             
         case .webOOPsite:

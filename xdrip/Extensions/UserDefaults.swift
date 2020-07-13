@@ -206,6 +206,9 @@ extension UserDefaults {
         /// if webOOP enabled, value of the token
         case webOOPtoken = "webOOPtoken"
         
+        /// in case Libre 2 users want to use the local calibration algorithm
+        case overrideWebOOPCalibration = "overrideWebOOPCalibration"
+        
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
         
@@ -1004,7 +1007,7 @@ extension UserDefaults {
         }
     }
     
-    /// OSLogEnabled - default false
+    /// addDebugLevelLogsInTraceFileAndNSLog - default false
     var addDebugLevelLogsInTraceFileAndNSLog: Bool {
         get {
             return bool(forKey: Key.addDebugLevelLogsInTraceFileAndNSLog.rawValue)
@@ -1040,6 +1043,16 @@ extension UserDefaults {
         }
     }
     
+    /// in case Libre 2 users want to use the local calibration algorithm
+    @objc dynamic var overrideWebOOPCalibration: Bool {
+        get {
+            return bool(forKey: Key.overrideWebOOPCalibration.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.overrideWebOOPCalibration.rawValue)
+        }
+    }
+
     /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
     var cgmTransmitterDeviceAddress: String? {
         get {
