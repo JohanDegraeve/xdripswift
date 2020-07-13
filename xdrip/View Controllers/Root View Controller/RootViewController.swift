@@ -272,6 +272,9 @@ final class RootViewController: UIViewController {
             // update label texts, minutes ago, diff and value
             self.updateLabelsAndChart(overrideApplicationState: true)
             
+            // create badge counter
+            self.createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
+            
             // if licenseinfo not yet accepted, show license info with only ok button
             if !UserDefaults.standard.licenseInfoAccepted {
                 
@@ -572,7 +575,7 @@ final class RootViewController: UIViewController {
                     
                 } else {
                     // update notification
-                    createBgReadingNotificationAndSetAppBadge()
+                    createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: false)
                     // update all text in  first screen
                     updateLabelsAndChart(overrideApplicationState: false)
                 }
@@ -609,7 +612,7 @@ final class RootViewController: UIViewController {
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
             
-        case UserDefaults.Key.isMaster, UserDefaults.Key.overrideWebOOPCalibration, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.overrideWebOOPCalibration :
+        case UserDefaults.Key.isMaster, UserDefaults.Key.overrideWebOOPCalibration, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl :
 
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -636,7 +639,7 @@ final class RootViewController: UIViewController {
         case UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
 
             // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
-            createBgReadingNotificationAndSetAppBadge()
+            createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
             
         case UserDefaults.Key.overrideWebOOPCalibration:
 
@@ -935,7 +938,9 @@ final class RootViewController: UIViewController {
     }
     
     /// creates bgreading notification, and set app badge to value of reading
-    private func createBgReadingNotificationAndSetAppBadge() {
+    /// - parameters:
+    ///     - if overrideShowReadingInNotification then badge counter will be set (if enabled off course) with function UIApplication.shared.applicationIconBadgeNumber. To be used if badge counter is  to be set eg when UserDefaults.standard.showReadingInAppBadge is changed
+    private func createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: Bool) {
         
         // first of all remove the application badge number. Possibly this is an old reading
         UIApplication.shared.applicationIconBadgeNumber = 0
@@ -976,7 +981,7 @@ final class RootViewController: UIViewController {
         if readingValueForBadge <= 40.0 {readingValueForBadge = 40.0}
         
         // check if notification on home screen is enabled in the settings
-        if UserDefaults.standard.showReadingInNotification  {
+        if UserDefaults.standard.showReadingInNotification && !overrideShowReadingInNotification  {
             
             // Create Notification Content
             let notificationContent = UNMutableNotificationContent()
@@ -1473,7 +1478,7 @@ extension RootViewController:NightScoutFollowerDelegate {
                 coreDataManager.saveChanges()
                 
                 // update notification and app badge
-                createBgReadingNotificationAndSetAppBadge()
+                createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: false)
                 
                 // update all text in  first screen
                 updateLabelsAndChart(overrideApplicationState: false)
