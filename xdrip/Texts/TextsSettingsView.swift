@@ -362,11 +362,11 @@ class Texts_SettingsView {
     }()
     
     static let sectionTitleTrace: String = {
-        return NSLocalizedString("sectionTitleTrace", tableName: filename, bundle: Bundle.main, value: "Trace", comment: "in Settings, section title for Trace")
+        return NSLocalizedString("sectionTitleTrace", tableName: filename, bundle: Bundle.main, value: "Issue Reporting", comment: "in Settings, section title for Trace")
     }()
     
     static let sendTraceFile: String = {
-        return NSLocalizedString("sendTraceFile", tableName: filename, bundle: Bundle.main, value: "Send Trace File", comment: "in Settings, row title to send settings")
+        return NSLocalizedString("sendTraceFile", tableName: filename, bundle: Bundle.main, value: "Send Issue Report", comment: "in Settings, row title to send settings")
     }()
     
     static let debugLevel: String = {
