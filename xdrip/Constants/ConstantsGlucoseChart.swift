@@ -6,12 +6,11 @@ enum ConstantsGlucoseChart {
     static let defaultChartWidthInHours = 6.0;
     
     /// default value for timeformat for labels in chart, time axis
-    ///
     /// H is hour 24 hour format, "h a" is hour 12 hour format  with a either am or pm
-    static let defaultTimeAxisLabelFormat = "H"
+    /// options can be "H", "HH", "HH:00"
+    static let defaultTimeAxisLabelFormat = "HH"
     
     /// usually 40.0 mgdl is the lowest value that cgm's give, putting it to 38 guarantees the points will always be visible
-    ///
     /// only in mgdl because the label will not be shown, hence no bizar values to be shown when going to mgdl
     static let absoluteMinimumChartValueInMgdl = 38.0
     
@@ -34,15 +33,24 @@ enum ConstantsGlucoseChart {
     static let thirdGlucoseValueRangeInMmol = [21.0, 23.0]
     
     /// axis line color    (make white to match new dark UI theme)
-    static let axisLineColor = UIColor.gray
+    static let axisLineColor = UIColor.darkGray
     
     /// axis line label    (make white to match new dark UI theme)
     static let axisLabelColor = UIColor.white
     
     /// grid color
-    static let gridColor = UIColor.gray
+    static let gridColor = UIColor.darkGray
+    static let gridColorObjectives = UIColor.darkGray.withAlphaComponent(0.4)
     
-    /// glucose color
+    /// objective/target range guidelines. Will use either standard gray or colored lines
+    /// make use alpha components to make the perceived brightness of each line be the same to the user (otherwise red appears washed out)
+    static let guidelineUrgentHighLow = UIColor.lightGray.withAlphaComponent(0.8)
+    static let guidelineHighLow = UIColor.lightGray.withAlphaComponent(1)
+    static let guidelineUrgentHighLowColor = UIColor.red.withAlphaComponent(0.8)
+    static let guidelineHighLowColor = UIColor.yellow.withAlphaComponent(0.7)
+    static let guidelineTargetColor = UIColor.green.withAlphaComponent(0.5)
+    
+    /// glucose colors
     static let glucoseTintColor = UIColor.cyan
     
     /// labels width for vertical axis

@@ -26,8 +26,11 @@ final class SettingsViewController: UIViewController {
     
     private enum Section: Int, CaseIterable, SettingsProtocol {
         
-        ///General settings - language, glucose unit, high and low value
+        ///General settings - language, glucose unit
         case general
+        
+        ///Home Screen settings - urgent high, high, target, low and urgent low values for guidelines
+        case homescreen
         
         /// alarms
         case alarms
@@ -64,6 +67,8 @@ final class SettingsViewController: UIViewController {
                 
             case .general:
                 return SettingsViewGeneralSettingsViewModel()
+            case .homescreen:
+                return SettingsViewHomeScreenSettingsViewModel()
             case .alarms:
                 return SettingsViewAlertSettingsViewModel()
             case .nightscout:

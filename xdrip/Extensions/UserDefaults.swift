@@ -9,11 +9,7 @@ extension UserDefaults {
         
         /// bloodglucose  unit
         case bloodGlucoseUnitIsMgDl = "bloodGlucoseUnit"
-        /// low value
-        case lowMarkValue = "lowMarkValue"
-        /// high value
-        case highMarkValue = "highMarkValue"
-        /// master or follower
+        /// urgent high value
         case isMaster = "isMaster"
         /// should notification be shown with reading yes or no
         case showReadingInNotification = "showReadingInNotification"
@@ -21,6 +17,25 @@ extension UserDefaults {
         case showReadingInAppBadge = "showReadingInAppBadge"
         /// should reading by multiplied by 10
         case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
+        
+        // Home Screen and graph settings
+        
+        /// show the objectives and make them display on the graph? Or just hide it all because it's too complicated to waste time with?
+        case useObjectives = "useObjectives"
+        /// show the objective lines in color or grey?
+        case urgentHighMarkValue = "urgentHighMarkValue"
+        /// high value
+        case highMarkValue = "highMarkValue"
+        /// low value
+        case lowMarkValue = "lowMarkValue"
+        /// urgent low value
+        case urgentLowMarkValue = "urgentLowMarkValue"
+        /// master or follower
+        case showColoredObjectives = "showColoredObjectives"
+        /// show the target line or hide it?
+        case showTarget = "showTarget"
+        /// target value
+        case targetMarkValue = "targetMarkValue"
         
         // Transmitter
         
@@ -211,46 +226,6 @@ extension UserDefaults {
         }
     }
     
-    /// the lowmarkvalue in unit selected by user ie, mgdl or mmol
-    @objc dynamic var lowMarkValueInUserChosenUnit:Double {
-        get {
-            //read currentvalue in mgdl
-            var returnValue = double(forKey: Key.lowMarkValue.rawValue)
-            // if 0 set to defaultvalue
-            if returnValue == 0.0 {
-                returnValue = ConstantsBGGraphBuilder.defaultLowMarkInMgdl
-            }
-            if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
-            }
-            return returnValue
-        }
-        set {
-            // store in mgdl
-            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.lowMarkValue.rawValue)
-        }
-    }
-    
-    /// the highmarkvalue in unit selected by user ie, mgdl or mmol
-    @objc dynamic var highMarkValueInUserChosenUnit:Double {
-        get {
-            //read currentvalue in mgdl
-            var returnValue = double(forKey: Key.highMarkValue.rawValue)
-            // if 0 set to defaultvalue
-            if returnValue == 0.0 {
-                returnValue = ConstantsBGGraphBuilder.defaultHighMmarkInMgdl
-            }
-            if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
-            }
-            return returnValue
-        }
-        set {
-            // store in mgdl
-            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
-        }
-    }
-    
     /// true if device is master, false if follower
     @objc dynamic var isMaster: Bool {
         // default value for bool in userdefaults is false, false is for master, true is for follower
@@ -259,34 +234,6 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.isMaster.rawValue)
-        }
-    }
-    
-    /// the highmarkvalue in unit selected by user ie, mgdl or mmol - rounded
-    @objc dynamic var highMarkValueInUserChosenUnitRounded:String {
-        get {
-            return highMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
-        }
-        set {
-            var value = newValue.toDouble()
-            if !bloodGlucoseUnitIsMgDl {
-                value = value?.mmolToMgdl()
-            }
-            set(value, forKey: Key.highMarkValue.rawValue)
-        }
-    }
-
-    /// the lowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
-    @objc dynamic var lowMarkValueInUserChosenUnitRounded:String {
-        get {
-            return lowMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
-        }
-        set {
-            var value = newValue.toDouble()
-            if !bloodGlucoseUnitIsMgDl {
-                value = value?.mmolToMgdl()
-            }
-            set(value, forKey: Key.lowMarkValue.rawValue)
         }
     }
     
@@ -322,7 +269,213 @@ extension UserDefaults {
             set(!newValue, forKey: Key.multipleAppBadgeValueWith10.rawValue)
         }
     }
-
+    
+    // MARK: Home Screen Settings
+    
+    /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var urgentHighMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.urgentHighMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentHighMarkValue.rawValue)
+        }
+    }
+    
+    /// the highmarkvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var highMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.highMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultHighMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
+        }
+    }
+    
+    /// the targetvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var targetMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.targetMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultTargetMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.targetMarkValue.rawValue)
+        }
+    }
+    
+    /// the lowmarkvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var lowMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.lowMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultLowMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.lowMarkValue.rawValue)
+        }
+    }
+    
+    /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var urgentLowMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.urgentLowMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentLowMarkValue.rawValue)
+        }
+    }
+    
+    /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var urgentHighMarkValueInUserChosenUnitRounded:String {
+        get {
+            return urgentHighMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.urgentHighMarkValue.rawValue)
+        }
+    }
+    
+    /// the highmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var highMarkValueInUserChosenUnitRounded:String {
+        get {
+            return highMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.highMarkValue.rawValue)
+        }
+    }
+    
+    /// the targetmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var targetMarkValueInUserChosenUnitRounded:String {
+        get {
+            return targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.targetMarkValue.rawValue)
+        }
+    }
+    
+    /// the lowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var lowMarkValueInUserChosenUnitRounded:String {
+        get {
+            return lowMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.lowMarkValue.rawValue)
+        }
+    }
+    
+    /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var urgentLowMarkValueInUserChosenUnitRounded:String {
+        get {
+            return urgentLowMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.urgentLowMarkValue.rawValue)
+        }
+    }
+    
+    /// should we use objectives for the BG values and graph lines etc?
+    @objc dynamic var useObjectives: Bool {
+        // default value for bool in userdefaults is false, by default we want the objective-based graph to be disabled so as not to scare anybody. They can enable it when they have time to understand it.
+        get {
+            return !bool(forKey: Key.useObjectives.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.useObjectives.rawValue)
+        }
+    }
+    
+    /// should the Guidelines be shown in color (yellow/red) on the graph?
+    @objc dynamic var showColoredObjectives: Bool {
+        // default value for bool in userdefaults is false, by default we want the guidelines to be shown in grey as per Nightscout
+        get {
+            return !bool(forKey: Key.showColoredObjectives.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showColoredObjectives.rawValue)
+        }
+    }
+    
+    /// should the target line (always shown in green) be shown on the graph?
+    @objc dynamic var showTarget: Bool {
+        // default value for bool in userdefaults is false, by default we will hide the target line as it could confuse users
+        get {
+            return !bool(forKey: Key.showTarget.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showTarget.rawValue)
+        }
+    }
+    
+    
     // MARK: Transmitter Settings
     
     /// cgm ransmittertype currently active

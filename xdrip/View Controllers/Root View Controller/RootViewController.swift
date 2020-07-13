@@ -1255,7 +1255,6 @@ final class RootViewController: UIViewController {
 }
 
 // MARK: - conform to CGMTransmitter protocol
-
 /// conform to CGMTransmitterDelegate
 extension RootViewController: CGMTransmitterDelegate {
     
@@ -1299,7 +1298,6 @@ extension RootViewController: CGMTransmitterDelegate {
 }
 
 // MARK: - conform to UITabBarControllerDelegate protocol
-
 /// conform to UITabBarControllerDelegate, want to receive info when user clicks specific tabs
 extension RootViewController: UITabBarControllerDelegate {
     
@@ -1320,7 +1318,6 @@ extension RootViewController: UITabBarControllerDelegate {
 }
 
 // MARK: - conform to UNUserNotificationCenterDelegate protocol
-
 /// conform to UNUserNotificationCenterDelegate, for notifications
 extension RootViewController: UNUserNotificationCenterDelegate {
     
@@ -1411,7 +1408,6 @@ extension RootViewController: UNUserNotificationCenterDelegate {
 }
 
 // MARK: - conform to NightScoutFollowerDelegate protocol
-
 extension RootViewController:NightScoutFollowerDelegate {
     
     func nightScoutFollowerInfoReceived(followGlucoseDataArray: inout [NightScoutBgReading]) {
