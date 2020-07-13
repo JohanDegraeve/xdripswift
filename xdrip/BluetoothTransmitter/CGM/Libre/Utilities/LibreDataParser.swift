@@ -124,7 +124,7 @@ class LibreDataParser {
             
             switch libreSensorType {
                 
-            case .libre1, .libreProH:// these types are all Libre 1
+            case .libre1A2, .libre1, .libreProH:// these types are all Libre 1
                 
                 // If the values are already available in userdefaults , then use those values
                 if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber == libreSensorSerialNumber.serialNumber {
@@ -169,7 +169,7 @@ class LibreDataParser {
 
                 }
                 
-            case .libre1A2, .libreUS:
+            case .libreUS:// not sure if this works for libreUS
                 
                 LibreOOPClient.getLibreRawGlucoseOOPOA2Data(libreData: libreData, oopWebSite: oopWebSite) { (libreRawGlucoseOOPA2Data, xDripError) in
                     
@@ -230,7 +230,7 @@ class LibreDataParser {
             
         } else if !webOOPEnabled {
             
-            // as webOOPEnabled it must be a Libre 1 type of sensor that supports "offline" parsing, ie without need for oop web
+            // as webOOPEnabled is not enabled it must be a Libre 1 type of sensor that supports "offline" parsing, ie without need for oop web
             
             // get readings from buffer using local Libre 1 parser
             let parsedLibre1Data = LibreDataParser.parseLibre1DataWithoutCalibration(libreData: libreData, timeStampLastBgReading: timeStampLastBgReading)
