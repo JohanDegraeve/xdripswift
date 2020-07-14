@@ -92,6 +92,9 @@
 		F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF9422ADB0D7005C1E43 /* HealthKitManager.swift */; };
 		F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F821CF9622AE589E005C1E43 /* HealthKit.framework */; };
 		F821CF9D22AEF483005C1E43 /* BGReadingSpeaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF9C22AEF483005C1E43 /* BGReadingSpeaker.swift */; };
+		F82436FA24BDFA5E00BED341 /* LibreReCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F82436F924BDFA5E00BED341 /* LibreReCalibrator.swift */; };
+		F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = F82436FB24BE014000BED341 /* TextsLibreStates.swift */; };
+		F82436FE24BE01F700BED341 /* LibreStates.strings in Resources */ = {isa = PBXBuildFile; fileRef = F82436FD24BE01F700BED341 /* LibreStates.strings */; };
 		F8252867243E50FE0067AF77 /* ConstantsLibre.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8252866243E50FE0067AF77 /* ConstantsLibre.swift */; };
 		F825286A2443AE190067AF77 /* DexcomG6BluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F82528692443AE190067AF77 /* DexcomG6BluetoothPeripheralViewModel.swift */; };
 		F825286C2443BEDC0067AF77 /* CGMG6TransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F825286B2443BEDC0067AF77 /* CGMG6TransmitterDelegate.swift */; };
@@ -436,6 +439,9 @@
 		F821CF9622AE589E005C1E43 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		F821CF9822AE589E005C1E43 /* xdrip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = xdrip.entitlements; sourceTree = "<group>"; };
 		F821CF9C22AEF483005C1E43 /* BGReadingSpeaker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BGReadingSpeaker.swift; sourceTree = "<group>"; };
+		F82436F924BDFA5E00BED341 /* LibreReCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreReCalibrator.swift; sourceTree = "<group>"; };
+		F82436FB24BE014000BED341 /* TextsLibreStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsLibreStates.swift; sourceTree = "<group>"; };
+		F82436FD24BE01F700BED341 /* LibreStates.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = LibreStates.strings; sourceTree = "<group>"; };
 		F8252866243E50FE0067AF77 /* ConstantsLibre.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsLibre.swift; sourceTree = "<group>"; };
 		F82528692443AE190067AF77 /* DexcomG6BluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG6BluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
 		F825286B2443BEDC0067AF77 /* CGMG6TransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG6TransmitterDelegate.swift; sourceTree = "<group>"; };
@@ -1231,6 +1237,7 @@
 				F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */,
 				F830992923C32A98005741DF /* WatlaaView.strings */,
 				F8AF11FF24B3B62D00AE5BA2 /* LibreErrors.strings */,
+				F82436FD24BE01F700BED341 /* LibreStates.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -1496,6 +1503,7 @@
 				F869188B23A044340065B607 /* TextsM5StackView.swift */,
 				F830992723C32A13005741DF /* TextsWatlaaView.swift */,
 				F8AF11F224B1279500AE5BA2 /* TextsLibreErrors.swift */,
+				F82436FB24BE014000BED341 /* TextsLibreStates.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -1686,6 +1694,7 @@
 				F8025E5221EE8CE500ECF0C0 /* Protocol */,
 				F8A54AAC22D6859200934E7A /* SlopeParameters.swift */,
 				F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */,
+				F82436F924BDFA5E00BED341 /* LibreReCalibrator.swift */,
 			);
 			path = Calibration;
 			sourceTree = "<group>";
@@ -2108,6 +2117,7 @@
 				F8B3A7D1226CC0B7004BA588 /* betterwakeup.mp3 in Resources */,
 				F8B3A81F227DEC92004BA588 /* README.md in Resources */,
 				F8BDD455221DEF22006EAB84 /* SettingsViews.strings in Resources */,
+				F82436FE24BE01F700BED341 /* LibreStates.strings in Resources */,
 				F8B48A9C22B2FA66009BCC01 /* SpeakReading.strings in Resources */,
 				F8B3A7C7226CC0B7004BA588 /* shortlow3.mp3 in Resources */,
 				F8B3A7CB226CC0B7004BA588 /* shortlow4.mp3 in Resources */,
@@ -2316,6 +2326,7 @@
 				F816E10E2437EAC9009EE65B /* BlueReader+CoreDataProperties.swift in Sources */,
 				F8F9722523A5915900C3F17D /* LibreRawGlucoseData.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
+				F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */,
 				F830991C23C2909E005741DF /* Watlaa+CoreDataClass.swift in Sources */,
 				F808D2CC240328FA0084B5DB /* Bubble+CoreDataClass.swift in Sources */,
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,
@@ -2425,6 +2436,7 @@
 				F897E25323FC871C0075E0E8 /* BluetoothPeripheralManager+WatlaaBluetoothTransmitterDelegate.swift in Sources */,
 				F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */,
 				F8F9723023A5915900C3F17D /* M5StackUtilities.swift in Sources */,
+				F82436FA24BDFA5E00BED341 /* LibreReCalibrator.swift in Sources */,
 				F89467F0249FFF5900F18424 /* LibreRawGlucoseOOPGlucose.swift in Sources */,
 				F8297F52238ECA3200D74D66 /* BluetoothPeripheralViewController.swift in Sources */,
 				F816E1312439E2DD009EE65B /* DexcomG4BluetoothPeripheralViewModel.swift in Sources */,
@@ -2868,7 +2880,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.1.13;
+				MARKETING_VERSION = 4.1.16;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2897,7 +2909,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.1.13;
+				MARKETING_VERSION = 4.1.16;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

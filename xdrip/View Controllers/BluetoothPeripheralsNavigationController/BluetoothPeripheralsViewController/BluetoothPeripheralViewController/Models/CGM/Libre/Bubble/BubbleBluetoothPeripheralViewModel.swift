@@ -182,7 +182,7 @@ extension BubbleBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
             cell.textLabel?.text = Texts_Common.sensorStatus
             
-            cell.detailTextLabel?.text = bubble.sensorState.description
+            cell.detailTextLabel?.text = bubble.sensorState.translatedDescription
             
         }
 

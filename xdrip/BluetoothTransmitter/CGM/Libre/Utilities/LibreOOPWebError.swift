@@ -15,6 +15,9 @@ enum LibreOOPWebError {
     /// in case web server returns err
     case jsonResponseHasError(msg: String?, errcode: Int?)
     
+    /// user tries Libre US which is not suppored
+    case libreUSNotSupported
+    
 }
 
 extension LibreOOPWebError: XdripError {
@@ -41,6 +44,9 @@ extension LibreOOPWebError: XdripError {
             
             // for now always return HIGH
             // maybe letter we change change to MEDIUM or LOW depending on errcode value
+            return .HIGH
+         
+        case .libreUSNotSupported:
             return .HIGH
             
         }
@@ -75,6 +81,9 @@ extension LibreOOPWebError: XdripError {
             
             return TextsLibreErrors.oOPWebServerError + " code = " + errcodeAsInt.description + ", message = " + message
             
+        case .libreUSNotSupported:
+            return TextsLibreErrors.oOPWebServerError + " " + TextsLibreErrors.libreUSNotSupported
+ 
         }
     }
     

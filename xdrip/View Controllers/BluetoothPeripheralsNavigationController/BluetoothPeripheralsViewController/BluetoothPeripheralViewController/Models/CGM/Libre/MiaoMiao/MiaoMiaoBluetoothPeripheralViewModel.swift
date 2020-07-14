@@ -144,7 +144,7 @@ extension MiaoMiaoBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
             cell.textLabel?.text = Texts_Common.sensorStatus
             
-            cell.detailTextLabel?.text = miaoMiao.sensorState.description
+            cell.detailTextLabel?.text = miaoMiao.sensorState.translatedDescription
             
         case .batteryLevel:
             

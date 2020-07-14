@@ -171,6 +171,10 @@ class LibreDataParser {
                 
             case .libreUS:// not sure if this works for libreUS
                 
+                // libreUS isn't working yet, create an error and send to delegate
+                cgmTransmitterDelegate?.errorOccurred(xDripError: LibreOOPWebError.libreUSNotSupported)
+                
+                // continue anyway, although this will not work
                 LibreOOPClient.getLibreRawGlucoseOOPOA2Data(libreData: libreData, oopWebSite: oopWebSite) { (libreRawGlucoseOOPA2Data, xDripError) in
                     
                     if let libreRawGlucoseOOPA2Data = libreRawGlucoseOOPA2Data as? LibreRawGlucoseOOPA2Data {
