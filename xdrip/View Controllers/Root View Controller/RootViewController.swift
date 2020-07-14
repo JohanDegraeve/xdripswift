@@ -890,11 +890,26 @@ final class RootViewController: UIViewController {
         case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa:
             
             if cgmTransmitter.isWebOOPEnabled() && !UserDefaults.standard.overrideWebOOPCalibration {
+                
+                // received values are already calibrated
                 return NoCalibrator()
+                
+            } else if cgmTransmitter.isWebOOPEnabled() && UserDefaults.standard.overrideWebOOPCalibration {
+                
+                // oop web enabled, means readings received are calibrated values
+                // overrideWebOOPCalibration enabled, means recalibration to be done
+                return LibreReCalibrator()
+                
             } else if cgmTransmitter.isNonFixedSlopeEnabled() {
+                
+                // no oop web, non-fixed slope
                 return Libre1NonFixedSlopeCalibrator()
+                
             } else {
+                
+                // no oop web, fixed slope
                 return Libre1Calibrator()
+                
             }
             
         }
