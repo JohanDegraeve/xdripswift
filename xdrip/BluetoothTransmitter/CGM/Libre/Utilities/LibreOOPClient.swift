@@ -177,7 +177,7 @@ class LibreOOPClient {
                         callback(response, nil)
 
                     }
-                    
+                 
                     return
                     
                 } catch {

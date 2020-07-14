@@ -895,7 +895,7 @@ final class RootViewController: UIViewController {
                 return NoCalibrator()
                 
             } else if cgmTransmitter.isWebOOPEnabled() && UserDefaults.standard.overrideWebOOPCalibration {
-                
+       
                 // oop web enabled, means readings received are calibrated values
                 // overrideWebOOPCalibration enabled, means recalibration to be done
                 return LibreReCalibrator()

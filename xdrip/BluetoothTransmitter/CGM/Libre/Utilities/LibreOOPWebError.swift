@@ -33,6 +33,12 @@ extension LibreOOPWebError: XdripError {
             return .LOW
             
         case .jsonResponseHasError(let msg, let errcode):
+            
+            // seems to during starting phase, errcode = 0, return .LOW in that case
+            if let errcode = errcode, errcode == 0 {
+               return .LOW
+            }
+            
             // for now always return HIGH
             // maybe letter we change change to MEDIUM or LOW depending on errcode value
             return .HIGH
