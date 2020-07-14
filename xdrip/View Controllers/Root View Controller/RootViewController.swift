@@ -565,7 +565,8 @@ final class RootViewController: UIViewController {
             if newReadingCreated {
                 
                 // only if no webOOPEnabled : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
-                if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && !cgmTransmitter.isWebOOPEnabled() {
+                // if overrideWebOOPCalibration true, then override value of isWebOOPEnabled
+                if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && (!cgmTransmitter.isWebOOPEnabled() || UserDefaults.standard.overrideWebOOPCalibration) {
                     // there must be at least 2 readings
                     let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
                     
