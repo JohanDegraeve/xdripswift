@@ -73,6 +73,22 @@ public enum AlertKind:Int, CaseIterable {
             fatalError("in alertKindRawValue, unknown case")
         }
     }
+    
+    /// if true, then this type of alert will (if raised) create an immediate notification which will have the current reading as text - simply means there's no need to create an additional notification with the current reading
+    func createsImmediateNotificationWithBGReading() -> Bool {
+        
+        switch self {
+            
+        case .low, .high, .verylow, .veryhigh, .fastdrop, .fastrise:
+            return true
+
+        case .missedreading, .batterylow, .calibration:
+            return false
+
+        }
+        
+        
+    }
 
     /// example, low alert needs a value = value below which alert needs to fire - there's actually no alert right now that doesn't need a value, in iosxdrip there was the iphonemuted alert, but I removed this here. Function remains, never now it might come back
     ///

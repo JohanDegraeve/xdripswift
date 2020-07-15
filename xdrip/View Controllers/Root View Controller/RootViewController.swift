@@ -561,12 +561,13 @@ final class RootViewController: UIViewController {
                 }
             }
            
-            // if a new reading is created, created either initial calibration request or bgreading notification - upload to nightscout and check alerts
+            // if a new reading is created, create either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
                 
                 // only if no webOOPEnabled : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
                 // if overrideWebOOPCalibration true, then override value of isWebOOPEnabled
                 if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && (!cgmTransmitter.isWebOOPEnabled() || UserDefaults.standard.overrideWebOOPCalibration) {
+                    
                     // there must be at least 2 readings
                     let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
                     
@@ -575,15 +576,15 @@ final class RootViewController: UIViewController {
                     }
                     
                 } else {
-                    // update notification
-                    createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: false)
+                    
+                    // check alerts, create notification, set app badge
+                    checkAlertsCreateNotificationAndSetAppBadge()
+                    
                     // update all text in  first screen
                     updateLabelsAndChart(overrideApplicationState: false)
                 }
                 
                 nightScoutUploadManager?.upload()
-                
-                alertManager?.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
                 
                 healthKitManager?.storeBgReadings()
 
@@ -851,11 +852,6 @@ final class RootViewController: UIViewController {
                 // initiate upload to Dexcom Share, if needed
                 if let dexcomShareUploadManager = self.dexcomShareUploadManager {
                     dexcomShareUploadManager.upload()
-                }
-                
-                // check alerts
-                if let alertManager = self.alertManager {
-                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
                 }
                 
                 // update labels
@@ -1298,6 +1294,29 @@ final class RootViewController: UIViewController {
         
     }
     
+    /// call alertManager.checkAlerts, and calls createBgReadingNotificationAndSetAppBadge with overrideShowReadingInNotification true or false, depending if immediate notification was created or not
+    private func checkAlertsCreateNotificationAndSetAppBadge() {
+        
+        // unwrap alerts and check alerts
+        if let alertManager = alertManager {
+            
+            // check if an immediate alert went off that shows the current reading
+            if alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds) {
+                
+                // an immediate alert went off that shows the current reading
+                // only update badge is required, (if enabled offcourse)
+                createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
+                
+            } else {
+                
+                // update notification and app badge
+                createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: false)
+                
+            }
+        }
+
+    }
+    
 }
 
 // MARK: - conform to CGMTransmitter protocol
@@ -1493,16 +1512,11 @@ extension RootViewController:NightScoutFollowerDelegate {
                 // save in core data
                 coreDataManager.saveChanges()
                 
-                // update notification and app badge
-                createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: false)
-                
                 // update all text in  first screen
                 updateLabelsAndChart(overrideApplicationState: false)
                 
-                // check alerts
-                if let alertManager = alertManager {
-                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds)
-                }
+                // check alerts, create notification, set app badge
+                checkAlertsCreateNotificationAndSetAppBadge()
                 
                 if let healthKitManager = healthKitManager {
                     healthKitManager.storeBgReadings()
