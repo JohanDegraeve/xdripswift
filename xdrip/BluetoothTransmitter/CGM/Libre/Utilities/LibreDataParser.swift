@@ -344,9 +344,9 @@ fileprivate func handleGlucoseData(result: (glucoseData:[GlucoseData], sensorTim
     
     // trace the sensor state
     if let sensorState = result.sensorState {
-        trace("in libreDataProcessor, sensor state = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, sensorState.description)
+        trace("in handleGlucoseData, sensor state = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, sensorState.description)
     } else {
-        trace("in libreDataProcessor, sensor state is unknown", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+        trace("in handleGlucoseData, sensor state is unknown", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
     }
 
     // if result.error not nil, then send it to the delegate and
@@ -381,7 +381,6 @@ fileprivate func handleGlucoseData(result: (glucoseData:[GlucoseData], sensorTim
     completionHandler(result.glucoseData.count > 0 ? result.glucoseData[0].timeStamp : nil, result.sensorState, result.xDripError)
     
 }
-
 
 /// to glucose data
 /// - Parameter measurements: array of LibreMeasurement
