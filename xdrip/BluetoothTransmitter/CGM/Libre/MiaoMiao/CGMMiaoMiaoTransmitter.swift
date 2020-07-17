@@ -41,7 +41,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     private var rxBuffer:Data
     
     /// how long to wait for next packet before sending startreadingcommand
-    private static let maxWaitForpacketInSeconds = 60.0
+    private static let maxWaitForpacketInSeconds = 5.0
     
     /// length of header added by MiaoMiao in front of data dat is received from Libre sensor
     private let miaoMiaoHeaderLength = 18
@@ -141,7 +141,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
             
             //check if buffer needs to be reset
             if (Date() > timestampFirstPacketReception.addingTimeInterval(CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds - 1)) {
-                trace("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info, CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds)
+                trace("in peripheral didUpdateValueFor, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info, CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds.description)
                 resetRxBuffer()
             }
             
