@@ -61,9 +61,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     // current sensor serial number, if nil then it's not known yet
     private var sensorSerialNumber:String?
 
-    /// gives information about type of sensor (Libre1, Libre2, etc..)
-    private var patchInfo: String?
-
     // MARK: - Initialization
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
@@ -161,6 +158,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                         if rxBuffer.count >= 363  {
                             trace("in peripheral didUpdateValueFor, Buffer complete", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
                             
+                            /// gives information about type of sensor (Libre1, Libre2, etc..) - if transmitter doesn't offer patchInfo, then use nil value, which corresponds to Libre 1
+                            var patchInfo: String?
+
                             // first off all see if the buffer contains patchInfo, and if yes send to delegate
                             if rxBuffer.count >= 369 {
                                 
