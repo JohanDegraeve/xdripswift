@@ -1,6 +1,35 @@
 import Foundation
 import os
 
+/// application version
+fileprivate var applicationVersion:String = {
+    
+    if let dictionary = Bundle.main.infoDictionary {
+
+        if let version = dictionary["CFBundleShortVersionString"] as? String  {
+            return version
+        }
+    }
+    
+    return "unknown"
+    
+}()
+
+/// build number
+fileprivate var buildNumber:String = {
+    
+    if let dictionary = Bundle.main.infoDictionary {
+        
+        if let buildnumber = dictionary["CFBundleVersion"] as? String  {
+            return buildnumber
+        }
+        
+    }
+    
+    return "unknown"
+    
+}()
+
 /// log only used for debuglogging
 fileprivate var log:OSLog = {
     let log:OSLog = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.debuglogging)
@@ -83,7 +112,7 @@ func trace(_ message: StaticString, log:OSLog, category: String, type: OSLogType
     var argumentsCounter: Int = 0
     
     var actualMessage = message.description
-    
+   
     // try to find the publicMark as long as argumentsCounter is less than the number of arguments
     while argumentsCounter < args.count {
         
@@ -149,7 +178,7 @@ func trace(_ message: StaticString, log:OSLog, category: String, type: OSLogType
     // nslog if enabled and if type = debug, then check also if debug logging is required
     if UserDefaults.standard.NSLogEnabled && (type != .debug || (type == .debug && UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog)) {
         
-        NSLog("%@", ConstantsLog.tracePrefix + " " + timeStamp + " " + category + " " + actualMessage)
+        NSLog("%@", ConstantsLog.tracePrefix + " " + timeStamp + " " + applicationVersion + " " + buildNumber + " " + category + " " + actualMessage)
         
     }
     
@@ -158,7 +187,7 @@ func trace(_ message: StaticString, log:OSLog, category: String, type: OSLogType
        
         do {
             
-            let textToWrite = timeStamp + " " + category + " " + actualMessage + "\n"
+            let textToWrite = timeStamp + " " + applicationVersion + " " + buildNumber + " " + category + " " + actualMessage + "\n"
             
             if let fileHandle = FileHandle(forWritingAtPath: traceFileName.path) {
                 
@@ -241,7 +270,7 @@ class Trace {
     private static var bluetoothPeripheralManager: BluetoothPeripheralManager?
     
     private static let paragraphSeperator = "\n\n===================================================\n\n"
-
+    
     // MARK: - initializer
     
     static func initialize(coreDataManager: CoreDataManager?) {
@@ -258,21 +287,8 @@ class Trace {
         var traceInfo = ""
 
         // app version and build
-        if let dictionary = Bundle.main.infoDictionary {
-            
-            if let version = dictionary["CFBundleShortVersionString"] as? String  {
-                traceInfo.appendStringAndNewLine("Version " + version)
-            } else {
-                traceInfo.appendStringAndNewLine("Version unknown")
-            }
-            
-            if let buildnumber = dictionary["CFBundleShortVersionString"] as? String  {
-                traceInfo.appendStringAndNewLine("Build number " + buildnumber)
-            } else {
-                traceInfo.appendStringAndNewLine("Build number")
-            }
-            
-        }
+        traceInfo.appendStringAndNewLine("Version " + applicationVersion)
+        traceInfo.appendStringAndNewLine("Build number " + buildNumber)
         
         // Info from UserDefaults
         
