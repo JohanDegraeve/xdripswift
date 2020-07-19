@@ -29,7 +29,7 @@ enum ConstantsLog {
     static let debuglogging = "xdripdebuglogging"
     
     /// timestamp format for nslog
-    static let dateFormatNSLog = "y-MM-dd-HH:mm:ss.SSSS"
+    static let dateFormatNSLog = "y-MM-dd HH:mm:ss.SSSS"
     
     /// G5
     static let categoryCGMG5 =                       "CGMG5                         "
