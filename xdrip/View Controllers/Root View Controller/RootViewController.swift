@@ -954,9 +954,6 @@ final class RootViewController: UIViewController {
     ///     - if overrideShowReadingInNotification then badge counter will be set (if enabled off course) with function UIApplication.shared.applicationIconBadgeNumber. To be used if badge counter is  to be set eg when UserDefaults.standard.showReadingInAppBadge is changed
     private func createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: Bool) {
         
-        // first of all remove the application badge number. Possibly this is an old reading
-        UIApplication.shared.applicationIconBadgeNumber = 0
-        
         // bgReadingsAccessor should not be nil at all, but let's not create a fatal error for that, there's already enough checks for it
         guard let bgReadingsAccessor = bgReadingsAccessor else {
             return
@@ -967,13 +964,23 @@ final class RootViewController: UIViewController {
         
         // if there's no reading for active sensor with calculated value , then no reason to continue
         if lastReading.count == 0 {
+            
             trace("in createBgReadingNotificationAndSetAppBadge, lastReading.count = 0", log: log, category: ConstantsLog.categoryRootView, type: .info)
+
+            // remove the application badge number. Possibly an old reading is still shown.
+            UIApplication.shared.applicationIconBadgeNumber = 0
+
             return
         }
         
         // if reading is older than 4.5 minutes, then also no reason to continue - this may happen eg in case of follower mode
         if Date().timeIntervalSince(lastReading[0].timeStamp) > 4.5 * 60 {
+            
             trace("in createBgReadingNotificationAndSetAppBadge, timestamp of last reading > 4.5 * 60", log: log, category: ConstantsLog.categoryRootView, type: .info)
+            
+            // remove the application badge number. Possibly the previous value is still shown
+            UIApplication.shared.applicationIconBadgeNumber = 0
+
             return
         }
         
@@ -1038,6 +1045,7 @@ final class RootViewController: UIViewController {
         else {
             
             // notification shouldn't be shown, but maybe the badge counter. Here the badge value needs to be shown in another way
+            
             if UserDefaults.standard.showReadingInAppBadge {
                 
                 // rescale of unit is mmol
