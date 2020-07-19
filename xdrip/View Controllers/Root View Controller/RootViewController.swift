@@ -640,6 +640,14 @@ final class RootViewController: UIViewController {
             
         case UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
 
+            // if showReadingInAppBadge = false, means user set it from true to false
+            // set applicationIconBadgeNumber to 0. This will cause removal of the badge counter, but als removal of any existing notification on the screen
+            if !UserDefaults.standard.showReadingInAppBadge {
+                
+                UIApplication.shared.applicationIconBadgeNumber = 0
+                
+            }
+            
             // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
             createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
             
