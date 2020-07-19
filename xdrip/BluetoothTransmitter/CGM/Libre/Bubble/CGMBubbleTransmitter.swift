@@ -160,7 +160,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         cGMBubbleTransmitterDelegate?.received(hardware: hardware, from: self)
                         cGMBubbleTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
                         
-                        // send hardware, firmware and batteryPercentage to delegate
+                        // send batteryPercentage to delegate
                         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
                         
                         // confirm receipt
