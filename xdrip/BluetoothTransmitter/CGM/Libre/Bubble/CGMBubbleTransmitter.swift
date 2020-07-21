@@ -49,6 +49,10 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// current sensor serial number, if nil then it's not known yet
     private var sensorSerialNumber:String?
     
+    /// - sensor serial number stored in type LibreSensorSerialNumber
+    /// - this is for temporary storage, when receiving .serialNumber from transmitter
+    private var libreSensorSerialNumber:LibreSensorSerialNumber?
+    
     /// gives information about type of sensor (Libre1, Libre2, etc..)
     private var patchInfo: String?
     
@@ -81,7 +85,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         
         // initialize sensorSerialNumber
         self.sensorSerialNumber = sensorSerialNumber
-
+        
         // assign CGMTransmitterDelegate
         self.cgmTransmitterDelegate = cGMTransmitterDelegate
         
@@ -170,11 +174,20 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         
                         guard value.count >= 10 else { return }
                         
-                        // this is actually the sensor serial number, adding it to rxBuffer, although it could as wel be calculated here.
+                        // this is actually the sensor serial number, adding it to rxBuffer (we could also not add it and set bubbleHeaderLength to 0 - this is historuc
                         rxBuffer.append(value.subdata(in: 2..<10))
                         
-                    case .dataPacket:
+                        // get libreSensorSerialNumber, if this fails, then self.libreSensorSerialNumber will keep it's current value
+                        guard let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8))) else {
+                            trace("    could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                            return
+                        }
                         
+                        // assign self.libreSensorSerialNumber to received libreSensorSerialNumber
+                        self.libreSensorSerialNumber = libreSensorSerialNumber
+
+                        
+                    case .dataPacket:
                         
                         rxBuffer.append(value.suffix(from: 4))
                         
@@ -185,31 +198,31 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 return
                             }
                             
-                            // libreSensorSerialNumber has been added to rxBuffer when receving .serialNumber (0xC0), it's the first 8 bytes
-                            guard let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8))) else {
-                                trace("    could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
-                                return
+                            // did we receive a serialNumber ?
+                            if let libreSensorSerialNumber = libreSensorSerialNumber {
+
+                                // verify serial number and if changed inform delegate
+                                if libreSensorSerialNumber.serialNumber != sensorSerialNumber {
+
+                                    // store self.sensorSerialNumber
+                                    sensorSerialNumber = libreSensorSerialNumber.serialNumber
+                                    
+                                    trace("    new sensor detected :  %{public}@", log: log, category: ConstantsLog.categoryCGMBubble, type: .info, libreSensorSerialNumber.serialNumber)
+                                    
+                                    // inform cgmTransmitterDelegate about new sensor detected
+                                    cgmTransmitterDelegate?.newSensorDetected()
+                                    
+                                    // inform cGMBubbleTransmitterDelegate about new sensor detected
+                                    cGMBubbleTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
+                                    
+                                    // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
+                                    timeStampLastBgReading = Date(timeIntervalSince1970: 0)
+                                    
+                                }
+
                             }
                             
-                            // verify serial number and if changed inform delegate
-                            if libreSensorSerialNumber.serialNumber != sensorSerialNumber {
-                                
-                                
-                                sensorSerialNumber = libreSensorSerialNumber.serialNumber
-                                
-                                trace("    new sensor detected :  %{public}@", log: log, category: ConstantsLog.categoryCGMBubble, type: .info, libreSensorSerialNumber.serialNumber)
-                                
-                                // inform delegate about new sensor detected
-                                cgmTransmitterDelegate?.newSensorDetected()
-                                
-                                cGMBubbleTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
-                                
-                                // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
-                                timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-                                
-                            }
-
-                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading, completionHandler: { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
+                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading) { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 if let timeStampLastBgReading = timeStampLastBgReading {
                                     self.timeStampLastBgReading = timeStampLastBgReading
@@ -219,7 +232,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                     self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
                                 }
                                 
-                            })
+                            }
                             
                             //reset the buffer
                             resetRxBuffer()
