@@ -49,6 +49,9 @@ class BubbleBluetoothPeripheralViewModel {
         }
     }
     
+    /// closure that the viewmodel should call when it receives a libre sensor type - doesn't need to be necessarily a new sensor type. This is to conform to protocol BluetoothPeripheralViewModel
+    private var onLibreSensorTypeReceived: ((LibreSensorType) -> ())?
+
     // MARK: - deinit
     
     deinit {
@@ -73,7 +76,9 @@ class BubbleBluetoothPeripheralViewModel {
 
 extension BubbleBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, onLibreSensorTypeReceived: ((LibreSensorType) -> ())?) {
+        
+        self.onLibreSensorTypeReceived = onLibreSensorTypeReceived
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         
@@ -298,11 +303,12 @@ extension BubbleBluetoothPeripheralViewModel: CGMBubbleTransmitterDelegate {
         
         // inform bluetoothPeripheralManager, bluetoothPeripheralManager will store the libreSensorType in the bubble object
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(libreSensorType: libreSensorType, from: cGMBubbleTransmitter)
-        
+
+        // inform bluetoothPeripheralViewController that sensor type was received
+        onLibreSensorTypeReceived?(libreSensorType)
+
         // here's the trigger to update the table row for sensorType
         reloadRow(row: Settings.sensorType.rawValue)
-        
-        // ideally we should also reload the row which allows to change the value of OOP web enabled, because it may have been set by the BluetoothPeripheralManager to true, but that's in the class BluetoothPeripheralViewController, tant pis. Might be confusing, user may see it as disabled but still it's enabled
         
     }
     
