@@ -55,6 +55,9 @@ enum SettingsSelectedRowAction {
     ///
     /// typical a pop up with a title and the message
     case showInfoText(title: String, message: String)
+
+    /// present modal view controller
+    case presentModal(viewController: UIViewController)
     
 }
 

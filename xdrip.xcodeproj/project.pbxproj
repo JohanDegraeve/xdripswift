@@ -3,10 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3802B21C24CB5CE0002BF97C /* SettingsViewLibreToolsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3802B21B24CB5CE0002BF97C /* SettingsViewLibreToolsViewModel.swift */; };
+		3802B22424CB6868002BF97C /* LibreTools in Frameworks */ = {isa = PBXBuildFile; productRef = 3802B22324CB6868002BF97C /* LibreTools */; };
 		A48D2DE552F4A356AA32746A /* Pods_xdrip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */; };
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
 		F8025C1321DA683400ECF0C0 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1221DA683400ECF0C0 /* Data.swift */; };
@@ -264,8 +266,22 @@
 		F8F9724923A69DAE00C3F17D /* M5StickC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F9724823A69DAE00C3F17D /* M5StickC.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		3802B22124CB6428002BF97C /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.debug.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.debug.xcconfig"; sourceTree = "<group>"; };
+		3802B21B24CB5CE0002BF97C /* SettingsViewLibreToolsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewLibreToolsViewModel.swift; sourceTree = "<group>"; };
 		662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2648F65F347D56D7DFFFAB7 /* Pods-xdrip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.release.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.release.xcconfig"; sourceTree = "<group>"; };
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
@@ -695,6 +711,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A48D2DE552F4A356AA32746A /* Pods_xdrip.framework in Frameworks */,
+				3802B22424CB6868002BF97C /* LibreTools in Frameworks */,
 				F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1183,6 +1200,7 @@
 				F8B3A83B227F090D004BA588 /* SettingsViewNightScoutSettingsViewModel.swift */,
 				F8B3A83D227F090D004BA588 /* SettingsViewSpeakSettingsViewModel.swift */,
 				F8B3A83A227F090D004BA588 /* SettingsViewTransmitterSettingsViewModel.swift */,
+				3802B21B24CB5CE0002BF97C /* SettingsViewLibreToolsViewModel.swift */,
 			);
 			path = SettingsViewModels;
 			sourceTree = "<group>";
@@ -1649,12 +1667,16 @@
 				F8AC425821ADEBD60078C348 /* Resources */,
 				F5EEC1C2586E9EA94DC6DBC7 /* [CP] Embed Pods Frameworks */,
 				F84F2BEC22EF80B300313474 /* ShellScript */,
+				3802B22124CB6428002BF97C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = xdrip;
+			packageProductDependencies = (
+				3802B22324CB6868002BF97C /* LibreTools */,
+			);
 			productName = xdrip;
 			productReference = F8AC425A21ADEBD60078C348 /* xdrip.app */;
 			productType = "com.apple.product-type.application";
@@ -1704,6 +1726,9 @@
 				de,
 			);
 			mainGroup = F8AC425121ADEBD60078C348;
+			packageReferences = (
+				3802B22224CB6868002BF97C /* XCRemoteSwiftPackageReference "LibreTools" */,
+			);
 			productRefGroup = F8AC425B21ADEBD60078C348 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1946,6 +1971,7 @@
 				F8A389C823203E3E0010F405 /* ConstantsM5Stack.swift in Sources */,
 				F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */,
 				F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */,
+				3802B21C24CB5CE0002BF97C /* SettingsViewLibreToolsViewModel.swift in Sources */,
 				F8B3A858227F6971004BA588 /* UISwitch.swift in Sources */,
 				F830990523B94ED7005741DF /* TimeScheduleViewController.swift in Sources */,
 				F8F9722123A5915900C3F17D /* LibreSensorSerialNumber.swift in Sources */,
@@ -2515,6 +2541,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3802B22224CB6868002BF97C /* XCRemoteSwiftPackageReference "LibreTools" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ivalkou/LibreTools";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3802B22324CB6868002BF97C /* LibreTools */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3802B22224CB6868002BF97C /* XCRemoteSwiftPackageReference "LibreTools" */;
+			productName = LibreTools;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */ = {

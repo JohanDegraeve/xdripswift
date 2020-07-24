@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "LibreTools",
+        "repositoryURL": "https://github.com/ivalkou/LibreTools",
+        "state": {
+          "branch": null,
+          "revision": "4372dfdbf2f6636d56a7fbcd279114905122e1ca",
+          "version": "1.0.5"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

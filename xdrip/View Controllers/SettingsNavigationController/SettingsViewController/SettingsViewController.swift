@@ -117,6 +117,9 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
         
         /// Apple Watch settings
         case AppleWatch
+
+        // Libre tools
+        case libreTools
         
         /// info
         case info
@@ -149,6 +152,8 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
                 return SettingsViewDevelopmentSettingsViewModel()
             case .AppleWatch:
                 return SettingsViewAppleWatchSettingsViewModel()
+            case .libreTools:
+                return SettingsViewLibreToolsViewModel()
             }
         }
 

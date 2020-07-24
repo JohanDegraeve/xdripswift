@@ -137,6 +137,8 @@ class SettingsViewUtilities {
                 let alert = UIAlertController(title: title, message: message, actionHandler: nil)
                 
                 uIViewController.present(alert, animated: true, completion: nil)
+            case let .presentModal(vc):
+                uIViewController.present(vc, animated: true, completion: nil)
             }
             
 
