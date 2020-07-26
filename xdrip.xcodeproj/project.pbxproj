@@ -386,6 +386,9 @@
 		F8E51D65244BA790001C9E5A /* WatlaaBluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D64244BA790001C9E5A /* WatlaaBluetoothPeripheralViewModel.swift */; };
 		F8E51D67244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D66244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift */; };
 		F8E51D6924549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */; };
+		F8E6C78C24CDDB83007C1199 /* SnoozeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */; };
+		F8E6C79024CEC22A007C1199 /* TextsSnooze.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */; };
+		F8E6C79124CEC2E3007C1199 /* Snooze.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8E6C79324CEC2E3007C1199 /* Snooze.strings */; };
 		F8EA6C8221B723BC0082976B /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C8121B723BC0082976B /* Date.swift */; };
 		F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6CA821BBE3010082976B /* UniqueId.swift */; };
 		F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD5322FF685400D2D610 /* NSMutableURLRequest.swift */; };
@@ -939,6 +942,9 @@
 		F8E51D64244BA790001C9E5A /* WatlaaBluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatlaaBluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
 		F8E51D66244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift"; sourceTree = "<group>"; };
 		F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTraceSettingsViewModel.swift; sourceTree = "<group>"; };
+		F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeViewController.swift; sourceTree = "<group>"; };
+		F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsSnooze.swift; sourceTree = "<group>"; };
+		F8E6C79224CEC2E3007C1199 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Snooze.strings; sourceTree = "<group>"; };
 		F8EA6C8121B723BC0082976B /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		F8EA6CA821BBE3010082976B /* UniqueId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniqueId.swift; sourceTree = "<group>"; };
 		F8EBB030239701DA0058B0D4 /* xdrip v6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v6.xcdatamodel"; sourceTree = "<group>"; };
@@ -1087,6 +1093,7 @@
 			isa = PBXGroup;
 			children = (
 				F8AC425F21ADEBD60078C348 /* RootViewController.swift */,
+				F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */,
 			);
 			path = "Root View Controller";
 			sourceTree = "<group>";
@@ -1452,6 +1459,7 @@
 				F830992923C32A98005741DF /* WatlaaView.strings */,
 				F8AF11FF24B3B62D00AE5BA2 /* LibreErrors.strings */,
 				F82436FD24BE01F700BED341 /* LibreStates.strings */,
+				F8E6C79324CEC2E3007C1199 /* Snooze.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -1825,6 +1833,7 @@
 				F830992723C32A13005741DF /* TextsWatlaaView.swift */,
 				F8AF11F224B1279500AE5BA2 /* TextsLibreErrors.swift */,
 				F82436FB24BE014000BED341 /* TextsLibreStates.swift */,
+				F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -2423,6 +2432,7 @@
 				F82437CA24CB7A9900BED341 /* Marimba_Flutter_or_Shake.caf in Resources */,
 				F824377724CB7A9800BED341 /* Siri_Urgent_Low_Glucose.caf in Resources */,
 				F82437D424CB7A9900BED341 /* Siri_Alert_Low_Glucose.caf in Resources */,
+				F8E6C79124CEC2E3007C1199 /* Snooze.strings in Resources */,
 				F824379B24CB7A9900BED341 /* Sci-Fi_Console_Alarm.caf in Resources */,
 				47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */,
 				F824377324CB7A9800BED341 /* Store_Door_Chime.caf in Resources */,
@@ -2795,6 +2805,7 @@
 				F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */,
 				F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */,
 				F8B3A858227F6971004BA588 /* UISwitch.swift in Sources */,
+				F8E6C78C24CDDB83007C1199 /* SnoozeViewController.swift in Sources */,
 				F8AF11F824B1E6EE00AE5BA2 /* XdripError.swift in Sources */,
 				F830990523B94ED7005741DF /* TimeScheduleViewController.swift in Sources */,
 				F8F9722123A5915900C3F17D /* LibreSensorSerialNumber.swift in Sources */,
@@ -2874,6 +2885,7 @@
 				F8F9721F23A5915900C3F17D /* LibreOOPClient.swift in Sources */,
 				F8F9722D23A5915900C3F17D /* M5StackBluetoothTransmitter.swift in Sources */,
 				F808D2C8240323CA0084B5DB /* BubbleBluetoothPeripheralViewModel.swift in Sources */,
+				F8E6C79024CEC22A007C1199 /* TextsSnooze.swift in Sources */,
 				F8F9722C23A5915900C3F17D /* GlucoseData.swift in Sources */,
 				F8A389E7232ECE7E0010F405 /* SettingsViewUtilities.swift in Sources */,
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
@@ -3153,6 +3165,14 @@
 				F817702A2491860F00AA3600 /* fr */,
 			);
 			name = SettingsViews.strings;
+			sourceTree = "<group>";
+		};
+		F8E6C79324CEC2E3007C1199 /* Snooze.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F8E6C79224CEC2E3007C1199 /* en */,
+			);
+			name = Snooze.strings;
 			sourceTree = "<group>";
 		};
 		F8EEDD572300136F00D2D610 /* DexcomShareTestResult.strings */ = {

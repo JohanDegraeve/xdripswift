@@ -37,11 +37,7 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var preSnoozeButtonOutlet: UIButton!
     
     @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
-        
-        let alert = UIAlertController(title: "Info", message: "Unfortuantely, presnooze functionality is not yet implemented", actionHandler: nil)
-        
-        self.present(alert, animated: true, completion: nil)
-
+        // opens the SnoozeViewController, see storyboard
     }
     
     /// outlet for label that shows how many minutes ago and so on
@@ -52,7 +48,7 @@ final class RootViewController: UIViewController {
     
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
-
+    
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
     
@@ -64,10 +60,10 @@ final class RootViewController: UIViewController {
     @IBAction func chartPanGestureRecognizerAction(_ sender: UIPanGestureRecognizer) {
         
         glucoseChartManager.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: {
-
+            
             // user has been panning, if chart is panned backward, then need to set valueLabel to value of latest chartPoint shown in the chart, and minutesAgo text to timeStamp of latestChartPoint
             if self.glucoseChartManager.chartIsPannedBackward {
-
+                
                 if let lastChartPointEarlierThanEndDate = self.glucoseChartManager.lastChartPointEarlierThanEndDate, let chartAxisValueDate = lastChartPointEarlierThanEndDate.x as? ChartAxisValueDate  {
                     
                     // valueLabel text should not be strikethrough (might still be strikethrough in case latest reading is older than 10 minutes
@@ -75,15 +71,15 @@ final class RootViewController: UIViewController {
                     
                     // set value to value of latest chartPoint
                     self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-
+                    
                     // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
                     self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
                     self.minutesLabelOutlet.textColor = UIColor.red
                     self.valueLabelOutlet.textColor = UIColor.lightGray
-
+                    
                     // apply strikethrough to the BG value text format
                     let attributedString = NSMutableAttributedString(string: self.valueLabelOutlet.text!)
-                attributedString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributedString.length))
+                    attributedString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributedString.length))
                     
                     self.valueLabelOutlet.attributedText = attributedString
                     
@@ -96,7 +92,7 @@ final class RootViewController: UIViewController {
                     self.updateLabelsAndChart(overrideApplicationState: false)
                     
                 }
-
+                
             } else {
                 
                 // chart is not panned, update labels is necessary
@@ -122,10 +118,10 @@ final class RootViewController: UIViewController {
     
     // MARK: - Constants for ApplicationManager usage
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updateLabelsAndChartTimer
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
     private let applicationManagerKeyCreateupdateLabelsAndChartTimer = "RootViewController-CreateupdateLabelsAndChartTimer"
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate updateLabelsAndChartTimer
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground
     private let applicationManagerKeyInvalidateupdateLabelsAndChartTimer = "RootViewController-InvalidateupdateLabelsAndChartTimer"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - updateLabels
@@ -215,14 +211,14 @@ final class RootViewController: UIViewController {
     ///
     /// in fact it will never be used with a nil value, except when connecting to a cgm transmitter for the first time
     private var webOOPEnabled: Bool?
-
+    
     /// current value of nonFixedSlopeEnabled, if nil then it means no cgmTransmitter connected yet , false is used as value
     /// - used to detect changes in the value
     ///
     /// in fact it will never be used with a nil value, except when connecting to a cgm transmitter for the first time
     private var nonFixedSlopeEnabled: Bool?
     
-    // MARK: - View Life Cycle
+    // MARK: - overriden functions
     
     // set the status bar content colour to light to match new darker theme
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -235,7 +231,7 @@ final class RootViewController: UIViewController {
         glucoseChartManager.didReceiveMemoryWarning()
         
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         
         super.viewWillAppear(animated)
@@ -257,13 +253,10 @@ final class RootViewController: UIViewController {
         
         // enable or disable the buttons 'sensor' and 'calibrate' on top, depending on master or follower
         changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
-
-        // disable the presnooze button as it's not yet implemented
-        preSnoozeButtonOutlet.disable()
         
         // initialize glucoseChartManager
         glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet)
-
+        
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
         // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like initializing the views
         coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
@@ -272,7 +265,7 @@ final class RootViewController: UIViewController {
             
             // glucoseChartManager still needs the reference to coreDataManager
             self.glucoseChartManager.coreDataManager = self.coreDataManager
-
+            
             // update label texts, minutes ago, diff and value
             self.updateLabelsAndChart(overrideApplicationState: true)
             
@@ -297,7 +290,7 @@ final class RootViewController: UIViewController {
                 self.present(alert, animated: true, completion: nil)
                 
             }
-
+            
         })
         
         // Setup View
@@ -307,7 +300,7 @@ final class RootViewController: UIViewController {
         // changing from follower to master or vice versa
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new
             , context: nil)
-
+        
         // bg reading notification and badge, and multiplication factor
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showReadingInNotification.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showReadingInAppBadge.rawValue, options: .new, context: nil)
@@ -317,8 +310,8 @@ final class RootViewController: UIViewController {
         
         // when overrideWebOOPCalibration changes, sensor needs to be restarted
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.overrideWebOOPCalibration.rawValue, options: .new, context: nil)
-            
-
+        
+        
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
         
@@ -344,7 +337,7 @@ final class RootViewController: UIViewController {
         
         // whenever app comes from-back to foreground, updateLabelsAndChart needs to be called
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {self.updateLabelsAndChart(overrideApplicationState: true)})
-         
+        
         // setup AVAudioSession
         setupAVAudioSession()
         
@@ -363,12 +356,38 @@ final class RootViewController: UIViewController {
         
         // add tracing when app comes to foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyTraceAppGoesToForeground, closure: {trace("Application will enter foreground", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
-
+        
         // add tracing when app will terminaten - this only works for non-suspended apps, probably (not tested) also works for apps that crash in the background
         ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeyTraceAppWillTerminate, closure: {trace("Application will terminate", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
-
+        
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        guard let segueIdentifier = segue.identifier else {
+            fatalError("In RootViewController, prepare for segue, Segue had no identifier")
+        }
+        
+        guard let segueIdentifierAsCase = SnoozeViewController.SegueIdentifiers(rawValue: segueIdentifier) else {
+            fatalError("In RootViewController, segueIdentifierAsCase could not be initialized")
+        }
+        
+        switch segueIdentifierAsCase {
+            
+        case SnoozeViewController.SegueIdentifiers.RootViewToSnoozeView:
+            
+            guard let vc = segue.destination as? SnoozeViewController else {
+                
+                fatalError("In RootViewController, prepare for segue, viewcontroller is not SnoozeViewController" )
+                
+            }
+            
+            // configure view controller
+            vc.configure(alertManager: alertManager)
+            
+        }
+    }
+
     /// sets AVAudioSession category to AVAudioSession.Category.playback with option mixWithOthers and
     /// AVAudioSession.sharedInstance().setActive(true)
     private func setupAVAudioSession() {
@@ -385,7 +404,7 @@ final class RootViewController: UIViewController {
         
         // setup Trace
         Trace.initialize(coreDataManager: coreDataManager)
-
+        
         // if coreDataManager is nil then there's no reason to continue
         guard let coreDataManager = coreDataManager else {
             fatalError("In setupApplicationData but coreDataManager == nil")
@@ -462,11 +481,11 @@ final class RootViewController: UIViewController {
                 if let nonFixedSlopeEnabled = self.nonFixedSlopeEnabled, nonFixedSlopeEnabled != cgmTransmitter.isNonFixedSlopeEnabled() {
                     
                     trace("in cgmTransmitterInfoChanged, nonFixedSlopeEnabled value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.isNonFixedSlopeEnabled().description)
-
+                    
                     self.stopSensor()
                     
                 }
-
+                
                 // check if the type of sensor supported by the cgmTransmitterType  has changed, if yes stop the sensor
                 if let currentTransmitterType = UserDefaults.standard.cgmTransmitterType, currentTransmitterType.sensorType() != cgmTransmitter.cgmTransmitterType().sensorType() {
                     
@@ -491,13 +510,13 @@ final class RootViewController: UIViewController {
         
         // setup bluetoothPeripheralManager
         bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: self, cgmTransmitterInfoChanged: cgmTransmitterInfoChanged)
-    
+        
         // to initialize UserDefaults.standard.transmitterTypeAsString
         cgmTransmitterInfoChanged()
         
         // setup alertmanager
         alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
-
+        
         // setup watchmanager
         watchManager = WatchManager(coreDataManager: coreDataManager)
         
@@ -558,7 +577,7 @@ final class RootViewController: UIViewController {
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 if glucose.timeStamp > timeStampLastBgReading {
-
+                    
                     let newReading = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
                     if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
@@ -578,7 +597,7 @@ final class RootViewController: UIViewController {
                     
                 }
             }
-           
+            
             // if a new reading is created, create either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
                 
@@ -605,7 +624,7 @@ final class RootViewController: UIViewController {
                 nightScoutUploadManager?.upload()
                 
                 healthKitManager?.storeBgReadings()
-
+                
                 bgReadingSpeaker?.speakNewReading()
                 
                 dexcomShareUploadManager?.upload()
@@ -615,6 +634,20 @@ final class RootViewController: UIViewController {
                 watchManager?.processNewReading()
                 
                 loopManager?.share()
+                
+            }
+        }
+        
+    }
+    
+    /// closes the SnoozeViewController if it is being presented now
+    private func closeSnoozeViewController() {
+        
+        if let presentedViewController = self.presentedViewController {
+            
+            if let snoozeViewController = presentedViewController as? SnoozeViewController {
+                
+                snoozeViewController.dismiss(animated: true, completion: nil)
                 
             }
         }
@@ -633,7 +666,7 @@ final class RootViewController: UIViewController {
         switch keyPathEnum {
             
         case UserDefaults.Key.isMaster, UserDefaults.Key.overrideWebOOPCalibration, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl :
-
+            
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
                 return
@@ -657,7 +690,7 @@ final class RootViewController: UIViewController {
             }
             
         case UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
-
+            
             // if showReadingInAppBadge = false, means user set it from true to false
             // set applicationIconBadgeNumber to 0. This will cause removal of the badge counter, but als removal of any existing notification on the screen
             if !UserDefaults.standard.showReadingInAppBadge {
@@ -670,11 +703,11 @@ final class RootViewController: UIViewController {
             createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
             
         case UserDefaults.Key.overrideWebOOPCalibration:
-
+            
             // user changes file of override web oop
             // apply logic only if web oop is enabled
             if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled() {
-
+                
                 trace("in observeValue, overrideWebOOPCalibration value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, UserDefaults.standard.overrideWebOOPCalibration.description)
                 
                 // stop the sensor
@@ -712,7 +745,7 @@ final class RootViewController: UIViewController {
         
         // at this moment, coreDataManager is not yet initialized, we're just calling here prerender and reloadChart to show the chart with x and y axis and gridlines, but without readings. The readings will be loaded once coreDataManager is setup, after which updateChart() will be called, which will initiate loading of readings from coredata
         self.chartOutlet.reloadChart()
-
+        
     }
     
     // MARK: - private helper functions
@@ -749,12 +782,12 @@ final class RootViewController: UIViewController {
         }
         
     }
-
+    
     /// will update the chart with endDate = currentDate
     private func updateChartWithResetEndDate() {
         
         glucoseChartManager.updateGlucoseChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, completionHandler: nil)
-
+        
     }
     
     /// launches timer that will do regular screen updates - and adds closure to ApplicationManager : when going to background, stop the timer, when coming to foreground, restart the timer
@@ -786,11 +819,18 @@ final class RootViewController: UIViewController {
         // call scheduleUpdateLabelsAndChartTimer function now - as the function setupUpdateLabelsAndChartTimer is called from viewdidload, it will be called immediately after app launch
         updateLabelsAndChartTimer = createAndScheduleUpdateLabelsAndChartTimer()
         
-        // updateLabelsAndChartTimer needs to be created when app comes back from background to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyCreateupdateLabelsAndChartTimer, closure: {updateLabelsAndChartTimer = createAndScheduleUpdateLabelsAndChartTimer()})
+        // when app goes to background
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateupdateLabelsAndChartTimer, closure: {
+            
+            // this is for the case that the snoozeViewController is shown. If not removed, then if user opens alert notification, the alert snooze wouldn't be shown
+            // that's why, close the snoozeViewController
+            self.closeSnoozeViewController()
+            
+            // updateLabelsAndChartTimer needs to be invalidated when app goes to background
+            invalidateUpdateLabelsAndChartTimer()
+            
+        })
         
-        // updateLabelsAndChartTimer needs to be invalidated when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateupdateLabelsAndChartTimer, closure: {invalidateUpdateLabelsAndChartTimer()})
     }
     
     /// opens an alert, that requests user to enter a calibration value, and calibrates
@@ -895,7 +935,7 @@ final class RootViewController: UIViewController {
         
         // present the alert
         self.present(alert, animated: true, completion: nil)
-
+        
     }
     
     /// this is just some functionality which is used frequently
@@ -922,12 +962,12 @@ final class RootViewController: UIViewController {
                 return NoCalibrator()
                 
             } else if cgmTransmitter.isWebOOPEnabled() && UserDefaults.standard.overrideWebOOPCalibration {
-       
+                
                 // oop web enabled, means readings received are calibrated values
                 // overrideWebOOPCalibration enabled, means recalibration to be done
                 
                 trace("in getCalibrator, calibrator = LibreReCalibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
-
+                
                 return LibreReCalibrator()
                 
             } else if cgmTransmitter.isNonFixedSlopeEnabled() {
@@ -1006,10 +1046,10 @@ final class RootViewController: UIViewController {
         if lastReading.count == 0 {
             
             trace("in createBgReadingNotificationAndSetAppBadge, lastReading.count = 0", log: log, category: ConstantsLog.categoryRootView, type: .info)
-
+            
             // remove the application badge number. Possibly an old reading is still shown.
             UIApplication.shared.applicationIconBadgeNumber = 0
-
+            
             return
         }
         
@@ -1020,7 +1060,7 @@ final class RootViewController: UIViewController {
             
             // remove the application badge number. Possibly the previous value is still shown
             UIApplication.shared.applicationIconBadgeNumber = 0
-
+            
             return
         }
         
@@ -1100,7 +1140,7 @@ final class RootViewController: UIViewController {
                 
             }
         }
-
+        
     }
     
     /// - updates the labels and the chart,
@@ -1110,16 +1150,16 @@ final class RootViewController: UIViewController {
     /// - parameters:
     ///     - overrideApplicationState : if true, then update will be done even if state is not .active
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false) {
-
+        
         // check that app is in foreground, but only if overrideApplicationState = false
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
-
+        
         // check if chart is currently panned back in time, in that case we don't update the labels
         guard !glucoseChartManager.chartIsPannedBackward else {return}
-
+        
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
-
+        
         // set minutesLabelOutlet.textColor to white, might still be red due to panning back in time
         self.minutesLabelOutlet.textColor = UIColor.white
         
@@ -1134,12 +1174,12 @@ final class RootViewController: UIViewController {
             diffLabelOutlet.text = ""
             return
         }
-
+        
         // assign last reading
         let lastReading = latestReadings[0]
         // assign last but one reading
         let lastButOneReading = latestReadings.count > 1 ? latestReadings[1]:nil
-
+        
         // start creating text for valueLabelOutlet, first the calculated value
         var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         
@@ -1189,7 +1229,7 @@ final class RootViewController: UIViewController {
         
         // create delta text
         diffLabelOutlet.text = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-
+        
         // update the chart up to now
         updateChartWithResetEndDate()
         
@@ -1212,7 +1252,7 @@ final class RootViewController: UIViewController {
                     listOfActions[Texts_HomeView.stopSensorActionTitle] = {(UIAlertAction) in
                         
                         trace("in createAndPresentSensorButtonActionSheet, user clicked stop sensor, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-
+                        
                         self.stopSensor()
                         
                     }
@@ -1324,7 +1364,7 @@ final class RootViewController: UIViewController {
             
             // prevent screen lock
             UIApplication.shared.isIdleTimerDisabled = true
-
+            
         }
     }
     
@@ -1361,6 +1401,11 @@ final class RootViewController: UIViewController {
             if alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds) {
                 
                 // an immediate alert went off that shows the current reading
+                
+                // possibily the app is in the foreground now
+                // if user would have opened SnoozeViewController now, then close it, otherwise the alarm picker view will not be shown
+                closeSnoozeViewController()
+
                 // only update badge is required, (if enabled offcourse)
                 createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
                 
@@ -1371,7 +1416,7 @@ final class RootViewController: UIViewController {
                 
             }
         }
-
+        
     }
     
 }
@@ -1411,12 +1456,12 @@ extension RootViewController: CGMTransmitterDelegate {
     func errorOccurred(xDripError: XdripError) {
         
         if xDripError.priority == .HIGH {
-
+            
             createNotification(title: Texts_Common.warning, body: xDripError.errorDescription, identifier: ConstantsNotifications.notificationIdentifierForxCGMTransmitterDelegatexDripError, sound: nil)
-
+            
         }
     }
-   
+    
 }
 
 // MARK: - conform to UITabBarControllerDelegate protocol
@@ -1431,9 +1476,9 @@ extension RootViewController: UITabBarControllerDelegate {
             navigationController.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
             
         } else if let navigationController = viewController as? BluetoothPeripheralNavigationController, let bluetoothPeripheralManager = bluetoothPeripheralManager, let coreDataManager = coreDataManager {
-
+            
             navigationController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
-           
+            
         }
     }
     
@@ -1467,7 +1512,7 @@ extension RootViewController: UNUserNotificationCenterDelegate {
             // so actually the app was in the foreground, at the  moment the Transmitter Class called the cgmTransmitterNeedsPairing function, there's no need to show the notification, we can immediately call back the cgmTransmitter initiatePairing function
             completionHandler([])
             bluetoothPeripheralManager?.initiatePairing()
-
+            
             // this will verify if it concerns an alert notification, if not pickerviewData will be nil
         } else if let pickerViewData = alertManager?.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler) {
             
