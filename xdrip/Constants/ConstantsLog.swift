@@ -29,7 +29,7 @@ enum ConstantsLog {
     static let debuglogging = "xdripdebuglogging"
     
     /// timestamp format for nslog
-    static let dateFormatNSLog = "y-MM-dd-HH:mm:ss.SSSS"
+    static let dateFormatNSLog = "y-MM-dd HH:mm:ss.SSSS"
     
     /// G5
     static let categoryCGMG5 =                       "CGMG5                         "
@@ -67,6 +67,12 @@ enum ConstantsLog {
     /// application data for M5Stack
     static let categoryApplicationDataWatlaa = "ApplicationDataWatlaa"
     
+    /// application data for BLEPeripheral
+    static let categoryApplicationDataBLEPeripheral = "ApplicationDataBLEPeripheral"
+    
+    /// application data for DexcomG5
+    static let categoryApplicationDataDexcomG5 = "ApplicationDataDexcomG5"
+    
     /// application for for M5StackName
     static let categoryApplicationDataM5StackNames = "ApplicationDataM5StackNames   "
     
@@ -100,6 +106,9 @@ enum ConstantsLog {
     /// LibreOOPClient
     static let categoryLibreOOPClient =              "LibreOOPClient                "
     
+    /// libreDataParser
+    static let categoryLibreDataParser =             "LibreDataParser               "
+    
     /// for use in M5Stack
     static let categoryM5StackBluetoothTransmitter = "M5StackBluetoothTransmitter   "
     
@@ -115,5 +124,13 @@ enum ConstantsLog {
     /// WatchManager logging
     static let categoryWatchManager =                "WatchManager                  "
     
+    /// bluetoothPeripheralViewController
+    static let categoryBluetoothPeripheralViewController =   "blePeripheralViewController   "
+    
+    /// nightscout view model
+    static let categoryNightScoutSettingsViewModel =         "nightScoutSettingsViewModel   "
+    
+    /// trace
+    static let categoryTraceSettingsViewModel =      "TraceSettingsViewModel"
 }
 

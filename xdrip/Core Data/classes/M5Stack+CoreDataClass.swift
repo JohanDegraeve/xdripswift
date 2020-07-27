@@ -18,7 +18,7 @@ public class M5Stack: NSManagedObject {
     /// explanation, see function parameterUpdateNotNeededAtNextConnect in protocol BluetoothPeripheral
     public var parameterUpdateNeeded: Bool = false
     
-    /// batterylevel, not stored in coreData, will only be available after having received it form the M5Stack
+    /// batterylevel, not stored in coreData, will only be available after having received it from the M5Stack
     public var batteryLevel: Int = 0
     
     /// create M5Stack, shouldconnect default value = true
@@ -30,14 +30,12 @@ public class M5Stack: NSManagedObject {
         
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         
-        self.address = address
-        self.name = name
-        self.shouldconnect = true
+        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+
         self.textcolor = Int32(textColor.rawValue)
         self.backGroundColor = Int32(backGroundColor.rawValue)
         self.rotation = Int32(rotation)
         self.brightness = Int16(brightness)
-        self.alias = alias
         
         // this is creation of an M5Stack, not M5Stick, set isM5StickC to false
         self.isM5StickC = false

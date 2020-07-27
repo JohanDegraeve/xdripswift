@@ -9,14 +9,11 @@
 "startsensortimeinfo" = "在下一个对话框中，您需要设置传感器插入的日期和时间. 输入正确的日期和时间是非常重要的. 尤其是对数据的准确度.";
 "scanbluetoothdeviceongoing" = "正在扫描发射器";
 "bluetoothisnoton" = "蓝牙未打开. 打开蓝牙并再次尝试.不要从设备的设置里直接配对. 扫描和配对都应该在app上进行.";
-"bluetoothdeviceconnectedinfo" = "发射器已配对. 设备信息已保存. 再次配对会默认选择此发射器.要使用新的发射器，请先取消配对";
 "sensorstart" = "启动探头";
 "notstarted" = "未启动";
 "notknown" = "未知";
 "lastconnection" = "上次连接";
 "transmitterbatterylevel" = "发射器电量";
-"connected" = "已连接";
-"neverconnected" = "未连接";
 "ago" = "之前";
 "licenseinfo" = "该程序是免费软件基金会发布的通用公共许可证条款下可使用的免费软件.包括第三版以及后续的新版本.这个程序的设计是希望会有用，但不做任何保证. 登录 http://www.gnu.org/licenses/gpl.txt 可获取更多详细信息 ";
 "transmitterinfo" = "首先进入设置选择你的发射器类型，并输入发射器ID.根据发射器类型, 返回主页扫描发射器.德康G5无需点击开始扫描.";

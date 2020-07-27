@@ -3,11 +3,26 @@ import Foundation
 /// categories are M5Stack, CGM, watlaa, ...
 enum BluetoothPeripheralCategory: String, CaseIterable {
     
+    /// for Dexcom, bubble, MiaoMiao ...
+    case CGM = "CGM"
+    
     /// this is the category for M5Stack ad M5StickC
     case M5Stack = "M5Stack"
     
-    /// category for watlaa, master and follower
-    case watlaa = "watlaa"
+    /// returns index in list of BluetoothPeripheralCategory's
+    func index() -> Int {
+        
+        for (index, type) in BluetoothPeripheralCategory.allCases.enumerated() {
+            
+            if type == self {
+                return index
+            }
+            
+        }
+        
+        return 0
+        
+    }
     
     /// gets list of  categories in array of strings, user will see those strings when selecting a category
     static func listOfCategories() -> [String] {

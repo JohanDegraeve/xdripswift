@@ -1,1 +1,13 @@
-
+"screenTitle" = "M5Stack";
+"authenticationFailureWarning" = "Echec de l'authentification au M5Stack, merci de saisir le mot de passe préconfiguré dans les réglages ou, si le M5Stack n'a pas de mot de passe préconfiguré, merci de ré-initialiser le M5Stack. Après la ré-initialisation, vous pouvez faire une nouvelle tentative en cliquant ici.";
+"blePasswordMissingWarning" = "Vous devez saisir un mot de passe dans les réglages";
+"m5StackResetRequiredWarning" = "M5Stack doit être réinitaliser afin de générer un nouveau mot de pase temporaire. Après réinitialisation, cliquez ";
+"m5StackSoftWhereHelpCellText" = "Où trouver le logiciel M5Stack ?";
+"m5StickCSoftWhereHelpCellText" = "Où trouver le logiciel M5StickC ?";
+"m5StackSoftWareHelpText" = "Allez à";
+"m5StackViewscreenTitle" = "M5Stack";
+"m5StickCViewscreenTitle" = "M5StickC";
+"deviceMustBeConnectedToPowerOff" = "M5Stack doit être connecté pour pouvoir être éteint.";
+"powerOffConfirm" = "Etes-vous sur d'éteindre le M5Stack?";
+"powerOff" = "Eteindre";
+"connectToWiFi" = "Connecter au WiFi";

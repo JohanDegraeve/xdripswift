@@ -19,4 +19,11 @@ class LibreRawGlucoseData: GlucoseData {
         self.init(timeStamp: timeStamp, glucoseLevelRaw: unsmoothedGlucose, glucoseLevelFiltered: unsmoothedGlucose, unsmoothedGlucose: unsmoothedGlucose)
     }
 
+    /// description
+    override var description: String {
+        
+        return "\nLibreRawGlucoseData\nunsmoothedGlucose = " + unsmoothedGlucose.description + "\n" + "GlucoseData = \n" + super.description
+        
+    }
+    
 }

@@ -2,40 +2,64 @@ import Foundation
 import os
 import CoreBluetooth
 import CoreData
+import UIKit
 
 class BluetoothPeripheralManager: NSObject {
+    
+    // MARK: - public properties
+    
+    /// - all currently known BluetoothPeripheral's (MStacks, cgmtransmitters, watlaa , ...)
+    /// - stored by type of bluetoothperipherals. In BluetoothPeripheralType, if the first type is M5Stack, then the first set of peripherals in the array will be all M5Stacks, and so on
+    public var bluetoothPeripherals: [BluetoothPeripheral] = []
+
+    /// the bluetoothTransmitter's, array must have the same size as bluetoothPeripherals. For each element in bluetoothPeripherals, there's an element at the same index in bluetoothTransmitters, which may be nil. nil value means user selected not to connect
+    public var bluetoothTransmitters: [BluetoothTransmitter?] = []
+    
+    /// for logging
+    public var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBluetoothPeripheralManager)
+    
+    /// if scan is called, an instance of M5StackBluetoothTransmitter is created with address and name. The new instance will be assigned to this variable, temporary, until a connection is made
+    public var tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral: BluetoothTransmitter?
+
+    /// while scanning for transmitter, store the type of transmitter being scanned, will be needed in case tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is being recreated (search for transmitterTypeBeingScannedFor in BluetoothPeripheralManager+BluetoothTransmitterDelegate
+    public var transmitterTypeBeingScannedFor: BluetoothPeripheralType?
+
+    /// to be called with result of StartScanning
+    public var callBackForScanningResult: ((BluetoothTransmitter.startScanningResult) -> Void)?
+    
+    /// if scan is called, and a connection is successfully made to a new device, then this function must be called
+    public var callBackAfterDiscoveringDevice: ((BluetoothPeripheral) -> Void)?
+
+    /// used to present alert messages
+    public let uIViewController: UIViewController
+    
+    /// bluetoothtransmitter may need pairing, but app is in background. Notification will be sent to user, user will open the app, at that moment pairing can happen. variable bluetoothTransmitterThatNeedsPairing will temporary store the BluetoothTransmitter that needs the pairing
+    public var bluetoothTransmitterThatNeedsPairing: BluetoothTransmitter?
+    
+    /// when xdrip connects to a BluetoothTransmitter that is also CGMTransmitter, then we'll call this function with the BluetoothTransmitter as argument. This function is defined by RootViewController, it will allow the RootViewController to set the CGMTransmitter, calibrator ...
+    public var cgmTransmitterInfoChanged: () -> ()
+    
+    /// address of the last active cgmTransmitter
+    ///
+    /// this is to keep track of changes in cgmTransmitter (ie if switching from transmitter A to B)
+    public var currentCgmTransmitterAddress: String? {
+        didSet(newValue) {
+            if newValue != currentCgmTransmitterAddress {
+                cgmTransmitterInfoChanged()
+            }
+        }
+    }
     
     // MARK: - private properties
     
     /// CoreDataManager to use
-    private let coreDataManager:CoreDataManager
-    
-    /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBluetoothPeripheralManager)
-    
-    /// dictionary with key = an instance of BluetoothPeripheral, and value an instance of BluetoothTransmitter. Value can be nil in which case we found a BluetoothPeripheral in the coredata but shouldconnect == false so we don't instanstiate a BluetoothTransmitter
-    //private var m5StacksBlueToothTransmitters = [BluetoothPeripheral : BluetoothTransmitter?]()
-    
-    /// all currently known BluetoothPeripheral's (MStacks, cgmtransmitters, watlaa , ...)
-    private var bluetoothPeripherals: [BluetoothPeripheral] = []
-    
-    /// the bluetoothTransmitter's, array must have the same size as bluetoothPeripherals. For each element in bluetoothPeripherals, there's an element at the same index in bluetoothTransmitters, which may be nil. nil value means user selected not to connect
-    private var bluetoothTransmitters: [BluetoothTransmitter?] = []
-    
-    /// to access m5Stack entity in coredata
-    private var m5StackAccessor: M5StackAccessor
+    public let coreDataManager:CoreDataManager
     
     /// reference to BgReadingsAccessor
     private var bgReadingsAccessor: BgReadingsAccessor
     
-    /// reference to watlaaAccessor
-    private var watlaaAccessor: WatlaaAccessor
-    
-    /// if scan is called, and a connection is successfully made to a new device, then a new M5Stack must be created, and this function will be called. It is owned by the UIViewController that calls the scan function
-    private var callBackAfterDiscoveringDevice: ((BluetoothPeripheral) -> Void)?
-    
-    /// if scan is called, an instance of M5StackBluetoothTransmitter is created with address and name. The new instance will be assigned to this variable, temporary, until a connection is made
-    private var tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral: BluetoothTransmitter?
+    /// reference to BLEPeripheralAccessor
+    private var bLEPeripheralAccessor: BLEPeripheralAccessor
     
     /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
     private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
@@ -43,96 +67,346 @@ class BluetoothPeripheralManager: NSObject {
     /// will be used to pass back bluetooth and cgm related events, probably temporary ?
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
-    /// when xdrip connects to a BluetoothTransmitter that is also CGMTransmitter, then we'll call this function with the BluetoothTransmitter as argument. This is to let the cgmTransmitterDelegate know what is the CGMTransmitter
-    private var onCGMTransmitterCreation: (CGMTransmitter?) -> ()
-
     // MARK: - initializer
     
     /// - parameters:
-    ///     - onCGMTransmitterCreation : to be called when cgmtransmitter is created
-    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, onCGMTransmitterCreation: @escaping (CGMTransmitter?) -> ()) {
+    ///     - cgmTransmitterInfoChanged : to be called when currently used cgmTransmitter changes
+    ///     - uIViewController : used to present alert messages
+    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, uIViewController: UIViewController, cgmTransmitterInfoChanged: @escaping () -> ()) {
         
         // initialize properties
         self.coreDataManager = coreDataManager
-        self.m5StackAccessor = M5StackAccessor(coreDataManager: coreDataManager)
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
-        self.watlaaAccessor = WatlaaAccessor(coreDataManager: coreDataManager)
         self.cgmTransmitterDelegate = cgmTransmitterDelegate
-        self.onCGMTransmitterCreation = onCGMTransmitterCreation
+        self.cgmTransmitterInfoChanged = cgmTransmitterInfoChanged
+        self.bLEPeripheralAccessor = BLEPeripheralAccessor(coreDataManager: coreDataManager)
+        self.uIViewController = uIViewController
         
         super.init()
         
-        // need to initialize all types of bluetoothperipheral
-        // using enum here to make sure future types are not forgotten
-        for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
-            
-            switch bluetoothPeripheralType {
-              
-            case .M5StickCType:
-                // no seperate handling needed for M5StickC because M5StickC is stored in coredata as M5Stack objecct, so it will be handled when going through case M5StackType
-                break
-                
-            case .M5StackType:
-                
-                // initialize m5Stacks
-                let m5Stacks = m5StackAccessor.getM5Stacks()
-                for m5Stack in m5Stacks {
+        // loop through blePeripherals
+        for blePeripheral in bLEPeripheralAccessor.getBLEPeripherals() {
+
+            // each time the app launches, we will send the parameters to all BluetoothPeripherals (only used for M5Stack for now)
+            blePeripheral.parameterUpdateNeededAtNextConnect = true
+
+            // need to initialize all types of bluetoothperipheral
+            // using enum here to make sure future types are not forgotten
+            bluetoothPeripheralTypeLoop: for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
+
+                switch bluetoothPeripheralType {
                     
-                    // add it to the list of bluetoothPeripherals
-                    bluetoothPeripherals.append(m5Stack)
+                case .M5StackType:
+                    // no seperate handling needed for M5StickC because M5StickC is stored in coredata as M5Stack objecct, so it will be handled when going through case M5StackType
+                    // in other words this case will never be applicable
+                    break
                     
-                    if m5Stack.shouldconnect {
+                case .M5StickCType:
+                    if let m5Stack = blePeripheral.m5Stack {
                         
-                        // create an instance of M5StackBluetoothTransmitter, M5StackBluetoothTransmitter will automatically try to connect to the M5Stack with the address that is stored in m5Stack
-                        // add it to the array of bluetoothTransmitters
-                        bluetoothTransmitters.append(M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: m5Stack.blepassword, bluetoothPeripheralType: m5Stack.isM5StickC ? .M5StickCType : .M5StackType))
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: m5Stack)
                         
-                    } else {
-                        
-                        // shouldn't connect, so don't create an instance of M5StackBluetoothTransmitter
-                        // but append a nil element
-                        bluetoothTransmitters.append(nil)
+                        if m5Stack.blePeripheral.shouldconnect {
+                            
+                            // create an instance of M5StackBluetoothTransmitter, M5StackBluetoothTransmitter will automatically try to connect to the M5Stack with the address that is stored in m5Stack
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(M5StackBluetoothTransmitter(address: m5Stack.blePeripheral.address, name: m5Stack.blePeripheral.name, bluetoothTransmitterDelegate: self, m5StackBluetoothTransmitterDelegate: self, blePassword: m5Stack.blepassword, bluetoothPeripheralType: m5Stack.isM5StickC ? .M5StickCType : .M5StackType), at: index)
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
                         
                     }
                     
-                    // each time the app launches, we will send the parameters to all BluetoothPeripherals
-                    m5Stack.parameterUpdateNeededAtNextConnect()
+                case .WatlaaType:
                     
-                }
-                
+                    if let watlaa = blePeripheral.watlaa {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: watlaa)
+                        
+                        if watlaa.blePeripheral.shouldconnect {
+                            
+                            // create an instance of WatlaaBluetoothTransmitter, WatlaaBluetoothTransmitter will automatically try to connect to the watlaa with the address that is stored in watlaa
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(WatlaaBluetoothTransmitter(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, timeStampLastBgReading: watlaa.timeStampLastBgReading, sensorSerialNumber: watlaa.blePeripheral.sensorSerialNumber, webOOPEnabled: watlaa.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: watlaa.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if watlaa is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                        
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
 
-
-            case .watlaaMaster:
+                    }
+                    
+                case .DexcomG5Type, .DexcomG6Type:
                 
-                // initialize watlaa's
-                let watlaas = watlaaAccessor.getWatlaas()
-                for watlaa in watlaas {
-                    
-                    // add it to the list of bluetoothPeripherals
-                    bluetoothPeripherals.append(watlaa)
-                    
-                    if watlaa.shouldconnect {
+                    // both DexcomG5Type and DexcomG6Type are stored in blePeripheral as dexcomG5
+                    if let dexcomG5orG6 = blePeripheral.dexcomG5 {
                         
-                        // create an instance of WatlaaBluetoothTransmitter, WatlaaBluetoothTransmitter will automatically try to connect to the watlaa with the address that is stored in watlaa
-                        // add it to the array of bluetoothTransmitters
-                        bluetoothTransmitters.append(WatlaaBluetoothTransmitterMaster(address: watlaa.address, name: watlaa.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, bluetoothPeripheralType: .watlaaMaster))
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG5orG6)
                         
-                    } else {
+                        if dexcomG5orG6.blePeripheral.shouldconnect {
+                            
+                            if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId {
+
+                                // create an instance of CGMG5Transmitter (or CGMG6Transmitter), CGMG5Transmitter (or CGMG6Transmitter) will automatically try to connect to the dexcom with the address that is stored in dexcom
+                                // add it to the array of bluetoothTransmitters
+                                if !dexcomG5orG6.isDexcomG6 {
+                                    
+                                    bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+                                 
+                                } else {
+                                    
+                                    bluetoothTransmitters.insert(CGMG6Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+
+                                }
+                                
+                                // if DexcomG5Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                                if bluetoothPeripheralType.category() == .CGM {
+                                    currentCgmTransmitterAddress = blePeripheral.address
+                                }
+                                
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
                         
-                        // shouldn't connect, so don't create an instance of M5StackBluetoothTransmitter
-                        // but append a nil element
-                        bluetoothTransmitters.append(nil)
+                        // because two types are being handled here (DexcomG5Type and DexcomG6Type) we need to avoid that the same blePeripheral is added two times
+                        // this we do by breaking the bluetoothPeripheralTypeLoop
+                        break bluetoothPeripheralTypeLoop
                         
                     }
                     
-                    // each time the app launches, we will send the parameters to all BluetoothPeripherals
-                    watlaa.parameterUpdateNeededAtNextConnect()
+                case .BubbleType:
                     
+                    if let bubble = blePeripheral.bubble {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: bubble)
+                        
+                        if bubble.blePeripheral.shouldconnect {
+                            
+                            // create an instance of BubbleBluetoothTransmitter, BubbleBluetoothTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMBubbleTransmitter(address: bubble.blePeripheral.address, name: bubble.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: bubble.timeStampLastBgReading, sensorSerialNumber: bubble.blePeripheral.sensorSerialNumber, webOOPEnabled: bubble.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: bubble.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if BubbleType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .MiaoMiaoType:
+                    
+                    if let miaoMiao = blePeripheral.miaoMiao {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: miaoMiao)
+                        
+                        if miaoMiao.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMMiaoMiaoTransmitter, CGMMiaoMiaoTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMMiaoMiaoTransmitter(address: miaoMiao.blePeripheral.address, name: miaoMiao.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: miaoMiao.timeStampLastBgReading, sensorSerialNumber: miaoMiao.blePeripheral.sensorSerialNumber, webOOPEnabled: miaoMiao.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: miaoMiao.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if MiaoMiaoType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                 
+                case .DexcomG4Type:
+                    
+                    if let dexcomG4 = blePeripheral.dexcomG4 {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG4)
+                        
+                        if dexcomG4.blePeripheral.shouldconnect {
+
+                            if let transmitterId = dexcomG4.blePeripheral.transmitterId {
+
+                                // create an instance of CGMDexcomG4Transmitter, CGMDexcomG4Transmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                                // add it to the array of bluetoothTransmitters
+                                bluetoothTransmitters.insert(CGMG4xDripTransmitter(address: dexcomG4.blePeripheral.address, name: dexcomG4.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMDexcomG4TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+                                
+                                // if DexcomG4Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                                if bluetoothPeripheralType.category() == .CGM {
+                                    currentCgmTransmitterAddress = blePeripheral.address
+                                }
+                                
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .DropletType:
+                    
+                    if let droplet = blePeripheral.droplet {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: droplet)
+                        
+                        if droplet.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMDropletTransmitter, CGMDropletTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMDroplet1Transmitter(address: droplet.blePeripheral.address, name: droplet.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMDropletTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: droplet.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if DropletType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .BlueReaderType:
+                    
+                    if let blueReader = blePeripheral.blueReader {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: blueReader)
+                        
+                        if blueReader.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMBlueReaderTransmitter, CGMBlueReaderTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMBlueReaderTransmitter(address: blueReader.blePeripheral.address, name: blueReader.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBlueReaderTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: blueReader.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if BlueReaderType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which should have the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .GNSentryType:
+                    
+                    if let gNSEntry = blePeripheral.gNSEntry {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: gNSEntry)
+                        
+                        if gNSEntry.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMGNSEntryTransmitter, CGMGNSEntryTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMGNSEntryTransmitter(address: gNSEntry.blePeripheral.address, name: gNSEntry.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: gNSEntry.timeStampLastBgReading, nonFixedSlopeEnabled: gNSEntry.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if GNSentryType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .BluconType:
+                    
+                    if let blucon = blePeripheral.blucon {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: blucon)
+                        
+                        if blucon.blePeripheral.shouldconnect {
+                            
+                            if let transmitterId = blucon.blePeripheral.transmitterId {
+                                
+                                // create an instance of CGMBluconTransmitter, CGMBluconTransmitter will automatically try to connect to the Bluon with the address that is stored in blucon
+                                // add it to the array of bluetoothTransmitters
+                                bluetoothTransmitters.insert(CGMBluconTransmitter(address: blucon.blePeripheral.address, name: blucon.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: blucon.timeStampLastBgReading, sensorSerialNumber: blucon.blePeripheral.sensorSerialNumber, nonFixedSlopeEnabled: blucon.blePeripheral.nonFixedSlopeEnabled), at: index)
+                                
+                                // if bluconType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                                if bluetoothPeripheralType.category() == .CGM {
+                                    currentCgmTransmitterAddress = blePeripheral.address
+                                }
+                                
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which should have the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
                 }
 
             }
             
         }
+        
+        
+        // CAN BE DELETED ONCE 3.X IS NOT USED ANYMORE
+        // if cgmTransUserDefaults.standard.cgmTransmitterTypemitterType is nil but UserDefaults.standard.cgmTransmitterDeviceAddress is not nil, then this is the first install of 4.x after 3.x
+        if UserDefaults.standard.cgmTransmitterType != nil &&  UserDefaults.standard.cgmTransmitterDeviceAddress != nil {
+            
+            uIViewController.present(UIAlertController(title: Texts_Common.warning, message: "Transmitters are now created in the bluetooth tab. You will need to recreate your transmitter first. Your sensor status will remain", actionHandler: nil), animated: true, completion: nil)
+            
+            UserDefaults.standard.cgmTransmitterDeviceAddress = nil
+            
+        }
+        // DELETE UP TO HERE
+        
         
         // when user changes any of the buetooth peripheral related settings, that need to be sent to the transmitter
         addObservers()
@@ -161,7 +435,7 @@ class BluetoothPeripheralManager: NSObject {
         for bluetoothPeripheral in bluetoothPeripherals {
             
             // if parameter toBluetoothPeripheral is not nil, then it means we need to send the reading only to this bluetoothPeripheral, so we skip all peripherals except that one
-            if toBluetoothPeripheral != nil && toBluetoothPeripheral!.getAddress() != bluetoothPeripheral.getAddress() {
+            if let toBluetoothPeripheral = toBluetoothPeripheral, toBluetoothPeripheral.blePeripheral.address != bluetoothPeripheral.blePeripheral.address {
                 continue
             }
             
@@ -180,8 +454,12 @@ class BluetoothPeripheralManager: NSObject {
                         _ = m5StackBluetoothTransmitter.writeBgReadingInfo(bgReading: bgReadingToSend[0])
                     }
                     
-                case .watlaaMaster:
+                case .WatlaaType:
                     // no need to send reading to watlaa in master mode
+                    break
+                    
+                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type:
+                    // cgm's don't receive reading, they send it
                     break
                     
                 }
@@ -191,23 +469,401 @@ class BluetoothPeripheralManager: NSObject {
         }
     }
 
-    // MARK: - private functions
-    
-    /// check if transmitter in bluetoothTransmitters with index, is the cgmtransmitter currently assigned to delegate, if so set cgmtransmitter at delegate to nil   - This should be temporary till cgm transmitters have moved to bluetooth tab
-    private func setCGMTransmitterToNilAtDelegate(withIndexInBluetoothTransmitters index: Int) {
-
-        if let cgmTransmitter = cgmTransmitterDelegate?.getCGMTransmitter() as? BluetoothTransmitter, let transmitterBeingDeleted = bluetoothTransmitters[index] {
+    /// disconnect from bluetoothPeripheral - and don't reconnect - set shouldconnect to false
+    public func disconnect(fromBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral) {
+        
+        // device should not reconnect after disconnecting
+        bluetoothPeripheral.blePeripheral.shouldconnect = false
+        
+        // save in coredata
+        coreDataManager.saveChanges()
+        
+        if let bluetoothTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) {
             
-            if cgmTransmitter.getAddress() == transmitterBeingDeleted.getAddress() {
+            _ = bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
+            
+        }
+        
+    }
+
+    /// returns the bluetoothTransmitter for the bluetoothPeripheral
+    /// - parameters:
+    ///     - forBluetoothPeripheral : the bluetoothPeripheral for which bluetoothTransmitter should be returned
+    ///     - createANewOneIfNecesssary : if bluetoothTransmitter is nil, then should one be created ?
+    public func getBluetoothTransmitter(for bluetoothPeripheral: BluetoothPeripheral, createANewOneIfNecesssary: Bool) -> BluetoothTransmitter? {
+        
+        if let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral) {
+            
+            if let bluetoothTransmitter = bluetoothTransmitters[index] {
+                return bluetoothTransmitter
+            }
+            
+            if createANewOneIfNecesssary {
                 
-                // so the cgmTransmitter is actually being deleted, so we need to also assign cgmTransmitterDelegate to nil to make sure there's no more reference to it
-                onCGMTransmitterCreation(nil)
+                var newTransmitter: BluetoothTransmitter? = nil
+                
+                switch bluetoothPeripheral.bluetoothPeripheralType() {
+                    
+                case .M5StackType, .M5StickCType:
+                    
+                    if let m5Stack = bluetoothPeripheral as? M5Stack {
+                        
+                        // blePassword : first check if m5Stack has a blepassword configured. If not then user blepassword from userDefaults, which can also still be nil
+                        var blePassword = m5Stack.blepassword
+                        if blePassword == nil {
+                            blePassword = UserDefaults.standard.m5StackBlePassword
+                        }
+                        
+                        newTransmitter = M5StackBluetoothTransmitter(address: m5Stack.blePeripheral.address, name: m5Stack.blePeripheral.name, bluetoothTransmitterDelegate: self, m5StackBluetoothTransmitterDelegate: self, blePassword: blePassword, bluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType())
+                    }
+                    
+                case .WatlaaType:
+                    
+                    if let watlaa = bluetoothPeripheral as? Watlaa {
+                        
+                        newTransmitter = WatlaaBluetoothTransmitter(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, timeStampLastBgReading: nil, sensorSerialNumber: watlaa.blePeripheral.sensorSerialNumber, webOOPEnabled: watlaa.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: watlaa.blePeripheral.nonFixedSlopeEnabled)
+                        
+                    }
+                    
+                case .DexcomG5Type, .DexcomG6Type:
+                    
+                    if let dexcomG5orG6 = bluetoothPeripheral as? DexcomG5 {
+                        
+                        if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
+                            
+                            if !dexcomG5orG6.isDexcomG6 {
+
+                                newTransmitter = CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+
+                            } else {
+
+                                newTransmitter = CGMG6Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+
+                            }
+                            
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case DexcomG5Type or DexcomG6Type but transmitterId is nil or cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+                    
+                case .DexcomG4Type:
+                    
+                    if let dexcomG4 = bluetoothPeripheral as? DexcomG4 {
+                        
+                        if let transmitterId = dexcomG4.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
+                            
+                            newTransmitter = CGMG4xDripTransmitter(address: dexcomG4.blePeripheral.address, name: dexcomG4.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMDexcomG4TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case DexcomG4Type but transmitterId is nil or cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+                    
+                case .BubbleType:
+                    
+                    if let bubble = bluetoothPeripheral as? Bubble {
+                    
+                        if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
+                            
+                            newTransmitter = CGMBubbleTransmitter(address: bubble.blePeripheral.address, name: bubble.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: bubble.blePeripheral.sensorSerialNumber, webOOPEnabled: bubble.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: bubble.blePeripheral.nonFixedSlopeEnabled)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case BubbleType but cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+                    
+                case .MiaoMiaoType:
+                    
+                    if let miaoMiao = bluetoothPeripheral as? MiaoMiao {
+                        
+                        if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
+                            
+                            newTransmitter = CGMMiaoMiaoTransmitter(address: miaoMiao.blePeripheral.address, name: miaoMiao.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: miaoMiao.blePeripheral.sensorSerialNumber, webOOPEnabled: miaoMiao.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: miaoMiao.blePeripheral.nonFixedSlopeEnabled)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case MiaoMiaoType but cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+                    
+                case .DropletType:
+                    
+                    if let droplet = bluetoothPeripheral as? Droplet {
+                        
+                        if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
+                            
+                            newTransmitter = CGMDroplet1Transmitter(address: droplet.blePeripheral.address, name: droplet.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMDropletTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: droplet.blePeripheral.nonFixedSlopeEnabled)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case DropletType but cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+                    
+                case .GNSentryType:
+                    
+                    if let gNSEntry = bluetoothPeripheral as? GNSEntry {
+                        
+                        if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
+                            
+                            newTransmitter = CGMGNSEntryTransmitter(address: gNSEntry.blePeripheral.address, name: gNSEntry.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, nonFixedSlopeEnabled: gNSEntry.blePeripheral.nonFixedSlopeEnabled)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case GNSEntryType but cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+                    
+                case .BlueReaderType:
+                    
+                    if let blueReader = bluetoothPeripheral as? BlueReader {
+                        
+                        if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
+                            
+                            newTransmitter = CGMBlueReaderTransmitter(address: blueReader.blePeripheral.address, name: blueReader.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBlueReaderTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: blueReader.blePeripheral.nonFixedSlopeEnabled)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case BlueReaderType but cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+                    
+                case .BluconType:
+                    
+                    if let blucon = bluetoothPeripheral as? Blucon {
+                        
+                        if let transmitterId = blucon.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
+                            
+                            newTransmitter = CGMBluconTransmitter(address: blucon.blePeripheral.address, name: blucon.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: blucon.blePeripheral.sensorSerialNumber, nonFixedSlopeEnabled: blucon.blePeripheral.nonFixedSlopeEnabled)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case BluconType but transmitterId is nil or cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+
+                }
+                
+                
+                bluetoothTransmitters[index] = newTransmitter
+                
+                return newTransmitter
                 
             }
             
         }
-
+        
+        return nil
     }
+
+    public func getTransmitterType(for bluetoothTransmitter:BluetoothTransmitter) -> BluetoothPeripheralType {
+        
+        for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
+            
+            // using switch through all cases, to make sure that new future types are supported
+            switch bluetoothPeripheralType {
+                
+            case .M5StackType, .M5StickCType:
+                
+                if let bluetoothTransmitter = bluetoothTransmitter as? M5StackBluetoothTransmitter {
+                    return bluetoothTransmitter.bluetoothPeripheralType
+                }
+                
+            case .WatlaaType:
+                
+                if bluetoothTransmitter is WatlaaBluetoothTransmitter {
+                    return .WatlaaType
+                }
+                
+            case .DexcomG5Type:
+                // every CGMG6Transmitter is CGMG5Transmitter, we need to avoid that
+                if bluetoothTransmitter is CGMG5Transmitter && !(bluetoothTransmitter is CGMG6Transmitter) {
+                    return .DexcomG5Type
+                }
+                
+            case .DexcomG6Type:
+                if bluetoothTransmitter is CGMG6Transmitter {
+                    return .DexcomG6Type
+                }
+                
+            case .BubbleType:
+                if bluetoothTransmitter is CGMBubbleTransmitter {
+                    return .BubbleType
+                }
+                
+            case .MiaoMiaoType:
+                if bluetoothTransmitter is CGMMiaoMiaoTransmitter {
+                    return .MiaoMiaoType
+                }
+                
+            case .BluconType:
+                if bluetoothTransmitter is CGMBluconTransmitter {
+                    return .BluconType
+                }
+                
+            case .GNSentryType:
+                if bluetoothTransmitter is CGMGNSEntryTransmitter {
+                    return .GNSentryType
+                }
+                
+            case .BlueReaderType:
+                if bluetoothTransmitter is CGMBlueReaderTransmitter {
+                    return .BlueReaderType
+                }
+                
+            case .DropletType:
+                if bluetoothTransmitter is CGMDroplet1Transmitter {
+                    return .DropletType
+                }
+                
+            case .DexcomG4Type:
+                if bluetoothTransmitter is CGMG4xDripTransmitter {
+                    return .DexcomG4Type
+                }
+                
+            }
+            
+        }
+        
+        // normally we shouldn't get here, but we need to return a value
+        fatalError("BluetoothPeripheralManager :  getTransmitterType did not find a valid type")
+        
+    }
+
+    /// - parameters:
+    ///     - transmitterId : only for transmitter types that need it (at the moment only Dexcom and Blucon)
+    public func createNewTransmitter(type: BluetoothPeripheralType, transmitterId: String?) -> BluetoothTransmitter {
+        
+        switch type {
+            
+        case .M5StackType, .M5StickCType:
+            
+            return M5StackBluetoothTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, m5StackBluetoothTransmitterDelegate: self, blePassword: UserDefaults.standard.m5StackBlePassword, bluetoothPeripheralType: type)
+            
+        case .WatlaaType:
+            
+            return WatlaaBluetoothTransmitter(address: nil, name: nil, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, timeStampLastBgReading: nil, sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil, nonFixedSlopeEnabled: nil)
+            
+        case .DexcomG5Type:
+            
+            guard let transmitterId = transmitterId, let cgmTransmitterDelegate =  cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, type DexcomG5Type, transmitterId is nil or cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMG5Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+            
+        case .DexcomG6Type:
+            
+            guard let transmitterId = transmitterId, let cgmTransmitterDelegate =  cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, type DexcomG6Type, transmitterId is nil or cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMG6Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+            
+        case .BubbleType:
+            
+            guard let cgmTransmitterDelegate =  cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, type DexcomG5Type, cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMBubbleTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil, nonFixedSlopeEnabled: nil)
+            
+        case .MiaoMiaoType:
+            
+            guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, MiaoMiaoType, cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMMiaoMiaoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil, nonFixedSlopeEnabled: nil)
+            
+        case .DropletType:
+            
+            guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, DropletType, cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMDroplet1Transmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMDropletTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: nil)
+            
+        case .GNSentryType:
+            
+            guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, GNSEntryType, cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMGNSEntryTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, nonFixedSlopeEnabled: nil)
+            
+        case .BlueReaderType:
+            
+            guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, BlueReaderType, cgmTransmitterDelegate is nil")
+            }
+            
+            
+            return CGMBlueReaderTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMBlueReaderTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: nil)
+            
+        case .BluconType:
+            
+            guard let transmitterId = transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, type BluconType, transmitterId is nil or cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMBluconTransmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: nil, nonFixedSlopeEnabled: nil)
+
+        case .DexcomG4Type:
+            
+            guard let transmitterId = transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, type DexcomG4Type, transmitterId is nil or cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMG4xDripTransmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMDexcomG4TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+            
+        }
+        
+    }
+
+    public func firstIndexInBluetoothPeripherals(bluetoothPeripheral: BluetoothPeripheral) -> Int? {
+        return bluetoothPeripherals.firstIndex(where: {$0.blePeripheral.address == bluetoothPeripheral.blePeripheral.address})
+    }
+
+    /// - will insert bluetoothPeripheral in the array bluetoothPeripherals, and returns the index where it's been inserted.
+    /// - it will be inserted in the correct location, ie depending on the BluetoothPeripheralType
+    public func insertInBluetoothPeripherals(bluetoothPeripheral: BluetoothPeripheral) -> Int {
+        
+        /// start with assuming we'll insert at location 0
+        var insertAt = 0
+        
+        /// index of bluetoothPeripheral's type in the enum BluetoothPeripheralType
+        let typeIndex: Int =  bluetoothPeripheral.bluetoothPeripheralType().category().index()
+
+        /// search for the first category which is higher ranked in the list (ie higher index) than typeIndex
+        while insertAt < bluetoothPeripherals.count && typeIndex > bluetoothPeripherals[insertAt].bluetoothPeripheralType().category().index() {
+            
+            insertAt = insertAt + 1
+        }
+        
+        if insertAt == bluetoothPeripherals.count {
+            bluetoothPeripherals.append(bluetoothPeripheral)
+        } else {
+            bluetoothPeripherals.insert(bluetoothPeripheral, at: insertAt)
+        }
+        
+        return insertAt
+        
+    }
+
+    // MARK: - private functions
     
     /// when user changes M5Stack related settings, then the transmitter need to get that info, add observers
     private func addObservers() {
@@ -222,71 +878,61 @@ class BluetoothPeripheralManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutAPIKey.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPsite.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.webOOPtoken.rawValue, options: .new, context: nil)
 
     }
     
-    /// disconnect from bluetoothPeripheral - and don't reconnect - set shouldconnect to false
-    private func disconnect(fromBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral) {
+    /// checks if the bluetoothTransmitter is the currently assigned CGMTransmitter. If yes it means bluetoothTransmitter is a CGMTransmitter and has shouldconnect = true and device address should match
+    /// - parameters:
+    ///     - bluetoothTransmitter if nil then returnvalue is false
+    private func transmitterIsCurrentlyUsedCGMTransmitter(bluetoothTransmitter: BluetoothTransmitter?) -> Bool {
         
-        // device should not reconnect after disconnecting
-        bluetoothPeripheral.dontTryToConnectToThisBluetoothPeripheral()
+        // assumption is that there can only be one bluetoothTransmitter that is of type CGMTransmitter and that has shouldconnect = true
+
+        // check bluetoothTransmitter not nil, if nil return false
+        guard let bluetoothTransmitter = bluetoothTransmitter else {return false}
         
-        // save in coredata
-        coreDataManager.saveChanges()
+        // if bluetoothTransmitter.deviceAddress matches currentCgmTransmitterAddress, then it's the cgm transmitter
+        return bluetoothTransmitter.deviceAddress == currentCgmTransmitterAddress
         
-        if let bluetoothTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) {
+    }
+    
+    private func  setTransmitterToNilAndCallcgmTransmitterInfoChangedIfNecessary(indexInBluetoothTransmittersArray index: Int) {
+        
+        // check if transmitter being deleted is the currently assigned CGMTransmitter and if yes call cgmTransmitterInfoChanged after setting bluetoothTransmitter to nil
+        var callcgmTransmitterInfoChanged = false
+        if transmitterIsCurrentlyUsedCGMTransmitter(bluetoothTransmitter: bluetoothTransmitters[index]) {
+            callcgmTransmitterInfoChanged = true
+        }
+        
+        // set bluetoothTransmitter to nil, this will also initiate a disconnect
+        bluetoothTransmitters[index] = nil
+        
+        if callcgmTransmitterInfoChanged {
             
-            _ = bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
+            // set currentCgmTransmitterAddress to nil, this will implicitly call cgmTransmitterInfoChanged
+            currentCgmTransmitterAddress = nil
             
         }
         
     }
     
-    private func firstIndexInBluetoothPeripherals(bluetoothPeripheral: BluetoothPeripheral) -> Int? {
-        return bluetoothPeripherals.firstIndex(where: {$0.getAddress() == bluetoothPeripheral.getAddress()})
-    }
-    
-    private func createNewTransmitter(type: BluetoothPeripheralType) -> BluetoothTransmitter {
+    /// helper function for extension BluetoothPeripheralManaging
+    private func getCGMTransmitter(for bluetoothPeripheral: BluetoothPeripheral) -> CGMTransmitter? {
         
-        switch type {
+        if bluetoothPeripheral.bluetoothPeripheralType().category() == .CGM {
             
-        case .M5StackType, .M5StickCType:
-            
-            return M5StackBluetoothTransmitter(address: nil, name: nil, delegate: self, blePassword: UserDefaults.standard.m5StackBlePassword, bluetoothPeripheralType: type)
-            
-        case .watlaaMaster:
-            
-            return WatlaaBluetoothTransmitterMaster(address: nil, name: nil, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, bluetoothPeripheralType: type)
-            
-        }
-
-    }
-    
-    private func getTransmitterType(for bluetoothTransmitter:BluetoothTransmitter) -> BluetoothPeripheralType {
-        
-        for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
-            
-            // using switch through all cases, to make sure that new future types are supported
-            switch bluetoothPeripheralType {
+            if let cgmTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) as? CGMTransmitter {
                 
-            case .M5StackType, .M5StickCType:
-                
-                if let bluetoothTransmitter = bluetoothTransmitter as? M5StackBluetoothTransmitter {
-                    return bluetoothTransmitter.bluetoothPeripheralType
-                }
-                
-            case .watlaaMaster:
-                
-                if bluetoothTransmitter is WatlaaBluetoothTransmitterMaster {
-                    return .watlaaMaster
-                }
+                return cgmTransmitter
                 
             }
             
         }
         
-        // normally we shouldn't get here, but we need to return a value
-        fatalError("BluetoothPeripheralManager :  getTransmitterType did not find a valid type")
+        return nil
         
     }
     
@@ -301,7 +947,7 @@ class BluetoothPeripheralManager: NSObject {
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
             
-        case UserDefaults.Key.m5StackWiFiName1, UserDefaults.Key.m5StackWiFiName2, UserDefaults.Key.m5StackWiFiName3, UserDefaults.Key.m5StackWiFiPassword1, UserDefaults.Key.m5StackWiFiPassword2, UserDefaults.Key.m5StackWiFiPassword3, UserDefaults.Key.nightScoutAPIKey, UserDefaults.Key.nightScoutUrl, UserDefaults.Key.bloodGlucoseUnitIsMgDl  :
+        case UserDefaults.Key.m5StackWiFiName1, UserDefaults.Key.m5StackWiFiName2, UserDefaults.Key.m5StackWiFiName3, UserDefaults.Key.m5StackWiFiPassword1, UserDefaults.Key.m5StackWiFiPassword2, UserDefaults.Key.m5StackWiFiPassword3, UserDefaults.Key.nightScoutAPIKey, UserDefaults.Key.nightScoutUrl, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.m5StackBlePassword, UserDefaults.Key.webOOPsite, UserDefaults.Key.webOOPtoken :
             
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -310,21 +956,60 @@ class BluetoothPeripheralManager: NSObject {
             
         default:
             break
+            
         }
         
+        // if changed from master to follower, then check if any of the bluetoothperipherals of type .CGM has shouldconnect true, and if yes set to false and inform user
+        if keyPathEnum == .isMaster {
+            
+            if !UserDefaults.standard.isMaster {
+            
+                for bluetoothPeripheral in bluetoothPeripherals {
+                    
+                    if bluetoothPeripheral.bluetoothPeripheralType().category() == .CGM {
+                        
+                        /// it might be in future that multiple connected CGM's are allowed, and that case they will be all disconnected, but the warning will only be given once
+                        var warningGiven = false
+                        
+                        if bluetoothPeripheral.blePeripheral.shouldconnect {
+                                
+                            // force disconnect
+                            disconnect(fromBluetoothPeripheral: bluetoothPeripheral)
+                            
+                            // set bluetoothTransmitter to nil
+                            setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheral)
+                            
+                            if !warningGiven {
+
+                                uIViewController.present(UIAlertController(title: Texts_Common.warning, message: Texts_BluetoothPeripheralView.cgmDeActivateBecauseMovingToFollowerMode, actionHandler: nil), animated: true, completion: nil)
+
+                                warningGiven = true
+                                
+                            }
+                            
+                        }
+                        
+                    }
+                }
+            }
+            
+        }
+        
+        // see for every bluetoothPeripheral, if the changed  UserDefaults value has impact on that bluetoothPeripheral
         for bluetoothPeripheral in bluetoothPeripherals {
             
             // if the there's no bluetoothTransmitter for this bluetoothPeripheral, then call parameterUpdateNeededAtNextConnect
             guard let bluetoothTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) else {
 
                 // seems to be bluetoothPeripheral which is currently disconnected - need to set parameterUpdateNeeded = true, so that all parameters will be sent as soon as reconnect occurs
-                bluetoothPeripheral.parameterUpdateNeededAtNextConnect()
+                bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 
-                return
+                continue
 
             }
             
-            // get the type
+            // go through all bluetoothPeripheralType's with switch statement - this is to ensure that future types are not forgotten
+            // for each of them see if any of the observed values needs to be sent to the peripheral
             switch bluetoothPeripheral.bluetoothPeripheralType() {
                 
             case .M5StackType, .M5StickCType:
@@ -384,12 +1069,31 @@ class BluetoothPeripheralManager: NSObject {
                 
                 // if not successful then set needs parameter update to true for the m5Stack
                 if !success {
-                    bluetoothPeripheral.parameterUpdateNeededAtNextConnect()
+                    bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .watlaaMaster:
-                break
-                
+            case .WatlaaType, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type:
+
+                // oop website and oop web token need to be checked
+                switch keyPathEnum {
+                    
+                case UserDefaults.Key.webOOPtoken, UserDefaults.Key.webOOPsite :
+                   
+                    guard let cGMTransmitter = bluetoothTransmitter as? CGMTransmitter else {
+                        trace("in observeValue, bluetoothPeripheral is not of type CGMTransmitter", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                        return
+                    }
+                    
+                    // set both oopWebToken and oopWebSite even if only one changed
+                    cGMTransmitter.setWebOOPToken(oopWebToken: UserDefaults.standard.webOOPtoken ?? ConstantsLibre.token)
+                    cGMTransmitter.setWebOOPSite(oopWebSite: UserDefaults.standard.webOOPSite ?? ConstantsLibre.site)
+                    // changing token and or url, so request new reading
+                    cGMTransmitter.requestNewReading()
+                    
+                default:
+                    break
+                    
+                }
             }
             
         }
@@ -402,18 +1106,91 @@ class BluetoothPeripheralManager: NSObject {
 
 extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
     
-    /// to scan for a new BluetoothPeripheral - callback will be called when a new BluetoothPeripheral is found and connected
-    func startScanningForNewDevice(type: BluetoothPeripheralType, callback: @escaping (BluetoothPeripheral) -> Void) {
+    func requestNewReading() {
+        
+        if let cgmTransmitter = getCGMTransmitter() {
+            
+            cgmTransmitter.requestNewReading()
+        }
+        
+    }
+
+    func getCGMTransmitter() -> CGMTransmitter? {
+        
+        for bluetoothTransmitter in bluetoothTransmitters {
+            
+            if transmitterIsCurrentlyUsedCGMTransmitter(bluetoothTransmitter: bluetoothTransmitter) {
+                
+                return bluetoothTransmitter as? CGMTransmitter
+                
+            }
+            
+        }
+        
+        return nil
+        
+    }
+    
+    func receivedNewValue(nonFixedSlopeEnabled: Bool, for bluetoothPeripheral: BluetoothPeripheral) {
+        
+        if let cgmTransmitter = getCGMTransmitter(for: bluetoothPeripheral) {
+
+            cgmTransmitter.setNonFixedSlopeEnabled(enabled: nonFixedSlopeEnabled)
+            
+            // nonFixedSlopeEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of nonFixedSlopeEnabled
+            cgmTransmitter.requestNewReading()
+            
+            // call cgmTransmitterInfoChanged
+            cgmTransmitterInfoChanged()
+
+        }
+        
+    }
+    
+    func receivedNewValue(webOOPEnabled: Bool, for bluetoothPeripheral: BluetoothPeripheral) {
+        
+        if let cgmTransmitter = getCGMTransmitter(for: bluetoothPeripheral) {
+
+            cgmTransmitter.setWebOOPEnabled(enabled: webOOPEnabled)
+            
+            // webOOPEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of webOOPEnabled
+            cgmTransmitter.requestNewReading()
+            
+            // call cgmTransmitterInfoChanged
+            cgmTransmitterInfoChanged()
+
+        }
+        
+    }
+    
+    func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, callBackForScanningResult: ((BluetoothTransmitter.startScanningResult) -> Void)?, callback: @escaping (BluetoothPeripheral) -> Void)  {
         
         callBackAfterDiscoveringDevice = callback
         
-        tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = createNewTransmitter(type: type)
+        // create a temporary transmitter of requested type
+        let newBluetoothTranmsitter = createNewTransmitter(type: type, transmitterId: transmitterId)
         
-        _ = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
-
+        // assign transmitterTypeBeingScannedFor, will be needed in case tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is being recreated (search for transmitterTypeBeingScannedFor in BluetoothPeripheralManager+BluetoothTransmitterDelegate
+        transmitterTypeBeingScannedFor = type
+        
+        tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = newBluetoothTranmsitter
+        
+        // start scanning
+        let scanningResult = newBluetoothTranmsitter.startScanning()
+        
+        // temporary store callBackForScanningResult, will be used in deviceDidUpdateBluetoothState, when startScanning is called again
+        self.callBackForScanningResult = callBackForScanningResult
+        
+        if let callBackForScanningResult = callBackForScanningResult {
+            
+            self.callBackForScanningResult = callBackForScanningResult
+            
+            callBackForScanningResult(scanningResult)
+            
+        }
+        
     }
     
-    /// stops scanning for new device
     func stopScanningForNewDevice() {
         
         if let tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral {
@@ -432,124 +1209,61 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
             return tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral.isScanning()
             
         } else {
+            
             return false
+            
         }
         
     }
     
-    /// try to connect to the M5Stack
     func connect(to bluetoothPeripheral: BluetoothPeripheral) {
         
-        // the trick : by calling bluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheral, createANewOneIfNecesssary: true), there's two cases
+        // the trick : by calling getBluetoothTransmitter(forBluetoothPeripheral: bluetoothPeripheral, createANewOneIfNecesssary: true), there's two cases
         // - either the bluetoothTransmitter already exists but not connected, it will be found in the call to bluetoothTransmitter and returned, then we connect to it
-        // - either the bluetoothTransmitter doesn't exist yet. It will be created. We assum here that bluetoothPeripheral has a mac address, as a consequence the BluetoothTransmitter will automatically try to connect. Here we try to connect again, but that's no issue
+        // - either the bluetoothTransmitter doesn't exist yet. It will be created. We assum here that bluetoothPeripheral has a mac address, as a consequence the BluetoothTransmitter will automatically try to connect. Here we try to connect again, but that's ok that as well tue BluetoothTransmitter will try to connect and we do it again here
         
         let transmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: true)
         
         transmitter?.connect()
-
+        
     }
     
-    /// returns the BluetoothPeripheral for the specified BluetoothTransmitter
-    /// - parameters:
-    ///     - for : the bluetoothTransmitter, for which BluetoothPeripheral should be returned
-    func getBluetoothPeripheral(for bluetoothTransmitter: BluetoothTransmitter) -> BluetoothPeripheral {
+    func getBluetoothPeripheral(for bluetoothTransmitter: BluetoothTransmitter) -> BluetoothPeripheral? {
         
-        guard let index = bluetoothTransmitters.firstIndex(of: bluetoothTransmitter) else {
-            fatalError("in BluetoothPeripheralManager, function getBluetoothPeripherals, could not find specified bluetoothTransmitter")
-        }
+        guard let index = bluetoothTransmitters.firstIndex(of: bluetoothTransmitter) else {return nil}
         
         return bluetoothPeripherals[index]
         
     }
     
-    /// returns the bluetoothTransmitter for the bluetoothPeripheral
-    /// - parameters:
-    ///     - forBluetoothPeripheral : the bluetoothPeripheral for which bluetoothTransmitter should be returned
-    ///     - createANewOneIfNecesssary : if bluetoothTransmitter is nil, then should one be created ?
-    func getBluetoothTransmitter(for bluetoothPeripheral: BluetoothPeripheral, createANewOneIfNecesssary: Bool) -> BluetoothTransmitter? {
-        
-        if let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral) {
-            
-            if let bluetoothTransmitter = bluetoothTransmitters[index] {
-                return bluetoothTransmitter
-            }
-
-            if createANewOneIfNecesssary {
-                
-                var newTransmitter: BluetoothTransmitter? = nil
-
-                switch bluetoothPeripheral.bluetoothPeripheralType() {
-                    
-                case .M5StackType, .M5StickCType:
-                    
-                    if let m5Stack = bluetoothPeripheral as? M5Stack {
-                        
-                        // blePassword : first check if m5Stack has a blepassword configured. If not then user blepassword from userDefaults, which can also still be nil
-                        var blePassword = m5Stack.blepassword
-                        if blePassword == nil {
-                            blePassword = UserDefaults.standard.m5StackBlePassword
-                        }
-                        
-                        newTransmitter = M5StackBluetoothTransmitter(address: m5Stack.address, name: m5Stack.name, delegate: self, blePassword: blePassword, bluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType())
-                    }
-                    
-                case .watlaaMaster:
-                    
-                    if let watlaa = bluetoothPeripheral as? Watlaa {
-
-                        newTransmitter = WatlaaBluetoothTransmitterMaster(address: watlaa.address, name: watlaa.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, bluetoothPeripheralType: .watlaaMaster)
-
-                    }
-                    
-                }
-
-                bluetoothTransmitters[index] = newTransmitter
-                
-                return newTransmitter
-                
-            }
-
-        }
-        
-        return nil
-    }
-    
-    /// deletes the BluetoothPeripheral in coredata, and also the corresponding BluetoothTransmitter if there is one will be deleted
     func deleteBluetoothPeripheral(bluetoothPeripheral: BluetoothPeripheral) {
-       
+        
         // find the bluetoothPeripheral in array bluetoothPeripherals, if it's not there then this looks like a coding error
         guard let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral) else {
             trace("in deleteBluetoothPeripheral but bluetoothPeripheral not found in bluetoothPeripherals, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
             return
         }
         
-        // check if transmitter being deleted is assigned to cgmTransmitterDelegate, if so we need to set it also to nil, otherwise the bluetoothTransmitter deinit function wouldn't get called
-        setCGMTransmitterToNilAtDelegate(withIndexInBluetoothTransmitters: index)
-
-        // set bluetoothTransmitter to nil, this will also initiate a disconnect
-        bluetoothTransmitters[index] = nil
-
+        setTransmitterToNilAndCallcgmTransmitterInfoChangedIfNecessary(indexInBluetoothTransmittersArray: index)
+        
         // delete in coredataManager
         coreDataManager.mainManagedObjectContext.delete(bluetoothPeripherals[index] as! NSManagedObject)
-        
+
+        // save in coredataManager
+        coreDataManager.saveChanges()
+
         // remove bluetoothTransmitter and bluetoothPeripheral entry from the two arrays
         bluetoothTransmitters.remove(at: index)
         bluetoothPeripherals.remove(at: index)
         
-        // save in coredataManager
-        coreDataManager.saveChanges()
-        
     }
     
-    /// - returns: the bluetoothPeripheral's managed by this BluetoothPeripheralManager
     func getBluetoothPeripherals() -> [BluetoothPeripheral] {
         
         return bluetoothPeripherals
         
     }
     
-    /// - returns: the bluetoothTransmitters managed by this BluetoothPeripheralManager
     func getBluetoothTransmitters() -> [BluetoothTransmitter] {
         
         var bluetoothTransmitters: [BluetoothTransmitter] = []
@@ -563,328 +1277,25 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         return bluetoothTransmitters
         
     }
-
-    /// bluetoothtransmitter for this bluetoothPeripheral will be deleted, as a result this will also disconnect the bluetoothPeripheral
+    
     func setBluetoothTransmitterToNil(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral) {
         
         if let index = firstIndexInBluetoothPeripherals(bluetoothPeripheral: bluetoothPeripheral) {
             
-            // check if transmitter being deleted is assigned to cgmTransmitterDelegate, if so we need to set it also to nil, otherwise the bluetoothTransmitter deinit function wouldn't get called
-            setCGMTransmitterToNilAtDelegate(withIndexInBluetoothTransmitters: index)
-
-            bluetoothTransmitters[index] = nil
+            setTransmitterToNilAndCallcgmTransmitterInfoChangedIfNecessary(indexInBluetoothTransmittersArray: index)
             
         }
     }
-
-}
-
-// MARK: - conform to BluetoothTransmitterDelegate
-
-extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     
-    func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
+    func initiatePairing() {
         
-        // temporary, till all cgm's are moved to second tab
-        if bluetoothTransmitter is CGMTransmitter {
-            onCGMTransmitterCreation((bluetoothTransmitter as! CGMTransmitter))
-        }
-        
-        // if tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil, then this is a connection to an already known/stored BluetoothTransmitter. BluetoothPeripheralManager is not interested in this info.
-        guard let tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral else {
-            trace("in didConnect, tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is nil, no further processing", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
-            return
-        }
-        
-        // check that address and name are not nil, otherwise this looks like a codding error
-        guard let deviceAddressNewTransmitter = bluetoothTransmitter.deviceAddress, let deviceNameNewTransmitter = bluetoothTransmitter.deviceName else {
-            trace("in didConnect, address or name of new transmitter is nil, looks like a coding error", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
-            return
-        }
-        
-        // check that tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral and the bluetoothTransmitter to which connection is made are actually the same objects, otherwise it's a connection that is made to a already known/stored BluetoothTransmitter
-        guard tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral == bluetoothTransmitter else {
-            trace("in didConnect, tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is not nil and not equal to  bluetoothTransmitter", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
-            return
-        }
-        
-        // check that it's a peripheral for which we don't know yet the address
-        for buetoothPeripheral in bluetoothPeripherals {
-            if buetoothPeripheral.getAddress() == deviceAddressNewTransmitter {
-                
-                trace("in didConnect, transmitter address already known. This is not a new device, will disconnect", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
+        bluetoothTransmitterThatNeedsPairing?.initiatePairing()
 
-                // it's an already known BluetoothTransmitter, not storing this, on the contrary disconnecting because maybe it's a bluetoothTransmitter already known for which user has preferred not to connect to
-                // If we're actually waiting for a new scan result, then there's an instance of BluetoothTransmitter stored in tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral - but this one stopped scanning, so let's recreate an instance of BluetoothTransmitter
-                self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = createNewTransmitter(type: getTransmitterType(for: bluetoothTransmitter))
-                
-                _ = self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
-                
-                return
-            }
-        }
-        
-        // it's a new peripheral that we will store. No need to continue scanning
-        bluetoothTransmitter.stopScanning()
-        
-        // create bluetoothPeripheral
-        let newBluetoothPeripheral = getTransmitterType(for: tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral).createNewBluetoothPeripheral(withAddress: deviceAddressNewTransmitter, withName: deviceNameNewTransmitter, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-
-        bluetoothPeripherals.append(newBluetoothPeripheral)
-        bluetoothTransmitters.append(bluetoothTransmitter)
-
-        // call the callback function
-        if let callBackAfterDiscoveringDevice = callBackAfterDiscoveringDevice {
-            callBackAfterDiscoveringDevice(newBluetoothPeripheral)
-            self.callBackAfterDiscoveringDevice = nil
-        }
-
-        // assign tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral to nil here
-        self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
-    }
-    
-    func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
-
-        trace("in deviceDidUpdateBluetoothState, no further action", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
-        
-        if bluetoothTransmitter.deviceAddress == nil {
-            /// this bluetoothTransmitter is created to start scanning for a new, unknown M5Stack, so start scanning
-            _ = bluetoothTransmitter.startScanning()
-        }
-
-    }
-    
-    func error(message: String) {
-        trace("in error, no further action", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
-    }
-    
-    func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
-        // no further action, This is for UIViewcontroller's that also receive this info, means info can only be shown if this happens while user has one of the UIViewcontrollers open
-        trace("in didDisconnectFrom", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
-
-    }
-
-}
-
-// MARK: - conform to WatlaaBluetoothTransmitterDelegate
-
-extension BluetoothPeripheralManager: WatlaaBluetoothTransmitterDelegate {
-    
-    func isReadyToReceiveData(watlaaBluetoothTransmitter: WatlaaBluetoothTransmitterMaster) {
-        
-        // request battery level
-        watlaaBluetoothTransmitter.readBatteryLevel()
-        
-    }
-    
-    func receivedBattery(level: Int, watlaaBluetoothTransmitter: WatlaaBluetoothTransmitterMaster) {
-    
-        guard let index = bluetoothTransmitters.firstIndex(of: watlaaBluetoothTransmitter), let watlaa = bluetoothPeripherals[index] as? Watlaa else {return}
-        
-        watlaa.batteryLevel = level
+        /// remove applicationManagerKeyInitiatePairing from application key manager - there's no need to initiate the pairing via this closure
+        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: BluetoothPeripheralManager.applicationManagerKeyInitiatePairing)
         
     }
     
 }
 
-// MARK: - conform to M5StackBluetoothTransmitterDelegate
-
-extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
-    
-    func receivedBattery(level: Int, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-        
-        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
-        
-        m5Stack.batteryLevel = level
-        
-    }
-    
-    /// did the app successfully authenticate towards M5Stack, if no, then disconnect will be done
-    func authentication(success: Bool, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-        
-        trace("in authentication with success = %{public}@", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info, success.description)
-        
-        // if authentication not successful then disconnect and don't reconnect, user should verify password or reset the M5Stack, disconnect and set shouldconnect to false, permenantly (ie store in core data)
-        // disconnection is done because maybe another device is trying to connect to the M5Stack, need to make it free
-        // also set shouldConnect to false (note that this is also done in M5StackViewController if an instance of that exists, no issue, shouldConnect will be set to false two times
-        if !success {
-            
-            // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
-            guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
-
-            // don't try to reconnect after disconnecting
-            m5Stack.shouldconnect = false
-            
-            // store in core data
-            coreDataManager.saveChanges()
-            
-            // disconnect
-            disconnect(fromBluetoothPeripheral: m5Stack)
-            
-        }
-    }
-
-    /// there's no ble password set, user should set it in the settings - disconnect will be called, shouldconnect is set to false
-    func blePasswordMissing(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-        
-        trace("in blePasswordMissing", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
-        
-        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
-        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
-
-        // don't try to reconnect after disconnecting
-        m5Stack.shouldconnect = false
-        
-        // store in core data
-        coreDataManager.saveChanges()
-        
-        // disconnect
-        disconnect(fromBluetoothPeripheral: m5Stack)
-        
-    }
-
-    /// if a new ble password is received from M5Stack
-    func newBlePassWord(newBlePassword: String, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-        
-        trace("in newBlePassWord, storing the password in M5Stack", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
-
-        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and also the bluetoothPeripheral and it should be an M5Stack
-        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
-
-        // possibily this is a new scanned m5stack, calling coreDataManager.saveChanges() but still the user may be in M5stackviewcontroller and decide not to save the m5stack, bad luck
-        m5Stack.blepassword = newBlePassword
-        
-        coreDataManager.saveChanges()
-        
-    }
-
-    /// it's an M5Stack without password configured in the ini file. xdrip app has been requesting temp password to M5Stack but this was already done once. M5Stack needs to be reset. - disconnect will be called, shouldconnect is set to false
-    func m5StackResetRequired(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-        
-        trace("in m5StackResetRequired", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
-        
-        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
-        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
-
-        m5Stack.dontTryToConnectToThisBluetoothPeripheral()
-        coreDataManager.saveChanges()
-        
-        // disconnect
-        disconnect(fromBluetoothPeripheral: m5Stack)
-        
-    }
-
-    /// M5Stack is asking for an update of all parameters, send them
-    func isAskingForAllParameters(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-        
-        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter) else {
-            trace("in isAskingForAllParameters, could not find index of bluetoothTransmitter, looks like a coding error", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
-            return
-        }
-        
-        // send all parameters, if successful,then for this m5Stack we can set parameterUpdateNeeded to false
-        if sendAllParametersToM5Stack(to: m5StackBluetoothTransmitter) {
-            (bluetoothPeripherals[index] as? M5Stack)?.parameterUpdateNotNeededAtNextConnect()
-        } else {
-            // failed, so we need to set parameterUpdateNeeded to true, so that next time it connects we will send all parameters
-            (bluetoothPeripherals[index] as? M5Stack)?.parameterUpdateNeededAtNextConnect()
-        }
-        
-    }
-    
-    /// will be called if M5Stack is connected, and authentication was successful, BluetoothPeripheralManager can start sending data like parameter updates or bgreadings
-    func isReadyToReceiveData(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
-
-        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
-        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
-
-        // if the M5Stack needs new parameters, then send them
-        if m5Stack.isParameterUpdateNeededAtNextConnect() {
-            
-            // send all parameters
-            if sendAllParametersToM5Stack(to: m5StackBluetoothTransmitter) {
-                m5Stack.parameterUpdateNotNeededAtNextConnect()
-            }
-            
-        }
-        
-        // send latest reading
-        sendLatestReading(to: m5Stack)
-        
-    }
-    
-    // MARK: - private functions related to M5Stack
-    
-    /// send all parameters to m5Stack
-    /// - parameters:
-    ///     - to : m5StackBluetoothTransmitter to send all parameters
-    /// - returns:
-    ///     successfully written all parameters or not
-    private func sendAllParametersToM5Stack(to m5StackBluetoothTransmitter : M5StackBluetoothTransmitter) -> Bool {
-        
-        // should find the m5StackBluetoothTransmitter in bluetoothTransmitters and it should be an M5Stack
-        guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return false}
-
-        // M5Stack must be ready to receive data
-        guard m5StackBluetoothTransmitter.isReadyToReceiveData else {
-            trace("in sendAllParameters, bluetoothTransmitter is not ready to receive data", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
-            return false
-        }
-        
-        // initialise returnValue, result
-        var success = true
-        
-        // send bloodglucoseunit
-        if !m5StackBluetoothTransmitter.writeBloodGlucoseUnit(isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {success = false}
-        
-        // send textColor
-        if !m5StackBluetoothTransmitter.writeTextColor(textColor: M5StackColor(forUInt16: UInt16(m5Stack.textcolor)) ?? UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor) {success = false}
-        
-        // send backGroundColor
-        if !m5StackBluetoothTransmitter.writeBackGroundColor(backGroundColor: M5StackColor(forUInt16: UInt16(m5Stack.backGroundColor)) ?? ConstantsM5Stack.defaultBackGroundColor ) {success = false}
-        
-        // send rotation
-        if !m5StackBluetoothTransmitter.writeRotation(rotation: Int(m5Stack.rotation)) {success = false}
-        
-        // send connectToWiFi
-        if !m5StackBluetoothTransmitter.writeConnectToWiFi(connect: m5Stack.connectToWiFi) {success = false}
-        
-        // send WiFiSSID's
-        if let wifiName = UserDefaults.standard.m5StackWiFiName1 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 1) {success = false}
-        }
-        if let wifiName = UserDefaults.standard.m5StackWiFiName2 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 2) {success = false}
-        }
-        if let wifiName = UserDefaults.standard.m5StackWiFiName3 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 3) {success = false}
-        }
-        
-        // send WiFiPasswords
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword1 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 1) {success = false}
-        }
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword2 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 2) {success = false}
-        }
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword3 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 3) {success = false}
-        }
-        
-        // send nightscout url
-        if let url = UserDefaults.standard.nightScoutUrl {
-            if !m5StackBluetoothTransmitter.writeNightScoutUrl(url: url) {success = false}
-        }
-        
-        // send nightscout token
-        if let token = UserDefaults.standard.nightScoutAPIKey {
-            if !m5StackBluetoothTransmitter.writeNightScoutAPIKey(apiKey: token) {success = false}
-        }
-        
-        // return success
-        return success
-    }
-    
-    
-}
 

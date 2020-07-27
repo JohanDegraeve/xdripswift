@@ -119,7 +119,7 @@ public final class GlucoseChartManager: NSObject {
             fontColor: ConstantsGlucoseChart.axisLabelColor
         )
         
-        chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: ConstantsGlucoseChart.gridColor)
+        chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: UserDefaults.standard.useObjectives ? ConstantsGlucoseChart.gridColorObjectives : ConstantsGlucoseChart.gridColor,  linesWidth: 0.5)
         
         // initialize enddate
         endDate = Date()
@@ -228,6 +228,8 @@ public final class GlucoseChartManager: NSObject {
                 // get glucosePoints from coredata
                 newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: bgReadingsAccessor)
             }
+            
+            self.loopThroughGlucoseChartPointsAndFindValues()
 
             DispatchQueue.main.async {
                 
@@ -235,7 +237,6 @@ public final class GlucoseChartManager: NSObject {
                 self.endDate = endDate
                 self.startDate = startDateToUse
                 self.glucoseChartPoints = newGlucoseChartPointsToPrepend + (reUseExistingChartPointList ? self.glucoseChartPoints : [ChartPoint]()) + newGlucoseChartPointsToAppend
-                
 
                 // update the chart outlet
                 chartOutlet.reloadChart()
@@ -487,8 +488,9 @@ public final class GlucoseChartManager: NSObject {
     
     private func generateGlucoseChartWithFrame(_ frame: CGRect) -> Chart? {
         
+        
         // first calculate necessary values by looping through all chart points
-        loopThroughGlucoseChartPointsAndFindValues()
+        //loopThroughGlucoseChartPointsAndFindValues()
         
         let xAxisValues = generateXAxisValues()
         
@@ -536,23 +538,53 @@ public final class GlucoseChartManager: NSObject {
         
         let yAxisModel = ChartAxisModel(axisValues: yAxisValues, lineColor: ConstantsGlucoseChart.axisLineColor, labelSpaceReservationMode: .fixed(labelsWidthY))
         
-        let coordsSpace = ChartCoordsSpaceLeftBottomSingleAxis(chartSettings: chartSettings, chartFrame: frame, xModel: xAxisModel, yModel: yAxisModel)
+        // put Y axis on right side
+        let coordsSpace = ChartCoordsSpaceRightBottomSingleAxis(chartSettings: chartSettings, chartFrame: frame, xModel: xAxisModel, yModel: yAxisModel)
         
         let (xAxisLayer, yAxisLayer, innerFrame) = (coordsSpace.xAxisLayer, coordsSpace.yAxisLayer, coordsSpace.chartInnerFrame)
         
         // now that we know innerFrame we can set innerFrameWidth
         innerFrameWidth = Double(innerFrame.width)
         
+        
+        chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: UserDefaults.standard.useObjectives ? ConstantsGlucoseChart.gridColorObjectives : ConstantsGlucoseChart.gridColor,  linesWidth: 0.5)
+        
         // Grid lines
         let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: chartGuideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: yAxisValues)
         
-        let circles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseTintColor, optimized: true)
+        // high/low/target guideline layer settings and styles
+        let urgentHighLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: UserDefaults.standard.showColoredObjectives ? ConstantsGlucoseChart.guidelineUrgentHighLowColor : ConstantsGlucoseChart.guidelineUrgentHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 2, dotSpacing: 5)
         
+        let highLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: UserDefaults.standard.showColoredObjectives ? ConstantsGlucoseChart.guidelineHighLowColor : ConstantsGlucoseChart.guidelineHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 4, dotSpacing: 2)
+        
+        let targetLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineTargetColor, linesWidth: UserDefaults.standard.useObjectives ? (UserDefaults.standard.showTarget ? 1 : 0) : 0, dotWidth: 4, dotSpacing: 0)
+        
+        // high/low/target guidelines
+        let urgentHighLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: urgentHighLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.urgentHighMarkValueInUserChosenUnit)])
+
+        let highLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: highLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.highMarkValueInUserChosenUnit)])
+        
+        let targetLineLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: targetLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.targetMarkValueInUserChosenUnit)])
+
+        let lowLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: highLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.lowMarkValueInUserChosenUnit)])
+
+        let urgentLowLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: urgentHighLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.urgentLowMarkValueInUserChosenUnit)])
+        
+        // red/yellow/green circle layers
+        let glucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseTintColor, optimized: true)
+            
         let layers: [ChartLayer?] = [
             gridLayer,
             xAxisLayer,
             yAxisLayer,
-            circles
+            // guideline layers
+            urgentHighLineLayer,
+            highLineLayer,
+            targetLineLayer,
+            lowLineLayer,
+            urgentLowLineLayer,
+            // glucosePoint layer(s)
+            glucoseCircles,
         ]
         
         return Chart(
@@ -602,12 +634,13 @@ public final class GlucoseChartManager: NSObject {
             
         }
     }
+
     
     /// function to be called when glucoseChartPoints array is updated, as first function in generateGlucoseChartWithFrame. Will loop through glucoseChartPoints and find :
     /// - the maximum bg value of the chartPoints between start and end date
     /// - the timeStamp of the chartPoint with the highest timestamp that is still lower than the endDate, in the list of glucoseChartPoints
     private func loopThroughGlucoseChartPointsAndFindValues() {
-
+        
         maximumValueInGlucoseChartPoints = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         
         lastChartPointEarlierThanEndDate = nil
@@ -618,10 +651,7 @@ public final class GlucoseChartManager: NSObject {
                 
             if let lastChartPointEarlierThanEndDate = lastChartPointEarlierThanEndDate {
                 
-                if
-                    (glucoseChartPoint.x as! ChartAxisValueDate).date <= endDate
-                    &&
-                    (lastChartPointEarlierThanEndDate.x as! ChartAxisValueDate).date < (glucoseChartPoint.x as! ChartAxisValueDate).date {
+                if (glucoseChartPoint.x as! ChartAxisValueDate).date <= endDate && (lastChartPointEarlierThanEndDate.x as! ChartAxisValueDate).date < (glucoseChartPoint.x as! ChartAxisValueDate).date {
                     
                     self.lastChartPointEarlierThanEndDate = glucoseChartPoint
                     
@@ -632,7 +662,7 @@ public final class GlucoseChartManager: NSObject {
                 lastChartPointEarlierThanEndDate = glucoseChartPoint
                 
             }
-
+            
         }
         
     }

@@ -28,7 +28,8 @@ final class M5StackSettingsViewController: UIViewController {
     /// setup datasource, delegate, seperatorInset
     private func setupTableView() {
         if let tableView = tableView {
-            tableView.separatorInset = UIEdgeInsets.zero
+            // insert slightly the separator text so that it doesn't touch the safe area limit
+            tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
             tableView.dataSource = self
             tableView.delegate = self
         }
@@ -82,7 +83,7 @@ extension M5StackSettingsViewController: UITableViewDelegate {
             
             let selectedRowAction = viewModel.onRowSelect(index: indexPath.row)
             
-            SettingsViewUtilities.runSelectedRowAction(selectedRowAction: selectedRowAction, forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withViewModel: viewModel, tableView: tableView, forUIViewController: self)
+            SettingsViewUtilities.runSelectedRowAction(selectedRowAction: selectedRowAction, forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withSettingsViewModel: viewModel, tableView: tableView, forUIViewController: self)
             
         }
     }

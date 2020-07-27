@@ -11,9 +11,20 @@ fileprivate enum Setting:Int, CaseIterable {
     /// licenseInfo
     case licenseInfo = 2
     
+    /// link to icons8
+    case icons8 = 3
+    
 }
 
 struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
+    
+    func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
+    
+    func storeUIViewController(uIViewController: UIViewController) {}
+    
+    func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
+        // this ViewModel does need to send back messages to the viewcontroller asynchronously
+    }
     
     func sectionTitle() -> String? {
         return Texts_HomeView.info
@@ -34,6 +45,9 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             
         case .buildNumber:
             return Texts_SettingsView.build
+            
+        case .icons8:
+            return "Icons By icons8.com"
 
         }
         
@@ -53,6 +67,9 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
 
         case .licenseInfo:
             return .detailButton
+            
+        case .icons8:
+            return .disclosureIndicator
             
         }
         
@@ -83,6 +100,10 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         case .licenseInfo:
             
             return nil
+            
+        case .icons8:
+            
+            return nil
 
         }
         
@@ -111,6 +132,13 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         case .licenseInfo:
             return SettingsSelectedRowAction.showInfoText(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress)
 
+        case .icons8:
+            guard let url = URL(string: "https://icons8.com") else { return .nothing}
+            
+            UIApplication.shared.open(url)
+            
+            return .nothing
+            
         }
     }
     

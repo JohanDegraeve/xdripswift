@@ -9,11 +9,7 @@ extension UserDefaults {
         
         /// bloodglucose  unit
         case bloodGlucoseUnitIsMgDl = "bloodGlucoseUnit"
-        /// low value
-        case lowMarkValue = "lowMarkValue"
-        /// high value
-        case highMarkValue = "highMarkValue"
-        /// master or follower
+        /// urgent high value
         case isMaster = "isMaster"
         /// should notification be shown with reading yes or no
         case showReadingInNotification = "showReadingInNotification"
@@ -22,18 +18,29 @@ extension UserDefaults {
         /// should reading by multiplied by 10
         case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
         
+        // Home Screen and graph settings
+        
+        /// show the objectives and make them display on the graph? Or just hide it all because it's too complicated to waste time with?
+        case useObjectives = "useObjectives"
+        /// show the objective lines in color or grey?
+        case urgentHighMarkValue = "urgentHighMarkValue"
+        /// high value
+        case highMarkValue = "highMarkValue"
+        /// low value
+        case lowMarkValue = "lowMarkValue"
+        /// urgent low value
+        case urgentLowMarkValue = "urgentLowMarkValue"
+        /// master or follower
+        case showColoredObjectives = "showColoredObjectives"
+        /// show the target line or hide it?
+        case showTarget = "showTarget"
+        /// target value
+        case targetMarkValue = "targetMarkValue"
+        
         // Transmitter
         
         /// transmitter type
         case transmitterTypeAsString = "transmitterTypeAsString"
-        /// transmitterid
-        case transmitterId = "transmitterId"
-        /// is web OOP enabled or not
-        case webOOPEnabled = "webOOPEnabled"
-        /// if webOOP enabled, what site to use
-        case webOOPsite = "webOOPsite"
-        /// if webOOP enabled, value of the token
-        case webOOPtoken = "webOOPtoken"
 
         // Nightscout
         
@@ -86,8 +93,6 @@ extension UserDefaults {
         case speakTrend = "speakTrend"
         /// speak interval
         case speakInterval = "speakInterval"
-        /// speak rate
-        case speakRate = "speakRate"
         
         // Settings that Keep track of alert and info messages shown to the user ======
         
@@ -145,23 +150,23 @@ extension UserDefaults {
         
         // Other Settings (not user configurable)
         
-        // cgm Transmitter
-        /// active transmitter address
-        case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
-        /// active transmitter name
-        case cgmTransmitterDeviceName = "cgmTransmitterDeviceName"
-        /// timestamp of last bluetooth disconnect to transmitter
-        case lastdisConnectTimestamp = "lastdisConnectTimestamp"
+        /// - in case missed reading alert settings are changed by user, this value will be set to true
+        /// - alertmanager will observe that value and when changed, verify if missed reading alert needs to be changed
+        case missedReadingAlertChanged = "missedReadingAlertChanged"
+        
+        /// when was the app launched, used in trace info that is sent via email. Just to be able to see afterwards if the app ever crashed. Because sometimes users say it crashed, but maybe it just stopped receiving readings and restarted by opening the app, but didn't really crash
+        case timeStampAppLaunch = "timeStampAppLaunch"
         
         // Nightscout
         /// timestamp lastest reading uploaded to NightScout
         case timeStampLatestNSUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
         
+        /// timestamp latest calibration uploaded to NightScout
+        case timeStampLatestNSUploadedCalibrationToNightScout = "timeStampLatestUploadedCalibration"
+        
         // Transmitter
         /// Transmitter Battery Level
         case transmitterBatteryInfo = "transmitterbatteryinfo"
-        /// Dexcom transmitter reset required
-        case transmitterResetRequired = "transmitterResetRequired"
         
         // HealthKit
         /// did user authorize the storage of readings in healthkit or not
@@ -174,10 +179,14 @@ extension UserDefaults {
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
         
-        // Sensor
-        /// sensor Serial Number, for now only applicable to Libre
-        case sensorSerialNumber = "sensorSerialNumber"
+        // Trace
+        /// should debug level logs be added in trace file or not, and also in NSLog
+        case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
         
+        // non fixed slope values for oop web Libre
+        /// web oop parameters, only for Libre 1
+        case libre1DerivedAlgorithmParameters = "algorithmParameters"
+
         // development settings
         
         /// G6 factor1 - for testing G6 scaling
@@ -191,6 +200,17 @@ extension UserDefaults {
         
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
+        
+        /// if webOOP enabled, what site to use
+        case webOOPsite = "webOOPsite"
+        /// if webOOP enabled, value of the token
+        case webOOPtoken = "webOOPtoken"
+        
+        /// in case Libre 2 users want to use the local calibration algorithm
+        case overrideWebOOPCalibration = "overrideWebOOPCalibration"
+        
+        /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
+        case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
         
     }
     
@@ -209,46 +229,6 @@ extension UserDefaults {
         }
     }
     
-    /// the lowmarkvalue in unit selected by user ie, mgdl or mmol
-    @objc dynamic var lowMarkValueInUserChosenUnit:Double {
-        get {
-            //read currentvalue in mgdl
-            var returnValue = double(forKey: Key.lowMarkValue.rawValue)
-            // if 0 set to defaultvalue
-            if returnValue == 0.0 {
-                returnValue = ConstantsBGGraphBuilder.defaultLowMarkInMgdl
-            }
-            if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
-            }
-            return returnValue
-        }
-        set {
-            // store in mgdl
-            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.lowMarkValue.rawValue)
-        }
-    }
-    
-    /// the highmarkvalue in unit selected by user ie, mgdl or mmol
-    @objc dynamic var highMarkValueInUserChosenUnit:Double {
-        get {
-            //read currentvalue in mgdl
-            var returnValue = double(forKey: Key.highMarkValue.rawValue)
-            // if 0 set to defaultvalue
-            if returnValue == 0.0 {
-                returnValue = ConstantsBGGraphBuilder.defaultHighMmarkInMgdl
-            }
-            if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
-            }
-            return returnValue
-        }
-        set {
-            // store in mgdl
-            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
-        }
-    }
-    
     /// true if device is master, false if follower
     @objc dynamic var isMaster: Bool {
         // default value for bool in userdefaults is false, false is for master, true is for follower
@@ -257,34 +237,6 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.isMaster.rawValue)
-        }
-    }
-    
-    /// the highmarkvalue in unit selected by user ie, mgdl or mmol - rounded
-    @objc dynamic var highMarkValueInUserChosenUnitRounded:String {
-        get {
-            return highMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
-        }
-        set {
-            var value = newValue.toDouble()
-            if !bloodGlucoseUnitIsMgDl {
-                value = value?.mmolToMgdl()
-            }
-            set(value, forKey: Key.highMarkValue.rawValue)
-        }
-    }
-
-    /// the lowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
-    @objc dynamic var lowMarkValueInUserChosenUnitRounded:String {
-        get {
-            return lowMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
-        }
-        set {
-            var value = newValue.toDouble()
-            if !bloodGlucoseUnitIsMgDl {
-                value = value?.mmolToMgdl()
-            }
-            set(value, forKey: Key.lowMarkValue.rawValue)
         }
     }
     
@@ -320,13 +272,219 @@ extension UserDefaults {
             set(!newValue, forKey: Key.multipleAppBadgeValueWith10.rawValue)
         }
     }
-
+    
+    // MARK: Home Screen Settings
+    
+    /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var urgentHighMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.urgentHighMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentHighMarkValue.rawValue)
+        }
+    }
+    
+    /// the highmarkvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var highMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.highMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultHighMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
+        }
+    }
+    
+    /// the targetvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var targetMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.targetMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultTargetMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.targetMarkValue.rawValue)
+        }
+    }
+    
+    /// the lowmarkvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var lowMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.lowMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultLowMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.lowMarkValue.rawValue)
+        }
+    }
+    
+    /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol
+    @objc dynamic var urgentLowMarkValueInUserChosenUnit:Double {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = double(forKey: Key.urgentLowMarkValue.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl
+            }
+            if !bloodGlucoseUnitIsMgDl {
+                returnValue = returnValue.mgdlToMmol()
+            }
+            return returnValue
+        }
+        set {
+            // store in mgdl
+            set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentLowMarkValue.rawValue)
+        }
+    }
+    
+    /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var urgentHighMarkValueInUserChosenUnitRounded:String {
+        get {
+            return urgentHighMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.urgentHighMarkValue.rawValue)
+        }
+    }
+    
+    /// the highmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var highMarkValueInUserChosenUnitRounded:String {
+        get {
+            return highMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.highMarkValue.rawValue)
+        }
+    }
+    
+    /// the targetmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var targetMarkValueInUserChosenUnitRounded:String {
+        get {
+            return targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.targetMarkValue.rawValue)
+        }
+    }
+    
+    /// the lowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var lowMarkValueInUserChosenUnitRounded:String {
+        get {
+            return lowMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.lowMarkValue.rawValue)
+        }
+    }
+    
+    /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
+    @objc dynamic var urgentLowMarkValueInUserChosenUnitRounded:String {
+        get {
+            return urgentLowMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+        }
+        set {
+            var value = newValue.toDouble()
+            if !bloodGlucoseUnitIsMgDl {
+                value = value?.mmolToMgdl()
+            }
+            set(value, forKey: Key.urgentLowMarkValue.rawValue)
+        }
+    }
+    
+    /// should we use objectives for the BG values and graph lines etc?
+    @objc dynamic var useObjectives: Bool {
+        // default value for bool in userdefaults is false, by default we want the objective-based graph to be disabled so as not to scare anybody. They can enable it when they have time to understand it.
+        get {
+            return !bool(forKey: Key.useObjectives.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.useObjectives.rawValue)
+        }
+    }
+    
+    /// should the Guidelines be shown in color (yellow/red) on the graph?
+    @objc dynamic var showColoredObjectives: Bool {
+        // default value for bool in userdefaults is false, by default we want the guidelines to be shown in grey as per Nightscout
+        get {
+            return !bool(forKey: Key.showColoredObjectives.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showColoredObjectives.rawValue)
+        }
+    }
+    
+    /// should the target line (always shown in green) be shown on the graph?
+    @objc dynamic var showTarget: Bool {
+        // default value for bool in userdefaults is false, by default we will hide the target line as it could confuse users
+        get {
+            return !bool(forKey: Key.showTarget.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showTarget.rawValue)
+        }
+    }
+    
+    
     // MARK: Transmitter Settings
     
-    /// setting a new transmittertype will also set the transmitterid to nil
-    var transmitterType:CGMTransmitterType? {
+    /// cgm ransmittertype currently active
+    var cgmTransmitterType:CGMTransmitterType? {
         get {
-            if let transmitterTypeAsString = transmitterTypeAsString {
+            if let transmitterTypeAsString = cgmTransmitterTypeAsString {
                 return CGMTransmitterType(rawValue: transmitterTypeAsString)
             } else {
                 return nil
@@ -335,7 +493,7 @@ extension UserDefaults {
     }
     
     /// transmittertype as String, just to be able to define dynamic dispatch and obj-c visibility
-    @objc dynamic var transmitterTypeAsString:String? {
+    @objc dynamic var cgmTransmitterTypeAsString:String? {
         get {
             return string(forKey: Key.transmitterTypeAsString.rawValue)
         }
@@ -343,55 +501,8 @@ extension UserDefaults {
             // if transmittertype has changed then also reset the transmitter id to nil
             // this is also a check to see if transmitterTypeAsString has really changed, because just calling a set without a new value may cause a transmittertype reset in other parts of the call (inclusive stopping sensor etc.)
             if newValue != string(forKey: Key.transmitterTypeAsString.rawValue) {
-                set(nil, forKey: Key.transmitterId.rawValue)
                 set(newValue, forKey: Key.transmitterTypeAsString.rawValue)
             }
-        }
-    }
-    
-    /// transmitter id
-    @objc dynamic var transmitterId:String? {
-        get {
-            return string(forKey: Key.transmitterId.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.transmitterId.rawValue)
-        }
-    }
-    
-    /// web oop enabled
-    @objc dynamic var webOOPEnabled: Bool {
-        get {
-            return bool(forKey: Key.webOOPEnabled.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.webOOPEnabled.rawValue)
-        }
-    }
-    
-    /// web oop site
-    @objc dynamic var webOOPSite:String? {
-        get {
-            return string(forKey: Key.webOOPsite.rawValue)
-        }
-        set {
-            var value = newValue
-            if let newValue = newValue {
-                if !newValue.startsWith("http") {
-                    value = "https://" + newValue
-                }
-            }
-            set(value, forKey: Key.webOOPsite.rawValue)
-        }
-    }
-
-    /// web oop token
-    @objc dynamic var webOOPtoken:String? {
-        get {
-            return string(forKey: Key.webOOPtoken.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.webOOPtoken.rawValue)
         }
     }
     
@@ -435,21 +546,7 @@ extension UserDefaults {
             return string(forKey: Key.nightScoutUrl.rawValue)
         }
         set {
-            var value = newValue
-            if let newValue = newValue {
-                
-                // if url doesn't start with http, then add https
-                if !newValue.startsWith("http") {
-                    value = "https://" + newValue
-                }
-                
-                // if url ends with /, remove it
-                if value!.last == "/" {
-                    value!.removeLast()
-                }
-                
-            }
-            set(value, forKey: Key.nightScoutUrl.rawValue)
+            set(newValue, forKey: Key.nightScoutUrl.rawValue)
         }
     }
     
@@ -611,16 +708,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.speakInterval.rawValue)
-        }
-    }
-    
-    /// speak readings interval in minutes, if nil then default value to be used
-    @objc dynamic var speakRate: Double {
-        get {
-            return double(forKey: Key.speakRate.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.speakRate.rawValue)
         }
     }
     
@@ -788,30 +875,24 @@ extension UserDefaults {
     
     // MARK: - =====  Other Settings ======
     
-    var cgmTransmitterDeviceAddress: String? {
+    /// - in case missed reading alert settings are changed by user, this value will be set to true
+    /// - alertmanager will observe that value and when changed, verify if missed reading alert needs to be changed
+    @objc dynamic var missedReadingAlertChanged: Bool {
         get {
-            return string(forKey: Key.cgmTransmitterDeviceAddress.rawValue)
+            return bool(forKey: Key.missedReadingAlertChanged.rawValue)
         }
         set {
-            set(newValue, forKey: Key.cgmTransmitterDeviceAddress.rawValue)
-        }
-    }
-    
-    var cgmTransmitterDeviceName: String? {
-        get {
-            return string(forKey: Key.cgmTransmitterDeviceName.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.cgmTransmitterDeviceName.rawValue)
+            set(newValue, forKey: Key.missedReadingAlertChanged.rawValue)
         }
     }
 
-    var lastdisConnectTimestamp:Date? {
+    /// when was the app launched, used in trace info that is sent via email. Just to be able to see afterwards if the app ever crashed. Because sometimes users say it crashed, but maybe it just stopped receiving readings and restarted by opening the app, but didn't really crash
+    var timeStampAppLaunch:Date? {
         get {
-            return object(forKey: Key.lastdisConnectTimestamp.rawValue) as? Date
+            return object(forKey: Key.timeStampAppLaunch.rawValue) as? Date
         }
         set {
-            set(newValue, forKey: Key.lastdisConnectTimestamp.rawValue)
+            set(newValue, forKey: Key.timeStampAppLaunch.rawValue)
         }
     }
     
@@ -825,7 +906,17 @@ extension UserDefaults {
         }
     }
     
-    /// transmitterBatteryInfo
+    /// timestamp latest calibration uploaded to NightScout
+    var timeStampLatestNightScoutUploadedCalibration:Date? {
+        get {
+            return object(forKey: Key.timeStampLatestNSUploadedCalibrationToNightScout.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestNSUploadedCalibrationToNightScout.rawValue)
+        }
+    }
+    
+    /// transmitterBatteryInfo, this should be the transmitter battery info of the latest active cgmTransmitter
     var transmitterBatteryInfo:TransmitterBatteryInfo? {
         get {
             if let data = object(forKey: Key.transmitterBatteryInfo.rawValue) as? Data {
@@ -844,16 +935,6 @@ extension UserDefaults {
         }
     }
     
-    /// is transmitter reset required or not
-    @objc dynamic var transmitterResetRequired: Bool {
-        get {
-            return bool(forKey: Key.transmitterResetRequired.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.transmitterResetRequired.rawValue)
-        }
-    }
-      
     /// did user authorize the storage of readings in healthkit or not - this setting is actually only used to allow the HealthKitManager to listen for changes in the authorization status
     var storeReadingsInHealthkitAuthorized:Bool {
         get {
@@ -881,16 +962,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.timeStampLatestDexcomShareUploadedBgReading.rawValue)
-        }
-    }
-    
-    /// sensor serial number, for now only useful for Libre sensor
-    var sensorSerialNumber:String? {
-        get {
-            return string(forKey: Key.sensorSerialNumber.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.sensorSerialNumber.rawValue)
         }
     }
     
@@ -935,7 +1006,78 @@ extension UserDefaults {
             set(newValue, forKey: Key.OSLogEnabled.rawValue)
         }
     }
+    
+    /// addDebugLevelLogsInTraceFileAndNSLog - default false
+    var addDebugLevelLogsInTraceFileAndNSLog: Bool {
+        get {
+            return bool(forKey: Key.addDebugLevelLogsInTraceFileAndNSLog.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.addDebugLevelLogsInTraceFileAndNSLog.rawValue)
+        }
+    }
+    
+    /// web oop site
+    @objc dynamic var webOOPSite:String? {
+        get {
+            return string(forKey: Key.webOOPsite.rawValue)
+        }
+        set {
+            var value = newValue
+            if let newValue = newValue {
+                if !newValue.startsWith("http") {
+                    value = "https://" + newValue
+                }
+            }
+            set(value, forKey: Key.webOOPsite.rawValue)
+        }
+    }
+    
+    /// web oop token
+    @objc dynamic var webOOPtoken:String? {
+        get {
+            return string(forKey: Key.webOOPtoken.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.webOOPtoken.rawValue)
+        }
+    }
+    
+    /// in case Libre 2 users want to use the local calibration algorithm
+    @objc dynamic var overrideWebOOPCalibration: Bool {
+        get {
+            return bool(forKey: Key.overrideWebOOPCalibration.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.overrideWebOOPCalibration.rawValue)
+        }
+    }
 
+    /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
+    var cgmTransmitterDeviceAddress: String? {
+        get {
+            return string(forKey: Key.cgmTransmitterDeviceAddress.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.cgmTransmitterDeviceAddress.rawValue)
+        }
+    }
+    
+    /// web oop parameters, only for bubble
+    var libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters? {
+        get {
+            guard let jsonString = string(forKey: Key.libre1DerivedAlgorithmParameters.rawValue) else { return nil }
+            guard let jsonData = jsonString.data(using: .utf8) else { return nil }
+            guard let value = try? JSONDecoder().decode(Libre1DerivedAlgorithmParameters.self, from: jsonData) else { return nil }
+            return value
+        }
+        set {
+            let encoder = JSONEncoder()
+            guard let jsonData = try? encoder.encode(newValue) else { return }
+            let jsonString = String(bytes: jsonData, encoding: .utf8)
+            set(jsonString, forKey: Key.libre1DerivedAlgorithmParameters.rawValue)
+        }
+    }
     
 }
 

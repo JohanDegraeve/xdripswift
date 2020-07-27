@@ -2,6 +2,11 @@ import UIKit
 
 final class BluetoothPeripheralNavigationController: UINavigationController {
     
+    // set the status bar content colour to light to match new darker theme
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
     // MARK:- private properties
     
     /// reference to coreDataManager
@@ -27,6 +32,7 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
         super.viewDidLoad()
         
         delegate = self
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {

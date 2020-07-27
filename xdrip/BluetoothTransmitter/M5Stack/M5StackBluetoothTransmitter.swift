@@ -35,15 +35,19 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     /// possible rotation values, , the value is how it will be sent to the M5Stack but not  how it's stored in the M5Stack object - In the M5Stack object we store an Int value which is used as index in rotationValues and rotationStrings
     private let rotationValues: [UInt16] = [ 1, 2, 3, 0]
     
+    public weak var m5StackBluetoothTransmitterDelegate: M5StackBluetoothTransmitterDelegate?
+
     // MARK: - initializer
 
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
-    ///     - delegate : the M5StackBluetoothTransmitterDelegate
+    ///     - m5StackBluetoothTransmitterDelegate : the M5StackBluetoothTransmitterDelegate
+    ///     - bluetoothTransmitterDelegate : BluetoothTransmitterDelegate
     ///     - blePassword : optional. If nil then xdrip will send a M5StackReadBlePassWordTxMessage to the M5Stack, so this would be a case where the M5Stack (all M5Stacks managed by xdrip) do not have a fixed blepassword
     ///     - bluetoothPeripheralType : M5Stack or M5StickC
-    init(address:String?, name: String?, delegate: M5StackBluetoothTransmitterDelegate, blePassword: String?, bluetoothPeripheralType: BluetoothPeripheralType) {
+    ///     - bluetoothTransmitterDelegate : BluetoothTransmitterDelegate
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, m5StackBluetoothTransmitterDelegate: M5StackBluetoothTransmitterDelegate, blePassword: String?, bluetoothPeripheralType: BluetoothPeripheralType) {
         
         // assign addressname and name, assume it's not been connected before
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "M5Stack")
@@ -59,8 +63,11 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         // assign bluetoothPeripheralType
         self.bluetoothPeripheralType = bluetoothPeripheralType
         
+        // assign m5StackBluetoothTransmitterDelegate
+        self.m5StackBluetoothTransmitterDelegate = m5StackBluetoothTransmitterDelegate
+        
         // call super
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service)], CBUUID_ReceiveCharacteristic: CBUUID_TxRxCharacteristic, CBUUID_WriteCharacteristic: CBUUID_TxRxCharacteristic, startScanningAfterInit: false, bluetoothTransmitterDelegate: delegate)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service)], CBUUID_ReceiveCharacteristic: CBUUID_TxRxCharacteristic, CBUUID_WriteCharacteristic: CBUUID_TxRxCharacteristic, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
 
     }
     
@@ -159,6 +166,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     func writeRotation(rotation: Int) -> Bool {
         
         trace("in writeRotation, attempting to send", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
+
         return writeDataToPeripheral(data: rotationValues[rotation].data, opCode: .writeRotationTx)
         
     }
@@ -320,10 +328,6 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             return
         }
         
-        //only for logging
-        let data = value.hexEncodedString()
-        trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .debug, data)
-        
         // value length should be at least 1
         guard value.count > 0 else {
             trace("    value length is 0, no further processing", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
@@ -349,8 +353,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
                 
                 self.blePassword = newBlePassword
                 
-                (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)? .newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: self)
-                (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: self)
+                m5StackBluetoothTransmitterDelegate?.newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: self)
                 
             }
             
@@ -362,8 +365,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             trace("    successfully authenticated", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             
             // inform delegates
-            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.authentication(success: true, m5StackBluetoothTransmitter: self)
-            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.authentication(success: true, m5StackBluetoothTransmitter: self)
+            m5StackBluetoothTransmitterDelegate?.authentication(success: true, m5StackBluetoothTransmitter: self)
             
             // final steps after successful communication
             finalizeConnectionSetup()
@@ -371,18 +373,13 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         case .authenticateFailureRx:
             // received authentication failure, inform delegates
 
-            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.authentication(success: false, m5StackBluetoothTransmitter: self)
-            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.authentication(success: false, m5StackBluetoothTransmitter: self)
+            m5StackBluetoothTransmitterDelegate?.authentication(success: false, m5StackBluetoothTransmitter: self)
             
         case .readBlePassWordError1Rx:
-            
-            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.blePasswordMissing(m5StackBluetoothTransmitter: self)
-            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.blePasswordMissing(m5StackBluetoothTransmitter: self)
+            m5StackBluetoothTransmitterDelegate?.blePasswordMissing(m5StackBluetoothTransmitter: self)
             
         case .readBlePassWordError2Rx:
-
-            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.m5StackResetRequired(m5StackBluetoothTransmitter: self)
-            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.m5StackResetRequired(m5StackBluetoothTransmitter: self)
+            m5StackBluetoothTransmitterDelegate?.m5StackResetRequired(m5StackBluetoothTransmitter: self)
             
         case .readTimeStampRx:
             
@@ -392,8 +389,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         case .readAllParametersRx:
             
             // M5Stack is asking for all parameters
-            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
-            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
+            m5StackBluetoothTransmitterDelegate?.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
             
         case .readBatteryLevelRx:
             
@@ -406,8 +402,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             let receivedBatteryLevel = Int(value[1])
             
             // M5Stack is sending batteryLevel, which is in the second byte
-            (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.receivedBattery(level: receivedBatteryLevel, m5StackBluetoothTransmitter: self)
-            (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.receivedBattery(level: receivedBatteryLevel, m5StackBluetoothTransmitter: self)
+            m5StackBluetoothTransmitterDelegate?.receivedBattery(level: receivedBatteryLevel, m5StackBluetoothTransmitter: self)
             
         }
 
@@ -543,8 +538,8 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         
         // this is the time when the M5stack is ready to receive readings or parameter updates
         isReadyToReceiveData = true
-        (fixedBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
-        (variableBluetoothTransmitterDelegate as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
+        
+        m5StackBluetoothTransmitterDelegate?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
 
     }
     

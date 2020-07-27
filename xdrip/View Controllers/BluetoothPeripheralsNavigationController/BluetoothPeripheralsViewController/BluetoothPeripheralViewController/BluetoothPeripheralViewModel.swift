@@ -1,27 +1,33 @@
 import Foundation
 import UIKit
 
-protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
+protocol BluetoothPeripheralViewModel {
     
     /// to be called before opening the actual viewcontroller or after discovering a new bluetoothperipheral
     /// - parameters :
-    ///    - bluetoothTransmitterDelegate : usually the uiViewController
     ///    - bluetoothPeripheral : if nil then the viewcontroller is opened to scan for a new peripheral
     ///    - bluetoothPeripheralManager : reference to bluetoothPeripheralManaging object
     ///    - tableView : needed to intiate refresh of row
     ///    - bluetoothPeripheralViewController : BluetoothPeripheralViewController
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate)
+    ///    - onLibreSensorTypeReceived : closure that the viewmodel should call when it receives a libre sensor type - doesn't need to be necessarily a new sensor type. This will allow the BluetoothPeripheralViewController to delete or add sections, namely oop web related settings
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView,  bluetoothPeripheralViewController: BluetoothPeripheralViewController, onLibreSensorTypeReceived: ((LibreSensorType) -> ())?)
+    
+    /// - for example  M5StackBluetoothTransmitter has a delegate of type M5StackBluetoothTransmitterDelegate.
+    /// - in the configure function, this varaible will be assigned to the viewmodel itself (if there is a M5StackBluetoothTransmitter)
+    /// - before the viewModel is deleted (this happens when user goes back from BluetoothPeripheralViewController to BluetoothPeripheralsViewController, we need to reassign
+    //func resetSpecificBlueToothTransmitterDelegate()
     
     /// screen title for uiviewcontroller
     func screenTitle() -> String
     
+    /// section title for specific section
     func sectionTitle(forSection section: Int) -> String
     
     /// updates the contents of a cell, for setting with rawValue withSettingRawValue
-    func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem)
+    func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral)
     
-    /// user clicked a row, this function does the necessary
-    func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem)
+    /// user clicked a row, this function returns an instance of SettingsSelectedRowAction, can be run with SettingsViewUtilities.runSelectedRowAction
+    func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging) -> SettingsSelectedRowAction
     
     /// - get number of settings in the viewmodel, in specified section number
     /// - this is the same as the number of rows in the section
@@ -30,11 +36,5 @@ protocol BluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
     
     /// how many sections does this viewmodel define, in addition to the section already defined in BluetoothPeripheralViewController
     func numberOfSections() -> Int
-    
-    /// used when new peripheral is discovered and connected, to temporary store values in model (eg in case of M5Stack, store the rotation value which would be a default value)
-    func storeTempValues(from bluetoothPeripheral: BluetoothPeripheral)
-    
-    /// used when user clicks done button in uiviewcontroller
-    func writeTempValues(to bluetoothPeripheral: BluetoothPeripheral)
     
 }

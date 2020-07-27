@@ -58,6 +58,8 @@ class DexcomShareUploadManager:NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.useUSDexcomShareurl.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.uploadReadingstoDexcomShare.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareSerialNumber.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareUseSchedule.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareSchedule.rawValue, options: .new, context: nil)
 
     }
     
@@ -104,7 +106,6 @@ class DexcomShareUploadManager:NSObject {
                         
                         if requiredSettingsAreNotNil() {
                             
-                            // check if required dexcom share settings are not nil
                             loginAndStoreSessionId { (success, error) in
                                 DispatchQueue.main.async {
                                     
@@ -113,7 +114,7 @@ class DexcomShareUploadManager:NSObject {
                                     if success {
                                         trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                                         
-                                        self.uploadBgReadingsToDexcomShare(firstAttempt: true)
+                                        self.upload()
                                         
                                     } else {
                                         trace("in observeValue, Dexcom Share credential check failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
@@ -125,7 +126,7 @@ class DexcomShareUploadManager:NSObject {
                         }
                     }
                     
-                case UserDefaults.Key.uploadReadingstoDexcomShare, UserDefaults.Key.dexcomShareSerialNumber, UserDefaults.Key.useUSDexcomShareurl :
+                case UserDefaults.Key.uploadReadingstoDexcomShare, UserDefaults.Key.dexcomShareSerialNumber, UserDefaults.Key.useUSDexcomShareurl, UserDefaults.Key.dexcomShareUseSchedule, UserDefaults.Key.dexcomShareSchedule :
                     
                     // if changing to enabled, then do a credentials test and if ok start upload, if fail don't give warning, that's the only difference with previous cases
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
@@ -142,7 +143,7 @@ class DexcomShareUploadManager:NSObject {
                                         if success {
                                             
                                             trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                                            self.uploadBgReadingsToDexcomShare(firstAttempt: true)
+                                            self.upload()
 
                                         } else {
                                             
@@ -207,9 +208,9 @@ class DexcomShareUploadManager:NSObject {
         let sharedSession = URLSession.shared
 
         // Create upload Task
-        let dataTask = sharedSession.uploadTask(with: request, from: "".data(using: .utf8), completionHandler: { (data, response, error) -> Void in
+        let task = sharedSession.uploadTask(with: request, from: "".data(using: .utf8), completionHandler: { (data, response, error) -> Void in
             
-            trace("in startRemoteMonitoringSessionAndStartUpload, in uploadTask completionHandlself.er", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+            trace("in startRemoteMonitoringSessionAndStartUpload, finished task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
             
             // if ends without success then log the data when existing the scope
             var success = false
@@ -291,7 +292,8 @@ class DexcomShareUploadManager:NSObject {
             
         })
         
-        dataTask.resume()
+        trace("in startRemoteMonitoringSessionAndStartUpload, calling task.resume", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+        task.resume()
 
     }
     
@@ -349,9 +351,6 @@ class DexcomShareUploadManager:NSObject {
             return
         }
         
-        // get shared URLSession
-        let sharedSession = URLSession.shared
-        
         // create upload data as dictionary
         let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map({$0.dictionaryRepresentationForDexcomShareUpload})
         let uploadDataAsDictionary:[String : Any] = [
@@ -366,9 +365,9 @@ class DexcomShareUploadManager:NSObject {
             let uploadData = try JSONSerialization.data(withJSONObject: uploadDataAsDictionary, options: [])
             
             // Create upload Task
-            let dataTask = sharedSession.uploadTask(with: request, from: uploadData, completionHandler: { (data, response, error) -> Void in
+            let task = URLSession.shared.uploadTask(with: request, from: uploadData, completionHandler: { (data, response, error) -> Void in
                 
-                trace("in uploadBgReadingsToDexcomShare, in uploadTask completionHandler", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+                trace("in uploadBgReadingsToDexcomShare, finished task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                 
                 // error cases
                 if let error = error {
@@ -499,7 +498,8 @@ class DexcomShareUploadManager:NSObject {
                 
             })
             
-            dataTask.resume()
+            trace("in uploadBgReadingsToDexcomShare, calling task.resume", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+            task.resume()
             
         } catch let error {
             trace("     failed to upload, error = %{public}@", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, error.localizedDescription)
@@ -546,9 +546,9 @@ class DexcomShareUploadManager:NSObject {
             let sharedSession = URLSession.shared
             
             // Create upload Task
-            let dataTask = sharedSession.uploadTask(with: request, from: uploadData, completionHandler: { (data, response, error) -> Void in
+            let task = sharedSession.uploadTask(with: request, from: uploadData, completionHandler: { (data, response, error) -> Void in
                 
-                trace("    in uploadTask completionHandler", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+                trace("in loginAndStoreSessionId, finished task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                 
                 // error cases
                 if let error = error {
@@ -619,7 +619,8 @@ class DexcomShareUploadManager:NSObject {
                 
             })
             
-            dataTask.resume()
+            trace("in loginAndStoreSessionId, calling task.resume", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+            task.resume()
 
         } catch let error {
             trace("     %{public}@", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, error.localizedDescription)

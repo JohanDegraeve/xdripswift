@@ -17,6 +17,12 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
+  
+    /// CGMBlueReaderTransmitterDelegate - not used used as there's no specific settings saved nor displayed for BlueReader
+    public weak var cGMBlueReaderTransmitterDelegate: CGMBlueReaderTransmitterDelegate?
+    
+    /// is nonFixed enabled for the transmitter or not
+    private var nonFixedSlopeEnabled: Bool
     
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMBlueReader)
@@ -28,7 +34,10 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
-    init(address:String?, name: String?, delegate:CGMTransmitterDelegate) {
+    ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
+    ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
+    ///     - cGMBlueReaderTransmitterDelegate : a CGMBlueReaderTransmitterDelegate
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBlueReaderTransmitterDelegate : CGMBlueReaderTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "blueReader")
@@ -37,38 +46,20 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
         }
         
         // assign CGMTransmitterDelegate
-        cgmTransmitterDelegate = delegate
+        cgmTransmitterDelegate = cGMTransmitterDelegate
         
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_BlueReader)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_BlueReader, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_BlueReader, startScanningAfterInit: CGMTransmitterType.blueReader.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
+        // assign cGMBlueReaderTransmitterDelegate
+        self.cGMBlueReaderTransmitterDelegate = cGMBlueReaderTransmitterDelegate
+        
+        // initialize nonFixedSlopeEnabled
+        self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
+
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_BlueReader)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_BlueReader, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_BlueReader, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }
     
     // MARK: - overriden  BluetoothTransmitter functions
     
-    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        
-        super.centralManager(central, didConnect: peripheral)
-        
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
-        
-    }
-    
-    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        
-        super.centralManagerDidUpdateState(central)
-        
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
-        
-    }
-    
-    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        
-        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
-        
-        cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
-        
-    }
-
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         
         super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
@@ -87,8 +78,6 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
                 trace("    failed to convert value to string", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .error)
                 return
             }
-            
-            trace("    value = %{public}@", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .info, valueAsString)
             
             //find indexes of " "
             let indexesOfSplitter = valueAsString.indexes(of: " ")
@@ -125,7 +114,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
             
             // send to delegate
             var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawDataAsDouble)]
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transMitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transMitterBatteryInfo, sensorTimeInMinutes: nil)
             
         } else {
             trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .error)
@@ -135,20 +124,31 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: CGMTransmitter protocol functions
     
-    /// to ask pairing - empty function because Bubble doesn't need pairing
-    ///
-    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
-    func initiatePairing() {}
-    
-    /// to ask transmitter reset - empty function because Bubble doesn't support reset
-    ///
-    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
-    func reset(requested:Bool) {}
-    
+    func setNonFixedSlopeEnabled(enabled: Bool) {
+        nonFixedSlopeEnabled = enabled
+    }
+
     /// this transmitter does not support oopWeb
     func setWebOOPEnabled(enabled: Bool) {}
     
-    /// this transmitter does not support oop web
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
+    func setWebOOPSite(oopWebSite: String) {}
+    
+    func setWebOOPToken(oopWebToken: String) {}
+    
+    func cgmTransmitterType() -> CGMTransmitterType {
+        return .blueReader
+    }
+
+    func isNonFixedSlopeEnabled() -> Bool {
+        return nonFixedSlopeEnabled
+    }
+    
+    func isWebOOPEnabled() -> Bool {
+        return false
+    }
+
+    func requestNewReading() {
+        // not supported for blucon
+    }
     
 }

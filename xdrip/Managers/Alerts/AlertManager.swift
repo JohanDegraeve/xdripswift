@@ -97,6 +97,9 @@ public class AlertManager:NSObject {
             
         })
         
+        // add observer for changes in UserDefaults
+        addObservers()
+        
     }
     
     // MARK: - public functions
@@ -104,11 +107,16 @@ public class AlertManager:NSObject {
     /// check all alerts and fire if needed
     /// - parameters:
     ///     - maxAgeOfLastBgReadingInSeconds : for master mode max 1 minute should be ok, but for follower mode it could be interesting to take a higher value
-    public func checkAlerts(maxAgeOfLastBgReadingInSeconds:Double) {
+    /// - returns:
+    ///     - if true then an immediate notification is created (immediate being not a future planned, like missed reading), which contains the bg reading in the text - so there's no need to create an additional notificationwith the text in it
+    public func checkAlerts(maxAgeOfLastBgReadingInSeconds:Double) -> Bool {
         
         // first of all remove all existing notifications, there should be only one open alert on the home screen. The most relevant one will be reraised
         uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: alertNotificationIdentifers)
         uNUserNotificationCenter.removeAllPendingNotificationRequests()
+        
+        /// this is the return value
+        var immediateNotificationCreated = false
         
         // get last bgreading, ignore sensor, because it must also work for follower mode
         let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
@@ -122,14 +130,13 @@ public class AlertManager:NSObject {
         // get transmitterBatteryInfo
         let transmitterBatteryInfo = UserDefaults.standard.transmitterBatteryInfo
         
-        // all alerts will only be created if there's a reading, less than 60 seconds old
-        // except for transmitterBatteryInfo alert
+        // all alerts will only be created if there's a reading, less than maxAgeOfLastBgReadingInSeconds seconds old
         if latestBgReadings.count > 0 {
             
             let lastBgReading = latestBgReadings[0]
 
             if abs(lastBgReading.timeStamp.timeIntervalSinceNow) < maxAgeOfLastBgReadingInSeconds {
-                // reading is for an active sensor and is less than 60 seconds old, let's check the alerts
+                // reading is maxAgeOfLastBgReadingInSeconds seconds old, let's check the alerts
                 // need to call checkAlert
                 
                 // if latestBgReadings[1] exists then assign it to lastButOneBgREading
@@ -147,9 +154,21 @@ public class AlertManager:NSObject {
                 let alertGroupsByPreference: [[AlertKind]] = [[.fastdrop], [.verylow, .low], [.fastrise], [.veryhigh, .high], [.calibration], [.batterylow]]
                 
                 // only raise first alert group that's been tripped
-                _ = alertGroupsByPreference.first(where: { (alertGroup:[AlertKind]) -> Bool in
+                // check the result to see if it's an alert kind that creates an immediate notification that contains the reading value
+                if let result = alertGroupsByPreference.first(where: { (alertGroup:[AlertKind]) -> Bool in
+                    
                     checkAlertGroupAndFire(alertGroup, checkAlertAndFireHelper)
-                })
+                    
+                }) {
+                    
+                    // in this check were assuming that if there's one alertKind in a group that creates an immediate notification, then also the other(s) do(es)
+                    for alertKind in result {
+                        if alertKind.createsImmediateNotificationWithBGReading() {
+                            immediateNotificationCreated = true
+                        }
+                    }
+                    
+                }
                 
                 // the missed reading alert will be a future planned alert
                 _ = checkAlertAndFireHelper(.missedreading)
@@ -160,6 +179,9 @@ public class AlertManager:NSObject {
         } else {
             trace("in checkAlerts, latestBgReadings.count == 0", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
         }
+        
+        return immediateNotificationCreated
+        
     }
     
     /// Function to be called that receives the notification actions. Will handle the response. - called when user clicks a notification
@@ -250,6 +272,46 @@ public class AlertManager:NSObject {
         return returnValue
     }
     
+    // MARK: - overriden functions
+    
+    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if let keyPath = keyPath {
+            
+            if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
+                
+                switch keyPathEnum {
+                    
+                case UserDefaults.Key.missedReadingAlertChanged :
+                    
+                    // if missedReadingAlertChanged didn't change to true then no further processing
+                    guard UserDefaults.standard.missedReadingAlertChanged else {return}
+                    
+                    // user changed a missed reading alert setting, so we're going to call checkAlertAndFire for .missedreading, which will replan or cancel any existing missed reading alert
+                    
+                    // get last bgreading, ignore sensor, because it must also work for follower mode
+                    // to check missed reading alert, we only need one reading
+                    let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 1, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                    
+                    if latestBgReadings.count > 0 {
+
+                        // first of all remove all existing missedreading notifications
+                        uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
+                        uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
+                        
+                        _ = checkAlertAndFire(alertKind: .missedreading, lastBgReading: latestBgReadings[0], lastButOneBgREading: nil, lastCalibration: nil, transmitterBatteryInfo: nil)
+
+                    }
+                    
+                    UserDefaults.standard.missedReadingAlertChanged = false
+                    
+                default:
+                    break
+                }
+            }
+        }
+    }
+
     // MARK: - private helper functions
     
     /// Checks group of alerts - Not to be used for alerts with delay (ie missedreading)
@@ -522,9 +584,28 @@ public class AlertManager:NSObject {
             // log the result
             trace("in checkAlert, raising alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             if delayInSecondsToUse > 0 {
-                trace("   delay = %{public}@ seconds, = %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, delayInSecondsToUse.description, ((round(Double(delayInSecondsToUse)/60*10))/10).description)
+                trace("   delay = %{public}@ seconds, = %{public}@ minutes - which means this is a future planned alert, it will not go off now", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, delayInSecondsToUse.description, ((round(Double(delayInSecondsToUse)/60*10))/10).description)
             }
 
+            // check if app is allowed to send local notification and if not write info to trace
+            UNUserNotificationCenter.current().getNotificationSettings { (notificationSettings) in
+                
+                switch notificationSettings.authorizationStatus {
+                case .denied:
+                    trace("   notificationSettings.authorizationStatus = denied", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
+                case .notDetermined:
+                    trace("   notificationSettings.authorizationStatus = notDetermined", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
+                case .authorized:
+                    break
+                case .provisional:
+                    trace("   notificationSettings.authorizationStatus = provisional", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
+
+                @unknown default:
+                    fatalError("unsupported authorizationStatus in AlertManager")
+                    
+                }
+            }
+            
             return true
             
         } else {
@@ -574,7 +655,7 @@ public class AlertManager:NSObject {
     /// adds the alert notification categories to the existing categories
     /// - parameters:
     ///     - existingCategories : notification categories that currently exist
-    func setAlertNotificationCategories(_ existingCategories: Set<UNNotificationCategory>) {
+    private func setAlertNotificationCategories(_ existingCategories: Set<UNNotificationCategory>) {
         
         // create var equal to existingCategories so we can add new categories
         var mutableExistingCategories = existingCategories
@@ -590,6 +671,13 @@ public class AlertManager:NSObject {
         
         // get UNUserNotificationCenter and set new list of categories
         UNUserNotificationCenter.current().setNotificationCategories(mutableExistingCategories)
+        
+    }
+
+    /// when user changes M5Stack related settings, then the transmitter need to get that info, add observers
+    private func addObservers() {
+        
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.missedReadingAlertChanged.rawValue, options: .new, context: nil)
         
     }
 

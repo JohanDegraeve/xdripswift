@@ -95,6 +95,10 @@ extension Data {
         append(UnsafeBufferPointer(start: &element, count: 1))
     }
     
+    func getByteAt(position:Int) -> Int {
+        return Int(self[position])
+    }
+    
 }
 
 

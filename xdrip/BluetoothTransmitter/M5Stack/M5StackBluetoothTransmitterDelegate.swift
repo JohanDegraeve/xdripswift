@@ -1,6 +1,6 @@
 import Foundation
 
-protocol M5StackBluetoothTransmitterDelegate: BluetoothTransmitterDelegate {
+protocol M5StackBluetoothTransmitterDelegate: AnyObject {
     
     /// will be called if M5StackBluetoothTransmitter is connected and ready to receive data
     func isReadyToReceiveData(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter)

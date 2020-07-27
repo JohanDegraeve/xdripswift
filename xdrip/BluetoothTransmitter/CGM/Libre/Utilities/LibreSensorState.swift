@@ -17,7 +17,7 @@ import Foundation
 /// - shutdown:      0x05 sensor stops operation after 15d after start
 /// - failure:       0x06 sensor has an error
 /// - unknown:       any other state
-enum LibreSensorState {
+public enum LibreSensorState {
     case notYetStarted
     case starting
     case ready
@@ -64,6 +64,25 @@ enum LibreSensorState {
             return "Sensor has failure"
         default:
             return "Unknown sensor state"
+        }
+    }
+    
+    var translatedDescription: String {
+        switch self {
+        case .notYetStarted:
+            return TextsLibreStates.notYetStarted
+        case .starting:
+            return TextsLibreStates.starting
+        case .ready:
+            return TextsLibreStates.ready
+        case .expired:
+            return TextsLibreStates.expired
+        case .shutdown:
+            return TextsLibreStates.shutdown
+        case .failure:
+            return TextsLibreStates.failure
+        default:
+            return TextsLibreStates.unknown
         }
     }
 }

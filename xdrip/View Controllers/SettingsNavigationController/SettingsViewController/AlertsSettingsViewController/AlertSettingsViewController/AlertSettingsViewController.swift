@@ -25,8 +25,17 @@ final class AlertSettingsViewController: UIViewController {
         // save the alertentry
         alertSettingsViewControllerData.coreDataManager.saveChanges()
         
+        // if it's a missed reading alert, then set UserDefaults.standard.missedReadingAlertChanged
+        // this will trigger the AlertManager to check if missed reading alert needs to be replanned
+        if alertEntryAsNSObject.alertkind == AlertKind.missedreading.rawValue {
+            
+            UserDefaults.standard.missedReadingAlertChanged = true
+            
+        }
+        
         // go back to the alerts settings screen
         performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
+        
     }
     
     @IBOutlet weak var doneButtonOutlet: UIBarButtonItem!
@@ -117,7 +126,8 @@ final class AlertSettingsViewController: UIViewController {
         
         /// setup tableView datasource, delegate, seperatorInset
         if let tableView = tableView {
-            tableView.separatorInset = UIEdgeInsets.zero
+            // insert slightly the separator text so that it doesn't touch the safe area limit
+            tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
             tableView.dataSource = alertSettingsViewControllerData
             tableView.delegate = alertSettingsViewControllerData
         }

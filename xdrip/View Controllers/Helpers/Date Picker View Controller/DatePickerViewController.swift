@@ -73,7 +73,7 @@ final class DatePickerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        //view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         
     }
 
@@ -124,9 +124,6 @@ final class DatePickerViewController: UIViewController {
         if let subTitle = subTitle {
             pickerViewSubTitle.text = subTitle
         }
-        
-        // set background color to white, doesn't seem to work when doing it in the interface builder
-        datePickerView.backgroundColor = .white
         
     }
     

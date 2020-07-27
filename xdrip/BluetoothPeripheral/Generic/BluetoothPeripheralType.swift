@@ -13,11 +13,38 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// M5StickC
     case M5StickCType = "M5StickC"
     
-    /// watlaa master
-    case watlaaMaster = "Watlaa master"
+    /// DexcomG4
+    case DexcomG4Type = "Dexcom G4 (bridge)"
     
-    /// - returns: the BluetoothPeripheralViewModel
-    func viewModel() -> BluetoothPeripheralViewModel {
+    /// DexcomG5
+    case DexcomG5Type = "Dexcom G5"
+    
+    /// DexcomG6
+    case DexcomG6Type = "Dexcom G6"
+    
+    /// Blucon
+    case BluconType = "Blucon"
+    
+    /// BlueReader
+    case BlueReaderType = "BlueReader"
+    
+    /// bubble
+    case BubbleType = "Bubble"
+    
+    /// Droplet
+    case DropletType = "Droplet"
+    
+    /// GNSentry
+    case GNSentryType = "GNSentry"
+    
+    /// MiaoMiao
+    case MiaoMiaoType = "MiaoMiao"
+      
+    /// watlaa master
+    case WatlaaType = "Watlaa"
+
+    /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
+    func viewModel() -> BluetoothPeripheralViewModel? {
         
         switch self {
             
@@ -27,8 +54,36 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StickCType:
             return M5StickCBluetoothPeripheralViewModel()
             
-        case .watlaaMaster:
-            return WatlaaMasterBluetoothPeripheralViewModel()
+        case .WatlaaType:
+            return WatlaaBluetoothPeripheralViewModel()
+            
+        case .DexcomG5Type:
+            return DexcomG5BluetoothPeripheralViewModel()
+            
+        case .BubbleType:
+            return BubbleBluetoothPeripheralViewModel()
+            
+        case .MiaoMiaoType:
+            return MiaoMiaoBluetoothPeripheralViewModel()
+            
+        case .BluconType:
+            return BluconBluetoothPeripheralViewModel()
+            
+        case .GNSentryType:
+            return GNSEntryBluetoothPeripheralViewModel()
+         
+        case .BlueReaderType:
+            return nil
+            
+        case .DropletType:
+            return DropletBluetoothPeripheralViewModel()
+            
+        case .DexcomG4Type:
+            return DexcomG4BluetoothPeripheralViewModel()
+            
+        case .DexcomG6Type:
+            return DexcomG6BluetoothPeripheralViewModel()
+            
         }
         
     }
@@ -48,35 +103,174 @@ enum BluetoothPeripheralType: String, CaseIterable {
 
         case .M5StickCType:
             
-            let newM5StickC = M5StickC(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
-
-            return newM5StickC
+            return M5StickC(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
-        case .watlaaMaster:
+        case .WatlaaType:
             
-            let newWatlaa = Watlaa(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            return Watlaa(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
-            return newWatlaa
+        case .DexcomG5Type:
+            
+            return DexcomG5(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
+        case .DexcomG6Type:
+            
+            // DexcomG6 is a DexcomG5 with isDexcomG6 set to true
+            let dexcomG6 = DexcomG5(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            dexcomG6.isDexcomG6 = true
+            
+            return dexcomG6
+            
+        case .BubbleType:
+            
+            return Bubble(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
+        case .MiaoMiaoType:
+            
+            return MiaoMiao(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
+        case .BluconType:
+            
+            return Blucon(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
+        case .GNSentryType:
+            
+            return GNSEntry(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+  
+        case .BlueReaderType:
+            
+            return BlueReader(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
+        case .DropletType:
+            
+            return Droplet(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
+        case .DexcomG4Type:
+            
+            return DexcomG4(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         }
-        
         
     }
 
     /// to which category of bluetoothperipherals does this type belong (M5Stack, CGM, ...)
     func category() -> BluetoothPeripheralCategory {
+        
         switch self {
             
-        case .M5StackType:
+        case .M5StackType, .M5StickCType:
             return .M5Stack
             
-        case .M5StickCType:
-            return .M5Stack
-            
-        case .watlaaMaster:
-            return .watlaa
+        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .WatlaaType:
+            return .CGM
             
         }
+        
+    }
+    
+    /// does the device need a transmitterID (currently only Dexcom and Blucon)
+    func needsTransmitterId() -> Bool {
+        
+        switch self {
+            
+        case .M5StackType, .M5StickCType, .WatlaaType, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
+            return false
+            
+        case .DexcomG5Type, .BluconType, .DexcomG4Type, .DexcomG6Type:
+            return true
+
+        }
+        
+    }
+    
+    /// - returns nil if id to validate has expected length and type of characters etc.
+    /// - returns error text if transmitterId is not ok
+    func validateTransmitterId(transmitterId:String) -> String? {
+        
+        switch self {
+            
+        case .DexcomG5Type, .DexcomG6Type:
+            
+            // length for G5 and G6 is 6
+            if transmitterId.count != 6 {
+                return Texts_ErrorMessages.TransmitterIDShouldHaveLength6
+            }
+            
+            //verify allowed chars
+            let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
+            if !transmitterId.validate(withRegex: regex) {
+                return Texts_ErrorMessages.DexcomTransmitterIDInvalidCharacters
+            }
+            
+            // reject transmitters with id in range 8G or higher. These are Firefly's
+            // convert to upper
+            let transmitterIdUpper = transmitterId.uppercased()
+            if transmitterIdUpper.compare("8G") == .orderedDescending {
+                return Texts_SettingsView.transmitterId8OrHigherNotSupported
+            }
+
+            // validation successful
+            return nil
+            
+        case .DexcomG4Type:
+
+            let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
+            if !transmitterId.validate(withRegex: regex) {
+                return Texts_ErrorMessages.DexcomTransmitterIDInvalidCharacters
+            }
+            if transmitterId.count != 5 {
+                return Texts_ErrorMessages.TransmitterIDShouldHaveLength5
+            }
+            return nil
+            
+        case .M5StackType, .M5StickCType, .WatlaaType, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
+            // no transmitter id means no validation to do
+            return nil
+            
+        case .BluconType:
+            
+            let regex = try! NSRegularExpression(pattern: "^[0-9]{1,5}$", options: .caseInsensitive)
+            if !transmitterId.validate(withRegex: regex) {
+                return Texts_ErrorMessages.TransmitterIdBluCon
+            }
+            
+            if transmitterId.count != 5 {
+                return Texts_ErrorMessages.TransmitterIdBluCon
+            }
+            return nil
+            
+        }
+        
+    }
+    
+    /// is it web oop supported or not.
+    func canWebOOP() -> Bool {
+        
+        switch self {
+            
+        case .M5StackType, .M5StickCType, .WatlaaType, .DexcomG4Type, .DexcomG5Type, .DexcomG6Type, .BluconType, .BlueReaderType, .DropletType , .GNSentryType:
+            return false
+            
+        case .BubbleType, .MiaoMiaoType:
+            return true
+                        
+        }
+        
+    }
+    
+    /// can use non fixed slopes or not
+    func canUseNonFixedSlope() -> Bool {
+       
+       switch self {
+           
+       case .M5StackType, .M5StickCType, .DexcomG4Type, .DexcomG5Type, .DexcomG6Type:
+           return false
+           
+       case .BubbleType, .MiaoMiaoType, .WatlaaType, .BluconType, .BlueReaderType, .DropletType , .GNSentryType:
+           return true
+                       
+       }
+       
     }
     
 }

@@ -6,6 +6,9 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     
     // MARK: - properties
     
+    /// CGMBubbleTransmitterDelegate
+    public weak var cGMBluconTransmitterDelegate: CGMBluconTransmitterDelegate?
+
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
@@ -21,10 +24,13 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     /// if value starts with this string, then it's assume that a battery low indication is sent by the Blucon
     private let unknownCommand2BatteryLowIndicator = "8bda02"
     
+    /// is nonFixed enabled for the transmitter or not
+    private var nonFixedSlopeEnabled: Bool
+    
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBlucon)
     
-    // used in parsing packet
+    /// timestamp of last received reading. When a new packet is received, then only the more recent readings will be treated
     private var timeStampLastBgReading:Date
     
     // waiting successful pairing yes or not
@@ -69,9 +75,11 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - transmitterID: expected transmitterID
-    ///     - delegate : CGMTransmitterDelegate
+    ///     - cGMTransmitterDelegate : CGMTransmitterDelegate
     ///     - sensorSerialNumber : is needed to allow detection of a new sensor.
-    init?(address:String?, name: String?, transmitterID:String, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, sensorSerialNumber:String?) {
+    ///     - bluetoothTransmitterDelegate : a NluetoothTransmitterDelegate
+    ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBluconTransmitterDelegate: CGMBluconTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date?, sensorSerialNumber:String?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         // start by using expected device name
@@ -82,19 +90,25 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         }
         
         // initialize timeStampLastBgReading
-        self.timeStampLastBgReading = timeStampLastBgReading
+        self.timeStampLastBgReading = timeStampLastBgReading ?? Date(timeIntervalSince1970: 0)
         
         // initialize sensorSerialNumber
         self.sensorSerialNumber = sensorSerialNumber
         
+        // initialize cGMBluconTransmitterDelegate
+        self.cGMBluconTransmitterDelegate = cGMBluconTransmitterDelegate
+        
         // initialize rxbuffer
         rxBuffer = Data()
+        
+        // initialize nonFixedSlopeEnabled
+        self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
 
         // initialize
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_BluconService)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Blucon, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Blucon, startScanningAfterInit: CGMTransmitterType.Blucon.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_BluconService)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Blucon, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Blucon, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
 
         //assign CGMTransmitterDelegate
-        cgmTransmitterDelegate = delegate
+        cgmTransmitterDelegate = cGMTransmitterDelegate
         
     }
     
@@ -134,7 +148,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     /// process new historic data block received from Blucon, one block is the contents when receiving multipleBlockResponseIndex, inclusive the opcode - this is used if we ask all Libre data from the transmitter, which includes sensorTime and sensorStatus
     /// - returns:
     ///     - did receive all data yes or no, if yes, then blucon can go to sleep
-    /// also calls delegate with result of new readings
+    /// also calls cGMTransmitterDelegate with result of new readings
     private func handleNewHistoricData(block: Data) -> Bool {
         
         //check if buffer needs to be reset
@@ -163,11 +177,12 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                 
             }
 
-            //get readings from buffer and send to delegate
-            var result = LibreDataParser.parse(libreData: rxBuffer, timeStampLastBgReading: timeStampLastBgReading)
+            //get readings from buffer and send to cGMTransmitterDelegate
+            // TODO: use LibreDataParser.libreDataProcessor and make parseLibre1DataWithoutCalibration private to LibreDataParser
+            var result = LibreDataParser.parseLibre1DataWithoutCalibration(libreData: rxBuffer, timeStampLastBgReading: timeStampLastBgReading)
             
             //TODO: sort glucosedata before calling newReadingsReceived
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorState: result.sensorState, sensorTimeInMinutes: result.sensorTimeInMinutes, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)
             
             //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
             if result.glucoseData.count > 0 {
@@ -186,10 +201,30 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         return false
     }
     
+    /*public static func test(input:Data) {
+        
+        // input should be minimum length 6
+        guard input.count >= 6 else {return }
+        
+        // input[5] * 6 + 4 - 6 should be uint
+        debuglogging("description input[5] = " + input[5].description)
+        guard input[5] * 6 >= 2 else {return }
+        
+        // caculate byte position in sensor body, decrement index to get the index where the last valid BG reading is stored
+        var nowGlucoseIndex2 = input[5] * 6 + 4 - 6
+        
+    }*/
+    
     private func blockNumberForNowGlucoseData(input:Data) -> String? {
         
-        // input should be minimu length 6
+        // input should be minimum length 6
         guard input.count >= 6 else {return nil}
+        
+        // input[5] * 6 + 4 - 6 should be uint
+        guard input[5] * 6 >= 2 else {
+            trace("in blockNumberForNowGlucoseData, input[5] * 6 < 2, this would result in a crash, returning nil", log: log, category: ConstantsLog.categoryBlucon, type: .info)
+            return nil
+        }
         
         // caculate byte position in sensor body, decrement index to get the index where the last valid BG reading is stored
         var nowGlucoseIndex2 = input[5] * 6 + 4 - 6
@@ -228,36 +263,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         return(curGluc)
     }
 
-    /// this transmitter does not support oop web
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
-
     // MARK: - overriden  BluetoothTransmitter functions
-    
-    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-
-        super.centralManager(central, didConnect: peripheral)
-        
-        trace("in centralManagerDidConnect", log: log, category: ConstantsLog.categoryBlucon, type: .info)
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
-
-    }
-
-    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
-    
-        super.centralManagerDidUpdateState(central)
-        
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
-
-    }
-
-    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-    
-        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
-        
-        trace("in centralManagerDidDisconnectPeripheral", log: log, category: ConstantsLog.categoryBlucon, type: .info)
-        cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
-
-    }
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         
@@ -270,16 +276,19 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             
             // no need to log the error, it's already logged in BluetoothTransmitter
             
-            // check if it's an encryption error, if so call delegate
+            // check if it's an encryption error, if so call cGMTransmitterDelegate
             if error.localizedDescription.uppercased().contains(find: "ENCRYPTION IS INSUFFICIENT") {
                 
-                cgmTransmitterDelegate?.cgmTransmitterNeedsPairing()
-                
+
+                // inform delegate
+                bluetoothTransmitterDelegate?.transmitterNeedsPairing(bluetoothTransmitter: self)
+
                 waitingSuccessfulPairing = true
             }
         } else {
             if waitingSuccessfulPairing {
-                cgmTransmitterDelegate?.successfullyPaired()
+                // inform delegate
+                bluetoothTransmitterDelegate?.pairingFailed()
                 waitingSuccessfulPairing = false
             }
         }
@@ -295,7 +304,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         
         // this is only applicable the very first time that blucon connects and pairing is done
         if waitingSuccessfulPairing {
-            cgmTransmitterDelegate?.successfullyPaired()
+            bluetoothTransmitterDelegate?.successfullyPaired()
             waitingSuccessfulPairing = false
         }
         
@@ -308,8 +317,6 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             
             // convert to string and log the value
             let valueAsString = value.hexEncodedString()
-            
-            trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryBlucon, type: .info, valueAsString)
             
             // get Opcode
             if let opCode = BluconTransmitterOpCode(withOpCodeValue: valueAsString) {
@@ -331,9 +338,10 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     sendCommandToBlucon(opcode: BluconTransmitterOpCode.getPatchInfoRequest)
                     
                     // by default set battery level to 100
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 100), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 100), sensorTimeInMinutes: nil)
                     
-                    
+                    cGMBluconTransmitterDelegate?.received(batteryLevel: 100, from: self)
+
                 case .error14:
                     
                     // Blucon didn't receive the next command it was waiting for, need to wait 5 minutes
@@ -344,7 +352,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     
                 case .sensorNotDetected:
                     
-                    // Blucon didn't detect sensor, call delegate
+                    // Blucon didn't detect sensor, call cGMTransmitterDelegate
                     cgmTransmitterDelegate?.sensorNotDetected()
                     
                     // and send Blucon to sleep
@@ -355,16 +363,18 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     // get serial number
                     let newSerialNumber = BluconUtilities.decodeSerialNumber(input: value)
                     
-                    // verify serial number and if changed inform delegate
+                    // verify serial number and if changed inform cGMTransmitterDelegate
                     if newSerialNumber != sensorSerialNumber {
                         
                         trace("    new sensor detected :  %{public}@", log: log, category: ConstantsLog.categoryBlucon, type: .info, newSerialNumber)
                         
                         sensorSerialNumber = newSerialNumber
                         
-                        // inform delegate about new sensor detected
+                        // inform cGMTransmitterDelegate about new sensor detected
                         cgmTransmitterDelegate?.newSensorDetected()
                         
+                        cGMBluconTransmitterDelegate?.received(serialNumber: sensorSerialNumber, from: self)
+
                         // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
                         timeStampLastBgReading = Date(timeIntervalSince1970: 0)
                         
@@ -389,8 +399,8 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                         
                     }
                     
-                    // inform delegate about sensorSerialNumber and sensorState
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorState: sensorState, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: sensorSerialNumber)
+                    // inform cGMTransmitterDelegate about sensorSerialNumber and sensorState
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
                     
                     return
                     
@@ -425,7 +435,10 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     if valueAsString.startsWith(unknownCommand2BatteryLowIndicator) {
                         
                         // this is considered as battery level 5%
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 5), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 5),  sensorTimeInMinutes: nil)
+                        
+                        cGMBluconTransmitterDelegate?.received(batteryLevel: 5, from: self)
+
                         
                     }
                     
@@ -513,7 +526,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                             
                             let glucoseData = GlucoseData(timeStamp: timeStampLastBgReading, glucoseLevelRaw: glucoseValue, glucoseLevelFiltered: glucoseValue)
                             var glucoseDataArray = [glucoseData]
-                            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil,  sensorTimeInMinutes: nil)
                             
                         }
                         
@@ -524,12 +537,16 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                 case .bluconBatteryLowIndication1:
                     
                     // this is considered as battery level 3%
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 3), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 3), sensorTimeInMinutes: nil)
                     
+                    cGMBluconTransmitterDelegate?.received(batteryLevel: 3, from: self)
+
                 case .bluconBatteryLowIndication2:
                     
                     // this is considered as battery level 2%
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 2), sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 2), sensorTimeInMinutes: nil)
+                    
+                    cGMBluconTransmitterDelegate?.received(batteryLevel: 2, from: self)
                     
                 }
                 
@@ -545,18 +562,32 @@ class CGMBluconTransmitter: BluetoothTransmitter {
 
 extension CGMBluconTransmitter: CGMTransmitter {
     
-    func initiatePairing() {
-        // nothing to do, Blucon keeps on reconnecting, resulting in continous pairing request
-        return
+    func requestNewReading() {
+        // not supported for blucon
     }
-    
-    func reset(requested: Bool) {
-        // no reset supported for blucon
-        return
+
+    func setNonFixedSlopeEnabled(enabled: Bool) {
+        nonFixedSlopeEnabled = enabled
     }
     
     /// this transmitter does not support oopWeb
     func setWebOOPEnabled(enabled: Bool) {
+    }
+
+    func setWebOOPSite(oopWebSite: String) {}
+    
+    func setWebOOPToken(oopWebToken: String) {}
+    
+    func cgmTransmitterType() -> CGMTransmitterType {
+        return .Blucon
+    }
+
+    func isNonFixedSlopeEnabled() -> Bool {
+        return nonFixedSlopeEnabled
+    }
+    
+    func isWebOOPEnabled() -> Bool {
+        return false
     }
 
 }

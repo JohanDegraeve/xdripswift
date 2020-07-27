@@ -35,7 +35,7 @@ public class BgReading: NSManagedObject {
         c = 0
         ra = 0
         rb = 0
-        rc = 0
+        rc = 0 
         hideSlope = false
         id = UniqueId.createEventId()
     }
@@ -182,10 +182,19 @@ public class BgReading: NSManagedObject {
         var deltaSign:String = ""
         if (value > 0) { deltaSign = "+"; }
         
+        // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
         if (mgdl) {
-            return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mgdl):"");
+            if (value > -1) && (value < 1) {
+                return "0" + (showUnit ? (" " + Texts_Common.mgdl):"");
+            } else {
+                return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mgdl):"");
+            }
         } else {
-            return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mmol):"");
+            if (value > -0.1) && (value < 0.1) {
+                return "0.0" + (showUnit ? (" " + Texts_Common.mmol):"");
+            } else {
+                return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mmol):"");
+            }
         }
     }
 

@@ -21,31 +21,22 @@ fileprivate enum Setting:Int, CaseIterable {
 /// conforms to SettingsViewModelProtocol for all Dexcom settings in the first sections screen
 class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
     
+    func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
+    
+    func storeUIViewController(uIViewController: UIViewController) {}
+    
+    func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
+        // this ViewModel does need to send back messages to the viewcontroller asynchronously
+    }
+    
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
         return true
     }
     
     func isEnabled(index: Int) -> Bool {
+
+        return true
         
-        // if it's a G5 (or maybe later G6) , then user doesn't need to set the serial number, because value of transmitterId is used in that case
-        if index == Setting.dexcomShareSerialNumber.rawValue {
-            
-            if let transmitterType = UserDefaults.standard.transmitterType  {
-                switch transmitterType {
-                    
-                case .dexcomG5, .dexcomG6:
-                    return false
-                    
-                default:
-                    return true
-                }
-            } else {
-                return true
-            }
-            
-        } else {
-            return true
-        }
     }
 
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {

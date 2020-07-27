@@ -18,6 +18,9 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
     
+    /// CGMDexcomG4TransmitterDelegate
+    public weak var cGMDexcomG4TransmitterDelegate: CGMDexcomG4TransmitterDelegate?
+    
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMxDripG4)
     
@@ -30,7 +33,9 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - transmitterID: expected transmitterID, 5 characters
-    init(address:String?, name: String?, transmitterID:String, delegate:CGMTransmitterDelegate) {
+    ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
+    ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMDexcomG4TransmitterDelegate : CGMDexcomG4TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: nil)
         if let address = address {
@@ -38,40 +43,19 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
         }
         
         //assign CGMTransmitterDelegate
-        cgmTransmitterDelegate = delegate
+        self.cgmTransmitterDelegate = cGMTransmitterDelegate
+        
+        // assign cGMDexcomG4TransmitterDelegate
+        self.cGMDexcomG4TransmitterDelegate = cGMDexcomG4TransmitterDelegate
         
         //assign transmitterId
         self.transmitterId = transmitterID
 
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G4, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G4)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_G4, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_G4, startScanningAfterInit: CGMTransmitterType.dexcomG4.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G4, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G4)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_G4, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_G4, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }
     
     // MARK: - MARK: CBCentralManager overriden functions
-    
-    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        
-        super.centralManager(central, didConnect: peripheral)
-        
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
-        
-    }
-    
-    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        
-        super.centralManagerDidUpdateState(central)
-        
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
-        
-    }
-    
-    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        
-        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
-        
-        cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
-        
-    }
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         
@@ -96,16 +80,12 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
             return
         }
         
-        //only for logging
-        let data = value.hexEncodedString()
-        trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMxDripG4, type: .debug, data)
-        
         switch XdripResponseType(rawValue: value[1]) {
         case .dataPacket?:
             //process value and get result
             let result = processxBridgeDataPacket(value: value)
             
-            // check transmitterid, if not correct write correct value and return
+            // check transmitterid, if not correct write correct value to the bridge, and return
             if let data = checkTransmitterId(receivedTransmitterId: result.transmitterID, expectedTransmitterId: self.transmitterId, log: log) {
                 trace("    in peripheralDidUpdateValueFor, sending transmitterid %{public}@ to xdrip ", log: log, category: ConstantsLog.categoryCGMxDripG4, type: .info, self.transmitterId)
                 _ = writeDataToPeripheral(data: data, type: .withoutResponse)//no need to log the result, this is already logged in BluetoothTransmitter.swift
@@ -115,14 +95,25 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
             // Data packet Acknowledgement, to put wixel to sleep
             _ = writeDataToPeripheral(data: Data([0x02,0xF0]), type: .withoutResponse)
             
+            // if glucoseData received, send to delegate. If transmitterBatteryInfo available, then also send this to cGMDexcomG4TransmitterDelegate
             if let glucoseData = result.glucoseData {
+                
                 var glucoseDataArray = [glucoseData]
+                
                 var transmitterBatteryInfo:TransmitterBatteryInfo? = nil
+                
                 if let level = result.batteryLevel {
+                    
                     transmitterBatteryInfo = TransmitterBatteryInfo.DexcomG4(level: level)
+                    
+                    cGMDexcomG4TransmitterDelegate?.received(batteryLevel: level, from: self)
+                    
                 }
-                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorTimeInMinutes: nil)
+                
             }
+            
         case .beaconPacket?:
             trace("    in peripheral didUpdateValueFor, received beaconPacket", log: log, category: ConstantsLog.categoryCGMxDripG4, type: .info)
             
@@ -151,35 +142,50 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
             if let glucoseData = result.glucoseData {
                 var glucoseDataArray = [glucoseData]
                 var transmitterBatteryInfo:TransmitterBatteryInfo? = nil
-                if let batteryLevel = result.batteryLevel {
-                    transmitterBatteryInfo = TransmitterBatteryInfo.DexcomG4(level: batteryLevel)
+                if let level = result.batteryLevel {
+                    
+                    transmitterBatteryInfo = TransmitterBatteryInfo.DexcomG4(level: level)
+                    
+                    cGMDexcomG4TransmitterDelegate?.received(batteryLevel: level, from: self)
+                    
                 }
-                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorState: nil, sensorTimeInMinutes: nil, firmware: nil, hardware: nil, hardwareSerialNumber: nil, bootloader: nil, sensorSerialNumber: nil)
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorTimeInMinutes: nil)
             }
         }
         
     }
     
-    // MARK: CGMTransmitter protocol functions
+    // MARK: -CGMTransmitter protocol functions
     
-    /// to ask pairing - empty function because G4 doesn't need pairing
-    ///
-    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
-    func initiatePairing() {}
+    // this transmitter does not support Libre non fixed slopes
+    func setNonFixedSlopeEnabled(enabled: Bool) {   
+    }
     
-    /// to ask transmitter reset - empty function because G4 doesn't support reset
-    ///
-    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
-    func reset(requested:Bool) {}
-
     /// this transmitter does not support oopWeb
     func setWebOOPEnabled(enabled: Bool) {
     }
     
-    /// this transmitter does not support oop web
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {}
+    func setWebOOPSite(oopWebSite: String) {}
     
-    // MARK: helper functions
+    func setWebOOPToken(oopWebToken: String) {}
+
+    func cgmTransmitterType() -> CGMTransmitterType {
+        return .dexcomG4
+    }
+
+    func isNonFixedSlopeEnabled() -> Bool {
+        return false
+    }
+    
+    func isWebOOPEnabled() -> Bool {
+        return false
+    }
+    
+    func requestNewReading() {
+        // not supported for blucon
+    }
+    
+    // MARK:- helper functions
     
     private func processxBridgeDataPacket(value:Data) -> (glucoseData:GlucoseData?, batteryLevel:Int?, transmitterID:String?) {
         guard value.count >= 10 else {

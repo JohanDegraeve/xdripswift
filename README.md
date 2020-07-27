@@ -6,7 +6,7 @@ Current Status :
 
 - Supported transmitters :
     - G5
-    - MiaoMiao 1 and 2, but only with Libre1
+    - MiaoMiao 1 and 2
     - G4 with xBridge
     - Blucon
     - Bubble
@@ -21,18 +21,8 @@ Current Status :
 - Bluetooth Connection to M5Stack, the M5Stack software to be used can be found here : https://github.com/JohanDegraeve/M5_NightscoutMon
 - Bluetooth Connection to M5StickC, the M5Stickc software to be used can be found here : https://github.com/JohanDegraeve/M5_StickC_xdrip_iOS
 - Connection to Watlaa :
-    - go to settings tab, select transmitter type Watlaa
-    - go back to home screen
-    - click transmitter
-    - click start sensor and start the sensor
-    - then go to the bluetooth tab (the second tab)
-    - click the +
-    - select watlaa
-    - select watlaa master
-    - scan
-    - click 'done'
     
-    xdrip should now receive the libre packets, you should get a calibration request
+    
 
 - create events in Calendar when new glucose reading is received. This to support AppleWatch. More info : https://github.com/JohanDegraeve/xdripswift/wiki/Calendar-Events---Apple-Watch
 

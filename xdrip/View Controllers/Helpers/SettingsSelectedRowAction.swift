@@ -25,9 +25,9 @@ enum SettingsSelectedRowAction {
     /// - text to show in the textfield
     /// - actionTitle: text in the button that allows the user to confirm the input (Example 'Ok'), if nil then default value "Ok" will be used
     /// - cancelTitle: text in the button that allows the user to cancel the input (Example 'Cancel'), if nil then default value "Cancel" will be used
+    /// - inputValidator : closure to execute to validate the input, input a string and returns either nil if validation was ok or a string giving the error message to show to the user if validation fails - if inputValidator = nil then not validation is done - if result is not nil, then actionHandler will not be executed
     /// - actionHandler: code to execute when user confirms input, with text that was entered by user, text is not optional here - actionHandler will not be executed if there's an inputValidator and that inputValidator returns false
     /// - cancelHandler: code to execute when user cancels input - if nil then no validation must be done
-    /// - inputValidator : closure to execute to validate the input, input a string and returns either nil if validation was ok or a string giving the error message to show to the user if validation fails - if inputValidator = nil then not validation is done
     case askText (title:String?, message:String?, keyboardType:UIKeyboardType?, text:String?, placeHolder:String?, actionTitle:String?, cancelTitle:String?, actionHandler: ((_ text: String) -> Void), cancelHandler: (() -> Void)?, inputValidator: ((String) -> String?)?)
     
     /// when clicked, the function parameter needs to be called
@@ -51,14 +51,20 @@ enum SettingsSelectedRowAction {
     /// (it's not the right place to define this, not a clear split view/model)
     case performSegue(withIdentifier: String, sender: Any?)
     
-    /// to show Info to user, eg licenseInfo, with a title and a message
-    ///
+    /// to show Info to user, eg licenseInfo, with a title and a message. If Ok is clicked, optional actionHandler is executed
+    /// - parameters:
+    ///     - title : pop up title
+    ///     - message : pop up message
+    ///     - actionHandler : will be executed when ok buttin is clicked
     /// typical a pop up with a title and the message
-    case showInfoText(title: String, message: String)
+    case showInfoText(title: String, message: String, actionHandler: (() -> Void)? = nil)
+    
+    /// user confirmation is required to perform the actionHandler
+    case askConfirmation(title: String?, message: String?, actionHandler: (() -> Void), cancelHandler: (() -> Void)?)
 
     /// present modal view controller
     case presentModal(viewController: UIViewController)
-    
+
 }
 
 /* explanation UITableViewCell.AccessoryType

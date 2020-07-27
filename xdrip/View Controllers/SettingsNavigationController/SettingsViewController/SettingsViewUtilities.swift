@@ -63,8 +63,7 @@ class SettingsViewUtilities {
     /// - parameters:
     ///     - withViewModel : need to know if refresh of the table is needed, can be nil in case a viewmodel is not used (eg M5StackViewController)
     ///     - tableView : need to know if refresh of the table is needed, can be nil in case a viewmodel is not used (eg M5StackViewController)
-    static func runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction, forRowWithIndex rowIndex: Int, forSectionWithIndex sectionIndex: Int, withViewModel viewModel: SettingsViewModelProtocol?, tableView: UITableView?, forUIViewController uIViewController: UIViewController) {
-        
+    static func runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction, forRowWithIndex rowIndex: Int, forSectionWithIndex sectionIndex: Int, withSettingsViewModel settingsViewModel: SettingsViewModelProtocol?, tableView: UITableView?, forUIViewController uIViewController: UIViewController) {
             
             switch selectedRowAction {
                 
@@ -80,14 +79,14 @@ class SettingsViewUtilities {
                         uIViewController.present(alert, animated: true, completion: nil)
                         
                     } else {
-
+                        
                         // do the action
                         actionHandler(text)
-
+                        
                     }
                     
                     // check if refresh is needed, either complete settingsview or individual section
-                    self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
+                    self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: settingsViewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
                     
                 }, cancelHandler: cancelHandler)
                 
@@ -103,7 +102,7 @@ class SettingsViewUtilities {
                 function()
                 
                 // check if refresh is needed, either complete settingsview or individual section
-                self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
+                self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: settingsViewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
                 
             case let .selectFromList(title, data, selectedRow, actionTitle, cancelTitle, actionHandler, cancelHandler, didSelectRowHandler):
                 
@@ -112,7 +111,7 @@ class SettingsViewUtilities {
                     actionHandler(index)
                     
                     // check if refresh is needed, either complete settingsview or individual section
-                    self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: viewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
+                    self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: settingsViewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
                     
                 }, onCancelClick: {
                     if let cancelHandler = cancelHandler { cancelHandler() }
@@ -132,15 +131,21 @@ class SettingsViewUtilities {
             case .performSegue(let withIdentifier, let sender):
                 uIViewController.performSegue(withIdentifier: withIdentifier, sender: sender)
                 
-            case let .showInfoText(title, message):
+            case let .showInfoText(title, message, actionHandler):
                 
-                let alert = UIAlertController(title: title, message: message, actionHandler: nil)
+                let alert = UIAlertController(title: title, message: message, actionHandler: actionHandler)
+                
+                uIViewController.present(alert, animated: true, completion: nil)
+                
+            case let .askConfirmation(title, message, actionHandler, cancelHandler):
+                
+                // first ask user confirmation
+                let alert = UIAlertController(title: title, message: message, actionHandler: actionHandler, cancelHandler: cancelHandler)
                 
                 uIViewController.present(alert, animated: true, completion: nil)
             case let .presentModal(vc):
                 uIViewController.present(vc, animated: true, completion: nil)
             }
-            
 
     }
 
@@ -161,9 +166,11 @@ class SettingsViewUtilities {
             } else {
                 tableView.reloadSections(IndexSet(integer: sectionIndex), with: .none)
             }
+        } else {
+            if let tableView = tableView {
+                tableView.reloadSections(IndexSet(integer: sectionIndex), with: .none)
+            }
         }
     }
     
-
-
 }

@@ -19,13 +19,16 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
 
+    /// CGMMiaoMiaoTransmitterDelegate
+    public weak var cGMMiaoMiaoTransmitterDelegate: CGMMiaoMiaoTransmitterDelegate?
+
     // maximum times resend request due to crc error
     let maxPacketResendRequests = 3;
     
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMMiaoMiao)
     
-    // used in parsing packet
+    /// timestamp of last received reading. When a new packet is received, then only the more recent readings will be treated
     private var timeStampLastBgReading:Date
     
     /// counts number of times resend was requested due to crc error
@@ -38,7 +41,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     private var rxBuffer:Data
     
     /// how long to wait for next packet before sending startreadingcommand
-    private static let maxWaitForpacketInSeconds = 60.0
+    private static let maxWaitForpacketInSeconds = 5.0
     
     /// length of header added by MiaoMiao in front of data dat is received from Libre sensor
     private let miaoMiaoHeaderLength = 18
@@ -46,22 +49,33 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// is the transmitter oop web enabled or not
     private var webOOPEnabled: Bool
     
+    /// is nonFixed enabled for the transmitter or not
+    private var nonFixedSlopeEnabled: Bool
+    
     /// oop website url to use in case oop web would be enabled
     private var oopWebSite: String
     
     /// oop token to use in case oop web would be enabled
     private var oopWebToken: String
         
+    // current sensor serial number, if nil then it's not known yet
+    private var sensorSerialNumber:String?
+
+    /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
+    var emptyArray: [GlucoseData] = []
+
     // MARK: - Initialization
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
-    ///     - delegate : CGMTransmitterDelegate intance
     ///     - timeStampLastBgReading : timestamp of last bgReading
     ///     - webOOPEnabled : enabled or not
     ///     - oopWebSite : oop web site url to use, only used in case webOOPEnabled = true
     ///     - oopWebToken : oop web token to use, only used in case webOOPEnabled = true
-    init(address:String?, name: String?, delegate:CGMTransmitterDelegate, timeStampLastBgReading:Date, webOOPEnabled: Bool, oopWebSite: String, oopWebToken: String) {
+    ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
+    ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
+    ///     - cGMMiaoMiaoTransmitterDelegate : a CGMMiaoMiaoTransmitterDelegate
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMMiaoMiaoTransmitterDelegate : CGMMiaoMiaoTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading: Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameMiaoMiao)
@@ -70,23 +84,32 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         }
 
         // assign CGMTransmitterDelegate
-        cgmTransmitterDelegate = delegate
+        self.cgmTransmitterDelegate = cGMTransmitterDelegate
         
+        // assign cGMMiaoMiaoTransmitterDelegate
+        self.cGMMiaoMiaoTransmitterDelegate = cGMMiaoMiaoTransmitterDelegate
+        
+        // initialize sensorSerialNumber
+        self.sensorSerialNumber = sensorSerialNumber
+
         // initialize rxbuffer
         rxBuffer = Data()
         timestampFirstPacketReception = Date()
         
-        //initialize timeStampLastBgReading
-        self.timeStampLastBgReading = timeStampLastBgReading
-        
+        // initialize timeStampLastBgReading
+        self.timeStampLastBgReading = timeStampLastBgReading ?? Date(timeIntervalSince1970: 0)
+
         // initialize webOOPEnabled
-        self.webOOPEnabled = webOOPEnabled
-
+        self.webOOPEnabled = webOOPEnabled ?? false
+        
         // initialize oopWebToken and oopWebSite
-        self.oopWebToken = oopWebToken
-        self.oopWebSite = oopWebSite
+        self.oopWebToken = oopWebToken ?? ConstantsLibre.token
+        self.oopWebSite = oopWebSite ?? ConstantsLibre.site
+        
+        // initialize nonFixedSlopeEnabled
+        self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
 
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, startScanningAfterInit: CGMTransmitterType.miaomiao.startScanningAfterInit(), bluetoothTransmitterDelegate: nil)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MiaoMiao)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MiaoMiao, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MiaoMiao, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }
     
@@ -102,30 +125,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     // MARK: - overriden  BluetoothTransmitter functions
-    
-    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        
-        super.centralManager(central, didConnect: peripheral)
-        
-        cgmTransmitterDelegate?.cgmTransmitterDidConnect(address: deviceAddress, name: deviceName)
-        
-    }
-    
-    override func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        
-        super.centralManagerDidUpdateState(central)
-        
-        cgmTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state)
-        
-    }
-    
-    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        
-        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
-        
-        cgmTransmitterDelegate?.cgmTransmitterDidDisconnect()
-        
-    }
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         
@@ -145,7 +144,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
             
             //check if buffer needs to be reset
             if (Date() > timestampFirstPacketReception.addingTimeInterval(CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds - 1)) {
-                trace("in peripheral didUpdateValueFor, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info, CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds)
+                trace("in peripheral didUpdateValueFor, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info, CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds.description)
                 resetRxBuffer()
             }
             
@@ -162,32 +161,101 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                         if rxBuffer.count >= 363  {
                             trace("in peripheral didUpdateValueFor, Buffer complete", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
                             
-                            if (Crc.LibreCrc(data: &rxBuffer, headerOffset: miaoMiaoHeaderLength)) {
-                                //get MiaoMiao info from MiaoMiao header
-                                let firmware = String(describing: rxBuffer[14...15].hexEncodedString())
-                                let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
-                                let batteryPercentage = Int(rxBuffer[13])
+                            /// gives information about type of sensor (Libre1, Libre2, etc..) - if transmitter doesn't offer patchInfo, then use nil value, which corresponds to Libre 1
+                            var patchInfo: String?
+
+                            // first off all see if the buffer contains patchInfo, and if yes send to delegate
+                            if rxBuffer.count >= 369 {
                                 
-                                LibreDataParser.libreDataProcessor(sensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)))?.serialNumber, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
-                                    self.timeStampLastBgReading = timeStampLastBgReading
-                                    
-                                })
+                                patchInfo = Data(rxBuffer[363...368]).hexEncodedString().uppercased()
                                 
-                                //reset the buffer
-                                resetRxBuffer()
-                                
-                            } else {
-                                let temp = resendPacketCounter
-                                resetRxBuffer()
-                                resendPacketCounter = temp + 1
-                                if resendPacketCounter < maxPacketResendRequests {
-                                    trace("in peripheral didUpdateValueFor, crc error encountered. New attempt launched", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
-                                    _ = sendStartReadingCommand()
-                                } else {
-                                    trace("in peripheral didUpdateValueFor, crc error encountered. Maximum nr of attempts reached", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
-                                    resendPacketCounter = 0
+                                if let patchInfo = patchInfo {
+                                    trace("    received patchInfo %{public}@", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info, patchInfo)
                                 }
+                                
                             }
+                            
+                            if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
+                                
+                                cGMMiaoMiaoTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
+                                
+                                // do CRC Check only for libre1
+                                // TODO : check if this also required for other LibreH
+                                if libreSensorType == .libre1 {
+                                    
+                                    guard Crc.LibreCrc(data: &rxBuffer, headerOffset: miaoMiaoHeaderLength) else {
+                                        
+                                        let temp = resendPacketCounter
+                                        resetRxBuffer()
+                                        resendPacketCounter = temp + 1
+                                        if resendPacketCounter < maxPacketResendRequests {
+                                            trace("in peripheral didUpdateValueFor, crc error encountered. New attempt launched", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
+                                            _ = sendStartReadingCommand()
+                                        } else {
+                                            trace("in peripheral didUpdateValueFor, crc error encountered. Maximum nr of attempts reached", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
+                                            resendPacketCounter = 0
+                                        }
+                                        
+                                        return
+                                    }
+                                    
+                                }
+                                
+                            }
+                                
+                                
+                            //get MiaoMiao info from MiaoMiao header
+                            let firmware = String(describing: rxBuffer[14...15].hexEncodedString())
+                            let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
+                            let batteryPercentage = Int(rxBuffer[13])
+                            
+                            // send firmware, hardware, battery level to delegate
+                            cGMMiaoMiaoTransmitterDelegate?.received(firmware: firmware, from: self)
+                            cGMMiaoMiaoTransmitterDelegate?.received(hardware: hardware, from: self)
+                            cGMMiaoMiaoTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
+                            
+                            // send batteryPercentage to delegate
+                            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
+
+                            // get sensor serialNumber and if changed inform delegate
+                            if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
+                                
+                                // (there will also be a seperate opcode form MiaoMiao because it's able to detect new sensor also)
+                                if libreSensorSerialNumber.serialNumber != sensorSerialNumber {
+                                    
+                                    sensorSerialNumber = libreSensorSerialNumber.serialNumber
+                                    
+                                    trace("    new sensor detected :  %{public}@", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info, libreSensorSerialNumber.serialNumber)
+                                    
+                                    // inform delegate about new sensor detected
+                                    cgmTransmitterDelegate?.newSensorDetected()
+                                    
+                                    cGMMiaoMiaoTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
+                                    
+                                    // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
+                                    timeStampLastBgReading = Date(timeIntervalSince1970: 0)
+                                    
+                                }
+                                
+                            }
+                            
+                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading, completionHandler: { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
+                                
+                                if let timeStampLastBgReading = timeStampLastBgReading {
+                                    self.timeStampLastBgReading = timeStampLastBgReading
+                                }
+                                
+                                if let sensorState = sensorState {
+                                    self.cGMMiaoMiaoTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
+                                }
+                                
+                                // TODO : xDripError could be used to show latest errors in bluetoothPeripheralView
+                                
+                            })
+                            
+                            //reset the buffer
+                            resetRxBuffer()
+
                         }
                         
                     case .frequencyChangedResponse:
@@ -236,15 +304,46 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: CGMTransmitter protocol functions
     
-    /// to ask pairing - empty function because G4 doesn't need pairing
-    ///
-    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
-    func initiatePairing() {}
+    /// this transmitter supports oopWeb
+    func setWebOOPEnabled(enabled: Bool) {
+        webOOPEnabled = enabled
+        
+        // immediately request a new reading
+        // there's no check here to see if peripheral, characteristic, connection, etc.. exists, but that's no issue. If anything's missing, write will simply fail,
+        _ = sendStartReadingCommand()
+    }
     
-    /// to ask transmitter reset - empty function because MiaoMiao doesn't support reset
-    ///
-    /// this function is not implemented in BluetoothTransmitter.swift, otherwise it might be forgotten to look at in future CGMTransmitter developments
-    func reset(requested:Bool) {}
+    func isWebOOPEnabled() -> Bool {
+        return webOOPEnabled
+    }
+    
+    func setNonFixedSlopeEnabled(enabled: Bool) {
+        nonFixedSlopeEnabled = enabled
+        
+        // immediately request a new reading
+        // there's no check here to see if peripheral, characteristic, connection, etc.. exists, but that's no issue. If anything's missing, write will simply fail,
+       _ = sendStartReadingCommand()
+    }
+    
+    func isNonFixedSlopeEnabled() -> Bool {
+        return nonFixedSlopeEnabled
+    }
+    
+    func setWebOOPSite(oopWebSite: String) {
+        self.oopWebSite = oopWebSite
+    }
+    
+    func setWebOOPToken(oopWebToken: String) {
+        self.oopWebToken = oopWebToken
+    }
+    
+    func requestNewReading() {
+        _ = sendStartReadingCommand()
+    }
+    
+    func cgmTransmitterType() -> CGMTransmitterType {
+        return .miaomiao
+    }
     
     // MARK: - helpers
     
@@ -255,41 +354,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         resendPacketCounter = 0
     }
     
-    /// this transmitter supports oopWeb
-    func setWebOOPEnabled(enabled: Bool) {
-        webOOPEnabled = enabled
-        
-        // immediately request a new reading
-        // there's no check here to see if peripheral, characteristic, connection, etc.. exists, but that's no issue. If anything's missing, write will simply fail,
-        _ = sendStartReadingCommand()
-    }
-
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {
-        self.oopWebToken = oopWebToken
-        self.oopWebSite = oopWebSite
-    }
-
 }
 
-fileprivate enum MiaoMiaoResponseType: UInt8 {
-    case dataPacket = 0x28
-    case newSensor = 0x32
-    case noSensor = 0x34
-    case frequencyChangedResponse = 0xD1
-}
 
-extension MiaoMiaoResponseType: CustomStringConvertible {
-    public var description: String {
-        switch self {
-        case .dataPacket:
-            return "Data packet received"
-        case .newSensor:
-            return "New sensor detected"
-        case .noSensor:
-            return "No sensor detected"
-        case .frequencyChangedResponse:
-            return "Reading interval changed"
-        }
-    }
-}
 

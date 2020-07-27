@@ -1,0 +1,13 @@
+"screenTitle" = "M5Stack";
+"authenticationFailureWarning" = "M5Stack-todennus epäonnistui, aseta joko esiasetettu salasana asetuksissa tai jos M5Stackilla ei ole esiasennettua salasanaa, resetoi M5Stack. M5Stack katkaisee yhteyden nyt. Voit tehdä uuden yrityksen napsauttamalla ";
+"blePasswordMissingWarning" = "Salasana täytyy asettaa asetuksissa";
+"m5StackResetRequiredWarning" = "M5Stack on resetoitava uuden väliaikaisen salasanan luomiseksi. Napsauta kun olet valmis ";
+"m5StackSoftWhereHelpCellText" = "Mistä löytyy M5Stack ohjelmisto ?";
+"m5StickCSoftWhereHelpCellText" = "Mistä löytyy M5StickC ohjelmisto ?";
+"m5StackSoftWareHelpText" = "Go to";
+"m5StackViewscreenTitle" = "M5Stack";
+"m5StickCViewscreenTitle" = "M5StickC";
+"deviceMustBeConnectedToPowerOff" = "M5Stack on oltava yhdistetty jotta voit sammuttaa sen";
+"powerOffConfirm" = "Haluatko varmasti sammuttaa M5Stackin ?";
+"powerOff" = "Sammuta";
+"connectToWiFi" = "Yhdistä WiFi";

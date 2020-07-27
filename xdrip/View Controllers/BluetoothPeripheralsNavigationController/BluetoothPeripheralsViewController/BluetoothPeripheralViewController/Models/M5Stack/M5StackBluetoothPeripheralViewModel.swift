@@ -31,8 +31,10 @@ class M5StackBluetoothPeripheralViewModel {
         
     }
     
-    public enum SpecificM5StackSettings:Int, CaseIterable {
-
+    // MARK: - private properties
+    
+    private enum SpecificM5StackSettings:Int, CaseIterable {
+        
         /// batteryLevel
         case batteryLevel = 0
         
@@ -42,19 +44,18 @@ class M5StackBluetoothPeripheralViewModel {
         /// user is requesting power off
         case powerOff = 2
         
-
     }
     
     /// - list of sections available in M5Stack, the last section is only applicable to M5Stack, not M5Stick
-    /// - counting starts at 1
-    public enum M5StackSections: Int, CaseIterable {
+    /// - counting starts at 0
+    private enum M5StackSections: Int, CaseIterable {
         
         /// helptest, blepassword, rotation, color, ... settings applicable to both M5Stack and M5StickC
-        case commonM5Settings = 1
-    
+        case commonM5Settings = 0
+        
         /// - settings only applicable to M5Stack : battery level, brightness, power off
         /// - THIS SHOULD ALWAYS BE THE LAST SECTION - so if sections are added, add them before this setting and increase the number of this setting
-        case specificM5StackSettings = 2
+        case specificM5StackSettings = 1
         
         func sectionTitle() -> String {
             switch self {
@@ -67,36 +68,8 @@ class M5StackBluetoothPeripheralViewModel {
         
     }
     
-    // MARK: - private properties
-    
-    /// section number for section with helpText, blePassword, textColor, backGroundColor, rotation, connectToWiFi
-    private let sectionNumberForM5StackCommonSettings = 1
-    
-    /// textColor to be used in M5Stack
-    ///
-    /// temp storage of value while user is editing the M5Stack attributes
-    private var textColorTemporaryValue: M5StackColor?
-    
-    /// rotation to be used in M5Stack
-    ///
-    /// temp storage of value while user is editing the M5Stack attributes
-    private var rotationTempValue: UInt16?
-    
-    /// connectToWiFi value to be used in M5Stack
-    ///
-    /// temp storage of value while user is editing the M5Stack attributes
-    private var connectToWiFiTempValue: Bool?
-    
-    /// backGroundColor to be used in M5Stack
-    ///
-    /// temp storage of value while user is editing the M5Stack attributes
-    private var backGroundColorTemporaryValue: M5StackColor?
-    
     /// brightness to be used in M5Stack
     ///
-    /// temp storage of value while user is editing the M5Stack attributes
-    private var brightnessTemporaryValue: Int?
-    
     /// possible rotation keys, , the value is shown to the user
     private let rotationStrings: [String] = [ "0", "90", "180", "270"]
     
@@ -112,7 +85,15 @@ class M5StackBluetoothPeripheralViewModel {
     /// reference to BluetoothPeripheralViewController that will own this M5StackBluetoothPeripheralViewModel - needed to present stuff etc
     private(set) weak var bluetoothPeripheralViewController: BluetoothPeripheralViewController?
     
-    private weak var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
+    /// temporary reference to bluetoothPerpipheral, will be set in configure function.
+    private var bluetoothPeripheral: BluetoothPeripheral?
+    
+    /// it's the bluetoothPeripheral as M5Stack
+    private var m5Stack: M5Stack? {
+        get {
+            return bluetoothPeripheral as? M5Stack
+        }
+    }
     
     // MARK: - public functions
     
@@ -125,8 +106,11 @@ class M5StackBluetoothPeripheralViewModel {
     
     /// - implements the update functions defined in protocol BluetoothPeripheralViewModelProtocol
     /// - this function is defined to allow override by M5StickC specific model class, because
-    public func userDidSelectM5StackRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem) {
-        
+    public func userDidSelectM5StackRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging) -> SettingsSelectedRowAction {
+
+        // m5Stack should be non nil here, otherwise would be a software error, because the specific settings should still be hidden if m5Stack is nil
+        guard let m5Stack = self.m5Stack else {return .nothing}
+
         switch section {
         case 1:
 
@@ -135,17 +119,17 @@ class M5StackBluetoothPeripheralViewModel {
             switch setting {
                 
             case .connectToWiFi:
-                break
+                return .nothing
                 
             case .m5StackHelpText:
-                let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_M5StackView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5Stack, actionHandler: nil)
                 
-                bluetoothPeripheralViewController?.present(alert, animated: true, completion: nil)
+                return .showInfoText(title: Texts_HomeView.info, message: Texts_M5StackView.m5StackSoftWareHelpText + " " + ConstantsM5Stack.githubURLM5Stack)
                 
             case .blePassword:
-                break
+                return .nothing
                 
             case .textColor:
+                
                 var texts = [String]()
                 var colors = [M5StackColor]()
                 for textColor in M5StackColor.allCases {
@@ -155,45 +139,37 @@ class M5StackBluetoothPeripheralViewModel {
                 
                 //find index for color stored in M5Stack or userdefaults
                 var selectedRow:Int?
-                if let textColor = textColorTemporaryValue {
+                if let textColor = M5StackColor(forUInt16: UInt16(m5Stack.textcolor)) {
                     selectedRow = texts.firstIndex(of:textColor.description)
                 } else if let textColor = UserDefaults.standard.m5StackTextColor?.description {
                     selectedRow = texts.firstIndex(of:textColor)
                 }
                 
-                // configure PickerViewData
-                let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: Texts_SettingsView.m5StackTextColor, withData: texts, selectedRow: selectedRow, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ index: Int) in
+                return .selectFromList(title: Texts_SettingsView.m5StackTextColor, data: texts, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {
+                    (_ index: Int) in
                     
                     if index != selectedRow {
                         
-                        // set temp value textColor to new textColor
-                        self.textColorTemporaryValue = colors[index]
+                        // set textColor to new value
+                        m5Stack.textcolor = Int32(colors[index].rawValue)
                         
                         // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
-                        if let m5StackPeripheral = bluetoothPeripheral as? M5Stack {
-                            if let textColor = self.textColorTemporaryValue, let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5StackPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.writeTextColor(textColor: textColor) {
-                                // do nothing, textColor successfully written to m5Stack - although it's not yet 100% sure because
-                            } else {
-                                m5StackPeripheral.parameterUpdateNeededAtNextConnect()
-                            }
+                        if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5Stack, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.writeTextColor(textColor: colors[index]) {
+                            // do nothing, textColor successfully written to m5Stack - although it's not yet 100% sure because
+                        } else {
+                            m5Stack.blePeripheral.parameterUpdateNeededAtNextConnect = true
                         }
-                        
+
                         // reload table
                         self.tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.textColor.rawValue, section: 1)], with: .none)
                         
-                        // enable the done button
-                        doneButtonOutlet.enable()
-                        
                     }
                     
-                }, onCancelClick: nil, didSelectRowHandler: nil)
+                }, cancelHandler: nil, didSelectRowHandler: nil)
                 
-                // create and present PickerViewController
-                if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
-                    PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
-                }
                 
             case .backGroundColor:
+                
                 var texts = [String]()
                 var colors = [M5StackColor]()
                 for backGroundColor in M5StackColor.allCases {
@@ -203,87 +179,63 @@ class M5StackBluetoothPeripheralViewModel {
                 
                 //find index for color stored in M5Stack or userdefaults
                 var selectedRow:Int?
-                if let backGroundColor = backGroundColorTemporaryValue {
+                if let backGroundColor = M5StackColor(forUInt16: UInt16(m5Stack.backGroundColor)) {
                     // backGroundColor is an instance of textColor, description gives us the textual representation
                     selectedRow = texts.firstIndex(of:backGroundColor.description)
                 } else  {
                     selectedRow = texts.firstIndex(of:ConstantsM5Stack.defaultBackGroundColor.description)
                 }
                 
-                // configure PickerViewData
-                let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: Texts_SettingsView.m5StackbackGroundColor, withData: texts, selectedRow: selectedRow, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ index: Int) in
+                return .selectFromList(title: Texts_SettingsView.m5StackbackGroundColor, data: texts, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {
+                    (_ index: Int) in
                     
                     if index != selectedRow {
                         
-                        // set temp value backGroundColor to new backGroundColor
-                        self.backGroundColorTemporaryValue = colors[index]
+                        // set backGroundColor to new value
+                        m5Stack.backGroundColor = Int32(colors[index].rawValue)
                         
                         // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
-                        if let m5StackPeripheral = bluetoothPeripheral as? M5Stack {
-                            if let backGroundColor = self.backGroundColorTemporaryValue, let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5StackPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.writeBackGroundColor(backGroundColor: backGroundColor) {
-                                // do nothing, backGroundColor successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
-                            } else {
-                                m5StackPeripheral.parameterUpdateNeededAtNextConnect()
-                            }
+                        if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5Stack, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.writeBackGroundColor(backGroundColor: colors[index]) {
+                            // do nothing, backGroundColor successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
+                        } else {
+                            m5Stack.blePeripheral.parameterUpdateNeededAtNextConnect = true
                         }
-                        
+
                         // reload table
                         self.tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.backGroundColor.rawValue, section: 1)], with: .none)
                         
-                        // enable the done button
-                        doneButtonOutlet.enable()
-                        
                     }
                     
-                }, onCancelClick: nil, didSelectRowHandler: nil)
-                
-                // create and present PickerViewController
-                if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
-                    PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
-                }
+                    
+                }, cancelHandler: nil, didSelectRowHandler: nil)
                 
             case .rotation:
-                //find index for rotation stored in M5Stack or userdefaults
-                var selectedRow:Int? = nil
-                if let rotation = rotationTempValue {
-                    selectedRow = Int(rotation)
-                } else {
-                    selectedRow = Int(ConstantsM5Stack.defaultRotation)
-                }
                 
-                // configure PickerViewData
-                let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: Texts_SettingsView.m5StackRotation, withData: rotationStrings, selectedRow: selectedRow, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ index: Int) in
+                //find index for rotation stored in M5Stack or userdefaults
+                let selectedRow = Int(m5Stack.rotation)
+                
+                return .selectFromList(title: Texts_SettingsView.m5StackRotation, data: rotationStrings, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {
+                    (_ index: Int) in
                     
                     if index != selectedRow {
                         
                         // set rotationTempValue to new rotation
-                        self.rotationTempValue = UInt16(index)
+                        m5Stack.rotation = Int32(UInt16(index))
                         
                         // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
-                        if let m5StackAsPeripheral = bluetoothPeripheral as? M5Stack {
-                            if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5StackAsPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.writeRotation(rotation: index) {
-                                // do nothing, rotation successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
-                            } else {
-                                m5StackAsPeripheral.parameterUpdateNeededAtNextConnect()
-                            }
+                        if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5Stack, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.writeRotation(rotation: index) {
+                            // do nothing, rotation successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
+                        } else {
+                            m5Stack.blePeripheral.parameterUpdateNeededAtNextConnect = true
                         }
                         
                         // reload table
                         self.tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.rotation.rawValue, section: 1)], with: .none)
                         
-                        // enable the done button
-                        doneButtonOutlet.enable()
-                        
                     }
                     
-                }, onCancelClick: nil, didSelectRowHandler: nil)
-                
-                // create and present PickerViewController
-                if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
-                    PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
-                }
-                
-                
+                    
+                }, cancelHandler: nil, didSelectRowHandler: nil)
                 
             }
 
@@ -296,65 +248,42 @@ class M5StackBluetoothPeripheralViewModel {
             case .brightness:
                 
                 //find index for brightness stored in M5Stack or use 100 as default value
-                var selectedRow:Int? = nil
                 // brightness goes from 0 to 100, in steps of 10. Dividing by 10 gives the selected row
-                if let brightness = brightnessTemporaryValue {
-                    selectedRow = brightness/10
-                } else {
-                    // default value is 100
-                    selectedRow = 10
-                }
+                let selectedRow = Int(m5Stack.brightness/10)
                 
-                // configure PickerViewData
-                let pickerViewData = PickerViewData(withMainTitle: nil, withSubTitle: Texts_SettingsView.m5StackBrightness, withData: brightnessStrings, selectedRow: selectedRow, withPriority: nil, actionButtonText: nil, cancelButtonText: nil, onActionClick: {(_ index: Int) in
+                return .selectFromList(title: Texts_SettingsView.m5StackBrightness, data: brightnessStrings, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {
+                    (_ index: Int) in
                     
                     if index != selectedRow {
                         
-                        // set rotationTempValue to new rotation
-                        self.brightnessTemporaryValue = index * 10
+                        // set brightness to new brightness
+                        m5Stack.brightness = Int16(index * 10)
                         
                         // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
-                        if let m5StackPeripheral = bluetoothPeripheral as? M5Stack {
-                            if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5StackPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.writeBrightness(brightness: index * 10) {
-                                // do nothing, brightness successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
-                            } else {
-                                m5StackPeripheral.parameterUpdateNeededAtNextConnect()
-                            }
+                        if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5Stack, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.writeBrightness(brightness: index * 10) {
+                            // do nothing, brightness successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
+                        } else {
+                            m5Stack.blePeripheral.parameterUpdateNeededAtNextConnect = true
                         }
                         
                         // reload table
                         self.tableView?.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.brightness.rawValue, section: M5StackSections.allCases.count)], with: .none)
                         
-                        // enable the done button
-                        doneButtonOutlet.enable()
-                        
                     }
                     
-                }, onCancelClick: nil, didSelectRowHandler: nil)
+                    
+                }, cancelHandler: nil, didSelectRowHandler: nil)
                 
-                // create and present PickerViewController
-                if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
-                    PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: bluetoothPeripheralViewController)
-                }
-
             case .batteryLevel:
-                break
+                return .nothing
                 
             case .powerOff:
                 
                 if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.getConnectionStatus() == CBPeripheralState.connected {
                     
-                    
-                    // first ask user confirmation
-                    let alert = UIAlertController(title: Texts_M5StackView.powerOffConfirm, message: nil, actionHandler: {
-                        
+                    return .askConfirmation(title: Texts_M5StackView.powerOffConfirm, message: nil, actionHandler: {
                         _ = m5StackBluetoothTransmitter.powerOff()
-                        
                     }, cancelHandler: nil)
-                    
-                    bluetoothPeripheralViewController?.present(alert, animated: true, completion: nil)
-                    
-                    
                     
                 } else {
                     
@@ -368,20 +297,18 @@ class M5StackBluetoothPeripheralViewModel {
             }
             
         default:
-            break
+            return .nothing
         }
         
-        
+        return .nothing
     }
     
     /// - implements the update functions defined in protocol BluetoothPeripheralViewModelProtocol
     /// - this function is defined to allow override by M5StickC specific model class, because update behaviour is different
-    public func updateM5Stack(cell: UITableViewCell, forRow row: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem) {
+    public func updateM5Stack(cell: UITableViewCell, forRow row: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral) {
       
-        // verify that bluetoothPeripheralAsNSObject is an M5Stack
-        guard let m5Stack = bluetoothPeripheral as? M5Stack else {
-            fatalError("M5StackBluetoothPeripheralViewModel update, bluetoothPeripheral is not M5Stack")
-        }
+        // unwrap m5Stack
+        guard let m5Stack = m5Stack else {return}
         
         // default value for accessoryView is nil
         cell.accessoryView = nil
@@ -400,20 +327,17 @@ class M5StackBluetoothPeripheralViewModel {
                 cell.textLabel?.text = Texts_M5StackView.connectToWiFi
                 cell.detailTextLabel?.text = nil
                 
-                cell.accessoryView = UISwitch(isOn: connectToWiFiTempValue ?? false, action: {
+                cell.accessoryView = UISwitch(isOn: m5Stack.connectToWiFi, action: {
                     (isOn:Bool) in
                     
-                    self.connectToWiFiTempValue = isOn
-                    
-                    // enable the done button, because value has changed
-                    doneButtonOutlet.enable()
+                    m5Stack.connectToWiFi = isOn
                     
                     // send value to M5Stack, if that would fail then set updateNeeded for that m5Stack
                     if let m5StackAsPeripheral = bluetoothPeripheral as? M5Stack, let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
                         if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5StackAsPeripheral, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter, m5StackBluetoothTransmitter.writeConnectToWiFi(connect: isOn) {
                             // do nothing, ConnectToWiFi successfully written to m5Stack - although it's not yet 100% sure because write returns true without waiting for response from bluetooth peripheral
                         } else {
-                            m5StackAsPeripheral.parameterUpdateNeededAtNextConnect()
+                            m5StackAsPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                         }
                     }
                     
@@ -434,7 +358,7 @@ class M5StackBluetoothPeripheralViewModel {
             case .textColor:
                 cell.textLabel?.text = Texts_SettingsView.m5StackTextColor
                 
-                if let textColor = textColorTemporaryValue {
+                if let textColor = M5StackColor(forUInt16: UInt16(m5Stack.textcolor)) {
                     cell.detailTextLabel?.text = textColor.description
                 } else {
                     if let textColor = UserDefaults.standard.m5StackTextColor {
@@ -449,7 +373,7 @@ class M5StackBluetoothPeripheralViewModel {
             case .backGroundColor:
                 cell.textLabel?.text = Texts_SettingsView.m5StackbackGroundColor
                 
-                if let backGroundColor = backGroundColorTemporaryValue {
+                if let backGroundColor = M5StackColor(forUInt16: UInt16(m5Stack.backGroundColor)) {
                     cell.detailTextLabel?.text = backGroundColor.description
                 } else {
                     cell.detailTextLabel?.text = ConstantsM5Stack.defaultBackGroundColor.description
@@ -459,13 +383,7 @@ class M5StackBluetoothPeripheralViewModel {
                 
             case .rotation:
                 cell.textLabel?.text = Texts_SettingsView.m5StackRotation
-                
-                if let rotation = rotationTempValue {
-                    cell.detailTextLabel?.text = rotationStrings[Int(rotation)]
-                } else {
-                    cell.detailTextLabel?.text = rotationStrings[Int(ConstantsM5Stack.defaultRotation)]
-                }
-                
+                cell.detailTextLabel?.text = rotationStrings[Int(m5Stack.rotation)]
                 cell.accessoryType = .disclosureIndicator
                 
             }
@@ -482,18 +400,16 @@ class M5StackBluetoothPeripheralViewModel {
                 
             case .brightness:
                 cell.textLabel?.text = Texts_SettingsView.m5StackBrightness
-                
-                if let brightness = brightnessTemporaryValue {
-                    cell.detailTextLabel?.text = brightnessStrings[Int(brightness/10)]
-                } else {
-                    cell.detailTextLabel?.text = brightnessStrings[brightnessStrings.count - 1]
-                }
-                
+                cell.detailTextLabel?.text = brightnessStrings[Int(m5Stack.brightness/10)]
                 cell.accessoryType = .disclosureIndicator
                 
             case .batteryLevel:
                 cell.textLabel?.text = Texts_BluetoothPeripheralsView.batteryLevel
-                cell.detailTextLabel?.text = m5Stack.batteryLevel.description
+                if m5Stack.batteryLevel > 0 {
+                    cell.detailTextLabel?.text = m5Stack.batteryLevel.description
+                } else {
+                    cell.detailTextLabel?.text = ""
+                }
                 cell.accessoryType = .none
                 
             case .powerOff:
@@ -514,25 +430,23 @@ class M5StackBluetoothPeripheralViewModel {
         return M5StackSections.allCases.count
     }
     
-}
+    // MARK: - deinit
+    
+    deinit {
+        
+        // when closing the viewModel, and if there's still a bluetoothTransmitter existing, then reset the specific delegate to BluetoothPeripheralManager
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
+        
+        guard let m5Stack = m5Stack else {return}
+        
+        guard let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5Stack, createANewOneIfNecesssary: false) else {return}
+        
+        guard let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter else {return}
 
-// MARK: - conform to BluetoothTransmitterDelegate
+        m5StackBluetoothTransmitter.m5StackBluetoothTransmitterDelegate = bluetoothPeripheralManager as! BluetoothPeripheralManager
 
-extension M5StackBluetoothPeripheralViewModel: BluetoothTransmitterDelegate {
-    
-    func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
-        bluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
     }
-    
-    func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
-        bluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
-    }
-    
-    func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
-        bluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
-    }
-    
-    
+
 }
 
 // MARK: - conform to M5StackBluetoothTransmitterDelegate
@@ -541,20 +455,34 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     
     func receivedBattery(level: Int, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
+        // inform bluetoothPeripheralManager also
+        (bluetoothPeripheralManager as? M5StackBluetoothTransmitterDelegate)?.receivedBattery(level: level, m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
+        
         // batteryLevel should get updated in M5Stack object by bluetoothPeripheralManager, here's the trigger to update the table
-        tableView?.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.batteryLevel.rawValue, section: M5StackSections.allCases.count)], with: .none)
+        tableView?.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.batteryLevel.rawValue, section: M5StackSections.specificM5StackSettings.rawValue)], with: .none)
         
     }
     
     func isAskingForAllParameters(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
+        // inform bluetoothPeripheralManager also
+        (bluetoothPeripheralManager as? M5StackBluetoothTransmitterDelegate)?.isAskingForAllParameters(m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
+        
         // viewcontroller doesn't use this
     }
     
     func isReadyToReceiveData(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
+        // inform bluetoothPeripheralManager also
+        (bluetoothPeripheralManager as? M5StackBluetoothTransmitterDelegate)?.isReadyToReceiveData(m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
+        
         // viewcontroller doesn't use this
     }
     
     func newBlePassWord(newBlePassword: String, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
+        
+        // inform bluetoothPeripheralManager also
+        (bluetoothPeripheralManager as? M5StackBluetoothTransmitterDelegate)?.newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
         
         // note : blePassword is also saved in BluetoothPeripheralManager, it will be saved two times
         if let m5StackPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack {
@@ -569,10 +497,13 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     
     func authentication(success: Bool, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
+        // inform bluetoothPeripheralManager also
+        (bluetoothPeripheralManager as? M5StackBluetoothTransmitterDelegate)?.authentication(success: success, m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
+        
         if !success, let m5StackPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack {
             
             // show warning, inform that user should set password or reset M5Stack
-            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
+            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_BluetoothPeripheralView.connect, actionHandler: {
                 
                 // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
                 self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackPeripheral)
@@ -585,10 +516,13 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     
     func blePasswordMissing(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
+        // inform bluetoothPeripheralManager also
+        (bluetoothPeripheralManager as? M5StackBluetoothTransmitterDelegate)?.blePasswordMissing(m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
+        
         guard let m5StackPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack else {return}
         
         // show warning, inform that user should set password
-        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
+        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_BluetoothPeripheralView.connect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
             self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackPeripheral)
@@ -601,10 +535,13 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     
     func m5StackResetRequired(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
         
+        // inform bluetoothPeripheralManager also
+        (bluetoothPeripheralManager as? M5StackBluetoothTransmitterDelegate)?.m5StackResetRequired(m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
+        
         guard let m5StackBluetoothPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: m5StackBluetoothTransmitter) as? M5Stack else {return}
         
         // show warning, inform that user should reset M5Stack
-        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.m5StackResetRequiredWarning + " " + Text_BluetoothPeripheralView.alwaysConnect, actionHandler: {
+        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.m5StackResetRequiredWarning + " " + Texts_BluetoothPeripheralView.connect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
             self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackBluetoothPeripheral)
@@ -617,116 +554,18 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
     
 }
 
-// MARK: - extension BluetoothPeripheralViewModelProtocol
+// MARK: - conform to BluetoothPeripheralViewModel
 
 extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
-
+    
     func numberOfSections() -> Int {
         return numberOfM5Sections()
     }
     
-    func writeTempValues(to bluetoothPeripheral: BluetoothPeripheral) {
-        
-        guard let m5StackBluetoothPeripheral = bluetoothPeripheral as? M5Stack else {return}
-        
-        // creating enum to make sure we don't forget new cases
-        for setting in SpecificM5StackSettings.allCases {
-            switch setting {
-                
-            case .batteryLevel, .powerOff :
-                break
-
-            case .brightness:
-                if let brightness = brightnessTemporaryValue {
-                    m5StackBluetoothPeripheral.brightness = Int16(brightness)
-                }
-            }
-            
-        }
-        
-        // creating enum to make sure we don't forget new cases
-        for setting in CommonM5Setting.allCases {
-            switch setting {
-                
-            case .m5StackHelpText, .blePassword :
-                break
-                
-            case .textColor:
-                if let textColorTemporaryValue = textColorTemporaryValue {
-                    m5StackBluetoothPeripheral.textcolor = Int32(textColorTemporaryValue.rawValue)
-                }
-                
-            case .backGroundColor:
-                if let backGroundColor = backGroundColorTemporaryValue {
-                    m5StackBluetoothPeripheral.backGroundColor = Int32(backGroundColor.rawValue)
-                }
-
-            case .rotation:
-                if let rotation = rotationTempValue {
-                    m5StackBluetoothPeripheral.rotation = Int32(rotation)
-                }
-                
-            case .connectToWiFi:
-                m5StackBluetoothPeripheral.connectToWiFi = connectToWiFiTempValue ?? false
-                
-            }
-        }
-        
-    }
-    
-    func storeTempValues(from bluetoothPeripheral: BluetoothPeripheral) {
-        
-        guard let m5StackBluetoothPeripheral = bluetoothPeripheral as? M5Stack else {return}
-        
-        // creating enum to make sure we don't forget new cases
-        for setting in SpecificM5StackSettings.allCases {
-            switch setting {
-                
-            case .batteryLevel, .powerOff :
-                break
-                
-            case .brightness:
-                // temporary store the value of brightness, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-                brightnessTemporaryValue = Int(m5StackBluetoothPeripheral.brightness)
-                
-            }
-            
-        }
-
-        // creating enum to make sure we don't forget new cases
-        for setting in CommonM5Setting.allCases {
-            
-            switch setting {
-                
-            case .m5StackHelpText, .blePassword :
-                break
-
-            case .textColor:
-                // temporary store the value of textColor, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-                textColorTemporaryValue = M5StackColor(forUInt16: UInt16(m5StackBluetoothPeripheral.textcolor))
-
-            case .backGroundColor:
-                // temporary store the value of backGroundColor, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-                backGroundColorTemporaryValue = M5StackColor(forUInt16: UInt16(m5StackBluetoothPeripheral.backGroundColor))
-
-            case .rotation:
-                // temporary store the value of rotation, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-                rotationTempValue = UInt16(m5StackBluetoothPeripheral.rotation)
-
-            case .connectToWiFi:
-                // temporary store the value of connectToWiFi, user can change this via the view, it will be stored back in the m5StackASNSObject only after clicking 'done' button
-                connectToWiFiTempValue = m5StackBluetoothPeripheral.connectToWiFi
-
-            }
-            
-        }
-        
-    }
-
     func numberOfSettings(inSection section:Int) -> Int {
-        
+
         switch section {
-        case 1:
+        case 1://starts at 1 since oopweb is not enabled for M5Stack
             return CommonM5Setting.allCases.count
         case 2:
             return SpecificM5StackSettings.allCases.count
@@ -736,16 +575,16 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
     }
     
-    func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging, doneButtonOutlet: UIBarButtonItem) {
+    func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging) -> SettingsSelectedRowAction {
         
-        userDidSelectM5StackRow(withSettingRawValue: rawValue, forSection: section, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, doneButtonOutlet: doneButtonOutlet)
+        return userDidSelectM5StackRow(withSettingRawValue: rawValue, forSection: section, for: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager)
         
     }
 
     
-    func update(cell: UITableViewCell, forRow row: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, doneButtonOutlet: UIBarButtonItem) {
+    func update(cell: UITableViewCell, forRow row: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral) {
         
-        updateM5Stack(cell: cell, forRow: row, forSection: section, for: bluetoothPeripheral, doneButtonOutlet: doneButtonOutlet)
+        updateM5Stack(cell: cell, forRow: row, forSection: section, for: bluetoothPeripheral)
         
     }
 
@@ -761,9 +600,11 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     ///    - bluetoothTransmitterDelegate : usually the uiViewController
     ///    - bluetoothPeripheral : if nil then the viewcontroller is opened to scan for a new peripheral
     ///    - bluetoothPeripheralManager : reference to bluetoothPeripheralManaging object
-    ///    - tableView : needed to intiate refresh of row
+    ///    - tableView : needed to initiate refresh of row
     ///    - bluetoothPeripheralViewController : BluetoothPeripheralViewController
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView,  bluetoothPeripheralViewController: BluetoothPeripheralViewController, onLibreSensorTypeReceived: ((LibreSensorType) -> ())?) {
+        
+        // this type of transmitter does not receive libre sensor types, so the closure onLibreSensorTypeReceived does not need to be stored
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         
@@ -771,20 +612,28 @@ extension M5StackBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         self.bluetoothPeripheralViewController = bluetoothPeripheralViewController
         
-        self.bluetoothTransmitterDelegate = bluetoothTransmitterDelegate
+        self.bluetoothPeripheral = bluetoothPeripheral
         
-        if let m5Stack = bluetoothPeripheral as? M5Stack  {
+        if let bluetoothPeripheral = bluetoothPeripheral {
             
-            storeTempValues(from: m5Stack)
-            
-            // also request batteryLevel, this may have been updated
-            if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5Stack, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter {
+            if let m5Stack = bluetoothPeripheral as? M5Stack {
                 
-                _ = m5StackBluetoothTransmitter.readBatteryLevel()
+                if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: m5Stack, createANewOneIfNecesssary: false), let m5StackBluetoothTransmitter = blueToothTransmitter as? M5StackBluetoothTransmitter {
+                    
+                    // set m5StackBluetoothTransmitter delegate to self.
+                    m5StackBluetoothTransmitter.m5StackBluetoothTransmitterDelegate = self
+                    
+                    // also request batteryLevel, this may have been updated
+                    _ = m5StackBluetoothTransmitter.readBatteryLevel()
+                    
+                }
                 
+            } else {
+                fatalError("in M5StackBluetoothPeripheralViewModel, configure. bluetoothPeripheral is not M5Stack")
             }
             
         }
+                
     }
     
 }

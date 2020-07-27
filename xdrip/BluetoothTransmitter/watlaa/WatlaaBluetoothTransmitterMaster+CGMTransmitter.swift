@@ -1,21 +1,51 @@
 import Foundation
 
-extension WatlaaBluetoothTransmitterMaster: CGMTransmitter {
-    
-    func initiatePairing() {
-        // no pairing needed for watlaa
+extension WatlaaBluetoothTransmitter: CGMTransmitter {
+ 
+    func setWebOOPSite(oopWebSite: String) {
+        
+        self.oopWebSite = oopWebSite
+        
     }
     
-    func reset(requested: Bool) {
-        // no reset need for watlaa
+    func setWebOOPToken(oopWebToken: String) {
+        
+        self.oopWebToken = oopWebToken
+        
     }
     
     func setWebOOPEnabled(enabled: Bool) {
-        // no web oop for watlaa as sensorid detection not supported
+        
+        webOOPEnabled = enabled
+        
+        // immediately request a new reading
+        // there's no check here to see if peripheral, characteristic, connection, etc.. exists, but that's no issue. If anything's missing, write will simply fail,
+        _ = sendStartReadingCommand()
+        
+    }
+
+    func setNonFixedSlopeEnabled(enabled: Bool) {
+        nonFixedSlopeEnabled = enabled
+        
+        // immediately request a new reading
+        // there's no check here to see if peripheral, characteristic, connection, etc.. exists, but that's no issue. If anything's missing, write will simply fail,
+        _ = sendStartReadingCommand()
     }
     
-    func setWebOOPSiteAndToken(oopWebSite: String, oopWebToken: String) {
-        // no web oop for watlaa as sensorid detection not supported
+    func cgmTransmitterType() -> CGMTransmitterType {
+        return .watlaa
+    }
+    
+    func isWebOOPEnabled() -> Bool {
+        return webOOPEnabled
+    }
+
+        func isNonFixedSlopeEnabled() -> Bool {
+        return nonFixedSlopeEnabled
+    }
+
+    func requestNewReading() {
+        _ = sendStartReadingCommand()
     }
     
 }

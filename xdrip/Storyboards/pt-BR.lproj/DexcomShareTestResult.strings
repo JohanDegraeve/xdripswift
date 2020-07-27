@@ -1,11 +1,11 @@
 "dexcomsharetestresult_verificationsuccessfulalerttitle" = "Verificação Sucedida";
-"dexcomsharetestresult_verificationsuccessfulalertbody" = "Sua conta dexcomshare foi verificada com sucesso";
+"dexcomsharetestresult_verificationsuccessfulalertbody" = "Sua conta Dexcom Share foi verificada com sucesso";
 "dexcomsharetestresult_verificationerroralerttitle" = "Erro de Verificação";
-"dexcomsharetestresult_SSO_AuthenticateAccountNotFound" = "Conta não encontrada";
+"dexcomsharetestresult_SSO_AuthenticateAccountNotFound" = "Conta Não Encontrada";
 "dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Máximo de logins atingidos. Aguarde 10 minutos para tentar novamente.";
 "dexcomsharetestresult_SSO_AuthenticatePasswordInvalid" = "Senha Inválida";
 "dexcomsharetestresult_uploadErrorWarning" = "Erro Dexcom Share Upload";
 "dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Número de serial Dexcom Share não bate com o número desta conta. Verifique o Número Serial nas configurações.";
 "dexcomsharetestresult_monitored_receiver_not_assigned_1" = "Parace que o id do transmissor ou número serial";
 "dexcomsharetestresult_monitored_receiver_not_assigned_2" = "não está especificado para";
-"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Use o app oficial Dexcom para registrar o transmissor (G5) ou o Share receiver (G4)\r\n\r\nPossivelmente você só está usando o url errado, verifique a configuração 'Use US url?'";
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Use o app oficial Dexcom para registrar o transmissor (G5) ou o Share receiver (G4)\r\n\r\nPossivelmente você só está usando o URL errado, verifique a configuração 'Use US URL?'";

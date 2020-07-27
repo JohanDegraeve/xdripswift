@@ -156,16 +156,15 @@ class NightScoutFollowManager:NSObject {
         // calculate count, which is a parameter in the nightscout API - divide by 60, worst case NightScout has a reading every minute, this can be the case for MiaoMiao
         let count = Int(-timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow / 60 + 1)
         
-        // get shared URLSession
-        let sharedSession = URLSession.shared
-        
         // ceate endpoint to get latest entries
         let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightScoutUrl, count: count, olderThan: timeStampOfFirstBgReadingToDowload)
         
         // create downloadTask and start download
         if let url = latestEntriesEndpoint.url {
             
-            let downloadTask = sharedSession.dataTask(with: url, completionHandler: { data, response, error in
+            let task = URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+                
+                trace("in download, finished task", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
                 
                 // get array of FollowGlucoseData from json
                 var followGlucoseDataArray = [NightScoutBgReading]()
@@ -188,7 +187,9 @@ class NightScoutFollowManager:NSObject {
                 
             })
             
-            downloadTask.resume()
+            trace("in download, calling task.resume", log: log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            task.resume()
+            
         }
 
     }
@@ -328,7 +329,11 @@ class NightScoutFollowManager:NSObject {
         // create playSoundTimer
         playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(ConstantsSuspensionPrevention.interval), eventHandler: {
                 // play the sound
+            
+             trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            
                 if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
+                    trace("playing audio", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
                     audioPlayer.play()
                 }
             })
@@ -373,9 +378,8 @@ class NightScoutFollowManager:NSObject {
         }
     }
     
-    // MARK:- observe function
+    // MARK:- overriden function
     
-    /// when user changes from master to follower or vice versa, processing is needed
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
         if let keyPath = keyPath {

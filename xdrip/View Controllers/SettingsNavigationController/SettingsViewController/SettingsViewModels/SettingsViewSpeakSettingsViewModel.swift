@@ -17,14 +17,20 @@ fileprivate enum Setting:Int, CaseIterable {
     /// speak each reading, each 2 readings ...  integer value
     case speakInterval = 4
     
-    /// rate at wich speak should be done
-    case speakRate = 5
 }
 
 /// conforms to SettingsViewModelProtocol for all speak settings in the first sections screen
 class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
     
-    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+    func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
+    
+    func storeUIViewController(uIViewController: UIViewController) {}
+    
+    func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
+        // this ViewModel does need to send back messages to the viewcontroller asynchronously
+    }
+    
+   func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
         return false
     }
     
@@ -60,15 +66,6 @@ class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
                 }
             }, cancelHandler: nil, didSelectRowHandler: nil)
 
-        case .speakRate:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelSpeakRate, message: Texts_SettingsView.labelSpeakRateMessage, keyboardType: .decimalPad, text: UserDefaults.standard.speakRate.description, placeHolder: UserDefaults.standard.speakRate.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(rateAsString:String) in
-                
-                if let newValue = rateAsString.toDouble() {
-                    UserDefaults.standard.speakRate = newValue
-                }
-                
-            }, cancelHandler: nil, inputValidator: nil)
-
         }
     }
     
@@ -99,8 +96,6 @@ class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.labelSpeakDelta
         case .speakInterval:
             return Texts_SettingsView.labelSpeakInterval
-        case .speakRate:
-            return Texts_SettingsView.labelSpeakRate
         }
     }
     
@@ -117,8 +112,6 @@ class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
         case .speakInterval:
             return UITableViewCell.AccessoryType.disclosureIndicator
         case .speakBgReadingLanguage:
-            return UITableViewCell.AccessoryType.disclosureIndicator
-        case .speakRate:
             return UITableViewCell.AccessoryType.disclosureIndicator
         }
     }
@@ -137,8 +130,6 @@ class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
             return UserDefaults.standard.speakInterval.description
         case .speakBgReadingLanguage:
             return Texts_SpeakReading.languageName
-        case .speakRate:
-            return UserDefaults.standard.speakRate.description
         }
     }
     
@@ -161,8 +152,6 @@ class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
             return nil
             
         case .speakBgReadingLanguage:
-            return nil
-        case .speakRate:
             return nil
         }
     }

@@ -10,7 +10,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - public properties
     
     /// variable : it can get a new value during app run, will be used by rootviewcontroller's that want to receive info
-    public weak var variableBluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
+    public weak var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
 
     // MARK: - private properties
     
@@ -32,11 +32,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// write characteristic
     private let CBUUID_WriteCharacteristic:String
     
-    /// if true, then scanning can start automatically as soon as an instance of the BluetoothTransmitter is created. This is typical for eg Dexcom G5, where an individual transitter can be idenfied via the transmitter id. Also the case for Blucon. For MiaoMiao and G4 xdrip this is different.
-    ///
-    /// parameter needs to be set during initialisation
-    private let startScanningAfterInit:Bool
-
     // for trace,
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBlueToothTransmitter)
 
@@ -65,9 +60,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// should the app try to reconnect after disconnect?
     private var reconnectAfterDisconnect:Bool = true
 
-    /// fixed : it will be set during init and  not change, there's also a variable one, named variableBluetoothTransmitterDelegate
-    private(set) weak var fixedBluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
-
     // MARK: - Initialization
     
     /// - parameters:
@@ -79,8 +71,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     ///     - servicesCBUUIDs: service uuid's
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
-    ///     - delegate : a
-    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID], CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, startScanningAfterInit:Bool, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?) {
+    ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
+    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID], CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
         
         switch addressAndName {
             
@@ -99,18 +91,16 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         self.CBUUID_WriteCharacteristic = CBUUID_WriteCharacteristic
         self.CBUUID_ReceiveCharacteristic = CBUUID_ReceiveCharacteristic
         
-        // assign startScanningAfterInit
-        self.startScanningAfterInit = startScanningAfterInit
-        
         //initialize timeStampLastStatusUpdate
         timeStampLastStatusUpdate = Date()
         
-        // assign delegate
-        self.fixedBluetoothTransmitterDelegate = bluetoothTransmitterDelegate
+        // assign bluetoothTransmitterDelegate
+        self.bluetoothTransmitterDelegate = bluetoothTransmitterDelegate
         
         super.init()
 
         initialize()
+        
     }
     
     // MARK: - De-initialization
@@ -176,7 +166,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         trace("in startScanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         
         //assign default returnvalue
-        var returnValue = BluetoothTransmitter.startScanningResult.other(reason: "unknown")
+        var returnValue = BluetoothTransmitter.startScanningResult.unknown
         
         // first check if already connected or connecting and if so stop processing
         if let peripheral = peripheral {
@@ -210,12 +200,31 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             }
             switch centralManager.state {
             case .poweredOn:
-                trace("    starting bluetooth scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                
+                trace("    state is poweredOn", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
                 centralManager.scanForPeripherals(withServices: services, options: nil)
                 returnValue = .success
+                
+            case .poweredOff:
+                
+                trace("    state is poweredOff", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
+                return .poweredOff
+            
+            case .unknown:
+                
+                trace("    state is unknown", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
+                return .unknown
+                
+            case .unauthorized:
+                
+                trace("    state is unauthorized", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
+                return .unauthorized
+                
             default:
-                trace("    bluetooth is not powered on, actual state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, "\(centralManager.state.toString())")
-                returnValue = .bluetoothNotPoweredOn(actualStateIs: centralManager.state.toString())
+                
+                trace("    state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, centralManager.state.toString())
+                return returnValue
+                
             }
         } else {
             trace("    centralManager is nil, can not starting scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
@@ -278,7 +287,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         self.peripheral = peripheral
         
         //in Spike a check is done to see if state is disconnected, this is code from the MiaoMiao developers, not sure if this is needed or not because normally the device should be disconnected
-        trace("in stopScanAndconnect, status = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, peripheral.state.description())
+        trace("in stopScanAndconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, peripheral.state.description())
         if peripheral.state == .disconnected {
             trace("    trying to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
             centralManager?.connect(peripheral, options: nil)
@@ -367,8 +376,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         trace("connected to peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'")
         
-        fixedBluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
-        variableBluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
+        bluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
 
         peripheral.discoverServices(servicesCBUUIDs)
         
@@ -394,16 +402,15 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         trace("in centralManagerDidUpdateState, for peripheral with name %{public}@, new state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", "\(central.state.toString())")
         
-        fixedBluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
-        variableBluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
+        bluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
 
-        /// in case status changed to powered on and if device address known then try either to retrieveperipherals, or if that doesn't succeed, start scanning
+        /// in case status changed to powered on and if device address known then try  to retrieveperipherals
         if central.state == .poweredOn, reconnectAfterDisconnect {
             if (deviceAddress != nil) {
-                /// try to connect to device to which connection was successfully done previously, this attempt is done by callling retrievePeripherals(central) - if that fails and if it's a device for which we can always scan (eg DexcomG5), then start scanning
-                if !retrievePeripherals(central) && startScanningAfterInit {
-                    _ = startScanning()
-                }
+                
+                /// try to connect to device to which connection was successfully done previously, this attempt is done by callling retrievePeripherals(central)
+                _ = retrievePeripherals(central)
+                
             }
         }
         
@@ -415,8 +422,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         trace("    didDisconnect peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info , deviceName ?? "'unknown'")
         
-        fixedBluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: self)
-        variableBluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: self)
+        bluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: self)
 
         if let error = error {
             trace("    error: %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error , error.localizedDescription)
@@ -510,8 +516,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
         
     }
-    
+
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+
+        // if debug level tracing enabled, then trace the received value
+        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog, let value = characteristic.value {
+            trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, value.hexEncodedString())
+        }
         
         timeStampLastStatusUpdate = Date()
         
@@ -520,39 +531,44 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
         
     }
-    
-    // MARK: methods to get address and name
-    
-    /// read device address
-    func getAddress() -> String? {
-        return deviceAddress
-    }
-    
-    /// read device name
-    func name() -> String? {
-        return deviceName
-    }
-    
+
+    /// to ask transmitter that it initiates pairing
+    ///
+    /// to be overriden. For transmitter types that don't need pairing, or that don't need pairing initiated by user/view controller, this function does not need to be overriden
+    func initiatePairing() {return}
+
     // MARK: - helpers
     
     private func initialize() {
-        centralManager = CBCentralManager(delegate: self, queue: nil, options: nil)
+        centralManager = CBCentralManager(delegate: self, queue: nil, options: [CBCentralManagerOptionShowPowerAlertKey: true])
     }
     
     // MARK: - enum's
     
     /// result of call to startscanning
-    enum startScanningResult {
-        //scanning started successfully
+    enum startScanningResult: Equatable {
+        
+        /// scanning started successfully
         case success
-        // was already scanning, can be considred as successful
+        
+        /// was already scanning, can be considred as successful
         case alreadyScanning
-        // scanning ot started because bluetooth is not powered on, actual state of centralmanger is in response
-        case bluetoothNotPoweredOn(actualStateIs:String)
-        // in case peripheral is currently connected then it makes no sense to start scanning
+        
+        /// scanning ,ot started because bluetooth is not powered on,
+        case poweredOff
+        
+        /// in case peripheral is currently connected then it makes no sense to start scanning
         case alreadyConnected
-        // peripheral is currently connecting, it makes no sense to start scanning
+        
+        /// peripheral is currently connecting, it makes no sense to start scanning
         case connecting
+        
+        /// unknown state
+        case unknown
+        
+        /// unauthorized
+        case unauthorized
+        
         // any other, reason specified in text
         case other(reason:String)
         
@@ -561,16 +577,27 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 
             case .success:
                 return "success"
+                
             case .alreadyScanning:
                 return "alreadyScanning"
-            case .bluetoothNotPoweredOn(let actualState):
-                return "not powered on, actual status =" + actualState
+                
+            case .poweredOff:
+                return "poweredOff"
+                
             case .alreadyConnected:
                 return "alreadyConnected"
+                
             case .connecting:
                 return "connecting"
+                
             case .other(let reason):
                 return "other reason : " + reason
+                
+            case .unknown:
+                return "unknown"
+                
+            case .unauthorized:
+                return "unauthorized"
                 
             }
         }
