@@ -14,6 +14,12 @@ fileprivate enum Setting:Int, CaseIterable {
 }
 
 struct SettingsViewLibreToolsViewModel: SettingsViewModelProtocol {
+    func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {}
+
+    func storeUIViewController(uIViewController: UIViewController) {}
+
+    func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
+
     func sectionTitle() -> String? { "Freestyle Libre" }
 
     func settingsRowText(index: Int) -> String {
