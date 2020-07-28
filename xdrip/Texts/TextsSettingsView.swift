@@ -51,7 +51,7 @@ class Texts_SettingsView {
     }()
 
     static let labelUseObjectives: String = {
-        return NSLocalizedString("settingsviews_useobjectives", tableName: filename, bundle: Bundle.main, value: "Use Objectives?", comment: "home screen settings, use objectives")
+        return NSLocalizedString("settingsviews_useobjectives", tableName: filename, bundle: Bundle.main, value: "Show Objectives in Graph?", comment: "home screen settings, use objectives in graph")
     }()
 
     static let labelUrgentHighValue: String = {
@@ -75,7 +75,7 @@ class Texts_SettingsView {
     }()
     
     static let labelShowColoredObjectives: String = {
-        return NSLocalizedString("settingsviews_showcoloredobjectives", tableName: filename, bundle: Bundle.main, value: "Show Colored Objective Lines?", comment: "home screen settings, show colored objectives")
+        return NSLocalizedString("settingsviews_showcoloredobjectives", tableName: filename, bundle: Bundle.main, value: "Show Colored Lines?", comment: "home screen settings, show colored objectives lines")
     }()
     
     static let labelShowTarget: String = {
