@@ -448,6 +448,8 @@ final class RootViewController: UIViewController {
                 // check if webOOPEnabled changed and if yes stop the sensor
                 if self.webOOPEnabled != cgmTransmitter.isWebOOPEnabled() {
                     
+                    trace("in cgmTransmitterInfoChanged, webOOPEnabled value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.isWebOOPEnabled().description)
+                    
                     self.stopSensor()
                     
                 }
@@ -455,12 +457,16 @@ final class RootViewController: UIViewController {
                 // check if nonFixedSlopeEnabled changed and if yes stop the sensor
                 if self.nonFixedSlopeEnabled != cgmTransmitter.isNonFixedSlopeEnabled() {
                     
+                    trace("in cgmTransmitterInfoChanged, nonFixedSlopeEnabled value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.isNonFixedSlopeEnabled().description)
+
                     self.stopSensor()
                     
                 }
 
                 // check if the type of sensor supported by the cgmTransmitterType  has changed, if yes stop the sensor
                 if let currentTransmitterType = UserDefaults.standard.cgmTransmitterType, currentTransmitterType.sensorType() != cgmTransmitter.cgmTransmitterType().sensorType() {
+                    
+                    trace("in cgmTransmitterInfoChanged, sensorType value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.cgmTransmitterType().sensorType().rawValue)
                     
                     self.stopSensor()
                     
@@ -657,8 +663,8 @@ final class RootViewController: UIViewController {
             // apply logic only if web oop is enabled
             if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled() {
 
-                trace("change in overrideWebOOPCalibration observed, stopping sensor and creating new calibrator. Requesting new reading", log: log, category: ConstantsLog.categoryRootView, type: .info)
-
+                trace("in cgmTransmitterInfoChanged, overrideWebOOPCalibration value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, UserDefaults.standard.overrideWebOOPCalibration.description)
+                
                 // stop the sensor
                 stopSensor()
                 
@@ -1174,7 +1180,13 @@ final class RootViewController: UIViewController {
             if cgmTransmitter.cgmTransmitterType().allowManualSensorStart() && UserDefaults.standard.isMaster {
                 // user needs to start and stop the sensor manually
                 if activeSensor != nil {
-                    listOfActions[Texts_HomeView.stopSensorActionTitle] = {(UIAlertAction) in self.stopSensor()}
+                    listOfActions[Texts_HomeView.stopSensorActionTitle] = {(UIAlertAction) in
+                        
+                        trace("in createAndPresentSensorButtonActionSheet, user clicked stop sensor, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+
+                        self.stopSensor()
+                        
+                    }
                 } else {
                     listOfActions[Texts_HomeView.startSensorActionTitle] = {(UIAlertAction) in self.startSensorAskUserForStarttime()}
                 }
