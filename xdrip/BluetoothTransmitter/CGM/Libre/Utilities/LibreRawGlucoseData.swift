@@ -12,7 +12,6 @@ class LibreRawGlucoseData: GlucoseData {
     }
     
     convenience init(timeStamp:Date, glucoseLevelRaw:Double) {
-        debuglogging("creating LibreRawGlucoseData with timestamp " + timeStamp.description(with: .current) + " and glucoseLevelRaw = " + glucoseLevelRaw.description)
         self.init(timeStamp: timeStamp, glucoseLevelRaw: glucoseLevelRaw, glucoseLevelFiltered: glucoseLevelRaw)
     }
     

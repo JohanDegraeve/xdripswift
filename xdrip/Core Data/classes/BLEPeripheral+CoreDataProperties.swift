@@ -31,12 +31,6 @@ extension BLEPeripheral {
     /// should weboop be used or not - defined here to make it easier for coding, although not every type of bluetoothperipheral needs this
     @NSManaged public var webOOPEnabled: Bool
 
-    /// web oop site - defined here to make it easier for coding, although not every type of bluetoothperipheral needs this
-    @NSManaged public var oopWebSite: String?
-    
-    /// web oop token - defined here to make it easier for coding, although not every type of bluetoothperipheral needs this
-    @NSManaged public var oopWebToken: String?
-
     /// a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...
     @NSManaged public var dexcomG5: DexcomG5?
     

@@ -41,7 +41,7 @@ class LibreOOPClient {
         let item1 = URLQueryItem(name: "patchUid", value: libreSensorSerialNumber.uidString.uppercased())
         let item2 = URLQueryItem(name: "patchInfo", value: patchInfo)
         let item3 = URLQueryItem(name: "content", value: libreData.hexEncodedString())
-        
+
         var urlComponents = URLComponents(string: "\(oopWebSite)/libreoop2")!
         
         urlComponents.queryItems = [item, item1, item2, item3]
@@ -162,13 +162,22 @@ class LibreOOPClient {
                 
                 // data is not nil, let's try to do json decoding
                 let decoder = JSONDecoder()
-                
+               
                 do {
                     
                     let response = try decoder.decode(type.self, from: data)
                     
-                    callback(response, nil)
-                    
+                    if response.isError {
+
+                        // if response isError is true, then still send the response, but also the msg, which should contain the error description
+                        callback(response, LibreOOPWebError.jsonResponseHasError(msg: response.msg, errcode: response.errcode))
+                        
+                    } else {
+
+                        callback(response, nil)
+
+                    }
+                 
                     return
                     
                 } catch {

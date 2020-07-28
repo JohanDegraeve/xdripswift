@@ -179,6 +179,14 @@ extension UserDefaults {
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
         
+        // Trace
+        /// should debug level logs be added in trace file or not, and also in NSLog
+        case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
+        
+        // non fixed slope values for oop web Libre
+        /// web oop parameters, only for Libre 1
+        case libre1DerivedAlgorithmParameters = "algorithmParameters"
+
         // development settings
         
         /// G6 factor1 - for testing G6 scaling
@@ -193,14 +201,16 @@ extension UserDefaults {
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
         
-        /// should debug level logs be added in trace file or not, and also in NSLog
-        case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
+        /// if webOOP enabled, what site to use
+        case webOOPsite = "webOOPsite"
+        /// if webOOP enabled, value of the token
+        case webOOPtoken = "webOOPtoken"
+        
+        /// in case Libre 2 users want to use the local calibration algorithm
+        case overrideWebOOPCalibration = "overrideWebOOPCalibration"
         
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
-        
-        /// web oop parameters, only for Libre 1
-        case libre1DerivedAlgorithmParameters = "algorithmParameters"
         
     }
     
@@ -997,7 +1007,7 @@ extension UserDefaults {
         }
     }
     
-    /// OSLogEnabled - default false
+    /// addDebugLevelLogsInTraceFileAndNSLog - default false
     var addDebugLevelLogsInTraceFileAndNSLog: Bool {
         get {
             return bool(forKey: Key.addDebugLevelLogsInTraceFileAndNSLog.rawValue)
@@ -1007,6 +1017,42 @@ extension UserDefaults {
         }
     }
     
+    /// web oop site
+    @objc dynamic var webOOPSite:String? {
+        get {
+            return string(forKey: Key.webOOPsite.rawValue)
+        }
+        set {
+            var value = newValue
+            if let newValue = newValue {
+                if !newValue.startsWith("http") {
+                    value = "https://" + newValue
+                }
+            }
+            set(value, forKey: Key.webOOPsite.rawValue)
+        }
+    }
+    
+    /// web oop token
+    @objc dynamic var webOOPtoken:String? {
+        get {
+            return string(forKey: Key.webOOPtoken.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.webOOPtoken.rawValue)
+        }
+    }
+    
+    /// in case Libre 2 users want to use the local calibration algorithm
+    @objc dynamic var overrideWebOOPCalibration: Bool {
+        get {
+            return bool(forKey: Key.overrideWebOOPCalibration.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.overrideWebOOPCalibration.rawValue)
+        }
+    }
+
     /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
     var cgmTransmitterDeviceAddress: String? {
         get {

@@ -16,7 +16,7 @@ public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebSe
     /// sensor message
     var msg: String?
     
-    var errcode: String?
+    var errcode: Int?
     
     /// if endTime != 0, the sensor expired
     var endTime: Int?

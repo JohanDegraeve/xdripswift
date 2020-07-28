@@ -33,6 +33,7 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
         
         // changing follower to master or master to follower requires changing ui for nightscout settings and transmitter type settings
+        // the same applies when changing bloodGlucoseUnit, because off the seperate section with bgObjectives
         if (index == Setting.masterFollower.rawValue || index == Setting.bloodGlucoseUnit.rawValue) {return true}
         
         return false

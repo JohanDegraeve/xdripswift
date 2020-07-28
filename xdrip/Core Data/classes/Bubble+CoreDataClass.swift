@@ -23,7 +23,7 @@ public class Bubble: NSManagedObject {
     
     /// create Bubble
     /// - parameters:
-    init(address: String, name: String, alias: String?, timeStampLastBgReading: Date?, sensorSerialNumber: String?, webOOPEnabled: Bool, oopWebSite: String?, oopWebToken: String?, nsManagedObjectContext:NSManagedObjectContext) {
+    init(address: String, name: String, alias: String?, timeStampLastBgReading: Date?, sensorSerialNumber: String?, webOOPEnabled: Bool, nsManagedObjectContext:NSManagedObjectContext) {
         
         let entity = NSEntityDescription.entity(forEntityName: "Bubble", in: nsManagedObjectContext)!
         
@@ -34,8 +34,6 @@ public class Bubble: NSManagedObject {
         blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
 
         blePeripheral.webOOPEnabled = webOOPEnabled
-        blePeripheral.oopWebSite = oopWebSite
-        blePeripheral.oopWebToken = oopWebToken
 
     }
     

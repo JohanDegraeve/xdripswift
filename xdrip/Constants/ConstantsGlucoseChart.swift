@@ -38,16 +38,28 @@ enum ConstantsGlucoseChart {
     /// axis line label    (make white to match new dark UI theme)
     static let axisLabelColor = UIColor.white
     
-    /// grid color
+    /// grid color to use if useObjectives is not enabled
     static let gridColor = UIColor.darkGray
+    
+    /// grid color to use if useObjectives is enabled
     static let gridColorObjectives = UIColor.darkGray.withAlphaComponent(0.4)
     
-    /// objective/target range guidelines. Will use either standard gray or colored lines
-    /// make use alpha components to make the perceived brightness of each line be the same to the user (otherwise red appears washed out)
+    // objective/target range guidelines. Will use either standard gray or colored lines
+    // make use alpha components to make the perceived brightness of each line be the same to the user (otherwise red appears washed out)
+    
+    /// color for urgent high and urgent low line, if showColoredObjectives is not enabled
     static let guidelineUrgentHighLow = UIColor.lightGray.withAlphaComponent(0.8)
+    
+    /// color for urgent high and urgent low line, if showColoredObjectives is not enabled
     static let guidelineHighLow = UIColor.lightGray.withAlphaComponent(1)
+    
+    /// color for urgent high and urgent low line, if showColoredObjectives is enabled
     static let guidelineUrgentHighLowColor = UIColor.red.withAlphaComponent(0.8)
+    
+    /// color for high and low line, if showColoredObjectives is enabled
     static let guidelineHighLowColor = UIColor.yellow.withAlphaComponent(0.7)
+    
+    /// color for target line
     static let guidelineTargetColor = UIColor.green.withAlphaComponent(0.5)
     
     /// glucose colors

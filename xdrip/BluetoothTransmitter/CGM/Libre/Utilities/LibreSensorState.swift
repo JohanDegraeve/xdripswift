@@ -66,4 +66,23 @@ public enum LibreSensorState {
             return "Unknown sensor state"
         }
     }
+    
+    var translatedDescription: String {
+        switch self {
+        case .notYetStarted:
+            return TextsLibreStates.notYetStarted
+        case .starting:
+            return TextsLibreStates.starting
+        case .ready:
+            return TextsLibreStates.ready
+        case .expired:
+            return TextsLibreStates.expired
+        case .shutdown:
+            return TextsLibreStates.shutdown
+        case .failure:
+            return TextsLibreStates.failure
+        default:
+            return TextsLibreStates.unknown
+        }
+    }
 }

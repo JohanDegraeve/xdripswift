@@ -56,16 +56,6 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     /// when user changes webOOP values in BluetoothPeripheralViewController, this function will be called
     func receivedNewValue(webOOPEnabled: Bool, for bluetoothPeripheral: BluetoothPeripheral)
     
-    /// to pass new value off oopWebSite
-    ///
-    /// when user changes webOOP values in BluetoothPeripheralViewController, this function will be called
-    func receivedNewValue(oopWebSite: String?, for bluetoothPeripheral: BluetoothPeripheral)
-    
-    /// to pass new value off oopWebToken
-    ///
-    /// when user changes webOOP values in BluetoothPeripheralViewController, this function will be called
-    func receivedNewValue(oopWebToken: String?, for bluetoothPeripheral: BluetoothPeripheral)
-    
     /// - returns the currently in use CGMTransmitter, nil if non in use.
     /// - in use means : created, and shouldconnect = true
     func getCGMTransmitter() -> CGMTransmitter?

@@ -32,11 +32,10 @@ extension LibreRawGlucoseWeb {
         returnValue = returnValue + "\nSize of [LibreRawGlucoseData] = " + libreGlucoseData.libreRawGlucoseData.count.description + "\n"
         
         if libreGlucoseData.libreRawGlucoseData.count > 0 {
-            returnValue = returnValue + "list = \n"
+            returnValue = returnValue + "latest reading = \n"
+
+            returnValue = returnValue + libreGlucoseData.libreRawGlucoseData[0].description + "\n"
             
-            for glucoseData in libreGlucoseData.libreRawGlucoseData {
-                returnValue = returnValue + glucoseData.description + "\n"
-            }
         }
         
         if let sensorTimeInMinutes = libreGlucoseData.sensorTimeInMinutes {

@@ -16,7 +16,7 @@ final class RootViewController: UIViewController {
     
     @IBAction func calibrateButtonAction(_ sender: UIButton) {
         
-        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled() {
+        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled(), !UserDefaults.standard.overrideWebOOPCalibration {
             
             let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil)
             
@@ -272,6 +272,9 @@ final class RootViewController: UIViewController {
             // update label texts, minutes ago, diff and value
             self.updateLabelsAndChart(overrideApplicationState: true)
             
+            // create badge counter
+            self.createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
+            
             // if licenseinfo not yet accepted, show license info with only ok button
             if !UserDefaults.standard.licenseInfoAccepted {
                 
@@ -307,6 +310,10 @@ final class RootViewController: UIViewController {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.multipleAppBadgeValueWith10.rawValue, options: .new, context: nil)
         // also update of unit requires update of badge
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
+        
+        // when overrideWebOOPCalibration changes, sensor needs to be restarted
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.overrideWebOOPCalibration.rawValue, options: .new, context: nil)
+            
 
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -441,18 +448,25 @@ final class RootViewController: UIViewController {
                 // check if webOOPEnabled changed and if yes stop the sensor
                 if self.webOOPEnabled != cgmTransmitter.isWebOOPEnabled() {
                     
+                    trace("in cgmTransmitterInfoChanged, webOOPEnabled value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.isWebOOPEnabled().description)
+                    
                     self.stopSensor()
                     
                 }
                 
+                // check if nonFixedSlopeEnabled changed and if yes stop the sensor
                 if self.nonFixedSlopeEnabled != cgmTransmitter.isNonFixedSlopeEnabled() {
                     
+                    trace("in cgmTransmitterInfoChanged, nonFixedSlopeEnabled value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.isNonFixedSlopeEnabled().description)
+
                     self.stopSensor()
                     
                 }
 
                 // check if the type of sensor supported by the cgmTransmitterType  has changed, if yes stop the sensor
                 if let currentTransmitterType = UserDefaults.standard.cgmTransmitterType, currentTransmitterType.sensorType() != cgmTransmitter.cgmTransmitterType().sensorType() {
+                    
+                    trace("in cgmTransmitterInfoChanged, sensorType value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.cgmTransmitterType().sensorType().rawValue)
                     
                     self.stopSensor()
                     
@@ -553,11 +567,13 @@ final class RootViewController: UIViewController {
                 }
             }
            
-            // if a new reading is created, created either initial calibration request or bgreading notification - upload to nightscout and check alerts
+            // if a new reading is created, create either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
                 
                 // only if no webOOPEnabled : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
-                if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && !cgmTransmitter.isWebOOPEnabled() {
+                // if overrideWebOOPCalibration true, then override value of isWebOOPEnabled
+                if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && (!cgmTransmitter.isWebOOPEnabled() || UserDefaults.standard.overrideWebOOPCalibration) {
+                    
                     // there must be at least 2 readings
                     let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
                     
@@ -566,15 +582,15 @@ final class RootViewController: UIViewController {
                     }
                     
                 } else {
-                    // update notification
-                    createBgReadingNotificationAndSetAppBadge()
+                    
+                    // check alerts, create notification, set app badge
+                    checkAlertsCreateNotificationAndSetAppBadge()
+                    
                     // update all text in  first screen
                     updateLabelsAndChart(overrideApplicationState: false)
                 }
                 
                 nightScoutUploadManager?.upload()
-                
-                alertManager?.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
                 
                 healthKitManager?.storeBgReadings()
 
@@ -604,8 +620,8 @@ final class RootViewController: UIViewController {
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
             
-        case UserDefaults.Key.isMaster  :
-            
+        case UserDefaults.Key.isMaster, UserDefaults.Key.overrideWebOOPCalibration, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl :
+
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
                 return
@@ -629,8 +645,36 @@ final class RootViewController: UIViewController {
             }
             
         case UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
+
+            // if showReadingInAppBadge = false, means user set it from true to false
+            // set applicationIconBadgeNumber to 0. This will cause removal of the badge counter, but als removal of any existing notification on the screen
+            if !UserDefaults.standard.showReadingInAppBadge {
+                
+                UIApplication.shared.applicationIconBadgeNumber = 0
+                
+            }
+            
             // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
-            createBgReadingNotificationAndSetAppBadge()
+            createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
+            
+        case UserDefaults.Key.overrideWebOOPCalibration:
+
+            // user changes file of override web oop
+            // apply logic only if web oop is enabled
+            if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled() {
+
+                trace("in cgmTransmitterInfoChanged, overrideWebOOPCalibration value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, UserDefaults.standard.overrideWebOOPCalibration.description)
+                
+                // stop the sensor
+                stopSensor()
+                
+                // assign new calibrator
+                calibrator = RootViewController.getCalibrator(cgmTransmitter: cgmTransmitter)
+                
+                // request a new reading
+                cgmTransmitter.requestNewReading()
+                
+            }
             
         default:
             break
@@ -824,11 +868,6 @@ final class RootViewController: UIViewController {
                     dexcomShareUploadManager.upload()
                 }
                 
-                // check alerts
-                if let alertManager = self.alertManager {
-                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsMaster.maximumBgReadingAgeForAlertsInSeconds)
-                }
-                
                 // update labels
                 self.updateLabelsAndChart(overrideApplicationState: false)
                 
@@ -860,12 +899,27 @@ final class RootViewController: UIViewController {
             
         case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa:
             
-            if cgmTransmitter.isWebOOPEnabled() {
+            if cgmTransmitter.isWebOOPEnabled() && !UserDefaults.standard.overrideWebOOPCalibration {
+                
+                // received values are already calibrated
                 return NoCalibrator()
+                
+            } else if cgmTransmitter.isWebOOPEnabled() && UserDefaults.standard.overrideWebOOPCalibration {
+       
+                // oop web enabled, means readings received are calibrated values
+                // overrideWebOOPCalibration enabled, means recalibration to be done
+                return LibreReCalibrator()
+                
             } else if cgmTransmitter.isNonFixedSlopeEnabled() {
+                
+                // no oop web, non-fixed slope
                 return Libre1NonFixedSlopeCalibrator()
+                
             } else {
+                
+                // no oop web, fixed slope
                 return Libre1Calibrator()
+                
             }
             
         }
@@ -910,10 +964,9 @@ final class RootViewController: UIViewController {
     }
     
     /// creates bgreading notification, and set app badge to value of reading
-    private func createBgReadingNotificationAndSetAppBadge() {
-        
-        // first of all remove the application badge number. Possibly this is an old reading
-        UIApplication.shared.applicationIconBadgeNumber = 0
+    /// - parameters:
+    ///     - if overrideShowReadingInNotification then badge counter will be set (if enabled off course) with function UIApplication.shared.applicationIconBadgeNumber. To be used if badge counter is  to be set eg when UserDefaults.standard.showReadingInAppBadge is changed
+    private func createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: Bool) {
         
         // bgReadingsAccessor should not be nil at all, but let's not create a fatal error for that, there's already enough checks for it
         guard let bgReadingsAccessor = bgReadingsAccessor else {
@@ -925,13 +978,23 @@ final class RootViewController: UIViewController {
         
         // if there's no reading for active sensor with calculated value , then no reason to continue
         if lastReading.count == 0 {
+            
             trace("in createBgReadingNotificationAndSetAppBadge, lastReading.count = 0", log: log, category: ConstantsLog.categoryRootView, type: .info)
+
+            // remove the application badge number. Possibly an old reading is still shown.
+            UIApplication.shared.applicationIconBadgeNumber = 0
+
             return
         }
         
         // if reading is older than 4.5 minutes, then also no reason to continue - this may happen eg in case of follower mode
         if Date().timeIntervalSince(lastReading[0].timeStamp) > 4.5 * 60 {
+            
             trace("in createBgReadingNotificationAndSetAppBadge, timestamp of last reading > 4.5 * 60", log: log, category: ConstantsLog.categoryRootView, type: .info)
+            
+            // remove the application badge number. Possibly the previous value is still shown
+            UIApplication.shared.applicationIconBadgeNumber = 0
+
             return
         }
         
@@ -951,7 +1014,7 @@ final class RootViewController: UIViewController {
         if readingValueForBadge <= 40.0 {readingValueForBadge = 40.0}
         
         // check if notification on home screen is enabled in the settings
-        if UserDefaults.standard.showReadingInNotification  {
+        if UserDefaults.standard.showReadingInNotification && !overrideShowReadingInNotification  {
             
             // Create Notification Content
             let notificationContent = UNMutableNotificationContent()
@@ -996,6 +1059,7 @@ final class RootViewController: UIViewController {
         else {
             
             // notification shouldn't be shown, but maybe the badge counter. Here the badge value needs to be shown in another way
+            
             if UserDefaults.standard.showReadingInAppBadge {
                 
                 // rescale of unit is mmol
@@ -1116,7 +1180,13 @@ final class RootViewController: UIViewController {
             if cgmTransmitter.cgmTransmitterType().allowManualSensorStart() && UserDefaults.standard.isMaster {
                 // user needs to start and stop the sensor manually
                 if activeSensor != nil {
-                    listOfActions[Texts_HomeView.stopSensorActionTitle] = {(UIAlertAction) in self.stopSensor()}
+                    listOfActions[Texts_HomeView.stopSensorActionTitle] = {(UIAlertAction) in
+                        
+                        trace("in createAndPresentSensorButtonActionSheet, user clicked stop sensor, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+
+                        self.stopSensor()
+                        
+                    }
                 } else {
                     listOfActions[Texts_HomeView.startSensorActionTitle] = {(UIAlertAction) in self.startSensorAskUserForStarttime()}
                 }
@@ -1250,6 +1320,29 @@ final class RootViewController: UIViewController {
             calibrateButtonOutlet.disable()
         }
         
+    }
+    
+    /// call alertManager.checkAlerts, and calls createBgReadingNotificationAndSetAppBadge with overrideShowReadingInNotification true or false, depending if immediate notification was created or not
+    private func checkAlertsCreateNotificationAndSetAppBadge() {
+        
+        // unwrap alerts and check alerts
+        if let alertManager = alertManager {
+            
+            // check if an immediate alert went off that shows the current reading
+            if alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds) {
+                
+                // an immediate alert went off that shows the current reading
+                // only update badge is required, (if enabled offcourse)
+                createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
+                
+            } else {
+                
+                // update notification and app badge
+                createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: false)
+                
+            }
+        }
+
     }
     
 }
@@ -1447,16 +1540,11 @@ extension RootViewController:NightScoutFollowerDelegate {
                 // save in core data
                 coreDataManager.saveChanges()
                 
-                // update notification
-                createBgReadingNotificationAndSetAppBadge()
-                
                 // update all text in  first screen
                 updateLabelsAndChart(overrideApplicationState: false)
                 
-                // check alerts
-                if let alertManager = alertManager {
-                    alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds)
-                }
+                // check alerts, create notification, set app badge
+                checkAlertsCreateNotificationAndSetAppBadge()
                 
                 if let healthKitManager = healthKitManager {
                     healthKitManager.storeBgReadings()

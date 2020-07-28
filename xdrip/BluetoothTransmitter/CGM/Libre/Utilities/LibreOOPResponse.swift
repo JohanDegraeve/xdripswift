@@ -13,6 +13,13 @@ import Foundation
 
 /// the parameters from server
 struct OopWebCalibrationStatus: Codable, CustomStringConvertible, LibreOOPWebServerResponseData {
+    
+    // if received from server, probably always nil ?
+    var msg: String?
+
+    // if received from server, probably always nil ?
+    var errcode: Int?
+
     var error: Bool?
     var command: String?
     var slope: OopWebCalibrationStatusResult?
@@ -25,6 +32,12 @@ struct OopWebCalibrationStatus: Codable, CustomStringConvertible, LibreOOPWebSer
         offset_offset = \(slope?.offsetOffset ?? 0)
         """
     }
+    
+    // protocol LibreOOPWebServerResponseData
+    var isError: Bool {
+        return error ?? false
+    }
+
 }
 
 struct OopWebCalibrationStatusResult: Codable {

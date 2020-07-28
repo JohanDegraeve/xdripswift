@@ -24,13 +24,7 @@ public struct Libre1DerivedAlgorithmParameters: Codable, CustomStringConvertible
         return "LibreDerivedAlgorithmParameters:: slopeslope: \(slope_slope), slopeoffset: \(slope_offset), offsetoffset: \(offset_offset), offsetSlope: \(offset_slope), extraSlope: \(extraSlope), extraOffset: \(extraOffset), isValidForFooterWithReverseCRCs: \(isValidForFooterWithReverseCRCs)"
     }
     
-    /// init will fail if slope_slope == 0 && slope_offset == 0 && offset_slope == 0 && offset_offset == 0
-    public init?(slope_slope: Double, slope_offset:Double, offset_slope: Double, offset_offset: Double, isValidForFooterWithReverseCRCs: Int, extraSlope: Double, extraOffset: Double, sensorSerialNumber:String) {
-        
-        guard slope_slope != 0 &&
-            slope_offset != 0 &&
-            offset_slope != 0 &&
-            offset_offset != 0 else {return nil}
+    public init(slope_slope: Double, slope_offset:Double, offset_slope: Double, offset_offset: Double, isValidForFooterWithReverseCRCs: Int, extraSlope: Double, extraOffset: Double, sensorSerialNumber:String) {
         
         self.slope_slope = slope_slope
         self.slope_offset = slope_offset
