@@ -264,9 +264,6 @@ public class NightScoutUploadManager:NSObject {
             // 2 records are uploaded to nightscout for each calibration: a cal record and a mbg record
             let calibrationsDictionaryRepresentation = calibrationsToUpload.map({$0.dictionaryRepresentationForCalRecordNightScoutUpload}) + calibrationsToUpload.map({$0.dictionaryRepresentationForMbgRecordNightScoutUpload})
             
-            let traceValue = calibrationsDictionaryRepresentation.description
-            trace("tracevalue = %{public}@", log: oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, traceValue)
-            
             uploadData(dataToUpload: calibrationsDictionaryRepresentation, traceString: "uploadCalibrationsToNightScout", siteURL: siteURL, path: nightScoutEntriesPath, apiKey: apiKey, completionHandler: {
                 
                 // change timeStampLatestNightScoutUploadedCalibration
@@ -298,16 +295,6 @@ public class NightScoutUploadManager:NSObject {
             
             // transform dataToUpload to json
             let dateToUploadAsJSON = try JSONSerialization.data(withJSONObject: dataToUpload, options: [])
-            
-            if let dateToUploadAsJSONAsString = String(bytes: dateToUploadAsJSON, encoding: .utf8) {
-                
-                trace("dateToUploadAsJSON =  %{public}@", log: oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, dateToUploadAsJSONAsString)
-                
-                
-                
-            } else {
-                trace("could not create dateToUploadAsJSON", log: oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
-            }
             
             if let url = URL(string: siteURL) {
                 
