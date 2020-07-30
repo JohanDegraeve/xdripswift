@@ -21,8 +21,8 @@ extension Calibration {
             "type": "cal",
             "sysTime": timeStamp.ISOStringFromDate(),
             // adjusted slope and intercept values for Nightscout
-            "slope": 1000 / slope,
-            "intercept": -(intercept * 1000) / slope,
+            "slope": slope != 0 ? 1000 / slope : 0,
+            "intercept": slope != 0 ? -(intercept * 1000) / slope : 0,
             "scale": 1
         ]
         

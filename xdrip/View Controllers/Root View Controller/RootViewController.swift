@@ -1103,6 +1103,7 @@ final class RootViewController: UIViewController {
         // if there's no readings, then give empty fields
         guard latestReadings.count > 0 else {
             valueLabelOutlet.text = "---"
+            valueLabelOutlet.textColor = UIColor.darkGray
             minutesLabelOutlet.text = ""
             diffLabelOutlet.text = ""
             return
@@ -1143,12 +1144,14 @@ final class RootViewController: UIViewController {
         // set both HIGH and LOW BG values to red as previous yellow for hig is now not so obvious due to in-range colour of green.
         if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
             valueLabelOutlet.textColor = UIColor.lightGray
-        } else if lastReading.calculatedValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+        } else if lastReading.calculatedValue >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) || lastReading.calculatedValue <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+            // BG is higher than urgentHigh or lower than urgentLow objectives
             valueLabelOutlet.textColor = UIColor.red
-        } else if lastReading.calculatedValue >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
-            valueLabelOutlet.textColor = UIColor.red
+        } else if lastReading.calculatedValue >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) || lastReading.calculatedValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+            // BG is between urgentHigh/high and low/urgentLow objectives
+            valueLabelOutlet.textColor = UIColor.yellow
         } else {
-            // keep text colour
+            // BG is between high and low objectives so considered "in range"
             valueLabelOutlet.textColor = UIColor.green
         }
         
