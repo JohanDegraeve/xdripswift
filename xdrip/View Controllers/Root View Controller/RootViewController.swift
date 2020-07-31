@@ -210,13 +210,17 @@ final class RootViewController: UIViewController {
         return dateFormatter
     }()
     
-    /// current value of webOPEnabled, default false
+    /// current value of webOPEnabled, if nil then it means no cgmTransmitter connected yet , false is used as value
     /// - used to detect changes in the value
-    private var webOOPEnabled = ConstantsLibre.defaultWebOOPEnabled
+    ///
+    /// in fact it will never be used with a nil value, except when connecting to a cgm transmitter for the first time
+    private var webOOPEnabled: Bool?
 
-    /// current value of nonFixedSlopeEnabled, default false
+    /// current value of nonFixedSlopeEnabled, if nil then it means no cgmTransmitter connected yet , false is used as value
     /// - used to detect changes in the value
-    private var nonFixedSlopeEnabled = ConstantsLibre.defaultNonFixedSlopeEnabled
+    ///
+    /// in fact it will never be used with a nil value, except when connecting to a cgm transmitter for the first time
+    private var nonFixedSlopeEnabled: Bool?
     
     // MARK: - View Life Cycle
     
@@ -446,7 +450,7 @@ final class RootViewController: UIViewController {
                 self.calibrator = RootViewController.getCalibrator(cgmTransmitter: cgmTransmitter)
                 
                 // check if webOOPEnabled changed and if yes stop the sensor
-                if self.webOOPEnabled != cgmTransmitter.isWebOOPEnabled() {
+                if let webOOPEnabled = self.webOOPEnabled, webOOPEnabled != cgmTransmitter.isWebOOPEnabled() {
                     
                     trace("in cgmTransmitterInfoChanged, webOOPEnabled value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.isWebOOPEnabled().description)
                     
@@ -455,7 +459,7 @@ final class RootViewController: UIViewController {
                 }
                 
                 // check if nonFixedSlopeEnabled changed and if yes stop the sensor
-                if self.nonFixedSlopeEnabled != cgmTransmitter.isNonFixedSlopeEnabled() {
+                if let nonFixedSlopeEnabled = self.nonFixedSlopeEnabled, nonFixedSlopeEnabled != cgmTransmitter.isNonFixedSlopeEnabled() {
                     
                     trace("in cgmTransmitterInfoChanged, nonFixedSlopeEnabled value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.isNonFixedSlopeEnabled().description)
 
