@@ -447,7 +447,7 @@ final class RootViewController: UIViewController {
             if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
                 
                 // reassign calibrator, even if the type of calibrator would not change
-                self.calibrator = RootViewController.getCalibrator(cgmTransmitter: cgmTransmitter)
+                self.calibrator = self.getCalibrator(cgmTransmitter: cgmTransmitter)
                 
                 // check if webOOPEnabled changed and if yes stop the sensor
                 if let webOOPEnabled = self.webOOPEnabled, webOOPEnabled != cgmTransmitter.isWebOOPEnabled() {
@@ -557,7 +557,13 @@ final class RootViewController: UIViewController {
             for (_, glucose) in glucoseData.enumerated().reversed() {
                 if glucose.timeStamp > timeStampLastBgReading {
 
-                    _ = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    let newReading = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), filteredData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    
+                    if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                        
+                        trace("new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description)
+                        
+                    }
                     
                     // save the newly created bgreading permenantly in coredata
                     coreDataManager.saveChanges()
@@ -673,7 +679,7 @@ final class RootViewController: UIViewController {
                 stopSensor()
                 
                 // assign new calibrator
-                calibrator = RootViewController.getCalibrator(cgmTransmitter: cgmTransmitter)
+                calibrator = getCalibrator(cgmTransmitter: cgmTransmitter)
                 
                 // request a new reading
                 cgmTransmitter.requestNewReading()
@@ -891,13 +897,15 @@ final class RootViewController: UIViewController {
     }
     
     /// this is just some functionality which is used frequently
-    private static func getCalibrator(cgmTransmitter: CGMTransmitter) -> Calibrator {
+    private func getCalibrator(cgmTransmitter: CGMTransmitter) -> Calibrator {
         
         let cgmTransmitterType = cgmTransmitter.cgmTransmitterType()
         
         switch cgmTransmitterType {
             
         case .dexcomG4, .dexcomG5, .dexcomG6:
+            
+            trace("in getCalibrator, calibrator = DexcomCalibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
             
             return DexcomCalibrator()
             
@@ -906,22 +914,34 @@ final class RootViewController: UIViewController {
             if cgmTransmitter.isWebOOPEnabled() && !UserDefaults.standard.overrideWebOOPCalibration {
                 
                 // received values are already calibrated
+                
+                trace("in getCalibrator, calibrator = NoCalibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
+                
                 return NoCalibrator()
                 
             } else if cgmTransmitter.isWebOOPEnabled() && UserDefaults.standard.overrideWebOOPCalibration {
        
                 // oop web enabled, means readings received are calibrated values
                 // overrideWebOOPCalibration enabled, means recalibration to be done
+                
+                trace("in getCalibrator, calibrator = LibreReCalibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
+
                 return LibreReCalibrator()
                 
             } else if cgmTransmitter.isNonFixedSlopeEnabled() {
                 
                 // no oop web, non-fixed slope
+                
+                trace("in getCalibrator, calibrator = Libre1NonFixedSlopeCalibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
+                
                 return Libre1NonFixedSlopeCalibrator()
                 
             } else {
                 
                 // no oop web, fixed slope
+                
+                trace("in getCalibrator, calibrator = Libre1Calibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
+                
                 return Libre1Calibrator()
                 
             }
