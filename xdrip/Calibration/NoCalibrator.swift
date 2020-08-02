@@ -50,7 +50,8 @@ class NoCalibrator: Calibrator {
         return bgReading
     }
     
-    
-
+    func description() -> String {
+        return "NoCalibrator"
+    }
     
 }
