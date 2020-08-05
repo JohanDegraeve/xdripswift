@@ -6,8 +6,9 @@
 "selectAliasText" = "اختر اسمًا مستعارًا لجهاز البلوتوث هذا ، وسيظهر الاسم في التطبيق ويسهل عليك التعرف عليه";
 "aliasAlreadyExists" = "يوجد بالفعل جهاز بلوتوث يحمل هذا الاسم المستعار";
 "confirmDeletionPeripheral" = "هل تريد حذف جهاز البلوتوث: ";
-"bluetoothPeripheralAlias" = "Alias:";
+"bluetoothPeripheralAlias" = "المعرف:";
 "SensorSerialNumber" = "الرقم التسلسلي للحساس:";
+"sensorType" = "نوع الحساس:";
 "serialNumber" = "الرقم التسلسلي:";
 "battery" = "البطارية:";
 "needsTransmitterId" = "رمز الهوية لجهاز الإرسال مفقود";
