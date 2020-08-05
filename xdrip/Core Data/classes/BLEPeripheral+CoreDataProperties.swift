@@ -24,15 +24,12 @@ extension BLEPeripheral {
 
     /// typical for M5Stack but can also be applicable for other device types. If app is connected, and user makes an update to one of the attributes, then the new value can immediately be sent. If app is not connected, then the sending must happen as soon as reconnect occurs. Then parameterUpdateNeededAtNextConnect will be set to true
     @NSManaged public var parameterUpdateNeededAtNextConnect: Bool
-    
+        
+    /// should non fixed slopes be used or not - defined here to make it easier for coding, although not every type of bluetoothperipheral needs this
+    @NSManaged public var nonFixedSlopeEnabled: Bool
+
     /// should weboop be used or not - defined here to make it easier for coding, although not every type of bluetoothperipheral needs this
     @NSManaged public var webOOPEnabled: Bool
-    
-    /// web oop site - defined here to make it easier for coding, although not every type of bluetoothperipheral needs this
-    @NSManaged public var oopWebSite: String?
-    
-    /// web oop token - defined here to make it easier for coding, although not every type of bluetoothperipheral needs this
-    @NSManaged public var oopWebToken: String?
 
     /// a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...
     @NSManaged public var dexcomG5: DexcomG5?

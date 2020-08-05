@@ -80,10 +80,6 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
             return
         }
         
-        //only for logging
-        let data = value.hexEncodedString()
-        trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMxDripG4, type: .debug, data)
-        
         switch XdripResponseType(rawValue: value[1]) {
         case .dataPacket?:
             //process value and get result
@@ -161,6 +157,10 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK: -CGMTransmitter protocol functions
     
+    // this transmitter does not support Libre non fixed slopes
+    func setNonFixedSlopeEnabled(enabled: Bool) {   
+    }
+    
     /// this transmitter does not support oopWeb
     func setWebOOPEnabled(enabled: Bool) {
     }
@@ -171,6 +171,10 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
 
     func cgmTransmitterType() -> CGMTransmitterType {
         return .dexcomG4
+    }
+
+    func isNonFixedSlopeEnabled() -> Bool {
+        return false
     }
     
     func isWebOOPEnabled() -> Bool {

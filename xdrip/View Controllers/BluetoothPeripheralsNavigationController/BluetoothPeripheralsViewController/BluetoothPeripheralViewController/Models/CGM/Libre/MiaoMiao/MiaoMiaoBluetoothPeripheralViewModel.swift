@@ -7,17 +7,23 @@ class MiaoMiaoBluetoothPeripheralViewModel {
     /// settings specific for MiaoMiao
     private enum Settings:Int, CaseIterable {
         
-        /// battery level
-        case batteryLevel = 0
-        
-        /// firmware version
-        case firmWare = 1
-        
-        /// hardware version
-        case hardWare = 2
+        /// Libre sensor type
+        case sensorType = 0
         
         /// Sensor serial number
-        case sensorSerialNumber = 3
+        case sensorSerialNumber = 1
+        
+        /// sensor State
+        case sensorState = 2
+        
+       /// battery level
+        case batteryLevel = 3
+        
+        /// firmware version
+        case firmWare = 4
+        
+        /// hardware version
+        case hardWare = 5
         
     }
     
@@ -43,6 +49,9 @@ class MiaoMiaoBluetoothPeripheralViewModel {
         }
     }
     
+    /// closure that the viewmodel should call when it receives a libre sensor type - doesn't need to be necessarily a new sensor type. This is to conform to protocol BluetoothPeripheralViewModel
+    private var onLibreSensorTypeReceived: ((LibreSensorType) -> ())?
+
     // MARK: - deinit
     
     deinit {
@@ -67,7 +76,9 @@ class MiaoMiaoBluetoothPeripheralViewModel {
 
 extension MiaoMiaoBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, onLibreSensorTypeReceived: ((LibreSensorType) -> ())?) {
+        
+        self.onLibreSensorTypeReceived = onLibreSensorTypeReceived
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         
@@ -106,7 +117,7 @@ extension MiaoMiaoBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral) {
         
         // verify that bluetoothPeripheral is a MiaoMiao
-        guard let MiaoMiao = bluetoothPeripheral as? MiaoMiao else {
+        guard let miaoMiao = bluetoothPeripheral as? MiaoMiao else {
             fatalError("MiaoMiaoBluetoothPeripheralViewModel update, bluetoothPeripheral is not MiaoMiao")
         }
         
@@ -116,12 +127,35 @@ extension MiaoMiaoBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         guard let setting = Settings(rawValue: rawValue) else { fatalError("MiaoMiaoBluetoothPeripheralViewModel update, unexpected setting") }
         
         switch setting {
+          
+        case .sensorType:
+            
+            cell.accessoryType = .none
+            
+            cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorType
+            
+            if let libreSensorType = miaoMiao.blePeripheral.libreSensorType {
+                
+                cell.detailTextLabel?.text = libreSensorType.description
+                
+            } else {
+                
+                cell.detailTextLabel?.text = nil
+            }
+
+        case .sensorState:
+            
+            cell.accessoryType = .none
+            
+            cell.textLabel?.text = Texts_Common.sensorStatus
+            
+            cell.detailTextLabel?.text = miaoMiao.sensorState.translatedDescription
             
         case .batteryLevel:
             
             cell.textLabel?.text = Texts_BluetoothPeripheralsView.batteryLevel
-            if MiaoMiao.batteryLevel > 0 {
-                cell.detailTextLabel?.text = MiaoMiao.batteryLevel.description + " %"
+            if miaoMiao.batteryLevel > 0 {
+                cell.detailTextLabel?.text = miaoMiao.batteryLevel.description + " %"
             } else {
                 cell.detailTextLabel?.text = ""
             }
@@ -130,19 +164,19 @@ extension MiaoMiaoBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         case .firmWare:
             
             cell.textLabel?.text = Texts_Common.firmware
-            cell.detailTextLabel?.text = MiaoMiao.firmware
+            cell.detailTextLabel?.text = miaoMiao.firmware
             cell.accessoryType = .disclosureIndicator
             
         case .hardWare:
             
             cell.textLabel?.text = Texts_Common.hardware
-            cell.detailTextLabel?.text = MiaoMiao.hardware
+            cell.detailTextLabel?.text = miaoMiao.hardware
             cell.accessoryType = .disclosureIndicator
             
         case .sensorSerialNumber:
             
             cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
-            cell.detailTextLabel?.text = MiaoMiao.blePeripheral.sensorSerialNumber
+            cell.detailTextLabel?.text = miaoMiao.blePeripheral.sensorSerialNumber
             cell.accessoryType = .disclosureIndicator
             
         }
@@ -160,7 +194,7 @@ extension MiaoMiaoBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         switch setting {
             
-        case .batteryLevel:
+        case .batteryLevel, .sensorType, .sensorState:
             return .nothing
             
         case .firmWare:
@@ -205,6 +239,29 @@ extension MiaoMiaoBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
 extension MiaoMiaoBluetoothPeripheralViewModel: CGMMiaoMiaoTransmitterDelegate {
     
+    func received(libreSensorType: LibreSensorType, from cGMMiaoMiaoTransmitter: CGMMiaoMiaoTransmitter) {
+        
+        // inform bluetoothPeripheralManager, bluetoothPeripheralManager will store the libreSensorType in the miaomiao object
+        (bluetoothPeripheralManager as? CGMMiaoMiaoTransmitterDelegate)?.received(libreSensorType: libreSensorType, from: cGMMiaoMiaoTransmitter)
+        
+        // inform bluetoothPeripheralViewController that sensor type was received
+        onLibreSensorTypeReceived?(libreSensorType)
+        
+        // here's the trigger to update the table row for sensorType
+        reloadRow(row: Settings.sensorType.rawValue)
+        
+    }
+    
+    func received(serialNumber: String, from cGMMiaoMiaoTransmitter: CGMMiaoMiaoTransmitter) {
+        
+        // inform also bluetoothPeripheralManager
+        (bluetoothPeripheralManager as? CGMMiaoMiaoTransmitterDelegate)?.received(serialNumber: serialNumber, from: cGMMiaoMiaoTransmitter)
+        
+        // here's the trigger to update the table
+        reloadRow(row: Settings.sensorSerialNumber.rawValue)
+        
+    }
+    
     func received(batteryLevel: Int, from cGMMiaoMiaoTransmitter: CGMMiaoMiaoTransmitter) {
         
         // inform also bluetoothPeripheralManager
@@ -215,16 +272,16 @@ extension MiaoMiaoBluetoothPeripheralViewModel: CGMMiaoMiaoTransmitterDelegate {
 
     }
     
-    func received(serialNumber: String, from cGMMiaoMiaoTransmitter: CGMMiaoMiaoTransmitter) {
+    func received(sensorStatus: LibreSensorState, from cGMMiaoMiaoTransmitter: CGMMiaoMiaoTransmitter) {
         
         // inform also bluetoothPeripheralManager
-        (bluetoothPeripheralManager as? CGMMiaoMiaoTransmitterDelegate)?.received(serialNumber: serialNumber, from: cGMMiaoMiaoTransmitter)
-     
+        (bluetoothPeripheralManager as? CGMMiaoMiaoTransmitterDelegate)?.received(sensorStatus: sensorStatus, from: cGMMiaoMiaoTransmitter)
+        
         // here's the trigger to update the table
-        reloadRow(row: Settings.sensorSerialNumber.rawValue)
-
+        reloadRow(row: Settings.sensorState.rawValue)
+        
     }
-    
+
     func received(firmware: String, from cGMMiaoMiaoTransmitter: CGMMiaoMiaoTransmitter) {
         
         // inform also bluetoothPeripheralManager

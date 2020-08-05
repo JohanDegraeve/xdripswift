@@ -21,6 +21,9 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// CGMBlueReaderTransmitterDelegate - not used used as there's no specific settings saved nor displayed for BlueReader
     public weak var cGMBlueReaderTransmitterDelegate: CGMBlueReaderTransmitterDelegate?
     
+    /// is nonFixed enabled for the transmitter or not
+    private var nonFixedSlopeEnabled: Bool
+    
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMBlueReader)
     
@@ -34,7 +37,7 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     ///     - cGMBlueReaderTransmitterDelegate : a CGMBlueReaderTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBlueReaderTransmitterDelegate : CGMBlueReaderTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBlueReaderTransmitterDelegate : CGMBlueReaderTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "blueReader")
@@ -47,6 +50,9 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
         
         // assign cGMBlueReaderTransmitterDelegate
         self.cGMBlueReaderTransmitterDelegate = cGMBlueReaderTransmitterDelegate
+        
+        // initialize nonFixedSlopeEnabled
+        self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
 
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_BlueReader)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_BlueReader, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_BlueReader, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
@@ -72,8 +78,6 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
                 trace("    failed to convert value to string", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .error)
                 return
             }
-            
-            trace("    value = %{public}@", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .info, valueAsString)
             
             //find indexes of " "
             let indexesOfSplitter = valueAsString.indexes(of: " ")
@@ -120,6 +124,10 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: CGMTransmitter protocol functions
     
+    func setNonFixedSlopeEnabled(enabled: Bool) {
+        nonFixedSlopeEnabled = enabled
+    }
+
     /// this transmitter does not support oopWeb
     func setWebOOPEnabled(enabled: Bool) {}
     
@@ -129,6 +137,10 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     func cgmTransmitterType() -> CGMTransmitterType {
         return .blueReader
+    }
+
+    func isNonFixedSlopeEnabled() -> Bool {
+        return nonFixedSlopeEnabled
     }
     
     func isWebOOPEnabled() -> Bool {

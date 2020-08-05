@@ -255,10 +255,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let value = characteristic.value {
             
-            //only for logging
-            let data = value.hexEncodedString()
-            trace("    data = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, data)
-            
             //check type of message and process according to type
             if let firstByte = value.first {
                 if let opCode = DexcomTransmitterOpCode(rawValue: firstByte) {
@@ -360,7 +356,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                         
                                         trace("    received unfiltered value 2096896.0, which is caused by low battery. Creating error message", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                                         
-                                        cgmTransmitterDelegate?.error(message: Texts_HomeView.dexcomBatteryTooLow)
+                                        cgmTransmitterDelegate?.errorOccurred(xDripError: DexcomError.receivedEnfilteredValue2096896)
                                         
                                     } else {
 
@@ -504,7 +500,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     func reset(requested:Bool) {
         G5ResetRequested = requested
     }
-    
+
+    /// this transmitter does not support Libre non fixed slopes
+    func setNonFixedSlopeEnabled(enabled: Bool) {    
+    }
+
     /// this transmitter does not support oopWeb
     func setWebOOPEnabled(enabled: Bool) {
     }
@@ -515,6 +515,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
     func cgmTransmitterType() -> CGMTransmitterType {
         return .dexcomG5
+    }
+
+    func isNonFixedSlopeEnabled() -> Bool {
+        return false
     }
     
     func isWebOOPEnabled() -> Bool {

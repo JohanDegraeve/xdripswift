@@ -20,14 +20,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_selectbgunit", tableName: filename, bundle: Bundle.main, value: "Blood Glucose Units:", comment: "for text in pop up where user can select bg unit")
     }()
     
-    static let labelLowValue: String = {
-        return NSLocalizedString("settingsviews_lowValue", tableName: filename, bundle: Bundle.main, value: "Low Value:", comment: "general settings, low value")
-    }()
-
-    static let labelHighValue: String = {
-        return NSLocalizedString("settingsviews_highValue", tableName: filename, bundle: Bundle.main, value: "High Value:", comment: "general settings, high value")
-    }()
-    
     static let labelMasterOrFollower: String = {
         return NSLocalizedString("settingsviews_masterorfollower", tableName: filename, bundle: Bundle.main, value: "Use as Master or Follower?", comment: "general settings, master or follower")
     }()
@@ -52,6 +44,45 @@ class Texts_SettingsView {
         return NSLocalizedString("multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10?", comment: "general settings, should reading be multiplied with 10 yes or no")
     }()
     
+    // MARK: - Section Home Screen
+    
+    static let sectionTitleHomeScreen: String = {
+        return NSLocalizedString("settingsviews_sectiontitlehomescreen", tableName: filename, bundle: Bundle.main, value: "Home Screen", comment: "home screen settings, section title")
+    }()
+
+    static let labelUseObjectives: String = {
+        return NSLocalizedString("settingsviews_useobjectives", tableName: filename, bundle: Bundle.main, value: "Show Objectives in Graph?", comment: "home screen settings, use objectives in graph")
+    }()
+
+    static let labelUrgentHighValue: String = {
+        return NSLocalizedString("settingsviews_urgenthighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value:", comment: "home screen settings, urgent high value")
+    }()
+    
+    static let labelHighValue: String = {
+        return NSLocalizedString("settingsviews_highValue", tableName: filename, bundle: Bundle.main, value: "High Value:", comment: "home screen settings, high value")
+    }()
+    
+    static let labelTargetValue: String = {
+        return NSLocalizedString("settingsviews_targetValue", tableName: filename, bundle: Bundle.main, value: "Target Value:", comment: "home screen settings, target value")
+    }()
+    
+    static let labelLowValue: String = {
+        return NSLocalizedString("settingsviews_lowValue", tableName: filename, bundle: Bundle.main, value: "Low Value:", comment: "home screen settings, low value")
+    }()
+    
+    static let labelUrgentLowValue: String = {
+        return NSLocalizedString("settingsviews_urgentlowValue", tableName: filename, bundle: Bundle.main, value: "Urgent Low Value:", comment: "home screen settings, urgent low value")
+    }()
+    
+    static let labelShowColoredObjectives: String = {
+        return NSLocalizedString("settingsviews_showcoloredobjectives", tableName: filename, bundle: Bundle.main, value: "Show Colored Lines?", comment: "home screen settings, show colored objectives lines")
+    }()
+    
+    static let labelShowTarget: String = {
+        return NSLocalizedString("settingsviews_showtarget", tableName: filename, bundle: Bundle.main, value: "Show Target Line?", comment: "home screen settings, show target line")
+    }()
+    
+    
     // MARK: - Section Transmitter
     
     static let sectionTitleTransmitter: String = {
@@ -75,11 +106,11 @@ class Texts_SettingsView {
     }()
     
     static let labelWebOOPTransmitter:String = {
-        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use the OOPWeb Algorithm?", comment: "web oop settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use the OOPWeb Service?", comment: "web oop settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelWebOOPSite:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPSite", tableName: filename, bundle: Bundle.main, value: "OOPWeb Site URL:", comment: "transmitter settings, the web oop site url")
+        return NSLocalizedString("settingsviews_labelWebOOPSite", tableName: filename, bundle: Bundle.main, value: "OOPWeb Server URL:", comment: "transmitter settings, the web oop site url")
     }()
     
     static let labelWebOOPtoken:String = {
@@ -87,15 +118,23 @@ class Texts_SettingsView {
     }()
     
     static let labelWebOOPSiteExplainingText:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPSiteExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Site URL (leave blank to use the default):", comment: "transmitter settings, the web oop site url, explaining text in dialog")
+        return NSLocalizedString("settingsviews_labelWebOOPSiteExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Server URL (optional):", comment: "transmitter settings, the web oop server url, explaining text in dialog")
     }()
     
     static let labelWebOOPtokenExplainingText:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPtokenExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Token (leave blank to use default):", comment: "transmitter settings, the web oop token, explaining text in dialog")
+        return NSLocalizedString("settingsviews_labelWebOOPtokenExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Token (optional):", comment: "transmitter settings, the web oop token, explaining text in dialog")
     }()
     
     static let labelWebOOP:String = {
-        return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "OOPWeb Algorithm", comment: "weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section")
+        return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "OOPWeb Service", comment: "weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section")
+    }()
+    
+    static let labelNonFixedTransmitter:String = {
+        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Use Non-Fixed Calibration Slopes?", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
+    }()
+    
+    static let labelNonFixed:String = {
+        return NSLocalizedString("settingsviews_labelNonFixed", tableName: filename, bundle: Bundle.main, value: "Non-Fixed Calibration Slopes", comment: "non fixed settings, title of the section")
     }()
     
     static let transmitterId8OrHigherNotSupported: String = {
@@ -323,11 +362,15 @@ class Texts_SettingsView {
     }()
     
     static let sectionTitleTrace: String = {
-        return NSLocalizedString("sectionTitleTrace", tableName: filename, bundle: Bundle.main, value: "Trace", comment: "in Settings, section title for Trace")
+        return NSLocalizedString("sectionTitleTrace", tableName: filename, bundle: Bundle.main, value: "Issue Reporting", comment: "in Settings, section title for Trace")
     }()
     
     static let sendTraceFile: String = {
-        return NSLocalizedString("sendTraceFile", tableName: filename, bundle: Bundle.main, value: "Send Trace File", comment: "in Settings, row title to send settings")
+        return NSLocalizedString("sendTraceFile", tableName: filename, bundle: Bundle.main, value: "Send Issue Report", comment: "in Settings, row title to send settings")
+    }()
+    
+    static let debugLevel: String = {
+        return NSLocalizedString("debugLevel", tableName: filename, bundle: Bundle.main, value: "Include Debug Level", comment: "in Settings, to enable debug level in trace file")
     }()
     
     static let describeProblem: String = {
@@ -344,6 +387,22 @@ class Texts_SettingsView {
     
     static let failedToSendEmail: String = {
         return NSLocalizedString("failedToSendEmail", tableName: filename, bundle: Bundle.main, value: "Failed to Send Email", comment: "In case user tries to send trace file via email but error occurs.")
+    }()
+    
+    static let volumeTestSoundPlayerExplanation: String = {
+        return NSLocalizedString("volumeTestSoundPlayerExplanation", tableName: filename, bundle: Bundle.main, value: "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test")
+    }()
+    
+    static let volumeTestSoundPlayer: String = {
+        return NSLocalizedString("volumeTestSoundPlayer", tableName: filename, bundle: Bundle.main, value: "Volume Test (with Override Mute On)", comment: "In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row")
+    }()
+    
+    static let volumeTestiOSSound: String = {
+        return NSLocalizedString("volumeTestiOSSound", tableName: filename, bundle: Bundle.main, value: "Volume Test (Current iPhone Volume)", comment: "In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row")
+    }()
+
+    static let volumeTestiOSSoundExplanation: String = {
+        return NSLocalizedString("volumeTestiOSSoundExplanation", tableName: filename, bundle: Bundle.main, value: "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test")
     }()
     
 }

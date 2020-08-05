@@ -9,7 +9,8 @@ protocol BluetoothPeripheralViewModel {
     ///    - bluetoothPeripheralManager : reference to bluetoothPeripheralManaging object
     ///    - tableView : needed to intiate refresh of row
     ///    - bluetoothPeripheralViewController : BluetoothPeripheralViewController
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView,  bluetoothPeripheralViewController: BluetoothPeripheralViewController)
+    ///    - onLibreSensorTypeReceived : closure that the viewmodel should call when it receives a libre sensor type - doesn't need to be necessarily a new sensor type. This will allow the BluetoothPeripheralViewController to delete or add sections, namely oop web related settings
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView,  bluetoothPeripheralViewController: BluetoothPeripheralViewController, onLibreSensorTypeReceived: ((LibreSensorType) -> ())?)
     
     /// - for example  M5StackBluetoothTransmitter has a delegate of type M5StackBluetoothTransmitterDelegate.
     /// - in the configure function, this varaible will be assigned to the viewmodel itself (if there is a M5StackBluetoothTransmitter)
@@ -36,6 +37,4 @@ protocol BluetoothPeripheralViewModel {
     /// how many sections does this viewmodel define, in addition to the section already defined in BluetoothPeripheralViewController
     func numberOfSections() -> Int
     
-    /// as weboop is a general setting, but only applicable to specific types of transmitter, the model will need to be able to tell if it's supported or not
-    ///
 }

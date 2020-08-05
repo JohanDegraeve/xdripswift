@@ -14,8 +14,6 @@ public class BlueReader: NSManagedObject {
         blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
         
         blePeripheral.webOOPEnabled = false
-        blePeripheral.oopWebSite = nil
-        blePeripheral.oopWebToken = nil
         
     }
     

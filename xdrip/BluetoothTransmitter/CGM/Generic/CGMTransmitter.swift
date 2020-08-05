@@ -4,6 +4,15 @@ import CoreBluetooth
 /// defines functions that every cgm transmitter should conform to
 protocol CGMTransmitter:AnyObject {
     
+    /// to set nonFixedSlopeEnabled - called when user changes the setting
+    ///
+    /// for transmitters who don't support non fixed slopes, there's no need to implemented this function<br>
+    /// ---  for transmitters who support non fixed (all Libre transmitters) this should be implemented
+    func setNonFixedSlopeEnabled(enabled:Bool)
+    
+    /// is the CGMTransmitter nonFixed enabled or not
+    func isNonFixedSlopeEnabled() -> Bool
+
     /// to set webOOPEnabled - called when user changes the setting
     ///
     /// for transmitters who don't support webOOP, there's no need to implemented this function<br>

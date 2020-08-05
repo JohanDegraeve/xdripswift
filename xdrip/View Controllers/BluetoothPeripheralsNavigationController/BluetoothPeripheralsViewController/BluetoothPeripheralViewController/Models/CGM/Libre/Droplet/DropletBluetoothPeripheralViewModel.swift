@@ -58,7 +58,9 @@ class DropletBluetoothPeripheralViewModel {
 
 extension DropletBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, onLibreSensorTypeReceived: ((LibreSensorType) -> ())?) {
+        
+        // this type of transmitter does not receive libre sensor types, so the closure onLibreSensorTypeReceived does not need to be stored
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         

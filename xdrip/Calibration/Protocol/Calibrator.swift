@@ -2,8 +2,12 @@ import Foundation
 import CoreData
 
 protocol Calibrator {
+    
     ///slope parameters to be defined per type of sensor Dexcom/Libre, in class that conforms to Calibrator protocol
     var sParams:SlopeParameters{get}
+    
+    /// for instance Dexcom values come in 100.000's, (eg rawvalue 140.000), in case of Dexcom divider is 1000, resulting in 140, then this value will be used in calibration algorithm.
+    var rawValueDivider:Double {get}
 
     /// false for Libre, true for Dexcom
     var ageAdjustMentNeeded:Bool{get}
@@ -42,6 +46,9 @@ protocol Calibrator {
     ///     - lastCalibrationsForActiveSensorInLastXDays: ... the latest calibrations in x days, in Spike/xdripplus it's 4. Order by timestamp, large to small, ie the first is the youngest
     ///     - firstCalibration: the very first calibration for the sensor
     func createNewCalibration(bgValue:Double, lastBgReading:BgReading, sensor:Sensor, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration,deviceName:String?, nsManagedObjectContext:NSManagedObjectContext) -> Calibration
+    
+    /// gives a description
+    func description() -> String
 }
 
 extension Calibrator {
@@ -132,8 +139,8 @@ extension Calibrator {
             timeStamp:timeStampToUse,
             sensor:sensor,
             calibration:lastCalibration,
-            rawData:rawData / 1000,
-            filteredData:filteredData / 1000,
+            rawData:rawData / rawValueDivider,
+            filteredData:filteredData / rawValueDivider,
             deviceName:deviceName,
             nsManagedObjectContext:nsManagedObjectContext
         )

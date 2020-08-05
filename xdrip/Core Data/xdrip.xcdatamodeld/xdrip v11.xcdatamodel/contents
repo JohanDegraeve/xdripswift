@@ -42,8 +42,7 @@
         <attribute name="alias" optional="YES" attributeType="String"/>
         <attribute name="lastConnectionStatusChangeTimeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name" attributeType="String"/>
-        <attribute name="oopWebSite" optional="YES" attributeType="String"/>
-        <attribute name="oopWebToken" optional="YES" attributeType="String"/>
+        <attribute name="nonFixedSlopeEnabled" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="parameterUpdateNeededAtNextConnect" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="sensorSerialNumber" optional="YES" attributeType="String"/>
         <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -150,7 +149,7 @@
         <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
-        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="358"/>
+        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="343"/>
         <element name="Blucon" positionX="-657" positionY="189" width="128" height="73"/>
         <element name="BlueReader" positionX="-639" positionY="207" width="128" height="58"/>
         <element name="Bubble" positionX="-657" positionY="189" width="128" height="103"/>

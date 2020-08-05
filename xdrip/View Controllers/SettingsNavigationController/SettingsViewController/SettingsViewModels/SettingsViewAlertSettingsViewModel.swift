@@ -1,10 +1,20 @@
 import UIKit
+import AVFoundation
 
 fileprivate enum Setting:Int, CaseIterable {
-    // alert types
+    
+    /// alert types
     case alertTypes = 0
-    // alerts
+    
+    /// alerts
     case alerts = 1
+    
+    /// volume test for sound played by soundPlayer
+    case volumeTestSoundPlayer = 2
+    
+    /// volume test for sound play in iOS notification
+    case volumeTestiOSSound = 3
+    
 }
 
 /// conforms to SettingsViewModelProtocol for all alert settings in the first sections screen
@@ -32,6 +42,47 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToAlertTypeSettings.rawValue, sender: nil)
         case .alerts:
             return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToAlertSettings.rawValue, sender: nil)
+            
+        case .volumeTestSoundPlayer:
+            
+            // here the volume of the soundplayer will be tested.
+            // soundplayer is used for alerts with override mute = on, except for missed reading alerts or any other delayed alert
+            
+            // create a soundplayer
+            let soundPlayer = SoundPlayer()
+            
+            // start playing the xdripalert.aif
+            soundPlayer.playSound(soundFileName: "xdripalert.aif")
+            
+            return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.volumeTestSoundPlayerExplanation, actionHandler: {
+                
+                // user clicked ok, which will close the pop up and also player should stop playing
+                soundPlayer.stopPlaying()
+                
+            })
+            
+        case .volumeTestiOSSound:
+
+            // here the iOS sound volume will be tested.
+            // this volume is used for alerts with override mute = off, and for missed reading alerts
+            // we use a notification for that with sound = xdripalert.aif
+            // The app is in the foreground  now (otherwise user wouldn't be able to select this option)
+            //    the RootViewController is conforming to UNUserNotificationCenterDelegate. As soon as notification content is added to uNUserNotificationCenter, the function userNotificationCenter willPresent will be called. There the completionHandler with .sound is called, which will cause the sound to be played
+            
+            // define and set the content
+            let content = UNMutableNotificationContent()
+            // body and title will not be shown, so contents can be empty
+            content.body = ""
+            content.title = ""
+            // sound
+            content.sound = UNNotificationSound.init(named: UNNotificationSoundName.init("xdripalert.aif"))
+            // notification request
+            let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.notificationIdentifierForVolumeTest, content: content, trigger: nil)
+            // Add Request to User Notification Center
+            UNUserNotificationCenter.current().add(notificationRequest)
+            
+            return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.volumeTestiOSSoundExplanation, actionHandler: nil)
+            
         }
     }
     
@@ -42,7 +93,7 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func numberOfRows() -> Int {
-        return 2
+        return Setting.allCases.count
     }
     
     func uiView(index: Int) -> UIView? {
@@ -58,6 +109,13 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.labelAlertTypes
         case .alerts:
             return Texts_SettingsView.labelAlerts
+            
+        case .volumeTestSoundPlayer:
+            return Texts_SettingsView.volumeTestSoundPlayer
+            
+        case .volumeTestiOSSound:
+            return Texts_SettingsView.volumeTestiOSSound
+            
         }
     }
     

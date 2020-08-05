@@ -27,6 +27,9 @@ public class NightScoutUploadManager:NSObject {
     /// SensorsAccessor instance
     private let sensorsAccessor: SensorsAccessor
     
+    /// CalibrationsAccessor instance
+    private let calibrationsAccessor: CalibrationsAccessor
+    
     /// reference to coreDataManager
     private let coreDataManager: CoreDataManager
     
@@ -47,6 +50,7 @@ public class NightScoutUploadManager:NSObject {
         // init properties
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+        self.calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         self.messageHandler = messageHandler
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         
@@ -85,6 +89,8 @@ public class NightScoutUploadManager:NSObject {
         
         // upload readings
         uploadBgReadingsToNightScout(siteURL: siteURL, apiKey: apiKey)
+        // upload calibrations
+        uploadCalibrationsToNightScout(siteURL: siteURL, apiKey: apiKey)
         
         // upload activeSensor if needed
         if UserDefaults.standard.uploadSensorStartTimeToNS, let activeSensor = sensorsAccessor.fetchActiveSensor() {
@@ -230,6 +236,50 @@ public class NightScoutUploadManager:NSObject {
         
     }
     
+    /// upload latest calibrations to nightscout
+    /// - parameters:
+    ///     - siteURL : nightscout site url
+    ///     - apiKey : nightscout api key
+    private func uploadCalibrationsToNightScout(siteURL:String, apiKey:String) {
+        
+        trace("in uploadCalibrationsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+        
+        // get the calibrations from the last maxDaysToUpload days
+        let calibrations = calibrationsAccessor.getLatestCalibrations(howManyDays: ConstantsNightScout.maxDaysToUpload, forSensor: nil)
+        
+        var calibrationsToUpload: [Calibration] = []
+        if let timeStampLatestNightScoutUploadedCalibration = UserDefaults.standard.timeStampLatestNightScoutUploadedCalibration {
+            // select calibrations that are more recent than the latest uploaded calibration
+            calibrationsToUpload = calibrations.filter({$0.timeStamp > timeStampLatestNightScoutUploadedCalibration })
+        }
+        else {
+            // or all calibrations if there is no previously uploaded calibration
+            calibrationsToUpload = calibrations
+        }
+        
+        if calibrationsToUpload.count > 0 {
+            trace("    number of calibrations to upload : %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, calibrationsToUpload.count.description)
+            
+            // map calibrations to dictionaryRepresentation
+            // 2 records are uploaded to nightscout for each calibration: a cal record and a mbg record
+            let calibrationsDictionaryRepresentation = calibrationsToUpload.map({$0.dictionaryRepresentationForCalRecordNightScoutUpload}) + calibrationsToUpload.map({$0.dictionaryRepresentationForMbgRecordNightScoutUpload})
+            
+            uploadData(dataToUpload: calibrationsDictionaryRepresentation, traceString: "uploadCalibrationsToNightScout", siteURL: siteURL, path: nightScoutEntriesPath, apiKey: apiKey, completionHandler: {
+                
+                // change timeStampLatestNightScoutUploadedCalibration
+                if let lastCalibration = calibrationsToUpload.first {
+                    trace("    in uploadCalibrationsToNightScout, upload succeeded, setting timeStampLatestNightScoutUploadedCalibration to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, lastCalibration.timeStamp.description(with: .current))
+                    UserDefaults.standard.timeStampLatestNightScoutUploadedCalibration = lastCalibration.timeStamp
+                }
+                
+            })
+            
+        } else {
+            trace("    no calibrations to upload", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+        }
+        
+    }
+    
     /// common functionality to upload data to nightscout
     /// - parameters:
     ///     - dataToUpload : data to upload
@@ -246,9 +296,6 @@ public class NightScoutUploadManager:NSObject {
             // transform dataToUpload to json
             let dateToUploadAsJSON = try JSONSerialization.data(withJSONObject: dataToUpload, options: [])
             
-            // get shared URLSession
-            let sharedSession = URLSession.shared
-            
             if let url = URL(string: siteURL) {
                 
                 // create upload url
@@ -262,9 +309,9 @@ public class NightScoutUploadManager:NSObject {
                 request.setValue(apiKey.sha1(), forHTTPHeaderField: "api-secret")
                 
                 // Create upload Task
-                let dataTask = sharedSession.uploadTask(with: request, from: dateToUploadAsJSON, completionHandler: { (data, response, error) -> Void in
+                let task = URLSession.shared.uploadTask(with: request, from: dateToUploadAsJSON, completionHandler: { (data, response, error) -> Void in
                     
-                    trace("    in upload, %{public}@, uploadTask completionHandler", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, traceString)
+                    trace("in uploadData, finished task", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
                     
                     // if ends without success then log the data
                     var success = false
@@ -303,7 +350,10 @@ public class NightScoutUploadManager:NSObject {
                     }
                     
                 })
-                dataTask.resume()
+                
+                trace("in uploadData, calling task.resume", log: oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+                task.resume()
+                
             }
             
         } catch let error {
@@ -323,6 +373,9 @@ public class NightScoutUploadManager:NSObject {
             request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
             
             let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
+                
+                trace("in testNightScoutCredentials, finished task", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+                
                 if let error = error {
                     completion(false, error)
                     return
@@ -335,7 +388,10 @@ public class NightScoutUploadManager:NSObject {
                     completion(true, nil)
                 }
             })
+            
+            trace("in testNightScoutCredentials, calling task.resume", log: oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
             task.resume()
+            
         }
     }
     

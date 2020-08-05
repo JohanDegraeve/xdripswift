@@ -145,4 +145,8 @@ class Texts_Common {
         return NSLocalizedString("unknown", tableName: filename, bundle: Bundle.main, value: "Unknown", comment: "general usage")
     }()
     
+    static let sensorStatus = {
+        return NSLocalizedString("sensorStatus", tableName: filename, bundle: Bundle.main, value: "Sensor status:", comment: "to show the sensor status")
+    }()
+    
 }

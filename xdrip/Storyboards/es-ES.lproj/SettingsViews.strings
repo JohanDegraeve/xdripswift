@@ -14,12 +14,12 @@
 "settingsviews_transmitterid" = "ID del Transmisor:";
 "settingsviews_givetransmitterid" = "ID del Transmisor";
 "settingsviews_resettransmitter" = "Resetear Transmisor";
-"settingsviews_webooptransmitter" = "Usar el Algoritmo OOPWeb?";
-"settingsviews_labelWebOOPSite" = "URL del sitio OOPWeb:";
+"settingsviews_webooptransmitter" = "Usar el Servicio OOPWeb?";
+"settingsviews_labelWebOOPSite" = "URL del Servidor OOPWeb:";
 "settingsviews_labelWebOOPtoken" = "Token OOPWeb:";
-"settingsviews_labelWebOOPSiteExplainingText" = "URL del sitio OOPWeb (opcional):";
-"settingsviews_labelWebOOPtokenExplainingText" = "Token del sitio OOPWeb (opcional):";
-"labelWebOOP" = "Algoritmo OOPWeb";
+"settingsviews_labelWebOOPSiteExplainingText" = "URL del Servidor OOPWeb (opcional):";
+"settingsviews_labelWebOOPtokenExplainingText" = "Token del Servidor OOPWeb (opcional):";
+"labelWebOOP" = "Servicio OOPWeb";
 "transmitterId8OrHigherNotSupported" = "Los transmisores con ID 8Gxxxx o más nuevos no son compatibles de momento!";
 "settingsviews_sectiontitlealerting" = "Alarma";
 "settingsviews_row_alert_types" = "Tipos de Alarmas";

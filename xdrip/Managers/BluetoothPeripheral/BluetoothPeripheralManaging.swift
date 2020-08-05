@@ -45,21 +45,16 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     
     /// bluetoothtransmitter may need pairing, but app is in background. Notification will be sent to user, user will open the app, at that moment initiatePairing will be called
     func initiatePairing()
+    
+    /// to pass new value off nonFixedSlopeEnabled
+    ///
+    /// when user changes the nonFixed value in BluetoothPeripheralViewController, this function will be called
+    func receivedNewValue(nonFixedSlopeEnabled: Bool, for bluetoothPeripheral: BluetoothPeripheral)
 
     /// to pass new value off webOOPEnabled
     ///
     /// when user changes webOOP values in BluetoothPeripheralViewController, this function will be called
     func receivedNewValue(webOOPEnabled: Bool, for bluetoothPeripheral: BluetoothPeripheral)
-    
-    /// to pass new value off oopWebSite
-    ///
-    /// when user changes webOOP values in BluetoothPeripheralViewController, this function will be called
-    func receivedNewValue(oopWebSite: String?, for bluetoothPeripheral: BluetoothPeripheral)
-    
-    /// to pass new value off oopWebToken
-    ///
-    /// when user changes webOOP values in BluetoothPeripheralViewController, this function will be called
-    func receivedNewValue(oopWebToken: String?, for bluetoothPeripheral: BluetoothPeripheral)
     
     /// - returns the currently in use CGMTransmitter, nil if non in use.
     /// - in use means : created, and shouldconnect = true

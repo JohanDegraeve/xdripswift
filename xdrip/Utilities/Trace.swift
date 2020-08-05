@@ -1,6 +1,35 @@
 import Foundation
 import os
 
+/// application version
+fileprivate var applicationVersion:String = {
+    
+    if let dictionary = Bundle.main.infoDictionary {
+
+        if let version = dictionary["CFBundleShortVersionString"] as? String  {
+            return version
+        }
+    }
+    
+    return "unknown"
+    
+}()
+
+/// build number
+fileprivate var buildNumber:String = {
+    
+    if let dictionary = Bundle.main.infoDictionary {
+        
+        if let buildnumber = dictionary["CFBundleVersion"] as? String  {
+            return buildnumber
+        }
+        
+    }
+    
+    return "unknown"
+    
+}()
+
 /// log only used for debuglogging
 fileprivate var log:OSLog = {
     let log:OSLog = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.debuglogging)
@@ -83,7 +112,7 @@ func trace(_ message: StaticString, log:OSLog, category: String, type: OSLogType
     var argumentsCounter: Int = 0
     
     var actualMessage = message.description
-    
+   
     // try to find the publicMark as long as argumentsCounter is less than the number of arguments
     while argumentsCounter < args.count {
         
@@ -146,34 +175,39 @@ func trace(_ message: StaticString, log:OSLog, category: String, type: OSLogType
     // create timeStamp to use in NSLog and tracefile
     let timeStamp = dateFormatNSLog.string(from: Date())
     
-    // nslog if enabled
-    if UserDefaults.standard.NSLogEnabled {
+    // nslog if enabled and if type = debug, then check also if debug logging is required
+    if UserDefaults.standard.NSLogEnabled && (type != .debug || (type == .debug && UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog)) {
         
-        NSLog("%@", ConstantsLog.tracePrefix + " " + timeStamp + " " + category + " " + actualMessage)
+        NSLog("%@", ConstantsLog.tracePrefix + " " + timeStamp + " " + applicationVersion + " " + buildNumber + " " + category + " " + actualMessage)
         
     }
     
-    // write trace to file
-    do {
-        
-        let textToWrite = timeStamp + " " + category + " " + actualMessage + "\n"
-        
-        if let fileHandle = FileHandle(forWritingAtPath: traceFileName.path) {
+    // write trace to file, only if type is not .debug or type is .debug and addDebugLevelLogsInTraceFileAndNSLog is true
+    if type != .debug || (type == .debug && UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog) {
+       
+        do {
             
-            // file already exists, go to end of file and append text
-            fileHandle.seekToEndOfFile()
-            fileHandle.write(textToWrite.data(using: .utf8)!)
-
-        } else {
+            let textToWrite = timeStamp + " " + applicationVersion + " " + buildNumber + " " + category + " " + actualMessage + "\n"
             
-            // file doesn't exist yet
-            try textToWrite.write(to: traceFileName, atomically: true, encoding: String.Encoding.utf8)
+            if let fileHandle = FileHandle(forWritingAtPath: traceFileName.path) {
+                
+                // file already exists, go to end of file and append text
+                fileHandle.seekToEndOfFile()
+                fileHandle.write(textToWrite.data(using: .utf8)!)
+                
+            } else {
+                
+                // file doesn't exist yet
+                try textToWrite.write(to: traceFileName, atomically: true, encoding: String.Encoding.utf8)
+                
+            }
             
+        } catch {
+            NSLog("%@", ConstantsLog.tracePrefix + " " + dateFormatNSLog.string(from: Date()) + " write trace to file failed")
         }
         
-    } catch {
-        NSLog("%@", ConstantsLog.tracePrefix + " " + dateFormatNSLog.string(from: Date()) + " write trace to file failed")
     }
+   
     
     // check if tracefile has reached limit size and if yes rotate the files
     if traceFileName.fileSize > ConstantsTrace.maximumFileSizeInMB * 1024 * 1024 {
@@ -236,7 +270,7 @@ class Trace {
     private static var bluetoothPeripheralManager: BluetoothPeripheralManager?
     
     private static let paragraphSeperator = "\n\n===================================================\n\n"
-
+    
     // MARK: - initializer
     
     static func initialize(coreDataManager: CoreDataManager?) {
@@ -253,21 +287,8 @@ class Trace {
         var traceInfo = ""
 
         // app version and build
-        if let dictionary = Bundle.main.infoDictionary {
-            
-            if let version = dictionary["CFBundleShortVersionString"] as? String  {
-                traceInfo.appendStringAndNewLine("Version " + version)
-            } else {
-                traceInfo.appendStringAndNewLine("Version unknown")
-            }
-            
-            if let buildnumber = dictionary["CFBundleShortVersionString"] as? String  {
-                traceInfo.appendStringAndNewLine("Build number " + buildnumber)
-            } else {
-                traceInfo.appendStringAndNewLine("Build number")
-            }
-            
-        }
+        traceInfo.appendStringAndNewLine("Version " + applicationVersion)
+        traceInfo.appendStringAndNewLine("Build number " + buildNumber)
         
         // Info from UserDefaults
         
@@ -282,6 +303,9 @@ class Trace {
             traceInfo.appendStringAndNewLine("Transmitter type = " + cgmTransmitterTypeAsString + "\n")
             traceInfo.appendStringAndNewLine(paragraphSeperator)
         }
+        
+        // is showReadingInNotification on or off
+        traceInfo.appendStringAndNewLine("bgReading in notification is on = " + UserDefaults.standard.showReadingInNotification.description + "\n")
         
         // Info from coredata
         
@@ -302,6 +326,10 @@ class Trace {
                     traceInfo.appendStringAndNewLine("    Alias : " + alias)
                 }
                 traceInfo.appendStringAndNewLine("    xDrip will " + (blePeripheral.shouldconnect ? "try ":"not try") + " to connect to this peripheral")
+                
+                if let libreSensorType = blePeripheral.libreSensorType {
+                    traceInfo.appendStringAndNewLine("last known libreSensorType = " + libreSensorType.description)
+                }
 
                 for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
                     
@@ -314,7 +342,7 @@ class Trace {
                             traceInfo.appendStringAndNewLine("    battery level = " + m5Stack.batteryLevel.description)
                             
                             // if needed additional specific info can be added
-                            
+      
                         }
                         
                     case .M5StickCType:

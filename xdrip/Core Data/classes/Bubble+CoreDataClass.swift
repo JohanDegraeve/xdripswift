@@ -3,8 +3,11 @@ import CoreData
 
 public class Bubble: NSManagedObject {
     
-    /// batterylevel, not stored in coreData, will only be available after having received it from the M5Stack
+    /// batterylevel, not stored in coreData, will only be available after having received it from the Bubble
     public var batteryLevel: Int = 0
+    
+    // sensorState
+    public var sensorState: LibreSensorState = .unknown
     
     /// create Bubble
     /// - parameters:
@@ -20,7 +23,7 @@ public class Bubble: NSManagedObject {
     
     /// create Bubble
     /// - parameters:
-    init(address: String, name: String, alias: String?, timeStampLastBgReading: Date?, sensorSerialNumber: String?, webOOPEnabled: Bool, oopWebSite: String?, oopWebToken: String?, nsManagedObjectContext:NSManagedObjectContext) {
+    init(address: String, name: String, alias: String?, timeStampLastBgReading: Date?, sensorSerialNumber: String?, webOOPEnabled: Bool, nsManagedObjectContext:NSManagedObjectContext) {
         
         let entity = NSEntityDescription.entity(forEntityName: "Bubble", in: nsManagedObjectContext)!
         
@@ -31,8 +34,6 @@ public class Bubble: NSManagedObject {
         blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
 
         blePeripheral.webOOPEnabled = webOOPEnabled
-        blePeripheral.oopWebSite = oopWebSite
-        blePeripheral.oopWebToken = oopWebToken
 
     }
     

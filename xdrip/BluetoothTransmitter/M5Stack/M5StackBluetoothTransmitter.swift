@@ -328,10 +328,6 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             return
         }
         
-        //only for logging
-        let data = value.hexEncodedString()
-        trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .debug, data)
-        
         // value length should be at least 1
         guard value.count > 0 else {
             trace("    value length is 0, no further processing", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)

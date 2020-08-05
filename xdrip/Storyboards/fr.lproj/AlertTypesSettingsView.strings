@@ -1,0 +1,17 @@
+"alerttypessettingsview_screentitle" = "Types d'alerte";
+"alerttypesettingsview_screentitle" = "Editer le type d'alerte";
+"alerttypesettingsview_name" = "Nom";
+"alerttypesettingsview_enabled" = "Activer";
+"alerttypesettingsview_vibrate" = "Vibrer";
+"alerttypesettingsview_snoozevianotification" = "Snooze via Notification";
+"alerttypesettingsview_defaultsnoozeperiod" = "Durée Snooze (mins)";
+"alerttypesettingsview_overridemute" = "Outrepasser le mode Silence";
+"alerttypesettingsview_soundname" = "Son";
+"alerttypesettingsview_defaultiossound" = "Son iOS";
+"alerttypesettingsview_givename" = "Nom de l'alerte";
+"alerttypesettingsview_givesnoozeperiod" = "Durée Snooze en Minutes";
+"alerttypesettingsview_picksoundname" = "Nom du son";
+"alertTypeNoSound" = "Pas de son";
+"alerttypenamealreadyexistsmessages" = "Une alerte avec le même nom existe. Utilisez un libellé différent";
+"confirmdeletionalerttype" = "Supprimer le type d'alerte: ";
+

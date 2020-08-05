@@ -78,6 +78,9 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     /// is the transmitter oop web enabled or not
     public var webOOPEnabled: Bool
     
+    /// is nonFixed enabled for the transmitter or not
+    public var nonFixedSlopeEnabled: Bool
+    
     /// oop website url to use in case oop web would be enabled
     public var oopWebSite: String
     
@@ -119,6 +122,9 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     // current sensor serial number, if nil then it's not known yet
     private var sensorSerialNumber:String?
 
+    /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
+    var emptyArray: [GlucoseData] = []
+
     // MARK: - public functions
     
     /// - parameters:
@@ -127,7 +133,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     ///     - cgmTransmitterDelegate : CGMTransmitterDelegate
     ///     - watlaaBluetoothTransmitterDelegate : the WatlaaBluetoothTransmitterDelegate
     ///     - bluetoothTransmitterDelegate : BluetoothTransmitterDelegate
-    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, timeStampLastBgReading: Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?) {
+    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, timeStampLastBgReading: Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "watlaa")
@@ -150,6 +156,9 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
         
         // initialize webOOPEnabled
         self.webOOPEnabled = webOOPEnabled ?? false
+
+        // initialize nonFixedSlopeEnabled
+        self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
         
         // initialize oopWebToken and oopWebSite
         self.oopWebToken = oopWebToken ?? ConstantsLibre.token
@@ -288,10 +297,8 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                         trace("in peripheral didUpdateValueFor, Buffer complete", log: log, category: ConstantsLog.categoryWatlaa, type: .info)
                         
                         if (Crc.LibreCrc(data: &rxBuffer, headerOffset: miaoMiaoHeaderLength)) {
-                            
-                            //get MiaoMiao info from MiaoMiao header
-                            let firmware = String(describing: rxBuffer[14...15].hexEncodedString())
-                            let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
+
+                            // get batteryPercentage
                             let batteryPercentage = Int(rxBuffer[13])
                             
                             // get sensor serialNumber and if changed inform delegate
@@ -320,11 +327,22 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                             // send battery level to delegate
                             watlaaBluetoothTransmitterDelegate?.received(transmitterBatteryLevel: batteryPercentage, watlaaBluetoothTransmitter: self)
                             
-                            LibreDataParser.libreDataProcessor(sensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)))?.serialNumber, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), firmware: firmware, hardware: hardware, hardwareSerialNumber: nil, bootloader: nil, timeStampLastBgReading: timeStampLastBgReading, completionHandler: {(timeStampLastBgReading:Date) in
-                                self.timeStampLastBgReading = timeStampLastBgReading
-                                
-                            })
+                            // send batteryPercentage to delegate
+                            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
                             
+                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: nil, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading, completionHandler:  { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
+                                
+                                if let timeStampLastBgReading = timeStampLastBgReading {
+                                    self.timeStampLastBgReading = timeStampLastBgReading
+                                }
+                                
+                                // TODO : use sensorState as in MiaoMiao and Bubble : show the status on bluetoothPeripheralView
+                                
+                                // TODO : xDripError could be used to show latest errors in bluetoothPeripheralView
+                                
+                            }
+                            )
+
                             //reset the buffer
                             resetRxBuffer()
                             

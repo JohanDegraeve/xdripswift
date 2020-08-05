@@ -4,6 +4,9 @@ import CoreData
 /// calibrator for cases where transmitter gives calibrated values, ie no calibration necessary. It will simply create readings with the value of rawData in the reading
 class NoCalibrator: Calibrator {
     
+    // not used here, arbitrary value assigned
+    var rawValueDivider: Double = 1000.0
+    
     /// value nil, not needed
     var sParams: SlopeParameters = SlopeParameters(LOW_SLOPE_1: 1, LOW_SLOPE_2: 1, HIGH_SLOPE_1: 1, HIGH_SLOPE_2: 1, DEFAULT_LOW_SLOPE_LOW: 1, DEFAULT_LOW_SLOPE_HIGH: 1, DEFAULT_SLOPE: 1, DEFAULT_HIGH_SLOPE_HIGH: 1, DEFAUL_HIGH_SLOPE_LOW: 1)
     
@@ -47,7 +50,8 @@ class NoCalibrator: Calibrator {
         return bgReading
     }
     
-    
-
+    func description() -> String {
+        return "NoCalibrator"
+    }
     
 }

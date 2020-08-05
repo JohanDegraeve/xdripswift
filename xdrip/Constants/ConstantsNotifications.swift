@@ -1,27 +1,5 @@
 enum ConstantsNotifications {
     
-    /// identifiers for alert categories
-    enum CategoryIdentifiersForAlerts {
-        /// for initial calibration
-        static let initialCalibrationRequest = "InititalCalibrationRequest"
-        /// subsequent calibration request
-        static let subsequentCalibrationRequest = "SubsequentCalibrationRequest"
-        /// high alert
-        static let highAlert = "highAlert"
-        /// low alert
-        static let lowAlert = "lowAlert"
-        /// very high alert
-        static let veryHighAlert = "veryHighAlert"
-        /// very low alert
-        static let veryLowAlert = "veryLowAlert"
-        /// missed reading alert
-        static let missedReadingAlert = "missedReadingAlert"
-        /// battery low
-        static let batteryLow = "batteryLow"
-        /// fast drop
-        static let fastdrop = "fastDrop"
-    }
-    
     /// identifiers for alert notifications
     enum NotificationIdentifiersForAlerts {
         /// high alert
@@ -69,5 +47,11 @@ enum ConstantsNotifications {
         /// transmitter reset result
         static let transmitterResetResult = "transmitterResetResult"
     }
+    
+    /// notification identifier for  volume test notification
+    static let notificationIdentifierForVolumeTest = "notificationIdentifierForVolumeTest"
+    
+    /// notification identifier for xDripErrors received in RootViewController's cgmTransmitterDelegate
+    static let notificationIdentifierForxCGMTransmitterDelegatexDripError = "notificationIdentifierForxCGMTransmitterDelegatexDripError"
     
 }
