@@ -675,7 +675,7 @@ final class RootViewController: UIViewController {
             // apply logic only if web oop is enabled
             if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled() {
 
-                trace("in cgmTransmitterInfoChanged, overrideWebOOPCalibration value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, UserDefaults.standard.overrideWebOOPCalibration.description)
+                trace("in observeValue, overrideWebOOPCalibration value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, UserDefaults.standard.overrideWebOOPCalibration.description)
                 
                 // stop the sensor
                 stopSensor()
