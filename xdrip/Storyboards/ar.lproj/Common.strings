@@ -32,3 +32,4 @@
 "firmware" = "البرنامج الثابت";
 "hardware" = "الجهاز";
 "unknown" = "غير معروف";
+"sensorStatus" = "حالة الحساس:";
