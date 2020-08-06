@@ -281,6 +281,11 @@ fileprivate func trendMeasurements(bytes: Data, mostRecentReadingDate: Date, tim
         if measurementDate > timeStampLastBgReading {
             let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
             measurements.append(measurement)
+            
+            if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                trace("in trendMeasurements, created measurement with measurement.rawGlucose = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, measurement.rawGlucose.description)
+            }
+            
         }
         
     }
@@ -319,6 +324,10 @@ fileprivate func historyMeasurements(bytes: Data, timeStampLastBgReading: Date, 
             let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, minuteCounter: Int(timeInMinutes.rawValue), date: measurementDate, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
             measurements.append(measurement)
             
+            if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                trace("in historyMeasurements, created measurement with measurement.rawGlucose = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, measurement.rawGlucose.description)
+            }
+
         } else {
             break
         }
@@ -444,6 +453,9 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
                 if timeStampOfNewGlucoseData.toMillisecondsAsDouble() < timeStampLastAddedGlucoseDataAsDouble - (5 * 60 * 1000 - 10000) {
                     timeStampLastAddedGlucoseDataAsDouble = timeStampOfNewGlucoseData.toMillisecondsAsDouble()
                     finalResult.append(glucose)
+                    
+                    trace("in parseLibre1DataWithOOPWebCalibration, processGlucoseData, created glucose = %{public}@ and timestamp = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, glucose.glucoseLevelRaw.description, glucose.timeStamp.description(with: .current))
+                    
                 }
                 
             } else {

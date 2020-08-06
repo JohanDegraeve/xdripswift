@@ -8,4 +8,8 @@ class Libre1Calibrator:Calibrator {
     
     let ageAdjustMentNeeded: Bool = false
     
+    func description() -> String {
+        return "Libre1Calibrator"
+    }
+    
 }

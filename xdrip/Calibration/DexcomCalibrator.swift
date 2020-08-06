@@ -8,5 +8,8 @@ class DexcomCalibrator:Calibrator {
     
     var ageAdjustMentNeeded: Bool = true
     
+    func description() -> String {
+        return "DexcomCalibrator"
+    }
     
 }

@@ -11,4 +11,8 @@ class LibreReCalibrator: Calibrator {
     
     let ageAdjustMentNeeded: Bool = false
     
+    func description() -> String {
+        return "LibreReCalibrator"
+    }
+    
 }
