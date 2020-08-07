@@ -3308,7 +3308,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.2.12;
+				MARKETING_VERSION = 4.2.13;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3337,7 +3337,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.2.12;
+				MARKETING_VERSION = 4.2.13;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
