@@ -129,9 +129,10 @@ class LibreDataParser {
                 // If the values are already available in userdefaults , then use those values
                 if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber == libreSensorSerialNumber.serialNumber {
                     
-                    // only for libre1 : in some cases libre1DerivedAlgorithmParameters is stored wiht slope_slope = 0, this doesn't work, reset the userdefaults to nil. The parameters will be fetched again from OOP Web
-                    // for libre1A2 : this check on slope_slope = 0 has been removed some time ago, so check only for libre1
-                    if libreSensorType == .libre1 && libre1DerivedAlgorithmParameters.slope_slope == 0 {
+                    // only for libre1 en libre1A2 : in some cases libre1DerivedAlgorithmParameters is stored wiht slope_slope = 0, this doesn't work, reset the userdefaults to nil. The parameters will be fetched again from OOP Web
+                    // for libre1A2 : this check on slope_slope = 0 has been removed some time ago, with commit b8d5b0dea77b098a1c9d88e410f485b7b17b8fd7, so solve issues with libre1A2, so it looks as if b8d5b0dea77b098a1c9d88e410f485b7b17b8fd7 should be undone
+                    // checking on slope_slope should have the same result, ie it's an invalid libre1DerivedAlgorithmParameters
+                    if (libreSensorType == .libre1 || libreSensorType == .libre1A2) && libre1DerivedAlgorithmParameters.slope_slope == 0 {
                         
                         UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
                         
