@@ -47,11 +47,11 @@ extension Date {
         return dateFormatter.string(from: self).appending("Z")
     }
     
-    /// date to short string, according to locale
-    func toShortString() -> String {
+    /// date to string, with date and time as specified by one of the values in DateFormatter.Style
+    func toString(timeStyle: DateFormatter.Style, dateStyle: DateFormatter.Style) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.timeStyle = .short
-        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = timeStyle
+        dateFormatter.dateStyle = dateStyle
         return dateFormatter.string(from: self)
     }
     

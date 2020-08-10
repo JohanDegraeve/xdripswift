@@ -295,7 +295,7 @@ class Trace {
         // timestamp app launch
         // unwrap timeStampAppLaunch
         if let timeStampAppLaunch = UserDefaults.standard.timeStampAppLaunch {
-            traceInfo.appendStringAndNewLine("App launched at " + timeStampAppLaunch.toShortString() + " local time.")
+            traceInfo.appendStringAndNewLine("App launched at " + timeStampAppLaunch.toString(timeStyle: .short, dateStyle: .short) + " local time.")
         }
 
         // cgm transmitter type from UserDefaults
