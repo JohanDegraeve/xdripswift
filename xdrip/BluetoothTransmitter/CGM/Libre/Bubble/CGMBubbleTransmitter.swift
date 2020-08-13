@@ -174,6 +174,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         
                         guard value.count >= 10 else { return }
                         
+                        // as serialNumber is always the first packet being sent, resetRxBuffer (just in case it wasn't done yet
+                        resetRxBuffer()
+                        
                         // this is actually the sensor serial number, adding it to rxBuffer (we could also not add it and set bubbleHeaderLength to 0 - this is historuc
                         rxBuffer.append(value.subdata(in: 2..<10))
                         
@@ -236,6 +239,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                             
                             //reset the buffer
                             resetRxBuffer()
+                            
                         }
                         
                     case .noSensor:
