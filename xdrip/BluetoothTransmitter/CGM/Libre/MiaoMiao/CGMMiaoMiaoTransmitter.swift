@@ -35,13 +35,13 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     private var resendPacketCounter:Int = 0
     
     /// used when processing MiaoMiao data packet
-    private var timestampFirstPacketReception:Date
+    private var timestampLastPacketReception:Date
     
     /// receive buffer for miaomiao packets
     private var rxBuffer:Data
     
     /// how long to wait for next packet before sending startreadingcommand
-    private static let maxWaitForpacketInSeconds = 5.0
+    private static let maxWaitForpacketInSeconds = 3.0
     
     /// length of header added by MiaoMiao in front of data dat is received from Libre sensor
     private let miaoMiaoHeaderLength = 18
@@ -94,7 +94,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
 
         // initialize rxbuffer
         rxBuffer = Data()
-        timestampFirstPacketReception = Date()
+        timestampLastPacketReception = Date()
         
         // initialize timeStampLastBgReading
         self.timeStampLastBgReading = timeStampLastBgReading ?? Date(timeIntervalSince1970: 0)
@@ -143,10 +143,13 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         if let value = characteristic.value {
             
             //check if buffer needs to be reset
-            if (Date() > timestampFirstPacketReception.addingTimeInterval(CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds - 1)) {
+            if (Date() > timestampLastPacketReception.addingTimeInterval(CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds)) {
                 trace("in peripheral didUpdateValueFor, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info, CGMMiaoMiaoTransmitter.maxWaitForpacketInSeconds.description)
                 resetRxBuffer()
             }
+            
+            // set timestampLastPacketReception to now, this gives the MM again maxWaitForpacketInSeconds seconds to send the next packet
+            timestampLastPacketReception = Date()
             
             //add new packet to buffer
             rxBuffer.append(value)
@@ -350,7 +353,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// reset rxBuffer, reset startDate, set resendPacketCounter to 0
     private func resetRxBuffer() {
         rxBuffer = Data()
-        timestampFirstPacketReception = Date()
+        timestampLastPacketReception = Date()
         resendPacketCounter = 0
     }
     
