@@ -62,7 +62,7 @@ class LibreOOPClient {
     ///   - callback: LibreA2GlucoseData and/or error
     static func getLibreRawGlucoseOOPOA2Data (libreData: Data, oopWebSite: String,  callback:@escaping (LibreOOPWebServerResponseData?, _ xDripError: XdripError?) -> Void) {
 
-        if let uploadURL = URL(string: "\(oopWebSite)/callnox") {
+        if let uploadURL = URL(string: "\(oopWebSite)/callnoxAndCalibrate") {
             do {
                 var request = URLRequest(url: uploadURL)
                 request.httpMethod = "POST"
