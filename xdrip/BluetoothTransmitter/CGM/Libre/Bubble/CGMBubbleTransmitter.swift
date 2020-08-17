@@ -254,7 +254,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 }
                             }
                             
-                            // now except libreProH, all data if libre1 format
+                            // now except libreProH, all libres' 344 data is libre1 format
                             // should crc check
                             guard crcIsOk(rxBuffer: &self.rxBuffer, patchInfo: patchInfo, bubbleHeaderLength: bubbleHeaderLength, log: log) else {
                                 return
