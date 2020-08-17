@@ -34,38 +34,32 @@ class LibreOOPClient {
     ///   - patchInfo : will be used by server to out the glucose data
     ///   - oopWebSite: the site url to use if oop web would be enabled
     ///   - oopWebToken: the token to use if oop web would be enabled
-    ///   - callback: LibreRawGlucoseOOPData and/or error
+    ///   - callback: LibreGlucoseData and/or error
     static func getLibreRawGlucoseOOPData(libreData: Data, libreSensorSerialNumber: LibreSensorSerialNumber, patchInfo: String, oopWebSite: String, oopWebToken: String, callback:@escaping (LibreOOPWebServerResponseData?, _ xDripError: XdripError?) -> Void) {
         
         let item = URLQueryItem(name: "accesstoken", value: oopWebToken)
         let item1 = URLQueryItem(name: "patchUid", value: libreSensorSerialNumber.uidString.uppercased())
         let item2 = URLQueryItem(name: "patchInfo", value: patchInfo)
         let item3 = URLQueryItem(name: "content", value: libreData.hexEncodedString())
-
-        var urlComponents = URLComponents(string: "\(oopWebSite)/libreoop2")!
-        
+        var urlComponents = URLComponents(string: "\(oopWebSite)/libreoop2AndCalibrate")!
         urlComponents.queryItems = [item, item1, item2, item3]
-        
-        if let uploadURL = URL(string: urlComponents.url?.absoluteString.removingPercentEncoding ?? "") {
-            
+        if let uploadURL = URL.init(string: urlComponents.url?.absoluteString.removingPercentEncoding ?? "") {
+            print(uploadURL)
             let request = NSMutableURLRequest(url: uploadURL)
             request.httpMethod = "POST"
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            
-            createDataTaskAndHandleResponse(LibreRawGlucoseOOPData.self, request: request as URLRequest, callback: callback)
-
+            createDataTaskAndHandleResponse(LibreGlucoseData.self, request: request as URLRequest, callback: callback)
         } else {
-            
             return
-            
         }
     }
+    
 
     /// if `patchInfo.hasPrefix("A2") 'Libre 1 A2', server uses another arithmetic to handle the 344 bytes
     /// - Parameters:
     ///   - libreData: the 344 bytes from Libre sensor
     ///   - oopWebSite: the site url to use if oop web would be enabled
-    ///   - callback: LibreRawGlucoseOOPA2Data and/or error
+    ///   - callback: LibreA2GlucoseData and/or error
     static func getLibreRawGlucoseOOPOA2Data (libreData: Data, oopWebSite: String,  callback:@escaping (LibreOOPWebServerResponseData?, _ xDripError: XdripError?) -> Void) {
 
         if let uploadURL = URL(string: "\(oopWebSite)/callnox") {
@@ -79,7 +73,7 @@ class LibreOOPClient {
                                            "list": string!]
                 request.setBodyContent(contentMap: json)
                 
-                createDataTaskAndHandleResponse(LibreRawGlucoseOOPA2Data.self, request: request, callback: callback)
+                createDataTaskAndHandleResponse(LibreA2GlucoseData.self, request: request, callback: callback)
                 
             } catch let error {
                 

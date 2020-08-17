@@ -2,7 +2,63 @@
 
 import Foundation
 
-public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebServerResponseData {
+public class LibreGlucoseData: Codable, LibreOOPWebServerResponseData {
+    var isError: Bool {
+        return data?.isError ?? true
+    }
+    
+    var msg: String? {
+        return data?.msg
+    }
+    
+    var errcode: Int? {
+        return data?.errcode
+    }
+    
+    struct Slope: Codable {
+        var slopeSlope: Double?
+        var slopeOffset: Double?
+        var offsetOffset: Double?
+        var offsetSlope: Double?
+        
+        enum CodingKeys: String, CodingKey {
+            case slopeSlope = "slope_slope"
+            case slopeOffset = "slope_offset"
+            case offsetOffset = "offset_offset"
+            case offsetSlope = "offset_slope"
+        }
+        
+        var isErrorParameters: Bool {
+            if slopeSlope == 0 &&
+                slopeOffset == 0 &&
+                offsetOffset == 0 &&
+                offsetSlope == 0 {
+                return true
+            }
+            return slopeSlope == nil || slopeOffset == nil || offsetOffset == nil || offsetSlope == nil
+        }
+    }
+    
+    private var slope: Slope?
+    var data: LibreRawGlucoseOOPData?
+    
+    var slopeValue: Libre1DerivedAlgorithmParameters? {
+        if let s = slope, !s.isErrorParameters {
+            return Libre1DerivedAlgorithmParameters.init(slope_slope: s.slopeSlope!,
+                                                        slope_offset: s.slopeOffset!,
+                                                        offset_slope: s.offsetSlope!,
+                                                        offset_offset: s.offsetOffset!,
+                                                        isValidForFooterWithReverseCRCs: 1,
+                                                        extraSlope: 1.0,
+                                                        extraOffset: 0.0,
+                                                        sensorSerialNumber: ""
+            )
+        }
+        return nil
+    }
+}
+
+public class LibreRawGlucoseOOPData: NSObject, Codable, LibreRawGlucoseWeb {
     
     /// histories by server
     var historicGlucose : [LibreRawGlucoseOOPGlucose]?
@@ -18,8 +74,12 @@ public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebSe
     
     var errcode: Int?
     
-    /// if endTime != 0, the sensor expired
+    /// if endTime < 0, the sensor expired
     var endTime: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case historicGlucose, realTimeGlucose, trendArrow, msg, errcode, endTime
+    }
     
     /// - time when instance of LibreRawGlucoseOOPData was created
     /// - this can be created to calculate the timestamp of realTimeGlucose
@@ -100,8 +160,8 @@ public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebSe
             }
         }
         
-        // if endTime != 0, the sensor expired
-        if let endTime = endTime, endTime != 0 {
+        // if endTime < 0, the sensor expired
+        if let endTime = endTime, endTime < 0 {
             state = .expired
         }
         

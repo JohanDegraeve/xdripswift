@@ -62,6 +62,12 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// oop token to use in case oop web would be enabled
     private var oopWebToken: String
     
+    /// hold libre pro/h data and handle the data
+    private var librePro: LibrePro?
+    
+    /// bubble firmware version
+    private var firmware: String?
+    
     // MARK: - Initialization
     
     /// - parameters:
@@ -167,8 +173,15 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         // send batteryPercentage to delegate
                         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
                         
+                        self.firmware = firmware
                         // confirm receipt
-                        _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
+                        // if firmware >= 2.6, write [0x08, 0x01, 0x00, 0x00, 0x00, 0x2B]
+                        // bubble will decrypt the libre2 data and return it
+                        if firmware.toDouble() ?? 0 >= 2.6 {
+                            _ = writeDataToPeripheral(data: Data([0x08, 0x01, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
+                        } else {
+                            _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
+                        }
                         
                     case .serialNumber:
                         
@@ -190,7 +203,19 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         self.libreSensorSerialNumber = libreSensorSerialNumber
 
                         
-                    case .dataPacket:
+                    case .dataPacket, .decryptedDataPacket:
+                        // decryptedDataPacket for bubble firmware >= 2.6
+                        // write [0x08, 0x01, 0x00, 0x00, 0x00, 0x2B] callback
+                        
+                        // sensor libre pro/h histories
+                        if (value[1] == 0x04) {
+                            rxBuffer.append(value.suffix(from: 4))
+                            if rxBuffer.count >= 200 + 352 {
+                                handleDataPackages()
+                            }
+                            return
+                        }
+                        
                         
                         rxBuffer.append(value.suffix(from: 4))
                         
@@ -225,17 +250,34 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
 
                             }
                             
-                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading) { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
-                                
-                                if let timeStampLastBgReading = timeStampLastBgReading {
-                                    self.timeStampLastBgReading = timeStampLastBgReading
+                            if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
+                                // handle libreProH data
+                                if libreSensorType == .libreProH {
+                                    let time = CLongLong(Date().timeIntervalSince1970 * 1000)
+                                    let pro = LibrePro(j: time, j2: time, bArr: rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength)).bytes)
+                                    // proStart != nil means can read pro histories
+                                    if let proStart = pro.proStart() {
+                                        let starts = proStart.toByteArray()
+                                        let bytes = (LibrePro.max + 1).toByteArray()
+                                        _ = writeDataToPeripheral(data: Data([0x02, 0x04, starts[1], starts[0], bytes[1], bytes[0]]), type: .withoutResponse)
+                                        return
+                                    }
                                 }
                                 
-                                if let sensorState = sensorState {
-                                    self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
+                                // if firmware < 2.6, libre2 and libreUS will decrypt fram local
+                                // after decryptFRAM, the libre2 and libreUS 344 will be libre1 344 data format
+                                if libreSensorType == .libre2 || libreSensorType == .libreUS {
+                                    if let firmware = firmware?.toDouble(), firmware < 2.6 {
+                                        var libreData = rxBuffer.subdata(in: bubbleHeaderLength..<rxBuffer.count)
+                                        let uid = rxBuffer[0..<bubbleHeaderLength].bytes
+                                        if let info = patchInfo?.hexadecimal?.bytes {
+                                            libreData = Data(PreLibre2.decryptFRAM(uid, info, libreData.bytes))
+                                        }
+                                    }
                                 }
-                                
                             }
+                            
+                            handleDataPackages()
                             
                             //reset the buffer
                             resetRxBuffer()
@@ -262,6 +304,19 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
             trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMBubble, type: .error)
         }
         
+    }
+    
+    func handleDataPackages() {
+        LibreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: bubbleHeaderLength..<rxBuffer.count)), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading) { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
+            
+            if let timeStampLastBgReading = timeStampLastBgReading {
+                self.timeStampLastBgReading = timeStampLastBgReading
+            }
+            
+            if let sensorState = sensorState {
+                self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
+            }
+        }
     }
         
     // MARK: CGMTransmitter protocol functions
@@ -334,6 +389,10 @@ fileprivate enum BubbleResponseType: UInt8 {
     case noSensor = 191 //0xBF
     case serialNumber = 192 //0xC0
     case patchInfo = 193 //0xC1
+    /// bubble firmware 2.6 support decrypt libre2 344 to libre1 344
+    /// if firmware >= 2.6, write [0x08, 0x01, 0x00, 0x00, 0x00, 0x2B]
+    /// bubble will decrypt the libre2 data and return it
+    case decryptedDataPacket = 136 // 0x88
 }
 
 fileprivate func crcIsOk(rxBuffer:inout Data, patchInfo: String?, bubbleHeaderLength: Int, log: OSLog) -> Bool {
@@ -369,7 +428,7 @@ fileprivate func crcIsOk(rxBuffer:inout Data, patchInfo: String?, bubbleHeaderLe
 extension BubbleResponseType: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .dataPacket:
+        case .dataPacket, .decryptedDataPacket:
             return "Data packet received"
         case .noSensor:
             return "No sensor detected"

@@ -10,7 +10,63 @@
 
 import Foundation
 
-public class LibreRawGlucoseOOPA2Data: NSObject, LibreRawGlucoseWeb, LibreOOPWebServerResponseData {
+public class LibreA2GlucoseData: Codable, LibreOOPWebServerResponseData {
+    var isError: Bool {
+        return data?.isError ?? true
+    }
+    
+    var msg: String? {
+        return data?.msg
+    }
+    
+    var errcode: Int? {
+        return data?.errcode
+    }
+    
+    struct Slope: Codable {
+        var slopeSlope: Double?
+        var slopeOffset: Double?
+        var offsetOffset: Double?
+        var offsetSlope: Double?
+        
+        enum CodingKeys: String, CodingKey {
+            case slopeSlope = "slope_slope"
+            case slopeOffset = "slope_offset"
+            case offsetOffset = "offset_offset"
+            case offsetSlope = "offset_slope"
+        }
+        
+        var isErrorParameters: Bool {
+            if slopeSlope == 0 &&
+                slopeOffset == 0 &&
+                offsetOffset == 0 &&
+                offsetSlope == 0 {
+                return true
+            }
+            return slopeSlope == nil || slopeOffset == nil || offsetOffset == nil || offsetSlope == nil
+        }
+    }
+    
+    private var slope: Slope?
+    var data: LibreRawGlucoseOOPA2Data?
+    
+    var slopeValue: Libre1DerivedAlgorithmParameters? {
+        if let s = slope, !s.isErrorParameters {
+            return Libre1DerivedAlgorithmParameters.init(slope_slope: s.slopeSlope!,
+                                                        slope_offset: s.slopeOffset!,
+                                                        offset_slope: s.offsetSlope!,
+                                                        offset_offset: s.offsetOffset!,
+                                                        isValidForFooterWithReverseCRCs: 1,
+                                                        extraSlope: 1.0,
+                                                        extraOffset: 0.0,
+                                                        sensorSerialNumber: ""
+            )
+        }
+        return nil
+    }
+}
+
+public class LibreRawGlucoseOOPA2Data: NSObject, Codable, LibreRawGlucoseWeb {
     
     // if received from server, probably always nil ?
     var msg: String?
@@ -18,6 +74,11 @@ public class LibreRawGlucoseOOPA2Data: NSObject, LibreRawGlucoseWeb, LibreOOPWeb
     var errcode: Int?
     
     var list: [LibreRawGlucoseOOPA2List]?
+    
+    
+    enum CodingKeys: String, CodingKey {
+        case msg, errcode, list
+    }
     
     /// - time when instance of LibreRawGlucoseOOPData was created
     /// - this can be created to calculate the timestamp of realtimeLibreRawGlucoseData

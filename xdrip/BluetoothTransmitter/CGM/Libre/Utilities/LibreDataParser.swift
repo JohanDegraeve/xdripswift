@@ -120,81 +120,89 @@ class LibreDataParser {
         trace("in libreDataProcessor, sensortype = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, libreSensorType.description)
         
         // let's see if we must use webOOP (if webOOPEnabled is true) and if so if we have all required info (libreSensorSerialNumber, oopWebSite and oopWebToken)
-        if let libreSensorSerialNumber = libreSensorSerialNumber, let oopWebSite = oopWebSite, let oopWebToken = oopWebToken, webOOPEnabled {
+        if var libreSensorSerialNumber = libreSensorSerialNumber, let oopWebSite = oopWebSite, let oopWebToken = oopWebToken, webOOPEnabled {
             
             switch libreSensorType {
                 
-            case .libre1A2, .libre1, .libreProH:// these types are all Libre 1
-                
-                // If the values are already available in userdefaults , then use those values
-                if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber == libreSensorSerialNumber.serialNumber {
-                    
-                    // only for libre1 en libre1A2 : in some cases libre1DerivedAlgorithmParameters is stored wiht slope_slope = 0, this doesn't work, reset the userdefaults to nil. The parameters will be fetched again from OOP Web
-                    // for libre1A2 : this check on slope_slope = 0 has been removed some time ago, with commit b8d5b0dea77b098a1c9d88e410f485b7b17b8fd7, so solve issues with libre1A2, so it looks as if b8d5b0dea77b098a1c9d88e410f485b7b17b8fd7 should be undone
-                    // checking on slope_slope should have the same result, ie it's an invalid libre1DerivedAlgorithmParameters
-                    if (libreSensorType == .libre1 || libreSensorType == .libre1A2) && libre1DerivedAlgorithmParameters.slope_slope == 0 {
-                        
-                        UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
-                        
-                    } else {
-                        
-                        trace("in libreDataProcessor, found libre1DerivedAlgorithmParameters in UserDefaults", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
-                        
-                        // if debug level logging enabled, than add full dump of libre1DerivedAlgorithmParameters in the trace (checking here to save some processing time if it's not needed
-                        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-                            trace("in libreDataProcessor, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, libre1DerivedAlgorithmParameters.description)
-                        }
-                        
-                        // parse the data using oop web algorithm
-                        let parsedResult = parseLibre1DataWithOOPWebCalibration(libreData: libreData, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters, timeStampLastBgReading: timeStampLastBgReading)
-                        
-                        handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
-                        
-                        return
-                        
-                    }
-
-                }
-
-                // get LibreDerivedAlgorithmParameters and parse using the libre1DerivedAlgorithmParameters
-                LibreOOPClient.getOopWebCalibrationStatus(bytes: libreData, libreSensorSerialNumber: libreSensorSerialNumber, oopWebSite: oopWebSite, oopWebToken: oopWebToken) { (oopWebCalibrationStatus, xDripError) in
-
-                    if let oopWebCalibrationStatus = oopWebCalibrationStatus as? OopWebCalibrationStatus,
-                        let slope = oopWebCalibrationStatus.slope {
-                        
-                        let libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(slope_slope: slope.slopeSlope ?? 0, slope_offset: slope.slopeOffset ?? 0, offset_slope: slope.offsetSlope ?? 0, offset_offset: slope.offsetOffset ?? 0, isValidForFooterWithReverseCRCs: Int(slope.isValidForFooterWithReverseCRCs ?? 1), extraSlope: 1.0, extraOffset: 0.0, sensorSerialNumber: libreSensorSerialNumber.serialNumber)
-                        
-                        // store result in UserDefaults, next time, server will not be used anymore, we will use the stored value
-                        UserDefaults.standard.libre1DerivedAlgorithmParameters = libre1DerivedAlgorithmParameters
-                        
-                        // if debug level logging enabled, than add full dump of libre1DerivedAlgorithmParameters in the trace (checking here to save some processing time if it's not needed
-                        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-                            trace("in libreDataProcessor, received libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, libre1DerivedAlgorithmParameters.description)
-                        }
-                        
-                        // parse the data using oop web algorithm
-                        let parsedResult = parseLibre1DataWithOOPWebCalibration(libreData: libreData, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters, timeStampLastBgReading: timeStampLastBgReading)
-                        
-                        handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
-                        
-                    } else {
-
-                        // libre1DerivedAlgorithmParameters not created, but possibly xDripError is not nil, so we need to call handleGlucoseData which will process xDripError
-                        handleGlucoseData(result: ([LibreRawGlucoseData](), nil, nil, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
-
-                    }
-
+            // now this three type receive 344 data will all the libre1 format
+            case .libreUS, .libre2, .libre1:
+                guard var patchInfo = patchInfo else {
+                    trace("in libreDataProcessor, handling libre 2 but patchInfo is nil", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+                    return
                 }
                 
-            case .libreUS:// not sure if this works for libreUS
-                
-                // libreUS isn't working yet, create an error and send to delegate
-                cgmTransmitterDelegate?.errorOccurred(xDripError: LibreOOPWebError.libreUSNotSupported)
+                if libreSensorType == .libre2 || libreSensorType == .libreUS {
+                    // libre2 and libreUS always use
+                    // patchInfo = "DF0000080000"
+                    // patchUid = "7683376000A007E0"
+                    patchInfo = "DF0000080000"
+                    libreSensorSerialNumber = LibreSensorSerialNumber.init(withUID: "7683376000A007E0".hexadecimal!)!
+                }
                 
                 // continue anyway, although this will not work
+                LibreOOPClient.getLibreRawGlucoseOOPData(libreData: libreData, libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, oopWebSite: oopWebSite, oopWebToken: oopWebToken) { (libreGlucoseData, xDripError) in
+                    
+                    // save the parameters, if the server failed, will use the parameters
+                    if let parameters = (libreGlucoseData as? LibreGlucoseData)?.slopeValue {
+                        UserDefaults.standard.libre1DerivedAlgorithmParameters = parameters
+                    }
+                    
+                    if let libreGlucoseData = (libreGlucoseData as? LibreGlucoseData)?.data {
+
+                        // if debug level logging enabled, than add full dump of libreRawGlucoseOOPA2Data in the trace (checking here to save some processing time if it's not needed
+                        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                            trace("in libreDataProcessor, received libreRawGlucoseOOPA2Data = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, libreGlucoseData.description)
+                            
+                        }
+                        
+                        // convert LibreRawGlucoseOOPData to (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?)
+                        let parsedResult = libreGlucoseData.glucoseData(timeStampLastBgReading: timeStampLastBgReading)
+                        
+                        handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+
+                    } else {
+                        
+                        // parse the data using oop web algorithm
+                        // if UserDefaults.standard.libre1DerivedAlgorithmParameters = nil, will use
+                        // the default parameters, code in LibreMeasurement
+                        let parsedResult = parseLibre1DataWithOOPWebCalibration(libreData: libreData, libre1DerivedAlgorithmParameters: UserDefaults.standard.libre1DerivedAlgorithmParameters, timeStampLastBgReading: timeStampLastBgReading)
+                        
+                        handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+
+                    }
+                }
+            case .libreProH:
+                let libreData = libreData.subdata(in: 0..<344)
+                let time = CLongLong(Date().timeIntervalSince1970 * 1000)
+                let pro = LibrePro(j: time, j2: time, bArr: libreData.bytes)
+                let result = pro.mo211a()
+                let sensorTime = result.sensorTime
+                var glucoses = [result.glucose]
+                
+                // sensorTime >= 20160, sensor expired
+                if (sensorTime < 20160) {
+                    // libre pro h histories
+                    if libreData.count == 344 + 200 {
+                        let libreProData = libreData.subdata(in: 344..<libreData.count)
+                        glucoses = pro.histroyData(historyData: libreProData.bytes)
+                        glucoses = glucoses.filter({ $0.timeStamp > timeStampLastBgReading.addingTimeInterval(60 * 4) })
+                    }
+                    
+                    handleGlucoseData(result: (glucoses, sensorTime, .ready, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+                } else {
+                    handleGlucoseData(result: ([], sensorTime, .expired, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+                }
+            case .libre1A2:
+                
+                // get libre1A2 glucoses
                 LibreOOPClient.getLibreRawGlucoseOOPOA2Data(libreData: libreData, oopWebSite: oopWebSite) { (libreRawGlucoseOOPA2Data, xDripError) in
                     
-                    if let libreRawGlucoseOOPA2Data = libreRawGlucoseOOPA2Data as? LibreRawGlucoseOOPA2Data {
+                    // save the parameters, if the server failed, will use the parameters
+                    if let parameters = (libreRawGlucoseOOPA2Data as? LibreA2GlucoseData)?.slopeValue {
+                        UserDefaults.standard.libre1DerivedAlgorithmParameters = parameters
+                    }
+                    
+                    if let libreRawGlucoseOOPA2Data = (libreRawGlucoseOOPA2Data as? LibreA2GlucoseData)?.data {
 
                         // if debug level logging enabled, than add full dump of libreRawGlucoseOOPA2Data in the trace (checking here to save some processing time if it's not needed
                         if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
@@ -209,44 +217,15 @@ class LibreDataParser {
 
                     } else {
                         
-                        // libreRawGlucoseOOPA2Data is nil, but possibly xDripError is not nil, so need to call handleGlucoseData which will process xDripError
-                        handleGlucoseData(result: ([LibreRawGlucoseData](), nil, nil, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+                        // parse the data using oop web algorithm
+                        // if UserDefaults.standard.libre1DerivedAlgorithmParameters = nil, will use
+                        // the default parameters, code in LibreMeasurement
+                        let parsedResult = parseLibre1DataWithOOPWebCalibration(libreData: libreData, libre1DerivedAlgorithmParameters: UserDefaults.standard.libre1DerivedAlgorithmParameters, timeStampLastBgReading: timeStampLastBgReading)
+                        
+                        handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
 
                     }
-                    
                 }
-                
-            case .libre2:
-                
-                // patchInfo must be non nil to handle libre 2
-                guard let patchInfo = patchInfo else {
-                    trace("in libreDataProcessor, handling libre 2 but patchInfo is nil", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-                    return
-                }
-                
-                LibreOOPClient.getLibreRawGlucoseOOPData(libreData: libreData, libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, oopWebSite: oopWebSite, oopWebToken: oopWebToken) { (libreRawGlucoseOOPData, xDripError) in
-                    
-                    if let libreRawGlucoseOOPData = libreRawGlucoseOOPData as? LibreRawGlucoseOOPData {
-
-                        // if debug level logging enabled, than add full dump of libreRawGlucoseOOPA2Data in the trace (checking here to save some processing time if it's not needed
-                        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-                            trace("in libreDataProcessor, received libreRawGlucoseOOPData = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, libreRawGlucoseOOPData.description)
-                        }
-                        
-                        // convert libreRawGlucoseOOPData to (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?)
-                        let parsedResult = libreRawGlucoseOOPData.glucoseData(timeStampLastBgReading: timeStampLastBgReading)
-                        
-                        handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
-
-                    } else {
-                       
-                        // libreRawGlucoseOOPData is nil, but possibly xDripError is not nil, so need to call handleGlucoseData which will process xDripError
-                        handleGlucoseData(result: ([LibreRawGlucoseData](), nil, nil, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
-
-                    }
-                    
-                }
-                
             }
             
         } else if !webOOPEnabled {
@@ -442,7 +421,7 @@ fileprivate func historyToLibreGlucose(_ measurements: [LibreMeasurement]) -> [L
 ///     - array of libreRawGlucoseData, first is the most recent. Only returns recent readings, ie not the ones that are older than timeStampLastBgReading. 30 seconds are added here, meaning, new reading should be at least 30 seconds more recent than timeStampLastBgReading
 ///     - sensorState: status of the sensor
 ///     - sensorTimeInMinutes: age of sensor in minutes
-fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters, timeStampLastBgReading: Date) -> (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
+fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?, timeStampLastBgReading: Date) -> (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
 
     // initialise returnvalue, array of LibreRawGlucoseData
     var finalResult:[LibreRawGlucoseData] = []
