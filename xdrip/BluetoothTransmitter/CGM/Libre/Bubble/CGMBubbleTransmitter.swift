@@ -210,6 +210,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         // sensor libre pro/h histories
                         if (value[1] == 0x04) {
                             rxBuffer.append(value.suffix(from: 4))
+                            // 200 bytes for liberProH histories
                             if rxBuffer.count >= 200 + 352 {
                                 handleDataPackages()
                             }
@@ -221,7 +222,40 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         
                         if rxBuffer.count >= 352 {
                             
-                            // crc check only for Libre 1
+                            if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
+                                // handle libreProH data
+                                if libreSensorType == .libreProH {
+                                    let time = CLongLong(Date().timeIntervalSince1970 * 1000)
+                                    let pro = LibrePro(j: time, j2: time, bArr: rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength)).bytes)
+                                    // proStart != nil means can read pro histories, write reading code
+                                    // proStart == nil, will handleDataPackages()
+                                    if let proStart = pro.proStart() {
+                                        let starts = proStart.toByteArray()
+                                        let bytes = (LibrePro.max + 1).toByteArray()
+                                        _ = writeDataToPeripheral(data: Data([0x02, 0x04, starts[1], starts[0], bytes[1], bytes[0]]), type: .withoutResponse)
+                                        // after received the histories, handle the rxBuffer
+                                        return
+                                    }
+                                }
+                                
+                                // if firmware < 2.6, libre2 and libreUS will decrypt fram local
+                                // after decryptFRAM, the libre2 and libreUS 344 will be libre1 344 data format
+                                // firmware >= 2.6, bubble will decrypt and return 344 bytes
+                                if libreSensorType == .libre2 || libreSensorType == .libreUS {
+                                    if let firmware = firmware?.toDouble(), firmware < 2.6 {
+                                        var libreData = rxBuffer.subdata(in: bubbleHeaderLength..<rxBuffer.count)
+                                        let uid = rxBuffer[0..<bubbleHeaderLength].bytes
+                                        if let info = patchInfo?.hexadecimal?.bytes {
+                                            libreData = Data(PreLibre2.decryptFRAM(uid, info, libreData.bytes))
+                                        }
+                                        // replace 344 bytes to Decrypted data
+                                        rxBuffer.replaceSubrange(bubbleHeaderLength..<rxBuffer.count, with: libreData)
+                                    }
+                                }
+                            }
+                            
+                            // now except libreProH, all data if libre1 format
+                            // should crc check
                             guard crcIsOk(rxBuffer: &self.rxBuffer, patchInfo: patchInfo, bubbleHeaderLength: bubbleHeaderLength, log: log) else {
                                 return
                             }
@@ -250,33 +284,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
 
                             }
                             
-                            if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
-                                // handle libreProH data
-                                if libreSensorType == .libreProH {
-                                    let time = CLongLong(Date().timeIntervalSince1970 * 1000)
-                                    let pro = LibrePro(j: time, j2: time, bArr: rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength)).bytes)
-                                    // proStart != nil means can read pro histories
-                                    if let proStart = pro.proStart() {
-                                        let starts = proStart.toByteArray()
-                                        let bytes = (LibrePro.max + 1).toByteArray()
-                                        _ = writeDataToPeripheral(data: Data([0x02, 0x04, starts[1], starts[0], bytes[1], bytes[0]]), type: .withoutResponse)
-                                        return
-                                    }
-                                }
-                                
-                                // if firmware < 2.6, libre2 and libreUS will decrypt fram local
-                                // after decryptFRAM, the libre2 and libreUS 344 will be libre1 344 data format
-                                if libreSensorType == .libre2 || libreSensorType == .libreUS {
-                                    if let firmware = firmware?.toDouble(), firmware < 2.6 {
-                                        var libreData = rxBuffer.subdata(in: bubbleHeaderLength..<rxBuffer.count)
-                                        let uid = rxBuffer[0..<bubbleHeaderLength].bytes
-                                        if let info = patchInfo?.hexadecimal?.bytes {
-                                            libreData = Data(PreLibre2.decryptFRAM(uid, info, libreData.bytes))
-                                        }
-                                    }
-                                }
-                            }
-                            
+                            // handle the data pachages
                             handleDataPackages()
                             
                             //reset the buffer
@@ -306,6 +314,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
     
+    // received all data packages and handle the packages
     func handleDataPackages() {
         LibreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: bubbleHeaderLength..<rxBuffer.count)), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading) { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
             
@@ -400,8 +409,8 @@ fileprivate func crcIsOk(rxBuffer:inout Data, patchInfo: String?, bubbleHeaderLe
     // get sensortype, and dependent on sensortype get crc
     if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {// should always return a value
         
-        // crc check only for Libre 1 (is this the right thing to do ?)
-        if libreSensorType == .libre1 {
+        // only libreProH not crc check, 
+        if libreSensorType != .libreProH {
             
             guard Crc.LibreCrc(data: &rxBuffer, headerOffset: bubbleHeaderLength) else {
                 trace("    Libre 1 sensor, CRC check failed, no further processing", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
@@ -411,13 +420,14 @@ fileprivate func crcIsOk(rxBuffer:inout Data, patchInfo: String?, bubbleHeaderLe
         }
         
         // do this for tracing only, not processing will continue if crc check fails
-        if libreSensorType == .libreProH {
-            
-            if !Crc.LibreCrc(data: &rxBuffer, headerOffset: bubbleHeaderLength) {
-                trace("    libreProH sensor, CRC check failed - will continue processing anyway", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
-            }
-            
-        }
+        // libreProH shouldn't run crc
+//        if libreSensorType == .libreProH {
+//
+//            if !Crc.LibreCrc(data: &rxBuffer, headerOffset: bubbleHeaderLength) {
+//                trace("    libreProH sensor, CRC check failed - will continue processing anyway", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+//            }
+//
+//        }
         
     }
 
