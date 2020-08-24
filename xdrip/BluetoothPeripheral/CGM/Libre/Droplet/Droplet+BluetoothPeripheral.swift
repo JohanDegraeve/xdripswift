@@ -9,4 +9,8 @@ extension Droplet: BluetoothPeripheral {
         
     }
     
+    func overrideNeedsOOPWeb() -> Bool {
+        return false
+    }
+    
 }

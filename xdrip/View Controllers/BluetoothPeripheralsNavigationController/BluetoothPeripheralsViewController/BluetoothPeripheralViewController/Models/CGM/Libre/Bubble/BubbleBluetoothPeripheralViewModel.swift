@@ -42,14 +42,14 @@ class BubbleBluetoothPeripheralViewModel {
     /// temporary reference to bluetoothPerpipheral, will be set in configure function.
     private var bluetoothPeripheral: BluetoothPeripheral?
     
-    /// it's the bluetoothPeripheral as M5Stack
+    /// it's the bluetoothPeripheral as Bubble
     private var bubble: Bubble? {
         get {
             return bluetoothPeripheral as? Bubble
         }
     }
     
-    /// closure that the viewmodel should call when it receives a libre sensor type - doesn't need to be necessarily a new sensor type. This is to conform to protocol BluetoothPeripheralViewModel
+    /// closure that the viewmodel should call when it receives a libre sensor type - doesn't need to be necessarily a new sensor type. This will allow the BluetoothPeripheralViewController to delete or add sections, namely oop web related settings.
     private var onLibreSensorTypeReceived: ((LibreSensorType) -> ())?
 
     // MARK: - deinit
@@ -305,6 +305,7 @@ extension BubbleBluetoothPeripheralViewModel: CGMBubbleTransmitterDelegate {
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(libreSensorType: libreSensorType, from: cGMBubbleTransmitter)
 
         // inform bluetoothPeripheralViewController that sensor type was received
+        // if libre2 or libreUs, then
         onLibreSensorTypeReceived?(libreSensorType)
 
         // here's the trigger to update the table row for sensorType

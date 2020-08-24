@@ -28,6 +28,8 @@
 		F808D2CC240328FA0084B5DB /* Bubble+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F808D2CB240328FA0084B5DB /* Bubble+CoreDataClass.swift */; };
 		F808D2CE2403292C0084B5DB /* Bubble+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F808D2CD2403292C0084B5DB /* Bubble+CoreDataProperties.swift */; };
 		F808D2D2240329E80084B5DB /* Bubble+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F808D2D1240329E70084B5DB /* Bubble+BluetoothPeripheral.swift */; };
+		F80D915C24F06A40006840B5 /* PreLibre2.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D915B24F06A40006840B5 /* PreLibre2.swift */; };
+		F80D916024F45EB3006840B5 /* LibreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D915F24F45EB2006840B5 /* LibreError.swift */; };
 		F80ED2EC236F68F90005C035 /* SettingsViewM5StackBluetoothSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80ED2E9236F68F90005C035 /* SettingsViewM5StackBluetoothSettingsViewModel.swift */; };
 		F80ED2ED236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80ED2EA236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift */; };
 		F80ED2EE236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80ED2EB236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift */; };
@@ -482,6 +484,8 @@
 		F808D2CB240328FA0084B5DB /* Bubble+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bubble+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F808D2CD2403292C0084B5DB /* Bubble+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bubble+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F808D2D1240329E70084B5DB /* Bubble+BluetoothPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bubble+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
+		F80D915B24F06A40006840B5 /* PreLibre2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreLibre2.swift; sourceTree = "<group>"; };
+		F80D915F24F45EB2006840B5 /* LibreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreError.swift; sourceTree = "<group>"; };
 		F80ED2E9236F68F90005C035 /* SettingsViewM5StackBluetoothSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackBluetoothSettingsViewModel.swift; sourceTree = "<group>"; };
 		F80ED2EA236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackGeneralSettingsViewModel.swift; sourceTree = "<group>"; };
 		F80ED2EB236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackWiFiSettingsViewModel.swift; sourceTree = "<group>"; };
@@ -2233,6 +2237,7 @@
 		F8F971E123A5915900C3F17D /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				F80D915B24F06A40006840B5 /* PreLibre2.swift */,
 				F8F971E823A5915900C3F17D /* CRC.swift */,
 				F8177024248ED4DE00AA3600 /* Libre1DerivedAlgorithmParameters.swift */,
 				F8F971E923A5915900C3F17D /* LibreDataParser.swift */,
@@ -2252,6 +2257,7 @@
 				F8177022248CF78300AA3600 /* LibreSensorType.swift */,
 				F8AF11F024B11FD400AE5BA2 /* LibreOOPWebError.swift */,
 				F8AF11FB24B27A6C00AE5BA2 /* LibreOOPWebServerResponse.swift */,
+				F80D915F24F45EB2006840B5 /* LibreError.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -2699,6 +2705,7 @@
 				F830991D23C2909E005741DF /* Watlaa+CoreDataProperties.swift in Sources */,
 				F8F9721623A5915900C3F17D /* CGMG4xDripTransmitter.swift in Sources */,
 				F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */,
+				F80D915C24F06A40006840B5 /* PreLibre2.swift in Sources */,
 				F8F9722223A5915900C3F17D /* CRC.swift in Sources */,
 				F89467F2249FFF8700F18424 /* LibreRawGlucoseOOPA2List.swift in Sources */,
 				F821CF6F229FC280005C1E43 /* Endpoint+NightScout.swift in Sources */,
@@ -2849,6 +2856,7 @@
 				F816E1082437E5B9009EE65B /* BlueReader+BluetoothPeripheral.swift in Sources */,
 				F8E51D67244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift in Sources */,
 				F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */,
+				F80D916024F45EB3006840B5 /* LibreError.swift in Sources */,
 				F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */,
 				F8F971B823A5914D00C3F17D /* BluetoothPeripheral.swift in Sources */,
 				F8F9721723A5915900C3F17D /* CGMDroplet1Transmitter.swift in Sources */,
@@ -3329,7 +3337,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.2.17;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdriptest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -3358,7 +3366,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.2.17;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdriptest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";

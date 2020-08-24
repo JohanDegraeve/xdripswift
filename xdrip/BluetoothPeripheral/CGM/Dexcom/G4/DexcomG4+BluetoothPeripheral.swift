@@ -7,5 +7,9 @@ extension DexcomG4: BluetoothPeripheral {
         return .DexcomG4Type
         
     }
+   
+    func overrideNeedsOOPWeb() -> Bool {
+        return false
+    }
     
 }

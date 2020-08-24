@@ -39,6 +39,8 @@ public enum LibreSensorType: String {
     }
     
     /// some of the Libre types can not work without webOOP. In case returnvalue is true, then user can not change the value
+    ///
+    /// note that this value can be overriden by BluetoothPeripheral function overrideNeedsWebOOP, for transmitters that support decryption
     func needsWebOOP() -> Bool {
         
         switch self {

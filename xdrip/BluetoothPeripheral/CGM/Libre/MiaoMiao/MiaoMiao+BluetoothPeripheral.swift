@@ -7,5 +7,9 @@ extension MiaoMiao: BluetoothPeripheral {
         return .MiaoMiaoType
         
     }
+ 
+    func overrideNeedsOOPWeb() -> Bool {
+        return false
+    }
     
 }

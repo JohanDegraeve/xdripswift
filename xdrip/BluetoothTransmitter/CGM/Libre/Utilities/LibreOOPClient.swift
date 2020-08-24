@@ -106,6 +106,8 @@ class LibreOOPClient {
             "timestamp": "\(Date().toMillisecondsAsInt64())",
         ]
 
+        debuglogging("content = " + bytes.hexEncodedString())
+        
         if let uploadURL = URL(string: "\(oopWebSite)/calibrateSensor") {
             var request = URLRequest(url: uploadURL)
             request.httpMethod = "POST"

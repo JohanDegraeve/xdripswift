@@ -9,5 +9,9 @@ extension BlueReader: BluetoothPeripheral {
         return .GNSentryType
         
     }
+  
+    func overrideNeedsOOPWeb() -> Bool {
+        return false
+    }
     
 }
