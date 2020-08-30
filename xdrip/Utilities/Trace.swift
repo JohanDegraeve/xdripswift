@@ -441,6 +441,13 @@ class Trace {
                             traceInfo.appendStringAndNewLine("    batteryLevel : " + watlaa.watlaaBatteryLevel.description)
                             
                         }
+                        
+                    case .Libre2Type:
+                        if let libre2 = blePeripheral.libre2 {
+                            
+                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
+
+                        }
 
                     }
                 }

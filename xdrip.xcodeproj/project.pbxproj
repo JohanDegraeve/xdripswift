@@ -30,6 +30,13 @@
 		F808D2D2240329E80084B5DB /* Bubble+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F808D2D1240329E70084B5DB /* Bubble+BluetoothPeripheral.swift */; };
 		F80D915C24F06A40006840B5 /* PreLibre2.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D915B24F06A40006840B5 /* PreLibre2.swift */; };
 		F80D916024F45EB3006840B5 /* LibreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D915F24F45EB2006840B5 /* LibreError.swift */; };
+		F80D916424F5B3DE006840B5 /* Libre2+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D916224F5B3DE006840B5 /* Libre2+CoreDataProperties.swift */; };
+		F80D916524F5B3DE006840B5 /* Libre2+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D916324F5B3DE006840B5 /* Libre2+CoreDataClass.swift */; };
+		F80D916824F7086D006840B5 /* Libre2BluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D916724F7086D006840B5 /* Libre2BluetoothPeripheralViewModel.swift */; };
+		F80D916B24F82913006840B5 /* CGMLibre2Transmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D916A24F82913006840B5 /* CGMLibre2Transmitter.swift */; };
+		F80D916D24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D916C24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift */; };
+		F80D917024F85C7A006840B5 /* Libre2+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D916F24F85C7A006840B5 /* Libre2+BluetoothPeripheral.swift */; };
+		F80D917224FA9CD5006840B5 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D917124FA9CD5006840B5 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift */; };
 		F80ED2EC236F68F90005C035 /* SettingsViewM5StackBluetoothSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80ED2E9236F68F90005C035 /* SettingsViewM5StackBluetoothSettingsViewModel.swift */; };
 		F80ED2ED236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80ED2EA236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift */; };
 		F80ED2EE236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80ED2EB236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift */; };
@@ -486,6 +493,14 @@
 		F808D2D1240329E70084B5DB /* Bubble+BluetoothPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bubble+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
 		F80D915B24F06A40006840B5 /* PreLibre2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreLibre2.swift; sourceTree = "<group>"; };
 		F80D915F24F45EB2006840B5 /* LibreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreError.swift; sourceTree = "<group>"; };
+		F80D916124F5AA62006840B5 /* xdrip v12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v12.xcdatamodel"; sourceTree = "<group>"; };
+		F80D916224F5B3DE006840B5 /* Libre2+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Libre2+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		F80D916324F5B3DE006840B5 /* Libre2+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Libre2+CoreDataClass.swift"; sourceTree = "<group>"; };
+		F80D916724F7086D006840B5 /* Libre2BluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2BluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
+		F80D916A24F82913006840B5 /* CGMLibre2Transmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMLibre2Transmitter.swift; sourceTree = "<group>"; };
+		F80D916C24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMLibre2TransmitterDelegate.swift; sourceTree = "<group>"; };
+		F80D916F24F85C7A006840B5 /* Libre2+BluetoothPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Libre2+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
+		F80D917124FA9CD5006840B5 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift"; sourceTree = "<group>"; };
 		F80ED2E9236F68F90005C035 /* SettingsViewM5StackBluetoothSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackBluetoothSettingsViewModel.swift; sourceTree = "<group>"; };
 		F80ED2EA236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackGeneralSettingsViewModel.swift; sourceTree = "<group>"; };
 		F80ED2EB236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackWiFiSettingsViewModel.swift; sourceTree = "<group>"; };
@@ -1122,6 +1137,7 @@
 		F808D2C3240323750084B5DB /* Libre */ = {
 			isa = PBXGroup;
 			children = (
+				F80D916624F70840006840B5 /* Libre2 */,
 				F816E11F24392D27009EE65B /* Droplet */,
 				F816E1112438A72C009EE65B /* BlueReader */,
 				F816E10124367389009EE65B /* GNSENtry */,
@@ -1143,6 +1159,7 @@
 		F808D2CF240329D40084B5DB /* Libre */ = {
 			isa = PBXGroup;
 			children = (
+				F80D916E24F85C5A006840B5 /* Libre2 */,
 				F816E114243919ED009EE65B /* Droplet */,
 				F816E1062437E58E009EE65B /* BlueReader */,
 				F816E0FC24367338009EE65B /* GNSEntry */,
@@ -1159,6 +1176,31 @@
 				F808D2D1240329E70084B5DB /* Bubble+BluetoothPeripheral.swift */,
 			);
 			path = Bubble;
+			sourceTree = "<group>";
+		};
+		F80D916624F70840006840B5 /* Libre2 */ = {
+			isa = PBXGroup;
+			children = (
+				F80D916724F7086D006840B5 /* Libre2BluetoothPeripheralViewModel.swift */,
+			);
+			path = Libre2;
+			sourceTree = "<group>";
+		};
+		F80D916924F828D5006840B5 /* Libre2 */ = {
+			isa = PBXGroup;
+			children = (
+				F80D916A24F82913006840B5 /* CGMLibre2Transmitter.swift */,
+				F80D916C24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift */,
+			);
+			path = Libre2;
+			sourceTree = "<group>";
+		};
+		F80D916E24F85C5A006840B5 /* Libre2 */ = {
+			isa = PBXGroup;
+			children = (
+				F80D916F24F85C7A006840B5 /* Libre2+BluetoothPeripheral.swift */,
+			);
+			path = Libre2;
 			sourceTree = "<group>";
 		};
 		F80ED2E8236F68D90005C035 /* M5StackSettingsViewModels */ = {
@@ -1358,6 +1400,7 @@
 				F8297F44238DC4AC00D74D66 /* BluetoothPeripheralManaging.swift */,
 				F816E12D2439E06E009EE65B /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift */,
 				F825286D2443C1000067AF77 /* BluetoothPeripheralManager+CGMG6TransmitterDelegate.swift */,
+				F80D917124FA9CD5006840B5 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift */,
 			);
 			path = BluetoothPeripheral;
 			sourceTree = "<group>";
@@ -2007,6 +2050,8 @@
 				F816E11B2439243B009EE65B /* Droplet+CoreDataProperties.swift */,
 				F816E0F624367137009EE65B /* GNSEntry+CoreDataClass.swift */,
 				F816E0F424367131009EE65B /* GNSEntry+CoreDataProperties.swift */,
+				F80D916324F5B3DE006840B5 /* Libre2+CoreDataClass.swift */,
+				F80D916224F5B3DE006840B5 /* Libre2+CoreDataProperties.swift */,
 				F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */,
 				F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */,
 				F8C97851242AA70C00A09483 /* MiaoMiao+CoreDataClass.swift */,
@@ -2177,6 +2222,7 @@
 		F8F971D623A5915900C3F17D /* Libre */ = {
 			isa = PBXGroup;
 			children = (
+				F80D916924F828D5006840B5 /* Libre2 */,
 				F8F971D723A5915900C3F17D /* Droplet */,
 				F8F971D923A5915900C3F17D /* BlueReader */,
 				F8F971DB23A5915900C3F17D /* GNSEntry */,
@@ -2661,6 +2707,7 @@
 				F8B3A84A227F090E004BA588 /* SettingsViewGeneralSettingsViewModel.swift in Sources */,
 				F83098FE23AD3F84005741DF /* UITabBarController.swift in Sources */,
 				F816E11A243923B2009EE65B /* Droplet+CoreDataClass.swift in Sources */,
+				F80D916D24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift in Sources */,
 				F816E1102437ED21009EE65B /* BluetoothPeripheralManager+CGMBlueReaderTransmitterDelegate.swift in Sources */,
 				F8B3A85B2280CCD1004BA588 /* AlertSettingsViewController.swift in Sources */,
 				F8F9722E23A5915900C3F17D /* M5StackTransmitterOpCode.swift in Sources */,
@@ -2684,6 +2731,7 @@
 				F8DF765323E34F4500063910 /* DexcomG5+CoreDataClass.swift in Sources */,
 				F8F9720F23A5915900C3F17D /* NSData+CRC.swift in Sources */,
 				F8A1585722EDB754007F5B5D /* ConstantsCoreData.swift in Sources */,
+				F80D917224FA9CD5006840B5 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift in Sources */,
 				F821CF9022AB1068005C1E43 /* DatePickerViewData.swift in Sources */,
 				F8F9722623A5915900C3F17D /* BluconTransmitterOpCode.swift in Sources */,
 				F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */,
@@ -2700,6 +2748,7 @@
 				F8AF11FC24B27A6D00AE5BA2 /* LibreOOPWebServerResponse.swift in Sources */,
 				F8F9723123A5915900C3F17D /* M5StackAuthenticateTXMessage.swift in Sources */,
 				F8F9721223A5915900C3F17D /* FirmwareVersionTxMessage.swift in Sources */,
+				F80D916824F7086D006840B5 /* Libre2BluetoothPeripheralViewModel.swift in Sources */,
 				F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */,
 				F8025E6B21F7CD7600ECF0C0 /* UIStoryboard.swift in Sources */,
 				F830991D23C2909E005741DF /* Watlaa+CoreDataProperties.swift in Sources */,
@@ -2727,6 +2776,7 @@
 				F80859292364D61B00F3829D /* UserDefaults+charts.swift in Sources */,
 				F8B3A7B2226A0878004BA588 /* TextsAlerts.swift in Sources */,
 				F8297F46238DC4AC00D74D66 /* BluetoothPeripheralManaging.swift in Sources */,
+				F80D917024F85C7A006840B5 /* Libre2+BluetoothPeripheral.swift in Sources */,
 				F8F9721423A5915900C3F17D /* AuthChallengeRxMessage.swift in Sources */,
 				F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */,
 				F81FA00A228F53680028C70F /* TextsHomeView.swift in Sources */,
@@ -2850,6 +2900,7 @@
 				F8F9720823A5915900C3F17D /* BatteryStatusTxMessage.swift in Sources */,
 				F8F9721C23A5915900C3F17D /* LibreOOPResponse.swift in Sources */,
 				F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */,
+				F80D916524F5B3DE006840B5 /* Libre2+CoreDataClass.swift in Sources */,
 				F898EDF2234A8A0500BFB79B /* UInt8.swift in Sources */,
 				F8DF766423E781C100063910 /* BLEPeripheralAccessor.swift in Sources */,
 				F816E12124392D40009EE65B /* DropletBluetoothPeripheralViewModel.swift in Sources */,
@@ -2908,7 +2959,9 @@
 				F816E11E24392690009EE65B /* BluetoothPeripheralManager+CGMDropletTransmitterDelegate.swift in Sources */,
 				F821CF6B229FC22D005C1E43 /* Endpoint.swift in Sources */,
 				F821CF58229BF43A005C1E43 /* AlertManager.swift in Sources */,
+				F80D916B24F82913006840B5 /* CGMLibre2Transmitter.swift in Sources */,
 				F8297F59238EE14E00D74D66 /* TextsBluetoothPeripheralsView.swift in Sources */,
+				F80D916424F5B3DE006840B5 /* Libre2+CoreDataProperties.swift in Sources */,
 				F898EDEC233F549100BFB79B /* UIBarButtonItem.swift in Sources */,
 				F816E0E42432A4FA009EE65B /* CGMBluconTransmitterDelegate.swift in Sources */,
 				F8A389CF232AE2EA0010F405 /* M5StackSettingsViewController.swift in Sources */,
@@ -3402,6 +3455,7 @@
 		F8AC429F21B31F160078C348 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				F80D916124F5AA62006840B5 /* xdrip v12.xcdatamodel */,
 				F8DF765123E34E6A00063910 /* xdrip v11.xcdatamodel */,
 				F8DF764E23DCF64F00063910 /* xdrip v10.xcdatamodel */,
 				F830991523C28E79005741DF /* xdrip v9.xcdatamodel */,
@@ -3414,7 +3468,7 @@
 				F85C4A93233632EC00D6A86F /* xdrip v2.xcdatamodel */,
 				F8AC42A021B31F160078C348 /* xdrip.xcdatamodel */,
 			);
-			currentVersion = F8DF765123E34E6A00063910 /* xdrip v11.xcdatamodel */;
+			currentVersion = F80D916124F5AA62006840B5 /* xdrip v12.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

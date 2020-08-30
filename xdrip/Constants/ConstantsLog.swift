@@ -43,6 +43,9 @@ enum ConstantsLog {
     /// Blucon
     static let categoryBlucon =                      "Blucon                        "
     
+    /// Libre2
+    static let categoryCGMLibre2 =                   "Libre2                        "
+    
     /// core data manager
     static let categoryCoreDataManager =             "CoreDataManager               "
     
@@ -132,5 +135,6 @@ enum ConstantsLog {
     
     /// trace
     static let categoryTraceSettingsViewModel =      "TraceSettingsViewModel"
+    
 }
 
