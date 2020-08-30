@@ -278,7 +278,7 @@ class BluetoothPeripheralManager: NSObject {
                         
                     }
                     
-                case .Libre2Type:
+                /*case .Libre2Type:
                     
                     if let libre2 = blePeripheral.libre2 {
                         
@@ -304,7 +304,7 @@ class BluetoothPeripheralManager: NSObject {
                         }
                         
                         
-                    }
+                    }*/
                     
                 case .DropletType:
                     
@@ -486,7 +486,7 @@ class BluetoothPeripheralManager: NSObject {
                     // no need to send reading to watlaa in master mode
                     break
                     
-                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .Libre2Type:
+                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type/*, .Libre2Type*/:
                     // cgm's don't receive reading, they send it
                     break
                     
@@ -682,7 +682,7 @@ class BluetoothPeripheralManager: NSObject {
                         }
                     }
                     
-                case .Libre2Type:
+                /*case .Libre2Type:
                     
                     if let libre2 = bluetoothPeripheral as? Libre2 {
                         
@@ -696,7 +696,7 @@ class BluetoothPeripheralManager: NSObject {
                             
                         }
                         
-                    }
+                    }*/
 
                 }
                 
@@ -777,10 +777,10 @@ class BluetoothPeripheralManager: NSObject {
                     return .DexcomG4Type
                 }
                 
-            case .Libre2Type:
+            /*case .Libre2Type:
                 if bluetoothTransmitter is CGMLibre2Transmitter {
                     return .Libre2Type
-                }
+                }*/
                 
             }
             
@@ -878,13 +878,13 @@ class BluetoothPeripheralManager: NSObject {
             
             return CGMG4xDripTransmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMDexcomG4TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
 
-        case .Libre2Type:
+        /*case .Libre2Type:
             
             guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
                 fatalError("in createNewTransmitter, Libre2Type, cgmTransmitterDelegate is nil")
             }
             
-            return CGMLibre2Transmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMLibre2TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: nil)
+            return CGMLibre2Transmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMLibre2TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: nil)*/
 
         }
         
@@ -1129,7 +1129,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .WatlaaType, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .Libre2Type:
+            case .WatlaaType, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type/*, .Libre2Type*/:
 
                 // oop website and oop web token need to be checked
                 switch keyPathEnum {

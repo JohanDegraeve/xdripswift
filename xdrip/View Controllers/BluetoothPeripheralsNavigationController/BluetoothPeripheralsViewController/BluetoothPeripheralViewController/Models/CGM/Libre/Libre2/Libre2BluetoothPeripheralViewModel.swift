@@ -87,11 +87,13 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     }
     
     func screenTitle() -> String {
-        return BluetoothPeripheralType.Libre2Type.rawValue
+        return "Libre2"
+        //return BluetoothPeripheralType.Libre2Type.rawValue
     }
     
     func sectionTitle(forSection section: Int) -> String {
-        return BluetoothPeripheralType.Libre2Type.rawValue
+        return "Libre2"
+        //return BluetoothPeripheralType.Libre2Type.rawValue
     }
     
     func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral) {

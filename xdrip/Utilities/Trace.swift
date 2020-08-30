@@ -442,12 +442,12 @@ class Trace {
                             
                         }
                         
-                    case .Libre2Type:
+                    /*case .Libre2Type:
                         if let libre2 = blePeripheral.libre2 {
                             
                             traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
 
-                        }
+                        }*/
 
                     }
                 }

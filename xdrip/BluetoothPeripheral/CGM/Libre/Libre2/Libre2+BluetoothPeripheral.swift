@@ -3,7 +3,8 @@ import Foundation
 extension Libre2: BluetoothPeripheral {
     
     func bluetoothPeripheralType() -> BluetoothPeripheralType {
-        return .Libre2Type
+        return .BluconType
+        //return .Libre2Type
     }
     
     func overrideNeedsOOPWeb() -> Bool {

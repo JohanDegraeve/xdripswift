@@ -94,7 +94,8 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     func setWebOOPToken(oopWebToken: String) {}
     
     func cgmTransmitterType() -> CGMTransmitterType {
-        return .Libre2
+        return .Blucon
+        //return .Libre2
     }
     
     func isWebOOPEnabled() -> Bool {

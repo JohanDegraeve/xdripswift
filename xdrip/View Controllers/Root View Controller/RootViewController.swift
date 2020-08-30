@@ -951,7 +951,7 @@ final class RootViewController: UIViewController {
             
             return DexcomCalibrator()
             
-        case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa, .Libre2:
+        case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa/*, .Libre2*/:
             
             if cgmTransmitter.isWebOOPEnabled() && !UserDefaults.standard.overrideWebOOPCalibration {
                 
