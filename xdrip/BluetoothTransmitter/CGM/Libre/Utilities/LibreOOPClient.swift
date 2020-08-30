@@ -106,8 +106,6 @@ class LibreOOPClient {
             "timestamp": "\(Date().toMillisecondsAsInt64())",
         ]
 
-        debuglogging("content = " + bytes.hexEncodedString())
-        
         if let uploadURL = URL(string: "\(oopWebSite)/calibrateSensor") {
             var request = URLRequest(url: uploadURL)
             request.httpMethod = "POST"
@@ -157,9 +155,9 @@ class LibreOOPClient {
                     
                 }
                 
-                // if debug level tracing, then log the data as String
+                // log the data as String
                 if let dataAsString = String(bytes: data, encoding: .utf8), UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-                    trace("in createDataTaskAndHandleResponse, data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug, dataAsString)
+                    trace("in createDataTaskAndHandleResponse, data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info, dataAsString)
                 }
                 
                 // data is not nil, let's try to do json decoding
