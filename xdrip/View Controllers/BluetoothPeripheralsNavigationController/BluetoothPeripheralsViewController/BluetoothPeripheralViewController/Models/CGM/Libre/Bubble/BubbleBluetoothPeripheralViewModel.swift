@@ -305,7 +305,6 @@ extension BubbleBluetoothPeripheralViewModel: CGMBubbleTransmitterDelegate {
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(libreSensorType: libreSensorType, from: cGMBubbleTransmitter)
 
         // inform bluetoothPeripheralViewController that sensor type was received
-        // if libre2 or libreUs, then
         onLibreSensorTypeReceived?(libreSensorType)
 
         // here's the trigger to update the table row for sensorType

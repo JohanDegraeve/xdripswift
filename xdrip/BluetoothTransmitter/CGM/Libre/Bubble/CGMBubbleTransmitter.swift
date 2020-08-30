@@ -222,19 +222,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                     
                                     if let firmware = firmware?.toDouble(), firmware < 2.6 {
                                         
-                                        var libreData = rxBuffer.subdata(in: bubbleHeaderLength..<rxBuffer.count)
-                                        
-                                        let uid = rxBuffer[0..<bubbleHeaderLength].bytes
-                                        
-                                        if let info = patchInfo?.hexadecimal() {
-                                            
-                                            trace("    decrypting libre data", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
-                                            libreData = Data(PreLibre2.decryptFRAM(uid, info.bytes, libreData.bytes))
-                                            
-                                        }
-                                        
-                                        // replace 344 bytes to Decrypted data
-                                        rxBuffer.replaceSubrange(bubbleHeaderLength..<rxBuffer.count, with: libreData)
+                                        dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer, headerLength: bubbleHeaderLength, log: log, patchInfo: patchInfo)
                                         
                                     } else {
                                         
@@ -245,12 +233,13 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                     dataIsDecryptedToLibre1Format = true
                                     
                                 }
-                            }
-                            
-                            // now except libreProH, all libres' 344 data is libre1 format
-                            // should crc check
-                            guard crcIsOk(rxBuffer: &self.rxBuffer, patchInfo: patchInfo, bubbleHeaderLength: bubbleHeaderLength, log: log) else {
-                                return
+                                
+                                // now except libreProH, all libres' 344 data is libre1 format
+                                // should crc check
+                                guard libreSensorType.crcIsOk(rxBuffer: &self.rxBuffer, headerLength: bubbleHeaderLength, log: log) else {
+                                    return
+                                }
+
                             }
                             
                             // did we receive a serialNumber ?
@@ -396,34 +385,6 @@ fileprivate enum BubbleResponseType: UInt8 {
     /// if firmware >= 2.6, write [0x08, 0x01, 0x00, 0x00, 0x00, 0x2B]
     /// bubble will decrypt the libre2 data and return it
     case decryptedDataPacket = 136 // 0x88
-}
-
-fileprivate func crcIsOk(rxBuffer:inout Data, patchInfo: String?, bubbleHeaderLength: Int, log: OSLog) -> Bool {
-    
-    // get sensortype, and dependent on sensortype get crc
-    if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {// should always return a value
-        
-        // crc check not for libreProH
-        if libreSensorType != .libreProH {
-            
-            guard Crc.LibreCrc(data: &rxBuffer, headerOffset: bubbleHeaderLength) else {
-                trace("    in crcIsOk, CRC check failed, no further processing", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
-                return false
-            }
-            
-        }
-        
-        // do this for tracing only, not processing will continue if crc check fails
-        if libreSensorType == .libreProH {
-            
-            trace("    libreProH sensor, no CRC check", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
-            
-        }
-        
-    }
-
-    return true
-
 }
 
 extension BubbleResponseType: CustomStringConvertible {

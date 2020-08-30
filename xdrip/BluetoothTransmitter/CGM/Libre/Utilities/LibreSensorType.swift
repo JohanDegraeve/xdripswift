@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 // sourcre https://github.com/gui-dos/DiaBLE
 
@@ -55,6 +56,59 @@ public enum LibreSensorType: String {
         
     }
     
+    /// decrypts for libre2 and libreUs,
+    func decryptIfPossibleAndNeeded(rxBuffer:inout Data, headerLength: Int, log: OSLog, patchInfo: String?) -> Bool {
+        
+        // decrypt of libre2 or libreUS
+        if self == .libre2 || self == .libreUS {
+            
+            var libreData = rxBuffer.subdata(in: headerLength..<rxBuffer.count)
+            
+            let uid = rxBuffer[0..<headerLength].bytes
+            
+            if let info = patchInfo?.hexadecimal() {
+                
+                trace("    decrypting libre data", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                libreData = Data(PreLibre2.decryptFRAM(uid, info.bytes, libreData.bytes))
+                
+            } else {
+                
+                return false
+                
+            }
+            
+            // replace 344 bytes to Decrypted data
+            rxBuffer.replaceSubrange(headerLength..<rxBuffer.count, with: libreData)
+            
+            return true
+
+        }
+        
+        return false
+        
+    }
+    
+    /// checks crc if needed for the sensor type (not for libreProH)
+    func crcIsOk(rxBuffer:inout Data, headerLength: Int, log: OSLog) -> Bool {
+        
+        switch self {
+            
+        case .libreProH:
+            trace("    libreProH sensor, no CRC check", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+            
+        case .libre1, .libre1A2, .libre2, .libreUS:
+            
+            guard Crc.LibreCrc(data: &rxBuffer, headerOffset: headerLength) else {
+                trace("    in crcIsOk, CRC check failed", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                return false
+            }
+            
+        }
+        
+        return true
+        
+    }
+
     /// - reads the first byte in patchInfo and dependent on that value, returns type of sensor
     /// - if patchInfo = nil, then returnvalue is Libre1
     /// - if first byte is unknown, then returns nil

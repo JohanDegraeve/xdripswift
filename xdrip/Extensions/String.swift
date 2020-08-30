@@ -182,6 +182,7 @@ extension String {
         
     }
     
+    /// creates Data using String in hex format, same result as Data(hexadecimalString: String)
     func hexadecimal() -> Data? {
         var data = Data(capacity: count / 2)
         
