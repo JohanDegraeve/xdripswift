@@ -57,18 +57,27 @@ public enum LibreSensorType: String {
     }
     
     /// decrypts for libre2 and libreUs,
-    func decryptIfPossibleAndNeeded(rxBuffer:inout Data, headerLength: Int, log: OSLog, patchInfo: String?) -> Bool {
+    func decryptIfPossibleAndNeeded(rxBuffer:inout Data, headerLength: Int, log: OSLog?, patchInfo: String?, uid: [UInt8]) -> Bool {
         
-        // decrypt of libre2 or libreUS
+        // index of last byte to process
+        let rxBufferEnd = headerLength + 344 - 1
+        
+        // rxBuffer size should be at least headerLength + 344, if not don't further process
+        guard rxBuffer.count >= headerLength + 344 else {
+            return false
+        }
+        
+        // decrypt if libre2 or libreUS
         if self == .libre2 || self == .libreUS {
             
-            var libreData = rxBuffer.subdata(in: headerLength..<rxBuffer.count)
-            
-            let uid = rxBuffer[0..<headerLength].bytes
-            
+            var libreData = rxBuffer.subdata(in: headerLength..<(rxBufferEnd + 1))
+
             if let info = patchInfo?.hexadecimal() {
                 
-                trace("    decrypting libre data", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                if let log = log {
+                    trace("    decrypting libre data", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                }
+                
                 libreData = Data(PreLibre2.decryptFRAM(uid, info.bytes, libreData.bytes))
                 
             } else {
@@ -78,7 +87,7 @@ public enum LibreSensorType: String {
             }
             
             // replace 344 bytes to Decrypted data
-            rxBuffer.replaceSubrange(headerLength..<rxBuffer.count, with: libreData)
+            rxBuffer.replaceSubrange(headerLength..<(rxBufferEnd + 1), with: libreData)
             
             return true
 
@@ -89,17 +98,24 @@ public enum LibreSensorType: String {
     }
     
     /// checks crc if needed for the sensor type (not for libreProH)
-    func crcIsOk(rxBuffer:inout Data, headerLength: Int, log: OSLog) -> Bool {
+    func crcIsOk(rxBuffer:inout Data, headerLength: Int, log: OSLog?) -> Bool {
         
         switch self {
             
         case .libreProH:
-            trace("    libreProH sensor, no CRC check", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+            
+            if let log = log {
+                trace("    libreProH sensor, no CRC check", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+            }
             
         case .libre1, .libre1A2, .libre2, .libreUS:
             
             guard Crc.LibreCrc(data: &rxBuffer, headerOffset: headerLength) else {
-                trace("    in crcIsOk, CRC check failed", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                
+                if let log = log {
+                    trace("    in crcIsOk, CRC check failed", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                }
+                
                 return false
             }
             

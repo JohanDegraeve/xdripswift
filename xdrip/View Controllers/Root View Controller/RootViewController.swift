@@ -291,6 +291,17 @@ final class RootViewController: UIViewController {
                 
             }
             
+            var testdataasstring = "28016b42ed2376270100a407e02200071001d1246b4186be53d1bea85da560c2f84bc0b4e27211a4d51b8d23f823de2a56b6c8e010fce2d5e72e1ddc3679f9faa0af3869550e0f99e03e6b2c4551de159ef79035a16f336b7ea22b50a53775ad7747c0b2bae541ee87138cff9f9e1e455673c95af36bc026f41607df3b4e75f89ea2"
+            
+            testdataasstring = testdataasstring + "f9c6ed40d8f63af7b7decaa4984a4893d32f4777aee1be0f725e8f9c97551b910ebbab574a37e3fd380f730fb884bca0b3179e4815de2df4888e3ffc9969f386ec377a2e77bdcf253ddac42fec9b492c07176aa7d8f918d91cceb97804a1efe571d4b35eac47e5b254027bf66fc49b58f386e32986f66f80cfb7673d5818610c460f"
+            
+            testdataasstring = testdataasstring + "01d640772d4c0f5409fccbded2f9654f84cba3c979ae111179d0afb28dbbb621b5012e3eb862fd6f0c737559a700fb456a8c373a0ede334c99a91a1861d2de5576cb73ebd28718653821ed42778f31d66ef7c817ea8fe1783463d7d8d787850b0734fcd62d1d299d083001d300"
+
+            if let testdataasdata = Data(hexadecimalString: testdataasstring) {
+                CGMMiaoMiaoTransmitter.testPeripheralDidUpdateValue(value: testdataasdata)
+
+            }
+            
         })
         
         // Setup View

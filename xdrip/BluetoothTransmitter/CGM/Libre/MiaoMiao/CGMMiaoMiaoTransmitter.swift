@@ -186,7 +186,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 cGMMiaoMiaoTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
 
                                 // decrypt of libre2 or libreUS
-                                dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer, headerLength: miaoMiaoHeaderLength, log: log, patchInfo: patchInfo)
+                                dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer, headerLength: miaoMiaoHeaderLength, log: log, patchInfo: patchInfo, uid: rxBuffer[5..<13].bytes)
                                 
                                 // now except libreProH, all libres' 344 data is libre1 format
                                 // should crc check
@@ -357,6 +357,114 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         rxBuffer = Data()
         timestampLastPacketReception = Date()
         resendPacketCounter = 0
+    }
+
+    /// to make tests, value should be full data packet, ie full rxbuffer
+    public static func testPeripheralDidUpdateValue(value: Data) {
+        
+        let miaoMiaoHeaderLength = 18
+        
+        var sensorSerialNumber:String = "hello"
+        
+        var rxBuffer = value
+        
+        //check type of message and process according to type
+        if let firstByte = rxBuffer.first {
+            if let miaoMiaoResponseState = MiaoMiaoResponseType(rawValue: firstByte) {
+                switch miaoMiaoResponseState {
+                    
+                case .dataPacket:
+                    //if buffer complete, then start processing
+                    if rxBuffer.count >= 363  {
+                        
+                        /// gives information about type of sensor (Libre1, Libre2, etc..) - if transmitter doesn't offer patchInfo, then use nil value, which corresponds to Libre 1
+                        var patchInfo: String?
+                        
+                        // first off all see if the buffer contains patchInfo, and if yes send to delegate
+                        if rxBuffer.count >= 369 {
+                            
+                            patchInfo = Data(rxBuffer[363...368]).hexEncodedString().uppercased()
+                            
+                            if let patchInfo = patchInfo {
+                                debuglogging("received patchInfo " + patchInfo)
+                            }
+                            
+                        }
+                        
+                        var dataIsDecryptedToLibre1Format = false
+                        
+                        if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
+                            // note that we should always have a libreSensorType
+                            
+                            debuglogging("libresensortype = " + libreSensorType.description)
+                            
+                            // decrypt of libre2 or libreUS
+                            dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer, headerLength: miaoMiaoHeaderLength, log: nil, patchInfo: patchInfo, uid: rxBuffer[5..<13].bytes)
+                            
+                            // now except libreProH, all libres' 344 data is libre1 format
+                            // should crc check
+                            guard libreSensorType.crcIsOk(rxBuffer: &rxBuffer, headerLength: miaoMiaoHeaderLength, log: nil) else {
+                                
+                                debuglogging("crc is not ok")
+                                
+                                return
+                                
+                            }
+                            
+                        }
+                        
+                        //get MiaoMiao info from MiaoMiao header
+                        //let firmware = String(describing: rxBuffer[14...15].hexEncodedString())
+                        //let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
+                        //let batteryPercentage = Int(rxBuffer[13])
+                        
+                        // get sensor serialNumber and if changed inform delegate
+                        if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
+                            
+                            // (there will also be a seperate opcode form MiaoMiao because it's able to detect new sensor also)
+                            if libreSensorSerialNumber.serialNumber != sensorSerialNumber {
+                                
+                                sensorSerialNumber = libreSensorSerialNumber.serialNumber
+                                
+                                debuglogging("    new sensor detected :  " + libreSensorSerialNumber.serialNumber)
+                                
+                            }
+                            
+                        }
+                        
+                        LibreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: patchInfo, webOOPEnabled: false, oopWebSite: ConstantsLibre.site, oopWebToken: ConstantsLibre.token, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: nil, timeStampLastBgReading: Date(timeIntervalSince1970: 0), dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, completionHandler: { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
+                            
+                            if let timeStampLastBgReading = timeStampLastBgReading {
+                                debuglogging("timeStampLastBgReading = " + timeStampLastBgReading.description(with: .current))
+                            }
+                            
+                            if let sensorState = sensorState {
+                                debuglogging("sensorstate = " + sensorState.description)
+                            }
+                            
+                            
+                        })
+                        
+                        
+                    }
+                    
+                case .frequencyChangedResponse:
+                    break
+                    
+                case .newSensor:
+                    break
+                    
+                case .noSensor:
+                    break
+                    
+                }
+            } else {
+                //rxbuffer doesn't start with a known miaomiaoresponse
+                //reset the buffer and send start reading command
+                
+            }
+        }
+
     }
     
 }
