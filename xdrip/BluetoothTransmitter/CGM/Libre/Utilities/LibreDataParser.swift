@@ -125,7 +125,11 @@ class LibreDataParser {
             
             // if data is already decrypted then process the data as if it were a libre1 sensor type
             if dataIsDecryptedToLibre1Format {
+                
                 libre1DataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, libreSensorType: libreSensorType, libreData: libreData, timeStampLastBgReading: timeStampLastBgReading, cgmTransmitterDelegate: cgmTransmitterDelegate, oopWebSite: oopWebSite, oopWebToken: oopWebToken, completionHandler: completionHandler)
+                
+                return
+                
             }
             
             switch libreSensorType {
