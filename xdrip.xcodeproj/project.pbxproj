@@ -240,6 +240,14 @@
 		F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */; };
 		F8691888239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8691887239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift */; };
 		F869188C23A044340065B607 /* TextsM5StackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F869188B23A044340065B607 /* TextsM5StackView.swift */; };
+		F870D3D325126A49008967B0 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F870D3D225126A49008967B0 /* NotificationCenter.framework */; };
+		F870D3D625126A49008967B0 /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3D525126A49008967B0 /* TodayViewController.swift */; };
+		F870D3D925126A49008967B0 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F870D3D725126A49008967B0 /* MainInterface.storyboard */; };
+		F870D3DD25126A49008967B0 /* xDrip4iOS.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = F870D3D125126A49008967B0 /* xDrip4iOS.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F870D3EA25129C43008967B0 /* Glucose+GlucoseKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3E925129C43008967B0 /* Glucose+GlucoseKit.swift */; };
+		F870D3EC25129FC2008967B0 /* XDripClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3EB25129FC2008967B0 /* XDripClient.swift */; };
+		F870D3EE2513B786008967B0 /* Trace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3ED2513B786008967B0 /* Trace.swift */; };
+		F870D3F125149EA0008967B0 /* TextsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3F025149EA0008967B0 /* TextsCommon.swift */; };
 		F878FA7D2405B3CF00BC6DA6 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F878FA7C2405B3CF00BC6DA6 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift */; };
 		F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F889CB71236D84AC00A81068 /* M5StackView.strings */; };
 		F890E07A247687AE008FB2EC /* URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = F890E079247687AE008FB2EC /* URL.swift */; };
@@ -461,6 +469,30 @@
 		F8F9724723A69A8000C3F17D /* BluetoothPeripheralCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F9724623A69A8000C3F17D /* BluetoothPeripheralCategory.swift */; };
 		F8F9724923A69DAE00C3F17D /* M5StickC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F9724823A69DAE00C3F17D /* M5StickC.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F870D3DB25126A49008967B0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F8AC425221ADEBD60078C348 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F870D3D025126A49008967B0;
+			remoteInfo = "xDrip4iOS Widget";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F870D3DE25126A49008967B0 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F870D3DD25126A49008967B0 /* xDrip4iOS.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.debug.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.debug.xcconfig"; sourceTree = "<group>"; };
@@ -729,6 +761,16 @@
 		F86A3C78247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F86A3C79247718C800EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F86A3C7A247718C800EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Main.strings; sourceTree = "<group>"; };
+		F870D3D125126A49008967B0 /* xDrip4iOS.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = xDrip4iOS.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F870D3D225126A49008967B0 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
+		F870D3D525126A49008967B0 /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
+		F870D3D825126A49008967B0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		F870D3DA25126A49008967B0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F870D3E22512701E008967B0 /* xDrip4iOS Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "xDrip4iOS Widget.entitlements"; sourceTree = "<group>"; };
+		F870D3E925129C43008967B0 /* Glucose+GlucoseKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Glucose+GlucoseKit.swift"; sourceTree = "<group>"; };
+		F870D3EB25129FC2008967B0 /* XDripClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XDripClient.swift; sourceTree = "<group>"; };
+		F870D3ED2513B786008967B0 /* Trace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trace.swift; sourceTree = "<group>"; };
+		F870D3F025149EA0008967B0 /* TextsCommon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextsCommon.swift; sourceTree = "<group>"; };
 		F878FA7C2405B3CF00BC6DA6 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift"; sourceTree = "<group>"; };
 		F889CB70236D84AC00A81068 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/M5StackView.strings; sourceTree = "<group>"; };
 		F889CB8D236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -1037,6 +1079,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		F870D3CE25126A49008967B0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F870D3D325126A49008967B0 /* NotificationCenter.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8AC425721ADEBD60078C348 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1054,6 +1104,7 @@
 			children = (
 				F821CF9622AE589E005C1E43 /* HealthKit.framework */,
 				662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */,
+				F870D3D225126A49008967B0 /* NotificationCenter.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1530,6 +1581,37 @@
 			path = "Application Delegate";
 			sourceTree = "<group>";
 		};
+		F870D3D425126A49008967B0 /* xDrip4iOS Widget */ = {
+			isa = PBXGroup;
+			children = (
+				F870D3EF25149EA0008967B0 /* Texts */,
+				F870D3E825129C0B008967B0 /* xDripClient */,
+				F870D3E22512701E008967B0 /* xDrip4iOS Widget.entitlements */,
+				F870D3D525126A49008967B0 /* TodayViewController.swift */,
+				F870D3D725126A49008967B0 /* MainInterface.storyboard */,
+				F870D3DA25126A49008967B0 /* Info.plist */,
+			);
+			path = "xDrip4iOS Widget";
+			sourceTree = "<group>";
+		};
+		F870D3E825129C0B008967B0 /* xDripClient */ = {
+			isa = PBXGroup;
+			children = (
+				F870D3EB25129FC2008967B0 /* XDripClient.swift */,
+				F870D3E925129C43008967B0 /* Glucose+GlucoseKit.swift */,
+				F870D3ED2513B786008967B0 /* Trace.swift */,
+			);
+			path = xDripClient;
+			sourceTree = "<group>";
+		};
+		F870D3EF25149EA0008967B0 /* Texts */ = {
+			isa = PBXGroup;
+			children = (
+				F870D3F025149EA0008967B0 /* TextsCommon.swift */,
+			);
+			path = Texts;
+			sourceTree = "<group>";
+		};
 		F8A389CD232A6A6F0010F405 /* M5StackSettingsViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -1543,6 +1625,7 @@
 			isa = PBXGroup;
 			children = (
 				F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */,
+				F870D3D425126A49008967B0 /* xDrip4iOS Widget */,
 				F8AC425B21ADEBD60078C348 /* Products */,
 				F8AC425C21ADEBD60078C348 /* xdrip */,
 				F85DC29B21CFCEB800B9F74A /* Recovered References */,
@@ -1555,6 +1638,7 @@
 			isa = PBXGroup;
 			children = (
 				F8AC425A21ADEBD60078C348 /* xdrip.app */,
+				F870D3D125126A49008967B0 /* xDrip4iOS.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2400,6 +2484,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		F870D3D025126A49008967B0 /* xDrip4iOS Widget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F870D3E125126A49008967B0 /* Build configuration list for PBXNativeTarget "xDrip4iOS Widget" */;
+			buildPhases = (
+				F870D3CD25126A49008967B0 /* Sources */,
+				F870D3CE25126A49008967B0 /* Frameworks */,
+				F870D3CF25126A49008967B0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "xDrip4iOS Widget";
+			productName = "xDrip4iOS Widget";
+			productReference = F870D3D125126A49008967B0 /* xDrip4iOS.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		F8AC425921ADEBD60078C348 /* xdrip */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F8AC426E21ADEBD70078C348 /* Build configuration list for PBXNativeTarget "xdrip" */;
@@ -2410,10 +2511,12 @@
 				F8AC425821ADEBD60078C348 /* Resources */,
 				F5EEC1C2586E9EA94DC6DBC7 /* [CP] Embed Pods Frameworks */,
 				F84F2BEC22EF80B300313474 /* ShellScript */,
+				F870D3DE25126A49008967B0 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F870D3DC25126A49008967B0 /* PBXTargetDependency */,
 			);
 			name = xdrip;
 			productName = xdrip;
@@ -2426,10 +2529,14 @@
 		F8AC425221ADEBD60078C348 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1010;
+				DefaultBuildSystemTypeForWorkspace = Latest;
+				LastSwiftUpdateCheck = 1170;
 				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = "Johan Degraeve";
 				TargetAttributes = {
+					F870D3D025126A49008967B0 = {
+						CreatedOnToolsVersion = 11.7;
+					};
 					F8AC425921ADEBD60078C348 = {
 						CreatedOnToolsVersion = 10.1;
 						LastSwiftMigration = 1030;
@@ -2471,11 +2578,20 @@
 			projectRoot = "";
 			targets = (
 				F8AC425921ADEBD60078C348 /* xdrip */,
+				F870D3D025126A49008967B0 /* xDrip4iOS Widget */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		F870D3CF25126A49008967B0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F870D3D925126A49008967B0 /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8AC425821ADEBD60078C348 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2691,6 +2807,18 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		F870D3CD25126A49008967B0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F870D3D625126A49008967B0 /* TodayViewController.swift in Sources */,
+				F870D3EE2513B786008967B0 /* Trace.swift in Sources */,
+				F870D3EC25129FC2008967B0 /* XDripClient.swift in Sources */,
+				F870D3EA25129C43008967B0 /* Glucose+GlucoseKit.swift in Sources */,
+				F870D3F125149EA0008967B0 /* TextsCommon.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8AC425621ADEBD60078C348 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3005,6 +3133,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		F870D3DC25126A49008967B0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F870D3D025126A49008967B0 /* xDrip4iOS Widget */;
+			targetProxy = F870D3DB25126A49008967B0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		470CE1FE246802EB00D5CB74 /* BluetoothPeripheralsView.strings */ = {
 			isa = PBXVariantGroup;
@@ -3026,6 +3162,14 @@
 				F86A3C6E247718C700EE7E46 /* ar */,
 			);
 			name = BluetoothPeripheralView.strings;
+			sourceTree = "<group>";
+		};
+		F870D3D725126A49008967B0 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F870D3D825126A49008967B0 /* Base */,
+			);
+			name = MainInterface.storyboard;
 			sourceTree = "<group>";
 		};
 		F889CB71236D84AC00A81068 /* M5StackView.strings */ = {
@@ -3253,6 +3397,52 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		F870D3DF25126A49008967B0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APP_GROUP_IDENTIFIER = "group.com.$(TeamIdentifierPrefix)loopkit.LoopGroup";
+				CODE_SIGN_ENTITLEMENTS = "xDrip4iOS Widget/xDrip4iOS Widget.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = RNX44PP998;
+				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
+				PRODUCT_NAME = xDrip4iOS;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F870D3E025126A49008967B0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APP_GROUP_IDENTIFIER = "group.com.$(TeamIdentifierPrefix)loopkit.LoopGroup";
+				CODE_SIGN_ENTITLEMENTS = "xDrip4iOS Widget/xDrip4iOS Widget.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = RNX44PP998;
+				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
+				PRODUCT_NAME = xDrip4iOS;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		F8AC426C21ADEBD70078C348 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3375,6 +3565,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				APP_GROUP_IDENTIFIER = "group.com.$(TeamIdentifierPrefix)loopkit.LoopGroup";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -3404,6 +3595,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E2648F65F347D56D7DFFFAB7 /* Pods-xdrip.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				APP_GROUP_IDENTIFIER = "group.com.$(TeamIdentifierPrefix)loopkit.LoopGroup";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -3431,6 +3623,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		F870D3E125126A49008967B0 /* Build configuration list for PBXNativeTarget "xDrip4iOS Widget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F870D3DF25126A49008967B0 /* Debug */,
+				F870D3E025126A49008967B0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F8AC425521ADEBD60078C348 /* Build configuration list for PBXProject "xdrip" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

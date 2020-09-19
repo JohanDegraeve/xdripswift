@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.3" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="M4Y-Lb-cyx">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Today View Controller-->
+        <scene sceneID="cwh-vc-ff4">
+            <objects>
+                <viewController id="M4Y-Lb-cyx" customClass="TodayViewController" customModule="xDrip4iOS" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="103"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Usa-lp-vmV" userLabel="Minutes Label Outlet">
+                                <rect key="frame" x="0.0" y="5" width="42" height="29"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="otr-CI-Hqi" userLabel="Value Label Outlet">
+                                <rect key="frame" x="0.0" y="119.5" width="320" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="Usa-lp-vmV" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" id="0fe-7e-MSM"/>
+                            <constraint firstAttribute="trailing" secondItem="otr-CI-Hqi" secondAttribute="trailing" id="2q3-jt-nac"/>
+                            <constraint firstItem="ssy-KU-ocm" firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="otr-CI-Hqi" secondAttribute="bottom" id="5L0-0E-63f"/>
+                            <constraint firstItem="Usa-lp-vmV" firstAttribute="top" secondItem="S3S-Oj-5AN" secondAttribute="top" constant="5" id="9Ko-DH-4lo"/>
+                            <constraint firstItem="otr-CI-Hqi" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" id="o82-vA-KE3"/>
+                            <constraint firstItem="otr-CI-Hqi" firstAttribute="top" secondItem="Usa-lp-vmV" secondAttribute="bottom" constant="38" id="zp7-5t-X5p" userLabel="Value Label Outlet.top = Minutes Label Outlet.bottom + 5"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="ssy-KU-ocm"/>
+                    </view>
+                    <extendedEdge key="edgesForExtendedLayout"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="320" height="103"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="137.68115942028987" y="108.81696428571428"/>
+        </scene>
+    </scenes>
+</document>
