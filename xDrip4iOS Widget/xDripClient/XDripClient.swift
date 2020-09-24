@@ -18,7 +18,7 @@ private let maxAttempts = 2
 
 public class XDripClient {
     
-    private let shared: UserDefaults?
+    public let shared: UserDefaults?
     
     public init(_ group: String? = Bundle.main.appGroupSuiteName) {
         shared = UserDefaults(suiteName: group)

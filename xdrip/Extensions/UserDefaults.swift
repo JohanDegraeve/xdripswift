@@ -1,6 +1,20 @@
 import Foundation
 
 extension UserDefaults {
+    
+    /// shared user defaults
+    private static let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName)
+    
+    /// common function to be called if user default needs to be stored in shared user defaults
+    public static func storeInSharedUserDefaults(value: Any, forKey key: String) {
+        
+        // setting to be stored also in shared userdefaults because it's used by the today widget
+        if let sharedUserDefaults = sharedUserDefaults {
+            sharedUserDefaults.set(value, forKey: key)
+        }
+        
+    }
+
     /// keys for settings and user defaults. For reading and writing settings, the keys should not be used, the specific functions kan be used.
     public enum Key: String {
         // User configurable Settings
@@ -226,6 +240,10 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.bloodGlucoseUnitIsMgDl.rawValue)
+
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            UserDefaults.storeInSharedUserDefaults(value: !newValue, forKey: Key.bloodGlucoseUnitIsMgDl.rawValue)
+            
         }
     }
     
@@ -292,6 +310,10 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentHighMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentHighMarkValue.rawValue)
+
         }
     }
     
@@ -312,6 +334,10 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
+
         }
     }
     
@@ -352,6 +378,10 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.lowMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.lowMarkValue.rawValue)
+
         }
     }
     
@@ -372,6 +402,10 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentLowMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentLowMarkValue.rawValue)
+
         }
     }
     
@@ -386,6 +420,12 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.urgentHighMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            if let value = value {
+                UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.urgentHighMarkValue.rawValue)
+            }
+
         }
     }
     
@@ -400,6 +440,12 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.highMarkValue.rawValue)
+
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            if let value = value {
+                UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.highMarkValue.rawValue)
+            }
+
         }
     }
     
@@ -428,6 +474,12 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.lowMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            if let value = value {
+                UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.lowMarkValue.rawValue)
+            }
+
         }
     }
     
@@ -442,6 +494,12 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.urgentLowMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            if let value = value {
+                UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.urgentLowMarkValue.rawValue)
+            }
+
         }
     }
     

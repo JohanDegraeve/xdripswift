@@ -197,7 +197,7 @@ public class BgReading: NSManagedObject {
             }
         }
     }
-
+    
     func currentSlope(previousBgReading:BgReading?) -> Double {
         
         if let previousBgReading = previousBgReading {
