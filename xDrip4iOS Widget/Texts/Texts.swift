@@ -1,7 +1,7 @@
 import Foundation
 
 // all common texts 
-class Texts_Common {
+class Texts {
     static private let filename = "Common"
     
     static let minutes = {
@@ -26,6 +26,10 @@ class Texts_Common {
 
     static let mmol: String = {
         return NSLocalizedString("common_mmol", tableName: filename, bundle: Bundle.main, value: "mmol/l", comment: "mmol/l")
+    }()
+
+    static let ago:String = {
+        return NSLocalizedString("ago", tableName: filename, bundle: Bundle.main, value: "ago", comment: "where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'")
     }()
 
 }

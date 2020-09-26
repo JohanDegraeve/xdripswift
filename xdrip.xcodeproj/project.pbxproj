@@ -247,7 +247,6 @@
 		F870D3EA25129C43008967B0 /* Glucose+GlucoseKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3E925129C43008967B0 /* Glucose+GlucoseKit.swift */; };
 		F870D3EC25129FC2008967B0 /* XDripClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3EB25129FC2008967B0 /* XDripClient.swift */; };
 		F870D3EE2513B786008967B0 /* Trace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3ED2513B786008967B0 /* Trace.swift */; };
-		F870D3F125149EA0008967B0 /* TextsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3F025149EA0008967B0 /* TextsCommon.swift */; };
 		F878FA7D2405B3CF00BC6DA6 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F878FA7C2405B3CF00BC6DA6 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift */; };
 		F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F889CB71236D84AC00A81068 /* M5StackView.strings */; };
 		F890E07A247687AE008FB2EC /* URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = F890E079247687AE008FB2EC /* URL.swift */; };
@@ -405,11 +404,10 @@
 		F8E51D6924549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */; };
 		F8E53FAB2517733700052CE5 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FAA2517733700052CE5 /* Double.swift */; };
 		F8E53FAF2517739700052CE5 /* ConstantsBloodGlucose.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FAE2517739700052CE5 /* ConstantsBloodGlucose.swift */; };
-		F8E53FB32517F1A100052CE5 /* TextsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FB22517F1A100052CE5 /* TextsHomeView.swift */; };
 		F8E53FB92517F79400052CE5 /* ConstantsBGGraphBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FB82517F79400052CE5 /* ConstantsBGGraphBuilder.swift */; };
 		F8E53FBD2517F96800052CE5 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FBC2517F96800052CE5 /* Date.swift */; };
 		F8E53FCE251D35FB00052CE5 /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8E53FD0251D35FB00052CE5 /* Common.strings */; };
-		F8E53FD8251D376900052CE5 /* HomeView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8E53FDA251D376900052CE5 /* HomeView.strings */; };
+		F8E53FE9251F7B8800052CE5 /* Texts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FE8251F7B8800052CE5 /* Texts.swift */; };
 		F8E6C78C24CDDB83007C1199 /* SnoozeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */; };
 		F8E6C79024CEC22A007C1199 /* TextsSnooze.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */; };
 		F8E6C79124CEC2E3007C1199 /* Snooze.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8E6C79324CEC2E3007C1199 /* Snooze.strings */; };
@@ -777,7 +775,6 @@
 		F870D3E925129C43008967B0 /* Glucose+GlucoseKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Glucose+GlucoseKit.swift"; sourceTree = "<group>"; };
 		F870D3EB25129FC2008967B0 /* XDripClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XDripClient.swift; sourceTree = "<group>"; };
 		F870D3ED2513B786008967B0 /* Trace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trace.swift; sourceTree = "<group>"; };
-		F870D3F025149EA0008967B0 /* TextsCommon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextsCommon.swift; sourceTree = "<group>"; };
 		F878FA7C2405B3CF00BC6DA6 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift"; sourceTree = "<group>"; };
 		F889CB70236D84AC00A81068 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/M5StackView.strings; sourceTree = "<group>"; };
 		F889CB8D236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -1012,7 +1009,6 @@
 		F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTraceSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8E53FAA2517733700052CE5 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
 		F8E53FAE2517739700052CE5 /* ConstantsBloodGlucose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBloodGlucose.swift; sourceTree = "<group>"; };
-		F8E53FB22517F1A100052CE5 /* TextsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsHomeView.swift; sourceTree = "<group>"; };
 		F8E53FB82517F79400052CE5 /* ConstantsBGGraphBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBGGraphBuilder.swift; sourceTree = "<group>"; };
 		F8E53FBC2517F96800052CE5 /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		F8E53FCF251D35FB00052CE5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Common.strings; sourceTree = "<group>"; };
@@ -1023,12 +1019,7 @@
 		F8E53FD5251D361D00052CE5 /* es-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-ES"; path = "es-ES.lproj/Common.strings"; sourceTree = "<group>"; };
 		F8E53FD6251D363900052CE5 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Common.strings"; sourceTree = "<group>"; };
 		F8E53FD7251D363B00052CE5 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Common.strings; sourceTree = "<group>"; };
-		F8E53FD9251D376900052CE5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/HomeView.strings; sourceTree = "<group>"; };
-		F8E53FDD251D376E00052CE5 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/HomeView.strings; sourceTree = "<group>"; };
-		F8E53FDE251D376F00052CE5 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/HomeView.strings; sourceTree = "<group>"; };
-		F8E53FDF251D377900052CE5 /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/HomeView.strings"; sourceTree = "<group>"; };
-		F8E53FE0251D377A00052CE5 /* es-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-ES"; path = "es-ES.lproj/HomeView.strings"; sourceTree = "<group>"; };
-		F8E53FE3251D381D00052CE5 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/HomeView.strings; sourceTree = "<group>"; };
+		F8E53FE8251F7B8800052CE5 /* Texts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Texts.swift; sourceTree = "<group>"; };
 		F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeViewController.swift; sourceTree = "<group>"; };
 		F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsSnooze.swift; sourceTree = "<group>"; };
 		F8E6C79224CEC2E3007C1199 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Snooze.strings; sourceTree = "<group>"; };
@@ -1637,10 +1628,8 @@
 		F870D3EF25149EA0008967B0 /* Texts */ = {
 			isa = PBXGroup;
 			children = (
-				F870D3F025149EA0008967B0 /* TextsCommon.swift */,
-				F8E53FB22517F1A100052CE5 /* TextsHomeView.swift */,
+				F8E53FE8251F7B8800052CE5 /* Texts.swift */,
 				F8E53FD0251D35FB00052CE5 /* Common.strings */,
-				F8E53FDA251D376900052CE5 /* HomeView.strings */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -2621,7 +2610,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F8E53FD8251D376900052CE5 /* HomeView.strings in Resources */,
 				F870D3D925126A49008967B0 /* MainInterface.storyboard in Resources */,
 				F8E53FCE251D35FB00052CE5 /* Common.strings in Resources */,
 			);
@@ -2849,12 +2837,11 @@
 				F870D3D625126A49008967B0 /* TodayViewController.swift in Sources */,
 				F8E53FBD2517F96800052CE5 /* Date.swift in Sources */,
 				F8E53FAF2517739700052CE5 /* ConstantsBloodGlucose.swift in Sources */,
-				F8E53FB32517F1A100052CE5 /* TextsHomeView.swift in Sources */,
 				F870D3EE2513B786008967B0 /* Trace.swift in Sources */,
 				F870D3EC25129FC2008967B0 /* XDripClient.swift in Sources */,
 				F870D3EA25129C43008967B0 /* Glucose+GlucoseKit.swift in Sources */,
 				F8E53FAB2517733700052CE5 /* Double.swift in Sources */,
-				F870D3F125149EA0008967B0 /* TextsCommon.swift in Sources */,
+				F8E53FE9251F7B8800052CE5 /* Texts.swift in Sources */,
 				F8E53FB92517F79400052CE5 /* ConstantsBGGraphBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3425,19 +3412,6 @@
 				F8E53FD7251D363B00052CE5 /* pt */,
 			);
 			name = Common.strings;
-			sourceTree = "<group>";
-		};
-		F8E53FDA251D376900052CE5 /* HomeView.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F8E53FD9251D376900052CE5 /* en */,
-				F8E53FDD251D376E00052CE5 /* ar */,
-				F8E53FDE251D376F00052CE5 /* zh */,
-				F8E53FDF251D377900052CE5 /* es-MX */,
-				F8E53FE0251D377A00052CE5 /* es-ES */,
-				F8E53FE3251D381D00052CE5 /* nl */,
-			);
-			name = HomeView.strings;
 			sourceTree = "<group>";
 		};
 		F8E6C79324CEC2E3007C1199 /* Snooze.strings */ = {

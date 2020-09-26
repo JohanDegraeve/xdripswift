@@ -157,7 +157,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         
         // get minutes ago and create text for minutes ago label
         let minutesAgo = -Int(lastReading.timestamp.timeIntervalSinceNow) / 60
-        let minutesAgoText = minutesAgo.description + " " + (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) + " " + Texts_HomeView.ago
+        let minutesAgoText = minutesAgo.description + " " + (minutesAgo == 1 ? Texts.minute:Texts.minutes) + " " + Texts.ago
         
         minutesLabelOutlet.text = minutesAgoText
         
@@ -170,11 +170,11 @@ class TodayViewController: UIViewController, NCWidgetProviding {
     private func unitizedString(calculatedValue: Double, unitIsMgDl:Bool) -> String {
         var returnValue:String
         if (calculatedValue >= 400) {
-            returnValue = Texts_Common.HIGH
+            returnValue = Texts.HIGH
         } else if (calculatedValue >= 40) {
             returnValue = calculatedValue.mgdlToMmolAndToString(mgdl: unitIsMgDl)
         } else if (calculatedValue > 12) {
-            returnValue = Texts_Common.LOW
+            returnValue = Texts.LOW
         } else {
             switch(calculatedValue) {
             case 0:
@@ -266,15 +266,15 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
         if (mgdl) {
             if (value > -1) && (value < 1) {
-                return "0" + " " + Texts_Common.mgdl;
+                return "0" + " " + Texts.mgdl;
             } else {
-                return deltaSign + valueAsString + " " + Texts_Common.mgdl;
+                return deltaSign + valueAsString + " " + Texts.mgdl;
             }
         } else {
             if (value > -0.1) && (value < 0.1) {
-                return "0.0" + " " + Texts_Common.mmol;
+                return "0.0" + " " + Texts.mmol;
             } else {
-                return deltaSign + valueAsString + " " + Texts_Common.mmol;
+                return deltaSign + valueAsString + " " + Texts.mmol;
             }
         }
     }
