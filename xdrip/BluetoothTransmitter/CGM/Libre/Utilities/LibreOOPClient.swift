@@ -156,7 +156,7 @@ class LibreOOPClient {
                 }
                 
                 // log the data as String
-                if let dataAsString = String(bytes: data, encoding: .utf8), UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                if let dataAsString = String(bytes: data, encoding: .utf8) {
                     trace("in createDataTaskAndHandleResponse, data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info, dataAsString)
                 }
                 
