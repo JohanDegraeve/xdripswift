@@ -231,8 +231,11 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         case 2:
             return "\u{2191}"
             
-        default:
+        case 1:
             return "\u{2191}\u{2191}"
+            
+        default:
+            return ""
             
         }
        
