@@ -105,7 +105,7 @@ class BgReadingsAccessor {
         }
     }
     
-    /// gets readings on a managedObjectContact that is created with concurrencyType: .privateQueueConcurrencyType
+    /// gets readings on a managedObjectContext that is created with concurrencyType: .privateQueueConcurrencyType
     /// - returns:
     ///        readings sorted by timestamp, ascending (ie first is oldest)
     /// - parameters:
@@ -142,6 +142,20 @@ class BgReadingsAccessor {
         
         return bgReadings
 
+    }
+    
+    // deletes readings, to be used for readings retrieved with getBgReadingsOnPrivateManagedObjectContext, to be called on background thread
+    func deleteReadingOnPrivateManagedObjectContext(bgReading: BgReading) {
+        
+        privateManagedObjectContext.delete(bgReading)
+        
+        // save changes to coredata
+        do {
+            try self.privateManagedObjectContext.save()
+        } catch {
+            trace("in deleteReadingOnPrivateManagedObjectContext,  Unable to Save Changes of Private Managed Object Context, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
+        }
+        
     }
     
     // MARK: - private helper functions

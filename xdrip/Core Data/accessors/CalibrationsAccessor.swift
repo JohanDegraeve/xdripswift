@@ -12,10 +12,18 @@ class CalibrationsAccessor {
     /// CoreDataManager to use
     private let coreDataManager:CoreDataManager
     
+    /// to be used when fetch request needs to run on a background thread
+    private let privateManagedObjectContext: NSManagedObjectContext
+    
     // MARK: - initializer
     
     init(coreDataManager:CoreDataManager) {
+        
         self.coreDataManager = coreDataManager
+        
+        privateManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateManagedObjectContext.persistentStoreCoordinator = coreDataManager.mainManagedObjectContext.persistentStoreCoordinator
+        
     }
     
     // MARK: - functions
@@ -80,6 +88,60 @@ class CalibrationsAccessor {
         return calibrations
     }
     
+    /// gets calibrations on a managedObjectContext that is created with concurrencyType: .privateQueueConcurrencyType
+    /// - returns:
+    ///        calibrations sorted by timestamp, ascending (ie first is oldest)
+    /// - parameters:
+    ///     - to : if specified, only return calibrations with timestamp  smaller than fromDate (not equal to)
+    ///     - from : if specified, only return calibrations with timestamp greater than fromDate (not equal to)
+    func getCalibrationsOnPrivateManagedObjectContext(from: Date?, to: Date?) -> [Calibration] {
+        
+        let fetchRequest: NSFetchRequest<Calibration> = Calibration.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Calibration.timeStamp), ascending: true)]
+        
+        // create predicate
+        if let from = from, to == nil {
+            let predicate = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: from.timeIntervalSince1970))
+            fetchRequest.predicate = predicate
+        } else if let to = to, from == nil {
+            let predicate = NSPredicate(format: "timeStamp < %@", NSDate(timeIntervalSince1970: to.timeIntervalSince1970))
+            fetchRequest.predicate = predicate
+        } else if let to = to, let from = from {
+            let predicate = NSPredicate(format: "timeStamp < %@ AND timeStamp > %@", NSDate(timeIntervalSince1970: to.timeIntervalSince1970), NSDate(timeIntervalSince1970: from.timeIntervalSince1970))
+            fetchRequest.predicate = predicate
+        }
+        
+        var calibrations = [Calibration]()
+        
+        privateManagedObjectContext.performAndWait {
+            do {
+                // Execute Fetch Request
+                calibrations = try fetchRequest.execute()
+            } catch {
+                let fetchError = error as NSError
+                trace("in getCalibrationsOnPrivateManagedObjectContext, Unable to Execute Calibration Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataCalibrations, type: .error, fetchError.localizedDescription)
+            }
+        }
+        
+        return calibrations
+        
+    }
+
+    // deletes Calibration, to be used for Calibration retrieved with getCalibrationOnPrivateManagedObjectContext, to be called on background thread
+    func deleteCalibrationOnPrivateManagedObjectContext(calibration: Calibration) {
+        
+        privateManagedObjectContext.delete(calibration)
+        
+        // save changes to coredata
+        do {
+            try self.privateManagedObjectContext.save()
+        } catch {
+            trace("in deleteCalibrationOnPrivateManagedObjectContext,  Unable to Save Changes of Private Managed Object Context, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataCalibrations, type: .error, error.localizedDescription)
+        }
+        
+    }
+    
+
     // MARK: - private helper functions
     
     private func getFirstOrLastCalibration(withActivesensor sensor:Sensor, first:Bool) -> Calibration? {

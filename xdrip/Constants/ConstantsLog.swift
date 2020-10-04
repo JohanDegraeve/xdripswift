@@ -136,5 +136,8 @@ enum ConstantsLog {
     /// trace
     static let categoryTraceSettingsViewModel =      "TraceSettingsViewModel"
     
+    /// housekeeping
+    static let categoryHouseKeeper =                 "HouseKeeper                   "
+    
 }
 

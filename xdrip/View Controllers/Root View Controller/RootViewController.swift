@@ -206,6 +206,9 @@ final class RootViewController: UIViewController {
         return dateFormatter
     }()
     
+    /// housekeeper instance
+    private var houseKeeper: HouseKeeper?
+    
     /// current value of webOPEnabled, if nil then it means no cgmTransmitter connected yet , false is used as value
     /// - used to detect changes in the value
     ///
@@ -271,6 +274,9 @@ final class RootViewController: UIViewController {
         coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
             
             self.setupApplicationData()
+            
+            // housekeeper should be non nil here, kall housekeeper
+            self.houseKeeper?.doAppStartUpHouseKeeping()
             
             // glucoseChartManager still needs the reference to coreDataManager
             self.glucoseChartManager.coreDataManager = self.coreDataManager
@@ -408,7 +414,7 @@ final class RootViewController: UIViewController {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, watchManager
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, watchManager, housekeeper
     private func setupApplicationData() {
         
         // setup Trace
@@ -430,6 +436,12 @@ final class RootViewController: UIViewController {
         
         // instantiate calibrations
         calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
+        guard let calibrationsAccessor = calibrationsAccessor else {
+            fatalError("In setupApplicationData, failed to initialize calibrationsAccessor")
+        }
+        
+        // instanstiate Housekeeper
+        houseKeeper = HouseKeeper(bgReadingsAccessor: bgReadingsAccessor, calibrationsAccessor: calibrationsAccessor)
         
         // setup nightscout synchronizer
         nightScoutUploadManager = NightScoutUploadManager(coreDataManager: coreDataManager, messageHandler: { (title:String, message:String) in
