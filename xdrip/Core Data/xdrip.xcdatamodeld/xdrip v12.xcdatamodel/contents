@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="16119" systemVersion="19G73" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="19H2" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="AlertEntry" representedClassName=".AlertEntry" syncable="YES">
         <attribute name="alertkind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="start" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="value" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="alertType" maxCount="1" deletionRule="No Action" destinationEntity="AlertType" inverseName="alertEntries" inverseEntity="AlertType"/>
+        <relationship name="alertType" maxCount="1" deletionRule="Nullify" destinationEntity="AlertType" inverseName="alertEntries" inverseEntity="AlertType"/>
     </entity>
     <entity name="AlertType" representedClassName=".AlertType" syncable="YES">
         <attribute name="enabled" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -14,7 +14,7 @@
         <attribute name="snoozeperiod" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="soundname" optional="YES" attributeType="String"/>
         <attribute name="vibrate" attributeType="Boolean" usesScalarValueType="YES"/>
-        <relationship name="alertEntries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AlertEntry" inverseName="alertType" inverseEntity="AlertEntry"/>
+        <relationship name="alertEntries" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="AlertEntry" inverseName="alertType" inverseEntity="AlertEntry"/>
     </entity>
     <entity name="BgReading" representedClassName=".BgReading" syncable="YES">
         <attribute name="a" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -151,8 +151,8 @@
         <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="watlaa" inverseEntity="BLEPeripheral"/>
     </entity>
     <elements>
-        <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="105"/>
-        <element name="AlertType" positionX="-657" positionY="180" width="128" height="165"/>
+        <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="28"/>
+        <element name="AlertType" positionX="-657" positionY="180" width="128" height="28"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
         <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="358"/>
         <element name="Blucon" positionX="-657" positionY="189" width="128" height="73"/>
@@ -163,10 +163,10 @@
         <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="193"/>
         <element name="Droplet" positionX="-630" positionY="216" width="128" height="58"/>
         <element name="GNSEntry" positionX="-648" positionY="198" width="128" height="118"/>
+        <element name="Libre2" positionX="-648" positionY="198" width="128" height="73"/>
         <element name="M5Stack" positionX="-657" positionY="180" width="128" height="163"/>
         <element name="MiaoMiao" positionX="-657" positionY="189" width="128" height="103"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="133"/>
         <element name="Watlaa" positionX="-639" positionY="207" width="128" height="103"/>
-        <element name="Libre2" positionX="-648" positionY="198" width="128" height="73"/>
     </elements>
 </model>
