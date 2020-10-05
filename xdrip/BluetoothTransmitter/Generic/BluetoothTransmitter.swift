@@ -76,9 +76,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         switch addressAndName {
             
-        case .alreadyConnectedBefore(let addressAndName):
-            deviceAddress = addressAndName.address
-            deviceName = addressAndName.name
+        case .alreadyConnectedBefore(let address, let name):
+            deviceAddress = address
+            deviceName = name
             
         case .notYetConnected(let newexpectedName):
             expectedName = newexpectedName
