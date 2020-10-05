@@ -212,14 +212,11 @@ class DexcomShareUploadManager:NSObject {
             
             trace("in startRemoteMonitoringSessionAndStartUpload, finished task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
             
-            // if ends without success then log the data when existing the scope
-            var success = false
+            // log the data when existing the scope
             defer {
-                if !success {
-                    if let data = data {
-                        if let dataAsString = String(bytes: data, encoding: .utf8) {
-                            trace("    data = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, dataAsString)
-                        }
+                if let data = data {
+                    if let dataAsString = String(bytes: data, encoding: .utf8) {
+                        trace("    data = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, dataAsString)
                     }
                 }
             }

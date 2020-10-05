@@ -99,9 +99,9 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral) {
         
         // verify that bluetoothPeripheral is a Libre2
-        guard let Libre2 = bluetoothPeripheral as? Libre2 else {
+        /*guard let Libre2 = bluetoothPeripheral as? Libre2 else {
             fatalError("Libre2BluetoothPeripheralViewModel update, bluetoothPeripheral is not Libre2")
-        }
+        }*/
         
         // default value for accessoryView is nil
         cell.accessoryView = nil

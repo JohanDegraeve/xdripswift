@@ -21,7 +21,7 @@ public class LibreRawGlucoseOOPA2Data: NSObject, LibreRawGlucoseWeb, LibreOOPWeb
     
     /// - time when instance of LibreRawGlucoseOOPData was created
     /// - this can be created to calculate the timestamp of realtimeLibreRawGlucoseData
-    let creationTimeStamp = Date()
+    var creationTimeStamp = Date()
 
     /// server parse value
     var content: LibreRawGlucoseOOPA2Cotent? {
