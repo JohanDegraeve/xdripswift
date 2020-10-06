@@ -643,11 +643,11 @@ public class AlertManager:NSObject {
                     trace("   notificationSettings.authorizationStatus = denied", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
                 case .notDetermined:
                     trace("   notificationSettings.authorizationStatus = notDetermined", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
-                case .authorized:
+                case .authorized, .ephemeral:
                     break
                 case .provisional:
                     trace("   notificationSettings.authorizationStatus = provisional", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
-
+                    
                 @unknown default:
                     fatalError("unsupported authorizationStatus in AlertManager")
                     

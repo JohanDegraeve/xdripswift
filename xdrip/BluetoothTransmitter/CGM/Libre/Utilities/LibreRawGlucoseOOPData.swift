@@ -23,7 +23,7 @@ public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebSe
     
     /// - time when instance of LibreRawGlucoseOOPData was created
     /// - this can be created to calculate the timestamp of realTimeGlucose
-    let creationTimeStamp = Date()
+    var creationTimeStamp = Date()
     
     enum Error: String {
         typealias RawValue = String

@@ -66,16 +66,16 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         trace("in peripheral didUpdateValueFor", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
         
-        if let value = characteristic.value {
+        /*if let value = characteristic.value {
             
-            guard let valueAsString = String(bytes: value, encoding: .utf8)  else {
+            if let valueAsString = String(bytes: value, encoding: .utf8)   {
                 trace("    failed to convert value to string", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
                 return
             }
             
         } else {
             trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
-        }
+        }*/
         
     }
     
