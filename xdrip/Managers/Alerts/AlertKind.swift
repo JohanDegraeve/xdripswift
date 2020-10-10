@@ -4,7 +4,7 @@ import Foundation
 public enum AlertKind:Int, CaseIterable {
     
     // when adding alertkinds, add new cases at the end (ie 9, ...)
-    // if this is done in the middle ((eg rapid rise alert might seem better positioned after veryhigh), then a database migration would be required, because the rawvalue is stored as Int16 in the coredata, namely the alertkind
+    // if this is done in the middle ((eg rapid rise alert might seem better positioned after veryhigh), then a database migration would be required, because the rawvalue is stored as Int16 in the coredata, namely the alertkind - and also in SnoozeParameters
     // the order of the alerts will in the uiview is determined by the initializer init(forRowAt row: Int)
 
     case verylow = 0

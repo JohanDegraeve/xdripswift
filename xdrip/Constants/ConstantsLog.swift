@@ -139,5 +139,8 @@ enum ConstantsLog {
     /// housekeeping
     static let categoryHouseKeeper =                 "HouseKeeper                   "
     
+    /// soonzeParameter accessor
+    static let categoryApplicationDataSnoozeParameter =      "ApplicationDataSnoozeParameter"
+    
 }
 

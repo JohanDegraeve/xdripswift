@@ -39,13 +39,16 @@ public class AlertManager:NSObject {
     private var soundPlayer:SoundPlayer?
     
     /// snooze parameters
-    private var snoozeParameters = [Int: SnoozeParameters]()
+    private var snoozeParameters = [SnoozeParameters]()
     
     /// helper array with all alert notification identifiers
     private var alertNotificationIdentifers = [String]()
     
     /// permanent reference to notificationcenter
     private let uNUserNotificationCenter:UNUserNotificationCenter
+    
+    // coredataManager instance
+    private var coreDataManager: CoreDataManager
     
     /// snooze times in minutes
     private let snoozeValueMinutes = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 75, 90, 120, 150, 180, 240, 300, 360, 420, 480, 540, 600, 1440, 10080]
@@ -69,14 +72,13 @@ public class AlertManager:NSObject {
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.soundPlayer = soundPlayer
         self.uNUserNotificationCenter = UNUserNotificationCenter.current()
+        self.coreDataManager = coreDataManager
         
         // call super.init
         super.init()
         
         // initialize snoozeparameters
-        for alertKind in AlertKind.allCases {
-            snoozeParameters[alertKind.rawValue] = SnoozeParameters()
-        }
+        snoozeParameters = SnoozeParametersAccessor(coreDataManager: coreDataManager).getSnoozeParameters()
         
         // in snoozeValueStrings, replace all occurrences of minutes, minute, etc... by language dependent value
         for (index, _) in snoozeValueStrings.enumerated() {
@@ -215,6 +217,9 @@ public class AlertManager:NSObject {
                     
                     snooze(alertKind: alertKind, snoozePeriodInMinutes: Int(currentAlertEntry.alertType.snoozeperiod), response: response)
                     
+                    // save changes in coredata
+                    coreDataManager.saveChanges()
+                    
                 case UNNotificationDefaultActionIdentifier:
                     
                     trace("in userNotificationCenter, received actionIdentifier : UNNotificationDefaultActionIdentifier (user clicked the notification which opens the app, but not the snooze action in this notification)", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
@@ -230,6 +235,8 @@ public class AlertManager:NSObject {
                     // if it's a missed reading alert, let's replan it in 5 minutes
                     if alertKind == .missedreading {
                         snooze(alertKind: .missedreading, snoozePeriodInMinutes: 5, response: response)
+                        // save changes in coredata
+                        coreDataManager.saveChanges()
                     }
 
                 default:
@@ -247,11 +254,7 @@ public class AlertManager:NSObject {
     
     /// get the snoozeParameter for the alertKind
     public func getSnoozeParameters(alertKind: AlertKind) -> SnoozeParameters {
-        if let snoozeParameters = snoozeParameters[alertKind.rawValue] {
-            return snoozeParameters
-        } else {
-            fatalError("in snoozeParameters(alertKind: AlertKind) -> SnoozeParameters, failed to get snoozeparameters for alertKind")
-        }
+        return snoozeParameters[alertKind.rawValue]
     }
 
     /// Function to be called that receives the notification actions. Will handle the response. completionHandler will not necessarily be called. Only if the identifier (response.notification.request.identifier) is one of the alert notification identifers, then it will handle the response and also call completionhandler.
@@ -286,6 +289,9 @@ public class AlertManager:NSObject {
         
         // unsnooze
         getSnoozeParameters(alertKind: alertKind).unSnooze()
+        
+        // save changes in coredata
+        coreDataManager.saveChanges()
         
     }
     
@@ -324,7 +330,10 @@ public class AlertManager:NSObject {
                                 // snooze
                                 trace("    snoozing alert %{public}@ for %{public}@ minutes (1)", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), snoozePeriod.description)
                                 self.getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: snoozePeriod)
-                                
+
+                                // save changes in coredata
+                                self.coreDataManager.saveChanges()
+
                                 // if it's a missed reading alert, then cancel any planned missed reading alerts and reschedule
                                 // if content is not nil, then it means a missed reading alert went off, the user clicked it, app opens, user clicks snooze, snoozing must be set
                                 // if content is nil, then this is an alert snoozed via presnooze button, missed reading alert needs to recalculated.
@@ -470,9 +479,9 @@ public class AlertManager:NSObject {
             switch alertKind {
                 
             case .missedreading: // any alert type that would be configured with a delay
-                if let snoozePeriodInMinutes = getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes, let snoozeTimeStamp = getSnoozeParameters(alertKind: alertKind).snoozeTimeStamp {
+                if getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes > 0, let snoozeTimeStamp = getSnoozeParameters(alertKind: alertKind).snoozeTimeStamp {
                     
-                    minimumDelayInSecondsToUse = -Int(Date().timeIntervalSince(Date(timeInterval: TimeInterval(snoozePeriodInMinutes * 60), since: snoozeTimeStamp)).rawValue)
+                    minimumDelayInSecondsToUse = -Int(Date().timeIntervalSince(Date(timeInterval: TimeInterval(getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes * 60), since: snoozeTimeStamp)).rawValue)
                     trace("in checkAlertAndFire, minimumDelayInSecondsToUse = %{public}@" , log: log, category: ConstantsLog.categoryAlertManager, type: .info, minimumDelayInSecondsToUse!.description)
 
                 } // if snoozePeriodInMinutes or snoozeTimeStamp is nil (which shouldn't be the case) continue without taking into account the snooze status
@@ -680,6 +689,9 @@ public class AlertManager:NSObject {
             // any other type of alert, set it to snoozed
             getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: snoozePeriodInMinutes)
             trace("Snoozing alert %{public}@ for %{public}@ minutes (2)", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), snoozePeriodInMinutes.description)
+            
+            // save changes in coredata
+            coreDataManager.saveChanges()
             
         }
         
