@@ -6,17 +6,6 @@ import UIKit
 
 public final class GlucoseChartManager: NSObject {
     
-    // MARK: - public properties
-    
-    /// reference to coreDataManager
-    public var coreDataManager: CoreDataManager? {
-        didSet {
-            if let coreDataManager = coreDataManager {
-                bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
-            }
-        }
-    }
-    
    // MARK: - private properties
     
     /// chartpoint array with glucose values and timestamp
@@ -71,7 +60,10 @@ public final class GlucoseChartManager: NSObject {
     private let axisLabelTimeFormatter: DateFormatter
     
     /// a BgReadingsAccessor
-    private var bgReadingsAccessor: BgReadingsAccessor?
+    private var bgReadingsAccessor: BgReadingsAccessor
+    
+    /// a coreDataManager
+    private var coreDataManager: CoreDataManager
     
     /// difference in seconds between two pixels (or x values, not sure if it's pixels)
     private var diffInSecondsBetweenTwoPoints: Double  {
@@ -109,7 +101,11 @@ public final class GlucoseChartManager: NSObject {
     
     /// - parameters:
     ///     - chartLongPressGestureRecognizer : defined here as parameter so that this class can handle the config of the recognizer
-    init(chartLongPressGestureRecognizer: UILongPressGestureRecognizer) {
+    init(chartLongPressGestureRecognizer: UILongPressGestureRecognizer, coreDataManager: CoreDataManager) {
+        
+        // set coreDataManager and bgReadingsAccessor
+        self.coreDataManager = coreDataManager
+        self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         
         // for tapping the chart, we're using UILongPressGestureRecognizer because UITapGestureRecognizer doesn't react on touch down. With UILongPressGestureRecognizer and minimumPressDuration set to 0, we get a trigger as soon as the chart is touched
         chartLongPressGestureRecognizer.minimumPressDuration = 0
@@ -169,12 +165,6 @@ public final class GlucoseChartManager: NSObject {
             // startDateToUse is either parameter value or (if nil), endDate minutes current chartwidth
             let startDateToUse = startDate != nil ? startDate! : Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: endDate)
             
-            // check that bgReadingsAccessor is not nil (should normally not be nil except at app startup)
-            guard let bgReadingsAccessor = self.bgReadingsAccessor else {
-                trace("in updateGlucoseChartPoints, bgReadingsAccessor, probably coreDataManager is not yet assigned", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info)
-                return
-            }
-            
             // we're going to check if we have already all chartpoints in the array self.glucoseChartPoints for the new start and date time. If not we're going to prepand a new array and/or append a new array
             
             // initialize new list of glucoseChartPoints to prepend
@@ -199,7 +189,7 @@ public final class GlucoseChartManager: NSObject {
                     reUseExistingChartPointList = false
                     
                     // use newGlucoseChartPointsToAppend and assign it to new list of chartpoints startDate to endDate
-                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: bgReadingsAccessor)
+                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.bgReadingsAccessor)
                     
                 } else if endDate <= lastGlucoseTimeStamp {
                     // so starDate <= date of last known glucosechartpoint and enddate is also <= that date
@@ -207,7 +197,7 @@ public final class GlucoseChartManager: NSObject {
                 } else {
                     
                     // append glucseChartpoints with date > x.date up to endDate
-                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: lastGlucoseTimeStamp, endDate: endDate, bgReadingsAccessor: bgReadingsAccessor)
+                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: lastGlucoseTimeStamp, endDate: endDate, bgReadingsAccessor: self.bgReadingsAccessor)
                 }
                 
                 // now see if we need to prepend
@@ -216,7 +206,7 @@ public final class GlucoseChartManager: NSObject {
                     
                     if let firstGlucoseChartPoint = self.glucoseChartPoints.first, let firstGlucoseChartPointX = firstGlucoseChartPoint.x as? ChartAxisValueDate, startDateToUse < firstGlucoseChartPointX.date {
                         
-                        newGlucoseChartPointsToPrepend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: firstGlucoseChartPointX.date, bgReadingsAccessor: bgReadingsAccessor)
+                        newGlucoseChartPointsToPrepend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: firstGlucoseChartPointX.date, bgReadingsAccessor: self.bgReadingsAccessor)
                     }
                     
                 }
@@ -226,7 +216,7 @@ public final class GlucoseChartManager: NSObject {
                 // this should be a case where there's no glucoseChartPoints stored yet, we just create a new array to append
 
                 // get glucosePoints from coredata
-                newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: bgReadingsAccessor)
+                newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.bgReadingsAccessor)
             }
             
             self.loopThroughGlucoseChartPointsAndFindValues()
