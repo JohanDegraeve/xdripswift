@@ -59,7 +59,7 @@ final class RootViewController: UIViewController {
     
     @IBAction func chartPanGestureRecognizerAction(_ sender: UIPanGestureRecognizer) {
         
-       /* glucoseChartManager.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: {
+        glucoseChartManager.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: {
             
             // user has been panning, if chart is panned backward, then need to set valueLabel to value of latest chartPoint shown in the chart, and minutesAgo text to timeStamp of latestChartPoint
             if self.glucoseChartManager.chartIsPannedBackward {
@@ -100,7 +100,7 @@ final class RootViewController: UIViewController {
                 
             }
             
-        })*/
+        })
         
     }
     
@@ -110,7 +110,7 @@ final class RootViewController: UIViewController {
         
         // this one needs trigger in case user has panned, chart is decelerating, user clicks to stop the decleration, call to handleUIGestureRecognizer will stop the deceleration
         // there's no completionhandler needed because the call in chartPanGestureRecognizerAction to handleUIGestureRecognizer already includes a completionhandler
-     //   glucoseChartManager.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: nil)
+        glucoseChartManager.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: nil)
         
     }
     
@@ -196,7 +196,7 @@ final class RootViewController: UIViewController {
     private var bluetoothPeripheralManager: BluetoothPeripheralManager?
     
     /// manage glucose chart
-    private var glucoseChartManager: GlucoseChartManager?
+    private var glucoseChartManager: GlucoseChartManager!
     
     /// dateformatter for minutesLabelOutlet, when user is panning the chart
     private let dateTimeFormatterForMinutesLabelWhenPanning: DateFormatter = {
@@ -231,7 +231,7 @@ final class RootViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // never seen it triggered, copied that from Loop
-       // glucoseChartManager.didReceiveMemoryWarning()
+        glucoseChartManager.didReceiveMemoryWarning()
         
     }
     
@@ -267,7 +267,7 @@ final class RootViewController: UIViewController {
         changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
         
         // initialize glucoseChartManager
-        //glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet)
+        glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet)
         
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
         // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like initializing the views
@@ -279,7 +279,7 @@ final class RootViewController: UIViewController {
             self.houseKeeper?.doAppStartUpHouseKeeping()
             
             // glucoseChartManager still needs the reference to coreDataManager
-       //     self.glucoseChartManager.coreDataManager = self.coreDataManager
+            self.glucoseChartManager.coreDataManager = self.coreDataManager
             
             // update label texts, minutes ago, diff and value
             self.updateLabelsAndChart(overrideApplicationState: true)
@@ -357,9 +357,9 @@ final class RootViewController: UIViewController {
         setupAVAudioSession()
         
         // initialize chartGenerator in chartOutlet
-     /*   self.chartOutlet.chartGenerator = { [weak self] (frame) in
+        self.chartOutlet.chartGenerator = { [weak self] (frame) in
             return self?.glucoseChartManager.glucoseChartWithFrame(frame)?.view
-        }*/
+        }
         
         // user may have long pressed the value label, so the screen will not lock, when going back to background, set isIdleTimerDisabled back to false
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyIsIdleTimerDisabled, closure: {
@@ -807,7 +807,7 @@ final class RootViewController: UIViewController {
     /// will update the chart with endDate = currentDate
     private func updateChartWithResetEndDate() {
         
-    //    glucoseChartManager.updateGlucoseChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, completionHandler: nil)
+        glucoseChartManager.updateGlucoseChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, completionHandler: nil)
         
     }
     
@@ -1176,7 +1176,7 @@ final class RootViewController: UIViewController {
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
         
         // check if chart is currently panned back in time, in that case we don't update the labels
-      //  guard !glucoseChartManager.chartIsPannedBackward else {return}
+        guard !glucoseChartManager.chartIsPannedBackward else {return}
         
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
@@ -1325,7 +1325,7 @@ final class RootViewController: UIViewController {
         
     }
     
-    // stops the active sensor and sets sensorSerialNumber in UserDefaults to nil
+    /// stops the active sensor and sets sensorSerialNumber in UserDefaults to nil
     private func stopSensor() {
         
         if let activeSensor = activeSensor, let coreDataManager = coreDataManager {
@@ -1339,7 +1339,7 @@ final class RootViewController: UIViewController {
         
     }
     
-    // start a new sensor, ask user for starttime
+    /// start a new sensor, ask user for starttime
     private func startSensorAskUserForStarttime() {
         
         // craete datePickerViewData
@@ -1443,6 +1443,7 @@ final class RootViewController: UIViewController {
 }
 
 // MARK: - conform to CGMTransmitter protocol
+
 /// conform to CGMTransmitterDelegate
 extension RootViewController: CGMTransmitterDelegate {
     
@@ -1486,6 +1487,7 @@ extension RootViewController: CGMTransmitterDelegate {
 }
 
 // MARK: - conform to UITabBarControllerDelegate protocol
+
 /// conform to UITabBarControllerDelegate, want to receive info when user clicks specific tabs
 extension RootViewController: UITabBarControllerDelegate {
     
@@ -1506,6 +1508,7 @@ extension RootViewController: UITabBarControllerDelegate {
 }
 
 // MARK: - conform to UNUserNotificationCenterDelegate protocol
+
 /// conform to UNUserNotificationCenterDelegate, for notifications
 extension RootViewController: UNUserNotificationCenterDelegate {
     
@@ -1596,6 +1599,7 @@ extension RootViewController: UNUserNotificationCenterDelegate {
 }
 
 // MARK: - conform to NightScoutFollowerDelegate protocol
+
 extension RootViewController:NightScoutFollowerDelegate {
     
     func nightScoutFollowerInfoReceived(followGlucoseDataArray: inout [NightScoutBgReading]) {
