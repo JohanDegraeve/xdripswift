@@ -182,6 +182,9 @@ extension UserDefaults {
         /// Transmitter Battery Level
         case transmitterBatteryInfo = "transmitterbatteryinfo"
         
+        /// timestamp last battery reading (will only be used for dexcom G5 where we need to explicitly ask for the battery)
+        case timeStampOfLastBatteryReading = "timeStampOfLastBatteryReading"
+        
         // HealthKit
         /// did user authorize the storage of readings in healthkit or not
         case storeReadingsInHealthkitAuthorized = "storeReadingsInHealthkitAuthorized"
@@ -990,6 +993,17 @@ extension UserDefaults {
             } else {
                 set(nil, forKey: Key.transmitterBatteryInfo.rawValue)
             }
+            timeStampOfLastBatteryReading = Date()
+        }
+    }
+    
+    /// timestamp latest calibration uploaded to NightScout
+    var timeStampOfLastBatteryReading:Date? {
+        get {
+            return object(forKey: Key.timeStampOfLastBatteryReading.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampOfLastBatteryReading.rawValue)
         }
     }
     

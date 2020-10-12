@@ -118,7 +118,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         self.timeStampOfLastG5Reading = Date(timeIntervalSince1970: 0)
         
         //set timeStampOfLastBatteryReading to 0
-        self.timeStampOfLastBatteryReading = Date(timeIntervalSince1970: 0)
+        if let timeStampOfLastBatteryReading = UserDefaults.standard.timeStampOfLastBatteryReading {
+            self.timeStampOfLastBatteryReading = timeStampOfLastBatteryReading
+        } else {
+            self.timeStampOfLastBatteryReading = Date(timeIntervalSince1970: 0)
+        }
         
         //set timeStampTransmitterReset to 0
         self.timeStampTransmitterReset = Date(timeIntervalSince1970: 0)
