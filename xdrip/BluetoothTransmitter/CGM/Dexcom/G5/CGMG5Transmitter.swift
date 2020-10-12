@@ -581,7 +581,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private func processBatteryStatusRxMessage(value:Data) {
         
         if let batteryStatusRxMessage = BatteryStatusRxMessage(data: value) {
-            
+
+            // this is only the internally local stored value, but the value in userdefaults will be set implicitly because the cgmTransmitterDelegate is also storing the transmitterbatteryinfo, which updates the timeStampOfLastBatteryReading in the UserDefaults
+            timeStampOfLastBatteryReading = Date()
+
             // cGMG5TransmitterDelegate for showing info on bluetoothviewcontroller and store in coredata
             cGMG5TransmitterDelegate?.received(transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), cGMG5Transmitter: self)
             
