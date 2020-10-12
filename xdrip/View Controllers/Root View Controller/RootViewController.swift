@@ -120,9 +120,6 @@ final class RootViewController: UIViewController {
     
     // MARK: - Constants for ApplicationManager usage
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
-    private let applicationManagerKeyCreateupdateLabelsAndChartTimer = "RootViewController-CreateupdateLabelsAndChartTimer"
-    
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground
     private let applicationManagerKeyInvalidateupdateLabelsAndChartTimer = "RootViewController-InvalidateupdateLabelsAndChartTimer"
     
@@ -147,8 +144,8 @@ final class RootViewController: UIViewController {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - to nillify the glucoseChartManager
     private let applicationManagerKeyNillifyGlucoseChartManager = "applicationManagerKeyNillifyGlucoseChartManager"
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - to initialize the glucoseChartManager
-    private let applicationManagerKeyInitializeGlucoseChartManager = "applicationManagerKeyInitializeGlucoseChartManager"
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to initialize the glucoseChartManager and update labels and chart
+    private let applicationManagerKeyInitializeGlucoseChartManagerAndUpdateLabelsAndChart = "applicationManagerKeyInitializeGlucoseChartManagerAndUpdateLabelsAndChart"
     
     // MARK: - Properties - other private properties
     
@@ -354,16 +351,8 @@ final class RootViewController: UIViewController {
         // setup the timer logic for updating the view regularly
         setupUpdateLabelsAndChartTimer()
         
-        // whenever app comes from-back to foreground, updateLabelsAndChart needs to be called
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {self.updateLabelsAndChart(overrideApplicationState: true)})
-        
         // setup AVAudioSession
         setupAVAudioSession()
-        
-        // initialize chartGenerator in chartOutlet
-        self.chartOutlet.chartGenerator = { [weak self] (frame) in
-            return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
-        }
         
         // user may have long pressed the value label, so the screen will not lock, when going back to background, set isIdleTimerDisabled back to false
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyIsIdleTimerDisabled, closure: {
@@ -379,18 +368,28 @@ final class RootViewController: UIViewController {
         // add tracing when app will terminaten - this only works for non-suspended apps, probably (not tested) also works for apps that crash in the background
         ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeyTraceAppWillTerminate, closure: {trace("Application will terminate", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
         
-        // when app goes to background, then the glucoseChartManager must be set to nil
+        // when app goes to background, then the glucoseChartManager and chartOutlet.chartGenerator must be set to nil - goal is to clean up memory, assuming this helps, it seems to because it keeps running more stable in the background when doing this
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyNillifyGlucoseChartManager, closure: {
+            
             self.glucoseChartManager = nil
+            
+            self.chartOutlet.chartGenerator = nil
+            
         })
-        
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyInitializeGlucoseChartManager, closure: {
+
+        // reinitialise glucose chart and also to update labels and chart
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyInitializeGlucoseChartManagerAndUpdateLabelsAndChart, closure: {
 
             if let coreDataManager = self.coreDataManager {
                 
                 self.glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: self.chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
                 
-                self.updateChartWithResetEndDate()
+                // initialize chartGenerator in chartOutlet
+                self.chartOutlet.chartGenerator = { [weak self] (frame) in
+                    return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
+                }
+                
+                self.updateLabelsAndChart(overrideApplicationState: true)
                 
             }
 
@@ -563,6 +562,11 @@ final class RootViewController: UIViewController {
         
         // initialize glucoseChartManager
         glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
+        
+        // initialize chartGenerator in chartOutlet
+        self.chartOutlet.chartGenerator = { [weak self] (frame) in
+            return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
+        }
         
     }
     
