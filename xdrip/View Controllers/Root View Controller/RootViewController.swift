@@ -120,11 +120,11 @@ final class RootViewController: UIViewController {
     
     // MARK: - Constants for ApplicationManager usage
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground
-    private let applicationManagerKeyInvalidateupdateLabelsAndChartTimer = "RootViewController-InvalidateupdateLabelsAndChartTimer"
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updateLabelsAndChartTimer
+    private let applicationManagerKeyCreateupdateLabelsAndChartTimer = "RootViewController-CreateupdateLabelsAndChartTimer"
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - updateLabels
-    private let applicationManagerKeyUpdateLabelsAndChart = "RootViewController-UpdateLabelsAndChart"
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground
+    private let applicationManagerKeyInvalidateupdateLabelsAndChartTimerAndCloseSnoozeViewController = "RootViewController-InvalidateupdateLabelsAndChartTimerAndCloseSnoozeViewController"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initial calibration
     private let applicationManagerKeyInitialCalibration = "RootViewController-InitialCalibration"
@@ -141,11 +141,11 @@ final class RootViewController: UIViewController {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillTerminate - trace that app goes to background
     private let applicationManagerKeyTraceAppWillTerminate = "applicationManagerKeyTraceAppWillTerminate"
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - to nillify the glucoseChartManager
-    private let applicationManagerKeyNillifyGlucoseChartManager = "applicationManagerKeyNillifyGlucoseChartManager"
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - to clean GlucoseChartManager memory
+    private let applicationManagerKeyCleanMemoryGlucoseChartManager = "applicationManagerKeyCleanMemoryGlucoseChartManager"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to initialize the glucoseChartManager and update labels and chart
-    private let applicationManagerKeyInitializeGlucoseChartManagerAndUpdateLabelsAndChart = "applicationManagerKeyInitializeGlucoseChartManagerAndUpdateLabelsAndChart"
+    private let applicationManagerKeyUpdateLabelsAndChart = "applicationManagerKeyUpdateLabelsAndChart"
     
     // MARK: - Properties - other private properties
     
@@ -368,11 +368,19 @@ final class RootViewController: UIViewController {
         // add tracing when app will terminaten - this only works for non-suspended apps, probably (not tested) also works for apps that crash in the background
         ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeyTraceAppWillTerminate, closure: {trace("Application will terminate", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
         
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInitializeGlucoseChartManagerAndUpdateLabelsAndChart, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyCleanMemoryGlucoseChartManager, closure: {
             
             self.glucoseChartManager?.cleanUpMemory()
             
         })
+        
+        // reinitialise glucose chart and also to update labels and chart
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
+            
+                self.updateLabelsAndChart(overrideApplicationState: true)
+            
+        })
+        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -850,8 +858,11 @@ final class RootViewController: UIViewController {
         // call scheduleUpdateLabelsAndChartTimer function now - as the function setupUpdateLabelsAndChartTimer is called from viewdidload, it will be called immediately after app launch
         updateLabelsAndChartTimer = createAndScheduleUpdateLabelsAndChartTimer()
         
+        // updateLabelsAndChartTimer needs to be created when app comes back from background to foreground
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyCreateupdateLabelsAndChartTimer, closure: {updateLabelsAndChartTimer = createAndScheduleUpdateLabelsAndChartTimer()})
+        
         // when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateupdateLabelsAndChartTimer, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateupdateLabelsAndChartTimerAndCloseSnoozeViewController, closure: {
             
             // this is for the case that the snoozeViewController is shown. If not removed, then if user opens alert notification, the alert snooze wouldn't be shown
             // that's why, close the snoozeViewController
