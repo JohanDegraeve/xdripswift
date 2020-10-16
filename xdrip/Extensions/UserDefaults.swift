@@ -215,6 +215,9 @@ extension UserDefaults {
         /// NSLog enabled or not
         case NSLogEnabled = "NSLogEnabled"
         
+        /// chartDisabled
+        case chartDisabled = "chartDisabled"
+        
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
         
@@ -1148,6 +1151,16 @@ extension UserDefaults {
             guard let jsonData = try? encoder.encode(newValue) else { return }
             let jsonString = String(bytes: jsonData, encoding: .utf8)
             set(jsonString, forKey: Key.libre1DerivedAlgorithmParameters.rawValue)
+        }
+    }
+    
+    /// chartDisabled - default false
+    var disableChart: Bool {
+        get {
+            return bool(forKey: Key.chartDisabled.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.chartDisabled.rawValue)
         }
     }
     

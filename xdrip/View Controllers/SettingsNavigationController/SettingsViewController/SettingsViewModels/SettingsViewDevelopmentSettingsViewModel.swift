@@ -17,6 +17,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// in case Libre 2 users want to use the local calibration algorithm
     case overrideWebOOPCalibration = 4
     
+    /// if true then chart will not be shown
+    case disableChart = 5
+    
 }
 
 struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
@@ -57,6 +60,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
             return "Override Web OOP Calibration"
             
+        case .disableChart:
+            return "disable Chart"
+            
         }
     }
     
@@ -74,6 +80,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
         case .webOOPtoken:
             return .disclosureIndicator
+            
+        case .disableChart:
+            return .none
             
         }
     }
@@ -104,6 +113,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             }
 
         case .overrideWebOOPCalibration:
+            return nil
+            
+        case .disableChart:
             return nil
             
         }
@@ -145,6 +157,14 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                 UserDefaults.standard.overrideWebOOPCalibration = isOn
                 
             })
+            
+        case .disableChart:
+            return UISwitch(isOn: UserDefaults.standard.disableChart, action: {
+                (isOn:Bool) in
+                
+                UserDefaults.standard.disableChart = isOn
+                
+            })
 
         }
         
@@ -160,7 +180,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration:
+        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration, .disableChart:
             return .nothing
             
         case .webOOPsite:

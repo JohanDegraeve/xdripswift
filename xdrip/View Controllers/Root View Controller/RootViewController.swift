@@ -238,7 +238,7 @@ final class RootViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // never seen it triggered, copied that from Loop
-        glucoseChartManager?.didReceiveMemoryWarning()
+        glucoseChartManager?.cleanUpMemory()
         
     }
     
@@ -368,31 +368,10 @@ final class RootViewController: UIViewController {
         // add tracing when app will terminaten - this only works for non-suspended apps, probably (not tested) also works for apps that crash in the background
         ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeyTraceAppWillTerminate, closure: {trace("Application will terminate", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
         
-        // when app goes to background, then the glucoseChartManager and chartOutlet.chartGenerator must be set to nil - goal is to clean up memory, assuming this helps, it seems to because it keeps running more stable in the background when doing this
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyNillifyGlucoseChartManager, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInitializeGlucoseChartManagerAndUpdateLabelsAndChart, closure: {
             
-            self.glucoseChartManager = nil
+            self.glucoseChartManager?.cleanUpMemory()
             
-            self.chartOutlet.chartGenerator = nil
-            
-        })
-
-        // reinitialise glucose chart and also to update labels and chart
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyInitializeGlucoseChartManagerAndUpdateLabelsAndChart, closure: {
-
-            if let coreDataManager = self.coreDataManager {
-                
-                self.glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: self.chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
-                
-                // initialize chartGenerator in chartOutlet
-                self.chartOutlet.chartGenerator = { [weak self] (frame) in
-                    return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
-                }
-                
-                self.updateLabelsAndChart(overrideApplicationState: true)
-                
-            }
-
         })
     }
     
@@ -560,12 +539,16 @@ final class RootViewController: UIViewController {
         // setup watchmanager
         watchManager = WatchManager(coreDataManager: coreDataManager)
         
-        // initialize glucoseChartManager
-        glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
-        
-        // initialize chartGenerator in chartOutlet
-        self.chartOutlet.chartGenerator = { [weak self] (frame) in
-            return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
+        // initialize glucoseChartManager, only if not disableChart
+        // after disabling chart in settings, app will need to be restarted to effectively disable it
+        if !UserDefaults.standard.disableChart {
+            glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
+            
+            // initialize chartGenerator in chartOutlet
+            self.chartOutlet.chartGenerator = { [weak self] (frame) in
+                return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
+            }
+
         }
         
     }
@@ -1199,14 +1182,14 @@ final class RootViewController: UIViewController {
     ///     - overrideApplicationState : if true, then update will be done even if state is not .active
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false) {
         
-        // glucoseChartManager should not ben nil here
-        guard let glucoseChartManager = glucoseChartManager else {return}
-        
-        // check that app is in foreground, but only if overrideApplicationState = false
+        // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
+        if let glucoseChartManager = glucoseChartManager  {
+            // check that app is in foreground, but only if overrideApplicationState = false
+            // check if chart is currently panned back in time, in that case we don't update the labels
+            guard !glucoseChartManager.chartIsPannedBackward else {return}
+        }
+
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
-        
-        // check if chart is currently panned back in time, in that case we don't update the labels
-        guard !glucoseChartManager.chartIsPannedBackward else {return}
         
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
