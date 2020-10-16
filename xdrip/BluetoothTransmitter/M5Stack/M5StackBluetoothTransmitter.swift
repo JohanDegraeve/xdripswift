@@ -27,7 +27,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     private var blePassword: String?
     
     /// temporary storage for packages received from M5Stack, with the password in it
-    private var blePasswordM5StackPacket =  M5StackPacket()
+    private var blePasswordM5StackPacket:M5StackPacket?
     
     /// is the transmitter ready to receive data like parameter updates or reading values
     private (set) var isReadyToReceiveData: Bool = false
@@ -347,13 +347,19 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             
             trace("    received new password, will store it", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             
-            blePasswordM5StackPacket.addNewPacket(value: value)
+            if blePasswordM5StackPacket == nil {
+                blePasswordM5StackPacket = M5StackPacket()
+            }
+            blePasswordM5StackPacket!.addNewPacket(value: value)
             
-            if let newBlePassword = blePasswordM5StackPacket.getText() {
+            if let newBlePassword = blePasswordM5StackPacket!.getText() {
                 
                 self.blePassword = newBlePassword
                 
                 m5StackBluetoothTransmitterDelegate?.newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: self)
+                
+                // memory clean up
+                blePasswordM5StackPacket = nil
                 
             }
             

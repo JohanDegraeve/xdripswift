@@ -198,6 +198,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             
         }
         
+        // setting characteristics to nil, they will be reinitialized at next connect
+        writeControlCharacteristic = nil
+        receiveAuthenticationCharacteristic = nil
+        communicationCharacteristic = nil
+        backfillCharacteristic = nil
+        
     }
 
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
