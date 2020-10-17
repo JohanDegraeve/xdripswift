@@ -842,9 +842,15 @@ final class RootViewController: UIViewController {
         
         // create closure to invalide the timer, if it exists
         let invalidateUpdateLabelsAndChartTimer = {
+            
             if let updateLabelsAndChartTimer = updateLabelsAndChartTimer {
+                
                 updateLabelsAndChartTimer.invalidate()
+                
             }
+            
+            updateLabelsAndChartTimer = nil
+
         }
         
         // create closure that launches the timer to update the first view every x seconds, and returns the created timer
