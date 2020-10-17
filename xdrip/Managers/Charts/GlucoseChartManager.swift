@@ -68,10 +68,9 @@ public final class GlucoseChartManager {
     /// used when user touches the chart. Deceleration is maybe still ongoing (from a previous pan). If set to true, then deceleration needs to be stopped
     private var stopDecelerationNextGestureTimerRun = false
     
-    /// the maximum value in glucoseChartPoints array between start and endPoint
-    ///
-    /// value calculated in loopThroughGlucoseChartPointsAndFindValues
-    private var maximumValueInGlucoseChartPoints:Double?
+    /// - the maximum value in glucoseChartPoints array between start and endPoint
+    /// - the value will never get smaller during the run time of the app
+    private var maximumValueInGlucoseChartPoints:Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
     
     /// - if glucoseChartPoints.count > 0, then this is the latest one that has timestamp less than endDate.
     ///
@@ -178,6 +177,20 @@ public final class GlucoseChartManager {
 
                 // get glucosePoints from coredata
                 newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor)
+            }
+            
+            // recalculate maximumValueInGlucoseChartPoints, there may be a higher value in newGlucoseChartPointsToAppend
+            for glucoseChartPoint in newGlucoseChartPointsToAppend {
+                
+                self.maximumValueInGlucoseChartPoints = max(self.maximumValueInGlucoseChartPoints, glucoseChartPoint.y.scalar)
+                
+            }
+            
+            // recalculate maximumValueInGlucoseChartPoints, there may be a higher value in newGlucoseChartPointsToPrepend
+            for glucoseChartPoint in newGlucoseChartPointsToPrepend {
+                
+                self.maximumValueInGlucoseChartPoints = max(self.maximumValueInGlucoseChartPoints, glucoseChartPoint.y.scalar)
+                
             }
             
             self.loopThroughGlucoseChartPointsAndFindValues()
@@ -416,10 +429,7 @@ public final class GlucoseChartManager {
     }
     
     private func generateGlucoseChartWithFrame(_ frame: CGRect) -> Chart? {
-        
-        // first calculate necessary values by looping through all chart points
-        //loopThroughGlucoseChartPointsAndFindValues()
-        
+
         let xAxisValues = generateXAxisValues()
         
         guard xAxisValues.count > 1 else {return nil}
@@ -444,7 +454,7 @@ public final class GlucoseChartManager {
         }
         
         // if the maxium yAxisValue doesn't support the maximum glucose value, then add the next range
-        if yAxisValues.last!.scalar < data().maximumValueInGlucoseChartPoints {
+        if yAxisValues.last!.scalar < maximumValueInGlucoseChartPoints {
             if unitIsMgDl {
                 yAxisValues += ConstantsGlucoseChart.secondGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
             } else {
@@ -453,7 +463,7 @@ public final class GlucoseChartManager {
         }
 
         // if the maxium yAxisValue doesn't support the maximum glucose value, then add the next range
-        if yAxisValues.last!.scalar < data().maximumValueInGlucoseChartPoints {
+        if yAxisValues.last!.scalar < maximumValueInGlucoseChartPoints {
             if unitIsMgDl {
                 yAxisValues += ConstantsGlucoseChart.thirdGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
             } else {
@@ -569,14 +579,10 @@ public final class GlucoseChartManager {
     /// - the timeStamp of the chartPoint with the highest timestamp that is still lower than the endDate, in the list of glucoseChartPoints
     private func loopThroughGlucoseChartPointsAndFindValues() {
         
-        maximumValueInGlucoseChartPoints = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-        
         lastChartPointEarlierThanEndDate = nil
         
         for glucoseChartPoint in glucoseChartPoints {
 
-            maximumValueInGlucoseChartPoints = max(data().maximumValueInGlucoseChartPoints, glucoseChartPoint.y.scalar)
-                
             if let lastChartPointEarlierThanEndDate = lastChartPointEarlierThanEndDate {
                 
                 if (glucoseChartPoint.x as! ChartAxisValueDate).date <= endDate && (lastChartPointEarlierThanEndDate.x as! ChartAxisValueDate).date < (glucoseChartPoint.x as! ChartAxisValueDate).date {
@@ -617,12 +623,10 @@ public final class GlucoseChartManager {
         
         bgReadingsAccessor = nil
         
-        maximumValueInGlucoseChartPoints = nil
-        
     }
     
     /// function which gives is variables that are set back to nil when nillifyData is called
-    private func data() -> (chartSettings: ChartSettings, chartPointDateFormatter: DateFormatter, operationQueue: OperationQueue, chartLabelSettings: ChartLabelSettings, chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings, axisLabelTimeFormatter: DateFormatter, bgReadingsAccessor: BgReadingsAccessor, maximumValueInGlucoseChartPoints: Double){
+    private func data() -> (chartSettings: ChartSettings, chartPointDateFormatter: DateFormatter, operationQueue: OperationQueue, chartLabelSettings: ChartLabelSettings, chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings, axisLabelTimeFormatter: DateFormatter, bgReadingsAccessor: BgReadingsAccessor){
         
         // setup chartSettings
         if chartSettings == nil {
@@ -684,12 +688,7 @@ public final class GlucoseChartManager {
             bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         }
         
-        // initialize maximumValueInGlucoseChartPoints
-        if maximumValueInGlucoseChartPoints == nil {
-            maximumValueInGlucoseChartPoints = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-        }
-
-        return (chartSettings!, chartPointDateFormatter!, operationQueue!, chartLabelSettings!, chartGuideLinesLayerSettings!, axisLabelTimeFormatter!, bgReadingsAccessor!, maximumValueInGlucoseChartPoints!)
+        return (chartSettings!, chartPointDateFormatter!, operationQueue!, chartLabelSettings!, chartGuideLinesLayerSettings!, axisLabelTimeFormatter!, bgReadingsAccessor!)
         
     }
     
