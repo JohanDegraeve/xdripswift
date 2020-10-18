@@ -977,6 +977,9 @@ final class RootViewController: UIViewController {
                 // watchManager should process new reading
                 self.watchManager?.processNewReading()
                 
+                // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
+                self.loopManager?.share()
+                
             }
             
         }, cancelHandler: nil)
@@ -1684,6 +1687,9 @@ extension RootViewController:NightScoutFollowerDelegate {
                 }
                 
                 bluetoothPeripheralManager?.sendLatestReading()
+                
+                // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
+                self.loopManager?.share()
                 
             }
         }
