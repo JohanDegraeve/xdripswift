@@ -432,7 +432,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                             
                         }
                         
-                        LibreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: patchInfo, webOOPEnabled: false, oopWebSite: ConstantsLibre.site, oopWebToken: ConstantsLibre.token, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: nil, timeStampLastBgReading: Date(timeIntervalSince1970: 0), dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, completionHandler: { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
+                        LibreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: patchInfo, webOOPEnabled: true, oopWebSite: ConstantsLibre.site, oopWebToken: ConstantsLibre.token, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: nil, timeStampLastBgReading: Date(timeIntervalSince1970: 0), dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, completionHandler: { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
                             
                             if let timeStampLastBgReading = timeStampLastBgReading {
                                 debuglogging("timeStampLastBgReading = " + timeStampLastBgReading.description(with: .current))

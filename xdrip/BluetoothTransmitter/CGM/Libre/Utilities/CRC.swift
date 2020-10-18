@@ -45,7 +45,7 @@ final class Crc {
     /// - parameter seed:    seed for crc
     ///
     /// - returns: crc16
-    private static func crc16(_ message: [UInt8], seed: UInt16? = nil) -> UInt16 {
+    public static func crc16(_ message: [UInt8], seed: UInt16? = nil) -> UInt16 {
         var crc: UInt16 = seed != nil ? seed! : 0x0000
         
         // calculate crc
@@ -74,7 +74,7 @@ final class Crc {
     /// - parameter bytes: Array of bytes with a crc in the first two bytes
     ///
     /// - returns: true if crc is valid
-    private static func hasValidCrc16InFirstTwoBytes(_ bytes: [UInt8]) -> Bool {
+    public static func hasValidCrc16InFirstTwoBytes(_ bytes: [UInt8]) -> Bool {
         
         //        print(Array(bytes.dropFirst(2)))
         let calculatedCrc = Crc.crc16(Array(bytes.dropFirst(2)), seed: 0xffff)

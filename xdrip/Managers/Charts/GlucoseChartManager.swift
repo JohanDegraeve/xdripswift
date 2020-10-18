@@ -145,7 +145,7 @@ public final class GlucoseChartManager {
                     
                     // startDate is bigger than the the date of the last currently stored ChartPoint, let's reinitialize the glucosechartpoints
                     reUseExistingChartPointList = false
-                    
+                
                     // use newGlucoseChartPointsToAppend and assign it to new list of chartpoints startDate to endDate
                     newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor)
                     

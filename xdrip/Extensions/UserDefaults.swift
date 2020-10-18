@@ -215,8 +215,8 @@ extension UserDefaults {
         /// NSLog enabled or not
         case NSLogEnabled = "NSLogEnabled"
         
-        /// chartDisabled
-        case chartDisabled = "chartDisabled"
+        /// off line calculation libre derived algorithm parameters, voor Libre only
+        case oopWebOffline = "oopWebOffline"
         
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
@@ -1154,13 +1154,13 @@ extension UserDefaults {
         }
     }
     
-    /// chartDisabled - default false
-    var disableChart: Bool {
+    /// off line calculation libre derived algorithm parameters, voor Libre only
+    var oopWebOffline: Bool {
         get {
-            return bool(forKey: Key.chartDisabled.rawValue)
+            return bool(forKey: Key.oopWebOffline.rawValue)
         }
         set {
-            set(newValue, forKey: Key.chartDisabled.rawValue)
+            set(newValue, forKey: Key.oopWebOffline.rawValue)
         }
     }
     
