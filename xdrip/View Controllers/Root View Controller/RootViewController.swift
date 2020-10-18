@@ -90,7 +90,7 @@ final class RootViewController: UIViewController {
                     
                 } else {
                     
-                    // this should normally not happen because lastChartPointEarlierThanEndDate should normally always be set
+                    // this would only be the case if there's no readings withing the shown timeframe
                     self.updateLabelsAndChart(overrideApplicationState: false)
                     
                 }

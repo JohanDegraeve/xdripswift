@@ -73,8 +73,6 @@ public final class GlucoseChartManager {
     private var maximumValueInGlucoseChartPoints:Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
     
     /// - if glucoseChartPoints.count > 0, then this is the latest one that has timestamp less than endDate.
-    ///
-    /// value calculated in loopThroughGlucoseChartPointsAndFindValues
     private(set) var lastChartPointEarlierThanEndDate: ChartPoint?
     
     /// is chart in panned state or not, meaning is it currently shifted back in time
@@ -193,7 +191,38 @@ public final class GlucoseChartManager {
                 
             }
             
-            self.loopThroughGlucoseChartPointsAndFindValues()
+            // closure will iterate through glucoseChartPoints and find latest date earlier than endDate and larger then startdate, if there isn't any it returns nil
+            let findLastChartPointEarlierThanEndDateInArray = { (_ glucoseChartPoints : [ChartPoint]) -> ChartPoint? in
+                
+                for (_, glucoseChartPoint) in glucoseChartPoints.enumerated().reversed() {
+                    
+                    if let chartAxisValueDate = glucoseChartPoint.x as? ChartAxisValueDate {
+                        
+                        if chartAxisValueDate.date < endDate {
+                            
+                            return glucoseChartPoint
+                            
+                        } else if let startDate = startDate, chartAxisValueDate.date < startDate {
+                            
+                            return nil
+                            
+                        }
+                        
+                    }
+                }
+                
+                return nil
+                
+            }
+            
+            // now calculate lastChartPointEarlierThanEndDate by using findLastChartPointEarlierThanEndDateInArray for newGlucoseChartPointsToAppend, newGlucoseChartPointsToPrepend and glucoseChartPoints
+            self.lastChartPointEarlierThanEndDate = findLastChartPointEarlierThanEndDateInArray(newGlucoseChartPointsToAppend)
+            if self.lastChartPointEarlierThanEndDate == nil && reUseExistingChartPointList {
+                self.lastChartPointEarlierThanEndDate = findLastChartPointEarlierThanEndDateInArray(self.glucoseChartPoints)
+            }
+            if self.lastChartPointEarlierThanEndDate == nil {
+                self.lastChartPointEarlierThanEndDate = findLastChartPointEarlierThanEndDateInArray(newGlucoseChartPointsToPrepend)
+            }
             
             DispatchQueue.main.async {
                 
@@ -571,34 +600,6 @@ public final class GlucoseChartManager {
             ChartPoint(bgReading: $0, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
         }
-    }
-
-    
-    /// function to be called when glucoseChartPoints array is updated, as first function in generateGlucoseChartWithFrame. Will loop through glucoseChartPoints and find :
-    /// - the maximum bg value of the chartPoints between start and end date
-    /// - the timeStamp of the chartPoint with the highest timestamp that is still lower than the endDate, in the list of glucoseChartPoints
-    private func loopThroughGlucoseChartPointsAndFindValues() {
-        
-        lastChartPointEarlierThanEndDate = nil
-        
-        for glucoseChartPoint in glucoseChartPoints {
-
-            if let lastChartPointEarlierThanEndDate = lastChartPointEarlierThanEndDate {
-                
-                if (glucoseChartPoint.x as! ChartAxisValueDate).date <= endDate && (lastChartPointEarlierThanEndDate.x as! ChartAxisValueDate).date < (glucoseChartPoint.x as! ChartAxisValueDate).date {
-                    
-                    self.lastChartPointEarlierThanEndDate = glucoseChartPoint
-                    
-                }
-                
-            } else {
-                
-                lastChartPointEarlierThanEndDate = glucoseChartPoint
-                
-            }
-            
-        }
-        
     }
     
     /// - set data to nil, will be called eg to clean up memory when going to the background
