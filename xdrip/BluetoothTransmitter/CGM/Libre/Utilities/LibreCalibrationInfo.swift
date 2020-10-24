@@ -29,12 +29,6 @@ public struct LibreCalibrationInfo: Codable {
         
     }
     
-    /// Reads Libredata in bits converts and the result to int
-    ///
-    /// Makes it possible to read for example 7 bits from a 1 byte (8 bit) buffer.
-    /// Can be used to read both FRAM and Libre2 Bluetooth buffer data . Buffer is expected to be unencrypted
-    /// - Returns: bits from buffer
-    
     static func readBits(_ buffer: [UInt8], _ byteOffset: Int, _ bitOffset: Int, _ bitCount: Int) -> Int {
         guard bitCount != 0 else {
             return 0
