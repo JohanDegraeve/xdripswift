@@ -547,18 +547,14 @@ final class RootViewController: UIViewController {
         // setup watchmanager
         watchManager = WatchManager(coreDataManager: coreDataManager)
         
-        // initialize glucoseChartManager, only if not disableChart
-        // after disabling chart in settings, app will need to be restarted to effectively disable it
-        if !UserDefaults.standard.disableChart {
-            glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
-            
-            // initialize chartGenerator in chartOutlet
-            self.chartOutlet.chartGenerator = { [weak self] (frame) in
-                return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
-            }
-
-        }
+        // initialize glucoseChartManager
+        glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
         
+        // initialize chartGenerator in chartOutlet
+        self.chartOutlet.chartGenerator = { [weak self] (frame) in
+            return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
+        }
+
     }
     
     /// process new glucose data received from transmitter.
@@ -976,7 +972,7 @@ final class RootViewController: UIViewController {
                 
                 // watchManager should process new reading
                 self.watchManager?.processNewReading()
-                
+            
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
                 self.loopManager?.share()
                 

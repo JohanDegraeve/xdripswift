@@ -17,8 +17,8 @@ fileprivate enum Setting:Int, CaseIterable {
     /// in case Libre 2 users want to use the local calibration algorithm
     case overrideWebOOPCalibration = 4
     
-    /// if true then chart will not be shown
-    case disableChart = 5
+    /// off line calculation libre derived algorithm parameters, voor Libre only
+    case oopWebOffline = 5
     
 }
 
@@ -60,8 +60,8 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
             return "Override Web OOP Calibration"
             
-        case .disableChart:
-            return "disable Chart"
+        case .oopWebOffline:
+            return "oop web offline"
             
         }
     }
@@ -81,7 +81,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .webOOPtoken:
             return .disclosureIndicator
             
-        case .disableChart:
+        case .oopWebOffline:
             return .none
             
         }
@@ -115,7 +115,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .overrideWebOOPCalibration:
             return nil
             
-        case .disableChart:
+        case .oopWebOffline:
             return nil
             
         }
@@ -158,11 +158,11 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                 
             })
             
-        case .disableChart:
-            return UISwitch(isOn: UserDefaults.standard.disableChart, action: {
+        case .oopWebOffline:
+            return UISwitch(isOn: UserDefaults.standard.oopWebOffline, action: {
                 (isOn:Bool) in
                 
-                UserDefaults.standard.disableChart = isOn
+                UserDefaults.standard.oopWebOffline = isOn
                 
             })
 
@@ -180,7 +180,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration, .disableChart:
+        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration, .oopWebOffline:
             return .nothing
             
         case .webOOPsite:

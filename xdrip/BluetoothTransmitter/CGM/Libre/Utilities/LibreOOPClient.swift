@@ -90,7 +90,7 @@ class LibreOOPClient {
         }
     }
         
-    /// get the `Libre1DerivedAlgorithmParameters for Libre1 Sensor, either from UserDefaults (if already fetched earlier for that sensor), or from oopWeb. If oopWeb fetch fails, then default values are used
+    /// get the `Libre1DerivedAlgorithmParameters for Libre1 Sensor,  from oopWeb
     /// - Parameters:
     ///   - bytes: the 344 bytes from Libre sensor
     ///   - libreSensorSerialNumber: LibreSensorSerialNumber is a structure that hold the serial number
