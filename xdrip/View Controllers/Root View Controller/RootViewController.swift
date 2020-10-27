@@ -327,7 +327,9 @@ final class RootViewController: UIViewController {
         // when overrideWebOOPCalibration changes, sensor needs to be restarted
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.overrideWebOOPCalibration.rawValue, options: .new, context: nil)
         
-        
+        // changing from oopweb offline or vice versa, new reading should be requested
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.oopWebOffline.rawValue, options: .new, context: nil)
+    
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
         
@@ -575,7 +577,7 @@ final class RootViewController: UIViewController {
         if activeSensor == nil {
             
             if let sensorTimeInMinutes = sensorTimeInMinutes, cgmTransmitter.cgmTransmitterType().canDetectNewSensor() {
-                
+
                 activeSensor = Sensor(startDate: Date(timeInterval: -Double(sensorTimeInMinutes * 60), since: Date()),nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                 if let activeSensor = activeSensor {
                     trace("created sensor with id : %{public}@ and startdate  %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, activeSensor.id, activeSensor.startDate.description)
@@ -700,7 +702,7 @@ final class RootViewController: UIViewController {
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
             
-        case UserDefaults.Key.isMaster, UserDefaults.Key.overrideWebOOPCalibration, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl :
+        case UserDefaults.Key.isMaster, UserDefaults.Key.overrideWebOOPCalibration, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.oopWebOffline :
             
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -752,6 +754,15 @@ final class RootViewController: UIViewController {
                 calibrator = getCalibrator(cgmTransmitter: cgmTransmitter)
                 
                 // request a new reading
+                cgmTransmitter.requestNewReading()
+                
+            }
+            
+        case UserDefaults.Key.oopWebOffline:
+            
+            // for example oop web doesn't work, user switches to oop web offline, a new reading will be requested immediately from transmitter, which should result in .. yes, a new reading
+            if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
+                
                 cgmTransmitter.requestNewReading()
                 
             }

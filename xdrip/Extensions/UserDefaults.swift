@@ -1155,7 +1155,7 @@ extension UserDefaults {
     }
     
     /// off line calculation libre derived algorithm parameters, voor Libre only
-    var oopWebOffline: Bool {
+    @objc dynamic var oopWebOffline: Bool {
         get {
             return bool(forKey: Key.oopWebOffline.rawValue)
         }
