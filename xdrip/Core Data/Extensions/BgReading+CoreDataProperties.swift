@@ -15,8 +15,6 @@ extension BgReading {
     @NSManaged public var calculatedValue: Double
     @NSManaged public var calculatedValueSlope: Double
     @NSManaged public var calibrationFlag: Bool
-    @NSManaged public var filteredCalculatedValue: Double
-    @NSManaged public var filteredData: Double
     @NSManaged public var hideSlope: Bool
     @NSManaged public var id: String
     @NSManaged public var ra: Double

@@ -16,7 +16,6 @@ class NoCalibrator: Calibrator {
     /// create a new BgReading
     /// - parameters:
     ///     - rawData : the rawdata value
-    ///     - filteredData : the filtered data
     ///     - timeStamp : optional, if nil then actualy date and time is used
     ///     - sensor : actual sensor, optional
     ///     - last3Readings : empty array
@@ -26,7 +25,7 @@ class NoCalibrator: Calibrator {
     ///     - lastCalibration : nil
     /// - returns:
     ///     - the created bgreading
-    func createNewBgReading(rawData:Double, filteredData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration?, lastCalibration:Calibration?, deviceName:String?, nsManagedObjectContext:NSManagedObjectContext ) -> BgReading {
+    func createNewBgReading(rawData:Double, timeStamp:Date?, sensor:Sensor?, last3Readings:inout Array<BgReading>, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration?, lastCalibration:Calibration?, deviceName:String?, nsManagedObjectContext:NSManagedObjectContext ) -> BgReading {
         
         var timeStampToUse:Date = Date()
         if let timeStamp = timeStamp {
@@ -38,7 +37,6 @@ class NoCalibrator: Calibrator {
             sensor:sensor,
             calibration:lastCalibration,
             rawData:rawData,
-            filteredData:filteredData,
             deviceName:deviceName,
             nsManagedObjectContext:nsManagedObjectContext
         )

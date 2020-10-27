@@ -5,18 +5,14 @@ class LibreRawGlucoseData: GlucoseData {
     
     var unsmoothedGlucose: Double
 
-    init(timeStamp:Date, glucoseLevelRaw:Double, glucoseLevelFiltered:Double, unsmoothedGlucose: Double = 0.0) {
+    init(timeStamp:Date, glucoseLevelRaw:Double, unsmoothedGlucose: Double = 0.0) {
         self.unsmoothedGlucose = unsmoothedGlucose
 
-        super.init(timeStamp: timeStamp, glucoseLevelRaw: glucoseLevelRaw, glucoseLevelFiltered: glucoseLevelFiltered)
-    }
-    
-    convenience init(timeStamp:Date, glucoseLevelRaw:Double) {
-        self.init(timeStamp: timeStamp, glucoseLevelRaw: glucoseLevelRaw, glucoseLevelFiltered: glucoseLevelRaw)
+        super.init(timeStamp: timeStamp, glucoseLevelRaw: glucoseLevelRaw)
     }
     
     convenience init(timeStamp:Date, unsmoothedGlucose: Double) {
-        self.init(timeStamp: timeStamp, glucoseLevelRaw: unsmoothedGlucose, glucoseLevelFiltered: unsmoothedGlucose, unsmoothedGlucose: unsmoothedGlucose)
+        self.init(timeStamp: timeStamp, glucoseLevelRaw: unsmoothedGlucose, unsmoothedGlucose: unsmoothedGlucose)
     }
 
     /// description

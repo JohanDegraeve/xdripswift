@@ -154,7 +154,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// for testing, used by temptesting
     @objc private func createTestReading() {
-        let testdata = GlucoseData(timeStamp: Date(), glucoseLevelRaw: testAmount, glucoseLevelFiltered: testAmount)
+        let testdata = GlucoseData(timeStamp: Date(), glucoseLevelRaw: testAmount)
         debuglogging("timestamp testdata = " + testdata.timeStamp.description + ", with amount = " + testAmount.description)
         var testdataasarray = [testdata]
         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &testdataasarray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
@@ -372,7 +372,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
                                         timeStampOfLastG5Reading = Date()
                                         
-                                        let glucoseData = GlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered), glucoseLevelFiltered: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered))
+                                        let glucoseData = GlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered))
                                         
                                         var glucoseDataArray = [glucoseData]
                                         

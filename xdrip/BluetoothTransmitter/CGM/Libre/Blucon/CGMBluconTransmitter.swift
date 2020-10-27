@@ -524,7 +524,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                             // get glucoseValue from value
                             let glucoseValue = nowGetGlucoseValue(input: value)
                             
-                            let glucoseData = GlucoseData(timeStamp: timeStampLastBgReading, glucoseLevelRaw: glucoseValue, glucoseLevelFiltered: glucoseValue)
+                            let glucoseData = GlucoseData(timeStamp: timeStampLastBgReading, glucoseLevelRaw: glucoseValue)
                             var glucoseDataArray = [glucoseData]
                             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil,  sensorTimeInMinutes: nil)
                             
