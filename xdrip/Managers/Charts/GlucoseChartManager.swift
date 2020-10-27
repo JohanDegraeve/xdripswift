@@ -394,7 +394,7 @@ public final class GlucoseChartManager {
         stopDecelerationNextGestureTimerRun = false
         
         // at regular intervals new distance to travel the chart will be calculated and setNewStartAndEndDate will be called
-        gestureTimer = RepeatingTimer(timeInterval: TimeInterval(ConstantsGlucoseChart.decelerationTimerValueInSeconds), eventHandler: {
+        gestureTimer = RepeatingTimer(timeInterval: TimeInterval(Double(ConstantsGlucoseChart.decelerationTimerValueInSeconds)), eventHandler: {
             
             // if stopDecelerationNextGestureTimerRun is set, then return
             if self.stopDecelerationNextGestureTimerRun {

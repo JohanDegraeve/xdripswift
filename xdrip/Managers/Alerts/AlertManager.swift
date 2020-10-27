@@ -456,7 +456,7 @@ public class AlertManager:NSObject {
         uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
         
         // replan missed reading alert, repeating with delay of snoozePeriodInMinutes
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(snoozePeriodInMinutes * 60), repeats: true)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(Double(snoozePeriodInMinutes) * 60.0), repeats: true)
         
         // create the notificationrequest
         let notificationRequest = UNNotificationRequest(identifier: AlertKind.missedreading.notificationIdentifier(), content: content, trigger: trigger)
@@ -497,7 +497,7 @@ public class AlertManager:NSObject {
             case .missedreading: // any alert type that would be configured with a delay
                 if getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes > 0, let snoozeTimeStamp = getSnoozeParameters(alertKind: alertKind).snoozeTimeStamp {
                     
-                    minimumDelayInSecondsToUse = -Int(Date().timeIntervalSince(Date(timeInterval: TimeInterval(getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes * 60), since: snoozeTimeStamp)).rawValue)
+                    minimumDelayInSecondsToUse = -Int(Date().timeIntervalSince(Date(timeInterval: TimeInterval(Double(getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes) * 60.0), since: snoozeTimeStamp)).rawValue)
                     trace("in checkAlertAndFire, minimumDelayInSecondsToUse = %{public}@" , log: log, category: ConstantsLog.categoryAlertManager, type: .info, minimumDelayInSecondsToUse!.description)
 
                 } // if snoozePeriodInMinutes or snoozeTimeStamp is nil (which shouldn't be the case) continue without taking into account the snooze status
@@ -636,7 +636,7 @@ public class AlertManager:NSObject {
             var trigger:UNTimeIntervalNotificationTrigger?
             if delayInSecondsToUse > 0 {
                 // set repeats to true
-                trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(delayInSecondsToUse), repeats: true)
+                trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(Double(delayInSecondsToUse)), repeats: true)
             }
             
             // create the notificationrequest

@@ -204,7 +204,7 @@ public class NightScoutUploadManager:NSObject {
         trace("in uploadBgReadingsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
         
         // get readings to upload, limit to x days, x = ConstantsNightScout.maxDaysToUpload
-        var timeStamp = Date(timeIntervalSinceNow: TimeInterval(-ConstantsNightScout.maxDaysToUpload*24*60*60))
+        var timeStamp = Date(timeIntervalSinceNow: TimeInterval(-Double(ConstantsNightScout.maxDaysToUpload) * 24.0 * 60.0 * 60.0))
         
         if let timeStampLatestNightScoutUploadedBgReading = UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading {
             if timeStampLatestNightScoutUploadedBgReading > timeStamp {

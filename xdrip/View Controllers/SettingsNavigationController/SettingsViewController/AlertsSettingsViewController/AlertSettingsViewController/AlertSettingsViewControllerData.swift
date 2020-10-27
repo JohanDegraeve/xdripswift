@@ -186,10 +186,10 @@ extension AlertSettingsViewControllerData {
             let nowAt000 = Date().toMidnight()
             
             // the actual date of start is nowAt000 + the number of minutes in the entry
-            let startAsDate = Date(timeInterval: TimeInterval(Int(start) * 60), since: nowAt000)
+            let startAsDate = Date(timeInterval: TimeInterval(Double(start) * 60.0), since: nowAt000)
             
             // create date pickerviewdata
-            let datePickerViewData = DatePickerViewData(withMainTitle: alertKindAsAlertKind.alertTitle(), withSubTitle: Texts_Alerts.alertStart, datePickerMode: .time, date: startAsDate, minimumDate: Date(timeInterval: TimeInterval(Int(minimumStart) * 60), since: nowAt000), maximumDate: Date(timeInterval: TimeInterval(Int(maximumStart) * 60), since: nowAt000), okButtonText: nil, cancelButtonText: nil
+            let datePickerViewData = DatePickerViewData(withMainTitle: alertKindAsAlertKind.alertTitle(), withSubTitle: Texts_Alerts.alertStart, datePickerMode: .time, date: startAsDate, minimumDate: Date(timeInterval: TimeInterval(Double(minimumStart) * 60.0), since: nowAt000), maximumDate: Date(timeInterval: TimeInterval(Double(maximumStart) * 60.0), since: nowAt000), okButtonText: nil, cancelButtonText: nil
                 , onOkClick: {(date) in
                     
                     // set new start value

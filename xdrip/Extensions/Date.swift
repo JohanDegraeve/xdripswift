@@ -34,7 +34,7 @@ extension Date {
         let hour = calendar.component(.hour, from: self)
         let minute = calendar.component(.minute, from: self)
         let seconds = calendar.component(.second, from: self)
-        let timeInterval = TimeInterval(-(hour * 3600 + minute * 60 + seconds))
+        let timeInterval = TimeInterval(-Double(hour * 3600 + minute * 60 + seconds))
         return Date(timeIntervalSinceNow: timeInterval)
     }
     

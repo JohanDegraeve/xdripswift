@@ -66,7 +66,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         // If the app is already in the foreground, then userNotificationCenter willPresent will be called, in this function the closure will be removed immediately, and the pairing request will be called. As a result, if the app is in the foreground, the user will not see (or hear) any notification, but the pairing will be initiated
         
         // max timestamp when notification was fired - connection stays open for 1 minute, taking 1 second as d
-        let maxTimeUserCanOpenApp = Date(timeIntervalSinceNow: TimeInterval(ConstantsDexcomG5.maxTimeToAcceptPairingInSeconds - 1))
+        let maxTimeUserCanOpenApp = Date(timeIntervalSinceNow: TimeInterval(Double(ConstantsDexcomG5.maxTimeToAcceptPairingInSeconds) - 1.0))
         
         // we will not just count on it that the user will click the notification to open the app (assuming the app is in the background, if the app is in the foreground, then we come in another flow)
         // whenever app comes from-back to foreground, updateLabelsAndChart needs to be called

@@ -86,9 +86,9 @@ final class TimeScheduleViewController: UIViewController {
         let nowAt000 = Date().toMidnight()
 
         // date is either minimumStart + 1 (if adding a new schedule) or the schedule pointed to by indexInSchedule
-        var date = Date(timeInterval: TimeInterval(Int(minimumStart + 1) * 60), since: nowAt000)
+        var date = Date(timeInterval: TimeInterval(Double(minimumStart + 1) * 60.0), since: nowAt000)
         if let indexInSchedule = indexInSchedule {
-            date = Date(timeInterval: TimeInterval(schedule[indexInSchedule] * 60), since: nowAt000)
+            date = Date(timeInterval: TimeInterval(Double(schedule[indexInSchedule]) * 60.0), since: nowAt000)
         }
         
         // index of schedule that will be edited or added
@@ -98,7 +98,7 @@ final class TimeScheduleViewController: UIViewController {
         let subTitle = Texts_SettingsView.editScheduleTimePickerSubtitle + " " + (indexNewOrUpdatedSchedule % 2 == 0 ? (Texts_Common.off + " -> " + Texts_Common.on) : (Texts_Common.on + " -> " + Texts_Common.off))
         
         // create date pickerviewdata
-        let datePickerViewData = DatePickerViewData(withMainTitle: nil, withSubTitle: subTitle, datePickerMode: .time, date: date, minimumDate: Date(timeInterval: TimeInterval(Int(minimumStart + 1) * 60), since: nowAt000), maximumDate: Date(timeInterval: TimeInterval(Int(maximumStart - 1) * 60), since: nowAt000), okButtonText: nil, cancelButtonText: indexInSchedule == nil ? nil : Texts_Common.delete
+        let datePickerViewData = DatePickerViewData(withMainTitle: nil, withSubTitle: subTitle, datePickerMode: .time, date: date, minimumDate: Date(timeInterval: TimeInterval(Double(minimumStart + 1) * 60.0), since: nowAt000), maximumDate: Date(timeInterval: TimeInterval(Double(maximumStart - 1) * 60.0), since: nowAt000), okButtonText: nil, cancelButtonText: indexInSchedule == nil ? nil : Texts_Common.delete
             , onOkClick: {(newdate) in
                 
                 if indexInSchedule == nil {
