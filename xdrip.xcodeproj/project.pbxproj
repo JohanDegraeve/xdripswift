@@ -459,7 +459,6 @@
 		F8F9722223A5915900C3F17D /* CRC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971E823A5915900C3F17D /* CRC.swift */; };
 		F8F9722323A5915900C3F17D /* LibreDataParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971E923A5915900C3F17D /* LibreDataParser.swift */; };
 		F8F9722423A5915900C3F17D /* LibreMeasurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971EA23A5915900C3F17D /* LibreMeasurement.swift */; };
-		F8F9722523A5915900C3F17D /* LibreRawGlucoseData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971EB23A5915900C3F17D /* LibreRawGlucoseData.swift */; };
 		F8F9722623A5915900C3F17D /* BluconTransmitterOpCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971ED23A5915900C3F17D /* BluconTransmitterOpCode.swift */; };
 		F8F9722723A5915900C3F17D /* CGMBluconTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971EE23A5915900C3F17D /* CGMBluconTransmitter.swift */; };
 		F8F9722823A5915900C3F17D /* BluconUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971EF23A5915900C3F17D /* BluconUtilities.swift */; };
@@ -1077,7 +1076,6 @@
 		F8F971E823A5915900C3F17D /* CRC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRC.swift; sourceTree = "<group>"; };
 		F8F971E923A5915900C3F17D /* LibreDataParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreDataParser.swift; sourceTree = "<group>"; };
 		F8F971EA23A5915900C3F17D /* LibreMeasurement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreMeasurement.swift; sourceTree = "<group>"; };
-		F8F971EB23A5915900C3F17D /* LibreRawGlucoseData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreRawGlucoseData.swift; sourceTree = "<group>"; };
 		F8F971ED23A5915900C3F17D /* BluconTransmitterOpCode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluconTransmitterOpCode.swift; sourceTree = "<group>"; };
 		F8F971EE23A5915900C3F17D /* CGMBluconTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMBluconTransmitter.swift; sourceTree = "<group>"; };
 		F8F971EF23A5915900C3F17D /* BluconUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluconUtilities.swift; sourceTree = "<group>"; };
@@ -2419,7 +2417,6 @@
 				F8F971E223A5915900C3F17D /* LibreOOPResponse.swift */,
 				F8AF11F024B11FD400AE5BA2 /* LibreOOPWebError.swift */,
 				F8AF11FB24B27A6C00AE5BA2 /* LibreOOPWebServerResponse.swift */,
-				F8F971EB23A5915900C3F17D /* LibreRawGlucoseData.swift */,
 				F89467F3249FFFA700F18424 /* LibreRawGlucoseOOPA2Cotent.swift */,
 				F8177026248ED57000AA3600 /* LibreRawGlucoseOOPA2Data.swift */,
 				F89467F1249FFF8700F18424 /* LibreRawGlucoseOOPA2List.swift */,
@@ -2977,7 +2974,6 @@
 				F8BECB05235CE5D80060DAE1 /* GlucoseChartManager.swift in Sources */,
 				F8C97850242A9FD500A09483 /* MiaoMiaoBluetoothPeripheralViewModel.swift in Sources */,
 				F816E10E2437EAC9009EE65B /* BlueReader+CoreDataProperties.swift in Sources */,
-				F8F9722523A5915900C3F17D /* LibreRawGlucoseData.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
 				F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */,
 				F830991C23C2909E005741DF /* Watlaa+CoreDataClass.swift in Sources */,

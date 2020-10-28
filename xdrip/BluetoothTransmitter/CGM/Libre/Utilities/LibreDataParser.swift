@@ -154,7 +154,7 @@ class LibreDataParser {
                             
                         }
                         
-                        // convert libreRawGlucoseOOPA2Data to (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?)
+                        // convert libreRawGlucoseOOPA2Data to (libreRawGlucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?)
                         let parsedResult = libreRawGlucoseOOPA2Data.glucoseData(timeStampLastBgReading: timeStampLastBgReading)
                         
                         handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
@@ -162,7 +162,7 @@ class LibreDataParser {
                     } else {
                         
                         // libreRawGlucoseOOPA2Data is nil, but possibly xDripError is not nil, so need to call handleGlucoseData which will process xDripError
-                        handleGlucoseData(result: ([LibreRawGlucoseData](), nil, nil, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+                        handleGlucoseData(result: ([GlucoseData](), nil, nil, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
 
                     }
                     
@@ -185,7 +185,7 @@ class LibreDataParser {
                             trace("in libreDataProcessor, received libreRawGlucoseOOPData = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, libreRawGlucoseOOPData.description)
                         }
                         
-                        // convert libreRawGlucoseOOPData to (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?)
+                        // convert libreRawGlucoseOOPData to (libreRawGlucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?)
                         let parsedResult = libreRawGlucoseOOPData.glucoseData(timeStampLastBgReading: timeStampLastBgReading)
                         
                         handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
@@ -193,7 +193,7 @@ class LibreDataParser {
                     } else {
                        
                         // libreRawGlucoseOOPData is nil, but possibly xDripError is not nil, so need to call handleGlucoseData which will process xDripError
-                        handleGlucoseData(result: ([LibreRawGlucoseData](), nil, nil, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+                        handleGlucoseData(result: ([GlucoseData](), nil, nil, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
 
                     }
                     
@@ -374,23 +374,23 @@ fileprivate func handleGlucoseData(result: (glucoseData:[GlucoseData], sensorTim
 
 /// to glucose data
 /// - Parameter measurements: array of LibreMeasurement
-/// - Returns: array of LibreRawGlucoseData
-fileprivate func trendToLibreGlucose(_ measurements: [LibreMeasurement]) -> [LibreRawGlucoseData] {
+/// - Returns: array of GlucoseData
+fileprivate func trendToLibreGlucose(_ measurements: [LibreMeasurement]) -> [GlucoseData] {
     
-    var origarr = [LibreRawGlucoseData]()
+    var origarr = [GlucoseData]()
     for trend in measurements {
-        let glucose = LibreRawGlucoseData.init(timeStamp: trend.date, glucoseLevelRaw: trend.temperatureAlgorithmGlucose)
+        let glucose = GlucoseData.init(timeStamp: trend.date, glucoseLevelRaw: trend.temperatureAlgorithmGlucose)
         origarr.append(glucose)
     }
     return origarr
 }
 
-fileprivate func historyToLibreGlucose(_ measurements: [LibreMeasurement]) -> [LibreRawGlucoseData] {
+fileprivate func historyToLibreGlucose(_ measurements: [LibreMeasurement]) -> [GlucoseData] {
     
-    var origarr = [LibreRawGlucoseData]()
+    var origarr = [GlucoseData]()
     
     for history in measurements {
-        let glucose = LibreRawGlucoseData(timeStamp: history.date, unsmoothedGlucose: history.temperatureAlgorithmGlucose)
+        let glucose = GlucoseData(timeStamp: history.date, glucoseLevelRaw: history.temperatureAlgorithmGlucose)
         origarr.append(glucose)
     }
     
@@ -406,10 +406,10 @@ fileprivate func historyToLibreGlucose(_ measurements: [LibreMeasurement]) -> [L
 ///     - array of libreRawGlucoseData, first is the most recent. Only returns recent readings, ie not the ones that are older than timeStampLastBgReading. 30 seconds are added here, meaning, new reading should be at least 30 seconds more recent than timeStampLastBgReading
 ///     - sensorState: status of the sensor
 ///     - sensorTimeInMinutes: age of sensor in minutes
-fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters, timeStampLastBgReading: Date) -> (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
+fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters, timeStampLastBgReading: Date) -> (libreRawGlucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
 
-    // initialise returnvalue, array of LibreRawGlucoseData
-    var finalResult:[LibreRawGlucoseData] = []
+    // initialise returnvalue, array of GlucoseData
+    var finalResult:[GlucoseData] = []
     
     // calculate sensorState
     let sensorState = LibreSensorState(stateByte: libreData[4])
@@ -420,7 +420,7 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
     let sensorTimeInMinutes:Int = 256 * (Int)(libreData.uint8(position: 317) & 0xFF) + (Int)(libreData.uint8(position: 316) & 0xFF)
     
     // iterates through glucoseData, compares timestamp, if still higher than timeStampLastBgReading (+ 30 seconds) then adds it to finalResult
-    let processGlucoseData = { (glucoseData: [LibreRawGlucoseData], timeStampLastAddedGlucoseData: Date) in
+    let processGlucoseData = { (glucoseData: [GlucoseData], timeStampLastAddedGlucoseData: Date) in
         
         var timeStampLastAddedGlucoseDataAsDouble = timeStampLastAddedGlucoseData.toMillisecondsAsDouble()
         
@@ -533,7 +533,7 @@ fileprivate func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialN
         } else {
             
             // libre1DerivedAlgorithmParameters not created, but possibly xDripError is not nil, so we need to call handleGlucoseData which will process xDripError
-            handleGlucoseData(result: ([LibreRawGlucoseData](), nil, nil, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+            handleGlucoseData(result: ([GlucoseData](), nil, nil, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
             
         }
         
