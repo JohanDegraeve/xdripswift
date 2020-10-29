@@ -472,10 +472,9 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
 ///     - libreData : either Libre 1 data or decrypted Libre 2 data
 fileprivate func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber, libreSensorType: LibreSensorType, libreData: Data, timeStampLastBgReading: Date, cgmTransmitterDelegate: CGMTransmitterDelegate?, oopWebSite: String, oopWebToken: String, completionHandler:@escaping ((_ timeStampLastBgReading: Date?, _ sensorState: LibreSensorState?, _ xDripError: XdripError?) -> ())) {
     
-    if UserDefaults.standard.oopWebOffline && UserDefaults.standard.libre1DerivedAlgorithmParameters == nil {
+    if UserDefaults.standard.libre1DerivedAlgorithmParameters == nil {
         
-        trace("in libreDataProcessor, calculate libre1DerivedAlgorithmParameters offline", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
-        UserDefaults.standard.libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(bytes: libreData.bytes)
+        UserDefaults.standard.libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(bytes: libreData.bytes, serialNumber: libreSensorSerialNumber.serialNumber)
         
     }
     

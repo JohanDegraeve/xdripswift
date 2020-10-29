@@ -18,7 +18,7 @@ public struct Libre1DerivedAlgorithmParameters: Codable, CustomStringConvertible
     public var isValidForFooterWithReverseCRCs: Int
     public var extraSlope : Double = 1
     public var extraOffset: Double = 0
-    public var serialNumber: String?
+    public var serialNumber: String
     
     public var description: String {
         return "LibreDerivedAlgorithmParameters:: slopeslope: \(slope_slope), slopeoffset: \(slope_offset), offsetoffset: \(offset_offset), offsetSlope: \(offset_slope), extraSlope: \(extraSlope), extraOffset: \(extraOffset), isValidForFooterWithReverseCRCs: \(isValidForFooterWithReverseCRCs)"
@@ -37,7 +37,9 @@ public struct Libre1DerivedAlgorithmParameters: Codable, CustomStringConvertible
         
     }
     
-    public init(bytes: [UInt8]) {
+    public init(bytes: [UInt8], serialNumber: String) {
+        
+        self.serialNumber = serialNumber
         
         let thresholds = LibreAlgorithmThresholds(glucoseLowerThreshold: 1000, glucoseUpperThreshold: 3000, temperatureLowerThreshold: 6000, temperatureUpperThreshold: 9000, forSensorIdentifiedBy: 49778)
         

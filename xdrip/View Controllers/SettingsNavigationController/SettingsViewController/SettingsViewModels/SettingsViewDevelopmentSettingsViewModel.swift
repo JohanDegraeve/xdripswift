@@ -17,9 +17,6 @@ fileprivate enum Setting:Int, CaseIterable {
     /// in case Libre 2 users want to use the local calibration algorithm
     case overrideWebOOPCalibration = 4
     
-    /// off line calculation libre derived algorithm parameters, voor Libre only
-    case oopWebOffline = 5
-    
 }
 
 struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
@@ -60,9 +57,6 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
             return "Override Web OOP Calibration"
             
-        case .oopWebOffline:
-            return "oop web offline"
-            
         }
     }
     
@@ -80,9 +74,6 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
         case .webOOPtoken:
             return .disclosureIndicator
-            
-        case .oopWebOffline:
-            return .none
             
         }
     }
@@ -113,9 +104,6 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             }
 
         case .overrideWebOOPCalibration:
-            return nil
-            
-        case .oopWebOffline:
             return nil
             
         }
@@ -158,14 +146,6 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                 
             })
             
-        case .oopWebOffline:
-            return UISwitch(isOn: UserDefaults.standard.oopWebOffline, action: {
-                (isOn:Bool) in
-                
-                UserDefaults.standard.oopWebOffline = isOn
-                
-            })
-
         }
         
     }
@@ -180,7 +160,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration, .oopWebOffline:
+        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration:
             return .nothing
             
         case .webOOPsite:

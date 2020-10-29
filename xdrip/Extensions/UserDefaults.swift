@@ -215,9 +215,6 @@ extension UserDefaults {
         /// NSLog enabled or not
         case NSLogEnabled = "NSLogEnabled"
         
-        /// off line calculation libre derived algorithm parameters, voor Libre only
-        case oopWebOffline = "oopWebOffline"
-        
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
         
@@ -1151,16 +1148,6 @@ extension UserDefaults {
             guard let jsonData = try? encoder.encode(newValue) else { return }
             let jsonString = String(bytes: jsonData, encoding: .utf8)
             set(jsonString, forKey: Key.libre1DerivedAlgorithmParameters.rawValue)
-        }
-    }
-    
-    /// off line calculation libre derived algorithm parameters, voor Libre only
-    @objc dynamic var oopWebOffline: Bool {
-        get {
-            return bool(forKey: Key.oopWebOffline.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.oopWebOffline.rawValue)
         }
     }
     
