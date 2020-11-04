@@ -25,7 +25,7 @@ class LibreMeasurement {
     /// The glucose value in mg/dl
     private let glucose: Double
     
-    let temperatureAlgorithmGlucose: Double
+    var temperatureAlgorithmGlucose: Double
 
     private let oopSlope: Double
 

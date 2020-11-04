@@ -227,7 +227,7 @@ fileprivate func getGlucoseRaw(bytes:Data) -> Int {
     return ((256 * (bytes.getByteAt(position: 0) & 0xFF) + (bytes.getByteAt(position: 1) & 0xFF)) & 0x1FFF)
 }
 
-fileprivate func trendMeasurements(bytes: Data, mostRecentReadingDate: Date, timeStampLastBgReading: Date, _ offset: Double = 0.0, slope: Double = 0.1, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?) -> [LibreMeasurement] {
+fileprivate func trendMeasurements(bytes: Data, mostRecentReadingDate: Date, _ offset: Double = 0.0, slope: Double = 0.1, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?) -> [LibreMeasurement] {
     
     //    let headerRange =   0..<24   //  24 bytes, i.e.  3 blocks a 8 bytes
     let bodyRange   =  24..<320  // 296 bytes, i.e. 37 blocks a 8 bytes
@@ -247,21 +247,18 @@ fileprivate func trendMeasurements(bytes: Data, mostRecentReadingDate: Date, tim
         let measurementBytes = Array(body[range])
         let measurementDate = mostRecentReadingDate.addingTimeInterval(Double(-60 * blockIndex))
         
-        if measurementDate > timeStampLastBgReading {
-            let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
-            measurements.append(measurement)
-            
-            if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-                trace("in trendMeasurements, created measurement with measurement.rawGlucose = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, measurement.rawGlucose.description)
-            }
-            
-        }
+        let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
+        measurements.append(measurement)
         
+        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+            trace("in trendMeasurements, created measurement with measurement.rawGlucose = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, measurement.rawGlucose.description)
+        }
+
     }
     return measurements
 }
 
-fileprivate func historyMeasurements(bytes: Data, timeStampLastBgReading: Date, _ offset: Double = 0.0, slope: Double = 0.1, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?) -> [LibreMeasurement] {
+fileprivate func historyMeasurements(bytes: Data, _ offset: Double = 0.0, slope: Double = 0.1, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?) -> [LibreMeasurement] {
     //    let headerRange =   0..<24   //  24 bytes, i.e.  3 blocks a 8 bytes
     let bodyRange   =  24..<320  // 296 bytes, i.e. 37 blocks a 8 bytes
     //    let footerRange = 320..<344  //  24 bytes, i.e.  3 blocks a 8 bytes
@@ -288,17 +285,11 @@ fileprivate func historyMeasurements(bytes: Data, timeStampLastBgReading: Date, 
         
         let measurementDate = Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60)
         
-        if measurementDate > timeStampLastBgReading {
-            
-            let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, minuteCounter: Int(timeInMinutes.rawValue), date: measurementDate, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
-            measurements.append(measurement)
-            
-            if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-                trace("in historyMeasurements, created measurement with measurement.rawGlucose = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, measurement.rawGlucose.description)
-            }
-
-        } else {
-            break
+        let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, minuteCounter: Int(timeInMinutes.rawValue), date: measurementDate, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
+        measurements.append(measurement)
+        
+        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+            trace("in historyMeasurements, created measurement with measurement.rawGlucose = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, measurement.rawGlucose.description)
         }
         
     }
@@ -442,18 +433,24 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
                 break
             }
         }
-        
+
     }
     
     // get last16 from trend data
     // latest reading will get date of now
-    let last16 = trendMeasurements(bytes: libreData, mostRecentReadingDate: Date(), timeStampLastBgReading: timeStampLastBgReading, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
+    var last16 = trendMeasurements(bytes: libreData, mostRecentReadingDate: Date(), libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
+    
+    // apply smoothing
+    last16.smoothSavitzkyGolayQuaDratic()
     
     // process last16, new readings should be smaller than now + 5 minutes
     processGlucoseData(trendToLibreGlucose(last16), Date(timeIntervalSinceNow: 5 * 60))
     
     // get last32 from history data
-    let last32 = historyMeasurements(bytes: libreData, timeStampLastBgReading: timeStampLastBgReading, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
+    var last32 = historyMeasurements(bytes: libreData, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
+    
+    // apply smoothing
+    last32.smoothSavitzkyGolayQuaDratic()
     
     // process last 32 with date earlier than the earliest in last16
     var timeStampLastAddedGlucoseData = Date()
