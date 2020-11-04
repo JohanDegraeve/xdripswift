@@ -214,7 +214,7 @@ extension UserDefaults {
         
         /// NSLog enabled or not
         case NSLogEnabled = "NSLogEnabled"
-        
+                
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
         
@@ -222,6 +222,9 @@ extension UserDefaults {
         case webOOPsite = "webOOPsite"
         /// if webOOP enabled, value of the token
         case webOOPtoken = "webOOPtoken"
+        
+        /// case smooth libre values
+        case smoothLibreValues = "smoothLibreValues"
         
         /// in case Libre 2 users want to use the local calibration algorithm
         case overrideWebOOPCalibration = "overrideWebOOPCalibration"
@@ -1066,6 +1069,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.NSLogEnabled.rawValue)
+        }
+    }
+    
+    /// smoothLibreValues - default false
+    var smoothLibreValues: Bool {
+        get {
+            return bool(forKey: Key.smoothLibreValues.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.smoothLibreValues.rawValue)
         }
     }
     

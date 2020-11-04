@@ -440,8 +440,12 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
     // latest reading will get date of now
     var last16 = trendMeasurements(bytes: libreData, mostRecentReadingDate: Date(), libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
     
-    // apply smoothing
-    last16.smoothSavitzkyGolayQuaDratic()
+    // apply smoothing if needed
+    if UserDefaults.standard.smoothLibreValues {
+        
+        last16.smoothSavitzkyGolayQuaDratic()
+        
+    }
     
     // process last16, new readings should be smaller than now + 5 minutes
     processGlucoseData(trendToLibreGlucose(last16), Date(timeIntervalSinceNow: 5 * 60))
@@ -449,8 +453,12 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
     // get last32 from history data
     var last32 = historyMeasurements(bytes: libreData, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
     
-    // apply smoothing
-    last32.smoothSavitzkyGolayQuaDratic()
+    // apply smoothing if needed
+    if UserDefaults.standard.smoothLibreValues {
+
+        last32.smoothSavitzkyGolayQuaDratic()
+
+    }
     
     // process last 32 with date earlier than the earliest in last16
     var timeStampLastAddedGlucoseData = Date()
