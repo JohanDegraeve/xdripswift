@@ -36,6 +36,7 @@ extension Array where Element: Smoothable {
     /// - ...continue with 5 here in the explanation ...
     /// - for the 5 last elements and 5 first elements, a regression is done. This regression is done used to give values to the 5 prepended and appended values. Which means it's as if we draw a line through the first 5 and 5 last original values, and use this line to give values to the 5 prepended and appended values
     /// - the 5 prepended and appended values are then used in the filter algorithm, which means we can also filter the original 5 first and last elements
+    /// see also example https://github.com/JohanDegraeve/xdripswift/wiki/Libre-value-smoothing
     mutating func smoothSavitzkyGolayQuaDratic() {
         
         // filterWidth is size of coefficients array
