@@ -477,7 +477,7 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
 ///     - libreData : either Libre 1 data or decrypted Libre 2 data
 fileprivate func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber, libreSensorType: LibreSensorType, libreData: Data, timeStampLastBgReading: Date, cgmTransmitterDelegate: CGMTransmitterDelegate?, oopWebSite: String, oopWebToken: String, completionHandler:@escaping ((_ timeStampLastBgReading: Date?, _ sensorState: LibreSensorState?, _ xDripError: XdripError?) -> ())) {
     
-    if UserDefaults.standard.libre1DerivedAlgorithmParameters == nil {
+    if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber != libreSensorSerialNumber.serialNumber || UserDefaults.standard.libre1DerivedAlgorithmParameters == nil {
         
         UserDefaults.standard.libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(bytes: libreData.bytes, serialNumber: libreSensorSerialNumber.serialNumber)
         
