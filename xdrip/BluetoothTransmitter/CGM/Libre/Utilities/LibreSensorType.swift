@@ -13,7 +13,7 @@ public enum LibreSensorType: String {
     case libre2    = "9D"
     
     case libreUS   = "E5"
-    
+   
     case libreProH = "70"
     
     var description: String {

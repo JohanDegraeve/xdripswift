@@ -74,7 +74,7 @@ enum CGMTransmitterType:String, CaseIterable {
     case watlaa = "Watlaa"
     
     /// Libre2
-    //case Libre2 = "Libre2"
+    case Libre2 = "Libre2"
     
     /// what sensorType does this CGMTransmitter type support
     func sensorType() -> CGMSensorType {
@@ -84,7 +84,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG4, .dexcomG5, .dexcomG6 :
             return .Dexcom
             
-        case .miaomiao, .Bubble, .GNSentry, .Droplet1, .blueReader, .watlaa, .Blucon/*, .Libre2*/:
+        case .miaomiao, .Bubble, .GNSentry, .Droplet1, .blueReader, .watlaa, .Blucon, .Libre2:
             return .Libre
             
         }
@@ -124,8 +124,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .watlaa:
             return false
             
-        /*case .Libre2:
-            return true*/
+        case .Libre2:
+            return true
             
         }
     }
@@ -140,7 +140,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG4, .dexcomG5, .dexcomG6, .GNSentry, .Droplet1, .blueReader, .watlaa:
             return true
             
-        case .miaomiao, .Bubble, .Blucon/*, .Libre2*/:
+        case .miaomiao, .Bubble, .Blucon, .Libre2:
             return true
         
         
@@ -178,8 +178,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .watlaa:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelWatlaa
             
-        /*case .Libre2:
-            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelLibre2*/
+        case .Libre2:
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelLibre2
             
         }
     }
@@ -212,8 +212,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .watlaa:
             return "%"
             
-        /*case .Libre2:
-            return "%"*/
+        case .Libre2:
+            return "%"
             
         }
     }

@@ -359,14 +359,110 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         resendPacketCounter = 0
     }
 
-    /// to make tests, value should be full data packet, ie full rxbuffer
-    public static func testPeripheralDidUpdateValue(value: Data) {
+    /// sample serial number in hex, as received from Libre, this is not the readable sensor number
+    private static let sampleSerialNumberInHex = "3f38a50000a407e0"
+    
+    /// sample miaomiao header in hex
+    //private let sampleMiaoMiaoHeader = "28016b455c2093690500a007e05c00071001"
+    
+    /// sample patchinfo in hex
+    private static let samplePatchInfoInHex =   "9D083001FB30"
+    
+    /// sample encrypted libre data in hex
+    private static var sampleLibreDataInHex:String = {
+
+        // here example libre 2 encrypted data
+        var sampleLibreDataInHex = "3244c69c763a7ec4290d1deb4db5cab2"
+        sampleLibreDataInHex = sampleLibreDataInHex + "5711a23c3cd3e7e27950a87afe243567"
+        sampleLibreDataInHex = sampleLibreDataInHex + "360a26adb3e6cf1754787603df0d6a57"
+        sampleLibreDataInHex = sampleLibreDataInHex + "aff41ec028efd297b067da06878cd7a6"
+        sampleLibreDataInHex = sampleLibreDataInHex + "6bff7a7121fe4072e74410be0d64b760"
+        sampleLibreDataInHex = sampleLibreDataInHex + "4e7c1ded16a24d14307f740fff7417b5"
+        sampleLibreDataInHex = sampleLibreDataInHex + "2fc31cfcf3976541c811cf4622f855a5"
+        sampleLibreDataInHex = sampleLibreDataInHex + "3589133584bee671a9aac8572bc97dfc"
+        sampleLibreDataInHex = sampleLibreDataInHex + "00966f04dc138780d26f301f8ed4ea10"
+        sampleLibreDataInHex = sampleLibreDataInHex + "36d358ece134a4142470ab29d695afe1"
+        sampleLibreDataInHex = sampleLibreDataInHex + "9be43c297f278039b8d483477d65b487"
+        sampleLibreDataInHex = sampleLibreDataInHex + "1786be196d0e48252488e8764a790089"
+        sampleLibreDataInHex = sampleLibreDataInHex + "78ad4e0466976eec5f06896673092de2"
+        sampleLibreDataInHex = sampleLibreDataInHex + "29925d7fdb67453a3011437a931c0b67"
+        sampleLibreDataInHex = sampleLibreDataInHex + "978157248da2fec758ff817aee394d84"
+        sampleLibreDataInHex = sampleLibreDataInHex + "00f3e645bfd9ec271fec5581b9f0e976"
+        sampleLibreDataInHex = sampleLibreDataInHex + "5d758d941fca99a3fa5c645e5c66bd7a"
+        sampleLibreDataInHex = sampleLibreDataInHex + "537cfa0a46a9471a5f7e00876f7640ba"
+        sampleLibreDataInHex = sampleLibreDataInHex + "32af681c01936f5bd511e0a672eb5fab"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a48967e9d4bd017fb4aebcb7fbca765e"
+        sampleLibreDataInHex = sampleLibreDataInHex + "48d5e4e1a7a2665f200eff8b47b60d1a"
+        sampleLibreDataInHex = sampleLibreDataInHex + "5870ccdc6cb29783"
+        
+        return sampleLibreDataInHex
+
+    }()
+    
+    /// - to make tests, value should be full data packet, ie full rxbuffer
+    /// - if value = nil then sample data defined here will be used
+    public static func testPeripheralDidUpdateValue(libreDataAsHexString: String?, serialNumberAsHexString: String?, patchInfoAsHexString:String?) {
         
         let miaoMiaoHeaderLength = 18
         
-        var sensorSerialNumber:String = "hello"
+        // using dummy value just to enforce a new sensor detected
+        var previousSensorSerialNumber:String = "hello"
         
-        var rxBuffer = value
+        var rxBuffer = Data()
+        
+        var libreDataAsHexStringToUse = ""
+        if let libreDataAsHexString = libreDataAsHexString {
+            libreDataAsHexStringToUse = libreDataAsHexString
+        } else {
+            libreDataAsHexStringToUse = sampleLibreDataInHex
+        }
+        
+        var serialNumberAsHexStringToUse = ""
+        if let serialNumberAsHexString = serialNumberAsHexString {
+            serialNumberAsHexStringToUse = serialNumberAsHexString
+        } else {
+            serialNumberAsHexStringToUse = sampleSerialNumberInHex
+        }
+        
+        var patchInfoAsHexStringToUse = ""
+        if let patchInfoAsHexString = patchInfoAsHexString {
+            patchInfoAsHexStringToUse = patchInfoAsHexString
+        } else {
+            patchInfoAsHexStringToUse = samplePatchInfoInHex
+        }
+        
+        if rxBuffer.count == 0 {
+
+            // mm response type + something + serial + something + libre data + patchinfo
+            // 0 is mm response type, use 0x28
+            // 1 to 4 use something dummy
+            // serial number (not readable) = 5 to 12 (inclusive), length 8
+            // 13 to 17 hare for battery, firmare , hardware, use something dummy
+            // libre data in hex = 18 to 361 (incusive), length 344
+            // 1 byte always 20 ?, length 1
+            // patchinfo = 363 to 368 (inclusive), length 6
+            rxBuffer =
+                Data(hexadecimalString: "28")! // response type for data // 1
+
+            rxBuffer = rxBuffer +
+                Data(hexadecimalString: "00000000")! // dummy value // 4 + 1 = 5
+
+            rxBuffer = rxBuffer +
+                Data(hexadecimalString: serialNumberAsHexStringToUse)!  // 5 + 8 = 13
+
+            rxBuffer = rxBuffer +
+                Data(hexadecimalString: "0000000000")!  // dummy value, is normally batttery, firmware, hardware // 13 + 5 = 18
+
+            rxBuffer = rxBuffer +
+                Data(hexadecimalString: libreDataAsHexStringToUse)!  // 344 + 18 = 362
+
+            rxBuffer = rxBuffer + Data(hexadecimalString: "20")! // 362 + 1 = 363
+
+            rxBuffer = rxBuffer +
+                Data(hexadecimalString: patchInfoAsHexStringToUse)! // 363 + 6 = 369
+
+            
+        }
         
         //check type of message and process according to type
         if let firstByte = rxBuffer.first {
@@ -422,9 +518,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                         if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
                             
                             // (there will also be a seperate opcode form MiaoMiao because it's able to detect new sensor also)
-                            if libreSensorSerialNumber.serialNumber != sensorSerialNumber {
+                            if libreSensorSerialNumber.serialNumber != previousSensorSerialNumber {
                                 
-                                sensorSerialNumber = libreSensorSerialNumber.serialNumber
+                                previousSensorSerialNumber = libreSensorSerialNumber.serialNumber
                                 
                                 debuglogging("    new sensor detected :  " + libreSensorSerialNumber.serialNumber)
                                 
@@ -463,6 +559,204 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                 //reset the buffer and send start reading command
                 
             }
+        }
+
+    }
+    
+    public static func testRange() {
+        
+        var testData = [String]()
+        var patchInfoRange = [String]()
+        var sampleLibreDataInHex = ""
+        
+        sampleLibreDataInHex = "7064027690617461bfaffe62454bb4a3"
+        sampleLibreDataInHex = sampleLibreDataInHex + "94d6e0e300fe1a3d9c303c967a9a2fd3"
+        sampleLibreDataInHex = sampleLibreDataInHex + "f5cdd5728fcf32c8c5da95bad7f3fc46"
+        sampleLibreDataInHex = sampleLibreDataInHex + "c74f00cc1d0d326657377b3e94cdd008"
+        sampleLibreDataInHex = sampleLibreDataInHex + "0374647d3f1c52b371eaf337cd9ac971"
+        sampleLibreDataInHex = sampleLibreDataInHex + "8dbb9a322a8fb0cb8363e1e40ecbcc05"
+        sampleLibreDataInHex = sampleLibreDataInHex + "ec045e2339ba989a5eb3d6cf2a022bb4"
+        sampleLibreDataInHex = sampleLibreDataInHex + "1266cac51e9d6494c69ac697bc79c176"
+        sampleLibreDataInHex = sampleLibreDataInHex + "e079b6f04630dc65b2d14d46674a8521"
+        sampleLibreDataInHex = sampleLibreDataInHex + "036089e33c7964e99e70a012064b8873"
+        sampleLibreDataInHex = sampleLibreDataInHex + "ae3fe026a26a40c4d86afe1e94fbf7b4"
+        sampleLibreDataInHex = sampleLibreDataInHex + "89113ec5928c95c635c4bf9eb8683a05"
+        sampleLibreDataInHex = sampleLibreDataInHex + "e63aced89915b30f3fb8f43f9a976ed1"
+        sampleLibreDataInHex = sampleLibreDataInHex + "1c498170062a85c78a11484143c22cf5"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a25a8b2b50ef3e3a3841fc2307a70eb7"
+        sampleLibreDataInHex = sampleLibreDataInHex + "e01c3fb125fab7c270d85b412e4055fc"
+        sampleLibreDataInHex = sampleLibreDataInHex + "bd9a546085e9c246b771fe68aae68a31"
+        sampleLibreDataInHex = sampleLibreDataInHex + "4b34c16a84faf39fc8edecd3a0b61350"
+        sampleLibreDataInHex = sampleLibreDataInHex + "2ae7537cc3c0dbde983c7a90846b68e0"
+        sampleLibreDataInHex = sampleLibreDataInHex + "178d005a3421a8e488710c30e7c238aa"
+        sampleLibreDataInHex = sampleLibreDataInHex + "fbd18352473ecfc46d2365bdb1363a51"
+        sampleLibreDataInHex = sampleLibreDataInHex + "4038f7bcaee12306"
+        
+        testData.append(sampleLibreDataInHex)
+        patchInfoRange.append("9D0830013635")
+        
+        sampleLibreDataInHex = "4fc0096be8c74510005a51d24e509d04"
+        sampleLibreDataInHex = sampleLibreDataInHex + "7e46ee053f36b054f378ee4448c162d5"
+        sampleLibreDataInHex = sampleLibreDataInHex + "1f5ddb94b00798a17a2f3a0adce8d5e1"
+        sampleLibreDataInHex = sampleLibreDataInHex + "869352f9000a85119930fe3f84598010"
+        sampleLibreDataInHex = sampleLibreDataInHex + "42a83648221b17c4ce135c870e81e0d6"
+        sampleLibreDataInHex = sampleLibreDataInHex + "672b51d415471aa219283836fc914003"
+        sampleLibreDataInHex = sampleLibreDataInHex + "069450c5067232f3e146797f21190213"
+        sampleLibreDataInHex = sampleLibreDataInHex + "dbde5f08875b68c780f9846e282c2a4a"
+        sampleLibreDataInHex = sampleLibreDataInHex + "29c1233ddff6d03689ea59d270c30a4e"
+        sampleLibreDataInHex = sampleLibreDataInHex + "6d3e3c211f2368487ff5c2e4288263bd"
+        sampleLibreDataInHex = sampleLibreDataInHex + "c06155e481304c65e351ea8a837278db"
+        sampleLibreDataInHex = sampleLibreDataInHex + "4c03d7d4931984797f0d81bbb46eccd5"
+        sampleLibreDataInHex = sampleLibreDataInHex + "232827c99880a2b00483e0ab8d1ee1be"
+        sampleLibreDataInHex = sampleLibreDataInHex + "721734b2257089666b942ab76d0bc73b"
+        sampleLibreDataInHex = sampleLibreDataInHex + "cc043ee973b5329b037ae8b7102e81d8"
+        sampleLibreDataInHex = sampleLibreDataInHex + "5b768f8841ce207b44693c4c47e7252a"
+        sampleLibreDataInHex = sampleLibreDataInHex + "06f0e459e1dd55ff8c4aeafcbd6f055e"
+        sampleLibreDataInHex = sampleLibreDataInHex + "256a74a8a7a0ff3e29688e258e7ff89e"
+        sampleLibreDataInHex = sampleLibreDataInHex + "44b9e6bee09ad77fa3076e0493e2e78f"
+        sampleLibreDataInHex = sampleLibreDataInHex + "d29fe94b35b4b95bc2b83215e0c4ce7a"
+        sampleLibreDataInHex = sampleLibreDataInHex + "3ec36a4346abde7b56187129a6bfb53e"
+        sampleLibreDataInHex = sampleLibreDataInHex + "2e66427e8dbb2fa7"
+        
+        testData.append(sampleLibreDataInHex)
+        patchInfoRange.append("9D083001AB33")
+        
+        sampleLibreDataInHex = "f1eff6d21ea36c22be75ae6bb834b436"
+        sampleLibreDataInHex = sampleLibreDataInHex + "c06911bcc95299663daa1cfa0ba54be3"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a172242d4663b193c400c5b32a8cfcd3"
+        sampleLibreDataInHex = sampleLibreDataInHex + "38bcad40f66eac23271f0186723da922"
+        sampleLibreDataInHex = sampleLibreDataInHex + "fc87c9f1d47f3ef6703ca33ef8e5c9e4"
+        sampleLibreDataInHex = sampleLibreDataInHex + "d904ae6de3233390a707c78f0af56931"
+        sampleLibreDataInHex = sampleLibreDataInHex + "b8bbaf7c06161bc55f697cc6d7792b21"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a2f1a0b5713f98f53ed27bd7de480378"
+        sampleLibreDataInHex = sampleLibreDataInHex + "97eedc842992f90411c40051e64df8f6"
+        sampleLibreDataInHex = sampleLibreDataInHex + "f57868a289adb6f2e7db9b67be0cbd07"
+        sampleLibreDataInHex = sampleLibreDataInHex + "584f0c6717be92df7b7fb30915fca661"
+        sampleLibreDataInHex = sampleLibreDataInHex + "d42d8e5705975ac3e723d83822e0126f"
+        sampleLibreDataInHex = sampleLibreDataInHex + "bb067e4a0e0e7c0a9cadb9281b903f04"
+        sampleLibreDataInHex = sampleLibreDataInHex + "ea396d31b3fe57dcf3ba7334fb851981"
+        sampleLibreDataInHex = sampleLibreDataInHex + "542a676ae53bec219b54b13486a05f62"
+        sampleLibreDataInHex = sampleLibreDataInHex + "c358d60bd740fec1dc4765cfd169fb90"
+        sampleLibreDataInHex = sampleLibreDataInHex + "9edebdda77538b451464b37f2be1dbe4"
+        sampleLibreDataInHex = sampleLibreDataInHex + "bd442d2b312e2184b146d7a618f12624"
+        sampleLibreDataInHex = sampleLibreDataInHex + "dc97bf3d761409c53b293787056c3935"
+        sampleLibreDataInHex = sampleLibreDataInHex + "4ab1b0c8a33a67e15a966b968b4d10c0"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a6ed33c0d02500c1ce3628aa30316b84"
+        sampleLibreDataInHex = sampleLibreDataInHex + "b6481bfd1b35f11d"
+        
+        testData.append(sampleLibreDataInHex)
+        patchInfoRange.append("9D0830016B32")
+        
+        sampleLibreDataInHex = "3244c69c763a7ec4290d1deb4db5cab2"
+        sampleLibreDataInHex = sampleLibreDataInHex + "5711a23c3cd3e7e27950a87afe243567"
+        sampleLibreDataInHex = sampleLibreDataInHex + "360a26adb3e6cf1754787603df0d6a57"
+        sampleLibreDataInHex = sampleLibreDataInHex + "aff41ec028efd297b067da06878cd7a6"
+        sampleLibreDataInHex = sampleLibreDataInHex + "6bff7a7121fe4072e74410be0d64b760"
+        sampleLibreDataInHex = sampleLibreDataInHex + "4e7c1ded16a24d14307f740fff7417b5"
+        sampleLibreDataInHex = sampleLibreDataInHex + "2fc31cfcf3976541c811cf4622f855a5"
+        sampleLibreDataInHex = sampleLibreDataInHex + "3589133584bee671a9aac8572bc97dfc"
+        sampleLibreDataInHex = sampleLibreDataInHex + "00966f04dc138780d26f301f8ed4ea10"
+        sampleLibreDataInHex = sampleLibreDataInHex + "36d358ece134a4142470ab29d695afe1"
+        sampleLibreDataInHex = sampleLibreDataInHex + "9be43c297f278039b8d483477d65b487"
+        sampleLibreDataInHex = sampleLibreDataInHex + "1786be196d0e48252488e8764a790089"
+        sampleLibreDataInHex = sampleLibreDataInHex + "78ad4e0466976eec5f06896673092de2"
+        sampleLibreDataInHex = sampleLibreDataInHex + "29925d7fdb67453a3011437a931c0b67"
+        sampleLibreDataInHex = sampleLibreDataInHex + "978157248da2fec758ff817aee394d84"
+        sampleLibreDataInHex = sampleLibreDataInHex + "00f3e645bfd9ec271fec5581b9f0e976"
+        sampleLibreDataInHex = sampleLibreDataInHex + "5d758d941fca99a3fa5c645e5c66bd7a"
+        sampleLibreDataInHex = sampleLibreDataInHex + "537cfa0a46a9471a5f7e00876f7640ba"
+        sampleLibreDataInHex = sampleLibreDataInHex + "32af681c01936f5bd511e0a672eb5fab"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a48967e9d4bd017fb4aebcb7fbca765e"
+        sampleLibreDataInHex = sampleLibreDataInHex + "48d5e4e1a7a2665f200eff8b47b60d1a"
+        sampleLibreDataInHex = sampleLibreDataInHex + "5870ccdc6cb29783"
+        
+        testData.append(sampleLibreDataInHex)
+        patchInfoRange.append("9D083001FB30")
+        
+        sampleLibreDataInHex = "4497d9548b50d2cfde3984166aa991c3"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a0253bc11bcfbc938a5f3c87d9386e16"
+        sampleLibreDataInHex = sampleLibreDataInHex + "c13ebf5094fa94665beb0d6aa061de46"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a06765a957836686bff4a16ff8e063b7"
+        sampleLibreDataInHex = sampleLibreDataInHex + "e86b01285e927e6443af3704e8c01e5b"
+        sampleLibreDataInHex = sampleLibreDataInHex + "eaa3e0504b29e41b2fa7538162d6beba"
+        sampleLibreDataInHex = sampleLibreDataInHex + "8b1c3b46ae34cc4ec782b42f5d94e1b4"
+        sampleLibreDataInHex = sampleLibreDataInHex + "3a1a685cfbd25260a639b33e54a5c9ed"
+        sampleLibreDataInHex = sampleLibreDataInHex + "0f05146da37f339108c84e8db6d6c519"
+        sampleLibreDataInHex = sampleLibreDataInHex + "ec74267ed9368b1dfed7d5bbee9780e8"
+        sampleLibreDataInHex = sampleLibreDataInHex + "414342bb4725af30b747f82e02090096"
+        sampleLibreDataInHex = sampleLibreDataInHex + "1815c5701262fc342b1b931f3515b498"
+        sampleLibreDataInHex = sampleLibreDataInHex + "773e356d19fbdafdfbd9aedc2eaa84ed"
+        sampleLibreDataInHex = sampleLibreDataInHex + "8d4d7ac586c4ec3594ce64c0cebfa268"
+        sampleLibreDataInHex = sampleLibreDataInHex + "335e709ed00157c8576cfa139155f995"
+        sampleLibreDataInHex = sampleLibreDataInHex + "0f609d2cc0b55836107f2ee8c69c5d67"
+        sampleLibreDataInHex = sampleLibreDataInHex + "52e6f6fd60a62db20d68fda37b7ae60b"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a44863f761b51c6ba84a997a486a1bcb"
+        sampleLibreDataInHex = sampleLibreDataInHex + "c59bf1e1268f342af9b30814aacb0628"
+        sampleLibreDataInHex = sampleLibreDataInHex + "882b8f5b0c9d58fc980c54052eea2fdd"
+        sampleLibreDataInHex = sampleLibreDataInHex + "64770c537f823fdca7e04beabd594987"
+        sampleLibreDataInHex = sampleLibreDataInHex + "df9e78bd965dd31e"
+        
+        testData.append(sampleLibreDataInHex)
+        patchInfoRange.append("9D0830019F2F")
+        
+        sampleLibreDataInHex = "803312dd230e2cdc4ff8eec9f624ec1e"
+        sampleLibreDataInHex = sampleLibreDataInHex + "be3f862a8ad1262167fa5d5945b513cb"
+        sampleLibreDataInHex = sampleLibreDataInHex + "059a74d93ca46a75328d8521649c4cfb"
+        sampleLibreDataInHex = sampleLibreDataInHex + "46da3ad69eed1354d69229243c1df10a"
+        sampleLibreDataInHex = sampleLibreDataInHex + "7f2474e68c7372098185e39c0ef291f8"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a752e3fca0888cd7ed8d871984e47019"
+        sampleLibreDataInHex = sampleLibreDataInHex + "1c7b4e8870d5c00faee42c6499597309"
+        sampleLibreDataInHex = sampleLibreDataInHex + "f5a7371332bceeb2cf6f3b7590585b50"
+        sampleLibreDataInHex = sampleLibreDataInHex + "b2e1bb458927d598e04940f3a85da0de"
+        sampleLibreDataInHex = sampleLibreDataInHex + "8b2eff34ff2b09751b56dbc5f01ce52f"
+        sampleLibreDataInHex = sampleLibreDataInHex + "fca7ed936d7d49398af2f3ab5becfe49"
+        sampleLibreDataInHex = sampleLibreDataInHex + "aa7b19c14614e58416ae989a6cf04a47"
+        sampleLibreDataInHex = sampleLibreDataInHex + "b4a2c36d5602baf26d20f98a5580672c"
+        sampleLibreDataInHex = sampleLibreDataInHex + "946ffaa7f07de89b02373396b59541a9"
+        sampleLibreDataInHex = sampleLibreDataInHex + "f0c2869e9ff837c76ad9f196c8b0074a"
+        sampleLibreDataInHex = sampleLibreDataInHex + "bd0e419d94c341862dca256d9f79a3b8"
+        sampleLibreDataInHex = sampleLibreDataInHex + "ef0259d54afecbbbe5e9f3dd65f183cc"
+        sampleLibreDataInHex = sampleLibreDataInHex + "c312babd72ad9ec340cb970456e17e0c"
+        sampleLibreDataInHex = sampleLibreDataInHex + "787f5ec90cd7d223caa477254b7c611d"
+        sampleLibreDataInHex = sampleLibreDataInHex + "34e7275ee0b9d8a6ab1b2b34d45d48e8"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a9498ee78829c6393fbb68087e2133ac"
+        sampleLibreDataInHex = sampleLibreDataInHex + "c81e8c6b58b64e5a"
+        
+        testData.append(sampleLibreDataInHex)
+        patchInfoRange.append("9D083001742E")
+        
+        sampleLibreDataInHex = "b046de8656527fc4ab0f05f16dddcbb2"
+        sampleLibreDataInHex = sampleLibreDataInHex + "d513ba261cbbe6e23a80b3619d4c3457"
+        sampleLibreDataInHex = sampleLibreDataInHex + "b40872b793bece17267a6e1dff658857"
+        sampleLibreDataInHex = sampleLibreDataInHex + "2dee06da2487d38f3265c21ca7e4d6a6"
+        sampleLibreDataInHex = sampleLibreDataInHex + "65fa625b0196cb75657208a4950bb654"
+        sampleLibreDataInHex = sampleLibreDataInHex + "cc7edff036e24c14097a6c211f1d57b5"
+        sampleLibreDataInHex = sampleLibreDataInHex + "ade904e6dfff646d4a13c75c02a054a5"
+        sampleLibreDataInHex = sampleLibreDataInHex + "9e8b0b1fa4d62e712b98d04d0ba17cfc"
+        sampleLibreDataInHex = sampleLibreDataInHex + "8294771efc7b8680506d2805aebceb10"
+        sampleLibreDataInHex = sampleLibreDataInHex + "b4d140f6f459a5d4ab72b333f6fdaee1"
+        sampleLibreDataInHex = sampleLibreDataInHex + "19e624335f4f81393ad69b5d5d0db587"
+        sampleLibreDataInHex = sampleLibreDataInHex + "9584a6034d664925a68af06c6a110189"
+        sampleLibreDataInHex = sampleLibreDataInHex + "faaf561e46ff6fecdd04917c53612ce2"
+        sampleLibreDataInHex = sampleLibreDataInHex + "ab904565fb0f443ab2135b60b3740a67"
+        sampleLibreDataInHex = sampleLibreDataInHex + "15834f3eadcaffc7dafd9960ce514c84"
+        sampleLibreDataInHex = sampleLibreDataInHex + "82f1fe5f9fb1ed279dee4d9b9998e876"
+        sampleLibreDataInHex = sampleLibreDataInHex + "df77958e3fa298a3785e7c447c0ebc7a"
+        sampleLibreDataInHex = sampleLibreDataInHex + "d17ee21066c1461add7c189d4f1e41ba"
+        sampleLibreDataInHex = sampleLibreDataInHex + "b0ad700621fb6e5b5713f8bc52835eab"
+        sampleLibreDataInHex = sampleLibreDataInHex + "268b7ff3f4d5007f36aca4adc8a2775e"
+        sampleLibreDataInHex = sampleLibreDataInHex + "cad7fcfb87ca675fa20ce79167de0c1a"
+        sampleLibreDataInHex = sampleLibreDataInHex + "da72d4c64cda9683"
+        
+        testData.append(sampleLibreDataInHex)
+        patchInfoRange.append("9D083001FB2C")
+        
+        //CGMMiaoMiaoTransmitter.testPeripheralDidUpdateValue(libreDataAsHexString: testData[4], serialNumberAsHexString: nil, patchInfoAsHexString: patchInfoRange[4])
+        
+        for (index, data) in testData.enumerated() {
+         
+         CGMMiaoMiaoTransmitter.testPeripheralDidUpdateValue(libreDataAsHexString: data, serialNumberAsHexString: nil, patchInfoAsHexString: patchInfoRange[index])
+         
         }
 
     }

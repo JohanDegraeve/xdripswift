@@ -19,7 +19,7 @@ protocol Smoothable {
 }
 
 /// local help class
-fileprivate class IsSmoothable: Smoothable {
+class IsSmoothable: Smoothable {
     
     var value: Double = 0.0
 

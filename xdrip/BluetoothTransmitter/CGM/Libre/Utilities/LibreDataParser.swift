@@ -439,6 +439,15 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
     // get last16 from trend data
     // latest reading will get date of now
     var last16 = trendMeasurements(bytes: libreData, mostRecentReadingDate: Date(), libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
+
+    /*var tempcopy = [IsSmoothable]()
+    for reading in last16 {
+        tempcopy.append(IsSmoothable(withValue: reading.temperatureAlgorithmGlucose))
+    }
+
+    let testnumber = 6
+
+    trace("%{public}@ LIST before smoothing = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, testnumber.description, last16.first!.value.roundToDecimal(0).description)*/
     
     // apply smoothing if needed
     if UserDefaults.standard.smoothLibreValues {
@@ -446,6 +455,14 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
         last16.smoothSavitzkyGolayQuaDratic()
         
     }
+    
+    /*for (index, reading) in last16.enumerated() {
+        trace("%{public}@ LIST before smoothing =>%{public}@=> after smoothing =>%{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, testnumber.description, tempcopy[index].value.description, reading.value.description)
+    }
+    
+    trace("%{public}@ LIST last reading = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, testnumber.description, last16.first!.value.roundToDecimal(0).description)
+    trace("%{public}@ LIST 10 minutes earlier reading = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, testnumber.description, last16[10].value.roundToDecimal(0).description)
+    trace("%{public}@ LIST 15 minutes earlier reading = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, testnumber.description, last16.last!.value.roundToDecimal(0).description)*/
     
     // process last16, new readings should be smaller than now + 5 minutes
     processGlucoseData(trendToLibreGlucose(last16), Date(timeIntervalSinceNow: 5 * 60))
@@ -477,7 +494,15 @@ fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1Der
 ///     - libreData : either Libre 1 data or decrypted Libre 2 data
 fileprivate func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber, libreSensorType: LibreSensorType, libreData: Data, timeStampLastBgReading: Date, cgmTransmitterDelegate: CGMTransmitterDelegate?, oopWebSite: String, oopWebToken: String, completionHandler:@escaping ((_ timeStampLastBgReading: Date?, _ sensorState: LibreSensorState?, _ xDripError: XdripError?) -> ())) {
     
-    if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber != libreSensorSerialNumber.serialNumber || UserDefaults.standard.libre1DerivedAlgorithmParameters == nil {
+    // if libre1DerivedAlgorithmParameters not nil, but not matching serial number, then assign to nil
+    if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber != libreSensorSerialNumber.serialNumber {
+        
+        UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
+        
+    }
+    
+    // if libre1DerivedAlgorithmParameters == nil, then calculate them
+    if UserDefaults.standard.libre1DerivedAlgorithmParameters == nil {
         
         UserDefaults.standard.libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(bytes: libreData.bytes, serialNumber: libreSensorSerialNumber.serialNumber)
         
@@ -495,7 +520,7 @@ fileprivate func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialN
             
         } else {
             
-            trace("in libreDataProcessor, found libre1DerivedAlgorithmParameters in UserDefaults", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info)
+            trace("in libreDataProcessor, found libre1DerivedAlgorithmParameters in UserDefaults", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
             
             // if debug level logging enabled, than add full dump of libre1DerivedAlgorithmParameters in the trace (checking here to save some processing time if it's not needed
             if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {

@@ -1215,7 +1215,6 @@
 			children = (
 				F80D916624F70840006840B5 /* Libre2 */,
 				F816E11F24392D27009EE65B /* Droplet */,
-				F816E1112438A72C009EE65B /* BlueReader */,
 				F816E10124367389009EE65B /* GNSENtry */,
 				F816E0EB2432A55F009EE65B /* Blucon */,
 				F8C9784E242A9FD500A09483 /* MiaoMiao */,
@@ -1325,13 +1324,6 @@
 			isa = PBXGroup;
 			children = (
 				F816E1072437E5B9009EE65B /* BlueReader+BluetoothPeripheral.swift */,
-			);
-			path = BlueReader;
-			sourceTree = "<group>";
-		};
-		F816E1112438A72C009EE65B /* BlueReader */ = {
-			isa = PBXGroup;
-			children = (
 			);
 			path = BlueReader;
 			sourceTree = "<group>";
@@ -3459,7 +3451,7 @@
 				CODE_SIGN_ENTITLEMENTS = "xDrip4iOS Widget/xDrip4iOS Widget.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4117;
+				CURRENT_PROJECT_VERSION = 4118;
 				DEVELOPMENT_TEAM = RNX44PP998;
 				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3468,7 +3460,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.4.10;
+				MARKETING_VERSION = 4.4.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
@@ -3484,7 +3476,7 @@
 				CODE_SIGN_ENTITLEMENTS = "xDrip4iOS Widget/xDrip4iOS Widget.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4117;
+				CURRENT_PROJECT_VERSION = 4118;
 				DEVELOPMENT_TEAM = RNX44PP998;
 				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3493,7 +3485,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.4.10;
+				MARKETING_VERSION = 4.4.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
@@ -3633,7 +3625,7 @@
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4117;
+				CURRENT_PROJECT_VERSION = 4118;
 				DEVELOPMENT_TEAM = RNX44PP998;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3641,7 +3633,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.4.10;
+				MARKETING_VERSION = 4.4.11;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3663,7 +3655,7 @@
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4117;
+				CURRENT_PROJECT_VERSION = 4118;
 				DEVELOPMENT_TEAM = RNX44PP998;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3671,7 +3663,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.4.10;
+				MARKETING_VERSION = 4.4.11;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
