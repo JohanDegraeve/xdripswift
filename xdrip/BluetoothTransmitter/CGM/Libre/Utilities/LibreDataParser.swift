@@ -8,7 +8,7 @@ class LibreDataParser {
     
     // MARK: - public functions
     
-    /// parses libre1 block, without oop web.
+    /// parses libre1 block, with or without oop web, if libre1DerivedAlgorithmParameters is nil, then oop web is not used
     /// - parameters:
     ///     - libreData: the 344 bytes block from Libre
     ///     - timeStampLastBgReading: this is of the timestamp of the latest reading we already received during previous session
@@ -16,12 +16,9 @@ class LibreDataParser {
     ///     - array of GlucoseData, first is the most recent. Only returns recent readings, ie not the ones that are older than timeStampLastBgReading. 30 seconds are added here, meaning, new reading should be at least 30 seconds more recent than timeStampLastBgReading
     ///     - sensorState: status of the sensor
     ///     - sensorTimeInMinutes: age of sensor in minutes
-    public static func parseLibre1DataWithoutCalibration(libreData: Data, timeStampLastBgReading:Date) -> (glucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int) {
+    ///     - libre1DerivedAlgorithmParameters : if nil then oop web is not used
+    public static func parseLibre1Data(libreData: Data, timeStampLastBgReading:Date, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?) -> (glucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int) {
         
-        var i:Int
-        var glucoseData:GlucoseData
-        var byte:Data
-        var timeInMinutes:Double
         let ourTime:Date = Date()
         let indexTrend:Int = libreData.getByteAt(position: 26) & 0xFF
         let indexHistory:Int = libreData.getByteAt(position: 27) & 0xFF
@@ -30,61 +27,81 @@ class LibreDataParser {
         var returnValue:Array<GlucoseData> = []
         let sensorState = LibreSensorState(stateByte: libreData[4])
         
-       // we will add the most recent readings, but then we'll only add the readings that are at least 5 minutes apart (giving 10 seconds spare)
-        // for that variable timeStampLastAddedGlucoseData is used. It's initially set to now + 5 minutes
-        var timeStampLastAddedGlucoseData = Date().toMillisecondsAsDouble() + 5 * 60 * 1000
+        var valuesBeforeSmoothing = [GlucoseData]()
         
-        trendloop: for index in 0..<16 {
-            i = indexTrend - index - 1
-            if i < 0 {i += 16}
-            timeInMinutes = max(0, (Double)(sensorTimeInMinutes - index))
-            let timeStampOfNewGlucoseData = sensorStartTimeInMilliseconds + timeInMinutes * 60 * 1000
+        // closure will be used for processing trend and history
+        let rangeProcessor = { (maxIndex: Int, indexTrendOrHistory: Int, timeInSecondsCalculator: (Int) -> Double, firstByteToAppend: Int ) in
             
-            //new reading should be at least 30 seconds younger than timeStampLastBgReading
-            if timeStampOfNewGlucoseData > (timeStampLastBgReading.toMillisecondsAsDouble() + 30000.0)
-            {
-                if timeStampOfNewGlucoseData < timeStampLastAddedGlucoseData - (5 * 60 * 1000 - 10000) {
-                    byte = Data()
-                    byte.append(libreData[(i * 6 + 29)])
-                    byte.append(libreData[(i * 6 + 28)])
-                    let glucoseLevelRaw = Double(getGlucoseRaw(bytes: byte))
-                    if (glucoseLevelRaw > 0) {
-                        glucoseData = GlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: glucoseLevelRaw * ConstantsBloodGlucose.libreMultiplier)
-                        returnValue.append(glucoseData)
-                        timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
-                    }
-                }
-            } else {
-                break trendloop
-            }
-        }
-
-        // loads history values
-        historyloop: for index in 0..<32 {
-            i = indexHistory - index - 1
-            if i < 0 {i += 32}
-            timeInMinutes = max(0,(Double)(abs(sensorTimeInMinutes - 3)/15)*15 - (Double)(index*15))
-            let timeStampOfNewGlucoseData = sensorStartTimeInMilliseconds + timeInMinutes * 60 * 1000
+            var result = [GlucoseData]()
             
-            //new reading should be at least 30 seconds younger than timeStampLastBgReading
-            if timeStampOfNewGlucoseData > (timeStampLastBgReading.toMillisecondsAsDouble() + 30000.0)
-            {
-                if timeStampOfNewGlucoseData < timeStampLastAddedGlucoseData - (5 * 60 * 1000 - 10000) {
-                    byte = Data()
-                    byte.append(libreData[(i * 6 + 125)])
-                    byte.append(libreData[(i * 6 + 124)])
-                    let glucoseLevelRaw = Double(getGlucoseRaw(bytes: byte))
-                    if (glucoseLevelRaw > 0) {
-                        glucoseData = GlucoseData(timeStamp: Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60), glucoseLevelRaw: glucoseLevelRaw * ConstantsBloodGlucose.libreMultiplier)
-                        returnValue.append(glucoseData)
-                        timeStampLastAddedGlucoseData = timeStampOfNewGlucoseData
+            for index in 0..<maxIndex {
+                var i = indexTrendOrHistory - index - 1
+                if i < 0 {i += maxIndex}
+                let timeInSeconds = timeInSecondsCalculator(index)
+                
+                var byte = Data()
+                byte.append(libreData[(i * 6 + firstByteToAppend)])
+                byte.append(libreData[(i * 6 + firstByteToAppend + 1)])
+                byte.append(libreData[(i * 6 + firstByteToAppend + 2)])
+                byte.append(libreData[(i * 6 + firstByteToAppend + 3)])
+                byte.append(libreData[(i * 6 + firstByteToAppend + 4)])
+                byte.append(libreData[(i * 6 + firstByteToAppend + 5)])
+                
+                let readingTimeStamp = Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInSeconds)
+                
+                // only add if readingTimeStamp smaller (ie older) than the readingTimestamp of the last already known reading. This is because history measurements start with a timestamp somewhere in the middle of the trend measurements
+                if let last = returnValue.last {
+                    
+                    if !(readingTimeStamp < last.timeStamp) {
+                        
+                        // skip the reading
+                        continue
+                        
                     }
+                    
                 }
-            } else {
-                break historyloop
+                
+                if let libre1DerivedAlgorithmParameters = libre1DerivedAlgorithmParameters {
+                    
+                    result.append(GlucoseData(timeStamp: readingTimeStamp, glucoseLevelRaw: LibreMeasurement(bytes: byte, slope: 0.1, offset: 0.0, date: readingTimeStamp, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters).temperatureAlgorithmGlucose))
+                    
+                    valuesBeforeSmoothing.append(GlucoseData(timeStamp: readingTimeStamp, glucoseLevelRaw: LibreMeasurement(bytes: byte, slope: 0.1, offset: 0.0, date: readingTimeStamp, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters).temperatureAlgorithmGlucose))
+                    
+                } else {
+                    
+                    let glucoseLevelRaw = Double(((256 * (byte.getByteAt(position: 1) & 0xFF) + (byte.getByteAt(position: 2) & 0xFF)) & 0x1FFF))
+                    
+                    if (glucoseLevelRaw > 0) {
+                        result.append(GlucoseData(timeStamp: readingTimeStamp, glucoseLevelRaw: glucoseLevelRaw * ConstantsBloodGlucose.libreMultiplier))
+                        valuesBeforeSmoothing.append(GlucoseData(timeStamp: readingTimeStamp, glucoseLevelRaw: glucoseLevelRaw * ConstantsBloodGlucose.libreMultiplier))
+                    }
+                    
+                }
+                
             }
+            
+            // smooth if required
+            if UserDefaults.standard.smoothLibreValues {
+                
+                result.smoothSavitzkyGolayQuaDratic(withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidth)
+                result.smoothSavitzkyGolayQuaDratic(withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidth)
+                
+            }
+            
+            returnValue = returnValue + result
+            
         }
-
+        
+        // process trend
+        rangeProcessor(16, indexTrend, { index in
+            return (max(0, (Double)(sensorTimeInMinutes - index))) * 60.0
+        }, 28)
+        
+        // process history
+        rangeProcessor(32, indexHistory, { index in
+            return (max(0,(Double)(abs(sensorTimeInMinutes - 3)/15)*15 - (Double)(index*15))) * 60.0
+        }, 124)
+    
         return (returnValue, sensorState, sensorTimeInMinutes)
         
     }
@@ -207,7 +224,7 @@ class LibreDataParser {
             // or it's a libre 2 sensor but the data is decrypted
             
             // get readings from buffer using local Libre 1 parser
-            let parsedLibre1Data = LibreDataParser.parseLibre1DataWithoutCalibration(libreData: libreData, timeStampLastBgReading: timeStampLastBgReading)
+            let parsedLibre1Data = LibreDataParser.parseLibre1Data(libreData: libreData, timeStampLastBgReading: timeStampLastBgReading, libre1DerivedAlgorithmParameters: nil)
             
             // handle the result
             handleGlucoseData(result: (parsedLibre1Data.glucoseData, parsedLibre1Data.sensorTimeInMinutes, parsedLibre1Data.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
@@ -221,81 +238,6 @@ class LibreDataParser {
 
     }
 
-}
-
-fileprivate func getGlucoseRaw(bytes:Data) -> Int {
-    return ((256 * (bytes.getByteAt(position: 0) & 0xFF) + (bytes.getByteAt(position: 1) & 0xFF)) & 0x1FFF)
-}
-
-fileprivate func trendMeasurements(bytes: Data, mostRecentReadingDate: Date, _ offset: Double = 0.0, slope: Double = 0.1, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?) -> [LibreMeasurement] {
-    
-    //    let headerRange =   0..<24   //  24 bytes, i.e.  3 blocks a 8 bytes
-    let bodyRange   =  24..<320  // 296 bytes, i.e. 37 blocks a 8 bytes
-    //    let footerRange = 320..<344  //  24 bytes, i.e.  3 blocks a 8 bytes
-    
-    let body   = Array(bytes[bodyRange])
-    let nextTrendBlock = Int(body[2])
-    
-    var measurements = [LibreMeasurement]()
-    // Trend data is stored in body from byte 4 to byte 4+96=100 in units of 6 bytes. Index on data such that most recent block is first.
-    for blockIndex in 0...15 {
-        var index = 4 + (nextTrendBlock - 1 - blockIndex) * 6 // runs backwards
-        if index < 4 {
-            index = index + 96 // if end of ring buffer is reached shift to beginning of ring buffer
-        }
-        let range = index..<index+6
-        let measurementBytes = Array(body[range])
-        let measurementDate = mostRecentReadingDate.addingTimeInterval(Double(-60 * blockIndex))
-        
-        let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, date: measurementDate, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
-        measurements.append(measurement)
-        
-        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-            trace("in trendMeasurements, created measurement with measurement.rawGlucose = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, measurement.rawGlucose.description)
-        }
-
-    }
-    return measurements
-}
-
-fileprivate func historyMeasurements(bytes: Data, _ offset: Double = 0.0, slope: Double = 0.1, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?) -> [LibreMeasurement] {
-    //    let headerRange =   0..<24   //  24 bytes, i.e.  3 blocks a 8 bytes
-    let bodyRange   =  24..<320  // 296 bytes, i.e. 37 blocks a 8 bytes
-    //    let footerRange = 320..<344  //  24 bytes, i.e.  3 blocks a 8 bytes
-    
-    let body   = Array(bytes[bodyRange])
-    let nextHistoryBlock = Int(body[3])
-    let minutesSinceStart = Int(body[293]) << 8 + Int(body[292])
-    let sensorStartTimeInMilliseconds:Double = Date().toMillisecondsAsDouble() - (Double)(minutesSinceStart * 60 * 1000)
-    
-    var measurements = [LibreMeasurement]()
-    
-    // History data is stored in body from byte 100 to byte 100+192-1=291 in units of 6 bytes. Index on data such that most recent block is first.
-    for blockIndex in 0..<32 {
-        
-        let timeInMinutes = max(0,(Double)(abs(minutesSinceStart - 3)/15)*15 - (Double)(blockIndex*15))
-        
-        var index = 100 + (nextHistoryBlock - 1 - blockIndex) * 6 // runs backwards
-        if index < 100 {
-            index = index + 192 // if end of ring buffer is reached shift to beginning of ring buffer
-        }
-        
-        let range = index..<index+6
-        let measurementBytes = Array(body[range])
-        
-        let measurementDate = Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInMinutes * 60)
-        
-        let measurement = LibreMeasurement(bytes: measurementBytes, slope: slope, offset: offset, minuteCounter: Int(timeInMinutes.rawValue), date: measurementDate, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
-        measurements.append(measurement)
-        
-        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-            trace("in historyMeasurements, created measurement with measurement.rawGlucose = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, measurement.rawGlucose.description)
-        }
-        
-    }
-    
-    return measurements
-    
 }
 
 /// calls delegate with parameters from result
@@ -363,133 +305,7 @@ fileprivate func handleGlucoseData(result: (glucoseData:[GlucoseData], sensorTim
     
 }
 
-/// to glucose data
-/// - Parameter measurements: array of LibreMeasurement
-/// - Returns: array of GlucoseData
-fileprivate func trendToLibreGlucose(_ measurements: [LibreMeasurement]) -> [GlucoseData] {
-    
-    var origarr = [GlucoseData]()
-    for trend in measurements {
-        let glucose = GlucoseData.init(timeStamp: trend.date, glucoseLevelRaw: trend.temperatureAlgorithmGlucose)
-        origarr.append(glucose)
-    }
-    return origarr
-}
-
-fileprivate func historyToLibreGlucose(_ measurements: [LibreMeasurement]) -> [GlucoseData] {
-    
-    var origarr = [GlucoseData]()
-    
-    for history in measurements {
-        let glucose = GlucoseData(timeStamp: history.date, glucoseLevelRaw: history.temperatureAlgorithmGlucose)
-        origarr.append(glucose)
-    }
-    
-    return origarr
-    
-}
-
-/// parses libre 1 block with OOP WEB.
-/// - parameters:
-///     - libreData: the 344 bytes block from Libre
-///     - timeStampLastBgReading: this is of the timestamp of the latest reading we already received during previous session
-/// - returns:
-///     - array of libreRawGlucoseData, first is the most recent. Only returns recent readings, ie not the ones that are older than timeStampLastBgReading. 30 seconds are added here, meaning, new reading should be at least 30 seconds more recent than timeStampLastBgReading
-///     - sensorState: status of the sensor
-///     - sensorTimeInMinutes: age of sensor in minutes
-fileprivate func parseLibre1DataWithOOPWebCalibration(libreData: Data, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters, timeStampLastBgReading: Date) -> (libreRawGlucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
-
-    // initialise returnvalue, array of GlucoseData
-    var finalResult:[GlucoseData] = []
-    
-    // calculate sensorState
-    let sensorState = LibreSensorState(stateByte: libreData[4])
-    
-    // if sensorState is not .ready, then return empty array
-    if sensorState != .ready { return (finalResult, sensorState, nil)  }
-    
-    let sensorTimeInMinutes:Int = 256 * (Int)(libreData.uint8(position: 317) & 0xFF) + (Int)(libreData.uint8(position: 316) & 0xFF)
-    
-    // iterates through glucoseData, compares timestamp, if still higher than timeStampLastBgReading (+ 30 seconds) then adds it to finalResult
-    let processGlucoseData = { (glucoseData: [GlucoseData], timeStampLastAddedGlucoseData: Date) in
-        
-        var timeStampLastAddedGlucoseDataAsDouble = timeStampLastAddedGlucoseData.toMillisecondsAsDouble()
-        
-        for glucose in glucoseData {
-            
-            let timeStampOfNewGlucoseData = glucose.timeStamp
-            if timeStampOfNewGlucoseData.toMillisecondsAsDouble() > (timeStampLastBgReading.toMillisecondsAsDouble() + 30000.0) {
-                
-                // return only readings that are at least 5 minutes away from each other, except the first, same approach as in LibreDataParser.parse
-                if timeStampOfNewGlucoseData.toMillisecondsAsDouble() < timeStampLastAddedGlucoseDataAsDouble - (5 * 60 * 1000 - 10000) {
-                    timeStampLastAddedGlucoseDataAsDouble = timeStampOfNewGlucoseData.toMillisecondsAsDouble()
-                    finalResult.append(glucose)
-                    
-                    trace("in parseLibre1DataWithOOPWebCalibration, processGlucoseData, created glucose = %{public}@ and timestamp = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, glucose.glucoseLevelRaw.description, glucose.timeStamp.description(with: .current))
-                    
-                }
-                
-            } else {
-                break
-            }
-        }
-
-    }
-    
-    // get last16 from trend data
-    // latest reading will get date of now
-    var last16 = trendMeasurements(bytes: libreData, mostRecentReadingDate: Date(), libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
-
-    /*var tempcopy = [IsSmoothable]()
-    for reading in last16 {
-        tempcopy.append(IsSmoothable(withValue: reading.temperatureAlgorithmGlucose))
-    }
-
-    let testnumber = 6
-
-    trace("%{public}@ LIST before smoothing = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, testnumber.description, last16.first!.value.roundToDecimal(0).description)*/
-    
-    // apply smoothing if needed
-    if UserDefaults.standard.smoothLibreValues {
-        
-        last16.smoothSavitzkyGolayQuaDratic()
-        
-    }
-    
-    /*for (index, reading) in last16.enumerated() {
-        trace("%{public}@ LIST before smoothing =>%{public}@=> after smoothing =>%{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, testnumber.description, tempcopy[index].value.description, reading.value.description)
-    }
-    
-    trace("%{public}@ LIST last reading = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, testnumber.description, last16.first!.value.roundToDecimal(0).description)
-    trace("%{public}@ LIST 10 minutes earlier reading = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, testnumber.description, last16[10].value.roundToDecimal(0).description)
-    trace("%{public}@ LIST 15 minutes earlier reading = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, testnumber.description, last16.last!.value.roundToDecimal(0).description)*/
-    
-    // process last16, new readings should be smaller than now + 5 minutes
-    processGlucoseData(trendToLibreGlucose(last16), Date(timeIntervalSinceNow: 5 * 60))
-    
-    // get last32 from history data
-    var last32 = historyMeasurements(bytes: libreData, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
-    
-    // apply smoothing if needed
-    if UserDefaults.standard.smoothLibreValues {
-
-        last32.smoothSavitzkyGolayQuaDratic()
-
-    }
-    
-    // process last 32 with date earlier than the earliest in last16
-    var timeStampLastAddedGlucoseData = Date()
-    if last16.count > 0, let last = last16.last {
-        timeStampLastAddedGlucoseData = last.date
-    }
-    
-    processGlucoseData(historyToLibreGlucose(last32), timeStampLastAddedGlucoseData)
-    
-    return (finalResult, sensorState, sensorTimeInMinutes)
-    
-}
-
-/// processes libre data that is in Libre 1 format, this includes decrypted Libre 2
+/// processes libre data that is in Libre 1 format, this includes decrypted Libre 2 - this is with oop web
 /// - parameters:
 ///     - libreData : either Libre 1 data or decrypted Libre 2 data
 fileprivate func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber, libreSensorType: LibreSensorType, libreData: Data, timeStampLastBgReading: Date, cgmTransmitterDelegate: CGMTransmitterDelegate?, oopWebSite: String, oopWebToken: String, completionHandler:@escaping ((_ timeStampLastBgReading: Date?, _ sensorState: LibreSensorState?, _ xDripError: XdripError?) -> ())) {
@@ -504,7 +320,7 @@ fileprivate func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialN
     // if libre1DerivedAlgorithmParameters == nil, then calculate them
     if UserDefaults.standard.libre1DerivedAlgorithmParameters == nil {
         
-        UserDefaults.standard.libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(bytes: libreData.bytes, serialNumber: libreSensorSerialNumber.serialNumber)
+        UserDefaults.standard.libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(bytes: libreData, serialNumber: libreSensorSerialNumber.serialNumber)
         
     }
     
@@ -527,10 +343,10 @@ fileprivate func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialN
                 trace("in libreDataProcessor, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, libre1DerivedAlgorithmParameters.description)
             }
             
-            // parse the data using oop web algorithm
-            let parsedResult = parseLibre1DataWithOOPWebCalibration(libreData: libreData, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters, timeStampLastBgReading: timeStampLastBgReading)
+            let parsedLibre1Data = LibreDataParser.parseLibre1Data(libreData: libreData, timeStampLastBgReading: timeStampLastBgReading, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
             
-            handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+            // handle the result
+            handleGlucoseData(result: (parsedLibre1Data.glucoseData, parsedLibre1Data.sensorTimeInMinutes, parsedLibre1Data.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
             
             return
             
@@ -554,11 +370,11 @@ fileprivate func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialN
                 trace("in libreDataProcessor, received libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, libre1DerivedAlgorithmParameters.description)
             }
             
-            // parse the data using oop web algorithm
-            let parsedResult = parseLibre1DataWithOOPWebCalibration(libreData: libreData, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters, timeStampLastBgReading: timeStampLastBgReading)
+            let parsedLibre1Data = LibreDataParser.parseLibre1Data(libreData: libreData, timeStampLastBgReading: timeStampLastBgReading, libre1DerivedAlgorithmParameters: UserDefaults.standard.libre1DerivedAlgorithmParameters)
             
-            handleGlucoseData(result: (parsedResult.libreRawGlucoseData.map { $0 as GlucoseData }, parsedResult.sensorTimeInMinutes, parsedResult.sensorState, xDripError), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
-            
+            // handle the result
+            handleGlucoseData(result: (parsedLibre1Data.glucoseData, parsedLibre1Data.sensorTimeInMinutes, parsedLibre1Data.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+
         } else {
             
             // libre1DerivedAlgorithmParameters not created, but possibly xDripError is not nil, so we need to call handleGlucoseData which will process xDripError
@@ -568,4 +384,25 @@ fileprivate func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialN
         
     }
 
+}
+
+
+/// Get date of most recent history value. (source dabear)
+/// History values are updated every 15 minutes. Their corresponding time from start of the sensor in minutes is 15, 30, 45, 60, ..., but the value is delivered three minutes later, i.e. at the minutes 18, 33, 48, 63, ... and so on. So for instance if the current time in minutes (since start of sensor) is 67, the most recent value is 7 minutes old. This can be calculated from the minutes since start. Unfortunately sometimes the history index is incremented earlier than the minutes counter and they are not in sync. This has to be corrected.
+///
+/// - Returns: the date of the most recent history value and the corresponding minute counter
+fileprivate func dateOfMostRecentHistoryValue(minutesSinceStart: Int, nextHistoryBlock: Int, date: Date) -> (date: Date, counter: Int) {
+    // Calculate correct date for the most recent history value.
+    //        date.addingTimeInterval( 60.0 * -Double( (minutesSinceStart - 3) % 15 + 3 ) )
+    let nextHistoryIndexCalculatedFromMinutesCounter = ( (minutesSinceStart - 3) / 15 ) % 32
+    let delay = (minutesSinceStart - 3) % 15 + 3 // in minutes
+    if nextHistoryIndexCalculatedFromMinutesCounter == nextHistoryBlock {
+        // Case when history index is incremented togehter with minutesSinceStart (in sync)
+        //            print("delay: \(delay), minutesSinceStart: \(minutesSinceStart), result: \(minutesSinceStart-delay)")
+        return (date: date.addingTimeInterval( 60.0 * -Double(delay) ), counter: minutesSinceStart - delay)
+    } else {
+        // Case when history index is incremented before minutesSinceStart (and they are async)
+        //            print("delay: \(delay), minutesSinceStart: \(minutesSinceStart), result: \(minutesSinceStart-delay-15)")
+        return (date: date.addingTimeInterval( 60.0 * -Double(delay - 15)), counter: minutesSinceStart - delay)
+    }
 }

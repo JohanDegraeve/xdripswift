@@ -307,6 +307,8 @@ final class RootViewController: UIViewController {
                 
             }
             
+            CGMMiaoMiaoTransmitter.testRange()
+            
         })
         
         // Setup View
@@ -588,16 +590,72 @@ final class RootViewController: UIViewController {
             
         }
         
+        guard glucoseData.count > 0 else {
+            
+            trace("glucoseData.count = 0", log: log, category: ConstantsLog.categoryRootView, type: .info)
+            
+            return
+            
+        }
+        
         // also for cases where calibration is not needed, we go through this code
         if let activeSensor = activeSensor, let calibrator = calibrator, let bgReadingsAccessor = bgReadingsAccessor {
             
             trace("calibrator = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, calibrator.description())
-            
+
             // initialize help variables
-            var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
             var lastCalibrationsForActiveSensorInLastXDays = calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
             let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
             let lastCalibrationForActiveSensor = calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
+
+            
+            
+            // next is only if smoothing is enabled, and if there's at least 11 minutes of readings in the glucoseData array, which will normally only be the case for Libre with MM/Bubble
+            // if that's the case then delete following existing BgReading's
+            //  - younger than 11 minutes : why, because some of the Libre transmitters return readings of the last 15 minutes for every minute, we don't go further than 11 minutes because these readings are not so well smoothed
+            //  - younger than the latest calibration : becuase if recalibration is used, then it might be difficult if there's been a recent calibration, to delete and recreate a reading with an earlier timestamp
+            //  - younger or equal in age than the oldest reading in the GlucoseData array
+            // why :
+            //    - in case of Libre, using transmitters like Bubble, MM, .. the 16 most recent readings in GlucoseData are smoothed (done in LibreDataParser if smoothing is enabled)
+            //    - specifically the reading at position 5, 6, 7....10 are well smoothed (because they are based on per minute readings of the last 15 minutes, inclusive 5 minutes before and 5 minutes after) we'll use
+            //
+            //  we will remove the BgReading's and then re-add them using smoothed values
+            // so we'll define the timestamp as of when readings should be deleted
+            // younger than 11 minutes
+            
+            // start defining timeStampToDelete as of when existing BgReading's will be deleted
+            // this value is also used to verify that glucoseData Array has enough readings
+            var timeStampToDelete = Date(timeIntervalSinceNow: -60.0 * (Double)(ConstantsSmoothing.readingsToDeleteInMinutes))
+            
+            // now check if we'll delete readings
+            // there must be a glucoseData.last, here assigning lastGlucoseData just to unwrap it
+            // checking lastGlucoseData.timeStamp < timeStampToDelete guarantees the oldest reading is older than the one we'll delete, so we're sur we have enough readings in glucoseData to refill the BgReadings
+            if let lastGlucoseData = glucoseData.last, lastGlucoseData.timeStamp < timeStampToDelete, UserDefaults.standard.smoothLibreValues {
+                
+                // younger than the timestamp of the latest reading
+                if let last = glucoseData.last {
+                    timeStampToDelete = max(timeStampToDelete, last.timeStamp)
+                }
+                
+                // younger than the timestamp of the latest calibration (would only be applicable if recalibration is used)
+                if let lastCalibrationForActiveSensor = lastCalibrationForActiveSensor {
+                    timeStampToDelete = max(timeStampToDelete, lastCalibrationForActiveSensor.timeStamp)
+                }
+                
+                // get the readings to be deleted
+                let lastBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStampToDelete, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+                
+                // delete them
+                for reading in lastBgReadings {
+                    
+                    coreDataManager.mainManagedObjectContext.delete(reading)
+                    
+                }
+
+            }
+
+            // initialize help variables
+            var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
             
             // was a new reading created or not
             var newReadingCreated = false
@@ -609,14 +667,18 @@ final class RootViewController: UIViewController {
             }
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
-            for (_, glucose) in glucoseData.enumerated().reversed() {
-                if glucose.timeStamp > timeStampLastBgReading {
+            for (index , glucose) in glucoseData.enumerated().reversed() {
+                
+                // we only add new glucose values if 5 minutes - 10 seconds younger than latest already existing reading, or, if it's the latest, it needs to be just younger
+                let checktimestamp = Date(timeInterval: 5.0 * 60.0 - 10.0, since: timeStampLastBgReading)
+                
+                if (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading)))  {
                     
-                    let newReading = calibrator.createNewBgReading(rawData: (Double)(glucose.glucoseLevelRaw), timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
                     if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
                         
-                        trace("new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description)
+                        trace("new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ","))
                         
                     }
                     
@@ -630,6 +692,7 @@ final class RootViewController: UIViewController {
                     timeStampLastBgReading = glucose.timeStamp
                     
                 }
+                
             }
             
             // if a new reading is created, create either initial calibration request or bgreading notification - upload to nightscout and check alerts
@@ -1233,7 +1296,7 @@ final class RootViewController: UIViewController {
         var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         
         // if latestReading is older than 11 minutes, then it should be strikethrough
-        if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
+        if lastReading.timeStamp < Date(timeIntervalSinceNow: -60.0 * 11) {
             
             let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
             attributeString.addAttribute(.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))

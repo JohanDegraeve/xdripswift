@@ -10,7 +10,7 @@ public struct LibreCalibrationInfo: Codable {
         var i6: Double
         
     
-    init(bytes: [UInt8]) {
+    init(bytes: Data) {
         
         i1 = Self.readBits(bytes, 2, 0, 3)
         
@@ -29,7 +29,7 @@ public struct LibreCalibrationInfo: Codable {
         
     }
     
-    static func readBits(_ buffer: [UInt8], _ byteOffset: Int, _ bitOffset: Int, _ bitCount: Int) -> Int {
+    static func readBits(_ buffer: Data, _ byteOffset: Int, _ bitOffset: Int, _ bitCount: Int) -> Int {
         guard bitCount != 0 else {
             return 0
         }
@@ -45,7 +45,7 @@ public struct LibreCalibrationInfo: Codable {
         return res
     }
     
-    static func writeBits(_ buffer: [UInt8], _ byteOffset: Int, _ bitOffset: Int, _ bitCount: Int, _ value: Int) -> [UInt8]{
+    static func writeBits(_ buffer: Data, _ byteOffset: Int, _ bitOffset: Int, _ bitCount: Int, _ value: Int) -> Data{
         
         var res = buffer; // Make a copy
         for i in stride(from: 0, to: bitCount, by: 1) {

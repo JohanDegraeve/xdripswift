@@ -2,7 +2,7 @@ import Foundation
 import CoreML
 
 /// allowed values are 0, 1, 2 or 3. It's the index in coefficients
-fileprivate let coefficientsRowToUse = 3
+fileprivate var coefficientsRowToUse = 3
 
 /// Savitzky Golay coefficients
 fileprivate let coefficients =  [[ -3.0, 12.0, 17.0, 12.0, -3.0],
@@ -32,20 +32,42 @@ class IsSmoothable: Smoothable {
 extension Array where Element: Smoothable {
     
     /// - apply Savitzky Golay filter
-    /// - before applying the filter, the array will be prepended and append with a number of elements equal to the filterwidth (filterwidth is defined by coefficients, default 5
+    /// - before applying the filter, the array will be prepended and append with a number of elements equal to the filterwidth, filterWidth default 5. Allowed values are 5, 4, 3, 2. If any other value is assigned, then 5 will be used
     /// - ...continue with 5 here in the explanation ...
     /// - for the 5 last elements and 5 first elements, a regression is done. This regression is done used to give values to the 5 prepended and appended values. Which means it's as if we draw a line through the first 5 and 5 last original values, and use this line to give values to the 5 prepended and appended values
     /// - the 5 prepended and appended values are then used in the filter algorithm, which means we can also filter the original 5 first and last elements
     /// see also example https://github.com/JohanDegraeve/xdripswift/wiki/Libre-value-smoothing
-    mutating func smoothSavitzkyGolayQuaDratic() {
+    mutating func smoothSavitzkyGolayQuaDratic(withFilterWidth filterWidth: Int = 5) {
         
-        // filterWidth is size of coefficients array
-        let filterWidth = (coefficients[coefficientsRowToUse].count - 1) / 2
+        // filterWidthToUse is the value of filterWidth to use in the algorithm. By default filterWidthToUse = parameter value filterWidth
+        var filterWidthToUse = filterWidth
         
-        // using 5 here in the comments as value for filterWidth
+        // calculate coefficientsRowToUse based on filterWdith
+        switch filterWidth {
+        case 5:
+            coefficientsRowToUse = 3
+            
+        case 4:
+            coefficientsRowToUse = 2
+            
+        case 3:
+            coefficientsRowToUse = 1
+            
+        case 2:
+            coefficientsRowToUse = 0
+            
+        default:
+            // invalid filterWidth was given in parameterList, use default value
+            coefficientsRowToUse = 3
+            
+            filterWidthToUse = 5
+            
+        }
+        
+        // using 5 here in the comments as value for filterWidthToUse
         
         // the amount of elements must be at least 5. If that's not the case then don't apply any smoothing
-        guard self.count >= filterWidth else {return}
+        guard self.count >= filterWidthToUse else {return}
         
         // create a new array, to which we will prepend and append 5 elements so that we can do also smoothing for the 5 last and 5 first values of the input array (which is self)
         // the 5 elements will be estimated by doing linear regression of the first 5 and last 5 elements of the original input array respectively
@@ -56,7 +78,7 @@ extension Array where Element: Smoothable {
         }
         
         // now prepend and append with 5 elements, each with a default value 0.0
-        for _ in 0..<filterWidth {
+        for _ in 0..<filterWidthToUse {
             tempArray.insert(IsSmoothable(), at: 0)
             tempArray.append(IsSmoothable())
         }
@@ -69,7 +91,7 @@ extension Array where Element: Smoothable {
         /// - we give each IsSmoothable the value of the index, meaning from 0 up to (length of tempArray) - 1
         /// - in fact it's not really smoothable, it's just because we use isSmoothable in function linearRegressionCreator
         var indicesArray = [Smoothable]()
-        for index in 0..<(self.count + (filterWidth * 2)) {
+        for index in 0..<(self.count + (filterWidthToUse * 2)) {
             indicesArray.append(IsSmoothable(withValue: Double(index)))
         }
         
@@ -91,10 +113,10 @@ extension Array where Element: Smoothable {
         }
         
         // now do the regression for the 5 first elements
-        doRegression(filterWidth..<(filterWidth * 2), 0..<filterWidth)
+        doRegression(filterWidthToUse..<(filterWidthToUse * 2), 0..<filterWidthToUse)
         
         // now do the regression for the 5 last elements
-        doRegression((tempArray.count - filterWidth * 2)..<(tempArray.count - filterWidth), (tempArray.count - filterWidth)..<tempArray.count)
+        doRegression((tempArray.count - filterWidthToUse * 2)..<(tempArray.count - filterWidthToUse), (tempArray.count - filterWidthToUse)..<tempArray.count)
         
         // now start filtering
         

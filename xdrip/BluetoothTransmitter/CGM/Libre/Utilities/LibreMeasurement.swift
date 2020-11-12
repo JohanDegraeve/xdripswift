@@ -42,7 +42,7 @@ class LibreMeasurement {
     ///     - date:   date of the measurement
     ///     - minuteCounter : minute counter of this measurement
     ///     - libre1DerivedAlgorithmParameters : Libre1DerivedAlgorithmParameters for the sensor
-    init(bytes: [UInt8], slope: Double = 0.1, offset: Double = 0.0, minuteCounter: Int = 0, date: Date, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters? = nil) {
+    init(bytes: Data, slope: Double = 0.1, offset: Double = 0.0, minuteCounter: Int = 0, date: Date, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters? = nil) {
         
         self.rawGlucose = (Int(bytes[1] & 0x1F) << 8) + Int(bytes[0]) // switched to 13 bit mask on 2018-03-15
         self.rawTemperature = (Int(bytes[4] & 0x3F) << 8)  + Int(bytes[3]) // 14 bit-mask for raw temperature

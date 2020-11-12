@@ -430,12 +430,6 @@ public class AlertManager:NSObject {
             // first check if the alert needs to fire, even if the alert would be snoozed, this will ensure logging.
             if checkAlertAndFireHelper(alertKind) {return true}
             
-            // tracing to be deleted once crash issue is solved
-            if let snoozeTimeStamp = getSnoozeParameters(alertKind: alertKind).snoozeTimeStamp {
-                trace("in checkAlertGroupAndFire before calling getSnoozeValue, snoozeTimeStamp = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeTimeStamp.description(with: .current))
-            } else {
-                trace("in checkAlertGroupAndFire before calling getSnoozeValue, snoozeTimeStamp = nil", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
-            }
             trace("in checkAlertGroupAndFire before calling getSnoozeValue, snoozePeriodInMinutes = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes.description)
             
             // if alertKind is snoozed then we don't want to check the next alert (example if verylow is snoozed then don't check low)
@@ -480,12 +474,6 @@ public class AlertManager:NSObject {
         /// will be initialized later
         var minimumDelayInSecondsToUse:Int?
         
-        // tracing to be deleted once crash issue is solved
-        if let snoozeTimeStamp = getSnoozeParameters(alertKind: alertKind).snoozeTimeStamp {
-            trace("in checkAlertAndFire before calling getSnoozeValue, snoozeTimeStamp = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeTimeStamp.description(with: .current))
-        } else {
-            trace("in checkAlertAndFire before calling getSnoozeValue, snoozeTimeStamp = nil", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
-        }
         trace("in checkAlertAndFire before calling getSnoozeValue, snoozePeriodInMinutes = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes.description)
 
         // check if snoozed

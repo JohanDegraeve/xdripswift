@@ -37,7 +37,7 @@ public struct Libre1DerivedAlgorithmParameters: Codable, CustomStringConvertible
         
     }
     
-    public init(bytes: [UInt8], serialNumber: String) {
+    public init(bytes: Data, serialNumber: String) {
         
         self.serialNumber = serialNumber
         

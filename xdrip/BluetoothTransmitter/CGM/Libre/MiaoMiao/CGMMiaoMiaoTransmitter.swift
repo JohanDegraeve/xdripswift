@@ -569,31 +569,31 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         var patchInfoRange = [String]()
         var sampleLibreDataInHex = ""
         
-        sampleLibreDataInHex = "7064027690617461bfaffe62454bb4a3"
-        sampleLibreDataInHex = sampleLibreDataInHex + "94d6e0e300fe1a3d9c303c967a9a2fd3"
-        sampleLibreDataInHex = sampleLibreDataInHex + "f5cdd5728fcf32c8c5da95bad7f3fc46"
-        sampleLibreDataInHex = sampleLibreDataInHex + "c74f00cc1d0d326657377b3e94cdd008"
-        sampleLibreDataInHex = sampleLibreDataInHex + "0374647d3f1c52b371eaf337cd9ac971"
-        sampleLibreDataInHex = sampleLibreDataInHex + "8dbb9a322a8fb0cb8363e1e40ecbcc05"
-        sampleLibreDataInHex = sampleLibreDataInHex + "ec045e2339ba989a5eb3d6cf2a022bb4"
-        sampleLibreDataInHex = sampleLibreDataInHex + "1266cac51e9d6494c69ac697bc79c176"
-        sampleLibreDataInHex = sampleLibreDataInHex + "e079b6f04630dc65b2d14d46674a8521"
-        sampleLibreDataInHex = sampleLibreDataInHex + "036089e33c7964e99e70a012064b8873"
-        sampleLibreDataInHex = sampleLibreDataInHex + "ae3fe026a26a40c4d86afe1e94fbf7b4"
-        sampleLibreDataInHex = sampleLibreDataInHex + "89113ec5928c95c635c4bf9eb8683a05"
-        sampleLibreDataInHex = sampleLibreDataInHex + "e63aced89915b30f3fb8f43f9a976ed1"
-        sampleLibreDataInHex = sampleLibreDataInHex + "1c498170062a85c78a11484143c22cf5"
-        sampleLibreDataInHex = sampleLibreDataInHex + "a25a8b2b50ef3e3a3841fc2307a70eb7"
-        sampleLibreDataInHex = sampleLibreDataInHex + "e01c3fb125fab7c270d85b412e4055fc"
-        sampleLibreDataInHex = sampleLibreDataInHex + "bd9a546085e9c246b771fe68aae68a31"
-        sampleLibreDataInHex = sampleLibreDataInHex + "4b34c16a84faf39fc8edecd3a0b61350"
-        sampleLibreDataInHex = sampleLibreDataInHex + "2ae7537cc3c0dbde983c7a90846b68e0"
-        sampleLibreDataInHex = sampleLibreDataInHex + "178d005a3421a8e488710c30e7c238aa"
-        sampleLibreDataInHex = sampleLibreDataInHex + "fbd18352473ecfc46d2365bdb1363a51"
-        sampleLibreDataInHex = sampleLibreDataInHex + "4038f7bcaee12306"
-        
+        // the first element is taken from another range of tests
+        sampleLibreDataInHex = "431d9ea2310d6903d9b3c3e0d0f42a0f"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a7af7c37a192075f5f1c7c6b9565dddc"
+        sampleLibreDataInHex = sampleLibreDataInHex + "0ab505a62e7fe3ab4d8af42bac82c2f4"
+        sampleLibreDataInHex = sampleLibreDataInHex + "f4ce50197f612ff02794f7de30e8e604"
+        sampleLibreDataInHex = sampleLibreDataInHex + "f60df8a5527110d117fec2b5492557dd"
+        sampleLibreDataInHex = sampleLibreDataInHex + "72c30ce68b2f61a811c1a2966e351608"
+        sampleLibreDataInHex = sampleLibreDataInHex + "dfd9cef7aed685a40c0932d9e7bd9679"
+        sampleLibreDataInHex = sampleLibreDataInHex + "d8902fca8d8e63aca1ab38c949f97215"
+        sampleLibreDataInHex = sampleLibreDataInHex + "088ffd9a1916885dc743094b0c8b01d4"
+        sampleLibreDataInHex = sampleLibreDataInHex + "ebfea1892e683021f45d1c4f543e3524"
+        sampleLibreDataInHex = sampleLibreDataInHex + "efc40505f2787af1ce0526f138f93dcc"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a0e637a2cd3201ff3fe58dbd28e8965e"
+        sampleLibreDataInHex = sampleLibreDataInHex + "0ef02eb36b0ae7f3402ac70cf1227b26"
+        sampleLibreDataInHex = sampleLibreDataInHex + "49b06cfd9c399effedb0bc1f17419708"
+        sampleLibreDataInHex = sampleLibreDataInHex + "88ad0a43070fae0354e2bd4de8094d52"
+        sampleLibreDataInHex = sampleLibreDataInHex + "084219db30e5e3badcf49b127ca96daa"
+        sampleLibreDataInHex = sampleLibreDataInHex + "7060b11711fa1a720a0e7054f72a5d47"
+        sampleLibreDataInHex = sampleLibreDataInHex + "69c34305db4c6ea671c3de9c3836b404"
+        sampleLibreDataInHex = sampleLibreDataInHex + "c2757c1630d48f8a45e29f7ecdad6e09"
+        sampleLibreDataInHex = sampleLibreDataInHex + "ab7be5156b33c2dcef483e6f2f568bfd"
+        sampleLibreDataInHex = sampleLibreDataInHex + "13276639182c9bfcd0b02180daf7eda7"
+        sampleLibreDataInHex = sampleLibreDataInHex + "a8ce12d7f1f3773e"
         testData.append(sampleLibreDataInHex)
-        patchInfoRange.append("9D0830013635")
+        patchInfoRange.append("9D083001D718")
         
         sampleLibreDataInHex = "4fc0096be8c74510005a51d24e509d04"
         sampleLibreDataInHex = sampleLibreDataInHex + "7e46ee053f36b054f378ee4448c162d5"
@@ -751,13 +751,13 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         testData.append(sampleLibreDataInHex)
         patchInfoRange.append("9D083001FB2C")
         
-        //CGMMiaoMiaoTransmitter.testPeripheralDidUpdateValue(libreDataAsHexString: testData[4], serialNumberAsHexString: nil, patchInfoAsHexString: patchInfoRange[4])
+        CGMMiaoMiaoTransmitter.testPeripheralDidUpdateValue(libreDataAsHexString: testData[0], serialNumberAsHexString: nil, patchInfoAsHexString: patchInfoRange[0])
         
-        for (index, data) in testData.enumerated() {
+        /*for (index, data) in testData.enumerated() {
          
          CGMMiaoMiaoTransmitter.testPeripheralDidUpdateValue(libreDataAsHexString: data, serialNumberAsHexString: nil, patchInfoAsHexString: patchInfoRange[index])
          
-        }
+        }*/
 
     }
     
