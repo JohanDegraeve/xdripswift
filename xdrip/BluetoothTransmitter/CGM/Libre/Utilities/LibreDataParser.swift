@@ -96,10 +96,15 @@ class LibreDataParser {
         rangeProcessor(16, indexTrend, { index in
             return (max(0, (Double)(sensorTimeInMinutes - index))) * 60.0
         }, 28)
-        
+
+        // needed in timeInSecondsCalculator for history processing
+        let date = dateOfMostRecentHistoryValue(sensorTimeInMinutes: sensorTimeInMinutes, nextHistoryBlock: indexHistory, date: ourTime)
+        let timeInSecondsOfMostRecentHistoryValue = (date.toMillisecondsAsDouble() - sensorStartTimeInMilliseconds) / 1000
+
         // process history
+        //date.addingTimeInterval(Double(-900 * blockIndex)
         rangeProcessor(32, indexHistory, { index in
-            return (max(0,(Double)(abs(sensorTimeInMinutes - 3)/15)*15 - (Double)(index*15))) * 60.0
+            return (max(0, timeInSecondsOfMostRecentHistoryValue - 900.0 * (Double)(index)))
         }, 124)
     
         return (returnValue, sensorState, sensorTimeInMinutes)
@@ -391,18 +396,18 @@ fileprivate func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialN
 /// History values are updated every 15 minutes. Their corresponding time from start of the sensor in minutes is 15, 30, 45, 60, ..., but the value is delivered three minutes later, i.e. at the minutes 18, 33, 48, 63, ... and so on. So for instance if the current time in minutes (since start of sensor) is 67, the most recent value is 7 minutes old. This can be calculated from the minutes since start. Unfortunately sometimes the history index is incremented earlier than the minutes counter and they are not in sync. This has to be corrected.
 ///
 /// - Returns: the date of the most recent history value and the corresponding minute counter
-fileprivate func dateOfMostRecentHistoryValue(minutesSinceStart: Int, nextHistoryBlock: Int, date: Date) -> (date: Date, counter: Int) {
+fileprivate func dateOfMostRecentHistoryValue(sensorTimeInMinutes: Int, nextHistoryBlock: Int, date: Date) -> Date {
     // Calculate correct date for the most recent history value.
-    //        date.addingTimeInterval( 60.0 * -Double( (minutesSinceStart - 3) % 15 + 3 ) )
-    let nextHistoryIndexCalculatedFromMinutesCounter = ( (minutesSinceStart - 3) / 15 ) % 32
-    let delay = (minutesSinceStart - 3) % 15 + 3 // in minutes
+    //        date.addingTimeInterval( 60.0 * -Double( (sensorTimeInMinutes - 3) % 15 + 3 ) )
+    let nextHistoryIndexCalculatedFromMinutesCounter = ( (sensorTimeInMinutes - 3) / 15 ) % 32
+    let delay = (sensorTimeInMinutes - 3) % 15 + 3 // in minutes
     if nextHistoryIndexCalculatedFromMinutesCounter == nextHistoryBlock {
-        // Case when history index is incremented togehter with minutesSinceStart (in sync)
-        //            print("delay: \(delay), minutesSinceStart: \(minutesSinceStart), result: \(minutesSinceStart-delay)")
-        return (date: date.addingTimeInterval( 60.0 * -Double(delay) ), counter: minutesSinceStart - delay)
+        // Case when history index is incremented togehter with sensorTimeInMinutes (in sync)
+        //            print("delay: \(delay), sensorTimeInMinutes: \(sensorTimeInMinutes), result: \(sensorTimeInMinutes-delay)")
+        return date.addingTimeInterval( 60.0 * -Double(delay))
     } else {
-        // Case when history index is incremented before minutesSinceStart (and they are async)
-        //            print("delay: \(delay), minutesSinceStart: \(minutesSinceStart), result: \(minutesSinceStart-delay-15)")
-        return (date: date.addingTimeInterval( 60.0 * -Double(delay - 15)), counter: minutesSinceStart - delay)
+        // Case when history index is incremented before sensorTimeInMinutes (and they are async)
+        //            print("delay: \(delay), sensorTimeInMinutes: \(sensorTimeInMinutes), result: \(sensorTimeInMinutes-delay-15)")
+        return date.addingTimeInterval( 60.0 * -Double(delay - 15))
     }
 }
