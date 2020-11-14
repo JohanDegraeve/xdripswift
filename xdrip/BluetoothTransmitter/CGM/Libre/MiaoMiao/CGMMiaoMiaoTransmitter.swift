@@ -467,18 +467,12 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                             
                             patchInfo = Data(rxBuffer[363...368]).hexEncodedString().uppercased()
                             
-                            if let patchInfo = patchInfo {
-                                debuglogging("received patchInfo " + patchInfo)
-                            }
-                            
                         }
                         
                         var dataIsDecryptedToLibre1Format = false
                         
                         if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
                             // note that we should always have a libreSensorType
-                            
-                            debuglogging("libresensortype = " + libreSensorType.description)
                             
                             // decrypt of libre2 or libreUS
                             dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer, headerLength: miaoMiaoHeaderLength, log: nil, patchInfo: patchInfo, uid: rxBuffer[5..<13].bytes)
@@ -508,18 +502,11 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 
                                 previousSensorSerialNumber = libreSensorSerialNumber.serialNumber
                                 
-                                debuglogging("    new sensor detected :  " + libreSensorSerialNumber.serialNumber)
-                                
                             }
                             
                         }
                         
                         LibreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: patchInfo, webOOPEnabled: true, oopWebSite: ConstantsLibre.site, oopWebToken: ConstantsLibre.token, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: nil, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
-                            
-                            if let sensorState = sensorState {
-                                debuglogging("sensorstate = " + sensorState.description)
-                            }
-                            
                             
                         })
                         
