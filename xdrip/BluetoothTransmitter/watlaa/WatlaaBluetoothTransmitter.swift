@@ -107,9 +107,6 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     /// used when processing data packet
     private var timestampFirstPacketReception:Date
 
-    /// timestamp of last received reading. When a new packet is received, then only the more recent readings will be treated
-    private var timeStampLastBgReading:Date
-
     /// battery level Characteristic, needed to be able to read value
     private var batteryLevelCharacteric: CBCharacteristic?
     
@@ -133,7 +130,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     ///     - cgmTransmitterDelegate : CGMTransmitterDelegate
     ///     - watlaaBluetoothTransmitterDelegate : the WatlaaBluetoothTransmitterDelegate
     ///     - bluetoothTransmitterDelegate : BluetoothTransmitterDelegate
-    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, timeStampLastBgReading: Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
+    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "watlaa")
@@ -150,9 +147,6 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
         
         // assign watlaaBluetoothTransmitterDelegate
         self.watlaaBluetoothTransmitterDelegate = watlaaBluetoothTransmitterDelegate
-        
-        // initialize timeStampLastBgReading
-        self.timeStampLastBgReading = timeStampLastBgReading ?? Date(timeIntervalSince1970: 0)
         
         // initialize webOOPEnabled
         self.webOOPEnabled = webOOPEnabled ?? false
@@ -317,9 +311,6 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                                     
                                     watlaaBluetoothTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
                                     
-                                    // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
-                                    timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-                                    
                                 }
                                 
                             }
@@ -330,11 +321,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                             // send batteryPercentage to delegate
                             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
                             
-                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: nil, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading, dataIsDecryptedToLibre1Format: false, completionHandler:  { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
-                                
-                                if let timeStampLastBgReading = timeStampLastBgReading {
-                                    self.timeStampLastBgReading = timeStampLastBgReading
-                                }
+                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: nil, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: false, completionHandler:  { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 // TODO : use sensorState as in MiaoMiao and Bubble : show the status on bluetoothPeripheralView
                                 

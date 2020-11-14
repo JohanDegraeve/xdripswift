@@ -19,7 +19,4 @@ extension GNSEntry {
     /// serialNumber
     @NSManaged public var serialNumber: String?
     
-    /// timestamp of last reading read with this transmitter
-    @NSManaged public var timeStampLastBgReading: Date?
-    
 }

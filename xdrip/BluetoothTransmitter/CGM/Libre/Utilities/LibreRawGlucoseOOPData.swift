@@ -109,7 +109,7 @@ public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebSe
         
     }
     
-    func glucoseData(timeStampLastBgReading: Date?) -> (libreRawGlucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
+    func glucoseData() -> (libreRawGlucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
 
         // initialize returnvalue, empty glucoseData array, sensorState, and nil as sensorTimeInMinutes
         var returnValue: ([GlucoseData], LibreSensorState, Int?) = ([GlucoseData](), sensorState, nil)
@@ -153,12 +153,7 @@ public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebSe
 
             // create timestamp of the reading
             let readingTimeStamp = creationTimeStamp.addingTimeInterval(-60 * Double(sensorTimeInMinutes - realTimeGlucose.id!))
-            
 
-            // only add the new reading if at least 30 seconds older than timeStampLastBgReading (if not nil) - when nil then 0.0 is used, readingTimeStamp will never be < 0.0
-            // as soon as a reading is found which is too old to process then break the loop
-            if readingTimeStamp.toMillisecondsAsDouble() < (timeStampLastBgReading != nil ? (timeStampLastBgReading!.toMillisecondsAsDouble() + 30000) : 0.0) {break}
-            
             //  only add readings that are at least 5 minutes away from each other, same approach as in LibreDataParser.parse
             if let lastElement = returnValue.0.last {
                 if lastElement.timeStamp.toMillisecondsAsDouble() - readingTimeStamp.toMillisecondsAsDouble() < (5 * 60 * 1000 - 10000) {continue}

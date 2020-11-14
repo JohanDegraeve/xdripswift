@@ -666,7 +666,7 @@ final class RootViewController: UIViewController {
                 timeStampLastBgReading = lastReading.timeStamp
             }
             
-            // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
+            // iterate through array, elements are ordered by timestamp, first is the youngest, we need to start with the oldest
             for (index , glucose) in glucoseData.enumerated().reversed() {
                 
                 // we only add new glucose values if 5 minutes - 10 seconds younger than latest already existing reading, or, if it's the latest, it needs to be just younger

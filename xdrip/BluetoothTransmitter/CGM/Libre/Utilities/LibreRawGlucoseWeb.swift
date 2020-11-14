@@ -8,13 +8,11 @@ protocol LibreRawGlucoseWeb {
     /// sensor state
     var sensorState: LibreSensorState { get }
     
-    /// - parameters:
-    ///     - timeStampLastBgReading: this is of the timestamp of the latest reading we already received during previous session, optional
     /// - returns:
-    ///     - array of libreRawGlucoseData, first is the most recent. Only returns recent readings, ie not the ones that are older than timeStampLastBgReading. 30 seconds are added here, meaning, new reading should be at least 30 seconds more recent than timeStampLastBgReading
+    ///     - array of libreRawGlucoseData, first is the most recent.
     ///     - sensorState: status of the sensor
     ///     - sensorTimeInMinutes: age of sensor in minutes, optional
-    func glucoseData(timeStampLastBgReading: Date?) -> (libreRawGlucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?)
+    func glucoseData() -> (libreRawGlucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?)
     
 }
 
@@ -27,7 +25,7 @@ extension LibreRawGlucoseWeb {
         
         returnValue = returnValue + "   sensorState = " + sensorState.description + "\n"
         
-        let libreGlucoseData = glucoseData(timeStampLastBgReading: nil)
+        let libreGlucoseData = glucoseData()
         
         returnValue = returnValue + "\nSize of [LibreRawGlucoseData] = " + libreGlucoseData.libreRawGlucoseData.count.description + "\n"
         

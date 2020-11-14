@@ -10,7 +10,4 @@ extension Blucon {
     // blePeripheral is required to conform to protocol BluetoothPeripheral
     @NSManaged public var blePeripheral: BLEPeripheral
     
-    /// timestamp of last reading read with this transmitter
-    @NSManaged public var timeStampLastBgReading: Date?
-    
 }

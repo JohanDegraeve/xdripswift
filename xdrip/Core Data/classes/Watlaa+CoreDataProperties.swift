@@ -17,7 +17,4 @@ extension Watlaa {
     /// hardware
     @NSManaged public var hardware: String?
     
-    /// timestamp of last reading read with this transmitter
-    @NSManaged public var timeStampLastBgReading: Date?
-
 }

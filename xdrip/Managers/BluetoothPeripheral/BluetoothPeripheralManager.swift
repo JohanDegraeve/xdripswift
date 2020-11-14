@@ -133,7 +133,7 @@ class BluetoothPeripheralManager: NSObject {
                             
                             // create an instance of WatlaaBluetoothTransmitter, WatlaaBluetoothTransmitter will automatically try to connect to the watlaa with the address that is stored in watlaa
                             // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(WatlaaBluetoothTransmitter(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, timeStampLastBgReading: watlaa.timeStampLastBgReading, sensorSerialNumber: watlaa.blePeripheral.sensorSerialNumber, webOOPEnabled: watlaa.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: watlaa.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            bluetoothTransmitters.insert(WatlaaBluetoothTransmitter(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, sensorSerialNumber: watlaa.blePeripheral.sensorSerialNumber, webOOPEnabled: watlaa.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: watlaa.blePeripheral.nonFixedSlopeEnabled), at: index)
                             
                             // if watlaa is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                             if bluetoothPeripheralType.category() == .CGM {
@@ -204,7 +204,7 @@ class BluetoothPeripheralManager: NSObject {
                             
                             // create an instance of BubbleBluetoothTransmitter, BubbleBluetoothTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
                             // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMBubbleTransmitter(address: bubble.blePeripheral.address, name: bubble.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: bubble.timeStampLastBgReading, sensorSerialNumber: bubble.blePeripheral.sensorSerialNumber, webOOPEnabled: bubble.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: bubble.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            bluetoothTransmitters.insert(CGMBubbleTransmitter(address: bubble.blePeripheral.address, name: bubble.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: bubble.blePeripheral.sensorSerialNumber, webOOPEnabled: bubble.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: bubble.blePeripheral.nonFixedSlopeEnabled), at: index)
                             
                             // if BubbleType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                             if bluetoothPeripheralType.category() == .CGM {
@@ -231,7 +231,7 @@ class BluetoothPeripheralManager: NSObject {
                             
                             // create an instance of CGMMiaoMiaoTransmitter, CGMMiaoMiaoTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
                             // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMMiaoMiaoTransmitter(address: miaoMiao.blePeripheral.address, name: miaoMiao.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: miaoMiao.timeStampLastBgReading, sensorSerialNumber: miaoMiao.blePeripheral.sensorSerialNumber, webOOPEnabled: miaoMiao.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: miaoMiao.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            bluetoothTransmitters.insert(CGMMiaoMiaoTransmitter(address: miaoMiao.blePeripheral.address, name: miaoMiao.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate,  sensorSerialNumber: miaoMiao.blePeripheral.sensorSerialNumber, webOOPEnabled: miaoMiao.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: miaoMiao.blePeripheral.nonFixedSlopeEnabled), at: index)
                             
                             // if MiaoMiaoType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                             if bluetoothPeripheralType.category() == .CGM {
@@ -371,7 +371,7 @@ class BluetoothPeripheralManager: NSObject {
                             
                             // create an instance of CGMGNSEntryTransmitter, CGMGNSEntryTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
                             // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMGNSEntryTransmitter(address: gNSEntry.blePeripheral.address, name: gNSEntry.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: gNSEntry.timeStampLastBgReading, nonFixedSlopeEnabled: gNSEntry.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            bluetoothTransmitters.insert(CGMGNSEntryTransmitter(address: gNSEntry.blePeripheral.address, name: gNSEntry.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: gNSEntry.blePeripheral.nonFixedSlopeEnabled), at: index)
                             
                             // if GNSentryType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                             if bluetoothPeripheralType.category() == .CGM {
@@ -400,7 +400,7 @@ class BluetoothPeripheralManager: NSObject {
                                 
                                 // create an instance of CGMBluconTransmitter, CGMBluconTransmitter will automatically try to connect to the Bluon with the address that is stored in blucon
                                 // add it to the array of bluetoothTransmitters
-                                bluetoothTransmitters.insert(CGMBluconTransmitter(address: blucon.blePeripheral.address, name: blucon.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: blucon.timeStampLastBgReading, sensorSerialNumber: blucon.blePeripheral.sensorSerialNumber, nonFixedSlopeEnabled: blucon.blePeripheral.nonFixedSlopeEnabled), at: index)
+                                bluetoothTransmitters.insert(CGMBluconTransmitter(address: blucon.blePeripheral.address, name: blucon.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: blucon.blePeripheral.sensorSerialNumber, nonFixedSlopeEnabled: blucon.blePeripheral.nonFixedSlopeEnabled), at: index)
                                 
                                 // if bluconType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                                 if bluetoothPeripheralType.category() == .CGM {
@@ -549,7 +549,7 @@ class BluetoothPeripheralManager: NSObject {
                     
                     if let watlaa = bluetoothPeripheral as? Watlaa {
                         
-                        newTransmitter = WatlaaBluetoothTransmitter(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, timeStampLastBgReading: nil, sensorSerialNumber: watlaa.blePeripheral.sensorSerialNumber, webOOPEnabled: watlaa.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: watlaa.blePeripheral.nonFixedSlopeEnabled)
+                        newTransmitter = WatlaaBluetoothTransmitter(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self,  sensorSerialNumber: watlaa.blePeripheral.sensorSerialNumber, webOOPEnabled: watlaa.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: watlaa.blePeripheral.nonFixedSlopeEnabled)
                         
                     }
                     
@@ -598,7 +598,7 @@ class BluetoothPeripheralManager: NSObject {
                     
                         if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
                             
-                            newTransmitter = CGMBubbleTransmitter(address: bubble.blePeripheral.address, name: bubble.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: bubble.blePeripheral.sensorSerialNumber, webOOPEnabled: bubble.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: bubble.blePeripheral.nonFixedSlopeEnabled)
+                            newTransmitter = CGMBubbleTransmitter(address: bubble.blePeripheral.address, name: bubble.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate,  sensorSerialNumber: bubble.blePeripheral.sensorSerialNumber, webOOPEnabled: bubble.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: bubble.blePeripheral.nonFixedSlopeEnabled)
                             
                         } else {
                             
@@ -613,7 +613,7 @@ class BluetoothPeripheralManager: NSObject {
                         
                         if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
                             
-                            newTransmitter = CGMMiaoMiaoTransmitter(address: miaoMiao.blePeripheral.address, name: miaoMiao.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: miaoMiao.blePeripheral.sensorSerialNumber, webOOPEnabled: miaoMiao.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: miaoMiao.blePeripheral.nonFixedSlopeEnabled)
+                            newTransmitter = CGMMiaoMiaoTransmitter(address: miaoMiao.blePeripheral.address, name: miaoMiao.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: miaoMiao.blePeripheral.sensorSerialNumber, webOOPEnabled: miaoMiao.blePeripheral.webOOPEnabled, oopWebSite: UserDefaults.standard.webOOPSite, oopWebToken: UserDefaults.standard.webOOPtoken, nonFixedSlopeEnabled: miaoMiao.blePeripheral.nonFixedSlopeEnabled)
                             
                         } else {
                             
@@ -643,7 +643,7 @@ class BluetoothPeripheralManager: NSObject {
                         
                         if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
                             
-                            newTransmitter = CGMGNSEntryTransmitter(address: gNSEntry.blePeripheral.address, name: gNSEntry.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, nonFixedSlopeEnabled: gNSEntry.blePeripheral.nonFixedSlopeEnabled)
+                            newTransmitter = CGMGNSEntryTransmitter(address: gNSEntry.blePeripheral.address, name: gNSEntry.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: gNSEntry.blePeripheral.nonFixedSlopeEnabled)
                             
                         } else {
                             
@@ -673,7 +673,7 @@ class BluetoothPeripheralManager: NSObject {
                         
                         if let transmitterId = blucon.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
                             
-                            newTransmitter = CGMBluconTransmitter(address: blucon.blePeripheral.address, name: blucon.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: blucon.blePeripheral.sensorSerialNumber, nonFixedSlopeEnabled: blucon.blePeripheral.nonFixedSlopeEnabled)
+                            newTransmitter = CGMBluconTransmitter(address: blucon.blePeripheral.address, name: blucon.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: blucon.blePeripheral.sensorSerialNumber, nonFixedSlopeEnabled: blucon.blePeripheral.nonFixedSlopeEnabled)
                             
                         } else {
                             
@@ -803,7 +803,7 @@ class BluetoothPeripheralManager: NSObject {
             
         case .WatlaaType:
             
-            return WatlaaBluetoothTransmitter(address: nil, name: nil, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, timeStampLastBgReading: nil, sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil, nonFixedSlopeEnabled: nil)
+            return WatlaaBluetoothTransmitter(address: nil, name: nil, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self,  sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil, nonFixedSlopeEnabled: nil)
             
         case .DexcomG5Type:
             
@@ -827,7 +827,7 @@ class BluetoothPeripheralManager: NSObject {
                 fatalError("in createNewTransmitter, type DexcomG5Type, cgmTransmitterDelegate is nil")
             }
             
-            return CGMBubbleTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil, nonFixedSlopeEnabled: nil)
+            return CGMBubbleTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate,  sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil, nonFixedSlopeEnabled: nil)
             
         case .MiaoMiaoType:
             
@@ -835,7 +835,7 @@ class BluetoothPeripheralManager: NSObject {
                 fatalError("in createNewTransmitter, MiaoMiaoType, cgmTransmitterDelegate is nil")
             }
             
-            return CGMMiaoMiaoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil, nonFixedSlopeEnabled: nil)
+            return CGMMiaoMiaoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate,  sensorSerialNumber: nil, webOOPEnabled: nil, oopWebSite: nil, oopWebToken: nil, nonFixedSlopeEnabled: nil)
             
         case .DropletType:
             
@@ -851,7 +851,7 @@ class BluetoothPeripheralManager: NSObject {
                 fatalError("in createNewTransmitter, GNSEntryType, cgmTransmitterDelegate is nil")
             }
             
-            return CGMGNSEntryTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, nonFixedSlopeEnabled: nil)
+            return CGMGNSEntryTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate,  nonFixedSlopeEnabled: nil)
             
         case .BlueReaderType:
             
@@ -868,7 +868,7 @@ class BluetoothPeripheralManager: NSObject {
                 fatalError("in createNewTransmitter, type BluconType, transmitterId is nil or cgmTransmitterDelegate is nil")
             }
             
-            return CGMBluconTransmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: nil, sensorSerialNumber: nil, nonFixedSlopeEnabled: nil)
+            return CGMBluconTransmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate,  sensorSerialNumber: nil, nonFixedSlopeEnabled: nil)
 
         case .DexcomG4Type:
             

@@ -79,7 +79,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     ///     - sensorSerialNumber : is needed to allow detection of a new sensor.
     ///     - bluetoothTransmitterDelegate : a NluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
-    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBluconTransmitterDelegate: CGMBluconTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date?, sensorSerialNumber:String?, nonFixedSlopeEnabled: Bool?) {
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBluconTransmitterDelegate: CGMBluconTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, sensorSerialNumber:String?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         // start by using expected device name
@@ -90,7 +90,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         }
         
         // initialize timeStampLastBgReading
-        self.timeStampLastBgReading = timeStampLastBgReading ?? Date(timeIntervalSince1970: 0)
+        self.timeStampLastBgReading = Date(timeIntervalSince1970: 0)
         
         // initialize sensorSerialNumber
         self.sensorSerialNumber = sensorSerialNumber
@@ -179,7 +179,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
 
             //get readings from buffer and send to cGMTransmitterDelegate
             // TODO: use LibreDataParser.libreDataProcessor and make parseLibre1DataWithoutOOPWebCalibration private to LibreDataParser
-            var result = LibreDataParser.parseLibre1Data(libreData: rxBuffer, timeStampLastBgReading: timeStampLastBgReading, libre1DerivedAlgorithmParameters: nil)
+            var result = LibreDataParser.parseLibre1Data(libreData: rxBuffer, libre1DerivedAlgorithmParameters: nil)
             
             //TODO: sort glucosedata before calling newReadingsReceived
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)

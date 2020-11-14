@@ -75,9 +75,6 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMGNSEntry)
     
-    /// timestamp of last received reading. When a new packet is received, then only the more recent readings will be treated
-    private var timeStampLastBgReadingInMinutes:Double
-    
     /// possible reading errors, as per GNSEntry documentation
     let GNW_BAND_NFC_HW_ERROR = 0
     let GNW_BAND_NFC_READING_ERROR = 1
@@ -102,16 +99,13 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     ///     - cGMGNSEntryTransmitterDelegate : a CGMGNSEntryTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMGNSEntryTransmitterDelegate : CGMGNSEntryTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading: Date?, nonFixedSlopeEnabled: Bool?) {
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMGNSEntryTransmitterDelegate : CGMGNSEntryTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "GNSentry")
         if let address = address {
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
         }
-        
-        //initialize timeStampLastBgReading
-        self.timeStampLastBgReadingInMinutes = timeStampLastBgReading != nil ? timeStampLastBgReading!.toMillisecondsAsDouble()/1000/60 : Date(timeIntervalSince1970: 0).toMillisecondsAsDouble()/1000/60
         
         // initialize nonFixedSlopeEnabled
         self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
@@ -222,20 +216,13 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
                         // get the reading value (mgdl)
                         let readingValueInMgDl = getIntAtPosition(numberOfBytes: 2, position: Int(7 + i * 2), data: &valueDecoded)
                         
-                        //new reading should be at least 30 seconds younger than timeStampLastBgReadingStoredInDatabase
-                        if readingTimeStampInMinutes > ((timeStampLastBgReadingInMinutes * 2) + 1)/2 {
-                            
-                            // sometimes 0 values are received, skip those
-                            if readingValueInMgDl > 0 {
-                                if readingTimeStampInMinutes * 60 * 1000 < timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) {
-                                    let glucoseData = GlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * ConstantsBloodGlucose.libreMultiplier)
-                                    readings.append(glucoseData)
-                                    timeStampLastAddedGlucoseDataInMinutes = readingTimeStampInMinutes
-                                }
+                        // sometimes 0 values are received, skip those
+                        if readingValueInMgDl > 0 {
+                            if readingTimeStampInMinutes * 60 * 1000 < timeStampLastAddedGlucoseDataInMinutes * 60 * 1000 - (5 * 60 * 1000 - 10000) {
+                                let glucoseData = GlucoseData(timeStamp: Date(timeIntervalSince1970: Double(readingTimeStampInMinutes) * 60.0), glucoseLevelRaw: Double(readingValueInMgDl) * ConstantsBloodGlucose.libreMultiplier)
+                                readings.append(glucoseData)
+                                timeStampLastAddedGlucoseDataInMinutes = readingTimeStampInMinutes
                             }
-                            
-                        } else {
-                            break loop
                         }
                         
                         // increase counter
@@ -244,10 +231,6 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
                     
                     cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &readings, transmitterBatteryInfo: nil, sensorTimeInMinutes: Int(sensorElapsedTimeInMinutes))
                     
-                    //set timeStampLastBgReading to timestamp of latest reading in the response so that next time we parse only the more recent readings
-                    if readings.count > 0 {
-                        timeStampLastBgReadingInMinutes = readings[0].timeStamp.toMillisecondsAsDouble()/1000/60
-                    }
                 }
             }
         }
