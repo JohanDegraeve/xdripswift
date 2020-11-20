@@ -1,4 +1,4 @@
-// https://github.com/JohanDegraeve/xdripswift/blob/bd5b3060f3a7d4c68dce767b5c86306239d06d14/xdrip/BluetoothTransmitter/CGM/Libre/Utilities/LibreRawGlucoseData.swift#L208
+// https://github.com/JohanDegraeve/xdripswift/blob/bd5b3060f3a7d4c68dce767b5c86306239d06d14/xdrip/BluetoothTransmitter/CGM/Libre/Utilities/GlucoseData.swift#L208
 
 import Foundation
 
@@ -23,7 +23,7 @@ public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebSe
     
     /// - time when instance of LibreRawGlucoseOOPData was created
     /// - this can be created to calculate the timestamp of realTimeGlucose
-    let creationTimeStamp = Date()
+    var creationTimeStamp = Date()
     
     enum Error: String {
         typealias RawValue = String
@@ -109,10 +109,10 @@ public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebSe
         
     }
     
-    func glucoseData(timeStampLastBgReading: Date?) -> (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
+    func glucoseData(timeStampLastBgReading: Date?) -> (libreRawGlucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
 
         // initialize returnvalue, empty glucoseData array, sensorState, and nil as sensorTimeInMinutes
-        var returnValue: ([LibreRawGlucoseData], LibreSensorState, Int?) = ([LibreRawGlucoseData](), sensorState, nil)
+        var returnValue: ([GlucoseData], LibreSensorState, Int?) = ([GlucoseData](), sensorState, nil)
 
         // if isError function returns true, then return empty array
         guard !isError else { return returnValue }
@@ -126,13 +126,13 @@ public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebSe
         // set senorTimeInMinutes in returnValue
         returnValue.2 = sensorTimeInMinutes
         
-        // get realtimeLibreRawGlucoseData which is the first element to add, with timestamp the time this instance of LibreRawGlucoseOOPData was created
-        let realtimeLibreRawGlucoseData = LibreRawGlucoseData(timeStamp: creationTimeStamp, glucoseLevelRaw: value)
+        // get realtimeGlucoseData which is the first element to add, with timestamp the time this instance of LibreRawGlucoseOOPData was created
+        let realtimeGlucoseData = GlucoseData(timeStamp: creationTimeStamp, glucoseLevelRaw: value)
         
         // add first element to returnValue
-        returnValue.0.append(realtimeLibreRawGlucoseData)
+        returnValue.0.append(realtimeGlucoseData)
 
-        // if historicGlucose is nil then return currentLibreRawGlucoseData and an empty array
+        // if historicGlucose is nil then return currentGlucoseData and an empty array
         guard var history = historicGlucose else {return returnValue}
 
         // check the order, first should be the highest value, time is sensor time in minutes, means first should be the most recent or the highest sensor time
@@ -168,7 +168,7 @@ public class LibreRawGlucoseOOPData: NSObject, LibreRawGlucoseWeb, LibreOOPWebSe
             if realTimeGlucose.value == nil {continue}
             if realTimeGlucose.value! == 0.0 {continue}
             
-            let libreRawGlucoseData = LibreRawGlucoseData(timeStamp: readingTimeStamp, glucoseLevelRaw: realTimeGlucose.value!)
+            let libreRawGlucoseData = GlucoseData(timeStamp: readingTimeStamp, glucoseLevelRaw: realTimeGlucose.value!)
             
             returnValue.0.append(libreRawGlucoseData)
             

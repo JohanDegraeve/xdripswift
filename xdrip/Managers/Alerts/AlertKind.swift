@@ -4,7 +4,7 @@ import Foundation
 public enum AlertKind:Int, CaseIterable {
     
     // when adding alertkinds, add new cases at the end (ie 9, ...)
-    // if this is done in the middle ((eg rapid rise alert might seem better positioned after veryhigh), then a database migration would be required, because the rawvalue is stored as Int16 in the coredata, namely the alertkind
+    // if this is done in the middle ((eg rapid rise alert might seem better positioned after veryhigh), then a database migration would be required, because the rawvalue is stored as Int16 in the coredata, namely the alertkind - and also in SnoozeParameters
     // the order of the alerts will in the uiview is determined by the initializer init(forRowAt row: Int)
 
     case verylow = 0
@@ -318,7 +318,7 @@ public enum AlertKind:Int, CaseIterable {
                     }
                     
                     // if this would be before start of nextAlertEntry then increase the delay
-                    var minutesSinceMidnightOfExpirtyTime = Date(timeInterval: TimeInterval(delayToUseInSeconds!), since: lastBgReading.timeStamp).minutesSinceMidNightLocalTime()
+                    var minutesSinceMidnightOfExpirtyTime = Date(timeInterval: TimeInterval(Double(delayToUseInSeconds!)), since: lastBgReading.timeStamp).minutesSinceMidNightLocalTime()
                     if minutesSinceMidnightOfExpirtyTime < Date().minutesSinceMidNightLocalTime() {
                         minutesSinceMidnightOfExpirtyTime += 24 * 60
                     }
@@ -341,7 +341,7 @@ public enum AlertKind:Int, CaseIterable {
                 if !currentAlertEntry.alertType.enabled || lastCalibration == nil {return (false, nil, nil, nil)}
                                 
                 // if lastCalibration not nil, check the timestamp and check if delay > value (in hours)
-                if abs(lastCalibration!.timeStamp.timeIntervalSinceNow) > TimeInterval(Int(currentAlertEntry.value) * 3600) {
+                if abs(lastCalibration!.timeStamp.timeIntervalSinceNow) > TimeInterval(Double(currentAlertEntry.value) * 3600.0) {
                     return(true, "", Texts_Alerts.calibrationNeededAlertTitle, nil)
                 }
                 return (false, nil, nil, nil)

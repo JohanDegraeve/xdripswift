@@ -235,7 +235,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 if let lastResetTimeStamp = dexcomG5.lastResetTimeStamp {
 
                     cell.textLabel?.text = Texts_BluetoothPeripheralView.lastResetTimeStamp
-                    cell.detailTextLabel?.text = lastResetTimeStamp.toShortString()
+                    cell.detailTextLabel?.text = lastResetTimeStamp.toString(timeStyle: .short, dateStyle: .short)
                     cell.accessoryType = .none
 
                 } else {

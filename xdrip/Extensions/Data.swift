@@ -79,20 +79,20 @@ extension Data {
         return number
     }
     
-    //source Data.Swift CGMBLEKit
-    func to<T: FixedWidthInteger>(_: T.Type) -> T {
-        return self.withUnsafeBytes { (bytes: UnsafePointer<T>) in
-            return T(littleEndian: bytes.pointee)
-        }
+    func to<T>(_: T.Type) -> T where T: ExpressibleByIntegerLiteral {
+        var value: T = 0
+        _ = Swift.withUnsafeMutableBytes(of: &value, { copyBytes(to: $0)} )
+        return value
     }
-
+    
     func toInt<T: FixedWidthInteger>() -> T {
         return to(T.self)
     }
     
     mutating func append<T: FixedWidthInteger>(_ newElement: T) {
-        var element = newElement.littleEndian
-        append(UnsafeBufferPointer(start: &element, count: 1))
+        
+        Swift.withUnsafeBytes(of: newElement.littleEndian) { self.append(contentsOf: $0) }
+        
     }
     
     func getByteAt(position:Int) -> Int {

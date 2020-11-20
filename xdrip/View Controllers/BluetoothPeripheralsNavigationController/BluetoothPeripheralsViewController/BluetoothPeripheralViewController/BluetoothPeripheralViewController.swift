@@ -244,7 +244,7 @@ class BluetoothPeripheralViewController: UIViewController {
             // bluetoothPeripheral already known
             
             // if sensor type is known and it requires oop web, then there's no need to show the oop web settings and the non-fixed slope settings
-            if let sensorType = bluetoothPeripheral.blePeripheral.libreSensorType, sensorType.needsWebOOP() {
+            if let sensorType = bluetoothPeripheral.blePeripheral.libreSensorType, sensorType.needsWebOOP(), !bluetoothPeripheral.overrideNeedsOOPWeb() {
                 
                 // mark web oop and non fixed slope settings sections as not shown
                 webOOPSettingsSectionIsShown = false
@@ -710,12 +710,22 @@ class BluetoothPeripheralViewController: UIViewController {
     }
     
     /// function called by model, if it receives a libre sensor type
+    /// - parameters:
+    ///     - libreSensorType : will be ued to determine if oop web needs to be enabled or not
+    ///     - oopWebAllowed : if set to true then it overrules the libreSensorType determined vallue,  if false then the libreSensorType determined value is used
     private func libreSensorTypeReceived(libreSensorType: LibreSensorType) {
        
         // if the sensortype needs web oop, and if web oop or non fixed slope settings sections are shown then delete those sections
+        // also check oopWebAllowed, if this is true, it overrules needsWebOOP
         // and if not, then the other way around
         
-        if libreSensorType.needsWebOOP() {
+        // check if overrideNeedsWebOOP needs to be set to true
+        var overrideNeedsWebOOP = false
+        if let bluetoothPeripheral = bluetoothPeripheral, bluetoothPeripheral.overrideNeedsOOPWeb() {
+            overrideNeedsWebOOP = true
+        }
+        
+        if libreSensorType.needsWebOOP() && !overrideNeedsWebOOP {
             
             var indexSet = IndexSet()
             
@@ -777,7 +787,6 @@ class BluetoothPeripheralViewController: UIViewController {
                 tableView.insertSections(indexSet, with: .none)
                 
             }
-            
             
         }
             
@@ -975,7 +984,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                         
                     }
                     
-                    cell.detailTextLabel?.text = lastConnectionStatusChangeTimeStamp.toShortString()
+                    cell.detailTextLabel?.text = lastConnectionStatusChangeTimeStamp.toString(timeStyle: .short, dateStyle: .short)
                     
                 } else {
                     cell.textLabel?.text = Texts_BluetoothPeripheralView.connectedAt
@@ -1078,9 +1087,15 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     
                 })
                 
+                // check if overrideNeedsWebOOP needs to be set to true
+                var overrideNeedsWebOOP = false
+                if let bluetoothPeripheral = bluetoothPeripheral, bluetoothPeripheral.overrideNeedsOOPWeb() {
+                    overrideNeedsWebOOP = true
+                }
+
                 // if it's a bluetoothPeripheral that supports libre and if it's a libre sensor type that needs oopWeb, then value can not be changed,
                 if let bluetoothPeripheral = self.bluetoothPeripheral, let libreSensorType = bluetoothPeripheral.blePeripheral.libreSensorType {
-                    if libreSensorType.needsWebOOP() {
+                    if libreSensorType.needsWebOOP() && !overrideNeedsWebOOP {
 
                         cell.accessoryView?.isUserInteractionEnabled = false
                         

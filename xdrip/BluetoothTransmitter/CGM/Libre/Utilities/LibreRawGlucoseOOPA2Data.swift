@@ -6,7 +6,7 @@
 //  Copyright © 2020 Johan Degraeve. All rights reserved.
 //
 
-// source https://github.com/JohanDegraeve/xdripswift/blob/bd5b3060f3a7d4c68dce767b5c86306239d06d14/xdrip/BluetoothTransmitter/CGM/Libre/Utilities/LibreRawGlucoseData.swift#L208
+// source https://github.com/JohanDegraeve/xdripswift/blob/bd5b3060f3a7d4c68dce767b5c86306239d06d14/xdrip/BluetoothTransmitter/CGM/Libre/Utilities/GlucoseData.swift#L208
 
 import Foundation
 
@@ -20,8 +20,8 @@ public class LibreRawGlucoseOOPA2Data: NSObject, LibreRawGlucoseWeb, LibreOOPWeb
     var list: [LibreRawGlucoseOOPA2List]?
     
     /// - time when instance of LibreRawGlucoseOOPData was created
-    /// - this can be created to calculate the timestamp of realtimeLibreRawGlucoseData
-    let creationTimeStamp = Date()
+    /// - this can be created to calculate the timestamp of realtimeGlucoseData
+    var creationTimeStamp = Date()
 
     /// server parse value
     var content: LibreRawGlucoseOOPA2Cotent? {
@@ -50,10 +50,10 @@ public class LibreRawGlucoseOOPA2Data: NSObject, LibreRawGlucoseWeb, LibreOOPWeb
         return state
     }
     
-    func glucoseData(timeStampLastBgReading: Date?) -> (libreRawGlucoseData:[LibreRawGlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
+    func glucoseData(timeStampLastBgReading: Date?) -> (libreRawGlucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int?) {
         
         // initialize returnvalue, empty glucoseData array, sensorState, and nil as sensorTimeInMinutes
-        var returnValue: ([LibreRawGlucoseData], LibreSensorState, Int?) = ([LibreRawGlucoseData](), sensorState, nil)
+        var returnValue: ([GlucoseData], LibreSensorState, Int?) = ([GlucoseData](), sensorState, nil)
 
         // if isError function returns true, then return empty array
         guard !isError else { return returnValue }
@@ -67,11 +67,11 @@ public class LibreRawGlucoseOOPA2Data: NSObject, LibreRawGlucoseWeb, LibreOOPWeb
         // set senorTimeInMinutes in returnValue
         returnValue.2 = sensorTimeInMinutes
         
-        // create realtimeLibreRawGlucoseData, which is the current glucose data
-        let realtimeLibreRawGlucoseData = LibreRawGlucoseData(timeStamp: creationTimeStamp, glucoseLevelRaw: currentBg)
+        // create realtimeGlucoseData, which is the current glucose data
+        let realtimeGlucoseData = GlucoseData(timeStamp: creationTimeStamp, glucoseLevelRaw: currentBg)
 
         // add first element
-        returnValue.0.append(realtimeLibreRawGlucoseData)
+        returnValue.0.append(realtimeGlucoseData)
 
         // history should be non nil, otherwise return only the first value
         guard var history = content.historicBg else { return returnValue }
@@ -109,7 +109,7 @@ public class LibreRawGlucoseOOPA2Data: NSObject, LibreRawGlucoseWeb, LibreOOPWeb
             if libreHistoricGlucoseA2.bg == nil {continue}
             if libreHistoricGlucoseA2.bg! == 0.0 {continue}
             
-            let libreRawGlucoseData = LibreRawGlucoseData(timeStamp: readingTimeStamp, glucoseLevelRaw: libreHistoricGlucoseA2.bg!)
+            let libreRawGlucoseData = GlucoseData(timeStamp: readingTimeStamp, glucoseLevelRaw: libreHistoricGlucoseA2.bg!)
             
             returnValue.0.append(libreRawGlucoseData)
             

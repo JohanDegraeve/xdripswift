@@ -118,7 +118,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         self.timeStampOfLastG5Reading = Date(timeIntervalSince1970: 0)
         
         //set timeStampOfLastBatteryReading to 0
-        self.timeStampOfLastBatteryReading = Date(timeIntervalSince1970: 0)
+        if let timeStampOfLastBatteryReading = UserDefaults.standard.timeStampOfLastBatteryReading {
+            self.timeStampOfLastBatteryReading = timeStampOfLastBatteryReading
+        } else {
+            self.timeStampOfLastBatteryReading = Date(timeIntervalSince1970: 0)
+        }
         
         //set timeStampTransmitterReset to 0
         self.timeStampTransmitterReset = Date(timeIntervalSince1970: 0)
@@ -150,7 +154,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// for testing, used by temptesting
     @objc private func createTestReading() {
-        let testdata = GlucoseData(timeStamp: Date(), glucoseLevelRaw: testAmount, glucoseLevelFiltered: testAmount)
+        let testdata = GlucoseData(timeStamp: Date(), glucoseLevelRaw: testAmount)
         debuglogging("timestamp testdata = " + testdata.timeStamp.description + ", with amount = " + testAmount.description)
         var testdataasarray = [testdata]
         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &testdataasarray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
@@ -193,6 +197,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             bluetoothTransmitterDelegate?.pairingFailed()
             
         }
+        
+        // setting characteristics to nil, they will be reinitialized at next connect
+        writeControlCharacteristic = nil
+        receiveAuthenticationCharacteristic = nil
+        communicationCharacteristic = nil
+        backfillCharacteristic = nil
         
     }
 
@@ -362,7 +372,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
                                         timeStampOfLastG5Reading = Date()
                                         
-                                        let glucoseData = GlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered), glucoseLevelFiltered: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered))
+                                        let glucoseData = GlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered))
                                         
                                         var glucoseDataArray = [glucoseData]
                                         
@@ -577,7 +587,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private func processBatteryStatusRxMessage(value:Data) {
         
         if let batteryStatusRxMessage = BatteryStatusRxMessage(data: value) {
-            
+
+            // this is only the internally local stored value, but the value in userdefaults will be set implicitly because the cgmTransmitterDelegate is also storing the transmitterbatteryinfo, which updates the timeStampOfLastBatteryReading in the UserDefaults
+            timeStampOfLastBatteryReading = Date()
+
             // cGMG5TransmitterDelegate for showing info on bluetoothviewcontroller and store in coredata
             cGMG5TransmitterDelegate?.received(transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), cGMG5Transmitter: self)
             

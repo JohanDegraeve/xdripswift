@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="19H2" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="AlertEntry" representedClassName=".AlertEntry" syncable="YES">
+        <attribute name="alertkind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="start" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="value" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="alertType" maxCount="1" deletionRule="Nullify" destinationEntity="AlertType" inverseName="alertEntries" inverseEntity="AlertType"/>
+    </entity>
+    <entity name="AlertType" representedClassName=".AlertType" syncable="YES">
+        <attribute name="enabled" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="overridemute" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="snooze" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="snoozeperiod" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="soundname" optional="YES" attributeType="String"/>
+        <attribute name="vibrate" attributeType="Boolean" usesScalarValueType="YES"/>
+        <relationship name="alertEntries" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="AlertEntry" inverseName="alertType" inverseEntity="AlertEntry"/>
+    </entity>
+    <entity name="BgReading" representedClassName=".BgReading" syncable="YES">
+        <attribute name="a" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="ageAdjustedRawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="b" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="c" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="calculatedValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="calculatedValueSlope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="calibrationFlag" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="deviceName" optional="YES" attributeType="String"/>
+        <attribute name="filteredCalculatedValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="filteredData" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="hideSlope" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="ra" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="rawData" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="rb" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="rc" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="calibration" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Calibration" inverseName="bgreadings" inverseEntity="Calibration"/>
+        <relationship name="sensor" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" inverseName="readings" inverseEntity="Sensor"/>
+    </entity>
+    <entity name="BLEPeripheral" representedClassName=".BLEPeripheral" syncable="YES">
+        <attribute name="address" attributeType="String"/>
+        <attribute name="alias" optional="YES" attributeType="String"/>
+        <attribute name="lastConnectionStatusChangeTimeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="nonFixedSlopeEnabled" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="parameterUpdateNeededAtNextConnect" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="sensorSerialNumber" optional="YES" attributeType="String"/>
+        <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="transmitterId" optional="YES" attributeType="String"/>
+        <attribute name="webOOPEnabled" attributeType="Boolean" usesScalarValueType="YES"/>
+        <relationship name="blucon" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Blucon" inverseName="blePeripheral" inverseEntity="Blucon"/>
+        <relationship name="blueReader" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BlueReader" inverseName="blePeripheral" inverseEntity="BlueReader"/>
+        <relationship name="bubble" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Bubble" inverseName="blePeripheral" inverseEntity="Bubble"/>
+        <relationship name="dexcomG4" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DexcomG4" inverseName="blePeripheral" inverseEntity="DexcomG4"/>
+        <relationship name="dexcomG5" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DexcomG5" inverseName="blePeripheral" inverseEntity="DexcomG5"/>
+        <relationship name="droplet" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Droplet" inverseName="blePeripheral" inverseEntity="Droplet"/>
+        <relationship name="gNSEntry" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="GNSEntry" inverseName="blePeripheral" inverseEntity="GNSEntry"/>
+        <relationship name="libre2" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Libre2" inverseName="blePeripheral" inverseEntity="Libre2"/>
+        <relationship name="m5Stack" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="M5Stack" inverseName="blePeripheral" inverseEntity="M5Stack"/>
+        <relationship name="miaoMiao" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="MiaoMiao" inverseName="blePeripheral" inverseEntity="MiaoMiao"/>
+        <relationship name="watlaa" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Watlaa" inverseName="blePeripheral" inverseEntity="Watlaa"/>
+    </entity>
+    <entity name="Blucon" representedClassName=".Blucon" syncable="YES">
+        <attribute name="timeStampLastBgReading" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="blucon" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="BlueReader" representedClassName=".BlueReader" syncable="YES">
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="blueReader" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="Bubble" representedClassName=".Bubble" syncable="YES">
+        <attribute name="firmware" optional="YES" attributeType="String"/>
+        <attribute name="hardware" optional="YES" attributeType="String"/>
+        <attribute name="timeStampLastBgReading" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="bubble" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="Calibration" representedClassName=".Calibration" syncable="YES">
+        <attribute name="adjustedRawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="bg" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="deviceName" optional="YES" attributeType="String"/>
+        <attribute name="distanceFromEstimate" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="estimateRawAtTimeOfCalibration" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="intercept" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="possibleBad" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="rawTimeStamp" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="rawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="sensorConfidence" attributeType="Double" usesScalarValueType="YES"/>
+        <attribute name="slope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="slopeConfidence" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="bgreadings" toMany="YES" deletionRule="Deny" destinationEntity="BgReading" inverseName="calibration" inverseEntity="BgReading"/>
+        <relationship name="sensor" maxCount="1" deletionRule="Nullify" destinationEntity="Sensor" inverseName="calibrations" inverseEntity="Sensor"/>
+    </entity>
+    <entity name="DexcomG4" representedClassName=".DexcomG4" syncable="YES">
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="dexcomG4" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="DexcomG5" representedClassName=".DexcomG5" syncable="YES">
+        <attribute name="batteryResist" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="batteryRuntime" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="batteryStatus" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="batteryTemperature" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="firmwareVersion" optional="YES" attributeType="String"/>
+        <attribute name="isDexcomG6" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="lastResetTimeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="voltageA" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="voltageB" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="dexcomG5" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="Droplet" representedClassName=".Droplet" syncable="YES">
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="droplet" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="GNSEntry" representedClassName=".GNSEntry" syncable="YES">
+        <attribute name="bootLoader" optional="YES" attributeType="String"/>
+        <attribute name="firmwareVersion" optional="YES" attributeType="String"/>
+        <attribute name="serialNumber" optional="YES" attributeType="String"/>
+        <attribute name="timeStampLastBgReading" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="gNSEntry" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="Libre2" representedClassName=".Libre2" syncable="YES">
+        <attribute name="timeStampLastBgReading" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="libre2" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="M5Stack" representedClassName=".M5Stack" syncable="YES">
+        <attribute name="backGroundColor" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="blepassword" optional="YES" attributeType="String"/>
+        <attribute name="brightness" optional="YES" attributeType="Integer 16" defaultValueString="100" usesScalarValueType="YES"/>
+        <attribute name="connectToWiFi" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isM5StickC" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="rotation" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="textcolor" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="m5Stack" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="MiaoMiao" representedClassName=".MiaoMiao" syncable="YES">
+        <attribute name="firmware" optional="YES" attributeType="String"/>
+        <attribute name="hardware" optional="YES" attributeType="String"/>
+        <attribute name="timeStampLastBgReading" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="miaoMiao" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="Sensor" representedClassName=".Sensor" syncable="YES">
+        <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="startDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="uploadedToNS" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <relationship name="calibrations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Calibration" inverseName="sensor" inverseEntity="Calibration"/>
+        <relationship name="readings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BgReading" inverseName="sensor" inverseEntity="BgReading"/>
+    </entity>
+    <entity name="SnoozeParameters" representedClassName=".SnoozeParameters" syncable="YES">
+        <attribute name="alertKind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="snoozePeriodInMinutes" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="snoozeTimeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="Watlaa" representedClassName=".Watlaa" syncable="YES">
+        <attribute name="firmware" optional="YES" attributeType="String"/>
+        <attribute name="hardware" optional="YES" attributeType="String"/>
+        <attribute name="timeStampLastBgReading" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="watlaa" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <elements>
+        <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="28"/>
+        <element name="AlertType" positionX="-657" positionY="180" width="128" height="28"/>
+        <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="330"/>
+        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="358"/>
+        <element name="Blucon" positionX="-657" positionY="189" width="128" height="73"/>
+        <element name="BlueReader" positionX="-639" positionY="207" width="128" height="58"/>
+        <element name="Bubble" positionX="-657" positionY="189" width="128" height="103"/>
+        <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
+        <element name="DexcomG4" positionX="-621" positionY="225" width="128" height="58"/>
+        <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="193"/>
+        <element name="Droplet" positionX="-630" positionY="216" width="128" height="58"/>
+        <element name="GNSEntry" positionX="-648" positionY="198" width="128" height="118"/>
+        <element name="Libre2" positionX="-648" positionY="198" width="128" height="73"/>
+        <element name="M5Stack" positionX="-657" positionY="180" width="128" height="163"/>
+        <element name="MiaoMiao" positionX="-657" positionY="189" width="128" height="103"/>
+        <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="133"/>
+        <element name="Watlaa" positionX="-639" positionY="207" width="128" height="103"/>
+        <element name="SnoozeParameters" positionX="-648" positionY="198" width="128" height="28"/>
+    </elements>
+</model>

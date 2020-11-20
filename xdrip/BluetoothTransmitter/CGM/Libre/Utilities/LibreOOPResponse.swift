@@ -20,7 +20,6 @@ struct OopWebCalibrationStatus: Codable, CustomStringConvertible, LibreOOPWebSer
     // if received from server, probably always nil ?
     var errcode: Int?
 
-    var error: Bool?
     var command: String?
     var slope: OopWebCalibrationStatusResult?
     
@@ -35,7 +34,7 @@ struct OopWebCalibrationStatus: Codable, CustomStringConvertible, LibreOOPWebSer
     
     // protocol LibreOOPWebServerResponseData
     var isError: Bool {
-        return error ?? false
+        return false
     }
 
 }

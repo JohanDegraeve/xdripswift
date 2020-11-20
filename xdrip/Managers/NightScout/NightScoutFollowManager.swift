@@ -94,8 +94,8 @@ class NightScoutFollowManager:NSObject {
         // for dev : creation of BgReading is done in seperate static function. This allows to do the BgReading creation in other place, as is done also for readings received from a transmitter.
         
         // create new bgReading
-        // using sgv as value for filteredData and rawData because in some case these values are not available in NightScout
-        let bgReading = BgReading(timeStamp: followGlucoseData.timeStamp, sensor: nil, calibration: nil, rawData: followGlucoseData.sgv, filteredData: followGlucoseData.sgv, deviceName: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        // using sgv as value for rawData because in some case these values are not available in NightScout
+        let bgReading = BgReading(timeStamp: followGlucoseData.timeStamp, sensor: nil, calibration: nil, rawData: followGlucoseData.sgv, deviceName: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 
         // set calculatedValue
         bgReading.calculatedValue = followGlucoseData.sgv
@@ -145,7 +145,7 @@ class NightScoutFollowManager:NSObject {
         guard let nightScoutUrl = UserDefaults.standard.nightScoutUrl else {return}
         
         // maximum timeStamp to download initially set to 1 day back
-        var timeStampOfFirstBgReadingToDowload = Date(timeIntervalSinceNow: TimeInterval(-ConstantsFollower.maxiumDaysOfReadingsToDownload * 24 * 3600))
+        var timeStampOfFirstBgReadingToDowload = Date(timeIntervalSinceNow: TimeInterval(-Double(ConstantsFollower.maxiumDaysOfReadingsToDownload) * 24.0 * 3600.0))
         
         // check timestamp of lastest stored bgreading with calculated value, if more recent then use this as timeStampOfFirstBgReadingToDowload
         let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
@@ -327,7 +327,7 @@ class NightScoutFollowManager:NSObject {
     private func enableSuspensionPrevention() {
         
         // create playSoundTimer
-        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(ConstantsSuspensionPrevention.interval), eventHandler: {
+        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(ConstantsSuspensionPrevention.interval)), eventHandler: {
                 // play the sound
             
              trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)

@@ -278,6 +278,34 @@ class BluetoothPeripheralManager: NSObject {
                         
                     }
                     
+                case .Libre2Type:
+                    
+                    if let libre2 = blePeripheral.libre2 {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: libre2)
+                        
+                        if libre2.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMDropletTransmitter, CGMDropletTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMLibre2Transmitter(address: libre2.blePeripheral.address, name: libre2.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMLibre2TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: libre2.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if Libre2Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                        
+                    }
+                    
                 case .DropletType:
                     
                     if let droplet = blePeripheral.droplet {
@@ -458,7 +486,7 @@ class BluetoothPeripheralManager: NSObject {
                     // no need to send reading to watlaa in master mode
                     break
                     
-                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type:
+                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .Libre2Type:
                     // cgm's don't receive reading, they send it
                     break
                     
@@ -480,7 +508,7 @@ class BluetoothPeripheralManager: NSObject {
         
         if let bluetoothTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) {
             
-            _ = bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
+            bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
             
         }
         
@@ -653,6 +681,22 @@ class BluetoothPeripheralManager: NSObject {
                             
                         }
                     }
+                    
+                case .Libre2Type:
+                    
+                    if let libre2 = bluetoothPeripheral as? Libre2 {
+                        
+                        if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
+                            
+                            newTransmitter = CGMLibre2Transmitter(address: libre2.blePeripheral.address, name: libre2.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMLibre2TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: libre2.blePeripheral.nonFixedSlopeEnabled)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case Libre2 but cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                        
+                    }
 
                 }
                 
@@ -731,6 +775,11 @@ class BluetoothPeripheralManager: NSObject {
             case .DexcomG4Type:
                 if bluetoothTransmitter is CGMG4xDripTransmitter {
                     return .DexcomG4Type
+                }
+                
+            case .Libre2Type:
+                if bluetoothTransmitter is CGMLibre2Transmitter {
+                    return .Libre2Type
                 }
                 
             }
@@ -828,7 +877,15 @@ class BluetoothPeripheralManager: NSObject {
             }
             
             return CGMG4xDripTransmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMDexcomG4TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+
+        case .Libre2Type:
             
+            guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, Libre2Type, cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMLibre2Transmitter(address: nil, name: nil, bluetoothTransmitterDelegate: self, cGMLibre2TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: nil)
+
         }
         
     }
@@ -1072,7 +1129,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .WatlaaType, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type:
+            case .WatlaaType, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .Libre2Type:
 
                 // oop website and oop web token need to be checked
                 switch keyPathEnum {

@@ -90,7 +90,7 @@ class LibreOOPClient {
         }
     }
         
-    /// get the `Libre1DerivedAlgorithmParameters for Libre1 Sensor, either from UserDefaults (if already fetched earlier for that sensor), or from oopWeb. If oopWeb fetch fails, then default values are used
+    /// get the `Libre1DerivedAlgorithmParameters for Libre1 Sensor,  from oopWeb
     /// - Parameters:
     ///   - bytes: the 344 bytes from Libre sensor
     ///   - libreSensorSerialNumber: LibreSensorSerialNumber is a structure that hold the serial number
@@ -155,9 +155,9 @@ class LibreOOPClient {
                     
                 }
                 
-                // if debug level tracing, then log the data as String
-                if let dataAsString = String(bytes: data, encoding: .utf8), UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-                    trace("in createDataTaskAndHandleResponse, data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .debug, dataAsString)
+                // log the data as String
+                if let dataAsString = String(bytes: data, encoding: .utf8) {
+                    trace("in createDataTaskAndHandleResponse, data as string = %{public}@", log: log, category: ConstantsLog.categoryLibreOOPClient, type: .info, dataAsString)
                 }
                 
                 // data is not nil, let's try to do json decoding

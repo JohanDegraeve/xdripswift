@@ -17,6 +17,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// in case Libre 2 users want to use the local calibration algorithm
     case overrideWebOOPCalibration = 4
     
+    /// case smooth libre values
+    case smoothLibreValues = 5
+    
 }
 
 struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
@@ -57,6 +60,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
             return "Override Web OOP Calibration"
             
+        case .smoothLibreValues:
+            return "Smooth Libre values"
+            
         }
     }
     
@@ -66,7 +72,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration:
+        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration, .smoothLibreValues:
             return UITableViewCell.AccessoryType.none
             
         case .webOOPsite:
@@ -104,6 +110,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             }
 
         case .overrideWebOOPCalibration:
+            return nil
+            
+        case .smoothLibreValues:
             return nil
             
         }
@@ -145,6 +154,14 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                 UserDefaults.standard.overrideWebOOPCalibration = isOn
                 
             })
+            
+        case .smoothLibreValues:
+            return UISwitch(isOn: UserDefaults.standard.smoothLibreValues, action: {
+                (isOn:Bool) in
+                
+                UserDefaults.standard.smoothLibreValues = isOn
+                
+            })
 
         }
         
@@ -160,7 +177,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration:
+        case .NSLogEnabled, .OSLogEnabled, .overrideWebOOPCalibration, .smoothLibreValues:
             return .nothing
             
         case .webOOPsite:

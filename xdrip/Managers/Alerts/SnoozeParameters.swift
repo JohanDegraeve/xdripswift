@@ -1,57 +1,38 @@
 import Foundation
 
-public class SnoozeParameters {
-    
-    // MARK: private properties
-    
-    /// this is snooze period chosen by user, nil value is not snoozed
-    private(set) var snoozePeriodInMinutes:Int?
-    
-    /// when was the alert snoozed, nil is not snoozed
-    private(set) var snoozeTimeStamp:Date?
-    
-    /// was the alert presnoozed by the user
-    private(set) var preSnoozed:Bool = false
+extension SnoozeParameters {
     
     // MARK: public functions
     
-    /// store snoozeperiod in minutes, snoozetimestamp = now, set preSnoozed to false
+    /// store snoozeperiod in minutes, snoozetimestamp = now,
     public func snooze(snoozePeriodInMinutes:Int) {
-        self.snoozePeriodInMinutes = snoozePeriodInMinutes
+        self.snoozePeriodInMinutes = Int16(snoozePeriodInMinutes)
         snoozeTimeStamp = Date()
-        preSnoozed = false
     }
     
-    /// store snoozeperiod in minutes, snoozetimestamp = now, set preSnoozed to true
-    public func preSnooze(snoozePeriodInMinutes:Int) {
-        snooze(snoozePeriodInMinutes: snoozePeriodInMinutes)
-        preSnoozed = true
-    }
-    
+
     /// reset snooze, ie not snoozed
     public func unSnooze() {
-        snoozePeriodInMinutes = nil
+        snoozePeriodInMinutes = 0
         snoozeTimeStamp = nil
-        preSnoozed = false
     }
     
     /// checks if snoozed and snoozetimestamp and if current time still within the period, then returns true
     /// - returns:
     ///     - isSnoozed : is the alert snoozed
-    ///     - isPreSnoozed : if the alert is snoozed (ie isSnoozed = true), then this says if the user snoozed the alert yes or no
     ///     - remainingSeconds : if the alert is snoozed, then this says how many seconds remaining
-    public func getSnoozeValue() -> (isSnoozed:Bool, isPreSnoozed:Bool?, remainingSeconds:Int?) {
-        if let snoozeTimeStamp = snoozeTimeStamp, let snoozePeriodInMinutes = snoozePeriodInMinutes {
-            if Date(timeInterval: TimeInterval(snoozePeriodInMinutes * 60), since: snoozeTimeStamp) < Date() {
+    public func getSnoozeValue() -> (isSnoozed:Bool, remainingSeconds:Int?) {
+        if let snoozeTimeStamp = snoozeTimeStamp, snoozePeriodInMinutes > 0 {
+            if Date(timeInterval: TimeInterval(Double(snoozePeriodInMinutes) * 60.0), since: snoozeTimeStamp) < Date() {
                 // snooze attributes are set, however they are expired
                 unSnooze() // set attributes to nil
-                return (false, nil, nil)
+                return (false, nil)
             } else {
                 // alert is still snoozed, calculate remaining seconds
-                return (true, preSnoozed, Int((snoozeTimeStamp.toMillisecondsAsDouble() + Double(snoozePeriodInMinutes) * 60 * 1000 - Date().toMillisecondsAsDouble())/1000))
+                return (true, Int((snoozeTimeStamp.toMillisecondsAsDouble() + Double(snoozePeriodInMinutes) * 60.0 * 1000.0 - Date().toMillisecondsAsDouble())/1000.0))
             }
         } else {
-            return (false, nil, nil)
+            return (false, nil)
         }
     }
 }

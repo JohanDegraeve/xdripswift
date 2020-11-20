@@ -22,7 +22,8 @@ extension BluetoothPeripheralManager: CGMMiaoMiaoTransmitterDelegate {
         
         // if the libreSensorType needs oopweb, then enable oopweb. (User may have set it to false, but if it's one that requires oopweb, then we force to true)
         // also disable non-fixed slopes, as calibration is not used, it makes no sense to show this as enabled
-        if libreSensorType.needsWebOOP() {
+        // and only if overrideNeedsOOPWeb is false
+        if libreSensorType.needsWebOOP() && !miaoMiao.overrideNeedsOOPWeb() {
             
             miaoMiao.blePeripheral.webOOPEnabled = true
             

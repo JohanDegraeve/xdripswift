@@ -35,7 +35,7 @@ extension LibreOOPWebError: XdripError {
         case .jsonParsingFailed:
             return .LOW
             
-        case .jsonResponseHasError(let msg, let errcode):
+        case .jsonResponseHasError( _, let errcode):
             
             // seems to during starting phase, errcode = 0, return .LOW in that case
             if let errcode = errcode, errcode == 0 {

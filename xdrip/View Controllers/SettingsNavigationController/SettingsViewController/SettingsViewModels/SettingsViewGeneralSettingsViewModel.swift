@@ -51,7 +51,7 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
         case .bloodGlucoseUnit:
             return SettingsSelectedRowAction.callFunction(function: {
                 
-                UserDefaults.standard.bloodGlucoseUnitIsMgDl ? (UserDefaults.standard.bloodGlucoseUnitIsMgDl) = false : (UserDefaults.standard.bloodGlucoseUnitIsMgDl = true)
+                UserDefaults.standard.bloodGlucoseUnitIsMgDl ? (UserDefaults.standard.bloodGlucoseUnitIsMgDl = false) : (UserDefaults.standard.bloodGlucoseUnitIsMgDl = true)
                 
             })
 

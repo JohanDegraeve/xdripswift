@@ -76,9 +76,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         switch addressAndName {
             
-        case .alreadyConnectedBefore(let addressAndName):
-            deviceAddress = addressAndName.address
-            deviceName = addressAndName.name
+        case .alreadyConnectedBefore(let address, let name):
+            deviceAddress = address
+            deviceName = name
             
         case .notYetConnected(let newexpectedName):
             expectedName = newexpectedName
@@ -519,9 +519,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
 
-        // if debug level tracing enabled, then trace the received value
+        // trace the received value
         if let value = characteristic.value {
-            trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, value.hexEncodedString())
+            trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, value.hexEncodedString())
         }
         
         timeStampLastStatusUpdate = Date()

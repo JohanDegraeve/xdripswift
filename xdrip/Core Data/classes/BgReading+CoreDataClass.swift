@@ -12,7 +12,6 @@ public class BgReading: NSManagedObject {
         sensor:Sensor?,
         calibration:Calibration?,
         rawData:Double,
-        filteredData:Double,
         deviceName:String?,
         nsManagedObjectContext:NSManagedObjectContext
     ) {
@@ -22,13 +21,11 @@ public class BgReading: NSManagedObject {
         self.sensor = sensor
         self.calibration = calibration
         self.rawData = rawData
-        self.filteredData = filteredData
         self.deviceName = deviceName
         
         ageAdjustedRawValue = 0
         calibrationFlag = false
         calculatedValue = 0
-        filteredCalculatedValue = 0
         calculatedValueSlope = 0
         a = 0
         b = 0
@@ -59,8 +56,6 @@ public class BgReading: NSManagedObject {
             r += "\n" + indentation + "calibration = " + calibration.log("      ")
         }
         r += "\n" + indentation + "calibrationFlag = " + calibrationFlag.description
-        r += "\n" + indentation + "filteredCalculatedValue = " + filteredCalculatedValue.description
-        r += "\n" + indentation + "filteredData = " + filteredData.description
         r += "\n" + indentation + "hideSlope = " + hideSlope.description
         r += "\n" + indentation + "ra = " + ra.description
         r += "\n" + indentation + "rawData = " + rawData.description
@@ -197,7 +192,7 @@ public class BgReading: NSManagedObject {
             }
         }
     }
-
+    
     func currentSlope(previousBgReading:BgReading?) -> Double {
         
         if let previousBgReading = previousBgReading {

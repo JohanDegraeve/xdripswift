@@ -189,7 +189,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
     
     private func processxBridgeDataPacket(value:Data) -> (glucoseData:GlucoseData?, batteryLevel:Int?, transmitterID:String?) {
         guard value.count >= 10 else {
-            trace("processxBridgeDataPacket, value.count = %{public}d, expecting minimum 10 so that we can find at least rawdata and filtereddata", log: log, category: ConstantsLog.categoryCGMxDripG4, type: .info, value.count)
+            trace("processxBridgeDataPacket, value.count = %{public}d, expecting minimum 10 so that we can find at least rawdata", log: log, category: ConstantsLog.categoryCGMxDripG4, type: .info, value.count)
             return (nil, nil, nil)
         }
         
@@ -200,9 +200,6 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
         
         //get rawdata
         let rawData = value.uint32(position: 2)
-        
-        //get filtereddata
-        let filteredData = value.uint32(position: 6)
         
         //get transmitter battery voltage, only if value size is big enough to hold it
         if value.count >= 11 {
@@ -215,7 +212,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
         }
         
         //create glucosedata
-        glucoseData = GlucoseData(timeStamp: Date(), glucoseLevelRaw: Double(rawData), glucoseLevelFiltered: Double(filteredData))
+        glucoseData = GlucoseData(timeStamp: Date(), glucoseLevelRaw: Double(rawData))
 
         return (glucoseData, batteryLevel, transmitterID)
     }

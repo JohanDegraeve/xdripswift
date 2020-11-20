@@ -178,8 +178,8 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             }
 
             //get readings from buffer and send to cGMTransmitterDelegate
-            // TODO: use LibreDataParser.libreDataProcessor and make parseLibre1DataWithoutCalibration private to LibreDataParser
-            var result = LibreDataParser.parseLibre1DataWithoutCalibration(libreData: rxBuffer, timeStampLastBgReading: timeStampLastBgReading)
+            // TODO: use LibreDataParser.libreDataProcessor and make parseLibre1DataWithoutOOPWebCalibration private to LibreDataParser
+            var result = LibreDataParser.parseLibre1Data(libreData: rxBuffer, timeStampLastBgReading: timeStampLastBgReading, libre1DerivedAlgorithmParameters: nil)
             
             //TODO: sort glucosedata before calling newReadingsReceived
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)
@@ -524,7 +524,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                             // get glucoseValue from value
                             let glucoseValue = nowGetGlucoseValue(input: value)
                             
-                            let glucoseData = GlucoseData(timeStamp: timeStampLastBgReading, glucoseLevelRaw: glucoseValue, glucoseLevelFiltered: glucoseValue)
+                            let glucoseData = GlucoseData(timeStamp: timeStampLastBgReading, glucoseLevelRaw: glucoseValue)
                             var glucoseDataArray = [glucoseData]
                             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil,  sensorTimeInMinutes: nil)
                             

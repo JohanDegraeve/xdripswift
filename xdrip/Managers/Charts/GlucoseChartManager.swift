@@ -4,18 +4,7 @@ import SwiftCharts
 import os.log
 import UIKit
 
-public final class GlucoseChartManager: NSObject {
-    
-    // MARK: - public properties
-    
-    /// reference to coreDataManager
-    public var coreDataManager: CoreDataManager? {
-        didSet {
-            if let coreDataManager = coreDataManager {
-                bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
-            }
-        }
-    }
+public final class GlucoseChartManager {
     
    // MARK: - private properties
     
@@ -31,23 +20,13 @@ public final class GlucoseChartManager: NSObject {
     /// for logging
     private var oslog = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
 
-    private let chartSettings: ChartSettings = {
-        var settings = ChartSettings()
-        settings.top = ConstantsGlucoseChart.top
-        settings.bottom = ConstantsGlucoseChart.bottom
-        settings.trailing = ConstantsGlucoseChart.trailing
-        settings.leading = ConstantsGlucoseChart.leading
-        settings.axisTitleLabelsToLabelsSpacing = ConstantsGlucoseChart.axisTitleLabelsToLabelsSpacing
-        settings.labelsToAxisSpacingX = ConstantsGlucoseChart.labelsToAxisSpacingX
-        settings.clipInnerFrame = false
-        return settings
-    }()
+    private var chartSettings: ChartSettings?
 
     private let labelsWidthY = ConstantsGlucoseChart.yAxisLabelsWidth
 
-    private var chartLabelSettings: ChartLabelSettings
+    private var chartLabelSettings: ChartLabelSettings?
 
-    private var chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings
+    private var chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings?
     
     /// The latest date on the X-axis
     private var endDate: Date
@@ -59,19 +38,16 @@ public final class GlucoseChartManager: NSObject {
     private var glucoseChart: Chart?
     
     /// dateformatter for timestamp in chartpoints
-    private let chartPointDateFormatter: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .none
-        dateFormatter.timeStyle = .short
-        
-        return dateFormatter
-    }()
+    private var chartPointDateFormatter: DateFormatter?
     
     /// timeformatter for horizontal axis label
-    private let axisLabelTimeFormatter: DateFormatter
+    private var axisLabelTimeFormatter: DateFormatter?
     
     /// a BgReadingsAccessor
     private var bgReadingsAccessor: BgReadingsAccessor?
+    
+    /// a coreDataManager
+    private var coreDataManager: CoreDataManager
     
     /// difference in seconds between two pixels (or x values, not sure if it's pixels)
     private var diffInSecondsBetweenTwoPoints: Double  {
@@ -84,7 +60,7 @@ public final class GlucoseChartManager: NSObject {
     private var innerFrameWidth: Double = 300.0
     
     /// used for getting bgreadings on a background thread, bgreadings are used to create list of chartPoints
-    private let operationQueue: OperationQueue
+    private var operationQueue: OperationQueue?
     
     /// This timer is used when decelerating the chart after end of panning.  We'll set a timer, each time the timer expires the chart will be shifted a bit
     private var gestureTimer:RepeatingTimer?
@@ -92,14 +68,11 @@ public final class GlucoseChartManager: NSObject {
     /// used when user touches the chart. Deceleration is maybe still ongoing (from a previous pan). If set to true, then deceleration needs to be stopped
     private var stopDecelerationNextGestureTimerRun = false
     
-    /// the maximum value in glucoseChartPoints array between start and endPoint
-    ///
-    /// value calculated in loopThroughGlucoseChartPointsAndFindValues
-    private var maximumValueInGlucoseChartPoints = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+    /// - the maximum value in glucoseChartPoints array between start and endPoint
+    /// - the value will never get smaller during the run time of the app
+    private var maximumValueInGlucoseChartPoints:Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
     
     /// - if glucoseChartPoints.count > 0, then this is the latest one that has timestamp less than endDate.
-    ///
-    /// value calculated in loopThroughGlucoseChartPointsAndFindValues
     private(set) var lastChartPointEarlierThanEndDate: ChartPoint?
     
     /// is chart in panned state or not, meaning is it currently shifted back in time
@@ -109,39 +82,20 @@ public final class GlucoseChartManager: NSObject {
     
     /// - parameters:
     ///     - chartLongPressGestureRecognizer : defined here as parameter so that this class can handle the config of the recognizer
-    init(chartLongPressGestureRecognizer: UILongPressGestureRecognizer) {
+    init(chartLongPressGestureRecognizer: UILongPressGestureRecognizer, coreDataManager: CoreDataManager) {
+        
+        // set coreDataManager and bgReadingsAccessor
+        self.coreDataManager = coreDataManager
         
         // for tapping the chart, we're using UILongPressGestureRecognizer because UITapGestureRecognizer doesn't react on touch down. With UILongPressGestureRecognizer and minimumPressDuration set to 0, we get a trigger as soon as the chart is touched
         chartLongPressGestureRecognizer.minimumPressDuration = 0
 
-        chartLabelSettings = ChartLabelSettings(
-            font: .systemFont(ofSize: 14),
-            fontColor: ConstantsGlucoseChart.axisLabelColor
-        )
-        
-        chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: UserDefaults.standard.useObjectives ? ConstantsGlucoseChart.gridColorObjectives : ConstantsGlucoseChart.gridColor,  linesWidth: 0.5)
-        
         // initialize enddate
         endDate = Date()
         
         // intialize startdate, which is enddate minus a few hours
         startDate = endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours))
         
-        axisLabelTimeFormatter = DateFormatter()
-        axisLabelTimeFormatter.dateFormat = UserDefaults.standard.chartTimeAxisLabelFormat
-        
-        // initialize operationQueue
-        operationQueue = OperationQueue()
-        
-        // operationQueue will be queue of blocks that gets readings and updates glucoseChartPoints, startDate and endDate. To avoid race condition, the operations should be one after the other
-        operationQueue.maxConcurrentOperationCount = 1
-
-        super.init()
-        
-        // update of unit requires glucoseChartPoints to be set to 0
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
-        
-
     }
     
     // MARK: - public functions
@@ -162,18 +116,12 @@ public final class GlucoseChartManager: NSObject {
         let operation = BlockOperation(block: {
             
             // if there's more than one operation waiting for execution, it makes no sense to execute this one, the next one has a newer endDate to use
-            guard self.operationQueue.operations.count <= 1 else {
+            guard self.data().operationQueue.operations.count <= 1 else {
                 return
             }
             
             // startDateToUse is either parameter value or (if nil), endDate minutes current chartwidth
             let startDateToUse = startDate != nil ? startDate! : Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: endDate)
-            
-            // check that bgReadingsAccessor is not nil (should normally not be nil except at app startup)
-            guard let bgReadingsAccessor = self.bgReadingsAccessor else {
-                trace("in updateGlucoseChartPoints, bgReadingsAccessor, probably coreDataManager is not yet assigned", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info)
-                return
-            }
             
             // we're going to check if we have already all chartpoints in the array self.glucoseChartPoints for the new start and date time. If not we're going to prepand a new array and/or append a new array
             
@@ -197,9 +145,9 @@ public final class GlucoseChartManager: NSObject {
                     
                     // startDate is bigger than the the date of the last currently stored ChartPoint, let's reinitialize the glucosechartpoints
                     reUseExistingChartPointList = false
-                    
+                
                     // use newGlucoseChartPointsToAppend and assign it to new list of chartpoints startDate to endDate
-                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: bgReadingsAccessor)
+                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor)
                     
                 } else if endDate <= lastGlucoseTimeStamp {
                     // so starDate <= date of last known glucosechartpoint and enddate is also <= that date
@@ -207,7 +155,7 @@ public final class GlucoseChartManager: NSObject {
                 } else {
                     
                     // append glucseChartpoints with date > x.date up to endDate
-                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: lastGlucoseTimeStamp, endDate: endDate, bgReadingsAccessor: bgReadingsAccessor)
+                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: lastGlucoseTimeStamp, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor)
                 }
                 
                 // now see if we need to prepend
@@ -216,7 +164,7 @@ public final class GlucoseChartManager: NSObject {
                     
                     if let firstGlucoseChartPoint = self.glucoseChartPoints.first, let firstGlucoseChartPointX = firstGlucoseChartPoint.x as? ChartAxisValueDate, startDateToUse < firstGlucoseChartPointX.date {
                         
-                        newGlucoseChartPointsToPrepend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: firstGlucoseChartPointX.date, bgReadingsAccessor: bgReadingsAccessor)
+                        newGlucoseChartPointsToPrepend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: firstGlucoseChartPointX.date, bgReadingsAccessor: self.data().bgReadingsAccessor)
                     }
                     
                 }
@@ -226,11 +174,56 @@ public final class GlucoseChartManager: NSObject {
                 // this should be a case where there's no glucoseChartPoints stored yet, we just create a new array to append
 
                 // get glucosePoints from coredata
-                newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: bgReadingsAccessor)
+                newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor)
             }
             
-            self.loopThroughGlucoseChartPointsAndFindValues()
-
+            // recalculate maximumValueInGlucoseChartPoints, there may be a higher value in newGlucoseChartPointsToAppend
+            for glucoseChartPoint in newGlucoseChartPointsToAppend {
+                
+                self.maximumValueInGlucoseChartPoints = max(self.maximumValueInGlucoseChartPoints, glucoseChartPoint.y.scalar)
+                
+            }
+            
+            // recalculate maximumValueInGlucoseChartPoints, there may be a higher value in newGlucoseChartPointsToPrepend
+            for glucoseChartPoint in newGlucoseChartPointsToPrepend {
+                
+                self.maximumValueInGlucoseChartPoints = max(self.maximumValueInGlucoseChartPoints, glucoseChartPoint.y.scalar)
+                
+            }
+            
+            // closure will iterate through glucoseChartPoints and find latest date earlier than endDate and larger then startdate, if there isn't any it returns nil
+            let findLastChartPointEarlierThanEndDateInArray = { (_ glucoseChartPoints : [ChartPoint]) -> ChartPoint? in
+                
+                for (_, glucoseChartPoint) in glucoseChartPoints.enumerated().reversed() {
+                    
+                    if let chartAxisValueDate = glucoseChartPoint.x as? ChartAxisValueDate {
+                        
+                        if chartAxisValueDate.date < endDate {
+                            
+                            return glucoseChartPoint
+                            
+                        } else if let startDate = startDate, chartAxisValueDate.date < startDate {
+                            
+                            return nil
+                            
+                        }
+                        
+                    }
+                }
+                
+                return nil
+                
+            }
+            
+            // now calculate lastChartPointEarlierThanEndDate by using findLastChartPointEarlierThanEndDateInArray for newGlucoseChartPointsToAppend, newGlucoseChartPointsToPrepend and glucoseChartPoints
+            self.lastChartPointEarlierThanEndDate = findLastChartPointEarlierThanEndDateInArray(newGlucoseChartPointsToAppend)
+            if self.lastChartPointEarlierThanEndDate == nil && reUseExistingChartPointList {
+                self.lastChartPointEarlierThanEndDate = findLastChartPointEarlierThanEndDateInArray(self.glucoseChartPoints)
+            }
+            if self.lastChartPointEarlierThanEndDate == nil {
+                self.lastChartPointEarlierThanEndDate = findLastChartPointEarlierThanEndDateInArray(newGlucoseChartPointsToPrepend)
+            }
+            
             DispatchQueue.main.async {
                 
                 // so we're in the main thread, now endDate and startDate and glucoseChartPoints can be safely assigned to value that was passed in the call to updateGlucoseChartPoints
@@ -251,17 +244,17 @@ public final class GlucoseChartManager: NSObject {
         })
         
         // add the operation to the queue and start it. As maxConcurrentOperationCount = 1, it may be kept until a previous operation has finished
-        operationQueue.addOperation {
+        data().operationQueue.addOperation {
             operation.start()
         }
-        
+
     }
     
-    public func didReceiveMemoryWarning() {
+    public func cleanUpMemory() {
         
-        trace("in didReceiveMemoryWarning, Purging chart data in response to memory warning", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .error)
+        trace("in cleanUpMemory", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info)
 
-        glucoseChartPoints = []
+        nillifyData()
         
     }
 
@@ -299,28 +292,6 @@ public final class GlucoseChartManager: NSObject {
         
     }
     
-    // MARK:- observe function
-    
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
-        if let keyPath = keyPath {
-            
-            if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
-                
-                switch keyPathEnum {
-                    
-                case UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
-                    glucoseChartPoints = []
-                    
-                default:
-                    break
-                    
-                }
-            }
-            
-        }
-    }
-
     // MARK: - private functions
 
     private func stopDeceleration() {
@@ -423,7 +394,7 @@ public final class GlucoseChartManager: NSObject {
         stopDecelerationNextGestureTimerRun = false
         
         // at regular intervals new distance to travel the chart will be calculated and setNewStartAndEndDate will be called
-        gestureTimer = RepeatingTimer(timeInterval: TimeInterval(ConstantsGlucoseChart.decelerationTimerValueInSeconds), eventHandler: {
+        gestureTimer = RepeatingTimer(timeInterval: TimeInterval(Double(ConstantsGlucoseChart.decelerationTimerValueInSeconds)), eventHandler: {
             
             // if stopDecelerationNextGestureTimerRun is set, then return
             if self.stopDecelerationNextGestureTimerRun {
@@ -487,11 +458,7 @@ public final class GlucoseChartManager: NSObject {
     }
     
     private func generateGlucoseChartWithFrame(_ frame: CGRect) -> Chart? {
-        
-        
-        // first calculate necessary values by looping through all chart points
-        //loopThroughGlucoseChartPointsAndFindValues()
-        
+
         let xAxisValues = generateXAxisValues()
         
         guard xAxisValues.count > 1 else {return nil}
@@ -502,7 +469,7 @@ public final class GlucoseChartManager: NSObject {
         let unitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
         // create yAxisValues, start with 38 mgdl, this is to make sure we show a bit lower than the real lowest value which is usually 40 mgdl, make the label hidden
-        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgdlToMmol(mgdl: unitIsMgDl), labelSettings: chartLabelSettings)
+        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgdlToMmol(mgdl: unitIsMgDl), labelSettings: data().chartLabelSettings)
         firstYAxisValue.hidden = true
         
         // create now the yAxisValues and add the first
@@ -510,26 +477,26 @@ public final class GlucoseChartManager: NSObject {
         
         // add first series
         if unitIsMgDl {
-            yAxisValues += ConstantsGlucoseChart.initialGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: chartLabelSettings)}
+            yAxisValues += ConstantsGlucoseChart.initialGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
         } else {
-            yAxisValues += ConstantsGlucoseChart.initialGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: chartLabelSettings)}
+            yAxisValues += ConstantsGlucoseChart.initialGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
         }
         
         // if the maxium yAxisValue doesn't support the maximum glucose value, then add the next range
         if yAxisValues.last!.scalar < maximumValueInGlucoseChartPoints {
             if unitIsMgDl {
-                yAxisValues += ConstantsGlucoseChart.secondGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: chartLabelSettings)}
+                yAxisValues += ConstantsGlucoseChart.secondGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
             } else {
-                yAxisValues += ConstantsGlucoseChart.secondGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: chartLabelSettings)}
+                yAxisValues += ConstantsGlucoseChart.secondGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
             }
         }
 
         // if the maxium yAxisValue doesn't support the maximum glucose value, then add the next range
         if yAxisValues.last!.scalar < maximumValueInGlucoseChartPoints {
             if unitIsMgDl {
-                yAxisValues += ConstantsGlucoseChart.thirdGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: chartLabelSettings)}
+                yAxisValues += ConstantsGlucoseChart.thirdGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
             } else {
-                yAxisValues += ConstantsGlucoseChart.thirdGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: chartLabelSettings)}
+                yAxisValues += ConstantsGlucoseChart.thirdGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
             }
         }
         
@@ -539,7 +506,7 @@ public final class GlucoseChartManager: NSObject {
         let yAxisModel = ChartAxisModel(axisValues: yAxisValues, lineColor: ConstantsGlucoseChart.axisLineColor, labelSpaceReservationMode: .fixed(labelsWidthY))
         
         // put Y axis on right side
-        let coordsSpace = ChartCoordsSpaceRightBottomSingleAxis(chartSettings: chartSettings, chartFrame: frame, xModel: xAxisModel, yModel: yAxisModel)
+        let coordsSpace = ChartCoordsSpaceRightBottomSingleAxis(chartSettings: data().chartSettings, chartFrame: frame, xModel: xAxisModel, yModel: yAxisModel)
         
         let (xAxisLayer, yAxisLayer, innerFrame) = (coordsSpace.xAxisLayer, coordsSpace.yAxisLayer, coordsSpace.chartInnerFrame)
         
@@ -550,7 +517,7 @@ public final class GlucoseChartManager: NSObject {
         chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: UserDefaults.standard.useObjectives ? ConstantsGlucoseChart.gridColorObjectives : ConstantsGlucoseChart.gridColor,  linesWidth: 0.5)
         
         // Grid lines
-        let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: chartGuideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: yAxisValues)
+        let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: data().chartGuideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: yAxisValues)
         
         // high/low/target guideline layer settings and styles
         let urgentHighLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: UserDefaults.standard.showColoredObjectives ? ConstantsGlucoseChart.guidelineUrgentHighLowColor : ConstantsGlucoseChart.guidelineUrgentHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 2, dotSpacing: 5)
@@ -590,7 +557,7 @@ public final class GlucoseChartManager: NSObject {
         return Chart(
             frame: frame,
             innerFrame: innerFrame,
-            settings: chartSettings,
+            settings: data().chartSettings,
             layers: layers.compactMap { $0 }
         )
     }
@@ -607,13 +574,13 @@ public final class GlucoseChartManager: NSObject {
         
         /// first, for each int in mappingArray, we create a ChartAxisValueDate, which will have as date one of the hours, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
         let startDateLower = startDate.toLowerHour()
-        var xAxisValues: [ChartAxisValue] = mappingArray.map { ChartAxisValueDate(date: Date(timeInterval: Double($0)*3600, since: startDateLower), formatter: axisLabelTimeFormatter, labelSettings: chartLabelSettings) }
+        var xAxisValues: [ChartAxisValue] = mappingArray.map { ChartAxisValueDate(date: Date(timeInterval: Double($0)*3600, since: startDateLower), formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings) }
         
         /// insert the start Date as first element, in this example 07:26
-        xAxisValues.insert(ChartAxisValueDate(date: startDate, formatter: axisLabelTimeFormatter, labelSettings: chartLabelSettings), at: 0)
+        xAxisValues.insert(ChartAxisValueDate(date: startDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings), at: 0)
         
         /// now append the endDate as last element, in this example 13:26
-        xAxisValues.append(ChartAxisValueDate(date: endDate, formatter: axisLabelTimeFormatter, labelSettings: chartLabelSettings))
+        xAxisValues.append(ChartAxisValueDate(date: endDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings))
          
         /// don't show the first and last hour, because this is usually not something like 13 but rather 13:26
         xAxisValues.first?.hidden = true
@@ -630,40 +597,99 @@ public final class GlucoseChartManager: NSObject {
         
         return bgReadingsAccessor.getBgReadingsOnPrivateManagedObjectContext(from: startDate, to: endDate).compactMap {
             
-            ChartPoint(bgReading: $0, formatter: self.chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            ChartPoint(bgReading: $0, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
         }
     }
-
     
-    /// function to be called when glucoseChartPoints array is updated, as first function in generateGlucoseChartWithFrame. Will loop through glucoseChartPoints and find :
-    /// - the maximum bg value of the chartPoints between start and end date
-    /// - the timeStamp of the chartPoint with the highest timestamp that is still lower than the endDate, in the list of glucoseChartPoints
-    private func loopThroughGlucoseChartPointsAndFindValues() {
+    /// - set data to nil, will be called eg to clean up memory when going to the background
+    /// - all needed variables will will be reinitialized as soon as data() is called
+    private func nillifyData() {
         
-        maximumValueInGlucoseChartPoints = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        stopDeceleration()
         
-        lastChartPointEarlierThanEndDate = nil
+        glucoseChartPoints = []
         
-        for glucoseChartPoint in glucoseChartPoints {
+        chartSettings = nil
+        
+        chartPointDateFormatter = nil
+        
+        operationQueue = nil
+        
+        chartLabelSettings = nil
+        
+        chartGuideLinesLayerSettings = nil
+        
+        axisLabelTimeFormatter = nil
+        
+        bgReadingsAccessor = nil
+        
+    }
+    
+    /// function which gives is variables that are set back to nil when nillifyData is called
+    private func data() -> (chartSettings: ChartSettings, chartPointDateFormatter: DateFormatter, operationQueue: OperationQueue, chartLabelSettings: ChartLabelSettings, chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings, axisLabelTimeFormatter: DateFormatter, bgReadingsAccessor: BgReadingsAccessor){
+        
+        // setup chartSettings
+        if chartSettings == nil {
 
-            maximumValueInGlucoseChartPoints = max(maximumValueInGlucoseChartPoints, glucoseChartPoint.y.scalar)
-                
-            if let lastChartPointEarlierThanEndDate = lastChartPointEarlierThanEndDate {
-                
-                if (glucoseChartPoint.x as! ChartAxisValueDate).date <= endDate && (lastChartPointEarlierThanEndDate.x as! ChartAxisValueDate).date < (glucoseChartPoint.x as! ChartAxisValueDate).date {
-                    
-                    self.lastChartPointEarlierThanEndDate = glucoseChartPoint
-                    
-                }
-                
-            } else {
-                
-                lastChartPointEarlierThanEndDate = glucoseChartPoint
-                
-            }
+            var newChartSettings = ChartSettings()
+            newChartSettings.top = ConstantsGlucoseChart.top
+            newChartSettings.bottom = ConstantsGlucoseChart.bottom
+            newChartSettings.trailing = ConstantsGlucoseChart.trailing
+            newChartSettings.leading = ConstantsGlucoseChart.leading
+            newChartSettings.axisTitleLabelsToLabelsSpacing = ConstantsGlucoseChart.axisTitleLabelsToLabelsSpacing
+            newChartSettings.labelsToAxisSpacingX = ConstantsGlucoseChart.labelsToAxisSpacingX
+            newChartSettings.clipInnerFrame = false
+
+            chartSettings = newChartSettings
             
         }
+        
+        // setup chartPointDateFormatter
+        if chartPointDateFormatter == nil {
+
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .none
+            dateFormatter.timeStyle = .short
+
+            chartPointDateFormatter = dateFormatter
+            
+        }
+        
+        // setup operationqueue
+        if operationQueue == nil {
+            // initialize operationQueue
+            operationQueue = OperationQueue()
+            
+            // operationQueue will be queue of blocks that gets readings and updates glucoseChartPoints, startDate and endDate. To avoid race condition, the operations should be one after the other
+            operationQueue!.maxConcurrentOperationCount = 1
+        }
+        
+        // intialize chartlabelsettings
+        if chartLabelSettings == nil {
+            chartLabelSettings = ChartLabelSettings(
+                font: .systemFont(ofSize: 14),
+                fontColor: ConstantsGlucoseChart.axisLabelColor
+            )
+        }
+        
+        // intialize chartGuideLinesLayerSettings
+        if chartGuideLinesLayerSettings == nil {
+            chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: UserDefaults.standard.useObjectives ? ConstantsGlucoseChart.gridColorObjectives : ConstantsGlucoseChart.gridColor,  linesWidth: 0.5)
+        }
+        
+        // intialize axisLabelTimeFormatter
+        if axisLabelTimeFormatter == nil {
+            axisLabelTimeFormatter = DateFormatter()
+            axisLabelTimeFormatter!.dateFormat = UserDefaults.standard.chartTimeAxisLabelFormat
+        }
+
+        // initialize bgReadingsAccessor
+        if bgReadingsAccessor == nil {
+            bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+        }
+        
+        return (chartSettings!, chartPointDateFormatter!, operationQueue!, chartLabelSettings!, chartGuideLinesLayerSettings!, axisLabelTimeFormatter!, bgReadingsAccessor!)
         
     }
     

@@ -295,7 +295,7 @@ class Trace {
         // timestamp app launch
         // unwrap timeStampAppLaunch
         if let timeStampAppLaunch = UserDefaults.standard.timeStampAppLaunch {
-            traceInfo.appendStringAndNewLine("App launched at " + timeStampAppLaunch.toShortString() + " local time.")
+            traceInfo.appendStringAndNewLine("App launched at " + timeStampAppLaunch.toString(timeStyle: .short, dateStyle: .short) + " local time.")
         }
 
         // cgm transmitter type from UserDefaults
@@ -441,7 +441,14 @@ class Trace {
                             traceInfo.appendStringAndNewLine("    batteryLevel : " + watlaa.watlaaBatteryLevel.description)
                             
                         }
-
+                        
+                    case .Libre2Type:
+                        if let libre2 = blePeripheral.libre2 {
+                            
+                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
+                            
+                        }
+                        
                     }
                 }
                 

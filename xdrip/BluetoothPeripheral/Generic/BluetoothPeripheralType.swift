@@ -42,6 +42,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
       
     /// watlaa master
     case WatlaaType = "Watlaa"
+    
+    /// Libre 2
+    case Libre2Type = "Libre test"
 
     /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
     func viewModel() -> BluetoothPeripheralViewModel? {
@@ -83,6 +86,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .DexcomG6Type:
             return DexcomG6BluetoothPeripheralViewModel()
+            
+        case .Libre2Type:
+            return Libre2BluetoothPeripheralViewModel()
             
         }
         
@@ -149,6 +155,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
             return DexcomG4(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
+        case .Libre2Type:
+            
+            return Libre2(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
         }
         
     }
@@ -161,7 +171,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StackType, .M5StickCType:
             return .M5Stack
             
-        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .WatlaaType:
+        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .WatlaaType, .Libre2Type:
             return .CGM
             
         }
@@ -173,7 +183,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .WatlaaType, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
+        case .M5StackType, .M5StickCType, .WatlaaType, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType, .Libre2Type:
             return false
             
         case .DexcomG5Type, .BluconType, .DexcomG4Type, .DexcomG6Type:
@@ -223,7 +233,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
             }
             return nil
             
-        case .M5StackType, .M5StickCType, .WatlaaType, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType:
+        case .M5StackType, .M5StickCType, .WatlaaType, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType, .Libre2Type:
             // no transmitter id means no validation to do
             return nil
             
@@ -253,6 +263,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .BubbleType, .MiaoMiaoType:
             return true
+            
+        case .Libre2Type:
+            // oop web can still be used for Libre2 because in the end the data received is Libre 1 format, we can use oop web to get slope parameters
+            return true
                         
         }
         
@@ -268,7 +282,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
            
        case .BubbleType, .MiaoMiaoType, .WatlaaType, .BluconType, .BlueReaderType, .DropletType , .GNSentryType:
            return true
-                       
+        
+       case .Libre2Type:
+            return true
+
        }
        
     }

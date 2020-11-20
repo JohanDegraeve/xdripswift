@@ -1,6 +1,20 @@
 import Foundation
 
 extension UserDefaults {
+    
+    /// shared user defaults
+    private static let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName)
+    
+    /// common function to be called if user default needs to be stored in shared user defaults
+    public static func storeInSharedUserDefaults(value: Any, forKey key: String) {
+        
+        // setting to be stored also in shared userdefaults because it's used by the today widget
+        if let sharedUserDefaults = sharedUserDefaults {
+            sharedUserDefaults.set(value, forKey: key)
+        }
+        
+    }
+
     /// keys for settings and user defaults. For reading and writing settings, the keys should not be used, the specific functions kan be used.
     public enum Key: String {
         // User configurable Settings
@@ -168,6 +182,9 @@ extension UserDefaults {
         /// Transmitter Battery Level
         case transmitterBatteryInfo = "transmitterbatteryinfo"
         
+        /// timestamp last battery reading (will only be used for dexcom G5 where we need to explicitly ask for the battery)
+        case timeStampOfLastBatteryReading = "timeStampOfLastBatteryReading"
+        
         // HealthKit
         /// did user authorize the storage of readings in healthkit or not
         case storeReadingsInHealthkitAuthorized = "storeReadingsInHealthkitAuthorized"
@@ -197,7 +214,7 @@ extension UserDefaults {
         
         /// NSLog enabled or not
         case NSLogEnabled = "NSLogEnabled"
-        
+                
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
         
@@ -205,6 +222,9 @@ extension UserDefaults {
         case webOOPsite = "webOOPsite"
         /// if webOOP enabled, value of the token
         case webOOPtoken = "webOOPtoken"
+        
+        /// case smooth libre values
+        case smoothLibreValues = "smoothLibreValues"
         
         /// in case Libre 2 users want to use the local calibration algorithm
         case overrideWebOOPCalibration = "overrideWebOOPCalibration"
@@ -226,6 +246,10 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.bloodGlucoseUnitIsMgDl.rawValue)
+
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            UserDefaults.storeInSharedUserDefaults(value: !newValue, forKey: Key.bloodGlucoseUnitIsMgDl.rawValue)
+            
         }
     }
     
@@ -292,6 +316,10 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentHighMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentHighMarkValue.rawValue)
+
         }
     }
     
@@ -312,6 +340,10 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
+
         }
     }
     
@@ -352,6 +384,10 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.lowMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.lowMarkValue.rawValue)
+
         }
     }
     
@@ -372,6 +408,10 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentLowMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentLowMarkValue.rawValue)
+
         }
     }
     
@@ -386,6 +426,12 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.urgentHighMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            if let value = value {
+                UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.urgentHighMarkValue.rawValue)
+            }
+
         }
     }
     
@@ -400,6 +446,12 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.highMarkValue.rawValue)
+
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            if let value = value {
+                UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.highMarkValue.rawValue)
+            }
+
         }
     }
     
@@ -428,6 +480,12 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.lowMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            if let value = value {
+                UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.lowMarkValue.rawValue)
+            }
+
         }
     }
     
@@ -442,6 +500,12 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.urgentLowMarkValue.rawValue)
+            
+            // setting to be stored also in shared userdefaults because it's used by the today widget
+            if let value = value {
+                UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.urgentLowMarkValue.rawValue)
+            }
+
         }
     }
     
@@ -932,6 +996,17 @@ extension UserDefaults {
             } else {
                 set(nil, forKey: Key.transmitterBatteryInfo.rawValue)
             }
+            timeStampOfLastBatteryReading = Date()
+        }
+    }
+    
+    /// timestamp latest calibration uploaded to NightScout
+    var timeStampOfLastBatteryReading:Date? {
+        get {
+            return object(forKey: Key.timeStampOfLastBatteryReading.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampOfLastBatteryReading.rawValue)
         }
     }
     
@@ -994,6 +1069,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.NSLogEnabled.rawValue)
+        }
+    }
+    
+    /// smoothLibreValues - default false
+    var smoothLibreValues: Bool {
+        get {
+            return bool(forKey: Key.smoothLibreValues.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.smoothLibreValues.rawValue)
         }
     }
     

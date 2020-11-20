@@ -7,5 +7,9 @@ extension GNSEntry: BluetoothPeripheral {
         return .GNSentryType
         
     }
+ 
+    func overrideNeedsOOPWeb() -> Bool {
+        return false
+    }
     
 }
