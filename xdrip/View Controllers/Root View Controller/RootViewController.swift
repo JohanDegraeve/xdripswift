@@ -307,8 +307,6 @@ final class RootViewController: UIViewController {
                 
             }
             
-            CGMMiaoMiaoTransmitter.testRange()
-            
         })
         
         // Setup View
@@ -531,6 +529,10 @@ final class RootViewController: UIViewController {
                 
                 // change value of UserDefaults.standard.transmitterTypeAsString
                 UserDefaults.standard.cgmTransmitterTypeAsString = cgmTransmitter.cgmTransmitterType().rawValue
+
+                // for testing only - for testing make sure there's a transmitter connected,
+                // eg a bubble or mm, not necessarily (better not) installed on a sensor
+                // CGMMiaoMiaoTransmitter.testRange(cGMTransmitterDelegate: self)
                 
             }
             
@@ -626,7 +628,7 @@ final class RootViewController: UIViewController {
             // start defining timeStampToDelete as of when existing BgReading's will be deleted
             // this value is also used to verify that glucoseData Array has enough readings
             var timeStampToDelete = Date(timeIntervalSinceNow: -60.0 * (Double)(ConstantsSmoothing.readingsToDeleteInMinutes))
-            
+
             // now check if we'll delete readings
             // there must be a glucoseData.last, here assigning lastGlucoseData just to unwrap it
             // checking lastGlucoseData.timeStamp < timeStampToDelete guarantees the oldest reading is older than the one we'll delete, so we're sur we have enough readings in glucoseData to refill the BgReadings
@@ -642,8 +644,8 @@ final class RootViewController: UIViewController {
                     timeStampToDelete = max(timeStampToDelete, lastCalibrationForActiveSensor.timeStamp)
                 }
                 
-                // get the readings to be deleted
-                let lastBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStampToDelete, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+                // get the readings to be deleted - delete also non-calibrated readings
+                let lastBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStampToDelete, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
                 
                 // delete them
                 for reading in lastBgReadings {
@@ -654,9 +656,6 @@ final class RootViewController: UIViewController {
 
             }
 
-            // initialize help variables
-            var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
-            
             // was a new reading created or not
             var newReadingCreated = false
             
@@ -672,24 +671,38 @@ final class RootViewController: UIViewController {
                 // we only add new glucose values if 5 minutes - 10 seconds younger than latest already existing reading, or, if it's the latest, it needs to be just younger
                 let checktimestamp = Date(timeInterval: 5.0 * 60.0 - 10.0, since: timeStampLastBgReading)
                 
-                if (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading)))  {
+                // timestamp of glucose being processed must be higher (ie more recent) than checktimestamp except if it's the last one (ie the first in the array), because there we don't care if it's less than 5 minutes different with the last but one
+                if (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading))) {
                     
-                    let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                    
-                    if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                    // check on glucoseLevelRaw > 0 because I've had a case where a faulty sensor was giving negative values
+                    if glucose.glucoseLevelRaw > 0 {
                         
-                        trace("new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ","))
+                        // get latest3BgReadings
+                        var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+                        
+                        let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        
+                        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                            
+                            trace("new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ","))
+                            
+                        }
+                        
+                        // save the newly created bgreading permenantly in coredata
+                        coreDataManager.saveChanges()
+                        
+                        // a new reading was created
+                        newReadingCreated = true
+                        
+                        // set timeStampLastBgReading to new timestamp
+                        timeStampLastBgReading = glucose.timeStamp
+                        
+
+                    } else {
+                        
+                        trace("reading skipped, rawValue <= 0, looks like a faulty sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                         
                     }
-                    
-                    // save the newly created bgreading permenantly in coredata
-                    coreDataManager.saveChanges()
-                    
-                    // a new reading was created
-                    newReadingCreated = true
-                    
-                    // set timeStampLastBgReading to new timestamp
-                    timeStampLastBgReading = glucose.timeStamp
                     
                 }
                 

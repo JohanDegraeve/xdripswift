@@ -62,6 +62,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// bubble firmware version
     private var firmware: String?
     
+    /// instance of libreDataParser
+    private let libreDataParser: LibreDataParser
+    
     // MARK: - Initialization
     
     /// - parameters:
@@ -105,6 +108,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         self.oopWebToken = oopWebToken ?? ConstantsLibre.token
         self.oopWebSite = oopWebSite ?? ConstantsLibre.site
         
+        // initiliaze LibreDataParser
+        self.libreDataParser = LibreDataParser()
+
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Bubble)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Bubble, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Bubble, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }
@@ -256,7 +262,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
 
                             }
 
-                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData:  (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format) { (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData:  (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil) { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 if let sensorState = sensorState {
                                     self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)

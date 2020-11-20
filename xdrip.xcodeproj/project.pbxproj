@@ -294,6 +294,7 @@
 		F8A1586F22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */; };
 		F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */; };
 		F8A1587322EDC893007F5B5D /* ConstantsDexcomShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */; };
+		F8A1850C25643B16000EF8A0 /* Double+Smoothable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1850B25643B16000EF8A0 /* Double+Smoothable.swift */; };
 		F8A389C823203E3E0010F405 /* ConstantsM5Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */; };
 		F8A389CF232AE2EA0010F405 /* M5StackSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389CE232AE2E90010F405 /* M5StackSettingsViewController.swift */; };
 		F8A389E7232ECE7E0010F405 /* SettingsViewUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389E6232ECE7E0010F405 /* SettingsViewUtilities.swift */; };
@@ -832,6 +833,7 @@
 		F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSuspensionPrevention.swift; sourceTree = "<group>"; };
 		F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSpeakReadingLanguages.swift; sourceTree = "<group>"; };
 		F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsDexcomShare.swift; sourceTree = "<group>"; };
+		F8A1850B25643B16000EF8A0 /* Double+Smoothable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Smoothable.swift"; sourceTree = "<group>"; };
 		F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsM5Stack.swift; sourceTree = "<group>"; };
 		F8A389CE232AE2E90010F405 /* M5StackSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackSettingsViewController.swift; sourceTree = "<group>"; };
 		F8A389E6232ECE7E0010F405 /* SettingsViewUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewUtilities.swift; sourceTree = "<group>"; };
@@ -1175,6 +1177,7 @@
 				F8E51D602448E695001C9E5A /* Bundle.swift */,
 				F8AF361A245D93ED00B5977B /* Int16.swift */,
 				F890E079247687AE008FB2EC /* URL.swift */,
+				F8A1850B25643B16000EF8A0 /* Double+Smoothable.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -3156,6 +3159,7 @@
 				F8A389ED23342EB10010F405 /* ConstantsNightScout.swift in Sources */,
 				F85FF3D1252F9FF9004E6FF1 /* SnoozeParameters+CoreDataClass.swift in Sources */,
 				F857A32A253E2D9E00951BB2 /* LibreAlgorithmThresholds.swift in Sources */,
+				F8A1850C25643B16000EF8A0 /* Double+Smoothable.swift in Sources */,
 				F890E07A247687AE008FB2EC /* URL.swift in Sources */,
 				F8B3A856227F28DC004BA588 /* AlertTypeSettingsViewController.swift in Sources */,
 				F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */,

@@ -8,6 +8,6 @@ enum ConstantsSmoothing {
     static let libreSmoothingFilterWidth = 5
     
     /// defines period of minutes to delete, ie all readings as of 11 minutes ago till current time will be deleted
-    static let readingsToDeleteInMinutes = 11
+    static let readingsToDeleteInMinutes = 16
     
 }

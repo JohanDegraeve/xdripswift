@@ -86,10 +86,10 @@ extension Array where Element: Smoothable {
         // so now we have tempArray, of length size of original array + 2 * 5
         // the first 5 and the last 5 elements are of type IsSmoothable with value 0
         
-        /// - indicesArray is a help array needed for the function linearRegressionCreator
-        /// - this will be the first parameter in the call to the linearRegression function, in fact it's an array of IsSmoothable with length = length of tempArray
-        /// - we give each IsSmoothable the value of the index, meaning from 0 up to (length of tempArray) - 1
-        /// - in fact it's not really smoothable, it's just because we use isSmoothable in function linearRegressionCreator
+        // - indicesArray is a help array needed for the function linearRegressionCreator
+        // - this will be the first parameter in the call to the linearRegression function, in fact it's an array of IsSmoothable with length = length of tempArray
+        // - we give each IsSmoothable the value of the index, meaning from 0 up to (length of tempArray) - 1
+        // - in fact it's not really smoothable, it's just because we use isSmoothable in function linearRegressionCreator
         var indicesArray = [Smoothable]()
         for index in 0..<(self.count + (filterWidthToUse * 2)) {
             indicesArray.append(IsSmoothable(withValue: Double(index)))

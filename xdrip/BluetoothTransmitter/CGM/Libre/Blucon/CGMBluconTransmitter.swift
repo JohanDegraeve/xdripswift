@@ -69,6 +69,9 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     // timestamp of sending singleBlockInfoPrefix command, if time of receiving singleBlockInfoResponsePrefix is too late, then reading will be ignored
     private var timeStampOfSendingSingleBlockInfoPrefix:Date?
     
+    /// instance of libreDataParser
+    private let libreDataParser: LibreDataParser
+    
     // MARK: - public functions
     
     /// - parameters:
@@ -103,6 +106,9 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         
         // initialize nonFixedSlopeEnabled
         self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
+
+        // initiliaze LibreDataParser
+        self.libreDataParser = LibreDataParser()
 
         // initialize
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_BluconService)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Blucon, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Blucon, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
@@ -178,8 +184,8 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             }
 
             //get readings from buffer and send to cGMTransmitterDelegate
-            // TODO: use LibreDataParser.libreDataProcessor and make parseLibre1DataWithoutOOPWebCalibration private to LibreDataParser
-            var result = LibreDataParser.parseLibre1Data(libreData: rxBuffer, libre1DerivedAlgorithmParameters: nil)
+            // TODO: use libreDataParserlibreDataProcessor and make parseLibre1DataWithoutOOPWebCalibration private to LibreDataParser
+            var result = libreDataParser.parseLibre1Data(libreData: rxBuffer, libre1DerivedAlgorithmParameters: nil, testTimeStamp: nil)
             
             //TODO: sort glucosedata before calling newReadingsReceived
             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)
