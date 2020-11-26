@@ -634,14 +634,30 @@ final class RootViewController: UIViewController {
             // checking lastGlucoseData.timeStamp < timeStampToDelete guarantees the oldest reading is older than the one we'll delete, so we're sur we have enough readings in glucoseData to refill the BgReadings
             if let lastGlucoseData = glucoseData.last, lastGlucoseData.timeStamp < timeStampToDelete, UserDefaults.standard.smoothLibreValues {
                 
-                // younger than the timestamp of the latest reading
+                // older than the timestamp of the latest reading
                 if let last = glucoseData.last {
                     timeStampToDelete = max(timeStampToDelete, last.timeStamp)
                 }
                 
-                // younger than the timestamp of the latest calibration (would only be applicable if recalibration is used)
+                // older than the timestamp of the latest calibration (would only be applicable if recalibration is used)
                 if let lastCalibrationForActiveSensor = lastCalibrationForActiveSensor {
                     timeStampToDelete = max(timeStampToDelete, lastCalibrationForActiveSensor.timeStamp)
+                }
+                
+                // there should be one reading per minute for the period that we want to delete readings, otherwise we may not be able to fill up a gap that is created by deleting readings, because the next readings are per 15 minutes. This will typically happen the first time the app runs (or reruns), the first range of readings is only 16 readings not enough to fill up a gap of more than 20 minutes
+                // we calculate the number of minutes between timeStampToDelete and now, use the result as index in glucoseData, the timestamp of that element is a number of minutes away from now, that number should be equal to index (as we expect one reading per minute)
+                let minutes = Int(abs(timeStampToDelete.timeIntervalSince(Date())/60.0))
+                if minutes < glucoseData.count {
+
+                    if abs(glucoseData[minutes].timeStamp.timeIntervalSince(timeStampToDelete)) > 2.0 {
+                        // increase timeStampToDelete with 5 minutes, this is in the assumption that ConstantsSmoothing.readingsToDeleteInMinutes is not more than 21, by reducing to 16 we should never have a gap because there's always minimum 16 values per minute
+                        timeStampToDelete = timeStampToDelete.addingTimeInterval(5.0 * 60)
+                        
+                    }
+                } else {
+                    // should never come here
+                    // increase timeStampToDelete with 5 minutes
+                    timeStampToDelete = timeStampToDelete.addingTimeInterval(5.0 * 60)
                 }
                 
                 // get the readings to be deleted - delete also non-calibrated readings
@@ -653,6 +669,10 @@ final class RootViewController: UIViewController {
                     coreDataManager.mainManagedObjectContext.delete(reading)
                     
                 }
+                
+                // as we're deleting readings, glucoseChartPoints need to be updated, otherwise we keep seeing old values
+                // this is the easiest way
+                glucoseChartManager?.cleanUpMemory()
 
             }
 
@@ -1290,7 +1310,7 @@ final class RootViewController: UIViewController {
         
         // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's not going to be a latestReading
         let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-        
+            
         // if there's no readings, then give empty fields
         guard latestReadings.count > 0 else {
             valueLabelOutlet.text = "---"
@@ -1302,6 +1322,7 @@ final class RootViewController: UIViewController {
         
         // assign last reading
         let lastReading = latestReadings[0]
+            
         // assign last but one reading
         let lastButOneReading = latestReadings.count > 1 ? latestReadings[1]:nil
         

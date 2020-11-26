@@ -101,25 +101,32 @@ class LibreDataParser {
             // add previously stored values if there are any
             trend = extendWithPreviousStoredValues(trend: trend)
             
-            // now, if previousRawValues was not anempty list, trend is a longer list of values (probably) because it's been extend with a subrange of previousRawvalues
-            // we reassing previousRawValues to the current list in trend, for next usage
-            // but we restricted it to maximum 32 most recent values, it makes no sense to store more
-            previousRawValues = Array(trend.map({$0.glucoseLevelRaw})[0..<(min(trend.count, 32))])
+            // now, if previousRawValues was not an empty list, trend is a longer list of values because it's been extended with a subrange of previousRawvalues
+            // we re-assign previousRawValues to the current list in trend, for next usage
+            // but we restricted it to maximum 64 most recent values, it makes no sense to store more
+            previousRawValues = Array(trend.map({$0.glucoseLevelRaw})[0..<(min(trend.count, 64))])
             
-            // smooth the per minute values, filterWidth 5
-            trend.smoothSavitzkyGolayQuaDratic(withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidth)
-            // smooth again, filterWidth 5
-            trend.smoothSavitzkyGolayQuaDratic(withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidth)
+            // smooth the per minute values, filterWidth 5, 2 iterations
+            for _ in 1...ConstantsSmoothing.libreSmoothingRepeatPerMinuteSmoothing {
 
-            // do the per 5 minutes smoothing
-            smoothPer5Minutes(trend: trend)
+                trend.smoothSavitzkyGolayQuaDratic(withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidthPerMinuteValues)
+
+            }
             
-            // and now restrict back to the first 16 values, ie the 16 most recent values
-            trend = Array(trend[0..<16])
+            // now smooth the trend, per 5 minutes smoothing, 3 iterations, filterWidth 3
+            smoothPer5Minutes(trend: trend, withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidthPer5MinuteValues, iterations: ConstantsSmoothing.libreSmoothingRepeatPer5MinuteSmoothing)
+            
+            // and now restrict back to the first 32 values, ie the 32 most recent values
+            trend = Array(trend[0..<(min(trend.count, 32))])
 
         }
         
-        // assign returnValue to trend, returnValue is used in rangeProcessor
+        // if trend count would be 0 here then no reason to continue, should normally not be the case
+        guard trend.count > 0 else {
+            return ([GlucoseData](), sensorState, sensorTimeInMinutes)
+        }
+        
+        // assign returnValue to trend, returnValue is used in rangeProcessor, which is still called to process the history values
         returnValue = trend
         
         // timeInSecondsOfMostRecentHistoryValue is needed in timeInSecondsCalculator to get the trend
@@ -132,7 +139,18 @@ class LibreDataParser {
         
         // smooth history one time, if required
         if UserDefaults.standard.smoothLibreValues {
-            history.smoothSavitzkyGolayQuaDratic(withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidth)
+            
+            // add the most recent trend value to the history, this will make the smoothing of the history values more correct
+            // otherwise we apply linear regression to the first element(s) in the history, which will give a less accurate result
+            // trend[0] is the measurement 15 minutes more recent than the first element in history, so we insert it at index 0
+            history.insert(GlucoseData(timeStamp: trend[0].timeStamp, glucoseLevelRaw: trend[0].glucoseLevelRaw), at: 0)
+            
+            // smooth
+            history.smoothSavitzkyGolayQuaDratic(withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidthPer15MinutesValues)
+            
+            // now remove the trend measurement that was inserted
+            history.remove(at: 0)
+            
         }
         
         // add history to returnvalue
@@ -518,54 +536,64 @@ class LibreDataParser {
         
     }
     
-    /// - smooths each value, using values of 5 minutes before , 10 minutes before, 5 minutes after and 10 minutes after
-    private func smoothPer5Minutes(trend: [GlucoseData]) {
+    /// - smooths each value, using values of 5 minutes before , 10 minutes before, 5 minutes after and 10 minutes after, ... the number of values taken into account depends on the filterWidth
+    /// - parameters :
+    ///     - withFilterWidth : filter width to use
+    ///     - repeat : how often to redo the filter
+    ///     - trend : glucoseData array to filter, objects in the array will be smoothed (= filtered)
+    private func smoothPer5Minutes(trend: [GlucoseData], withFilterWidth filterWidth: Int, iterations: Int) {
         
         // trend must both have at least 16 values, should always be the case, just to avoid crashes
         guard trend.count >= 16 else {return}
         
-        // copy gluse values to array of double
+        // copy glucose values to array of double
         let smoothedValues = trend.map({$0.glucoseLevelRaw})
         
         // now we have smoothedValues, Double's with values equal to trend's glucoseLevelRaw values
-        // we will apply smoothing, each value will be smoothed using the value if 5 minutes before, 10 minutes before, 5 minutes after and 10 minutes after - because we'll never use two subsequent values, we use them with an interval of 5 minutes and with a filterWidth of 2
+        // we will apply smoothing, each value will be smoothed using the value if 5 minutes before, 10 minutes before, 15 minutes before, 5 minutes after and 10 minutes after and 15 minutes after - because we'll never use two subsequent values, we use them with an interval of 5 minutes and with a filterWidth of 2 .. and more
         for (index, value) in trend.enumerated() {
             
             // initalize toSmooth with value that will be smoothed
             var toSmooth = [smoothedValues[index]]
             
-            // indexOfValueBeingSmoothed
+            // while adding values to toSmooth, we need to keep track of the index of the value being smoothed
             var indexOfValueBeingSmoothed = 0
             
-            // prepend values 5 and 10 minutes ago
-            if index - 5 >= 0 {
-                toSmooth.insert(smoothedValues[index - 5], at: 0)
-                indexOfValueBeingSmoothed = 1
+            // prepend values 5 and 10 and 15 minutes ago, ... maximum 5 which is the maximum filterwidth
+            for count in 1...5 {
+                
+                let indexToUse = index - 5 * count
+                
+                if indexToUse >= 0 {
+                    toSmooth.insert(smoothedValues[indexToUse], at: 0)
+                    indexOfValueBeingSmoothed = count
+                }
+                
             }
             
-            if index - 10 >= 0 {
-                toSmooth.insert(smoothedValues[index - 10], at: 0)
-                indexOfValueBeingSmoothed = 2
+            // append values 5 and 10 and 15 minutes later, ... maximum 5 which is the maximum filterwidth
+            for count in 1...5 {
+                
+                let indexToUse = index + 5 * count
+                
+                if indexToUse < smoothedValues.count - 1 {
+                    toSmooth.append(smoothedValues[indexToUse])
+                }
+                
             }
-            
-            // append values 5 and 10 minutes later
-            if index + 5 <= smoothedValues.count - 1 {
-                toSmooth.append(smoothedValues[index + 5])
-            }
-            
-            if index + 10 <= smoothedValues.count - 1 {
-                toSmooth.append(smoothedValues[index + 10])
-            }
-            
+
             // smooth
-            toSmooth.smoothSavitzkyGolayQuaDratic(withFilterWidth: 2)
-            toSmooth.smoothSavitzkyGolayQuaDratic(withFilterWidth: 2)
-            toSmooth.smoothSavitzkyGolayQuaDratic(withFilterWidth: 2)
+            for _ in 1...iterations {
+
+                toSmooth.smoothSavitzkyGolayQuaDratic(withFilterWidth: filterWidth)
+
+            }
 
             // now change the value being smoothed
             value.glucoseLevelRaw = toSmooth[indexOfValueBeingSmoothed]
             
         }
+        
     }
     
 }
