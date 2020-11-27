@@ -56,7 +56,7 @@ class WatchManager: NSObject {
         }
         
         // get 2 last Readings, with a calculatedValue
-        let lastReading = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)//
         
         // there should be at least one reading
         guard lastReading.count > 0 else {

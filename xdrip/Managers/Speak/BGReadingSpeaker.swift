@@ -73,7 +73,7 @@ class BGReadingSpeaker:NSObject {
         }
         
         // get latest reading, ignore sensor, rawdata, timestamp - only 1
-        let lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, fromDate: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let lastReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
 
         // if there's no readings, then no further processing
         if lastReadings.count == 0 {

@@ -28,6 +28,45 @@ class BgReadingsAccessor {
     
     // MARK: - public functions
     
+    /// - Gives 2 latest readings with calculatedValue != 0, minimum time between the two readings specified by minimumTimeIntervalInMinutes
+    ///
+    /// - parameters:
+    ///     - minimumTimeIntervalInMinutes : minimum time between the two readings in seconds
+    /// - returns: 0 1 or 2 readings, minimum time diff between the two readings
+    ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
+    func get2LatestBgReadings(minimumTimeIntervalInMinutes: Double) -> [BgReading] {
+        
+        // assuming there will be at most 1 reading per minute stored, feching minimumTimeIntervalInMinutes readings should be enough, adding 5 to be sure we fetch enough readings
+        let readingsToFetch = Int(minimumTimeIntervalInMinutes) + 5
+        
+        // to define the fromDate, assume there's one reading every 5 minutes, and multiple with readingsToFetch
+        let fromDate = Date(timeIntervalSinceNow: -(Double(readingsToFetch) * 5.0 * 60.0))
+        
+        // get latest readings
+        let latestReadings = getLatestBgReadings(limit: readingsToFetch, fromDate: fromDate, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        
+        // if there's no readings, then return empty array
+        if latestReadings.count == 0 {return [BgReading]()}
+        
+        // if there's only one reading, then return it
+        if latestReadings.count == 1 {return [latestReadings[0]]}
+    
+        // there's more than one reading, search the first with time difference >= minimumTimeIntervalInMinutes
+        var indexNextReading = 1
+        while (abs(latestReadings[indexNextReading].timeStamp.timeIntervalSince(latestReadings[0].timeStamp)) < minimumTimeIntervalInMinutes * 60.0 ) && indexNextReading < latestReadings.count {
+
+            indexNextReading = indexNextReading + 1
+            
+        }
+        
+        // indexNextReading = size of latestReadings, then it means we didn't find a second reading with time difference >= minimumTimeIntervalInMinutes, return only the first
+        if indexNextReading == latestReadings.count {return [latestReadings[0]]}
+        
+        // return the first, and the one found matching the expected time difference
+        return [latestReadings[0], latestReadings[indexNextReading]]
+        
+    }
+    
     /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil, with maximumDays old
     ///
     /// - parameters:

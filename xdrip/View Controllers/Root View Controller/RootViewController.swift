@@ -1182,7 +1182,7 @@ final class RootViewController: UIViewController {
         }
         
         // get lastReading, with a calculatedValue - no check on activeSensor because in follower mode there is no active sensor
-        let lastReading = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)//
         
         // if there's no reading for active sensor with calculated value , then no reason to continue
         if lastReading.count == 0 {
@@ -1309,7 +1309,7 @@ final class RootViewController: UIViewController {
         self.minutesLabelOutlet.textColor = UIColor.white
         
         // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's not going to be a latestReading
-        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let latestReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
             
         // if there's no readings, then give empty fields
         guard latestReadings.count > 0 else {
