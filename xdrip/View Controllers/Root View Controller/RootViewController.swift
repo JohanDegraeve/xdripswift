@@ -681,7 +681,7 @@ final class RootViewController: UIViewController {
             
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-            if let lastReading = bgReadingsAccessor.last(forSensor: activeSensor) {
+            if let lastReading = bgReadingsAccessor.last(forSensor: nil) {
                 timeStampLastBgReading = lastReading.timeStamp
             }
             
