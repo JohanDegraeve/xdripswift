@@ -36,7 +36,7 @@ class LibreDataParser {
         var returnValue:Array<GlucoseData> = []
         let sensorState = LibreSensorState(stateByte: libreData[4])
         
-        // closure will be used for processing trend and history range, and return trend and history as array of GlucoseData
+        // rangeProcessor will be used for processing trend or history range, and return trend or history as array of GlucoseData
         let rangeProcessor = { (maxIndex: Int, indexTrendOrHistory: Int, timeInSecondsCalculator: (Int) -> Double, firstByteToAppend: Int ) -> [GlucoseData] in
             
             var result = [GlucoseData]()
@@ -56,7 +56,7 @@ class LibreDataParser {
                 
                 let readingTimeStamp = Date(timeIntervalSince1970: sensorStartTimeInMilliseconds/1000 + timeInSeconds)
                 
-                // only add if readingTimeStamp smaller (ie older) than the readingTimestamp of the last already known reading. This is because history measurements start with a timestamp somewhere in the middle of the trend measurements
+                // only add if readingTimeStamp smaller (ie reading is older) than the readingTimestamp of the last already known reading. This needs to be done because history measurements start with a timestamp somewhere in the middle of the trend measurements
                 if let last = returnValue.last {
                     
                     if !(readingTimeStamp < last.timeStamp) {
@@ -68,12 +68,14 @@ class LibreDataParser {
                     
                 }
                 
+                // do we calibrate with the oop web derived slope and intercep t?
                 if let libre1DerivedAlgorithmParameters = libre1DerivedAlgorithmParameters {
                     
                     result.append(GlucoseData(timeStamp: readingTimeStamp, glucoseLevelRaw: LibreMeasurement(bytes: byte, slope: 0.1, offset: 0.0, date: readingTimeStamp, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters).temperatureAlgorithmGlucose))
                     
                 } else {
                     
+                    // no calibration to do
                     let glucoseLevelRaw = Double(((256 * (byte.getByteAt(position: 1) & 0xFF) + (byte.getByteAt(position: 0) & 0xFF)) & 0x1FFF))
                     
                     if (glucoseLevelRaw > 0) {
@@ -90,23 +92,23 @@ class LibreDataParser {
             
         }
         
-        // get trend values as array of GlucoseData
+        // now use rangeProcessor to get trend measurements as array of GlucoseData
         var trend  = rangeProcessor(16, indexTrend, { index in
             return (max(0, (Double)(sensorTimeInMinutes - index))) * 60.0
         }, 28)
         
-        // smooth, if required,
+        // smooth, if required
         if UserDefaults.standard.smoothLibreValues {
             
             // add previously stored values if there are any
-            trend = extendWithPreviousStoredValues(trend: trend)
+            trend = extendWithPreviousRawValues(trend: trend)
             
             // now, if previousRawValues was not an empty list, trend is a longer list of values because it's been extended with a subrange of previousRawvalues
             // we re-assign previousRawValues to the current list in trend, for next usage
             // but we restricted it to maximum 64 most recent values, it makes no sense to store more
-            previousRawValues = Array(trend.map({$0.glucoseLevelRaw})[0..<(min(trend.count, 64))])
+            previousRawValues = Array(trend.map({$0.glucoseLevelRaw})[0..<(min(trend.count, 69))])
             
-            // smooth the per minute values, filterWidth 5, 2 iterations
+            // smooth the trend values, filterWidth 5, 2 iterations
             for _ in 1...ConstantsSmoothing.libreSmoothingRepeatPerMinuteSmoothing {
 
                 trend.smoothSavitzkyGolayQuaDratic(withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidthPerMinuteValues)
@@ -116,9 +118,9 @@ class LibreDataParser {
             // now smooth the trend, per 5 minutes smoothing, 3 iterations, filterWidth 3
             smoothPer5Minutes(trend: trend, withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidthPer5MinuteValues, iterations: ConstantsSmoothing.libreSmoothingRepeatPer5MinuteSmoothing)
             
-            // and now restrict back to the first 32 values, ie the 32 most recent values
-            trend = Array(trend[0..<(min(trend.count, 32))])
-
+            // and now restrict back to the first 60 values, ie the 60 most recent values (why 60 ? looks large enough for what we want to do : 21 readings at most will be deleted as defined by ConstantsSmoothing.readingsToDeleteInMinutes + shifting timetamp (see later)
+            trend = Array(trend[0..<(min(trend.count, 66))])
+            
         }
         
         // if trend count would be 0 here then no reason to continue, should normally not be the case
@@ -132,7 +134,7 @@ class LibreDataParser {
         // timeInSecondsOfMostRecentHistoryValue is needed in timeInSecondsCalculator to get the trend
         let timeInSecondsOfMostRecentHistoryValue = (dateOfMostRecentHistoryValue(sensorTimeInMinutes: sensorTimeInMinutes, nextHistoryBlock: indexHistory, date: ourTime).toMillisecondsAsDouble() - sensorStartTimeInMilliseconds) / 1000
 
-        // get measurement values as array of GlucoseData
+        // now use rangeProcessor to get history measurements as array of GlucoseData
         var history = rangeProcessor(32, indexHistory, { index in
             return (max(0, timeInSecondsOfMostRecentHistoryValue - 900.0 * (Double)(index)))
         }, 124)
@@ -155,6 +157,34 @@ class LibreDataParser {
         
         // add history to returnvalue
         returnValue = returnValue + history
+        
+        // if smoothing, then shift every timestamp forward in time by ConstantsSmoothing.timeStampOffSetInMinutes
+        // this to remove recent, scattered values which can't be smoothed very well
+        // disadvantage is dat we introduce a delay in the readings
+        if let firstElement = returnValue.first, UserDefaults.standard.smoothLibreValues && ConstantsSmoothing.timeStampOffSetInMinutes > 0.0 {
+            
+            // timestamp of first element before applying the offset, we need this later
+            // bring the seconds to 0 (meaning example if date would be 1st of December 23:34:25, timeStampFirstElement will be 1st of December 23:34:00
+            let timeStampFirstElement = firstElement.timeStamp.addingTimeInterval(-Double(Calendar.current.component(.second, from: firstElement.timeStamp)))
+            
+            debuglogging("secondsInTimeStampFirstElement = " + timeStampFirstElement.description(with: .current))
+            
+            // loop through readings and shift all by ConstantsSmoothing.timeStampOffSetInMinutes minutes
+            //
+            for reading in returnValue {
+                
+                reading.timeStamp.addTimeInterval(ConstantsSmoothing.timeStampOffSetInMinutes * 60.0)
+                
+            }
+            
+            // create a new array with only the elements that have a timeStamp before or equal to timeStampFirstElement
+            if let first = returnValue.firstIndex(where: {$0.timeStamp <= timeStampFirstElement}) {
+
+                returnValue = Array(returnValue[first..<returnValue.count])
+
+            }
+
+        }
         
         return (returnValue, sensorState, sensorTimeInMinutes)
         
@@ -485,7 +515,7 @@ class LibreDataParser {
 
     /// - uses previously stored values and tries to append trend with previous values, based on mathing values (appending meaning, as it's sorted by first the youngest
     /// - we need to find at least 4 matching values (just in case user has perfectly steady values for more than 3 minutes which will probably never happen), but this means maximum gap that we can close is 11 minutes, which is enough
-    private func extendWithPreviousStoredValues(trend: [GlucoseData]) -> [GlucoseData] {
+    private func extendWithPreviousRawValues(trend: [GlucoseData]) -> [GlucoseData] {
         
         // previous values and trend must both have at least 16 values, should always be the case, just to avoid crashes
         guard previousRawValues.count >= 16 && trend.count >= 16 else {return trend}
@@ -495,24 +525,24 @@ class LibreDataParser {
         
         // for each value in trend, we will try to find a series of 4 (defined by amountOfValuesToCompare) matching values in previousRawValues
         // if found then we add the last values of previousRawValues, until we have a new consecutive array of values in newTrend
-        for (index, _) in trend.enumerated() {
+        for (match, _) in trend.enumerated() {
             
-            if recursive(indexInPreviousRawValues: 0, indexInTrend: index, trendValues: &newTrend) {
+            if recursive(indexInPreviousRawValues: 0, indexInTrend: match, trendValues: &newTrend) {
 
-                // now match indexes the first matching index, we can append 'match' values (meaning value of match)
+                // now match indexes the first matching index
                 
                 // we'll need the timestamp of the current last element
                 var lastTimeStamp = trend.last!.timeStamp
                 
                 // the first element from previousRawValue to append is at index size of trend - index
                 // ad we go up to size of previousRawValues - 1 (stride is exclusive the last value)
-                for i in stride(from: (16 - index), to: previousRawValues.count, by: 1) {
+                for i in stride(from: (16 - match), to: previousRawValues.count, by: 1) {
 
                     // next element will have a timestamp being previous timestamp - 1 minute
                     lastTimeStamp = lastTimeStamp.addingTimeInterval(-60.0)
                     
                     newTrend.append(GlucoseData(timeStamp: lastTimeStamp, glucoseLevelRaw: previousRawValues[i]))
-                    
+                   
                 }
                 
                 // found a matching range, now further processing needed
@@ -522,7 +552,7 @@ class LibreDataParser {
                 
                 // didn't find a match
                 // if we already reached 16 minutes amount of values to compare then stop
-                if index == 16 - amountOfValuesToCompare {
+                if match == 16 - amountOfValuesToCompare {
                     
                     break
                     

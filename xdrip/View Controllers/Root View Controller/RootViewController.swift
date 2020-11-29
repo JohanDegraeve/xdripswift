@@ -646,19 +646,39 @@ final class RootViewController: UIViewController {
                 
                 // there should be one reading per minute for the period that we want to delete readings, otherwise we may not be able to fill up a gap that is created by deleting readings, because the next readings are per 15 minutes. This will typically happen the first time the app runs (or reruns), the first range of readings is only 16 readings not enough to fill up a gap of more than 20 minutes
                 // we calculate the number of minutes between timeStampToDelete and now, use the result as index in glucoseData, the timestamp of that element is a number of minutes away from now, that number should be equal to index (as we expect one reading per minute)
-                let minutes = Int(abs(timeStampToDelete.timeIntervalSince(Date())/60.0))
-                if minutes < glucoseData.count {
+                // if that's not the case add 1 minute to timeStampToDelete
+                // repeat this until reached
+                let checkTimeStampToDelete = { (glucoseData: [GlucoseData]) -> Bool in
 
-                    if abs(glucoseData[minutes].timeStamp.timeIntervalSince(timeStampToDelete)) > 2.0 {
-                        // increase timeStampToDelete with 5 minutes, this is in the assumption that ConstantsSmoothing.readingsToDeleteInMinutes is not more than 21, by reducing to 16 we should never have a gap because there's always minimum 16 values per minute
-                        timeStampToDelete = timeStampToDelete.addingTimeInterval(5.0 * 60)
+                    // just to avoid infinite loop
+                    if timeStampToDelete > Date() {return true}
+                    
+                    let minutes = Int(abs(timeStampToDelete.timeIntervalSince(Date())/60.0))
+                    
+                    if minutes < glucoseData.count {
                         
+                        if abs(glucoseData[minutes].timeStamp.timeIntervalSince(timeStampToDelete)) > 1.0 {
+                            // increase timeStampToDelete with 5 minutes, this is in the assumption that ConstantsSmoothing.readingsToDeleteInMinutes is not more than 21, by reducing to 16 we should never have a gap because there's always minimum 16 values per minute
+                            timeStampToDelete = timeStampToDelete.addingTimeInterval(1.0 * 60)
+                            
+                            return false
+                            
+                        }
+                        
+                        return true
+                        
+                    } else {
+                        // should never come here
+                        // increase timeStampToDelete with 5 minutes
+                        timeStampToDelete = timeStampToDelete.addingTimeInterval(1.0 * 60)
+                        
+                        return false
                     }
-                } else {
-                    // should never come here
-                    // increase timeStampToDelete with 5 minutes
-                    timeStampToDelete = timeStampToDelete.addingTimeInterval(5.0 * 60)
+
                 }
+                
+                // repeat the function checkTimeStampToDelete until timeStampToDelete is high enough so that we delete only bgReading's without creating a gap that can't be filled in
+                while !checkTimeStampToDelete(glucoseData) {}
                 
                 // get the readings to be deleted - delete also non-calibrated readings
                 let lastBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStampToDelete, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
@@ -671,12 +691,12 @@ final class RootViewController: UIViewController {
                 }
                 
                 // as we're deleting readings, glucoseChartPoints need to be updated, otherwise we keep seeing old values
-                // this is the easiest way
+                // this is the easiest way to achieve it
                 glucoseChartManager?.cleanUpMemory()
 
             }
 
-            // was a new reading created or not
+            // was a new reading created or not ?
             var newReadingCreated = false
             
             // assign value of timeStampLastBgReading
@@ -686,7 +706,7 @@ final class RootViewController: UIViewController {
             }
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, we need to start with the oldest
-            for (index , glucose) in glucoseData.enumerated().reversed() {
+            for (index, glucose) in glucoseData.enumerated().reversed() {
                 
                 // we only add new glucose values if 5 minutes - 10 seconds younger than latest already existing reading, or, if it's the latest, it needs to be just younger
                 let checktimestamp = Date(timeInterval: 5.0 * 60.0 - 10.0, since: timeStampLastBgReading)

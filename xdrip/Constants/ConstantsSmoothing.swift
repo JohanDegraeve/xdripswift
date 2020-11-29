@@ -26,4 +26,10 @@ enum ConstantsSmoothing {
     /// defines period of minutes to delete, ie all readings as of 11 minutes ago till current time will be deleted
     static let readingsToDeleteInMinutes = 21
     
+    /// - if smoothing is enabled then readings will be shifted forward in time
+    /// - this is to cope with the wrong smoothing for the latest readings that may happen
+    /// - allowed values 0, 1, 2, 3, 4, 5 (or anything in between)
+    /// - 0 is not used
+    static let timeStampOffSetInMinutes = 0.0
+    
 }
