@@ -53,13 +53,13 @@ class BgReadingsAccessor {
     
         // there's more than one reading, search the first with time difference >= minimumTimeIntervalInMinutes
         var indexNextReading = 1
-        while (abs(latestReadings[indexNextReading].timeStamp.timeIntervalSince(latestReadings[0].timeStamp)) < minimumTimeIntervalInMinutes * 60.0 ) && indexNextReading < latestReadings.count {
+        while indexNextReading < latestReadings.count && (abs(latestReadings[indexNextReading].timeStamp.timeIntervalSince(latestReadings[0].timeStamp)) < minimumTimeIntervalInMinutes * 60.0 ) {
 
             indexNextReading = indexNextReading + 1
             
         }
         
-        // indexNextReading = size of latestReadings, then it means we didn't find a second reading with time difference >= minimumTimeIntervalInMinutes, return only the first
+        // if indexNextReading = size of latestReadings, then it means we didn't find a second reading with time difference >= minimumTimeIntervalInMinutes, return only the first
         if indexNextReading == latestReadings.count {return [latestReadings[0]]}
         
         // return the first, and the one found matching the expected time difference
