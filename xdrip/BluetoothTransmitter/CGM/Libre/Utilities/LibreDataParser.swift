@@ -105,7 +105,7 @@ class LibreDataParser {
             
             // now, if previousRawValues was not an empty list, trend is a longer list of values because it's been extended with a subrange of previousRawvalues
             // we re-assign previousRawValues to the current list in trend, for next usage
-            // but we restricted it to maximum 64 most recent values, it makes no sense to store more
+            // but we restricted it to maximum 69 most recent values, it makes no sense to store more
             previousRawValues = Array(trend.map({$0.glucoseLevelRaw})[0..<(min(trend.count, 69))])
             
             // smooth the trend values, filterWidth 5, 2 iterations
@@ -118,7 +118,7 @@ class LibreDataParser {
             // now smooth the trend, per 5 minutes smoothing, 3 iterations, filterWidth 3
             smoothPer5Minutes(trend: trend, withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidthPer5MinuteValues, iterations: ConstantsSmoothing.libreSmoothingRepeatPer5MinuteSmoothing)
             
-            // and now restrict back to the first 60 values, ie the 60 most recent values (why 60 ? looks large enough for what we want to do : 21 readings at most will be deleted as defined by ConstantsSmoothing.readingsToDeleteInMinutes + shifting timetamp (see later)
+            // and now restrict back to the first 66 values, ie the 66 most recent values (why 66 ? looks large enough for what we want to do : 21 readings at most will be deleted as defined by ConstantsSmoothing.readingsToDeleteInMinutes + shifting timetamp (see later)
             trend = Array(trend[0..<(min(trend.count, 66))])
             
         }
@@ -157,34 +157,6 @@ class LibreDataParser {
         
         // add history to returnvalue
         returnValue = returnValue + history
-        
-        // if smoothing, then shift every timestamp forward in time by ConstantsSmoothing.timeStampOffSetInMinutes
-        // this to remove recent, scattered values which can't be smoothed very well
-        // disadvantage is dat we introduce a delay in the readings
-        if let firstElement = returnValue.first, UserDefaults.standard.smoothLibreValues && ConstantsSmoothing.timeStampOffSetInMinutes > 0.0 {
-            
-            // timestamp of first element before applying the offset, we need this later
-            // bring the seconds to 0 (meaning example if date would be 1st of December 23:34:25, timeStampFirstElement will be 1st of December 23:34:00
-            let timeStampFirstElement = firstElement.timeStamp.addingTimeInterval(-Double(Calendar.current.component(.second, from: firstElement.timeStamp)))
-            
-            debuglogging("secondsInTimeStampFirstElement = " + timeStampFirstElement.description(with: .current))
-            
-            // loop through readings and shift all by ConstantsSmoothing.timeStampOffSetInMinutes minutes
-            //
-            for reading in returnValue {
-                
-                reading.timeStamp.addTimeInterval(ConstantsSmoothing.timeStampOffSetInMinutes * 60.0)
-                
-            }
-            
-            // create a new array with only the elements that have a timeStamp before or equal to timeStampFirstElement
-            if let first = returnValue.firstIndex(where: {$0.timeStamp <= timeStampFirstElement}) {
-
-                returnValue = Array(returnValue[first..<returnValue.count])
-
-            }
-
-        }
         
         return (returnValue, sensorState, sensorTimeInMinutes)
         
@@ -517,8 +489,8 @@ class LibreDataParser {
     /// - we need to find at least 4 matching values (just in case user has perfectly steady values for more than 3 minutes which will probably never happen), but this means maximum gap that we can close is 11 minutes, which is enough
     private func extendWithPreviousRawValues(trend: [GlucoseData]) -> [GlucoseData] {
         
-        // previous values and trend must both have at least 16 values, should always be the case, just to avoid crashes
-        guard previousRawValues.count >= 16 && trend.count >= 16 else {return trend}
+        // previousRawValues length must be at least 16 and trend length must equal to 16 values, should always be the case, just to avoid crashes
+        guard previousRawValues.count >= 16 && trend.count == 16 else {return trend}
         
         // create a new array with IsSmoothable objects, values being equal to glucoseLevelRaw of each trend value
         var newTrend = trend.map({GlucoseData(timeStamp: $0.timeStamp, glucoseLevelRaw: $0.glucoseLevelRaw)})
