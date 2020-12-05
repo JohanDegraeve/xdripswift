@@ -232,6 +232,23 @@ extension UserDefaults {
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
         
+        
+        // Libre
+        /// Libre unlock code
+        case libreActiveSensorUnlockCode = "activeSensorUnlockCode"
+        
+        /// Libre Unlock count
+        case libreActiveSensorUnlockCount = "activeSensorUnlockCount"
+        
+        /// - Libre sensor id - used in Libre 2 setup - should be read first eg via bubble or mm and then used in Libre 2 communication
+        /// - stored as data as read from transmitter
+        case libreSensorUID = "libreSensorUID"
+        
+        
+        /// - Libre patch info - used in Libre 2 setup - should be read first eg via bubble or mm and then used in Libre 2 communication
+        /// - stored as data as read from transmitter
+        case librePatchInfo = "librePatchInfo"
+        
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -1161,6 +1178,62 @@ extension UserDefaults {
             guard let jsonData = try? encoder.encode(newValue) else { return }
             let jsonString = String(bytes: jsonData, encoding: .utf8)
             set(jsonString, forKey: Key.libre1DerivedAlgorithmParameters.rawValue)
+        }
+    }
+    
+    /// Libre Unlock code
+    var libreActiveSensorUnlockCode: UInt32 {
+        get {
+            
+            let value = UInt32(integer(forKey: Key.libreActiveSensorUnlockCode.rawValue))
+            
+            if value == 0 {
+                return 42
+            }
+            
+            return UInt32(integer(forKey: Key.libreActiveSensorUnlockCode.rawValue))
+            
+        }
+        set {
+            set(newValue, forKey: Key.libreActiveSensorUnlockCode.rawValue)
+        }
+    }
+
+    /// Libre Unlock count
+    var libreActiveSensorUnlockCount: UInt16 {
+        get {
+            return UInt16(integer(forKey: Key.libreActiveSensorUnlockCount.rawValue))
+        }
+        set {
+            set(newValue, forKey: Key.libreActiveSensorUnlockCount.rawValue)
+        }
+    }
+    
+    /// Libre sensor id
+    var libreSensorUID: Data {
+        get {
+            if let data = object(forKey: Key.libreSensorUID.rawValue) as? Data {
+                return data
+            } else {
+                return Data(hex: "b2742c0100a407e0")
+            }
+        }
+        set {
+            set(newValue, forKey: Key.libreSensorUID.rawValue)
+        }
+    }
+    
+    /// Libre librePatchInfo
+    var librePatchInfo: Data {
+        get {
+            if let data = object(forKey: Key.librePatchInfo.rawValue) as? Data {
+                return data
+            } else {
+                return Data(hex: "9d083001db2c")
+            }
+        }
+        set {
+            set(newValue, forKey: Key.librePatchInfo.rawValue)
         }
     }
     

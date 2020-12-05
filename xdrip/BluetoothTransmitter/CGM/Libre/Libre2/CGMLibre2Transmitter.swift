@@ -7,13 +7,16 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     // MARK: - properties
     
     /// service to be discovered
-    let CBUUID_Service_Libre2: String = "FDE3"
+    private let CBUUID_Service_Libre2: String = "FDE3"
     
     /// receive characteristic
-    let CBUUID_ReceiveCharacteristic_Libre2: String = "F002"
+    private let CBUUID_ReceiveCharacteristic_Libre2: String = "F002"
     
     /// write characteristic
-    let CBUUID_WriteCharacteristic_Libre2: String = "F001"
+    private let CBUUID_WriteCharacteristic_Libre2: String = "F001"
+    
+    /// how many bytes should we receive from Libre 2
+    private let expectedBufferSize = 46
     
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
@@ -29,8 +32,18 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
     private var emptyArray: [GlucoseData] = []
+
+    /// used when processing Libre 2 data packet
+    private var startDate:Date
     
-    private var unlockCount: UInt16 = 0
+    // receive buffer for Libre 2 packets
+    private var rxBuffer:Data
+    
+    // how long to wait for next packet before resetting the rxBuffer
+    private static let maxWaitForpacketInSeconds = 3.0
+
+    /// is the transmitter oop web enabled or not
+    private var webOOPEnabled: Bool
     
     // MARK: - Initialization
     /// - parameters:
@@ -39,7 +52,8 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - bluetoothTransmitterDelegate : a bluetoothTransmitterDelegate
     ///     - cGMLibre2TransmitterDelegate : a CGMLibre2TransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMLibre2TransmitterDelegate : CGMLibre2TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, nonFixedSlopeEnabled: Bool?) {
+    ///     - webOOPEnabled : enabled or not, if nil then default false
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMLibre2TransmitterDelegate : CGMLibre2TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, nonFixedSlopeEnabled: Bool?, webOOPEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "abbott")
@@ -56,6 +70,15 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         // initialize nonFixedSlopeEnabled
         self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
         
+        // initialize rxbuffer
+        rxBuffer = Data()
+        
+        // initialize startDate
+        startDate = Date()
+        
+        // initialize webOOPEnabled
+        self.webOOPEnabled = webOOPEnabled ?? false
+
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Libre2)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Libre2, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Libre2, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }
@@ -66,18 +89,54 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
-        trace("in peripheral didUpdateValueFor", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
-        
-        /*if let value = characteristic.value {
+        if let value = characteristic.value {
             
-            if let valueAsString = String(bytes: value, encoding: .utf8)   {
-                trace("    failed to convert value to string", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
-                return
+            //check if buffer needs to be reset
+            if (Date() > startDate.addingTimeInterval(CGMLibre2Transmitter.maxWaitForpacketInSeconds)) {
+                
+                trace("in peripheral didUpdateValueFor, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, CGMLibre2Transmitter.maxWaitForpacketInSeconds.description)
+                
+                resetRxBuffer()
+                
             }
             
+            // add new value to rxBuffer
+            rxBuffer.append(value)
+            
+            // check if enough bytes are received, and if yes start processing
+            if rxBuffer.count == expectedBufferSize {
+                
+                do {
+                    
+                    // if libre1DerivedAlgorithmParameters not nil, but not matching serial number, then assign to nil (copied from LibreDataParser)
+                    // we should be able to read libreSensorUID via bluetooth
+                    if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber != LibreSensorSerialNumber(withUID: UserDefaults.standard.libreSensorUID)?.serialNumber {
+                        
+                        UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
+                        
+                    }
+                    
+                    // decrypt buffer and parse
+                    // if oop web not enabled, then don't pass libre1DerivedAlgorithmParameters
+                    let parsedBLEData = Libre2BLEUtilities.parseBLEData(Data(try Libre2BLEUtilities.decryptBLE(sensorUID: UserDefaults.standard.libreSensorUID, data: rxBuffer)), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ?  UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
+                    
+                    var glucoseData = parsedBLEData.bleGlucose.map({GlucoseData(timeStamp: $0.date, glucoseLevelRaw: ($0.temperatureAlgorithmGlucose > 0 ? $0.temperatureAlgorithmGlucose : Double($0.rawGlucose) * ConstantsBloodGlucose.libreMultiplier))}).filter({$0.glucoseLevelRaw > 0.0})
+                    
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseData, transmitterBatteryInfo: nil, sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes))
+                    
+                } catch {
+                    
+                    trace("in peripheral didUpdateValueFor, error while parsing/decrypting data =  %{public}@ ", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, error.localizedDescription)
+                    
+                    resetRxBuffer()
+                    
+                }
+                
+            }
+
         } else {
-            trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
-        }*/
+            trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
+        }
         
     }
     
@@ -85,45 +144,62 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
         
-        // !!! DIABLE IS DOING THIS AFTER HAVING RECEIVED dataServiceUUID !!!
-        
         if error == nil && characteristic.isNotifying {
             
-            //app.device.macAddress = settings.activeSensorAddress
+            UserDefaults.standard.libreActiveSensorUnlockCount += 1
             
-            unlockCount += 1
+            trace("sensorid =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, UserDefaults.standard.libreSensorUID.toHexString(), UserDefaults.standard.librePatchInfo.toHexString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
             
-            trace("in peripheral didUpdateNotificationStateFor, writing streaming unlock payload: ", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            let unLockPayLoad = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: UserDefaults.standard.libreSensorUID, info: UserDefaults.standard.librePatchInfo, enableTime: UserDefaults.standard.libreActiveSensorUnlockCode, unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount))
             
-           // main.debugLog("Bluetooth: writing streaming unlock payload: \(Data(Libre2.streamingUnlockPayload(id: sensor.uid, info: sensor.patchInfo, enableTime: sensor.unlockCode, unlockCount: sensor.unlockCount)).hex) (unlock code: \(sensor.unlockCode), unlock count: \(sensor.unlockCount))")
+            trace("in peripheral didUpdateNotificationStateFor, writing streaming unlock payload: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unLockPayLoad.toHexString())
             
-        //   app.device.write([UInt8](Data(Libre2.streamingUnlockPayload(id: sensor.uid, info: sensor.patchInfo, enableTime: sensor.unlockCode, unlockCount: sensor.unlockCount))), .withResponse)
+            _ = writeDataToPeripheral(data: unLockPayLoad, type: .withResponse)
+
+        }
+        
+    }
+    
+    // MARK: - helpers
+    
+    /// reset rxBuffer, reset startDate, stop packetRxMonitorTimer, set resendPacketCounter to 0
+    private func resetRxBuffer() {
+        rxBuffer = Data()
+        startDate = Date()
+    }
+
+    // MARK: - CGMTransmitter protocol functions
+    
+    func setNonFixedSlopeEnabled(enabled: Bool) {
+        
+        if nonFixedSlopeEnabled != enabled {
             
+            nonFixedSlopeEnabled = enabled
+            
+        }
+    }
+    
+    /// set webOOPEnabled value
+    func setWebOOPEnabled(enabled: Bool) {
+        
+        if webOOPEnabled != enabled {
+            
+            webOOPEnabled = enabled
             
         }
         
     }
     
-    // MARK: - CGMTransmitter protocol functions
+    func setWebOOPSite(oopWebSite: String) {/*not used*/}
     
-    func setNonFixedSlopeEnabled(enabled: Bool) {
-        nonFixedSlopeEnabled = enabled
-    }
-    
-    /// this transmitter does not support oopWeb
-    func setWebOOPEnabled(enabled: Bool) {
-    }
-    
-    func setWebOOPSite(oopWebSite: String) {}
-    
-    func setWebOOPToken(oopWebToken: String) {}
+    func setWebOOPToken(oopWebToken: String) {/*not used*/}
     
     func cgmTransmitterType() -> CGMTransmitterType {
         return .Libre2
     }
     
     func isWebOOPEnabled() -> Bool {
-        return false
+        return webOOPEnabled
     }
     
     func isNonFixedSlopeEnabled() -> Bool {
@@ -131,7 +207,7 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     func requestNewReading() {
-        // not supported for blucon
+        // not supported for Libre 2
     }
     
 }

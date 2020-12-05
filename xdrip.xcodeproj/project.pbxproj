@@ -302,6 +302,7 @@
 		F8A389ED23342EB10010F405 /* ConstantsNightScout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */; };
 		F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AAC22D6859200934E7A /* SlopeParameters.swift */; };
 		F8A54AAF22D686CD00934E7A /* NightScoutBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */; };
+		F8A5EEAE25791F370085E660 /* Libre2BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEAD25791F370085E660 /* Libre2BLEUtilities.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
 		F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* RootViewController.swift */; };
 		F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426321ADEBD60078C348 /* Main.storyboard */; };
@@ -842,6 +843,7 @@
 		F8A54AAC22D6859200934E7A /* SlopeParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlopeParameters.swift; sourceTree = "<group>"; };
 		F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightScoutBgReading.swift; sourceTree = "<group>"; };
 		F8A54B0A22D9215500934E7A /* xdrip-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "xdrip-Bridging-Header.h"; sourceTree = "<group>"; };
+		F8A5EEAD25791F370085E660 /* Libre2BLEUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2BLEUtilities.swift; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F8AC425F21ADEBD60078C348 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
@@ -2431,6 +2433,7 @@
 				F8F971E423A5915900C3F17D /* LibreSensorState.swift */,
 				F8177022248CF78300AA3600 /* LibreSensorType.swift */,
 				F80D915B24F06A40006840B5 /* PreLibre2.swift */,
+				F8A5EEAD25791F370085E660 /* Libre2BLEUtilities.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -3051,6 +3054,7 @@
 				F816E0FE24367338009EE65B /* GNSEntry+BluetoothPeripheral.swift in Sources */,
 				F8B3A808227A2933004BA588 /* SettingsSelectedRowAction.swift in Sources */,
 				F816E0F02433C31B009EE65B /* Blucon+CoreDataProperties.swift in Sources */,
+				F8A5EEAE25791F370085E660 /* Libre2BLEUtilities.swift in Sources */,
 				F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */,
 				F8F9720723A5915900C3F17D /* AuthChallengeTxMessage.swift in Sources */,
 				F8B3A78E22622954004BA588 /* AlertType+CoreDataClass.swift in Sources */,
@@ -3470,7 +3474,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.4.14;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswifttest.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -3495,7 +3499,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.4.14;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswifttest.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -3643,7 +3647,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.4.14;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswifttest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -3673,7 +3677,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.4.14;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswifttest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
