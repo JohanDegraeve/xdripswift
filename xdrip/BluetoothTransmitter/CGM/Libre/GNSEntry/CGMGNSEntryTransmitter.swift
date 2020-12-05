@@ -263,7 +263,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     func requestNewReading() {
-        // not supported for blucon
+        // not supported for GNSEntry
     }
     
     // MARK: CBCentralManager overriden functions

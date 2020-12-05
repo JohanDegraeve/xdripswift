@@ -153,7 +153,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
 
     func requestNewReading() {
-        // not supported for blucon
+        // not supported for droplet
     }
     
 }

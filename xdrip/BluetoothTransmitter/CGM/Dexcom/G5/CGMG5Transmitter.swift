@@ -536,7 +536,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     func requestNewReading() {
-        // not supported for blucon
+        // not supported for Dexcom G5
     }
     
     // MARK:- helper functions
