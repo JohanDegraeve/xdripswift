@@ -303,6 +303,10 @@
 		F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AAC22D6859200934E7A /* SlopeParameters.swift */; };
 		F8A54AAF22D686CD00934E7A /* NightScoutBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */; };
 		F8A5EEAE25791F370085E660 /* Libre2BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEAD25791F370085E660 /* Libre2BLEUtilities.swift */; };
+		F8A5EEB2257CEC290085E660 /* LibreNFC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEB1257CEC290085E660 /* LibreNFC.swift */; };
+		F8A5EEB8257CF2940085E660 /* TextsLibreNFC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */; };
+		F8A5EEBC257CF38C0085E660 /* LibreNFC.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8A5EEBB257CF38C0085E660 /* LibreNFC.strings */; };
+		F8A5EEC2257D18DC0085E660 /* LibreNFCDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEC1257D18DC0085E660 /* LibreNFCDelegate.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
 		F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* RootViewController.swift */; };
 		F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426321ADEBD60078C348 /* Main.storyboard */; };
@@ -844,6 +848,11 @@
 		F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightScoutBgReading.swift; sourceTree = "<group>"; };
 		F8A54B0A22D9215500934E7A /* xdrip-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "xdrip-Bridging-Header.h"; sourceTree = "<group>"; };
 		F8A5EEAD25791F370085E660 /* Libre2BLEUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2BLEUtilities.swift; sourceTree = "<group>"; };
+		F8A5EEB1257CEC290085E660 /* LibreNFC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreNFC.swift; sourceTree = "<group>"; };
+		F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsLibreNFC.swift; sourceTree = "<group>"; };
+		F8A5EEBB257CF38C0085E660 /* LibreNFC.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = LibreNFC.strings; sourceTree = "<group>"; };
+		F8A5EEC1257D18DC0085E660 /* LibreNFCDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreNFCDelegate.swift; sourceTree = "<group>"; };
+		F8A5EEC5257EDC910085E660 /* xdripDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = xdripDebug.entitlements; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F8AC425F21ADEBD60078C348 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
@@ -1583,6 +1592,7 @@
 				F8AF11FF24B3B62D00AE5BA2 /* LibreErrors.strings */,
 				F82436FD24BE01F700BED341 /* LibreStates.strings */,
 				F8E6C79324CEC2E3007C1199 /* Snooze.strings */,
+				F8A5EEBB257CF38C0085E660 /* LibreNFC.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -1684,6 +1694,7 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
+				F8A5EEC5257EDC910085E660 /* xdripDebug.entitlements */,
 				F85DC2FB21D2CD7000B9F74A /* Application Delegate */,
 				F8F971AD23A5914C00C3F17D /* BluetoothPeripheral */,
 				F8F971B923A5915900C3F17D /* BluetoothTransmitter */,
@@ -2004,6 +2015,7 @@
 				F8AF11F224B1279500AE5BA2 /* TextsLibreErrors.swift */,
 				F82436FB24BE014000BED341 /* TextsLibreStates.swift */,
 				F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */,
+				F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -2434,6 +2446,8 @@
 				F8177022248CF78300AA3600 /* LibreSensorType.swift */,
 				F80D915B24F06A40006840B5 /* PreLibre2.swift */,
 				F8A5EEAD25791F370085E660 /* Libre2BLEUtilities.swift */,
+				F8A5EEB1257CEC290085E660 /* LibreNFC.swift */,
+				F8A5EEC1257D18DC0085E660 /* LibreNFCDelegate.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -2730,6 +2744,7 @@
 				F82437A024CB7A9900BED341 /* Siri_Missed_Readings.caf in Resources */,
 				F824377924CB7A9800BED341 /* Sci-Fi_Alarm_Loop_3.caf in Resources */,
 				F8B3A7CB226CC0B7004BA588 /* shortlow4.mp3 in Resources */,
+				F8A5EEBC257CF38C0085E660 /* LibreNFC.strings in Resources */,
 				F82437C624CB7A9900BED341 /* Siri_Alert_High_Glucose.caf in Resources */,
 				F82437A924CB7A9900BED341 /* Wake_Up_Will_You.caf in Resources */,
 				F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */,
@@ -2859,6 +2874,7 @@
 			files = (
 				F8BDD450221CAA64006EAB84 /* TextsCommon.swift in Sources */,
 				F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */,
+				F8A5EEC2257D18DC0085E660 /* LibreNFCDelegate.swift in Sources */,
 				F8F9720523A5915900C3F17D /* TransmitterMessage.swift in Sources */,
 				F816E1282439DE55009EE65B /* CGMDexomG4TransmitterDelegate.swift in Sources */,
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
@@ -3053,6 +3069,7 @@
 				F8B3A850227F26F8004BA588 /* AlertTypesSettingsViewController.swift in Sources */,
 				F816E0FE24367338009EE65B /* GNSEntry+BluetoothPeripheral.swift in Sources */,
 				F8B3A808227A2933004BA588 /* SettingsSelectedRowAction.swift in Sources */,
+				F8A5EEB2257CEC290085E660 /* LibreNFC.swift in Sources */,
 				F816E0F02433C31B009EE65B /* Blucon+CoreDataProperties.swift in Sources */,
 				F8A5EEAE25791F370085E660 /* Libre2BLEUtilities.swift in Sources */,
 				F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */,
@@ -3073,6 +3090,7 @@
 				F898EDF2234A8A0500BFB79B /* UInt8.swift in Sources */,
 				F8DF766423E781C100063910 /* BLEPeripheralAccessor.swift in Sources */,
 				F816E12124392D40009EE65B /* DropletBluetoothPeripheralViewModel.swift in Sources */,
+				F8A5EEB8257CF2940085E660 /* TextsLibreNFC.swift in Sources */,
 				F816E1082437E5B9009EE65B /* BlueReader+BluetoothPeripheral.swift in Sources */,
 				F8E51D67244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift in Sources */,
 				F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */,
@@ -3474,7 +3492,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.4.14;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswifttest.xDrip4iOS-Widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -3635,7 +3653,7 @@
 				APP_GROUP_IDENTIFIER = "group.com.$(TeamIdentifierPrefix)loopkit.LoopGroup";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
+				CODE_SIGN_ENTITLEMENTS = xdrip/xdripDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4120;
@@ -3647,7 +3665,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.4.14;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswifttest;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";

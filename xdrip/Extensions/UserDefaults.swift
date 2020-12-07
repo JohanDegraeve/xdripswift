@@ -1210,12 +1210,12 @@ extension UserDefaults {
     }
     
     /// Libre sensor id
-    var libreSensorUID: Data {
+    var libreSensorUID: Data? {
         get {
             if let data = object(forKey: Key.libreSensorUID.rawValue) as? Data {
                 return data
             } else {
-                return Data(hex: "b2742c0100a407e0")
+                return nil
             }
         }
         set {
@@ -1224,12 +1224,12 @@ extension UserDefaults {
     }
     
     /// Libre librePatchInfo
-    var librePatchInfo: Data {
+    var librePatchInfo: Data? {
         get {
             if let data = object(forKey: Key.librePatchInfo.rawValue) as? Data {
                 return data
             } else {
-                return Data(hex: "9d083001db2c")
+                return nil
             }
         }
         set {
