@@ -1,6 +1,7 @@
 import Foundation
 import os
 import CoreBluetooth
+import CoreNFC
 
 class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     
@@ -102,14 +103,16 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // create libreNFC instance and start session, as the object
         // LibreNFC will store a reference to self, as a result the object will not be deinitialized as long as CGMLibre2Transmitter is not deinitialized
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14.0, *), NFCTagReaderSession.readingAvailable {
             
             libreNFC = LibreNFC(libreNFCDelegate: self)
             
             (libreNFC as! LibreNFC).startSession()
             
         } else {
-            // Fallback on earlier versions
+            
+            bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.deviceMustSupportNFCAndIOS14)
+            
         }
         
         // start the bluetooth scanning

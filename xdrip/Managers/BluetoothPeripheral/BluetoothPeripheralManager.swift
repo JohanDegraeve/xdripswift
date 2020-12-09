@@ -508,7 +508,7 @@ class BluetoothPeripheralManager: NSObject {
         
         if let bluetoothTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) {
             
-            bluetoothTransmitter.disconnect(reconnectAfterDisconnect: false)
+            bluetoothTransmitter.disconnect()
             
         }
         

@@ -57,9 +57,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// used in BluetoothTransmitter class, eg if after calling discoverServices new method is called and time is exceed, then cancel connection
     private let maxTimeToWaitForPeripheralResponse = 5.0
     
-    /// should the app try to reconnect after disconnect?
-    private var reconnectAfterDisconnect:Bool = true
-
     // MARK: - Initialization
     
     /// - parameters:
@@ -106,19 +103,16 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - De-initialization
     
     deinit {
-        // reconnect not necessary
-        reconnectAfterDisconnect = false
         
         // disconnect the device
         disconnect()
+        
     }
     
     // MARK: - public functions
     
     /// will try to connect to the device, first by calling retrievePeripherals, if peripheral not known, then by calling startScanning
     func connect() {
-        
-        reconnectAfterDisconnect = true
         
         if let centralManager = centralManager, !retrievePeripherals(centralManager) {
             _ = startScanning()
@@ -132,11 +126,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     /// disconnect the device
-    /// - parameters:
-    ///     - reconnectAfterDisconnect : internal variable reconnectAfterDisconnect will be assigned this value. When didDisconnect is called, and reconnectAfterDisconnect = false, then no reconnect will occur
-    func disconnect(reconnectAfterDisconnect: Bool = true) {
-        
-        self.reconnectAfterDisconnect = reconnectAfterDisconnect
+    func disconnect() {
         
         if let peripheral = peripheral {
             if let centralManager = centralManager {
@@ -224,7 +214,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 
                 trace("    state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, centralManager.state.toString())
                 return returnValue
-                
+           
             }
         } else {
             trace("    centralManager is nil, can not starting scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
@@ -405,7 +395,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         bluetoothTransmitterDelegate?.deviceDidUpdateBluetoothState(state: central.state, bluetoothTransmitter: self)
 
         /// in case status changed to powered on and if device address known then try  to retrieveperipherals
-        if central.state == .poweredOn, reconnectAfterDisconnect {
+        if central.state == .poweredOn {
             if (deviceAddress != nil) {
                 
                 /// try to connect to device to which connection was successfully done previously, this attempt is done by callling retrievePeripherals(central)
@@ -428,24 +418,15 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             trace("    error: %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error , error.localizedDescription)
         }
         
-        // check if automatic reconnect is needed or not
-        if !reconnectAfterDisconnect {
-            
-            trace("    reconnectAfterDisconnect is false, will not try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
-            
+        // if self.peripheral == nil, then a manual disconnect or something like that has occured, no need to reconnect
+        // otherwise disconnect occurred because of other (like out of range), so let's try to reconnect
+        if let ownPeripheral = self.peripheral {
+            trace("    Will try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+            centralManager?.connect(ownPeripheral, options: nil)
         } else {
-
-            // if self.peripheral == nil, then a manual disconnect or something like that has occured, no need to reconnect
-            // otherwise disconnect occurred because of other (like out of range), so let's try to reconnect
-            if let ownPeripheral = self.peripheral {
-                trace("    Will try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
-                centralManager?.connect(ownPeripheral, options: nil)
-            } else {
-                trace("    peripheral is nil, will not try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
-            }
-
+            trace("    peripheral is nil, will not try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         }
-        
+
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
