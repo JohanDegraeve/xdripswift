@@ -49,6 +49,8 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     // current sensor serial number, if nil then it's not known yet
     private var sensorSerialNumber:String?
     
+    // define libreNFC as NSObject, otherwise check on iOS14 wouuld need to be added.
+    // it will be casted to LibreNFC when needed
     private var libreNFC: NSObject?
     
     // MARK: - Initialization
@@ -101,13 +103,17 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         // when user clicks the scan button, an NFC read is initiated which will enable the bluetooth streaming
         // meanwhile, the real scanning can start
         
-        // create libreNFC instance and start session, as the object
-        // LibreNFC will store a reference to self, as a result the object will not be deinitialized as long as CGMLibre2Transmitter is not deinitialized
+        // create libreNFC instance and start session
         if #available(iOS 14.0, *), NFCTagReaderSession.readingAvailable {
             
-            libreNFC = LibreNFC(libreNFCDelegate: self)
-            
-            (libreNFC as! LibreNFC).startSession()
+            // startScanning is getting called several times, but we must restrict launch of nfc scan to one single time, therefore check if libreNFC == nil
+            if libreNFC == nil {
+
+                libreNFC = LibreNFC(libreNFCDelegate: self)
+                
+                (libreNFC as! LibreNFC).startSession()
+
+            }
             
         } else {
             

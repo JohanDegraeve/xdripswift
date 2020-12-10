@@ -1,3 +1,4 @@
 "scanComplete" = "Scan Complete";
 "holdTopOfIphoneNearSensor" = "Hold the top of your iOS device near the sensor";
+"deviceMustSupportNFCAndIOS14" = "Device must support NFC and must run at least iOS 14.0";
 

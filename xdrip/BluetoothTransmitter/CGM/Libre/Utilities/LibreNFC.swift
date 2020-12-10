@@ -36,7 +36,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLibreNFC)
     
     /// will be used to pass back info like sensorUid , patchInfo to delegate
-    private var libreNFCDelegate: LibreNFCDelegate?
+    private(set) weak var libreNFCDelegate: LibreNFCDelegate?
     
     /// fixed unlock code to use
     private let unlockCode: UInt32 = 42

@@ -412,7 +412,7 @@ class BluetoothPeripheralViewController: UIViewController {
         // initiailize previousScanningResult to nil
         previousScanningResult = nil
         
-        bluetoothPeripheralManager.startScanningForNewDevice(type: type, transmitterId: transmitterIdTempValue, callBackForScanningResult: handleScanningResult(startScanningResult:), callback: { (bluetoothPeripheral) in
+        bluetoothPeripheralManager.startScanningForNewDevice(type: type, transmitterId: transmitterIdTempValue, bluetoothTransmitterDelegate: self, callBackForScanningResult: handleScanningResult(startScanningResult:), callback: { (bluetoothPeripheral) in
 
             // remove info alert screen which may still be there
             self.dismissInfoAlertWhenScanningStarts()
@@ -1268,6 +1268,8 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
     }
     
 }
+
+// MARK: - extension BluetoothTransmitterDelegate
 
 extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
     
