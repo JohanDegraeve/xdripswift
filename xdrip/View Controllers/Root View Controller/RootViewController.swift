@@ -1260,9 +1260,9 @@ final class RootViewController: UIViewController {
                 
                 // rescale if unit is mmol
                 if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
-                    readingValueForBadge = readingValueForBadge.mgdlToMmol().roundToDecimal(1)
+                    readingValueForBadge = readingValueForBadge.mgdlToMmol().round(toDecimalPlaces: 1)
                 } else {
-                    readingValueForBadge = readingValueForBadge.roundToDecimal(0)
+                    readingValueForBadge = readingValueForBadge.round(toDecimalPlaces: 0)
                 }
                 
                 notificationContent.badge = NSNumber(value: readingValueForBadge.rawValue)
@@ -1379,15 +1379,18 @@ final class RootViewController: UIViewController {
             
         }
         
+        // to make follow code a bit more readable
+        let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
         // if data is stale (over 11 minutes old), show it as gray colour to indicate that it isn't current
         // if not, then set color, depending on value lower than low mark or higher than high mark
         // set both HIGH and LOW BG values to red as previous yellow for hig is now not so obvious due to in-range colour of green.
         if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
             valueLabelOutlet.textColor = UIColor.lightGray
-        } else if lastReading.calculatedValue >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) || lastReading.calculatedValue <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+        } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
             // BG is higher than urgentHigh or lower than urgentLow objectives
             valueLabelOutlet.textColor = UIColor.red
-        } else if lastReading.calculatedValue >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) || lastReading.calculatedValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+        } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
             // BG is between urgentHigh/high and low/urgentLow objectives
             valueLabelOutlet.textColor = UIColor.yellow
         } else {

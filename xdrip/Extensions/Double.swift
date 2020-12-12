@@ -45,8 +45,8 @@ extension Double: RawRepresentable {
     }
     
     /// returns the value rounded to fractionDigits
-    func roundToDecimal(_ fractionDigits: Int) -> Double {
-        let multiplier = pow(10, Double(fractionDigits))
+    func round(toDecimalPlaces: Int) -> Double {
+        let multiplier = pow(10, Double(toDecimalPlaces))
         return Darwin.round(self * multiplier) / multiplier
     }
     
@@ -57,6 +57,21 @@ extension Double: RawRepresentable {
         } else {
             return String(format:"%.1f", self)
         }
+    }
+    
+    /// if mgdl, then returns self, unchanged. If not mgdl, return self rounded to 1 decimal place
+    func bgValueRounded(mgdl: Bool) -> Double {
+        
+        if mgdl {
+            
+            return self
+            
+        } else {
+            
+            return self.round(toDecimalPlaces: 1)
+            
+        }
+        
     }
     
     /// converts mmol to mgdl if parametermgdl = false and, converts value to string, round. Number of digits after decimal seperator depends on the unit. For mg/dl 0 digits after decimal seperator, for mmol, 1 digit after decimal seperator

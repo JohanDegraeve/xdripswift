@@ -197,7 +197,7 @@ public enum AlertKind:Int, CaseIterable {
                     // first check if lastBgReading not nil and calculatedValue > 0.0, never know that it's not been checked by caller
                     if lastBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
                     // now do the actual check if alert is applicable or not
-                    if lastBgReading.calculatedValue < Double(currentAlertEntry.value) {
+                    if lastBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) < Double(currentAlertEntry.value).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
                         return (true, lastBgReading.unitizedDeltaString(previousBgReading: lastButOneBgReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), createAlertTitleForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), nil)
                     } else {return (false, nil, nil, nil)}
                 } else {return (false, nil, nil, nil)}
@@ -210,7 +210,7 @@ public enum AlertKind:Int, CaseIterable {
                     // first check if calculatedValue > 0.0, never know that it's not been checked by caller
                     if lastBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
                     // now do the actual check if alert is applicable or not
-                    if lastBgReading.calculatedValue > Double(currentAlertEntry.value) {
+                    if lastBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl){
                         return (true, lastBgReading.unitizedDeltaString(previousBgReading: lastButOneBgReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), createAlertTitleForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), nil)
                     } else {return (false, nil, nil, nil)}
                 } else {return (false, nil, nil, nil)}
@@ -227,7 +227,7 @@ public enum AlertKind:Int, CaseIterable {
                         // first check if calculatedValue > 0.0, never know that it's not been checked by caller
                         if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
                         // now do the actual check if alert is applicable or not
-                        if lastButOneBgReading.calculatedValue - lastBgReading.calculatedValue > Double(currentAlertEntry.value) {
+                        if lastButOneBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) - lastBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
                             return (true, lastBgReading.unitizedDeltaString(previousBgReading: lastButOneBgReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), createAlertTitleForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), nil)
                         } else {return (false, nil, nil, nil)}
 
@@ -247,7 +247,7 @@ public enum AlertKind:Int, CaseIterable {
                         // first check if calculatedValue > 0.0, never know that it's not been checked by caller
                         if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
                         // now do the actual check if alert is applicable or not
-                        if lastBgReading.calculatedValue - lastButOneBgReading.calculatedValue > Double(currentAlertEntry.value) {
+                        if lastBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) - lastButOneBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
                             return (true, lastBgReading.unitizedDeltaString(previousBgReading: lastButOneBgReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), createAlertTitleForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), nil)
                         } else {return (false, nil, nil, nil)}
 
