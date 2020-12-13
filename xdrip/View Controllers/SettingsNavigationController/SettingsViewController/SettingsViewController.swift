@@ -62,11 +62,11 @@ final class SettingsViewController: UIViewController {
         /// developper settings
         case developer
         
-        func viewModel() -> SettingsViewModelProtocol {
+        func viewModel(coreDataManager: CoreDataManager?) -> SettingsViewModelProtocol {
             switch self {
                 
             case .general:
-                return SettingsViewGeneralSettingsViewModel()
+                return SettingsViewGeneralSettingsViewModel(coreDataManager: coreDataManager)
             case .homescreen:
                 return SettingsViewHomeScreenSettingsViewModel()
             case .alarms:
@@ -108,7 +108,7 @@ final class SettingsViewController: UIViewController {
         for section in Section.allCases {
 
             // get a viewModel for the section
-            let viewModel = section.viewModel()
+            let viewModel = section.viewModel(coreDataManager: coreDataManager)
             
             // unwrap messageHandler and store in the viewModel
             if let messageHandler = messageHandler {

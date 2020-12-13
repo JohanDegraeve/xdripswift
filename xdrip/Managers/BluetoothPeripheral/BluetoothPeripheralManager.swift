@@ -1026,9 +1026,6 @@ class BluetoothPeripheralManager: NSObject {
                     
                     if bluetoothPeripheral.bluetoothPeripheralType().category() == .CGM {
                         
-                        /// it might be in future that multiple connected CGM's are allowed, and that case they will be all disconnected, but the warning will only be given once
-                        var warningGiven = false
-                        
                         if bluetoothPeripheral.blePeripheral.shouldconnect {
                                 
                             // force disconnect
@@ -1036,14 +1033,6 @@ class BluetoothPeripheralManager: NSObject {
                             
                             // set bluetoothTransmitter to nil
                             setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheral)
-                            
-                            if !warningGiven {
-
-                                uIViewController.present(UIAlertController(title: Texts_Common.warning, message: Texts_BluetoothPeripheralView.cgmDeActivateBecauseMovingToFollowerMode, actionHandler: nil), animated: true, completion: nil)
-
-                                warningGiven = true
-                                
-                            }
                             
                         }
                         

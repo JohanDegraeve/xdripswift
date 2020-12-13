@@ -20,7 +20,15 @@ fileprivate enum Setting:Int, CaseIterable {
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
-struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
+class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
+    
+    private var coreDataManager: CoreDataManager?
+    
+    init(coreDataManager: CoreDataManager?) {
+        
+        self.coreDataManager = coreDataManager
+        
+    }
     
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
@@ -57,15 +65,49 @@ struct SettingsViewGeneralSettingsViewModel:SettingsViewModelProtocol {
 
         case .masterFollower:
             
-            return SettingsSelectedRowAction.callFunction(function: {
-                if UserDefaults.standard.isMaster {
-                    UserDefaults.standard.isMaster = false
-                } else {
-                    UserDefaults.standard.isMaster = true
-                }
+            // switching from master to follower will set cgm transmitter to nil and stop the sensor. If there's a sensor active then it's better to ask for a confirmation, if not then do the change without asking confirmation
 
-            })
+            if UserDefaults.standard.isMaster {
                 
+                if let coreDataManager = coreDataManager {
+                    
+                    if SensorsAccessor(coreDataManager: coreDataManager).fetchActiveSensor() != nil {
+
+                        return .askConfirmation(title: Texts_Common.warning, message: Texts_SettingsView.warningChangeFromMasterToFollower, actionHandler: {
+                            
+                            UserDefaults.standard.isMaster = false
+                            
+                        }, cancelHandler: nil)
+
+                    } else {
+                        
+                        // no sensor active
+                        // set to follower
+                        return SettingsSelectedRowAction.callFunction(function: {
+                            UserDefaults.standard.isMaster = false
+                        })
+                        
+                    }
+                    
+                } else {
+                    
+                    // coredata manager is nil, should normally not be the case
+                    return SettingsSelectedRowAction.callFunction(function: {
+                        UserDefaults.standard.isMaster = false
+                    })
+
+                }
+                
+                
+            } else {
+                
+                // switching from follower to master
+                return SettingsSelectedRowAction.callFunction(function: {
+                    UserDefaults.standard.isMaster = true
+                })
+
+            }
+            
         case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return SettingsSelectedRowAction.nothing
             
