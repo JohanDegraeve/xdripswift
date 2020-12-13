@@ -267,7 +267,7 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
         case .nightScoutEnabled:
             return nil
         case .nightScoutAPIKey:
-            return UserDefaults.standard.nightScoutAPIKey
+            return "***********"
         case .nightScoutUrl:
             return UserDefaults.standard.nightScoutUrl
         case .useSchedule:
