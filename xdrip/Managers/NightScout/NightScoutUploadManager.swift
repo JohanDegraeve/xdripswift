@@ -39,6 +39,12 @@ public class NightScoutUploadManager:NSObject {
     /// in case errors occur like credential check error, then this closure will be called with title and message
     private let messageHandler:((String, String) -> Void)?
     
+    /// temp storage transmitterBatteryInfo, if changed then upload to NightScout will be done
+    private var latestTransmitterBatteryInfo: TransmitterBatteryInfo?
+    
+    /// temp storate uploader battery level, if changed then upload to NightScout will be done
+    private var latestUploaderBatteryLevel: Float?
+    
     // MARK: - initializer
     
     /// initializer
@@ -102,6 +108,18 @@ public class NightScoutUploadManager:NSObject {
                 uploadActiveSensorToNightScout(siteURL: siteURL, apiKey: apiKey, sensor: activeSensor)
 
             }
+        }
+        
+        // upload transmitter battery info if needed, also upload uploader battery level
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        if UserDefaults.standard.transmitterBatteryInfo != latestTransmitterBatteryInfo || latestUploaderBatteryLevel != UIDevice.current.batteryLevel {
+            
+            if let transmitterBatteryInfo = UserDefaults.standard.transmitterBatteryInfo {
+
+                uploadTransmitterBatteryInfoToNightScout(siteURL: siteURL, apiKey: apiKey, transmitterBatteryInfo: transmitterBatteryInfo)
+
+            }
+            
         }
         
     }
@@ -168,6 +186,41 @@ public class NightScoutUploadManager:NSObject {
     
     // MARK: - private helper functions
     
+    /// upload battery level to nightscout
+    /// - parameters:
+    ///     - siteURL : nightscout site url
+    ///     - apiKey : nightscout api key
+    ///     - transmitterBatteryInfosensor: setransmitterBatteryInfosensornsor to upload
+    private func uploadTransmitterBatteryInfoToNightScout(siteURL:String, apiKey:String, transmitterBatteryInfo: TransmitterBatteryInfo) {
+        
+        trace("in uploadTransmitterBatteryInfoToNightScout, transmitterBatteryInfo not yet uploaded to NS", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+        
+        // enable battery monitoring on iOS device
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        
+        // https://testhdsync.herokuapp.com/api-docs/#/Devicestatus/addDevicestatuses
+        let transmitterBatteryInfoAsKeyValue = transmitterBatteryInfo.batteryLevel
+        let dataToUpload = [
+            "uploader" : [
+                "name" : "transmitter",
+                "battery" : Int(UIDevice.current.batteryLevel * 100.0),
+                transmitterBatteryInfoAsKeyValue.key : transmitterBatteryInfoAsKeyValue.value
+            ]
+        ] as [String : Any]
+        
+        uploadData(dataToUpload: dataToUpload, traceString: "uploadTransmitterBatteryInfoToNightScout", siteURL: siteURL, path: nightScoutDeviceStatusPath, apiKey: apiKey, completionHandler: {
+        
+            // sensor successfully uploaded, change value in coredata
+            trace("in uploadTransmitterBatteryInfoToNightScout, transmitterBatteryInfo uploaded to NS", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+            
+            self.latestTransmitterBatteryInfo = transmitterBatteryInfo
+            
+            self.latestUploaderBatteryLevel = UIDevice.current.batteryLevel
+
+        })
+        
+    }
+
     /// upload sensor to nightscout
     /// - parameters:
     ///     - siteURL : nightscout site url
@@ -183,18 +236,18 @@ public class NightScoutUploadManager:NSObject {
             "created_at": sensor.startDate.ISOStringFromDate(),
             "enteredBy": "xDrip iOS"
         ]
-
-        uploadData(dataToUpload: dataToUpload, traceString: "uploadActiveSensorToNightScout", siteURL: siteURL, path: nightScoutTreatmentPath, apiKey: apiKey, completionHandler: {
         
+        uploadData(dataToUpload: dataToUpload, traceString: "uploadActiveSensorToNightScout", siteURL: siteURL, path: nightScoutTreatmentPath, apiKey: apiKey, completionHandler: {
+            
             // sensor successfully uploaded, change value in coredata
             trace("in uploadActiveSensorToNightScout, activeSensor uploaded to NS", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
             sensor.uploadedToNS = true
             self.coreDataManager.saveChanges()
-
+            
         })
         
     }
-
+    
     /// upload latest readings to nightscout
     /// - parameters:
     ///     - siteURL : nightscout site url
