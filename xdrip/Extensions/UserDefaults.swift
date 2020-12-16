@@ -71,6 +71,8 @@ extension UserDefaults {
         case nightScoutAPIKey = "nightScoutAPIKey"
         /// send sensor start time to nightscout ?
         case uploadSensorStartTimeToNS = "uploadSensorStartTimeToNS"
+        /// port number ot use, 0 means not set
+        case nightScoutPort = "nightScoutPort"
         
         // Dexcom Share
         
@@ -616,6 +618,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.uploadSensorStartTimeToNS.rawValue)
+        }
+    }
+    
+    /// Nightscout port number, 0 means not set
+    @objc dynamic var nightScoutPort: Int {
+        get {
+            return integer(forKey: Key.nightScoutPort.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.nightScoutPort.rawValue)
         }
     }
 

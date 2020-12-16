@@ -9,20 +9,23 @@ fileprivate enum Setting:Int, CaseIterable {
     ///nightscout url
     case nightScoutUrl = 1
     
+    /// port
+    case port = 2
+    
     /// nightscout api key
-    case nightScoutAPIKey = 2
+    case nightScoutAPIKey = 3
     
     /// to allow testing explicitly
-    case testUrlAndAPIKey = 3
+    case testUrlAndAPIKey = 4
     
     /// should sensor start time be uploaded to NS yes or no
-    case uploadSensorStartTime = 4
+    case uploadSensorStartTime = 5
     
     /// use nightscout schedule or not
-    case useSchedule = 5
+    case useSchedule = 6
     
     /// open uiviewcontroller to edit schedule
-    case schedule = 6
+    case schedule = 7
     
 }
 
@@ -180,7 +183,8 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
         case .uploadSensorStartTime:
             return SettingsSelectedRowAction.nothing
             
-        }
+        case .port:
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightScoutPort, message: nil, keyboardType: .numberPad, text: UserDefaults.standard.nightScoutPort != 0 ? UserDefaults.standard.nightScoutPort.description : nil, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(port:String) in if let port = port.toNilIfLength0() { UserDefaults.standard.nightScoutPort = Int(port) ?? 0 } else {UserDefaults.standard.nightScoutPort = 0}}, cancelHandler: nil, inputValidator: nil)}
     }
     
     func sectionTitle() -> String? {
@@ -228,6 +232,8 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return Texts_SettingsView.uploadSensorStartTime
         case .testUrlAndAPIKey:
             return Texts_SettingsView.testUrlAndAPIKey
+        case .port:
+            return Texts_SettingsView.nightScoutPort
         }
     }
     
@@ -249,6 +255,8 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return UITableViewCell.AccessoryType.none
         case .testUrlAndAPIKey:
             return .none
+        case .port:
+            return .disclosureIndicator
         }
     }
     
@@ -270,6 +278,8 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return nil
         case .testUrlAndAPIKey:
             return nil
+        case .port:
+            return UserDefaults.standard.nightScoutPort != 0 ? UserDefaults.standard.nightScoutPort.description : nil
         }
     }
     
@@ -297,6 +307,9 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return UISwitch(isOn: UserDefaults.standard.uploadSensorStartTimeToNS, action: {(isOn:Bool) in UserDefaults.standard.uploadSensorStartTimeToNS = isOn})
             
         case .testUrlAndAPIKey:
+            return nil
+            
+        case .port:
             return nil
             
         }
