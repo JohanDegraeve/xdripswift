@@ -157,6 +157,53 @@ extension Array where Element: Smoothable {
     
 }
 
+extension Array where Element: BgReading {
+    
+    /// Filter out readings that are too close to each other
+    /// - parameters:
+    ///     - minimumTimeBetweenTwoReadingsInMinutes : filter out readings that are to close to each other in time, minimum difference in time between two readings = minimumTimeBetweenTwoReadingsInMinutes
+    ///     - lastConnectionStatusChangeTimeStamp : lastConnectionStatusChangeTimeStamp > timeStampLastProcessedBgReading then the first connection will be returned, even if it's less than minimumTimeBetweenTwoReadingsInMinutes away from timeStampLastProcessedBgReading
+    ///     - timeStampLastProcessedBgReading : only readings younger than timeStampLastProcessedBgReading will be returned, if nil then this check is not done
+    /// - returns
+    ///     filtered array, with readings at least minimumTimeBetweenTwoReadingsInMinutes away from each other
+    func filter(minimumTimeBetweenTwoReadingsInMinutes: Double, lastConnectionStatusChangeTimeStamp: Date?, timeStampLastProcessedBgReading: Date?) -> [BgReading] {
+
+        var didCheckLastConnectionStatusChangeTimeStamp = false
+        
+        var timeStampLatestCheckedReading = timeStampLastProcessedBgReading
+        
+        return self.filter({
+            
+            if let lastConnectionStatusChangeTimeStamp = lastConnectionStatusChangeTimeStamp, let timeStampLastProcessedBgReading = timeStampLastProcessedBgReading,  !didCheckLastConnectionStatusChangeTimeStamp {
+                
+                didCheckLastConnectionStatusChangeTimeStamp = true
+                
+                // if there was a disconnect or reconnect after the latest processed reading, then add this reading - this will only apply to the first reading
+                if lastConnectionStatusChangeTimeStamp.timeIntervalSince(timeStampLastProcessedBgReading) > 0.0 {
+                    
+                    return true
+                    
+                }
+                
+            }
+            
+            var returnValue = true
+            if let timeStampLatestCheckedReading = timeStampLatestCheckedReading {
+
+                returnValue = $0.timeStamp.timeIntervalSince(timeStampLatestCheckedReading) > minimumTimeBetweenTwoReadingsInMinutes * 60.0
+
+            }
+            
+            timeStampLatestCheckedReading = $0.timeStamp
+
+            return returnValue
+            
+        })
+
+    }
+
+}
+
 /// source https://github.com/raywenderlich/swift-algorithm-club/tree/master/Linear%20Regression
 fileprivate func multiply(_ a: ArraySlice<Smoothable>, _ b: ArraySlice<Smoothable>) -> ArraySlice<Smoothable> {
     return zip(a,b).map({IsSmoothable(withValue: $0.value * $1.value)})[0..<a.count]

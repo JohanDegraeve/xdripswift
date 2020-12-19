@@ -779,19 +779,19 @@ final class RootViewController: UIViewController {
                     updateLabelsAndChart(overrideApplicationState: false)
                 }
                 
-                nightScoutUploadManager?.upload()
+                nightScoutUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
-                healthKitManager?.storeBgReadings()
+                healthKitManager?.storeBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
-                bgReadingSpeaker?.speakNewReading()
+                bgReadingSpeaker?.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
-                dexcomShareUploadManager?.upload()
+                dexcomShareUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 bluetoothPeripheralManager?.sendLatestReading()
                 
-                watchManager?.processNewReading()
+                watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
-                loopManager?.share()
+                loopManager?.share(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
             }
         }
@@ -1079,12 +1079,12 @@ final class RootViewController: UIViewController {
                 
                 // initiate upload to NightScout, if needed
                 if let nightScoutUploadManager = self.nightScoutUploadManager {
-                    nightScoutUploadManager.upload()
+                    nightScoutUploadManager.upload(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 }
                 
                 // initiate upload to Dexcom Share, if needed
                 if let dexcomShareUploadManager = self.dexcomShareUploadManager {
-                    dexcomShareUploadManager.upload()
+                    dexcomShareUploadManager.upload(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 }
                 
                 // update labels
@@ -1094,10 +1094,10 @@ final class RootViewController: UIViewController {
                 self.bluetoothPeripheralManager?.sendLatestReading()
                 
                 // watchManager should process new reading
-                self.watchManager?.processNewReading()
+                self.watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
             
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
-                self.loopManager?.share()
+                self.loopManager?.share(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 
             }
             
@@ -1210,7 +1210,7 @@ final class RootViewController: UIViewController {
         }
         
         // get lastReading, with a calculatedValue - no check on activeSensor because in follower mode there is no active sensor
-        let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)//
+        let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0).filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsNotifications.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp(), timeStampLastProcessedBgReading: nil)
         
         // if there's no reading for active sensor with calculated value , then no reason to continue
         if lastReading.count == 0 {
@@ -1596,6 +1596,16 @@ final class RootViewController: UIViewController {
         
     }
     
+    // a long function just to get the timestamp of the last disconnect or reconnect. If not known then returns 1 1 1970
+    private func lastConnectionStatusChangeTimeStamp() -> Date  {
+        
+        // this is actually unwrapping of optionals, goal is to get date of last disconnect/reconnect - all optionals should exist so it doesn't matter what is returned true or false
+        guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter, let bluetoothPeripheral = self.bluetoothPeripheralManager?.getBluetoothPeripheral(for: bluetoothTransmitter), let lastConnectionStatusChangeTimeStamp = bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp else {return Date(timeIntervalSince1970: 0)}
+        
+        return lastConnectionStatusChangeTimeStamp
+        
+    }
+    
 }
 
 // MARK: - conform to CGMTransmitter protocol
@@ -1802,17 +1812,17 @@ extension RootViewController:NightScoutFollowerDelegate {
                 checkAlertsCreateNotificationAndSetAppBadge()
                 
                 if let healthKitManager = healthKitManager {
-                    healthKitManager.storeBgReadings()
+                    healthKitManager.storeBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 }
                 
                 if let bgReadingSpeaker = bgReadingSpeaker {
-                    bgReadingSpeaker.speakNewReading()
+                    bgReadingSpeaker.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 }
                 
                 bluetoothPeripheralManager?.sendLatestReading()
                 
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
-                self.loopManager?.share()
+                self.loopManager?.share(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
             }
         }

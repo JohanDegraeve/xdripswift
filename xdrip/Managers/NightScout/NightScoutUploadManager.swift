@@ -51,6 +51,7 @@ public class NightScoutUploadManager:NSObject {
     /// - parameters:
     ///     - coreDataManager : needed to get latest readings
     ///     - messageHandler : in case errors occur like credential check error, then this closure will be called with title and message
+    ///     - checkIfDisReConnectAfterTimeStampFunction : function to verify if there's been a disconnect or reconnect after the timestamp of the given reading
     init(coreDataManager: CoreDataManager, messageHandler:((_ title:String, _ message:String) -> Void)?) {
         
         // init properties
@@ -74,7 +75,9 @@ public class NightScoutUploadManager:NSObject {
     // MARK: - public functions
     
     /// uploads latest BgReadings to NightScout, only if nightscout enabled, not master, url and key defined, if schedule enabled then check also schedule
-    public func upload() {
+    /// - parameters:
+    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
+    public func upload(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // check if NightScout is enabled
         guard UserDefaults.standard.nightScoutEnabled else {return}
@@ -95,7 +98,7 @@ public class NightScoutUploadManager:NSObject {
         }
         
         // upload readings
-        uploadBgReadingsToNightScout(siteURL: siteURL, apiKey: apiKey)
+        uploadBgReadingsToNightScout(siteURL: siteURL, apiKey: apiKey, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
         // upload calibrations
         uploadCalibrationsToNightScout(siteURL: siteURL, apiKey: apiKey)
         
@@ -146,7 +149,7 @@ public class NightScoutUploadManager:NSObject {
                                 DispatchQueue.main.async {
                                     self.callMessageHandler(withCredentialVerificationResult: success, error: error)
                                     if success {
-                                        self.upload()
+                                        self.upload(lastConnectionStatusChangeTimeStamp: nil)
                                     } else {
                                         trace("in observeValue, NightScout credential check failed", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
                                     }
@@ -168,7 +171,7 @@ public class NightScoutUploadManager:NSObject {
                                 testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
                                     DispatchQueue.main.async {
                                         if success {
-                                            self.upload()
+                                            self.upload(lastConnectionStatusChangeTimeStamp: nil)
                                         } else {
                                             trace("in observeValue, NightScout credential check failed", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
                                         }
@@ -253,7 +256,7 @@ public class NightScoutUploadManager:NSObject {
     /// - parameters:
     ///     - siteURL : nightscout site url
     ///     - apiKey : nightscout api key
-    private func uploadBgReadingsToNightScout(siteURL:String, apiKey:String) {
+    private func uploadBgReadingsToNightScout(siteURL:String, apiKey:String, lastConnectionStatusChangeTimeStamp: Date?) {
         
         trace("in uploadBgReadingsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
         
@@ -266,7 +269,8 @@ public class NightScoutUploadManager:NSObject {
             }
         }
         
-        let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        // get latest readings, filter : minimiumTimeBetweenTwoReadingsInMinutes beteen two readings, except for the first if a dis/reconnect occured since the latest reading
+        let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsNightScout.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: timeStamp)
         
         if bgReadingsToUpload.count > 0 {
             trace("    number of readings to upload : %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, bgReadingsToUpload.count.description)

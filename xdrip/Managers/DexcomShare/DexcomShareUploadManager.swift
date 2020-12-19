@@ -66,7 +66,9 @@ class DexcomShareUploadManager:NSObject {
     // MARK: - public functions
     
     /// uploads latest BgReadings to Dexcom Share
-    public func upload() {
+    /// - parameters:
+    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
+    public func upload(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // check if dexcomShare is enabled
         guard UserDefaults.standard.uploadReadingstoDexcomShare else {return}
@@ -87,7 +89,7 @@ class DexcomShareUploadManager:NSObject {
         }
         
         // upload
-        uploadBgReadingsToDexcomShare(firstAttempt: true)
+        uploadBgReadingsToDexcomShare(firstAttempt: true, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
         
     }
 
@@ -114,7 +116,7 @@ class DexcomShareUploadManager:NSObject {
                                     if success {
                                         trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                                         
-                                        self.upload()
+                                        self.upload(lastConnectionStatusChangeTimeStamp: nil)
                                         
                                     } else {
                                         trace("in observeValue, Dexcom Share credential check failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
@@ -143,7 +145,7 @@ class DexcomShareUploadManager:NSObject {
                                         if success {
                                             
                                             trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                                            self.upload()
+                                            self.upload(lastConnectionStatusChangeTimeStamp: nil)
 
                                         } else {
                                             
@@ -170,9 +172,11 @@ class DexcomShareUploadManager:NSObject {
     // MARK: - private helper functions
     
     /// will call StartRemoteMonitoringSession with serialNumber
+    /// - parameters:
+    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
     ///
     /// dexcomShareSessionId and UserDefaults.standard.dexcomShareSerialNumber should be not nil
-    private func startRemoteMonitoringSessionAndStartUpload() {
+    private func startRemoteMonitoringSessionAndStartUpload(lastConnectionStatusChangeTimeStamp: Date?) {
         
         trace("in startRemoteMonitoringSessionAndStartUpload", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
         
@@ -274,7 +278,7 @@ class DexcomShareUploadManager:NSObject {
                     
                     //there's no error, call uploadBgReadingsToDexcomShare in main thread
                     DispatchQueue.main.async {
-                        self.uploadBgReadingsToDexcomShare(firstAttempt: true)
+                        self.uploadBgReadingsToDexcomShare(firstAttempt: true, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
                     }
                     
                 } else {
@@ -297,9 +301,10 @@ class DexcomShareUploadManager:NSObject {
     /// will try to upload the latest readings - if dexcomShareSessionId is nil then first a login attempt will be done and after that an upload.
     /// - parameters:
     ///     - firstAttempt : if true, and if dexcomShareSessionId not nil, but upload attempt fails with because dexcomShareSessionId is not valid, then a new login attempt will be done, after which a new upload attempt - if false, then no new upload attempt will be done
+    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
     ///
     /// firstAttempt is there to avoid that the app runs in an endless loop
-    private func uploadBgReadingsToDexcomShare(firstAttempt:Bool) {
+    private func uploadBgReadingsToDexcomShare(firstAttempt:Bool, lastConnectionStatusChangeTimeStamp: Date?) {
         
         trace("in uploadBgReadingsToDexcomShare", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
         
@@ -319,7 +324,7 @@ class DexcomShareUploadManager:NSObject {
                     if success {
                         trace("in uploadBgReadingsToDexcomShare, login successful, will restart uploadBgReadingsToDexcomShare", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                         // retry the upload
-                        self.uploadBgReadingsToDexcomShare(firstAttempt: firstAttempt)
+                        self.uploadBgReadingsToDexcomShare(firstAttempt: firstAttempt, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
                     } else {
                         trace("in uploadBgReadingsToDexcomShare, login failed, no further processing", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                     }
@@ -328,12 +333,15 @@ class DexcomShareUploadManager:NSObject {
             return
         }
         
-        // get readings to upload, limit to 8 hours
+        // get timestamp of first reading to upload, limit to 8 hours
         var timeStamp = Date(timeIntervalSinceNow: -8*60*60)
         if let timeStampLatestDexcomShareUploadedBgReading = UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading {
             timeStamp = timeStampLatestDexcomShareUploadedBgReading
         }
-        let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        
+        // get readings to upload, applying minimumTimeBetweenTwoReadingsInMinutes filter
+        let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsDexcomShare.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: timeStamp)
+        
         trace("    number of readings to upload : %{public}@", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, bgReadingsToUpload.count.description)
 
         // if no no readings to upload, no further processing
@@ -422,7 +430,7 @@ class DexcomShareUploadManager:NSObject {
                                             if success {
                                                 trace("in uploadBgReadingsToDexcomShare, new login successful", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                                                 // retry the upload
-                                                self.uploadBgReadingsToDexcomShare(firstAttempt: false)
+                                                self.uploadBgReadingsToDexcomShare(firstAttempt: false, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
                                             } else {
                                                 trace("in uploadBgReadingsToDexcomShare, new login failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                                             }
@@ -434,7 +442,7 @@ class DexcomShareUploadManager:NSObject {
                                 } else if errorCode == "MonitoringSessionNotActive" {
                                     // call startRemoteMonitoringSessionAndStartUpload in main thread
                                     DispatchQueue.main.async {
-                                        self.startRemoteMonitoringSessionAndStartUpload()
+                                        self.startRemoteMonitoringSessionAndStartUpload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
                                     }
                                     return
                                     

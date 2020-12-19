@@ -10,8 +10,6 @@ import Foundation
 
 public class LoopManager:NSObject {
     
-    // MARK: - public properties
-    
     // MARK: - private properties
     
     /// reference to coreDataManager
@@ -22,6 +20,8 @@ public class LoopManager:NSObject {
     
     /// shared UserDefaults to publish data
     private let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName)
+    
+    // MARK: - initializer
     
     init(coreDataManager:CoreDataManager) {
         
@@ -34,32 +34,51 @@ public class LoopManager:NSObject {
         
     }
     
+    // MARK: - public functions
+    
     /// share latest readings with Loop
-    public func share() {
+    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
+    public func share(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // unwrap sharedUserDefaults
         guard let sharedUserDefaults = sharedUserDefaults else {return}
 
-        // get last readings with calculated value
-        let lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-        
-        // if there's no readings, then no further processing
-        if lastReadings.count == 0 {
-            return
-        }
-        
+        // get last readings with calculated value, don't apply yet the filtering, we will first store for the widget unfiltered
+        var lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+
         // convert to json Dexcom Share format
         var dictionary = [Dictionary<String, Any>]()
         for reading in lastReadings {
             dictionary.append(reading.dictionaryRepresentationForDexcomShareUpload)
+        }
+
+        // to json
+        if let data = try? JSONSerialization.data(withJSONObject: dictionary) {
+
+            // share to userDefaults for widget
+            if lastReadings.count > 0 {
+                sharedUserDefaults.set(data, forKey: "latestReadings-widget")
+            }
+            
+        }
+        
+        // applying minimumTimeBetweenTwoReadingsInMinutes filter, for loop
+        lastReadings = lastReadings.filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsShareWithLoop.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: UserDefaults.standard.timeStampLatestLoopSharedBgReading)
+
+        // if there's no readings, then no further processing
+        if lastReadings.count == 0 {
+            return
         }
         
         guard let data = try? JSONSerialization.data(withJSONObject: dictionary) else {
             return
         }
         
-        
         sharedUserDefaults.set(data, forKey: "latestReadings")
+        
+        if let last = lastReadings.last {
+            UserDefaults.standard.timeStampLatestLoopSharedBgReading = last.timeStamp
+        }
         
     }
     
