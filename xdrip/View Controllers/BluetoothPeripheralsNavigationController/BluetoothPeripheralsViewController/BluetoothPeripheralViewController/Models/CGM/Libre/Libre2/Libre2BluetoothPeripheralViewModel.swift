@@ -146,7 +146,7 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
 }
 
-// MARK: - conform to CGMDropletTransmitterDelegate
+// MARK: - conform to CGMLibre2TransmitterDelegate
 
 extension Libre2BluetoothPeripheralViewModel: CGMLibre2TransmitterDelegate {
     
