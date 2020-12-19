@@ -228,6 +228,9 @@ extension UserDefaults {
         /// case smooth libre values
         case smoothLibreValues = "smoothLibreValues"
         
+        /// used for Libre data parsing
+        case previousRawLibreValues = "previousRawLibreValues"
+        
         /// in case Libre 2 users want to use the local calibration algorithm
         case overrideWebOOPCalibration = "overrideWebOOPCalibration"
         
@@ -1111,6 +1114,22 @@ extension UserDefaults {
         }
     }
     
+    /// used for Libre data parsing
+    var previousRawLibreValues: [Double] {
+        get {
+            if let data = object(forKey: Key.previousRawLibreValues.rawValue) as? [Double] {
+                return data as [Double]
+            } else {
+                return [Double]()
+            }
+            
+        }
+        set {
+            set(newValue, forKey: Key.previousRawLibreValues.rawValue)
+        }
+    }
+    
+
     /// OSLogEnabled - default false
     var OSLogEnabled: Bool {
         get {

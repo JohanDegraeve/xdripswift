@@ -10,7 +10,11 @@ class LibreDataParser {
     
     /// - per minute readings (trend) will be stored each time, as received rom Libre (meaning not smoothed)
     /// - goal is to reuse them in next reading session, for the smoothing of new values
-    private var previousRawValues = [Double]()
+    private var previousRawValues = UserDefaults.standard.previousRawLibreValues {
+        didSet {
+            UserDefaults.standard.previousRawLibreValues = previousRawValues
+        }
+    }
     
     /// for appending of previously stored values, how many values should match ?
     private let amountOfValuesToCompare = 4
