@@ -206,10 +206,6 @@ extension UserDefaults {
         /// web oop parameters, only for Libre 1
         case libre1DerivedAlgorithmParameters = "algorithmParameters"
 
-        // Loop share
-        /// timestamp lastest reading shared with Loop
-        case timeStampLatestLoopSharedBgReading = "timeStampLatestLoopSharedBgReading"
-        
         // development settings
         
         /// G6 factor1 - for testing G6 scaling
@@ -1013,16 +1009,6 @@ extension UserDefaults {
         }
     }
     
-    /// timestamp lastest reading uploaded to NightScout
-    var timeStampLatestLoopSharedBgReading:Date? {
-        get {
-            return object(forKey: Key.timeStampLatestLoopSharedBgReading.rawValue) as? Date
-        }
-        set {
-            set(newValue, forKey: Key.timeStampLatestLoopSharedBgReading.rawValue)
-        }
-    }
-
     /// transmitterBatteryInfo, this should be the transmitter battery info of the latest active cgmTransmitter
     var transmitterBatteryInfo:TransmitterBatteryInfo? {
         get {

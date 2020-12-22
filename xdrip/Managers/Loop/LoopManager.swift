@@ -63,7 +63,7 @@ public class LoopManager:NSObject {
         }
         
         // applying minimumTimeBetweenTwoReadingsInMinutes filter, for loop
-        lastReadings = lastReadings.filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsShareWithLoop.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: UserDefaults.standard.timeStampLatestLoopSharedBgReading)
+        lastReadings = lastReadings.filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsShareWithLoop.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: nil)
 
         // if there's no readings, then no further processing
         if lastReadings.count == 0 {
@@ -75,10 +75,6 @@ public class LoopManager:NSObject {
         }
         
         sharedUserDefaults.set(data, forKey: "latestReadings")
-        
-        if let last = lastReadings.last {
-            UserDefaults.standard.timeStampLatestLoopSharedBgReading = last.timeStamp
-        }
         
     }
     
