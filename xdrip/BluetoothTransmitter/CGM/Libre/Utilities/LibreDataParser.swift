@@ -438,8 +438,8 @@ class LibreDataParser {
             
         }
         
-        // call delegate with result
         var result = result
+        // call delegate with result
         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)
         
         completionHandler(result.sensorState, result.xDripError)
