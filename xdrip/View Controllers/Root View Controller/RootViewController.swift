@@ -261,14 +261,6 @@ final class RootViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        //2b000000868dfc3eef2c489c (unlock code: 42, unlock count: 2, sensor id: b2742c0100a407e0, patch info: 9d083001783a)
-        //trace("payload = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, Data(PreLibre2.streamingUnlockPayload(sensorUID: Data(hexadecimalString: "b2742c0100a407e0")!, info: Data(hexadecimalString: "9d083001783a")!, enableTime: 42, unlockCount: 1)).toHexString())
-        
-        //  UserDefaults.standard.librePatchInfo = Data(hexadecimalString: "9d0830014926")!
-        //  UserDefaults.standard.libreSensorUID = Data(hexadecimalString: "b2742c0100a407e0")!
-        //  UserDefaults.standard.libreActiveSensorUnlockCode = 42
-        //  UserDefaults.standard.libreActiveSensorUnlockCount = 0
-        
         // this is to force update of userdefaults that are also stored in the shared user defaults
         // these are used by the today widget. After a year or so (september 2021) this can all be deleted
         UserDefaults.standard.urgentLowMarkValueInUserChosenUnit = UserDefaults.standard.urgentLowMarkValueInUserChosenUnit
@@ -286,6 +278,14 @@ final class RootViewController: UIViewController {
         coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
             
             self.setupApplicationData()
+            
+            // test Libre2
+            if let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
+                let test = CGMLibre2Transmitter(address: "dummyaddress", name: "dummyname", bluetoothTransmitterDelegate: bluetoothPeripheralManager, cGMLibre2TransmitterDelegate: self, sensorSerialNumber: nil, cGMTransmitterDelegate: self, nonFixedSlopeEnabled: false, webOOPEnabled: false)
+                
+                test.testRange()
+                
+            }
             
             // housekeeper should be non nil here, kall housekeeper
             self.houseKeeper?.doAppStartUpHouseKeeping()
@@ -1836,3 +1836,10 @@ extension RootViewController: UIGestureRecognizerDelegate {
     }
     
 }
+
+// MARK: - conform to CGMLibre2TransmitterDelegate
+
+extension RootViewController: CGMLibre2TransmitterDelegate {
+    
+}
+

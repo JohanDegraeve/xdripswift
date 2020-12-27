@@ -15,7 +15,7 @@ class Libre2BLEUtilities {
             UInt8((time >> 16) & 0xFF),
             UInt8((time >> 24) & 0xFF)
         ]
-        
+
         // Then we need data of activation command and enable command that were sent to sensor
         let ad = PreLibre2.usefulFunction(sensorUID: sensorUID, x: 0x1b, y: 0x1b6a)
         let ed = PreLibre2.usefulFunction(sensorUID: sensorUID, x: 0x1e, y: UInt16(enableTime & 0xFFFF) ^ UInt16(info[5], info[4]))
@@ -91,18 +91,32 @@ class Libre2BLEUtilities {
     }
 
     /// - returns:
-    ///     - array of LibreMeasurement
+    ///     - array of GlucoseData. Returns empty array if the latest value is 0.0 for any reason
+    ///     - restricts to reading 8 values from data, the 8th value differens only 1 minute from its previous value. (while the others differ 2 minutes). This allows us to sync with previously stored values
+    ///     - will extend the result with values from previous reading sessions - if possible. This is only possible of the maximum difference between two reading sessions is 8 minutes
     ///     - sensor time in minutes
-    public static func parseBLEData( _ data: Data, libre1DerivedAlgorithmParameters : Libre1DerivedAlgorithmParameters?) -> (bleGlucose: [LibreMeasurement], sensorTimeInMinutes: UInt16) {
+    public static func parseBLEData( _ data: Data, libre1DerivedAlgorithmParameters : Libre1DerivedAlgorithmParameters?) -> (bleGlucose: [GlucoseData], sensorTimeInMinutes: UInt16) {
         
-        var bleGlucose: [LibreMeasurement] = []
+        // how many values to store in rawGlucoseValues, which is not equal to the amount of values read
+        // because Libre 2 gives reading every 2 minutes, then 15
+        let amountOfValuesToStore = 8
         
+        var bleGlucose: [GlucoseData] = []
+        
+        // will store the raw glucose values
+        var rawGlucoseValues = [Int](repeating: 0, count: amountOfValuesToStore)
+        
+        // will store the raw temperature values, as with raw glucose values
+        var rawTemperatureValues = [Int](repeating: 0, count: amountOfValuesToStore)
+        
+        // will store the temperature adjustment values, as with raw glucose values
+        var temperatureAdjustmentValues = [Int](repeating: 0, count: amountOfValuesToStore)
+        
+        // sensor age in minutes
         let wearTimeMinutes = UInt16(data[40...41])
         
-        let startDate = Date() - Double(wearTimeMinutes) * 60
-        
-        let delay = 2
-        for i in 0 ..< 10 {
+        for i in 0 ..< 7 {
+            
             let raw = LibreCalibrationInfo.readBits(data, i * 4, 0, 0xe)
             let rawTemperature = LibreCalibrationInfo.readBits(data, i * 4, 0xe, 0xc) << 2
             var temperatureAdjustment = LibreCalibrationInfo.readBits(data, i * 4, 0x1a, 0x5) << 2
@@ -111,25 +125,57 @@ class Libre2BLEUtilities {
                 temperatureAdjustment = -temperatureAdjustment
             }
             
-            var id = Int(wearTimeMinutes)
+            // calculate index
+            let index = [0, 2, 4, 6, 7, 12, 15][i]
             
-            if i < 7 {
-                // sparse trend values
-                id -= [0, 2, 4, 6, 7, 12, 15][i]
-                
-            } else {
-                // latest three historic values
-                id = ((id - delay) / 15) * 15 - 15 * (i - 7)
+            // check index still smaller than amountOfValuesToStore, else stop processing
+            if index >= amountOfValuesToStore {
+                break
             }
             
-            let date = startDate + Double(id * 60)
+            // store raw in rawGlucoseValues
+            rawGlucoseValues[index] = raw
             
-            let libreMeasurement = LibreMeasurement(rawGlucose: raw, rawTemperature: rawTemperature, minuteCounter: 0, date: date, temperatureAdjustment: temperatureAdjustment, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
+            // store rawTemperature in rawTemperatureValues
+            rawTemperatureValues[index] = rawTemperature
             
-            bleGlucose.append(libreMeasurement)
+            // store temperatureAdjustment in temperatureAdjustmentValues
+            temperatureAdjustmentValues[index] = temperatureAdjustment
             
         }
         
+        // append previous rawvalues
+        appendPreviousValues(to: &rawGlucoseValues, rawTemperatureValues: &rawTemperatureValues, temperatureAdjustmentValues: &temperatureAdjustmentValues)
+        
+        // store current values (appended with previous values) in userdefaults prevous values
+        UserDefaults.standard.previousRawGlucoseValues = Array(rawGlucoseValues[0..<(min(rawGlucoseValues.count, ConstantsSmoothing.amountOfPreviousReadingsToStore))])
+        UserDefaults.standard.previousTemperatureAdjustmentValues = Array(temperatureAdjustmentValues[0..<(min(rawGlucoseValues.count, ConstantsSmoothing.amountOfPreviousReadingsToStore))])
+        UserDefaults.standard.previousRawTemperatureValues = Array(rawTemperatureValues[0..<(min(rawGlucoseValues.count, ConstantsSmoothing.amountOfPreviousReadingsToStore))])
+
+        // create glucosedata for each known rawglucose and add to returnvallue
+        for (index, _) in rawGlucoseValues.enumerated() {
+            
+            let libreMeasurement = LibreMeasurement(rawGlucose: rawGlucoseValues[index], rawTemperature: rawTemperatureValues[index], minuteCounter: 0, date: Date().addingTimeInterval(-Double(60 * index)), temperatureAdjustment: temperatureAdjustmentValues[index], libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
+            
+            bleGlucose.append(GlucoseData(timeStamp: libreMeasurement.date, glucoseLevelRaw: (libreMeasurement.temperatureAlgorithmGlucose > 0 ? libreMeasurement.temperatureAlgorithmGlucose : Double(libreMeasurement.rawGlucose) * ConstantsBloodGlucose.libreMultiplier)))
+            
+
+        }
+        
+        // sensor gives values only every 1 minute but it gives only 4 readings for the last 8 minutes, ie with a gap of 1 minute, we try to fill those gaps using previous sessions, but this may not always be successful, (eg if there's been a disconnection of 2 minutes). So let's fill missing gaps of maximum 1 value
+        bleGlucose.fill0Gaps(maxGapWidth: 1)
+
+        // if first (most recent) value has rawGlucose 0.0 then return empty array
+        if let first = bleGlucose.first {
+            if first.glucoseLevelRaw == 0.0 {
+                return ([GlucoseData](), wearTimeMinutes)
+            }
+        }
+        
+        // there's still possibly 0 values, eg first or last
+        // filter out readings with glucoseLevelRaw = 0, if any
+        bleGlucose = bleGlucose.filter({return $0.glucoseLevelRaw > 0.0})
+
         return (bleGlucose, wearTimeMinutes)
         
     }
@@ -145,4 +191,78 @@ class Libre2BLEUtilities {
         return reverseCrc.byteSwapped
     }
     
+    /// compares rawGlucoseValues and rawTemperatureValues to previously stored values, and tries to extend/complete the range using previously stored values
+    private static func appendPreviousValues(to rawGlucoseValues: inout [Int], rawTemperatureValues: inout [Int], temperatureAdjustmentValues: inout [Int]) {
+        
+        // unwrap stored previous values, if nil then it means it was never used before, nothing to append
+        guard let previousRawGlucoseValues = UserDefaults.standard.previousRawGlucoseValues, let previousRawTemperatureValues = UserDefaults.standard.previousRawTemperatureValues, let previousTemperatureAdjustmentValues = UserDefaults.standard.previousTemperatureAdjustmentValues else {return}
+        
+        // size of each array of stored values should be the same, check that to avoid crashes
+        guard previousRawGlucoseValues.count == previousRawTemperatureValues.count, previousRawTemperatureValues.count == previousTemperatureAdjustmentValues.count else {return}
+        
+        // if match found, then indexOffset will be difference in index in previousRawGlucoseValues and rawGlucoseValues previousRawGlucoseValues
+        // if nil then no rawGlucoseValue found in
+        var indexOffset: Int? = nil
+        
+        // iterate through rawGlucoseValues, for each value, iterate through previousRawGlucoseValues - if matching rawGlucoseValue and rawTemperatureValue then we can sync rawGlucoseValues with previousRawGlucoseValues
+        rawGlucoseValuesloop: for (index, _) in rawGlucoseValues.enumerated() {
+            
+            // check if rawGlucoseValues[index] is not 0, if it is then it's a minute for which there's no value and no need to find matching value in previousRawGlucoseValues
+            if rawGlucoseValues[index] > 0 {
+                
+                // compare rawGlucoseValue and rawTemperatureValue to each value in previous arrays, until match found
+                for (indexStored, _) in previousRawGlucoseValues.enumerated() {
+                    
+                    if rawGlucoseValues[index] == previousRawGlucoseValues[indexStored] && rawTemperatureValues[index] == previousRawTemperatureValues[indexStored] {
+                        
+                        // matching value found
+                        indexOffset = indexStored - index
+                        
+                        // stop searching
+                        break rawGlucoseValuesloop
+                        
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+        // if match found, then start filling up 0-values and appending older values
+        if indexOffset != nil, let indexOffset = indexOffset {
+            
+            // first fill up 0-values
+            for (index, _) in rawGlucoseValues.enumerated() {
+                
+                if rawGlucoseValues[index] == 0 && index + indexOffset < previousRawGlucoseValues.count && index + indexOffset >= 0 {
+                    rawGlucoseValues[index] = previousRawGlucoseValues[index + indexOffset]
+                    temperatureAdjustmentValues[index] = previousTemperatureAdjustmentValues[index + indexOffset]
+                    rawTemperatureValues[index] = previousRawTemperatureValues[index + indexOffset]
+                }
+                
+            }
+            
+            // now append additional values present in previousRawGlucoseValues if any
+            if !(previousRawGlucoseValues.count < rawGlucoseValues.count + indexOffset) {
+
+                let rangeForRemainingValues = (rawGlucoseValues.count + indexOffset)..<previousRawGlucoseValues.count
+                
+                let remainingPreviousRawGlucoseValues = Array(previousRawGlucoseValues[rangeForRemainingValues])
+                let remainingRawTemperatureValues = Array(previousRawTemperatureValues[rangeForRemainingValues])
+                let remainingTemperatureAdjustmentValues = Array(previousTemperatureAdjustmentValues[rangeForRemainingValues])
+                
+                for (index, _) in remainingPreviousRawGlucoseValues.enumerated() {
+                    
+                    rawGlucoseValues.append(remainingPreviousRawGlucoseValues[index])
+                    rawTemperatureValues.append(remainingRawTemperatureValues[index])
+                    temperatureAdjustmentValues.append(remainingTemperatureAdjustmentValues[index])
+                    
+                }
+
+            }
+            
+        }
+        
+    }
 }

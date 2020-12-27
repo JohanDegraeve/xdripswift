@@ -376,6 +376,7 @@
 		F8B48A9C22B2FA66009BCC01 /* SpeakReading.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */; };
 		F8B48AA022B2FA7B009BCC01 /* HomeView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B48A9E22B2FA7B009BCC01 /* HomeView.strings */; };
 		F8B48AA422B2FA9B009BCC01 /* CalibrationRequest.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B48AA222B2FA9A009BCC01 /* CalibrationRequest.strings */; };
+		F8B955EB2591355200C06016 /* CGMLibre2Transmitter+TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B955EA2591355200C06016 /* CGMLibre2Transmitter+TestData.swift */; };
 		F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD4232218790E006EAB84 /* UserDefaults.swift */; };
 		F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD436221A0349006EAB84 /* Localizable.strings */; };
 		F8BDD43F221B5BAF006EAB84 /* TextsErrorMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD43E221B5BAF006EAB84 /* TextsErrorMessages.swift */; };
@@ -983,6 +984,7 @@
 		F8B48B1022B37C84009BCC01 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F8B48B1122B37C84009BCC01 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/NightScoutTestResult.strings; sourceTree = "<group>"; };
 		F8B48B1222B37C84009BCC01 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/SettingsViews.strings; sourceTree = "<group>"; };
+		F8B955EA2591355200C06016 /* CGMLibre2Transmitter+TestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGMLibre2Transmitter+TestData.swift"; sourceTree = "<group>"; };
 		F8BDD4232218790E006EAB84 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		F8BDD435221A0005006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		F8BDD437221A0349006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1283,6 +1285,7 @@
 			children = (
 				F80D916A24F82913006840B5 /* CGMLibre2Transmitter.swift */,
 				F80D916C24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift */,
+				F8B955EA2591355200C06016 /* CGMLibre2Transmitter+TestData.swift */,
 			);
 			path = Libre2;
 			sourceTree = "<group>";
@@ -2887,6 +2890,7 @@
 				F816E11A243923B2009EE65B /* Droplet+CoreDataClass.swift in Sources */,
 				F80D916D24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift in Sources */,
 				F816E1102437ED21009EE65B /* BluetoothPeripheralManager+CGMBlueReaderTransmitterDelegate.swift in Sources */,
+				F8B955EB2591355200C06016 /* CGMLibre2Transmitter+TestData.swift in Sources */,
 				F8B3A85B2280CCD1004BA588 /* AlertSettingsViewController.swift in Sources */,
 				F8F9722E23A5915900C3F17D /* M5StackTransmitterOpCode.swift in Sources */,
 				F8F9720223A5915900C3F17D /* CGMG6Transmitter.swift in Sources */,
@@ -3492,7 +3496,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.4.15;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswifttest.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -3517,7 +3521,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.4.15;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswifttest.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -3665,7 +3669,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.4.15;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswifttest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -3695,7 +3699,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.4.15;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswifttest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
