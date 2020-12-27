@@ -60,7 +60,8 @@ class BGReadingSpeaker:NSObject {
     ///     - no other sound is playing (via sharedAudioPlayer)
     ///     - there' s a recent reading less than 4.5 minutes old
     ///     - time since last spoken reading > interval defined by user (UserDefaults.standard.speakInterval)
-    public func speakNewReading() {
+    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
+    public func speakNewReading(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // if speak reading not enabled, then no further processing
         if !UserDefaults.standard.speakReadings {
@@ -72,8 +73,8 @@ class BGReadingSpeaker:NSObject {
             return
         }
         
-        // get latest reading, ignore sensor, rawdata, timestamp - only 1
-        let lastReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
+        // get latest reading, ignore sensor, rawdata, timestamp - only 1 - applying minimumTimeBetweenTwoReadingsInMinutes filter
+        let lastReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0).filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsSpeakReading.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: nil)
 
         // if there's no readings, then no further processing
         if lastReadings.count == 0 {

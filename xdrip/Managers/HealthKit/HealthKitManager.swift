@@ -50,7 +50,7 @@ public class HealthKitManager:NSObject {
         healthKitInitialized = initializeHealthKit()
         
         // do first store
-        storeBgReadings()
+        storeBgReadings(lastConnectionStatusChangeTimeStamp: nil)
         
     }
     
@@ -95,7 +95,9 @@ public class HealthKitManager:NSObject {
     }
     
     /// stores latest readings in healthkit, only if HK supported, authorized, enabled in settings
-    public func storeBgReadings() {
+    /// - parameters:
+    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
+    public func storeBgReadings(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // healthkit setting must be on, and healthkit must be initialized successfully
         if !UserDefaults.standard.storeReadingsInHealthkit || !healthKitInitialized {
@@ -105,8 +107,8 @@ public class HealthKitManager:NSObject {
         // bloodGlucoseType should not be nil
         guard let bloodGlucoseType = bloodGlucoseType else {return}
         
-          // get readings to store, limit to 2016 = maximum 1 week - just to avoid a huge array is being returned here
-        let bgReadingsToStore = bgReadingsAccessor.getLatestBgReadings(limit: 2016, fromDate: UserDefaults.standard.timeStampLatestHealthKitStoreBgReading, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+          // get readings to store, limit to 2016 = maximum 1 week - just to avoid a huge array is being returned here, applying minimumTimeBetweenTwoReadingsInMinutes filter
+        let bgReadingsToStore = bgReadingsAccessor.getLatestBgReadings(limit: 2016, fromDate: UserDefaults.standard.timeStampLatestHealthKitStoreBgReading, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsHealthKit.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: UserDefaults.standard.timeStampLatestHealthKitStoreBgReading)
         
         let bloodGlucoseUnit = HKUnit.init(from: "mg/dL")
         
@@ -149,7 +151,7 @@ public class HealthKitManager:NSObject {
                         healthKitInitialized = initializeHealthKit()
                         
                         // doesn't matter which if the two settings got changed, it's ok to call initialize
-                        storeBgReadings()
+                        storeBgReadings(lastConnectionStatusChangeTimeStamp: nil)
                         
                     }
 

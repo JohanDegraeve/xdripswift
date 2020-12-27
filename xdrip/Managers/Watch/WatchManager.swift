@@ -30,18 +30,19 @@ class WatchManager: NSObject {
     // MARK: - public functions
     
     /// process new readings
-    public func processNewReading() {
+    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
+    public func processNewReading(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // check if createCalenderEvent is enabled in the settings and if so create calender event
         if UserDefaults.standard.createCalendarEvent  {
-            createCalendarEvent()
+            createCalendarEvent(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
         }
         
     }
     
     // MARK: - private functions
     
-    private func createCalendarEvent() {
+    private func createCalendarEvent(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // check that access to calendar is authorized by the user
         guard EKEventStore.authorizationStatus(for: .event) == .authorized else {
@@ -56,7 +57,7 @@ class WatchManager: NSObject {
         }
         
         // get 2 last Readings, with a calculatedValue
-        let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)//
+        let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0).filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsWatch.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: nil)
         
         // there should be at least one reading
         guard lastReading.count > 0 else {

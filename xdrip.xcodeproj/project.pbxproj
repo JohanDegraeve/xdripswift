@@ -378,6 +378,8 @@
 		F8B48AA422B2FA9B009BCC01 /* CalibrationRequest.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B48AA222B2FA9A009BCC01 /* CalibrationRequest.strings */; };
 		F8B955EB2591355200C06016 /* CGMLibre2Transmitter+TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B955EA2591355200C06016 /* CGMLibre2Transmitter+TestData.swift */; };
 		F8B9560A259294FA00C06016 /* GlucoseDataFilterFlatValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B95609259294FA00C06016 /* GlucoseDataFilterFlatValues.swift */; };
+		F8B955B1258BEE9D00C06016 /* ConstantsSpeakReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B955B0258BEE9D00C06016 /* ConstantsSpeakReading.swift */; };
+		F8B955B7258D5E2000C06016 /* ConstantsHealthKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B955B6258D5E2000C06016 /* ConstantsHealthKit.swift */; };
 		F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD4232218790E006EAB84 /* UserDefaults.swift */; };
 		F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD436221A0349006EAB84 /* Localizable.strings */; };
 		F8BDD43F221B5BAF006EAB84 /* TextsErrorMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD43E221B5BAF006EAB84 /* TextsErrorMessages.swift */; };
@@ -987,6 +989,8 @@
 		F8B48B1222B37C84009BCC01 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F8B955EA2591355200C06016 /* CGMLibre2Transmitter+TestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGMLibre2Transmitter+TestData.swift"; sourceTree = "<group>"; };
 		F8B95609259294FA00C06016 /* GlucoseDataFilterFlatValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseDataFilterFlatValues.swift; sourceTree = "<group>"; };
+		F8B955B0258BEE9D00C06016 /* ConstantsSpeakReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSpeakReading.swift; sourceTree = "<group>"; };
+		F8B955B6258D5E2000C06016 /* ConstantsHealthKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsHealthKit.swift; sourceTree = "<group>"; };
 		F8BDD4232218790E006EAB84 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		F8BDD435221A0005006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		F8BDD437221A0349006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -2131,6 +2135,7 @@
 				F8A1585A22EDB7EA007F5B5D /* ConstantsDexcomG5.swift */,
 				F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */,
 				F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */,
+				F8B955B6258D5E2000C06016 /* ConstantsHealthKit.swift */,
 				F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */,
 				F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */,
 				F8252866243E50FE0067AF77 /* ConstantsLibre.swift */,
@@ -2140,12 +2145,13 @@
 				F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */,
 				F8A1586022EDB844007F5B5D /* ConstantsNotifications.swift */,
 				F8E51D5E2448E2E8001C9E5A /* ConstantsShareWithLoop.swift */,
+				F85FB768255DE14600D1C39E /* ConstantsSmoothing.swift */,
 				F8A1586222EDB86E007F5B5D /* ConstantsSounds.swift */,
+				F8B955B0258BEE9D00C06016 /* ConstantsSpeakReading.swift */,
 				F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */,
 				F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */,
 				F8AF36142455C6F700B5977B /* ConstantsTrace.swift */,
 				F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */,
-				F85FB768255DE14600D1C39E /* ConstantsSmoothing.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -2912,6 +2918,7 @@
 				F8C97856242AA86B00A09483 /* CGMMiaoMiaoTransmitterDelegate.swift in Sources */,
 				F898EDF6234A8A5700BFB79B /* UInt32.swift in Sources */,
 				F816E0F32433DAA9009EE65B /* BluetoothPeripheralManager+CGMBluconTransmitterDelegate.swift in Sources */,
+				F8B955B1258BEE9D00C06016 /* ConstantsSpeakReading.swift in Sources */,
 				F8F9723223A5915900C3F17D /* M5StackReadBlePassWordTxMessage.swift in Sources */,
 				F8A54AAF22D686CD00934E7A /* NightScoutBgReading.swift in Sources */,
 				F8DF765323E34F4500063910 /* DexcomG5+CoreDataClass.swift in Sources */,
@@ -2961,6 +2968,7 @@
 				F8F9723923A5928D00C3F17D /* M5StackBluetoothPeripheralViewModel.swift in Sources */,
 				F8F9722B23A5915900C3F17D /* CGMTransmitterDelegate.swift in Sources */,
 				F80859292364D61B00F3829D /* UserDefaults+charts.swift in Sources */,
+				F8B955B7258D5E2000C06016 /* ConstantsHealthKit.swift in Sources */,
 				F8B3A7B2226A0878004BA588 /* TextsAlerts.swift in Sources */,
 				F8297F46238DC4AC00D74D66 /* BluetoothPeripheralManaging.swift in Sources */,
 				F80D917024F85C7A006840B5 /* Libre2+BluetoothPeripheral.swift in Sources */,
