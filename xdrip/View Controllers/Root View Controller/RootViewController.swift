@@ -279,14 +279,6 @@ final class RootViewController: UIViewController {
             
             self.setupApplicationData()
             
-            // test Libre2
-            if let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
-                let test = CGMLibre2Transmitter(address: "dummyaddress", name: "dummyname", bluetoothTransmitterDelegate: bluetoothPeripheralManager, cGMLibre2TransmitterDelegate: self, sensorSerialNumber: nil, cGMTransmitterDelegate: self, nonFixedSlopeEnabled: false, webOOPEnabled: false)
-                
-                test.testRange()
-                
-            }
-            
             // housekeeper should be non nil here, kall housekeeper
             self.houseKeeper?.doAppStartUpHouseKeeping()
             
