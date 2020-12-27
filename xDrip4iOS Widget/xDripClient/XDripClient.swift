@@ -30,7 +30,7 @@ public class XDripClient {
     
     private func fetchLastWithRetries(_ n: Int, remaining: Int, callback: @escaping (ClientError?, [Glucose]?) -> Void) {
         do {
-            guard let sharedData = shared?.data(forKey: "latestReadings-widget") else {
+            guard let sharedData = shared?.data(forKey: "latestReadings") else {
                 throw ClientError.fetchError
             }
             

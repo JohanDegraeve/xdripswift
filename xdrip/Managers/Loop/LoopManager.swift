@@ -37,14 +37,18 @@ public class LoopManager:NSObject {
     // MARK: - public functions
     
     /// share latest readings with Loop
-    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
-    public func share(lastConnectionStatusChangeTimeStamp: Date?) {
+    public func share() {
         
         // unwrap sharedUserDefaults
         guard let sharedUserDefaults = sharedUserDefaults else {return}
 
-        // get last readings with calculated value, don't apply yet the filtering, we will first store for the widget unfiltered
-        var lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        // get last readings with calculated value
+        let lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: UserDefaults.standard.timeStampLatestLoopSharedBgReading, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+
+        // if there's no readings, then no further processing
+        if lastReadings.count == 0 {
+            return
+        }
 
         // convert to json Dexcom Share format
         var dictionary = [Dictionary<String, Any>]()
@@ -52,22 +56,24 @@ public class LoopManager:NSObject {
             dictionary.append(reading.dictionaryRepresentationForDexcomShareUpload)
         }
 
-        // to json
-        if let data = try? JSONSerialization.data(withJSONObject: dictionary) {
-
-            // share to userDefaults for widget
-            if lastReadings.count > 0 {
-                sharedUserDefaults.set(data, forKey: "latestReadings-widget")
+        // get Dictionary stored in UserDefaults from previous session
+        // append readings already stored in this storedDictionary so that we get dictionary filled with maxReadingsToShareWithLoop readings, if possible
+        if let storedDictionary = UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary, storedDictionary.count > 0 {
+            
+            let maxAmountsOfReadingsToAppend = ConstantsShareWithLoop.maxReadingsToShareWithLoop - dictionary.count
+            
+            if maxAmountsOfReadingsToAppend > 0 {
+                
+                let rangeToAppend = 0..<(min(storedDictionary.count, maxAmountsOfReadingsToAppend))
+                
+                for value in storedDictionary[rangeToAppend] {
+                    
+                    dictionary.append(value)
+                    
+                }
+                
             }
             
-        }
-        
-        // applying minimumTimeBetweenTwoReadingsInMinutes filter, for loop
-        lastReadings = lastReadings.filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsShareWithLoop.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: nil)
-
-        // if there's no readings, then no further processing
-        if lastReadings.count == 0 {
-            return
         }
         
         guard let data = try? JSONSerialization.data(withJSONObject: dictionary) else {
@@ -75,6 +81,10 @@ public class LoopManager:NSObject {
         }
         
         sharedUserDefaults.set(data, forKey: "latestReadings")
+        
+        UserDefaults.standard.timeStampLatestLoopSharedBgReading = lastReadings.first!.timeStamp
+        
+        UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
         
     }
     

@@ -786,7 +786,7 @@ final class RootViewController: UIViewController {
                 
                 watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
-                loopManager?.share(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                loopManager?.share()
                 
             }
         }
@@ -1092,7 +1092,7 @@ final class RootViewController: UIViewController {
                 self.watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
             
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
-                self.loopManager?.share(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
+                self.loopManager?.share()
                 
             }
             
@@ -1817,7 +1817,7 @@ extension RootViewController:NightScoutFollowerDelegate {
                 bluetoothPeripheralManager?.sendLatestReading()
                 
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
-                self.loopManager?.share(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                self.loopManager?.share()
                 
             }
         }

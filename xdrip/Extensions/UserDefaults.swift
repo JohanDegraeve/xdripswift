@@ -198,6 +198,13 @@ extension UserDefaults {
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
         
+        // Loop
+        /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
+        case readingsStoredInSharedUserDefaultsAsDictionary = "readingsStoredInSharedUserDefaultsAsDictionary"
+            
+        /// timestamp lastest reading shared with Loop
+        case timeStampLatestLoopSharedBgReading = "timeStampLatestLoopSharedBgReading"
+            
         // Trace
         /// should debug level logs be added in trace file or not, and also in NSLog
         case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
@@ -1078,6 +1085,28 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.timeStampLatestDexcomShareUploadedBgReading.rawValue)
+        }
+    }
+    
+    // MARK: - =====  Loop Share Settings ======
+    
+    /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
+    var readingsStoredInSharedUserDefaultsAsDictionary: [Dictionary<String, Any>]? {
+        get {
+            return object(forKey: Key.readingsStoredInSharedUserDefaultsAsDictionary.rawValue) as? [Dictionary<String, Any>]
+        }
+        set {
+            set(newValue, forKey: Key.readingsStoredInSharedUserDefaultsAsDictionary.rawValue)
+        }
+    }
+
+    /// timestamp lastest reading uploaded to NightScout
+    var timeStampLatestLoopSharedBgReading:Date? {
+        get {
+            return object(forKey: Key.timeStampLatestLoopSharedBgReading.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestLoopSharedBgReading.rawValue)
         }
     }
     
