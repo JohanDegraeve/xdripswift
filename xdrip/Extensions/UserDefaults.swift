@@ -71,6 +71,8 @@ extension UserDefaults {
         case nightScoutAPIKey = "nightScoutAPIKey"
         /// send sensor start time to nightscout ?
         case uploadSensorStartTimeToNS = "uploadSensorStartTimeToNS"
+        /// port number ot use, 0 means not set
+        case nightScoutPort = "nightScoutPort"
         
         // Dexcom Share
         
@@ -225,6 +227,18 @@ extension UserDefaults {
         
         /// case smooth libre values
         case smoothLibreValues = "smoothLibreValues"
+        
+        /// used for Libre data parsing - only for Libre 1 or Libre 2 read via transmitter, ie full NFC block
+        case previousRawLibreValues = "previousRawLibreValues"
+        
+        /// used for storing data read with Libre 2 direct
+        case previousRawGlucoseValues = "previousRawGlucoseValues"
+        
+        /// used for storing data read with Libre 2 direct
+        case previousRawTemperatureValues = "previousRawTemperatureValues"
+        
+        /// used for storing data read with Libre 2 direct
+        case previousTemperatureAdjustmentValues = "previousTemperatureAdjustmentValues"
         
         /// in case Libre 2 users want to use the local calibration algorithm
         case overrideWebOOPCalibration = "overrideWebOOPCalibration"
@@ -616,6 +630,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.uploadSensorStartTimeToNS.rawValue)
+        }
+    }
+    
+    /// Nightscout port number, 0 means not set
+    @objc dynamic var nightScoutPort: Int {
+        get {
+            return integer(forKey: Key.nightScoutPort.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.nightScoutPort.rawValue)
         }
     }
 
@@ -1096,6 +1120,66 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.smoothLibreValues.rawValue)
+        }
+    }
+    
+    /// used for Libre data parsing - for processing in LibreDataParser which is only in case of reading with NFC (ie bubble etc)
+    var previousRawLibreValues: [Double] {
+        get {
+            if let data = object(forKey: Key.previousRawLibreValues.rawValue) as? [Double] {
+                return data as [Double]
+            } else {
+                return [Double]()
+            }
+            
+        }
+        set {
+            set(newValue, forKey: Key.previousRawLibreValues.rawValue)
+        }
+    }
+    
+    /// used for storing data read with Libre 2 direct
+    var previousRawGlucoseValues: [Int]? {
+        get {
+            if let data = object(forKey: Key.previousRawGlucoseValues.rawValue) as? [Int] {
+                return data as [Int]
+            } else {
+                return nil
+            }
+            
+        }
+        set {
+            set(newValue, forKey: Key.previousRawGlucoseValues.rawValue)
+        }
+    }
+    
+    /// used for storing data read with Libre 2 direct
+    var previousRawTemperatureValues: [Int]? {
+        get {
+            if let data = object(forKey: Key.previousRawTemperatureValues.rawValue) as? [Int] {
+                return data as [Int]
+            } else {
+                return nil
+            }
+            
+        }
+        set {
+            set(newValue, forKey: Key.previousRawTemperatureValues.rawValue)
+        }
+    }
+    
+    /// used for storing data read with Libre 2 direct
+    var previousTemperatureAdjustmentValues: [Int]? {
+        get {
+            if let data = object(forKey: Key.previousTemperatureAdjustmentValues.rawValue) as? [Int] {
+                return data as [Int]
+            } else {
+                return nil
+            }
+            
+        }
+        set {
+            set(newValue, forKey: Key.previousTemperatureAdjustmentValues.rawValue)
         }
     }
     

@@ -1,6 +1,6 @@
 import Foundation
 
-enum TransmitterBatteryInfo {
+enum TransmitterBatteryInfo: Equatable {
     
     /// for transmitters to give battery in percentage
     case percentage (percentage:Int)
@@ -20,6 +20,28 @@ enum TransmitterBatteryInfo {
             return "VoltageA = " + voltA.description + ", Voltage B = " + voltB.description + ", resistance = " + res.description + ", runtime = " + runt.description + ", temperature = " + temp.description
         case .percentage(let perc):
             return  perc.description + "%"
+        }
+    }
+    
+    /// returns key and value to be used in json representation
+    var batteryLevel: (key: String, value: Any) {
+        
+        switch (self) {
+        
+        case .percentage(percentage: let percentage):
+            
+            return ("battery" , percentage)
+            
+            
+        case .DexcomG5(voltageA: let voltageA, voltageB: _, resist: _, runtime: _, temperature: _):
+            
+            return ("batteryVoltage" , voltageA)
+
+            
+        case .DexcomG4(level: let level):
+            
+            return ("battery" , level)
+
         }
     }
 

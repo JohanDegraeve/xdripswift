@@ -157,6 +157,123 @@ extension Array where Element: Smoothable {
     
 }
 
+extension Array where Element: GlucoseData {
+    
+    /// - GlucoseData array has values with glucoseLevelRaw = 0.0 - this function will do extrapolation of prevous and next non 0 values to estimate/fill up 0 values
+    /// - if first or last elements in the array have value 0.0, then these will not be filled
+    /// - parameters:
+    ///     - maxGapWidth :if there' s more consecutive elements with value 0.0, then no filling will be applied
+    ///
+    /// - Example:
+    /// - values before filling gaps
+    /// - value 0 : 76235,2883999999
+    /// - value 1 : 0
+    /// - value 2 : 79058,8176
+    /// - value 3 : 0
+    /// - value 4 : 80352,9351499999
+    /// - value 5 : 0
+    /// - value 6 : 82117,6409
+    /// - value 7 : 83764,6995999999
+    /// - values after filling gaps
+    /// - value 0 : 76235,2883999999
+    /// - value 1 : 77647,0529999999
+    /// - value 2 : 79058,8176
+    /// - value 3 : 79705,8763749999
+    /// - value 4 : 80352,9351499999
+    /// - value 5 : 81235,2880249999
+    /// - value 6 : 82117,6409
+    /// - value 7 : 83764,6995999999
+    mutating func fill0Gaps(maxGapWidth :Int) {
+        
+        // need to find a first non 0 value
+        var previousNon0Value: Double?
+
+        var nextNon0ValueIndex: Int?
+
+        mainloop: for (var index, value) in self.enumerated() {
+
+            // in case a 1 ormore values were already filled, no further processing needed, skip them
+            if let nextNon0ValueIndex = nextNon0ValueIndex {
+                if index < nextNon0ValueIndex {continue}
+            }
+            
+            if previousNon0Value == nil {
+                if value.glucoseLevelRaw == 0.0 {
+                    continue
+                } else {
+                    previousNon0Value = value.glucoseLevelRaw
+                }
+            }
+            
+            if value.glucoseLevelRaw == 0.0 && index < self.count - 1 {
+                
+                nextNon0ValueIndex = nil
+                
+                // find next non 0 value
+                findnextnon0value: for index2 in (index + 1)..<self.count {
+                    
+                    if self[index2].glucoseLevelRaw != 0.0 {
+                        
+                        // found a value which is not 0
+                        nextNon0ValueIndex = index2
+                        
+                        break findnextnon0value
+                        
+                    }
+                    
+                }
+                
+                if nextNon0ValueIndex != nil, let nextNon0ValueIndex = nextNon0ValueIndex {
+                    
+                    // found a non 0 value, let's see if the gap is within maxGapWidth
+                    // unwrap firstnon0Value, it must be non 0
+                    if nextNon0ValueIndex - index <= maxGapWidth, let firstnon0Value = previousNon0Value {
+                        
+                        // fill up 0 values, increase each value increaseValueWith
+                        let increaseValueWith = (self[nextNon0ValueIndex].glucoseLevelRaw - firstnon0Value) / Double((nextNon0ValueIndex - (index - 1)))
+                        
+                        if index < nextNon0ValueIndex {
+
+                            for index3 in (index)..<nextNon0ValueIndex {
+                                
+                                let slope = Double(index3 - (index - 1))
+                                
+                                self[index3].glucoseLevelRaw = firstnon0Value + increaseValueWith * slope
+                                
+                            }
+
+                        }
+                        
+                        
+                    } else {
+                        
+                        // we will not fill up the gap with 0 values, continue main loop with index value set to nextNon0ValueIndex
+                        index = nextNon0ValueIndex
+                    }
+                    
+                    // assign firstnon0Value to next originally non 0 value
+                    previousNon0Value = self[nextNon0ValueIndex].glucoseLevelRaw
+                    
+                } else {
+                    // did not find a next non 0 value, we're done
+                    break mainloop
+                }
+                
+            } else {
+                
+                // value.glucoseLevelRaw != 0.0 or index = self.count - 1
+                // in the first case, we need to assign firstnon0Value to the last 0 nil value found
+                // in the second case it will not be used anymore but we can assign it anyway
+                previousNon0Value = value.glucoseLevelRaw
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
 /// source https://github.com/raywenderlich/swift-algorithm-club/tree/master/Linear%20Regression
 fileprivate func multiply(_ a: ArraySlice<Smoothable>, _ b: ArraySlice<Smoothable>) -> ArraySlice<Smoothable> {
     return zip(a,b).map({IsSmoothable(withValue: $0.value * $1.value)})[0..<a.count]

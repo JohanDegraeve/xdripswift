@@ -261,14 +261,6 @@ final class RootViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        //2b000000868dfc3eef2c489c (unlock code: 42, unlock count: 2, sensor id: b2742c0100a407e0, patch info: 9d083001783a)
-        //trace("payload = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, Data(PreLibre2.streamingUnlockPayload(sensorUID: Data(hexadecimalString: "b2742c0100a407e0")!, info: Data(hexadecimalString: "9d083001783a")!, enableTime: 42, unlockCount: 1)).toHexString())
-        
-        //  UserDefaults.standard.librePatchInfo = Data(hexadecimalString: "9d0830014926")!
-        //  UserDefaults.standard.libreSensorUID = Data(hexadecimalString: "b2742c0100a407e0")!
-        //  UserDefaults.standard.libreActiveSensorUnlockCode = 42
-        //  UserDefaults.standard.libreActiveSensorUnlockCount = 0
-        
         // this is to force update of userdefaults that are also stored in the shared user defaults
         // these are used by the today widget. After a year or so (september 2021) this can all be deleted
         UserDefaults.standard.urgentLowMarkValueInUserChosenUnit = UserDefaults.standard.urgentLowMarkValueInUserChosenUnit
@@ -607,6 +599,9 @@ final class RootViewController: UIViewController {
             return
             
         }
+        
+        // check for flat values, this will only apply to Libre because in case of Dexcom there's always only one element in the glucoseData array
+        glucoseData = glucoseData.checkFlatValues()
         
         // also for cases where calibration is not needed, we go through this code
         if let activeSensor = activeSensor, let calibrator = calibrator, let bgReadingsAccessor = bgReadingsAccessor {
@@ -1836,3 +1831,10 @@ extension RootViewController: UIGestureRecognizerDelegate {
     }
     
 }
+
+// MARK: - conform to CGMLibre2TransmitterDelegate
+
+extension RootViewController: CGMLibre2TransmitterDelegate {
+    
+}
+

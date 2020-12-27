@@ -141,49 +141,8 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let value = characteristic.value {
             
-            //check if buffer needs to be reset
-            if (Date() > startDate.addingTimeInterval(CGMLibre2Transmitter.maxWaitForpacketInSeconds)) {
-                
-                trace("in peripheral didUpdateValueFor, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, CGMLibre2Transmitter.maxWaitForpacketInSeconds.description)
-                
-                resetRxBuffer()
-                
-            }
+            processValue(value: value, sensorUID: libreSensorUID)
             
-            // add new value to rxBuffer
-            rxBuffer.append(value)
-            
-            // check if enough bytes are received, and if yes start processing
-            if rxBuffer.count == expectedBufferSize {
-                
-                do {
-                    
-                    // if libre1DerivedAlgorithmParameters not nil, but not matching serial number, then assign to nil (copied from LibreDataParser)
-                    // we should be able to read libreSensorUID via bluetooth
-                    if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber != sensorSerialNumber {
-                        
-                        UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
-                        
-                    }
-                    
-                    // decrypt buffer and parse
-                    // if oop web not enabled, then don't pass libre1DerivedAlgorithmParameters
-                    let parsedBLEData = Libre2BLEUtilities.parseBLEData(Data(try Libre2BLEUtilities.decryptBLE(sensorUID: libreSensorUID, data: rxBuffer)), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ?  UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
-                    
-                    var glucoseData = parsedBLEData.bleGlucose.map({GlucoseData(timeStamp: $0.date, glucoseLevelRaw: ($0.temperatureAlgorithmGlucose > 0 ? $0.temperatureAlgorithmGlucose : Double($0.rawGlucose) * ConstantsBloodGlucose.libreMultiplier))}).filter({$0.glucoseLevelRaw > 0.0})
-                    
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseData, transmitterBatteryInfo: nil, sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes))
-                    
-                } catch {
-                    
-                    trace("in peripheral didUpdateValueFor, error while parsing/decrypting data =  %{public}@ ", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, error.localizedDescription)
-                    
-                    resetRxBuffer()
-                    
-                }
-                
-            }
-
         } else {
             trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
         }
@@ -235,6 +194,52 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         rxBuffer = Data()
         startDate = Date()
     }
+    
+    /// process value received from transmitter
+    public func processValue(value: Data, sensorUID: Data) {
+        
+        //check if buffer needs to be reset
+        if (Date() > startDate.addingTimeInterval(CGMLibre2Transmitter.maxWaitForpacketInSeconds)) {
+            
+            trace("in peripheral didUpdateValueFor, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, CGMLibre2Transmitter.maxWaitForpacketInSeconds.description)
+            
+            resetRxBuffer()
+            
+        }
+        
+        // add new value to rxBuffer
+        rxBuffer.append(value)
+        
+        // check if enough bytes are received, and if yes start processing
+        if rxBuffer.count == expectedBufferSize {
+            
+            do {
+                
+                // if libre1DerivedAlgorithmParameters not nil, but not matching serial number, then assign to nil (copied from LibreDataParser)
+                // we should be able to read libreSensorUID via bluetooth
+                if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber != sensorSerialNumber {
+                    
+                    UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
+                    
+                }
+                
+                // decrypt buffer and parse
+                // if oop web not enabled, then don't pass libre1DerivedAlgorithmParameters
+                var parsedBLEData = Libre2BLEUtilities.parseBLEData(Data(try Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: rxBuffer)), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ? UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
+                
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &parsedBLEData.bleGlucose, transmitterBatteryInfo: nil, sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes))
+                
+            } catch {
+                
+                trace("in peripheral didUpdateValueFor, error while parsing/decrypting data =  %{public}@ ", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, error.localizedDescription)
+                
+                resetRxBuffer()
+                
+            }
+            
+        }
+        
+    }
 
     // MARK: - CGMTransmitter protocol functions
     
@@ -281,6 +286,7 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
 }
 
 // MARK: - NFCTagReaderSessionDelegate functions
+
 extension CGMLibre2Transmitter: LibreNFCDelegate {
     
     func received(sensorUID: Data) {

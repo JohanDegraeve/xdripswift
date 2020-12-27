@@ -8,7 +8,7 @@ enum ConstantsLibre {
     static let defaultWebOOPEnabled = false
     
     /// site for libreOOP client
-    static let site = "http://www.glucose.space"
+    static let site = "https://www.glucose.space"
     
     /// token to use to access site
     static let token = "bubble-201907"

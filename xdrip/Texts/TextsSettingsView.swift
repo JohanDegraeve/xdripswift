@@ -253,6 +253,10 @@ class Texts_SettingsView {
         return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Nightscout URL and API_SECRET?", comment: "nightscout settings, when clicking the cell, test the url and api key")
     }()
 
+    static let nightScoutPort: String = {
+        return NSLocalizedString("nightScoutPort", tableName: filename, bundle: Bundle.main, value: "Port", comment: "nightscout settings, port to use")
+    }()
+
     // MARK: - Section Speak
     
     static let sectionTitleSpeak: String = {

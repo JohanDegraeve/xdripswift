@@ -10,7 +10,11 @@ class LibreDataParser {
     
     /// - per minute readings (trend) will be stored each time, as received rom Libre (meaning not smoothed)
     /// - goal is to reuse them in next reading session, for the smoothing of new values
-    private var previousRawValues = [Double]()
+    private var previousRawValues = UserDefaults.standard.previousRawLibreValues {
+        didSet {
+            UserDefaults.standard.previousRawLibreValues = previousRawValues
+        }
+    }
     
     /// for appending of previously stored values, how many values should match ?
     private let amountOfValuesToCompare = 4
@@ -105,8 +109,8 @@ class LibreDataParser {
             
             // now, if previousRawValues was not an empty list, trend is a longer list of values because it's been extended with a subrange of previousRawvalues
             // we re-assign previousRawValues to the current list in trend, for next usage
-            // but we restricted it to maximum 69 most recent values, it makes no sense to store more
-            previousRawValues = Array(trend.map({$0.glucoseLevelRaw})[0..<(min(trend.count, 69))])
+            // but we restricted it to maximum x most recent values, it makes no sense to store more
+            previousRawValues = Array(trend.map({$0.glucoseLevelRaw})[0..<(min(trend.count, ConstantsSmoothing.amountOfPreviousReadingsToStore))])
             
             // smooth the trend values, filterWidth 5, 2 iterations
             for _ in 1...ConstantsSmoothing.libreSmoothingRepeatPerMinuteSmoothing {
@@ -118,9 +122,6 @@ class LibreDataParser {
             // now smooth the trend, per 5 minutes smoothing, 3 iterations, filterWidth 3
             smoothPer5Minutes(trend: trend, withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidthPer5MinuteValues, iterations: ConstantsSmoothing.libreSmoothingRepeatPer5MinuteSmoothing)
             
-            // and now restrict back to the first 66 values, ie the 66 most recent values (why 66 ? looks large enough for what we want to do : 21 readings at most will be deleted as defined by ConstantsSmoothing.readingsToDeleteInMinutes + shifting timetamp (see later)
-            trend = Array(trend[0..<(min(trend.count, 66))])
-            
         }
         
         // if trend count would be 0 here then no reason to continue, should normally not be the case
@@ -128,7 +129,7 @@ class LibreDataParser {
             return ([GlucoseData](), sensorState, sensorTimeInMinutes)
         }
         
-        // assign returnValue to trend, returnValue is used in rangeProcessor, which is still called to process the history values
+        // assign returnValue to trend, returnValue is used in rangeProcessor, which is still called to process the history values - just to get the timestamp of the first reading in trend
         returnValue = trend
         
         // timeInSecondsOfMostRecentHistoryValue is needed in timeInSecondsCalculator to get the trend
@@ -434,8 +435,8 @@ class LibreDataParser {
             
         }
         
-        // call delegate with result
         var result = result
+        // call delegate with result
         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)
         
         completionHandler(result.sensorState, result.xDripError)
