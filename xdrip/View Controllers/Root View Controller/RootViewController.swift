@@ -630,7 +630,7 @@ final class RootViewController: UIViewController {
             
             // start defining timeStampToDelete as of when existing BgReading's will be deleted
             // this value is also used to verify that glucoseData Array has enough readings
-            var timeStampToDelete = Date(timeIntervalSinceNow: -60.0 * (Double)(ConstantsSmoothing.readingsToDeleteInMinutes))
+            var timeStampToDelete = Date(timeIntervalSinceNow: -60.0 * (Double)(ConstantsLibreSmoothing.readingsToDeleteInMinutes))
 
             // now check if we'll delete readings
             // there must be a glucoseData.last, here assigning lastGlucoseData just to unwrap it

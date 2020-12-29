@@ -1,6 +1,6 @@
 import Foundation
 
-extension Double: Smoothable {
+extension Double: SavitzkyGolaySmoothable {
     
     var value: Double {
         get {

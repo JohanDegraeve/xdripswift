@@ -148,9 +148,9 @@ class Libre2BLEUtilities {
         appendPreviousValues(to: &rawGlucoseValues, rawTemperatureValues: &rawTemperatureValues, temperatureAdjustmentValues: &temperatureAdjustmentValues)
         
         // store current values (appended with previous values) in userdefaults prevous values
-        UserDefaults.standard.previousRawGlucoseValues = Array(rawGlucoseValues[0..<(min(rawGlucoseValues.count, ConstantsSmoothing.amountOfPreviousReadingsToStore))])
-        UserDefaults.standard.previousTemperatureAdjustmentValues = Array(temperatureAdjustmentValues[0..<(min(rawGlucoseValues.count, ConstantsSmoothing.amountOfPreviousReadingsToStore))])
-        UserDefaults.standard.previousRawTemperatureValues = Array(rawTemperatureValues[0..<(min(rawGlucoseValues.count, ConstantsSmoothing.amountOfPreviousReadingsToStore))])
+        UserDefaults.standard.previousRawGlucoseValues = Array(rawGlucoseValues[0..<(min(rawGlucoseValues.count, ConstantsLibreSmoothing.amountOfPreviousReadingsToStore))])
+        UserDefaults.standard.previousTemperatureAdjustmentValues = Array(temperatureAdjustmentValues[0..<(min(rawGlucoseValues.count, ConstantsLibreSmoothing.amountOfPreviousReadingsToStore))])
+        UserDefaults.standard.previousRawTemperatureValues = Array(rawTemperatureValues[0..<(min(rawGlucoseValues.count, ConstantsLibreSmoothing.amountOfPreviousReadingsToStore))])
 
         // create glucosedata for each known rawglucose and add to returnvallue
         for (index, _) in rawGlucoseValues.enumerated() {

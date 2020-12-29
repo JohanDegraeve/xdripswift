@@ -101,26 +101,19 @@ class LibreDataParser {
             return (max(0, (Double)(sensorTimeInMinutes - index))) * 60.0
         }, 28)
         
+        // add previously stored values if there are any
+        trend = extendWithPreviousRawValues(trend: trend)
+        
+        // now, if previousRawValues was not an empty list, trend is a longer list of values because it's been extended with a subrange of previousRawvalues
+        // we re-assign previousRawValues to the current list in trend, for next usage
+        // but we restricted it to maximum x most recent values, it makes no sense to store more
+        previousRawValues = Array(trend.map({$0.glucoseLevelRaw})[0..<(min(trend.count, ConstantsLibreSmoothing.amountOfPreviousReadingsToStore))])
+        
         // smooth, if required
         if UserDefaults.standard.smoothLibreValues {
             
-            // add previously stored values if there are any
-            trend = extendWithPreviousRawValues(trend: trend)
-            
-            // now, if previousRawValues was not an empty list, trend is a longer list of values because it's been extended with a subrange of previousRawvalues
-            // we re-assign previousRawValues to the current list in trend, for next usage
-            // but we restricted it to maximum x most recent values, it makes no sense to store more
-            previousRawValues = Array(trend.map({$0.glucoseLevelRaw})[0..<(min(trend.count, ConstantsSmoothing.amountOfPreviousReadingsToStore))])
-            
-            // smooth the trend values, filterWidth 5, 2 iterations
-            for _ in 1...ConstantsSmoothing.libreSmoothingRepeatPerMinuteSmoothing {
-
-                trend.smoothSavitzkyGolayQuaDratic(withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidthPerMinuteValues)
-
-            }
-            
-            // now smooth the trend, per 5 minutes smoothing, 3 iterations, filterWidth 3
-            smoothPer5Minutes(trend: trend, withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidthPer5MinuteValues, iterations: ConstantsSmoothing.libreSmoothingRepeatPer5MinuteSmoothing)
+            // apply SavitzkyGolayFilter
+            LibreSmoothing.smooth(trend: &trend, repeatPerMinuteSmoothingSavitzkyGolay: ConstantsLibreSmoothing.libreSmoothingRepeatPerMinuteSmoothing, filterWidthPerMinuteValuesSavitzkyGolay: ConstantsLibreSmoothing.filterWidthPerMinuteValues, filterWidthPer5MinuteValuesSavitzkyGolay: ConstantsLibreSmoothing.filterWidthPer5MinuteValues, repeatPer5MinuteSmoothingSavitzkyGolay: ConstantsLibreSmoothing.repeatPer5MinuteSmoothing)
             
         }
         
@@ -149,7 +142,7 @@ class LibreDataParser {
             history.insert(GlucoseData(timeStamp: trend[0].timeStamp, glucoseLevelRaw: trend[0].glucoseLevelRaw), at: 0)
             
             // smooth
-            history.smoothSavitzkyGolayQuaDratic(withFilterWidth: ConstantsSmoothing.libreSmoothingFilterWidthPer15MinutesValues)
+            LibreSmoothing.smooth(history: &history, filterWidthPer5MinuteSmoothingSavitzkyGolay: ConstantsLibreSmoothing.libreSmoothingFilterWidthPer15MinutesValues)
             
             // now remove the trend measurement that was inserted
             history.remove(at: 0)
@@ -493,7 +486,7 @@ class LibreDataParser {
         // previousRawValues length must be at least 16 and trend length must equal to 16 values, should always be the case, just to avoid crashes
         guard previousRawValues.count >= 16 && trend.count == 16 else {return trend}
         
-        // create a new array with IsSmoothable objects, values being equal to glucoseLevelRaw of each trend value
+        // create a new array with new GlucoseData instances
         var newTrend = trend.map({GlucoseData(timeStamp: $0.timeStamp, glucoseLevelRaw: $0.glucoseLevelRaw)})
         
         // for each value in trend, we will try to find a series of 4 (defined by amountOfValuesToCompare) matching values in previousRawValues
@@ -536,66 +529,6 @@ class LibreDataParser {
         }
         
         return newTrend
-        
-    }
-    
-    /// - smooths each value, using values of 5 minutes before , 10 minutes before, 5 minutes after and 10 minutes after, ... the number of values taken into account depends on the filterWidth
-    /// - parameters :
-    ///     - withFilterWidth : filter width to use
-    ///     - repeat : how often to redo the filter
-    ///     - trend : glucoseData array to filter, objects in the array will be smoothed (= filtered)
-    private func smoothPer5Minutes(trend: [GlucoseData], withFilterWidth filterWidth: Int, iterations: Int) {
-        
-        // trend must both have at least 16 values, should always be the case, just to avoid crashes
-        guard trend.count >= 16 else {return}
-        
-        // copy glucose values to array of double
-        let smoothedValues = trend.map({$0.glucoseLevelRaw})
-        
-        // now we have smoothedValues, Double's with values equal to trend's glucoseLevelRaw values
-        // we will apply smoothing, each value will be smoothed using the value if 5 minutes before, 10 minutes before, 15 minutes before, 5 minutes after and 10 minutes after and 15 minutes after - because we'll never use two subsequent values, we use them with an interval of 5 minutes and with a filterWidth of 2 .. and more
-        for (index, value) in trend.enumerated() {
-            
-            // initalize toSmooth with value that will be smoothed
-            var toSmooth = [smoothedValues[index]]
-            
-            // while adding values to toSmooth, we need to keep track of the index of the value being smoothed
-            var indexOfValueBeingSmoothed = 0
-            
-            // prepend values 5 and 10 and 15 minutes ago, ... maximum 5 which is the maximum filterwidth
-            for count in 1...5 {
-                
-                let indexToUse = index - 5 * count
-                
-                if indexToUse >= 0 {
-                    toSmooth.insert(smoothedValues[indexToUse], at: 0)
-                    indexOfValueBeingSmoothed = count
-                }
-                
-            }
-            
-            // append values 5 and 10 and 15 minutes later, ... maximum 5 which is the maximum filterwidth
-            for count in 1...5 {
-                
-                let indexToUse = index + 5 * count
-                
-                if indexToUse < smoothedValues.count - 1 {
-                    toSmooth.append(smoothedValues[indexToUse])
-                }
-                
-            }
-
-            // smooth
-            for _ in 1...iterations {
-
-                toSmooth.smoothSavitzkyGolayQuaDratic(withFilterWidth: filterWidth)
-
-            }
-
-            // now change the value being smoothed
-            value.glucoseLevelRaw = toSmooth[indexOfValueBeingSmoothed]
-            
-        }
         
     }
     
