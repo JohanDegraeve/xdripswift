@@ -204,13 +204,28 @@ public class NightScoutUploadManager:NSObject {
         
         // https://testhdsync.herokuapp.com/api-docs/#/Devicestatus/addDevicestatuses
         let transmitterBatteryInfoAsKeyValue = transmitterBatteryInfo.batteryLevel
-        let dataToUpload = [
+        
+        // not very clear here how json should look alike. For dexcom it seems to work with "battery":"the battery level off the iOS device" and "batteryVoltage":"Dexcom voltage"
+        // while for other devices like MM and Bubble, there's no batterVoltage but also a battery, so for this case I'm using "battery":"transmitter battery level", otherwise there's two "battery" keys which causes a crash - I'll hear if if it's not ok
+        // first assign dataToUpload assuming the key for transmitter battery will be "battery" (ie it's not a dexcom)
+        var dataToUpload = [
             "uploader" : [
                 "name" : "transmitter",
-                "battery" : Int(UIDevice.current.batteryLevel * 100.0),
-                transmitterBatteryInfoAsKeyValue.key : transmitterBatteryInfoAsKeyValue.value
+                "battery" : transmitterBatteryInfoAsKeyValue.value
             ]
         ] as [String : Any]
+        
+        // now check if the key for transmitter battery is not "battery" and if so reassign dataToUpload now with battery being the iOS devices battery level
+        if transmitterBatteryInfoAsKeyValue.key != "battery" {
+            dataToUpload = [
+                "uploader" : [
+                    "name" : "transmitter",
+                    "battery" : Int(UIDevice.current.batteryLevel * 100.0),
+                    transmitterBatteryInfoAsKeyValue.key : transmitterBatteryInfoAsKeyValue.value
+                ]
+            ]
+        }
+        
         
         uploadData(dataToUpload: dataToUpload, traceString: "uploadTransmitterBatteryInfoToNightScout", siteURL: siteURL, path: nightScoutDeviceStatusPath, apiKey: apiKey, completionHandler: {
         
