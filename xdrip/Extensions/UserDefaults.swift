@@ -71,7 +71,7 @@ extension UserDefaults {
         case nightScoutAPIKey = "nightScoutAPIKey"
         /// send sensor start time to nightscout ?
         case uploadSensorStartTimeToNS = "uploadSensorStartTimeToNS"
-        /// port number ot use, 0 means not set
+        /// port number to use, 0 means not set
         case nightScoutPort = "nightScoutPort"
         
         // Dexcom Share
