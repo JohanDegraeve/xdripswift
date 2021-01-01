@@ -120,7 +120,8 @@ extension Array where Element: GlucoseData {
 
 extension Array where Element: BgReading {
     
-    /// Filter out readings that are too close to each other
+    /// - Filter out readings that are too close to each other
+    /// - BgReadings array must be sorted by timeStamp of the BgReading, ascending, ie youngest first
     /// - parameters:
     ///     - minimumTimeBetweenTwoReadingsInMinutes : filter out readings that are to close to each other in time, minimum difference in time between two readings = minimumTimeBetweenTwoReadingsInMinutes
     ///     - lastConnectionStatusChangeTimeStamp : lastConnectionStatusChangeTimeStamp > timeStampLastProcessedBgReading then the first connection will be returned, even if it's less than minimumTimeBetweenTwoReadingsInMinutes away from timeStampLastProcessedBgReading
@@ -133,14 +134,20 @@ extension Array where Element: BgReading {
         
         var timeStampLatestCheckedReading = timeStampLastProcessedBgReading
         
-        return self.filter({
+        // create a copy of self, reversed, because the filter algorithm assumes the first is the oldest element, while self is order by youngest first
+        var arrayReversed = Array(self.reversed())
+        
+        // do the required filtering
+        arrayReversed =  arrayReversed.filter({
             
             if let lastConnectionStatusChangeTimeStamp = lastConnectionStatusChangeTimeStamp, let timeStampLastProcessedBgReading = timeStampLastProcessedBgReading,  !didCheckLastConnectionStatusChangeTimeStamp {
-                
+
                 didCheckLastConnectionStatusChangeTimeStamp = true
                 
                 // if there was a disconnect or reconnect after the latest processed reading, then add this reading - this will only apply to the first reading
                 if lastConnectionStatusChangeTimeStamp.timeIntervalSince(timeStampLastProcessedBgReading) > 0.0 {
+                    
+                    timeStampLatestCheckedReading = $0.timeStamp
                     
                     return true
                     
@@ -154,12 +161,16 @@ extension Array where Element: BgReading {
                 returnValue = $0.timeStamp.timeIntervalSince(timeStampLatestCheckedReading) > minimumTimeBetweenTwoReadingsInMinutes * 60.0
 
             }
-            
-            timeStampLatestCheckedReading = $0.timeStamp
+
+            if returnValue {
+                timeStampLatestCheckedReading = $0.timeStamp
+            }
 
             return returnValue
             
         })
+        
+        return Array(arrayReversed.reversed())
 
     }
 

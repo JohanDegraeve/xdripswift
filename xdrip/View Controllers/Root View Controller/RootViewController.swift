@@ -779,7 +779,7 @@ final class RootViewController: UIViewController {
                 
                 nightScoutUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
-                healthKitManager?.storeBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                healthKitManager?.storeBgReadings()
                 
                 bgReadingSpeaker?.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
@@ -1815,7 +1815,7 @@ extension RootViewController:NightScoutFollowerDelegate {
                 checkAlertsCreateNotificationAndSetAppBadge()
                 
                 if let healthKitManager = healthKitManager {
-                    healthKitManager.storeBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                    healthKitManager.storeBgReadings()
                 }
                 
                 if let bgReadingSpeaker = bgReadingSpeaker {

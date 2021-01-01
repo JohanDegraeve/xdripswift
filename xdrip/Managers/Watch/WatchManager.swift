@@ -18,6 +18,9 @@ class WatchManager: NSObject {
     /// to create and delete events
     private let eventStore = EKEventStore()
     
+    /// timestamp of last reading for which calendar event is created, initially set to 1 jan 1970
+    private var timeStampLastProcessedReading = Date(timeIntervalSince1970: 0.0)
+
     // MARK: - initializer
     
     init(coreDataManager: CoreDataManager) {
@@ -31,7 +34,7 @@ class WatchManager: NSObject {
     
     /// process new readings
     ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
-    public func processNewReading(lastConnectionStatusChangeTimeStamp: Date?) {
+    public func processNewReading(lastConnectionStatusChangeTimeStamp: Date) {
         
         // check if createCalenderEvent is enabled in the settings and if so create calender event
         if UserDefaults.standard.createCalendarEvent  {
@@ -42,7 +45,7 @@ class WatchManager: NSObject {
     
     // MARK: - private functions
     
-    private func createCalendarEvent(lastConnectionStatusChangeTimeStamp: Date?) {
+    private func createCalendarEvent(lastConnectionStatusChangeTimeStamp: Date) {
         
         // check that access to calendar is authorized by the user
         guard EKEventStore.authorizationStatus(for: .event) == .authorized else {
@@ -57,7 +60,7 @@ class WatchManager: NSObject {
         }
         
         // get 2 last Readings, with a calculatedValue
-        let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0).filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsWatch.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: nil)
+        let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
         
         // there should be at least one reading
         guard lastReading.count > 0 else {
@@ -65,6 +68,15 @@ class WatchManager: NSObject {
             return
         }
         
+        // check if timeStampLastProcessedReading is at least minimiumTimeBetweenTwoReadingsInMinutes earlier than now (or it's at least minimiumTimeBetweenTwoReadingsInMinutes minutes ago that event was created for reading) - otherwise don't create event
+        // exception : there's been a disconnect/reconnect after the last spoken reading
+        if (abs(timeStampLastProcessedReading.timeIntervalSince(Date())) < ConstantsWatch.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 && lastConnectionStatusChangeTimeStamp.timeIntervalSince(timeStampLastProcessedReading) < 0) {
+            
+            trace("in createCalendarEvent, no new calendar event will be created because it's too close to previous event", log: log, category: ConstantsLog.categoryWatchManager, type: .info)
+            return
+            
+        }
+
         // latest reading should be less than 5 minutes old
         guard abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 5 * 60 else {
             trace("in createCalendarEvent, the latest reading is older than 5 minutes", log: log, category: ConstantsLog.categoryWatchManager, type: .info)
