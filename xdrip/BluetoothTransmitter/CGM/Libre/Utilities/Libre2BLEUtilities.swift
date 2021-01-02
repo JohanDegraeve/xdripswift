@@ -172,6 +172,14 @@ class Libre2BLEUtilities {
             }
         }
         
+        // smooth, if required
+        if UserDefaults.standard.smoothLibreValues {
+            
+            // apply Libre smoothing
+            LibreSmoothing.smooth(trend: &bleGlucose, repeatPerMinuteSmoothingSavitzkyGolay: ConstantsLibreSmoothing.libreSmoothingRepeatPerMinuteSmoothing, filterWidthPerMinuteValuesSavitzkyGolay: ConstantsLibreSmoothing.filterWidthPerMinuteValues, filterWidthPer5MinuteValuesSavitzkyGolay: ConstantsLibreSmoothing.filterWidthPer5MinuteValues, repeatPer5MinuteSmoothingSavitzkyGolay: ConstantsLibreSmoothing.repeatPer5MinuteSmoothing)
+            
+        }
+        
         // there's still possibly 0 values, eg first or last
         // filter out readings with glucoseLevelRaw = 0, if any
         bleGlucose = bleGlucose.filter({return $0.glucoseLevelRaw > 0.0})
