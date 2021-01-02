@@ -142,13 +142,13 @@ extension Array where Element: BgReading {
             
             if let lastConnectionStatusChangeTimeStamp = lastConnectionStatusChangeTimeStamp, let timeStampLastProcessedBgReading = timeStampLastProcessedBgReading,  !didCheckLastConnectionStatusChangeTimeStamp {
 
-                didCheckLastConnectionStatusChangeTimeStamp = true
-                
-                // if there was a disconnect or reconnect after the latest processed reading, then add this reading - this will only apply to the first reading
-                if lastConnectionStatusChangeTimeStamp.timeIntervalSince(timeStampLastProcessedBgReading) > 0.0 {
+                // if there was a disconnect or reconnect after the latest processed reading, and $0.timestamp (ie reading being processed) is after lastConnectionStatusChangeTimeStamp then add the reading
+                if lastConnectionStatusChangeTimeStamp.timeIntervalSince(timeStampLastProcessedBgReading) > 0.0 && lastConnectionStatusChangeTimeStamp.timeIntervalSince($0.timeStamp) < 0.0 {
                     
                     timeStampLatestCheckedReading = $0.timeStamp
-                    
+
+                    didCheckLastConnectionStatusChangeTimeStamp = true
+
                     return true
                     
                 }
