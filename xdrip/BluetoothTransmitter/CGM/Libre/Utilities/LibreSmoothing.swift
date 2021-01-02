@@ -9,11 +9,6 @@ class LibreSmoothing {
     /// - after Kalman filter, back the per 5 minutes : using values of 5 minutes before , 10 minutes before, 5 minutes after and 10 minutes after, ... the number of values taken into account depends on the filterWidth
     public static func smooth(trend: inout [GlucoseData], repeatPerMinuteSmoothingSavitzkyGolay: Int, filterWidthPerMinuteValuesSavitzkyGolay: Int, filterWidthPer5MinuteValuesSavitzkyGolay: Int, repeatPer5MinuteSmoothingSavitzkyGolay:Int) {
         
-        debuglogging("trend before savitzkygolay filter")
-         for (_, value) in trend.enumerated().reversed() {
-            debuglogging("value = " + value.glucoseLevelRaw.description.replacingOccurrences(of: ".", with: ","))
-        }
-
         // smooth the trend values, filterWidth 5, 2 iterations
         for _ in 1...repeatPerMinuteSmoothingSavitzkyGolay {
             
@@ -21,18 +16,8 @@ class LibreSmoothing {
             
         }
         
-        debuglogging("trend before kalman filter")
-        for (_, value) in trend.enumerated().reversed() {
-            debuglogging("value = " + value.glucoseLevelRaw.description.replacingOccurrences(of: ".", with: ","))
-        }
-
         // apply Kalman filter
         LibreSmoothing.smoothWithKalmanFilter(trend: &trend, filterNoise: 2.5)
-
-        debuglogging("trend after kalman filter")
-        for (_, value) in trend.enumerated().reversed() {
-            debuglogging("value = " + value.glucoseLevelRaw.description.replacingOccurrences(of: ".", with: ","))
-        }
 
         // now smooth per 5 minutes
         LibreSmoothing.smoothPer5Minutes(trend: trend, withFilterWidth: filterWidthPer5MinuteValuesSavitzkyGolay, iterations: repeatPer5MinuteSmoothingSavitzkyGolay)
