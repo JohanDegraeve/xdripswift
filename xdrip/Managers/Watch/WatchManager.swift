@@ -20,7 +20,7 @@ class WatchManager: NSObject {
     
     /// timestamp of last reading for which calendar event is created, initially set to 1 jan 1970
     private var timeStampLastProcessedReading = Date(timeIntervalSince1970: 0.0)
-
+    
     // MARK: - initializer
     
     init(coreDataManager: CoreDataManager) {
@@ -34,7 +34,7 @@ class WatchManager: NSObject {
     
     /// process new readings
     ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
-    public func processNewReading(lastConnectionStatusChangeTimeStamp: Date) {
+    public func processNewReading(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // check if createCalenderEvent is enabled in the settings and if so create calender event
         if UserDefaults.standard.createCalendarEvent  {
@@ -45,7 +45,7 @@ class WatchManager: NSObject {
     
     // MARK: - private functions
     
-    private func createCalendarEvent(lastConnectionStatusChangeTimeStamp: Date) {
+    private func createCalendarEvent(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // check that access to calendar is authorized by the user
         guard EKEventStore.authorizationStatus(for: .event) == .authorized else {
@@ -69,8 +69,8 @@ class WatchManager: NSObject {
         }
         
         // check if timeStampLastProcessedReading is at least minimiumTimeBetweenTwoReadingsInMinutes earlier than now (or it's at least minimiumTimeBetweenTwoReadingsInMinutes minutes ago that event was created for reading) - otherwise don't create event
-        // exception : there's been a disconnect/reconnect after the last spoken reading
-        if (abs(timeStampLastProcessedReading.timeIntervalSince(Date())) < ConstantsWatch.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 && lastConnectionStatusChangeTimeStamp.timeIntervalSince(timeStampLastProcessedReading) < 0) {
+        // exception : there's been a disconnect/reconnect after the last processed reading (if lastConnectionStatusChangeTimeStamp != nil)
+        if (abs(timeStampLastProcessedReading.timeIntervalSince(Date())) < ConstantsWatch.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 && (lastConnectionStatusChangeTimeStamp != nil ? lastConnectionStatusChangeTimeStamp! : Date(timeIntervalSince1970: 0)).timeIntervalSince(timeStampLastProcessedReading) < 0) {
             
             trace("in createCalendarEvent, no new calendar event will be created because it's too close to previous event", log: log, category: ConstantsLog.categoryWatchManager, type: .info)
             return

@@ -1824,6 +1824,9 @@ extension RootViewController:NightScoutFollowerDelegate {
                 
                 bluetoothPeripheralManager?.sendLatestReading()
                 
+                // ask watchManager to process new reading, ignore last connection change timestamp because this is follower mode, there is no connection to a transmitter
+                watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: nil)
+                
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
                 self.loopManager?.share()
                 
