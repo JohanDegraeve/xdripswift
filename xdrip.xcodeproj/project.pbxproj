@@ -437,9 +437,6 @@
 		F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */; };
 		F8F7B8E6259A6EBF00C47B04 /* LibreSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F7B8E5259A6EBF00C47B04 /* LibreSmoothing.swift */; };
 		F8F7B8EB259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F7B8EA259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift */; };
-		F8F7B8F0259A850100C47B04 /* Double+KalmanFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F7B8EF259A850000C47B04 /* Double+KalmanFilter.swift */; };
-		F8F7B8F6259A852D00C47B04 /* KalmanFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F7B8F5259A852D00C47B04 /* KalmanFilter.swift */; };
-		F8F7B8FA259A857400C47B04 /* KalmanFilterType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F7B8F9259A857400C47B04 /* KalmanFilterType.swift */; };
 		F8F971B623A5914D00C3F17D /* M5Stack+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971B123A5914C00C3F17D /* M5Stack+BluetoothPeripheral.swift */; };
 		F8F971B723A5914D00C3F17D /* BluetoothPeripheralType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971B423A5914C00C3F17D /* BluetoothPeripheralType.swift */; };
 		F8F971B823A5914D00C3F17D /* BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971B523A5914C00C3F17D /* BluetoothPeripheral.swift */; };
@@ -1073,9 +1070,6 @@
 		F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCalibrator.swift; sourceTree = "<group>"; };
 		F8F7B8E5259A6EBF00C47B04 /* LibreSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreSmoothing.swift; sourceTree = "<group>"; };
 		F8F7B8EA259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavitzkyGolaySmoothableArray.swift; sourceTree = "<group>"; };
-		F8F7B8EF259A850000C47B04 /* Double+KalmanFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+KalmanFilter.swift"; sourceTree = "<group>"; };
-		F8F7B8F5259A852D00C47B04 /* KalmanFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalmanFilter.swift; sourceTree = "<group>"; };
-		F8F7B8F9259A857400C47B04 /* KalmanFilterType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalmanFilterType.swift; sourceTree = "<group>"; };
 		F8F971B123A5914C00C3F17D /* M5Stack+BluetoothPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5Stack+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
 		F8F971B423A5914C00C3F17D /* BluetoothPeripheralType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralType.swift; sourceTree = "<group>"; };
 		F8F971B523A5914C00C3F17D /* BluetoothPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheral.swift; sourceTree = "<group>"; };
@@ -2252,9 +2246,6 @@
 		F8F7B8EE259A84A300C47B04 /* KalmanFilter */ = {
 			isa = PBXGroup;
 			children = (
-				F8F7B8EF259A850000C47B04 /* Double+KalmanFilter.swift */,
-				F8F7B8F5259A852D00C47B04 /* KalmanFilter.swift */,
-				F8F7B8F9259A857400C47B04 /* KalmanFilterType.swift */,
 			);
 			path = KalmanFilter;
 			sourceTree = "<group>";
@@ -3047,7 +3038,6 @@
 				F8C97850242A9FD500A09483 /* MiaoMiaoBluetoothPeripheralViewModel.swift in Sources */,
 				F816E10E2437EAC9009EE65B /* BlueReader+CoreDataProperties.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
-				F8F7B8F6259A852D00C47B04 /* KalmanFilter.swift in Sources */,
 				F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */,
 				F8F7B8EB259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift in Sources */,
 				F830991C23C2909E005741DF /* Watlaa+CoreDataClass.swift in Sources */,
@@ -3088,7 +3078,6 @@
 				F8297F4F238DCAD800D74D66 /* BluetoothPeripheralNavigationController.swift in Sources */,
 				F8A1585322EDB602007F5B5D /* ConstantsBloodGlucose.swift in Sources */,
 				F85FB769255DE14600D1C39E /* ConstantsLibreSmoothing.swift in Sources */,
-				F8F7B8FA259A857400C47B04 /* KalmanFilterType.swift in Sources */,
 				F8DF766023E38FC100063910 /* BLEPeripheral+CoreDataClass.swift in Sources */,
 				F80ED2EE236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift in Sources */,
 				F8FDD6CB2553385000625B49 /* Array.swift in Sources */,
@@ -3215,7 +3204,6 @@
 				F80859272364355F00F3829D /* ConstantsGlucoseChart.swift in Sources */,
 				F825286E2443C1000067AF77 /* BluetoothPeripheralManager+CGMG6TransmitterDelegate.swift in Sources */,
 				F816E10324367389009EE65B /* GNSEntryBluetoothPeripheralViewModel.swift in Sources */,
-				F8F7B8F0259A850100C47B04 /* Double+KalmanFilter.swift in Sources */,
 				F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */,
 				F8DF766D23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift in Sources */,
 				F8E51D65244BA790001C9E5A /* WatlaaBluetoothPeripheralViewModel.swift in Sources */,

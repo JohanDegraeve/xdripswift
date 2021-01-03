@@ -5,8 +5,8 @@ class LibreSmoothing {
     // MARK: - public functions
     
     /// - smooths trend array of GlucoseData, ie per minute values using SavitzkyGolayQuaDratic filter
-    /// - first per minute SavitzkyGolayQuaDratic, then Kalman filter
-    /// - after Kalman filter, back the per 5 minutes : using values of 5 minutes before , 10 minutes before, 5 minutes after and 10 minutes after, ... the number of values taken into account depends on the filterWidth
+    /// - first per minute SavitzkyGolayQuaDratic
+    /// - then per 5 minutes : using values of 5 minutes before , 10 minutes before, 5 minutes after and 10 minutes after, ... the number of values taken into account depends on the filterWidth
     public static func smooth(trend: inout [GlucoseData], repeatPerMinuteSmoothingSavitzkyGolay: Int, filterWidthPerMinuteValuesSavitzkyGolay: Int, filterWidthPer5MinuteValuesSavitzkyGolay: Int, repeatPer5MinuteSmoothingSavitzkyGolay:Int) {
         
         // smooth the trend values, filterWidth 5, 2 iterations
@@ -16,9 +16,6 @@ class LibreSmoothing {
             
         }
         
-        // apply Kalman filter
-        LibreSmoothing.smoothWithKalmanFilter(trend: &trend, filterNoise: 2.5)
-
         // now smooth per 5 minutes
         LibreSmoothing.smoothPer5Minutes(trend: trend, withFilterWidth: filterWidthPer5MinuteValuesSavitzkyGolay, iterations: repeatPer5MinuteSmoothingSavitzkyGolay)
         
@@ -33,41 +30,6 @@ class LibreSmoothing {
     
     // MARK: - private functions
 
-    /// trend must be list of non 0 values, equal time distance from each other (ie every minute)
-    private static func smoothWithKalmanFilter(trend: inout [GlucoseData], filterNoise: Double) {
-
-        // there must be at least one element
-        guard trend.count > 0 else {return}
-        
-        // all values must be > 0.0
-        guard trend.filter({return $0.glucoseLevelRaw > 0.0}).count > 0 else {return}
-
-        // copy glucoseLevelRaw for each element in trend to array of Double
-        let trendAsDoubleArray = trend.map({$0.glucoseLevelRaw})
-        
-        var filter = KalmanFilter(stateEstimatePrior: trendAsDoubleArray[0], errorCovariancePrior: filterNoise)
-        
-        // iterate through the items reversed, because the first item is actually the most recent
-        for (index, item) in trendAsDoubleArray.enumerated().reversed() {
-            
-            let prediction = filter.predict(stateTransitionModel: 1, controlInputModel: 0, controlVector: 0, covarianceOfProcessNoise: filterNoise)
-            
-            let update = prediction.update(measurement: item, observationModel: 1, covarienceOfObservationNoise: filterNoise)
-            
-            filter = update
-            
-            let glucose = filter.stateEstimatePrior
-            
-            guard (glucose > 0.0) else {
-                break
-            }
-            
-            trend[index].glucoseLevelRaw = glucose
-            
-        }
-        
-    }
-    
     /// - smooths each value, using values of 5 minutes before , 10 minutes before, 5 minutes after and 10 minutes after, ... the number of values taken into account depends on the filterWidth
     /// - parameters :
     ///     - withFilterWidth : filter width to use
