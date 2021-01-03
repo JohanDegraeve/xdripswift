@@ -27,7 +27,7 @@ extension Array where Element: GlucoseData {
     /// - value 5 : 81235,2880249999
     /// - value 6 : 82117,6409
     /// - value 7 : 83764,6995999999
-    mutating func fill0Gaps(maxGapWidth :Int) {
+    func fill0Gaps(maxGapWidth :Int) {
         
         // need to find a first non 0 value
         var previousNon0Value: Double?
