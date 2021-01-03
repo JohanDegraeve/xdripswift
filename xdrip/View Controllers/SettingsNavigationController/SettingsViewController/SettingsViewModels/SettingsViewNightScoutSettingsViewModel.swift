@@ -196,9 +196,9 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
         // if nightscout upload not enabled then only first row is shown
         if UserDefaults.standard.nightScoutEnabled {
             
-            // in follower mode, only two first rows to be shown : nightscout enabled button and url
+            // in follower mode, only 5 first rows to be shown : nightscout enabled button, url, port number, api key, option to test
             if !UserDefaults.standard.isMaster {
-                return 2
+                return 5
             }
             
             // if schedule not enabled then show all rows except the last which is to edit the schedule
