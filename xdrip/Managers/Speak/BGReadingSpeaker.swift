@@ -60,7 +60,8 @@ class BGReadingSpeaker:NSObject {
     ///     - no other sound is playing (via sharedAudioPlayer)
     ///     - there' s a recent reading less than 4.5 minutes old
     ///     - time since last spoken reading > interval defined by user (UserDefaults.standard.speakInterval)
-    public func speakNewReading() {
+    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect
+    public func speakNewReading(lastConnectionStatusChangeTimeStamp: Date) {
         
         // if speak reading not enabled, then no further processing
         if !UserDefaults.standard.speakReadings {
@@ -85,6 +86,14 @@ class BGReadingSpeaker:NSObject {
         // example user selects 10 minutes interval, next reading will arrive in exactly 10 minutes, time interval to be checked will be 590 seconds
         if Int(Date().timeIntervalSince(timeStampLastSpokenReading)) < (UserDefaults.standard.speakInterval * 60 - 10) {
             return
+        }
+        
+        // check if timeStampLastSpokenReading is at least minimiumTimeBetweenTwoReadingsInMinutes earlier than now (or it's at least minimiumTimeBetweenTwoReadingsInMinutes minutes ago that reading was spoken) - otherwise don't speak the reading
+        // exception : there's been a disconnect/reconnect after the last spoken reading
+        if (abs(timeStampLastSpokenReading.timeIntervalSince(Date())) < ConstantsSpeakReading.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 && lastConnectionStatusChangeTimeStamp.timeIntervalSince(timeStampLastSpokenReading) < 0) {
+            
+            return
+            
         }
         
         // assign bgReadingToSpeak

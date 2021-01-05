@@ -71,7 +71,7 @@ extension UserDefaults {
         case nightScoutAPIKey = "nightScoutAPIKey"
         /// send sensor start time to nightscout ?
         case uploadSensorStartTimeToNS = "uploadSensorStartTimeToNS"
-        /// port number ot use, 0 means not set
+        /// port number to use, 0 means not set
         case nightScoutPort = "nightScoutPort"
         
         // Dexcom Share
@@ -198,12 +198,19 @@ extension UserDefaults {
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
         
+        // Loop
+        /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
+        case readingsStoredInSharedUserDefaultsAsDictionary = "readingsStoredInSharedUserDefaultsAsDictionary"
+            
+        /// timestamp lastest reading shared with Loop
+        case timeStampLatestLoopSharedBgReading = "timeStampLatestLoopSharedBgReading"
+            
         // Trace
         /// should debug level logs be added in trace file or not, and also in NSLog
         case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
         
         // non fixed slope values for oop web Libre
-        /// web oop parameters, only for Libre 1
+        /// web oop parameters, only for bubble, miaomiao and Libre 2
         case libre1DerivedAlgorithmParameters = "algorithmParameters"
 
         // development settings
@@ -1081,6 +1088,28 @@ extension UserDefaults {
         }
     }
     
+    // MARK: - =====  Loop Share Settings ======
+    
+    /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
+    var readingsStoredInSharedUserDefaultsAsDictionary: [Dictionary<String, Any>]? {
+        get {
+            return object(forKey: Key.readingsStoredInSharedUserDefaultsAsDictionary.rawValue) as? [Dictionary<String, Any>]
+        }
+        set {
+            set(newValue, forKey: Key.readingsStoredInSharedUserDefaultsAsDictionary.rawValue)
+        }
+    }
+
+    /// timestamp lastest reading uploaded to NightScout
+    var timeStampLatestLoopSharedBgReading:Date? {
+        get {
+            return object(forKey: Key.timeStampLatestLoopSharedBgReading.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestLoopSharedBgReading.rawValue)
+        }
+    }
+    
     // MARK: - =====  technical settings for testing ======
     
     /// G6 factor 1
@@ -1249,7 +1278,7 @@ extension UserDefaults {
         }
     }
     
-    /// web oop parameters, only for bubble
+    /// web oop parameters, only for bubble, miaomiao and Libre 2
     var libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters? {
         get {
             guard let jsonString = string(forKey: Key.libre1DerivedAlgorithmParameters.rawValue) else { return nil }

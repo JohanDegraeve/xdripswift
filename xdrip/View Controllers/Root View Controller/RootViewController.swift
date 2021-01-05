@@ -228,6 +228,9 @@ final class RootViewController: UIViewController {
     /// in fact it will never be used with a nil value, except when connecting to a cgm transmitter for the first time
     private var nonFixedSlopeEnabled: Bool?
     
+    /// when was the last notification created with bgreading, setting to 1 1 1970 initially to avoid having to unwrap it
+    private var timeStampLastBGNotification = Date(timeIntervalSince1970: 0)
+    
     // MARK: - overriden functions
     
     // set the status bar content colour to light to match new darker theme
@@ -630,7 +633,7 @@ final class RootViewController: UIViewController {
             
             // start defining timeStampToDelete as of when existing BgReading's will be deleted
             // this value is also used to verify that glucoseData Array has enough readings
-            var timeStampToDelete = Date(timeIntervalSinceNow: -60.0 * (Double)(ConstantsSmoothing.readingsToDeleteInMinutes))
+            var timeStampToDelete = Date(timeIntervalSinceNow: -60.0 * (Double)(ConstantsLibreSmoothing.readingsToDeleteInMinutes))
 
             // now check if we'll delete readings
             // there must be a glucoseData.last, here assigning lastGlucoseData just to unwrap it
@@ -774,17 +777,17 @@ final class RootViewController: UIViewController {
                     updateLabelsAndChart(overrideApplicationState: false)
                 }
                 
-                nightScoutUploadManager?.upload()
+                nightScoutUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 healthKitManager?.storeBgReadings()
                 
-                bgReadingSpeaker?.speakNewReading()
+                bgReadingSpeaker?.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
-                dexcomShareUploadManager?.upload()
+                dexcomShareUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 bluetoothPeripheralManager?.sendLatestReading()
                 
-                watchManager?.processNewReading()
+                watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 loopManager?.share()
                 
@@ -1074,12 +1077,12 @@ final class RootViewController: UIViewController {
                 
                 // initiate upload to NightScout, if needed
                 if let nightScoutUploadManager = self.nightScoutUploadManager {
-                    nightScoutUploadManager.upload()
+                    nightScoutUploadManager.upload(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 }
                 
                 // initiate upload to Dexcom Share, if needed
                 if let dexcomShareUploadManager = self.dexcomShareUploadManager {
-                    dexcomShareUploadManager.upload()
+                    dexcomShareUploadManager.upload(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 }
                 
                 // update labels
@@ -1089,7 +1092,7 @@ final class RootViewController: UIViewController {
                 self.bluetoothPeripheralManager?.sendLatestReading()
                 
                 // watchManager should process new reading
-                self.watchManager?.processNewReading()
+                self.watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
             
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
                 self.loopManager?.share()
@@ -1205,7 +1208,7 @@ final class RootViewController: UIViewController {
         }
         
         // get lastReading, with a calculatedValue - no check on activeSensor because in follower mode there is no active sensor
-        let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)//
+        let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
         
         // if there's no reading for active sensor with calculated value , then no reason to continue
         if lastReading.count == 0 {
@@ -1245,7 +1248,8 @@ final class RootViewController: UIViewController {
         if readingValueForBadge <= 40.0 {readingValueForBadge = 40.0}
         
         // check if notification on home screen is enabled in the settings
-        if UserDefaults.standard.showReadingInNotification && !overrideShowReadingInNotification  {
+        // and also if last notification was long enough ago (longer than ConstantsNotifications.minimiumTimeBetweenTwoReadingsInMinutes), except if there would have been a disconnect since previous notification (simply because I like getting a new reading with a notification by disabling/reenabling bluetooth
+        if UserDefaults.standard.showReadingInNotification && !overrideShowReadingInNotification && (abs(timeStampLastBGNotification.timeIntervalSince(Date())) > ConstantsNotifications.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 || lastConnectionStatusChangeTimeStamp().timeIntervalSince(timeStampLastBGNotification) > 0) {
             
             // Create Notification Content
             let notificationContent = UNMutableNotificationContent()
@@ -1286,6 +1290,9 @@ final class RootViewController: UIViewController {
                     trace("Unable to Add bg reading Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
                 }
             }
+            
+            // set timeStampLastBGNotification to now
+            timeStampLastBGNotification = Date()
         }
         else {
             
@@ -1568,7 +1575,7 @@ final class RootViewController: UIViewController {
         
         // unwrap alerts and check alerts
         if let alertManager = alertManager {
-            
+
             // check if an immediate alert went off that shows the current reading
             if alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds) {
                 
@@ -1577,7 +1584,7 @@ final class RootViewController: UIViewController {
                 // possibily the app is in the foreground now
                 // if user would have opened SnoozeViewController now, then close it, otherwise the alarm picker view will not be shown
                 closeSnoozeViewController()
-
+                
                 // only update badge is required, (if enabled offcourse)
                 createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
                 
@@ -1587,7 +1594,18 @@ final class RootViewController: UIViewController {
                 createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: false)
                 
             }
+
         }
+
+    }
+    
+    // a long function just to get the timestamp of the last disconnect or reconnect. If not known then returns 1 1 1970
+    private func lastConnectionStatusChangeTimeStamp() -> Date  {
+        
+        // this is actually unwrapping of optionals, goal is to get date of last disconnect/reconnect - all optionals should exist so it doesn't matter what is returned true or false
+        guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter, let bluetoothPeripheral = self.bluetoothPeripheralManager?.getBluetoothPeripheral(for: bluetoothTransmitter), let lastConnectionStatusChangeTimeStamp = bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp else {return Date(timeIntervalSince1970: 0)}
+        
+        return lastConnectionStatusChangeTimeStamp
         
     }
     
@@ -1801,10 +1819,13 @@ extension RootViewController:NightScoutFollowerDelegate {
                 }
                 
                 if let bgReadingSpeaker = bgReadingSpeaker {
-                    bgReadingSpeaker.speakNewReading()
+                    bgReadingSpeaker.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 }
                 
                 bluetoothPeripheralManager?.sendLatestReading()
+                
+                // ask watchManager to process new reading, ignore last connection change timestamp because this is follower mode, there is no connection to a transmitter
+                watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: nil)
                 
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
                 self.loopManager?.share()
@@ -1831,10 +1852,3 @@ extension RootViewController: UIGestureRecognizerDelegate {
     }
     
 }
-
-// MARK: - conform to CGMLibre2TransmitterDelegate
-
-extension RootViewController: CGMLibre2TransmitterDelegate {
-    
-}
-

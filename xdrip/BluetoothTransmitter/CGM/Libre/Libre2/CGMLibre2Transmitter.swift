@@ -289,6 +289,36 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
 
 extension CGMLibre2Transmitter: LibreNFCDelegate {
     
+    func received(fram: Data) {
+        
+        trace("received fram :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, fram.toHexString())
+        
+        // first get sensor status and send to delegate
+        if fram.count >= 5 {
+            
+            let sensorState = LibreSensorState(stateByte: fram[4])
+            
+            cGMLibre2TransmitterDelegate?.received(sensorStatus: sensorState, from: self)
+            
+        }
+        
+        // if we already know the patchinfo (which we should because normally received(patchInfo: Data gets called before received(fram: Data), then patchInfo should not be nil
+        // same for sensorUID
+        if let patchInfo =  UserDefaults.standard.librePatchInfo, let sensorUID = UserDefaults.standard.libreSensorUID, let libreSensorType = LibreSensorType.type(patchInfo: patchInfo.hexEncodedString().uppercased()), let serialNumber = self.sensorSerialNumber {
+            
+            var framCopy = fram
+            
+            if libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &framCopy, headerLength: 0, log: log, patchInfo: patchInfo.hexEncodedString().uppercased(), uid: sensorUID.bytes) {
+                
+                // we have all date to create libre1DerivedAlgorithmParameters
+                UserDefaults.standard.libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(bytes: framCopy, serialNumber: serialNumber)
+                
+            }
+            
+        }
+        
+    }
+    
     func received(sensorUID: Data) {
         
         // store sensorUID as data in UserDefaults
@@ -307,6 +337,8 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
                 self.sensorSerialNumber = receivedSensorSerialNumber
                 
                 cgmTransmitterDelegate?.newSensorDetected()
+                
+                cGMLibre2TransmitterDelegate?.received(serialNumber: receivedSensorSerialNumber, from: self)
                 
             }
             
