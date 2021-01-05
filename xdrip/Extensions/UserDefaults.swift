@@ -210,7 +210,7 @@ extension UserDefaults {
         case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
         
         // non fixed slope values for oop web Libre
-        /// web oop parameters, only for Libre 1
+        /// web oop parameters, only for bubble, miaomiao and Libre 2
         case libre1DerivedAlgorithmParameters = "algorithmParameters"
 
         // development settings
@@ -1278,7 +1278,7 @@ extension UserDefaults {
         }
     }
     
-    /// web oop parameters, only for bubble
+    /// web oop parameters, only for bubble, miaomiao and Libre 2
     var libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters? {
         get {
             guard let jsonString = string(forKey: Key.libre1DerivedAlgorithmParameters.rawValue) else { return nil }

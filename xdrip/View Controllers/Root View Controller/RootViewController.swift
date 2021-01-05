@@ -1852,10 +1852,3 @@ extension RootViewController: UIGestureRecognizerDelegate {
     }
     
 }
-
-// MARK: - conform to CGMLibre2TransmitterDelegate
-
-extension RootViewController: CGMLibre2TransmitterDelegate {
-    
-}
-

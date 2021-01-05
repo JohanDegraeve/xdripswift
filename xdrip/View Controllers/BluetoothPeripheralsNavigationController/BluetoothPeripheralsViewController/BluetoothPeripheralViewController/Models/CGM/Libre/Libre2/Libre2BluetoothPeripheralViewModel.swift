@@ -5,8 +5,11 @@ class Libre2BluetoothPeripheralViewModel {
     /// settings specific for Libre2
     private enum Settings: Int, CaseIterable {
         
-        /// battery level
-        case batteryLevel = 0
+        /// Sensor serial number
+        case sensorSerialNumber = 0
+        
+        /// sensor State
+        case sensorState = 1
 
     }
     
@@ -31,6 +34,9 @@ class Libre2BluetoothPeripheralViewModel {
             return bluetoothPeripheral as? Libre2
         }
     }
+
+    /// Libre 2 settings will be in section 0 + numberOfGeneralSections
+    private let sectionNumberForMiaoMiaoSpecificSettings = 0
 
     // MARK: - deinit
     
@@ -97,9 +103,9 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral) {
         
         // verify that bluetoothPeripheral is a Libre2
-        /*guard let Libre2 = bluetoothPeripheral as? Libre2 else {
+        guard let libre2 = bluetoothPeripheral as? Libre2 else {
             fatalError("Libre2BluetoothPeripheralViewModel update, bluetoothPeripheral is not Libre2")
-        }*/
+        }
         
         // default value for accessoryView is nil
         cell.accessoryView = nil
@@ -108,14 +114,18 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         switch setting {
             
-        case .batteryLevel:
+        case .sensorState:
             
-            cell.textLabel?.text = Texts_BluetoothPeripheralsView.batteryLevel
-
-            // not yet supported, can we get the battery level for Libre 2 ?
-            cell.detailTextLabel?.text = ""
-
             cell.accessoryType = .none
+            cell.textLabel?.text = Texts_Common.sensorStatus
+            cell.detailTextLabel?.text = libre2.sensorState.translatedDescription
+
+        case .sensorSerialNumber:
+            
+            cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
+            cell.detailTextLabel?.text = libre2.blePeripheral.sensorSerialNumber
+            cell.accessoryType = .disclosureIndicator
+
             
         }
         
@@ -123,14 +133,28 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     
     func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging) -> SettingsSelectedRowAction {
         
+        // verify that bluetoothPeripheral is a Libre2
+        guard let libre2 = bluetoothPeripheral as? Libre2 else {
+            fatalError("Libre2BluetoothPeripheralViewModel update, bluetoothPeripheral is not Libre2")
+        }
+
         guard let setting = Settings(rawValue: rawValue) else { fatalError("Libre2BluetoothPeripheralViewModel userDidSelectRow, unexpected setting") }
         
         switch setting {
-            
-        case .batteryLevel:
+        
+        case .sensorState:
             return .nothing
             
+        case .sensorSerialNumber:
+            
+            // serial text could be longer than screen width, clicking the row allows to see it in a pop up with more text place
+            if let serialNumber = libre2.blePeripheral.sensorSerialNumber {
+                return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " : " + serialNumber)
+            }
+            
         }
+        
+        return .nothing
         
     }
     
@@ -139,7 +163,7 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     }
     
     func numberOfSections() -> Int {
-        // for the moment only one specific section for DexcomG5
+        // for the moment only one specific section for Libre2
         return 1
     }
     
@@ -150,5 +174,35 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
 extension Libre2BluetoothPeripheralViewModel: CGMLibre2TransmitterDelegate {
     
+    func received(sensorStatus: LibreSensorState, from cGMLibre2Transmitter: CGMLibre2Transmitter) {
+        
+        // inform also bluetoothPeripheralManager
+        (bluetoothPeripheralManager as? CGMLibre2TransmitterDelegate)?.received(sensorStatus: sensorStatus, from: cGMLibre2Transmitter)
+        
+        // here's the trigger to update the table
+        reloadRow(row: Settings.sensorState.rawValue)
+        
+    }
+
+    func received(serialNumber: String, from cGMLibre2Transmitter: CGMLibre2Transmitter) {
+        
+        // inform also bluetoothPeripheralManager
+        (bluetoothPeripheralManager as? CGMLibre2TransmitterDelegate)?.received(serialNumber: serialNumber, from: cGMLibre2Transmitter)
+        
+        // here's the trigger to update the table
+        reloadRow(row: Settings.sensorSerialNumber.rawValue)
+
+    }
+    
+    private func reloadRow(row: Int) {
+        
+        if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
+            
+            tableView?.reloadRows(at: [IndexPath(row: row, section: bluetoothPeripheralViewController.numberOfGeneralSections() + sectionNumberForMiaoMiaoSpecificSettings)], with: .none)
+            
+        }
+    }
+    
+
 }
 

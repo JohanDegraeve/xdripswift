@@ -196,7 +196,9 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                     let patchInfo = response
                                     self.libreNFCDelegate?.received(patchInfo: patchInfo)
                                     self.tracePatchInfo(patchInfo: patchInfo)
-                                    
+ 
+                                    // send FRAM to delegate
+                                    self.libreNFCDelegate?.received(fram: fram)
 
                                     msg = "NFC: dump of "
 
