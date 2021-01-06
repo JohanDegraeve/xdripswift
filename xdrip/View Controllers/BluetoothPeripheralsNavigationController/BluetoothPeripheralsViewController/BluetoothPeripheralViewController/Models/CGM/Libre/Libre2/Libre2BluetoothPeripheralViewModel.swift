@@ -1,4 +1,5 @@
 import UIKit
+import OSLog
 
 class Libre2BluetoothPeripheralViewModel {
   
@@ -12,6 +13,8 @@ class Libre2BluetoothPeripheralViewModel {
         case sensorState = 1
 
     }
+    
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: "Libre2BluetoothPeripheralViewModel")
     
     /// Libre2 settings willb be in section 0 + numberOfGeneralSections
     private let sectionNumberForLibre2SpecificSettings = 0
@@ -76,9 +79,9 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         if let bluetoothPeripheral = bluetoothPeripheral {
             
-            if let droplet = bluetoothPeripheral as? Libre2 {
+            if let libre2 = bluetoothPeripheral as? Libre2 {
                 
-                if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: droplet, createANewOneIfNecesssary: false), let cGMLibre2Transmitter = blueToothTransmitter as? CGMLibre2Transmitter {
+                if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: libre2, createANewOneIfNecesssary: false), let cGMLibre2Transmitter = blueToothTransmitter as? CGMLibre2Transmitter {
                     
                     // set CGMLibre2Transmitter delegate to self.
                     cGMLibre2Transmitter.cGMLibre2TransmitterDelegate = self

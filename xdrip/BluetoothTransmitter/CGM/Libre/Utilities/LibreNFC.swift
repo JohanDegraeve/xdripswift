@@ -94,6 +94,187 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     
     func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         
+        DispatchQueue.main.async {
+            
+            xdrip.trace("NFC: did detect tags", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info)
+            
+            guard let firstTag = tags.first else { return }
+            guard case .iso15693(let tag) = firstTag else { return }
+            
+            session.alertMessage = TextsLibreNFC.scanComplete
+            
+            let blocks = 43
+            let requestBlocks = 3
+            
+            let requests = Int(ceil(Double(blocks) / Double(requestBlocks)))
+            let remainder = blocks % requestBlocks
+            var dataArray = [Data](repeating: Data(), count: blocks)
+            
+            session.connect(to: firstTag) { error in
+                
+                if let error = error {
+                    
+                    self.trace(systemError: error, ownErrorString: "Connection failure:", invalidateSession: true, session: session)
+                    
+                    return
+                    
+                }
+                
+                tag.getSystemInfo(requestFlags: [.address, .highDataRate]) { result in
+                    
+                    switch result {
+                    
+                    case .failure(let error):
+                        
+                        self.trace(systemError: error, ownErrorString: "Error while getting system info:", invalidateSession: true, session: session)
+                        
+                        return
+                        
+                    case .success(let systemInfo):
+                        
+                        tag.customCommand(requestFlags: .highDataRate, customCommandCode: 0xA1, customRequestParameters: Data()) {
+                            
+                            response, error in
+                            
+                            if let error = error {
+                                
+                                self.trace(systemError: error, ownErrorString: "error while getting patch info:", invalidateSession: false, session: session)
+                                
+                            }
+                            
+                            for i in 0 ..< requests {
+                                
+                                tag.readMultipleBlocks(requestFlags: [.highDataRate, .address],blockRange: NSRange(UInt8(i * requestBlocks) ... UInt8(i * requestBlocks + (i == requests - 1 ? (remainder == 0 ? requestBlocks : remainder) : requestBlocks) - (requestBlocks > 1 ? 1 : 0)))) {
+                                    
+                                    blockArray, error in
+                                    
+                                    if let error = error {
+                                        
+                                        self.trace(systemError: error, ownErrorString: "error while reading multiple blocks (#\(i * requestBlocks) - #\(i * requestBlocks + (i == requests - 1 ? (remainder == 0 ? requestBlocks : remainder) : requestBlocks) - (requestBlocks > 1 ? 1 : 0))):", invalidateSession: true, session: session)
+                                        
+                                        if i != requests - 1 { return }
+                                        
+                                    } else {
+                                        
+                                        for j in 0 ..< blockArray.count {
+                                            
+                                            dataArray[i * requestBlocks + j] = blockArray[j]
+                                            
+                                        }
+                                        
+                                    }
+                                    
+                                    if i == requests - 1 {
+                                        
+                                        var fram = Data()
+                                        
+                                        var msg = ""
+                                        
+                                        for (n, data) in dataArray.enumerated() {
+                                            if data.count > 0 {
+                                                fram.append(data)
+                                                msg += "NFC: block #\(String(format:"%02d", n))  \(data.reduce("", { $0 + String(format: "%02X", $1) + " "}).dropLast())\n"
+                                            }
+                                        }
+                                        
+                                        if !msg.isEmpty { xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, String(msg.dropLast())) }
+                                        
+                                        self.traceICIdentifier(tag: tag)
+                                        self.traceICManufacturer(tag: tag)
+                                        self.traceICSerialNumber(tag: tag)
+                                        self.traceROM(tag: tag)
+                                        self.traceICReference(systemInfo: systemInfo)
+                                        self.traceApplicationFamilyIdentifier(systemInfo: systemInfo)
+                                        self.traceDataStorageFormatIdentifier(systemInfo: systemInfo)
+                                        self.traceMemorySize(systemInfo: systemInfo)
+                                        self.traceBlockSize(systemInfo: systemInfo)
+                                        
+                                        // get sensorUID and send to delegate
+                                        let sensorUID = Data(tag.identifier.reversed())
+                                        self.libreNFCDelegate?.received(sensorUID: sensorUID)
+                                        self.traceSensorUID(sensorUID: sensorUID)
+                                        
+                                        // get patchInfo and send to delegate
+                                        let patchInfo = response
+                                        self.libreNFCDelegate?.received(patchInfo: patchInfo)
+                                        self.tracePatchInfo(patchInfo: patchInfo)
+                                        
+                                        // send FRAM to delegate
+                                        self.libreNFCDelegate?.received(fram: fram)
+                                        
+                                        msg = "NFC: dump of "
+                                        
+                                        self.readRaw(0xF860, 43 * 8, tag: tag) {
+                                            
+                                            let debugInfo = msg + ($2?.localizedDescription ?? $1.hexDump(address: Int($0), header: "FRAM:"))
+                                            xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
+                                            
+                                            self.readRaw(0x1A00, 64, tag: tag) {
+                                                
+                                                let debugInfo = msg + ($2?.localizedDescription ?? $1.hexDump(address: Int($0), header: "config RAM\n(patchUid at 0x1A08):"))
+                                                xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
+                                                
+                                                self.readRaw(0xFFAC, 36, tag: tag) {
+                                                    
+                                                    var debugInfo = msg + ($2?.localizedDescription ?? $1.hexDump(address: Int($0), header: "patch table for A0-A4 E0-E2 commands:"))
+                                                    xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
+                                                    
+                                                    let subCmd: Subcommand = .enableStreaming
+                                                    
+                                                    let cmd = self.nfcCommand(subCmd, unlockCode: self.unlockCode, patchInfo: patchInfo, sensorUID: sensorUID)
+                                                    
+                                                    debugInfo = "NFC: sending Libre 2 command to " + subCmd.description + " : code: 0x" + String(format: "%0X", cmd.code) + ", parameters: 0x" + cmd.parameters.toHexString() + "unlock code: " +  self.unlockCode.description
+                                                    xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
+                                                    
+                                                    tag.customCommand(requestFlags: .highDataRate, customCommandCode: Int(cmd.code), customRequestParameters:  cmd.parameters) { response, error in
+                                                        
+                                                        let debugInfo = "NFC: '" + subCmd.description + " command response " + response.count.description + " bytes : 0x" + response.toHexString() + ", error: " +  (error?.localizedDescription ?? "none")
+                                                        xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
+                                                        
+                                                        if subCmd == .enableStreaming && response.count == 6 {
+                                                            
+                                                            let serialNumber: String = LibreSensorSerialNumber(withUID: sensorUID)?.serialNumber ?? "unknown"
+                                                            
+                                                            let debugInfo = "NFC: enabled BLE streaming on Libre 2 " + serialNumber + " unlock code: " + self.unlockCode.description + " MAC address: " + Data(response.reversed()).hexAddress
+                                                            xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
+                                                            
+                                                            self.libreNFCDelegate?.streamingEnabled(successful : true)
+                                                            
+                                                            
+                                                        } else {
+                                                            // enableStreaming failed ?
+                                                            self.libreNFCDelegate?.streamingEnabled(successful : false)
+                                                            
+                                                        }
+                                                        if subCmd == .activate && response.count == 4 {
+                                                            
+                                                            let debugInfo = "NFC: after trying activating received " + response.toHexString() + " for the patch info " + patchInfo.toHexString()
+                                                            xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
+                                                            
+                                                            // receiving 9d081000 for a patchInfo 9d0830010000 but state remaining .notActivated
+                                                            // TODO
+                                                        }
+                                                        
+                                                        session.invalidate()
+                                                    }
+                                                    
+                                                    
+                                                }
+                                            }
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+            
+            
+        }
+        
         xdrip.trace("NFC: did detect tags", log: log, category: ConstantsLog.categoryLibreNFC, type: .info)
         
         guard let firstTag = tags.first else { return }
