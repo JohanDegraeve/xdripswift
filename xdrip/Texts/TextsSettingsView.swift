@@ -110,7 +110,7 @@ class Texts_SettingsView {
     }()
     
     static let labelWebOOPTransmitter:String = {
-        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use the OOPWeb Service?", comment: "web oop settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use FreeStyle Libre Algorithm?", comment: "web oop settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelWebOOPSite:String = {
@@ -162,7 +162,7 @@ class Texts_SettingsView {
     // MARK: - Section Healthkit
     
     static let sectionTitleHealthKit: String = {
-        return NSLocalizedString("settingsviews_sectiontitlehealthkit", tableName: filename, bundle: Bundle.main, value: "Apple Health Integration", comment: "healthkit settings, section title")
+        return NSLocalizedString("settingsviews_sectiontitlehealthkit", tableName: filename, bundle: Bundle.main, value: "Apple Health", comment: "healthkit settings, section title")
     }()
     
     static let labelHealthKit:String = {
@@ -291,7 +291,11 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_speakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two readings (mins)", comment: "When clicking the interval setting, a pop up asks for number of minutes between two spoken readings, this is the message displayed in the pop up")
     }()
     
-    // MARK: - Section Info
+    // MARK: - Section About Info
+    
+    static let sectionTitleAbout: String = {
+        return NSLocalizedString("settingsviews_sectiontitleAbout", tableName: filename, bundle: Bundle.main, value: "About xDrip4iOS", comment: "about settings, section title")
+    }()
     
     static let version = {
         return NSLocalizedString("settingsviews_Version", tableName: filename, bundle: Bundle.main, value: "Version:", comment: "used in settings, section Info, title of the version setting")
