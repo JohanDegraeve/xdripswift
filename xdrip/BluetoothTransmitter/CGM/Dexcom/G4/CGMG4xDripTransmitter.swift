@@ -182,7 +182,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
     }
     
     func requestNewReading() {
-        // not supported for blucon
+        // not supported for Dexcom G4
     }
     
     // MARK:- helper functions

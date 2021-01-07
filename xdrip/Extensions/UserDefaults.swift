@@ -71,6 +71,8 @@ extension UserDefaults {
         case nightScoutAPIKey = "nightScoutAPIKey"
         /// send sensor start time to nightscout ?
         case uploadSensorStartTimeToNS = "uploadSensorStartTimeToNS"
+        /// port number to use, 0 means not set
+        case nightScoutPort = "nightScoutPort"
         
         // Dexcom Share
         
@@ -196,12 +198,19 @@ extension UserDefaults {
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
         
+        // Loop
+        /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
+        case readingsStoredInSharedUserDefaultsAsDictionary = "readingsStoredInSharedUserDefaultsAsDictionary"
+            
+        /// timestamp lastest reading shared with Loop
+        case timeStampLatestLoopSharedBgReading = "timeStampLatestLoopSharedBgReading"
+            
         // Trace
         /// should debug level logs be added in trace file or not, and also in NSLog
         case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
         
         // non fixed slope values for oop web Libre
-        /// web oop parameters, only for Libre 1
+        /// web oop parameters, only for bubble, miaomiao and Libre 2
         case libre1DerivedAlgorithmParameters = "algorithmParameters"
 
         // development settings
@@ -226,11 +235,40 @@ extension UserDefaults {
         /// case smooth libre values
         case smoothLibreValues = "smoothLibreValues"
         
+        /// used for Libre data parsing - only for Libre 1 or Libre 2 read via transmitter, ie full NFC block
+        case previousRawLibreValues = "previousRawLibreValues"
+        
+        /// used for storing data read with Libre 2 direct
+        case previousRawGlucoseValues = "previousRawGlucoseValues"
+        
+        /// used for storing data read with Libre 2 direct
+        case previousRawTemperatureValues = "previousRawTemperatureValues"
+        
+        /// used for storing data read with Libre 2 direct
+        case previousTemperatureAdjustmentValues = "previousTemperatureAdjustmentValues"
+        
         /// in case Libre 2 users want to use the local calibration algorithm
         case overrideWebOOPCalibration = "overrideWebOOPCalibration"
         
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
+        
+        
+        // Libre
+        /// Libre unlock code
+        case libreActiveSensorUnlockCode = "activeSensorUnlockCode"
+        
+        /// Libre Unlock count
+        case libreActiveSensorUnlockCount = "activeSensorUnlockCount"
+        
+        /// - Libre sensor id - used in Libre 2 setup - should be read first eg via bubble or mm and then used in Libre 2 communication
+        /// - stored as data as read from transmitter
+        case libreSensorUID = "libreSensorUID"
+        
+        
+        /// - Libre patch info - used in Libre 2 setup - should be read first eg via bubble or mm and then used in Libre 2 communication
+        /// - stored as data as read from transmitter
+        case librePatchInfo = "librePatchInfo"
         
     }
     
@@ -599,6 +637,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.uploadSensorStartTimeToNS.rawValue)
+        }
+    }
+    
+    /// Nightscout port number, 0 means not set
+    @objc dynamic var nightScoutPort: Int {
+        get {
+            return integer(forKey: Key.nightScoutPort.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.nightScoutPort.rawValue)
         }
     }
 
@@ -1040,6 +1088,28 @@ extension UserDefaults {
         }
     }
     
+    // MARK: - =====  Loop Share Settings ======
+    
+    /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
+    var readingsStoredInSharedUserDefaultsAsDictionary: [Dictionary<String, Any>]? {
+        get {
+            return object(forKey: Key.readingsStoredInSharedUserDefaultsAsDictionary.rawValue) as? [Dictionary<String, Any>]
+        }
+        set {
+            set(newValue, forKey: Key.readingsStoredInSharedUserDefaultsAsDictionary.rawValue)
+        }
+    }
+
+    /// timestamp lastest reading uploaded to NightScout
+    var timeStampLatestLoopSharedBgReading:Date? {
+        get {
+            return object(forKey: Key.timeStampLatestLoopSharedBgReading.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestLoopSharedBgReading.rawValue)
+        }
+    }
+    
     // MARK: - =====  technical settings for testing ======
     
     /// G6 factor 1
@@ -1079,6 +1149,66 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.smoothLibreValues.rawValue)
+        }
+    }
+    
+    /// used for Libre data parsing - for processing in LibreDataParser which is only in case of reading with NFC (ie bubble etc)
+    var previousRawLibreValues: [Double] {
+        get {
+            if let data = object(forKey: Key.previousRawLibreValues.rawValue) as? [Double] {
+                return data as [Double]
+            } else {
+                return [Double]()
+            }
+            
+        }
+        set {
+            set(newValue, forKey: Key.previousRawLibreValues.rawValue)
+        }
+    }
+    
+    /// used for storing data read with Libre 2 direct
+    var previousRawGlucoseValues: [Int]? {
+        get {
+            if let data = object(forKey: Key.previousRawGlucoseValues.rawValue) as? [Int] {
+                return data as [Int]
+            } else {
+                return nil
+            }
+            
+        }
+        set {
+            set(newValue, forKey: Key.previousRawGlucoseValues.rawValue)
+        }
+    }
+    
+    /// used for storing data read with Libre 2 direct
+    var previousRawTemperatureValues: [Int]? {
+        get {
+            if let data = object(forKey: Key.previousRawTemperatureValues.rawValue) as? [Int] {
+                return data as [Int]
+            } else {
+                return nil
+            }
+            
+        }
+        set {
+            set(newValue, forKey: Key.previousRawTemperatureValues.rawValue)
+        }
+    }
+    
+    /// used for storing data read with Libre 2 direct
+    var previousTemperatureAdjustmentValues: [Int]? {
+        get {
+            if let data = object(forKey: Key.previousTemperatureAdjustmentValues.rawValue) as? [Int] {
+                return data as [Int]
+            } else {
+                return nil
+            }
+            
+        }
+        set {
+            set(newValue, forKey: Key.previousTemperatureAdjustmentValues.rawValue)
         }
     }
     
@@ -1148,7 +1278,7 @@ extension UserDefaults {
         }
     }
     
-    /// web oop parameters, only for bubble
+    /// web oop parameters, only for bubble, miaomiao and Libre 2
     var libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters? {
         get {
             guard let jsonString = string(forKey: Key.libre1DerivedAlgorithmParameters.rawValue) else { return nil }
@@ -1161,6 +1291,62 @@ extension UserDefaults {
             guard let jsonData = try? encoder.encode(newValue) else { return }
             let jsonString = String(bytes: jsonData, encoding: .utf8)
             set(jsonString, forKey: Key.libre1DerivedAlgorithmParameters.rawValue)
+        }
+    }
+    
+    /// Libre Unlock code
+    var libreActiveSensorUnlockCode: UInt32 {
+        get {
+            
+            let value = UInt32(integer(forKey: Key.libreActiveSensorUnlockCode.rawValue))
+            
+            if value == 0 {
+                return 42
+            }
+            
+            return UInt32(integer(forKey: Key.libreActiveSensorUnlockCode.rawValue))
+            
+        }
+        set {
+            set(newValue, forKey: Key.libreActiveSensorUnlockCode.rawValue)
+        }
+    }
+
+    /// Libre Unlock count
+    var libreActiveSensorUnlockCount: UInt16 {
+        get {
+            return UInt16(integer(forKey: Key.libreActiveSensorUnlockCount.rawValue))
+        }
+        set {
+            set(newValue, forKey: Key.libreActiveSensorUnlockCount.rawValue)
+        }
+    }
+    
+    /// Libre sensor id
+    var libreSensorUID: Data? {
+        get {
+            if let data = object(forKey: Key.libreSensorUID.rawValue) as? Data {
+                return data
+            } else {
+                return nil
+            }
+        }
+        set {
+            set(newValue, forKey: Key.libreSensorUID.rawValue)
+        }
+    }
+    
+    /// Libre librePatchInfo
+    var librePatchInfo: Data? {
+        get {
+            if let data = object(forKey: Key.librePatchInfo.rawValue) as? Data {
+                return data
+            } else {
+                return nil
+            }
+        }
+        set {
+            set(newValue, forKey: Key.librePatchInfo.rawValue)
         }
     }
     

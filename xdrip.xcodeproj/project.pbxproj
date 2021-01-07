@@ -239,7 +239,7 @@
 		F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */; };
 		F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */; };
 		F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */; };
-		F85FB769255DE14600D1C39E /* ConstantsSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85FB768255DE14600D1C39E /* ConstantsSmoothing.swift */; };
+		F85FB769255DE14600D1C39E /* ConstantsLibreSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85FB768255DE14600D1C39E /* ConstantsLibreSmoothing.swift */; };
 		F85FF39125288870004E6FF1 /* HouseKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85FF39025288870004E6FF1 /* HouseKeeper.swift */; };
 		F85FF3C4252D0C32004E6FF1 /* xdrip.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */; };
 		F85FF3CD252F9FD7004E6FF1 /* SnoozeParameters+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85FF3CC252F9FD7004E6FF1 /* SnoozeParameters+CoreDataProperties.swift */; };
@@ -294,6 +294,7 @@
 		F8A1586F22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */; };
 		F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */; };
 		F8A1587322EDC893007F5B5D /* ConstantsDexcomShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */; };
+		F8A1850C25643B16000EF8A0 /* Double+Smoothable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1850B25643B16000EF8A0 /* Double+Smoothable.swift */; };
 		F8A389C823203E3E0010F405 /* ConstantsM5Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */; };
 		F8A389CF232AE2EA0010F405 /* M5StackSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389CE232AE2E90010F405 /* M5StackSettingsViewController.swift */; };
 		F8A389E7232ECE7E0010F405 /* SettingsViewUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389E6232ECE7E0010F405 /* SettingsViewUtilities.swift */; };
@@ -301,6 +302,11 @@
 		F8A389ED23342EB10010F405 /* ConstantsNightScout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */; };
 		F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AAC22D6859200934E7A /* SlopeParameters.swift */; };
 		F8A54AAF22D686CD00934E7A /* NightScoutBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */; };
+		F8A5EEAE25791F370085E660 /* Libre2BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEAD25791F370085E660 /* Libre2BLEUtilities.swift */; };
+		F8A5EEB2257CEC290085E660 /* LibreNFC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEB1257CEC290085E660 /* LibreNFC.swift */; };
+		F8A5EEB8257CF2940085E660 /* TextsLibreNFC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */; };
+		F8A5EEBC257CF38C0085E660 /* LibreNFC.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8A5EEBB257CF38C0085E660 /* LibreNFC.strings */; };
+		F8A5EEC2257D18DC0085E660 /* LibreNFCDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEC1257D18DC0085E660 /* LibreNFCDelegate.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
 		F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* RootViewController.swift */; };
 		F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426321ADEBD60078C348 /* Main.storyboard */; };
@@ -370,6 +376,10 @@
 		F8B48A9C22B2FA66009BCC01 /* SpeakReading.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */; };
 		F8B48AA022B2FA7B009BCC01 /* HomeView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B48A9E22B2FA7B009BCC01 /* HomeView.strings */; };
 		F8B48AA422B2FA9B009BCC01 /* CalibrationRequest.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B48AA222B2FA9A009BCC01 /* CalibrationRequest.strings */; };
+		F8B955B1258BEE9D00C06016 /* ConstantsSpeakReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B955B0258BEE9D00C06016 /* ConstantsSpeakReading.swift */; };
+		F8B955B7258D5E2000C06016 /* ConstantsHealthKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B955B6258D5E2000C06016 /* ConstantsHealthKit.swift */; };
+		F8B955EB2591355200C06016 /* CGMLibre2Transmitter+TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B955EA2591355200C06016 /* CGMLibre2Transmitter+TestData.swift */; };
+		F8B9560A259294FA00C06016 /* GlucoseDataFilterFlatValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B95609259294FA00C06016 /* GlucoseDataFilterFlatValues.swift */; };
 		F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD4232218790E006EAB84 /* UserDefaults.swift */; };
 		F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD436221A0349006EAB84 /* Localizable.strings */; };
 		F8BDD43F221B5BAF006EAB84 /* TextsErrorMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD43E221B5BAF006EAB84 /* TextsErrorMessages.swift */; };
@@ -425,6 +435,8 @@
 		F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD5322FF685400D2D610 /* NSMutableURLRequest.swift */; };
 		F8EEDD552300136F00D2D610 /* DexcomShareTestResult.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8EEDD572300136F00D2D610 /* DexcomShareTestResult.strings */; };
 		F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */; };
+		F8F7B8E6259A6EBF00C47B04 /* LibreSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F7B8E5259A6EBF00C47B04 /* LibreSmoothing.swift */; };
+		F8F7B8EB259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F7B8EA259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift */; };
 		F8F971B623A5914D00C3F17D /* M5Stack+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971B123A5914C00C3F17D /* M5Stack+BluetoothPeripheral.swift */; };
 		F8F971B723A5914D00C3F17D /* BluetoothPeripheralType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971B423A5914C00C3F17D /* BluetoothPeripheralType.swift */; };
 		F8F971B823A5914D00C3F17D /* BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971B523A5914C00C3F17D /* BluetoothPeripheral.swift */; };
@@ -754,7 +766,7 @@
 		F85DC2F021CFE3D400B9F74A /* Calibration+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Calibration+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Sensor+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+CoreDataClass.swift"; sourceTree = "<group>"; };
-		F85FB768255DE14600D1C39E /* ConstantsSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSmoothing.swift; sourceTree = "<group>"; };
+		F85FB768255DE14600D1C39E /* ConstantsLibreSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsLibreSmoothing.swift; sourceTree = "<group>"; };
 		F85FF39025288870004E6FF1 /* HouseKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HouseKeeper.swift; sourceTree = "<group>"; };
 		F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v12.xcdatamodel"; sourceTree = "<group>"; };
 		F85FF3CB252F9C9A004E6FF1 /* xdrip v13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v13.xcdatamodel"; sourceTree = "<group>"; };
@@ -791,6 +803,7 @@
 		F870D3ED2513B786008967B0 /* Trace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trace.swift; sourceTree = "<group>"; };
 		F878FA7C2405B3CF00BC6DA6 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift"; sourceTree = "<group>"; };
 		F8797CE9255B43960033956B /* GlucoseData+Smoothable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GlucoseData+Smoothable.swift"; sourceTree = "<group>"; };
+		F87F5EFD2560686C00FFA395 /* xdrip v15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v15.xcdatamodel"; sourceTree = "<group>"; };
 		F889CB70236D84AC00A81068 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/M5StackView.strings; sourceTree = "<group>"; };
 		F889CB8D236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F889CB8E236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
@@ -831,6 +844,7 @@
 		F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSuspensionPrevention.swift; sourceTree = "<group>"; };
 		F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSpeakReadingLanguages.swift; sourceTree = "<group>"; };
 		F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsDexcomShare.swift; sourceTree = "<group>"; };
+		F8A1850B25643B16000EF8A0 /* Double+Smoothable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Smoothable.swift"; sourceTree = "<group>"; };
 		F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsM5Stack.swift; sourceTree = "<group>"; };
 		F8A389CE232AE2E90010F405 /* M5StackSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StackSettingsViewController.swift; sourceTree = "<group>"; };
 		F8A389E6232ECE7E0010F405 /* SettingsViewUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewUtilities.swift; sourceTree = "<group>"; };
@@ -839,6 +853,12 @@
 		F8A54AAC22D6859200934E7A /* SlopeParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlopeParameters.swift; sourceTree = "<group>"; };
 		F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightScoutBgReading.swift; sourceTree = "<group>"; };
 		F8A54B0A22D9215500934E7A /* xdrip-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "xdrip-Bridging-Header.h"; sourceTree = "<group>"; };
+		F8A5EEAD25791F370085E660 /* Libre2BLEUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2BLEUtilities.swift; sourceTree = "<group>"; };
+		F8A5EEB1257CEC290085E660 /* LibreNFC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreNFC.swift; sourceTree = "<group>"; };
+		F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsLibreNFC.swift; sourceTree = "<group>"; };
+		F8A5EEBB257CF38C0085E660 /* LibreNFC.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = LibreNFC.strings; sourceTree = "<group>"; };
+		F8A5EEC1257D18DC0085E660 /* LibreNFCDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreNFCDelegate.swift; sourceTree = "<group>"; };
+		F8A5EEC5257EDC910085E660 /* xdripDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = xdripDebug.entitlements; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F8AC425F21ADEBD60078C348 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
@@ -969,6 +989,10 @@
 		F8B48B1022B37C84009BCC01 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F8B48B1122B37C84009BCC01 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/NightScoutTestResult.strings; sourceTree = "<group>"; };
 		F8B48B1222B37C84009BCC01 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/SettingsViews.strings; sourceTree = "<group>"; };
+		F8B955B0258BEE9D00C06016 /* ConstantsSpeakReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSpeakReading.swift; sourceTree = "<group>"; };
+		F8B955B6258D5E2000C06016 /* ConstantsHealthKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsHealthKit.swift; sourceTree = "<group>"; };
+		F8B955EA2591355200C06016 /* CGMLibre2Transmitter+TestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGMLibre2Transmitter+TestData.swift"; sourceTree = "<group>"; };
+		F8B95609259294FA00C06016 /* GlucoseDataFilterFlatValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseDataFilterFlatValues.swift; sourceTree = "<group>"; };
 		F8BDD4232218790E006EAB84 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		F8BDD435221A0005006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		F8BDD437221A0349006EAB84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1044,6 +1068,8 @@
 		F8EEDD612300139800D2D610 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
 		F8EEDD622300139A00D2D610 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
 		F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCalibrator.swift; sourceTree = "<group>"; };
+		F8F7B8E5259A6EBF00C47B04 /* LibreSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreSmoothing.swift; sourceTree = "<group>"; };
+		F8F7B8EA259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavitzkyGolaySmoothableArray.swift; sourceTree = "<group>"; };
 		F8F971B123A5914C00C3F17D /* M5Stack+BluetoothPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5Stack+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
 		F8F971B423A5914C00C3F17D /* BluetoothPeripheralType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralType.swift; sourceTree = "<group>"; };
 		F8F971B523A5914C00C3F17D /* BluetoothPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheral.swift; sourceTree = "<group>"; };
@@ -1174,6 +1200,7 @@
 				F8E51D602448E695001C9E5A /* Bundle.swift */,
 				F8AF361A245D93ED00B5977B /* Int16.swift */,
 				F890E079247687AE008FB2EC /* URL.swift */,
+				F8A1850B25643B16000EF8A0 /* Double+Smoothable.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1268,6 +1295,7 @@
 			children = (
 				F80D916A24F82913006840B5 /* CGMLibre2Transmitter.swift */,
 				F80D916C24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift */,
+				F8B955EA2591355200C06016 /* CGMLibre2Transmitter+TestData.swift */,
 			);
 			path = Libre2;
 			sourceTree = "<group>";
@@ -1577,6 +1605,7 @@
 				F8AF11FF24B3B62D00AE5BA2 /* LibreErrors.strings */,
 				F82436FD24BE01F700BED341 /* LibreStates.strings */,
 				F8E6C79324CEC2E3007C1199 /* Snooze.strings */,
+				F8A5EEBB257CF38C0085E660 /* LibreNFC.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -1678,6 +1707,7 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
+				F8A5EEC5257EDC910085E660 /* xdripDebug.entitlements */,
 				F85DC2FB21D2CD7000B9F74A /* Application Delegate */,
 				F8F971AD23A5914C00C3F17D /* BluetoothPeripheral */,
 				F8F971B923A5915900C3F17D /* BluetoothTransmitter */,
@@ -1998,6 +2028,7 @@
 				F8AF11F224B1279500AE5BA2 /* TextsLibreErrors.swift */,
 				F82436FB24BE014000BED341 /* TextsLibreStates.swift */,
 				F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */,
+				F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -2108,6 +2139,7 @@
 				F8A1585A22EDB7EA007F5B5D /* ConstantsDexcomG5.swift */,
 				F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */,
 				F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */,
+				F8B955B6258D5E2000C06016 /* ConstantsHealthKit.swift */,
 				F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */,
 				F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */,
 				F8252866243E50FE0067AF77 /* ConstantsLibre.swift */,
@@ -2117,12 +2149,13 @@
 				F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */,
 				F8A1586022EDB844007F5B5D /* ConstantsNotifications.swift */,
 				F8E51D5E2448E2E8001C9E5A /* ConstantsShareWithLoop.swift */,
+				F85FB768255DE14600D1C39E /* ConstantsLibreSmoothing.swift */,
 				F8A1586222EDB86E007F5B5D /* ConstantsSounds.swift */,
+				F8B955B0258BEE9D00C06016 /* ConstantsSpeakReading.swift */,
 				F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */,
 				F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */,
 				F8AF36142455C6F700B5977B /* ConstantsTrace.swift */,
 				F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */,
-				F85FB768255DE14600D1C39E /* ConstantsSmoothing.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -2131,14 +2164,16 @@
 		F8EA6C8021B723A80082976B /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				F85FF38F25288860004E6FF1 /* HouseKeeping */,
 				F8AF11F624B1E6D700AE5BA2 /* Errors */,
-				F8C5EBE622F38F0E00563B5F /* Trace.swift */,
-				F821CF69229FC22D005C1E43 /* Network */,
-				F8B3A7DD226E48C1004BA588 /* SoundPlayer */,
-				F8EA6CA821BBE3010082976B /* UniqueId.swift */,
+				F85FF38F25288860004E6FF1 /* HouseKeeping */,
+				F8F7B8EE259A84A300C47B04 /* KalmanFilter */,
 				F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */,
+				F821CF69229FC22D005C1E43 /* Network */,
 				F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */,
+				F8F7B8E9259A7A9400C47B04 /* SavitzkyGolayFilter */,
+				F8B3A7DD226E48C1004BA588 /* SoundPlayer */,
+				F8C5EBE622F38F0E00563B5F /* Trace.swift */,
+				F8EA6CA821BBE3010082976B /* UniqueId.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -2198,6 +2233,21 @@
 				F82436F924BDFA5E00BED341 /* LibreReCalibrator.swift */,
 			);
 			path = Calibration;
+			sourceTree = "<group>";
+		};
+		F8F7B8E9259A7A9400C47B04 /* SavitzkyGolayFilter */ = {
+			isa = PBXGroup;
+			children = (
+				F8F7B8EA259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift */,
+			);
+			path = SavitzkyGolayFilter;
+			sourceTree = "<group>";
+		};
+		F8F7B8EE259A84A300C47B04 /* KalmanFilter */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = KalmanFilter;
 			sourceTree = "<group>";
 		};
 		F8F971AD23A5914C00C3F17D /* BluetoothPeripheral */ = {
@@ -2427,6 +2477,10 @@
 				F8F971E423A5915900C3F17D /* LibreSensorState.swift */,
 				F8177022248CF78300AA3600 /* LibreSensorType.swift */,
 				F80D915B24F06A40006840B5 /* PreLibre2.swift */,
+				F8A5EEAD25791F370085E660 /* Libre2BLEUtilities.swift */,
+				F8A5EEB1257CEC290085E660 /* LibreNFC.swift */,
+				F8A5EEC1257D18DC0085E660 /* LibreNFCDelegate.swift */,
+				F8F7B8E5259A6EBF00C47B04 /* LibreSmoothing.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -2451,6 +2505,7 @@
 				F8F971F423A5915900C3F17D /* GlucoseData.swift */,
 				F8C9784C2428052D00A09483 /* CGMSensorType.swift */,
 				F8797CE9255B43960033956B /* GlucoseData+Smoothable.swift */,
+				F8B95609259294FA00C06016 /* GlucoseDataFilterFlatValues.swift */,
 			);
 			path = Generic;
 			sourceTree = "<group>";
@@ -2723,6 +2778,7 @@
 				F82437A024CB7A9900BED341 /* Siri_Missed_Readings.caf in Resources */,
 				F824377924CB7A9800BED341 /* Sci-Fi_Alarm_Loop_3.caf in Resources */,
 				F8B3A7CB226CC0B7004BA588 /* shortlow4.mp3 in Resources */,
+				F8A5EEBC257CF38C0085E660 /* LibreNFC.strings in Resources */,
 				F82437C624CB7A9900BED341 /* Siri_Alert_High_Glucose.caf in Resources */,
 				F82437A924CB7A9900BED341 /* Wake_Up_Will_You.caf in Resources */,
 				F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */,
@@ -2852,6 +2908,7 @@
 			files = (
 				F8BDD450221CAA64006EAB84 /* TextsCommon.swift in Sources */,
 				F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */,
+				F8A5EEC2257D18DC0085E660 /* LibreNFCDelegate.swift in Sources */,
 				F8F9720523A5915900C3F17D /* TransmitterMessage.swift in Sources */,
 				F816E1282439DE55009EE65B /* CGMDexomG4TransmitterDelegate.swift in Sources */,
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
@@ -2864,6 +2921,7 @@
 				F816E11A243923B2009EE65B /* Droplet+CoreDataClass.swift in Sources */,
 				F80D916D24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift in Sources */,
 				F816E1102437ED21009EE65B /* BluetoothPeripheralManager+CGMBlueReaderTransmitterDelegate.swift in Sources */,
+				F8B955EB2591355200C06016 /* CGMLibre2Transmitter+TestData.swift in Sources */,
 				F8B3A85B2280CCD1004BA588 /* AlertSettingsViewController.swift in Sources */,
 				F8F9722E23A5915900C3F17D /* M5StackTransmitterOpCode.swift in Sources */,
 				F8F9720223A5915900C3F17D /* CGMG6Transmitter.swift in Sources */,
@@ -2882,6 +2940,7 @@
 				F8C97856242AA86B00A09483 /* CGMMiaoMiaoTransmitterDelegate.swift in Sources */,
 				F898EDF6234A8A5700BFB79B /* UInt32.swift in Sources */,
 				F816E0F32433DAA9009EE65B /* BluetoothPeripheralManager+CGMBluconTransmitterDelegate.swift in Sources */,
+				F8B955B1258BEE9D00C06016 /* ConstantsSpeakReading.swift in Sources */,
 				F8F9723223A5915900C3F17D /* M5StackReadBlePassWordTxMessage.swift in Sources */,
 				F8A54AAF22D686CD00934E7A /* NightScoutBgReading.swift in Sources */,
 				F8DF765323E34F4500063910 /* DexcomG5+CoreDataClass.swift in Sources */,
@@ -2931,6 +2990,7 @@
 				F8F9723923A5928D00C3F17D /* M5StackBluetoothPeripheralViewModel.swift in Sources */,
 				F8F9722B23A5915900C3F17D /* CGMTransmitterDelegate.swift in Sources */,
 				F80859292364D61B00F3829D /* UserDefaults+charts.swift in Sources */,
+				F8B955B7258D5E2000C06016 /* ConstantsHealthKit.swift in Sources */,
 				F8B3A7B2226A0878004BA588 /* TextsAlerts.swift in Sources */,
 				F8297F46238DC4AC00D74D66 /* BluetoothPeripheralManaging.swift in Sources */,
 				F80D917024F85C7A006840B5 /* Libre2+BluetoothPeripheral.swift in Sources */,
@@ -2944,6 +3004,7 @@
 				F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */,
 				F8E51D612448E695001C9E5A /* Bundle.swift in Sources */,
 				F821CF61229BF4A2005C1E43 /* NightScoutUploadManager.swift in Sources */,
+				F8B9560A259294FA00C06016 /* GlucoseDataFilterFlatValues.swift in Sources */,
 				F8F9721023A5915900C3F17D /* TransmitterVersionRxMessage.swift in Sources */,
 				F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */,
 				F8A1585522EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift in Sources */,
@@ -2978,6 +3039,7 @@
 				F816E10E2437EAC9009EE65B /* BlueReader+CoreDataProperties.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
 				F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */,
+				F8F7B8EB259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift in Sources */,
 				F830991C23C2909E005741DF /* Watlaa+CoreDataClass.swift in Sources */,
 				F808D2CC240328FA0084B5DB /* Bubble+CoreDataClass.swift in Sources */,
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,
@@ -2998,6 +3060,7 @@
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
 				F8B3A847227F090E004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,
 				F8B3A79622635A25004BA588 /* AlertEntry+CoreDataClass.swift in Sources */,
+				F8F7B8E6259A6EBF00C47B04 /* LibreSmoothing.swift in Sources */,
 				F808D2CA240325E40084B5DB /* CGMBubbleTransmitterDelegate.swift in Sources */,
 				F804870C2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift in Sources */,
 				F825286C2443BEDC0067AF77 /* CGMG6TransmitterDelegate.swift in Sources */,
@@ -3014,7 +3077,7 @@
 				F8691888239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift in Sources */,
 				F8297F4F238DCAD800D74D66 /* BluetoothPeripheralNavigationController.swift in Sources */,
 				F8A1585322EDB602007F5B5D /* ConstantsBloodGlucose.swift in Sources */,
-				F85FB769255DE14600D1C39E /* ConstantsSmoothing.swift in Sources */,
+				F85FB769255DE14600D1C39E /* ConstantsLibreSmoothing.swift in Sources */,
 				F8DF766023E38FC100063910 /* BLEPeripheral+CoreDataClass.swift in Sources */,
 				F80ED2EE236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift in Sources */,
 				F8FDD6CB2553385000625B49 /* Array.swift in Sources */,
@@ -3046,7 +3109,9 @@
 				F8B3A850227F26F8004BA588 /* AlertTypesSettingsViewController.swift in Sources */,
 				F816E0FE24367338009EE65B /* GNSEntry+BluetoothPeripheral.swift in Sources */,
 				F8B3A808227A2933004BA588 /* SettingsSelectedRowAction.swift in Sources */,
+				F8A5EEB2257CEC290085E660 /* LibreNFC.swift in Sources */,
 				F816E0F02433C31B009EE65B /* Blucon+CoreDataProperties.swift in Sources */,
+				F8A5EEAE25791F370085E660 /* Libre2BLEUtilities.swift in Sources */,
 				F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */,
 				F8F9720723A5915900C3F17D /* AuthChallengeTxMessage.swift in Sources */,
 				F8B3A78E22622954004BA588 /* AlertType+CoreDataClass.swift in Sources */,
@@ -3065,6 +3130,7 @@
 				F898EDF2234A8A0500BFB79B /* UInt8.swift in Sources */,
 				F8DF766423E781C100063910 /* BLEPeripheralAccessor.swift in Sources */,
 				F816E12124392D40009EE65B /* DropletBluetoothPeripheralViewModel.swift in Sources */,
+				F8A5EEB8257CF2940085E660 /* TextsLibreNFC.swift in Sources */,
 				F816E1082437E5B9009EE65B /* BlueReader+BluetoothPeripheral.swift in Sources */,
 				F8E51D67244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift in Sources */,
 				F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */,
@@ -3155,6 +3221,7 @@
 				F8A389ED23342EB10010F405 /* ConstantsNightScout.swift in Sources */,
 				F85FF3D1252F9FF9004E6FF1 /* SnoozeParameters+CoreDataClass.swift in Sources */,
 				F857A32A253E2D9E00951BB2 /* LibreAlgorithmThresholds.swift in Sources */,
+				F8A1850C25643B16000EF8A0 /* Double+Smoothable.swift in Sources */,
 				F890E07A247687AE008FB2EC /* URL.swift in Sources */,
 				F8B3A856227F28DC004BA588 /* AlertTypeSettingsViewController.swift in Sources */,
 				F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */,
@@ -3455,7 +3522,7 @@
 				CODE_SIGN_ENTITLEMENTS = "xDrip4iOS Widget/xDrip4iOS Widget.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4118;
+				CURRENT_PROJECT_VERSION = 4121;
 				DEVELOPMENT_TEAM = RNX44PP998;
 				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3464,7 +3531,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.4.11;
+				MARKETING_VERSION = 4.4.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
@@ -3480,7 +3547,7 @@
 				CODE_SIGN_ENTITLEMENTS = "xDrip4iOS Widget/xDrip4iOS Widget.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4118;
+				CURRENT_PROJECT_VERSION = 4121;
 				DEVELOPMENT_TEAM = RNX44PP998;
 				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3489,7 +3556,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.4.11;
+				MARKETING_VERSION = 4.4.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
@@ -3626,10 +3693,10 @@
 				APP_GROUP_IDENTIFIER = "group.com.$(TeamIdentifierPrefix)loopkit.LoopGroup";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
+				CODE_SIGN_ENTITLEMENTS = xdrip/xdripDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4118;
+				CURRENT_PROJECT_VERSION = 4121;
 				DEVELOPMENT_TEAM = RNX44PP998;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3637,7 +3704,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.4.11;
+				MARKETING_VERSION = 4.4.15;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3659,7 +3726,7 @@
 				CODE_SIGN_ENTITLEMENTS = xdrip/xdrip.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4118;
+				CURRENT_PROJECT_VERSION = 4121;
 				DEVELOPMENT_TEAM = RNX44PP998;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3667,7 +3734,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.4.11;
+				MARKETING_VERSION = 4.4.15;
 				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3713,11 +3780,12 @@
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				F87F5EFD2560686C00FFA395 /* xdrip v15.xcdatamodel */,
 				F83275882546225400D305E6 /* xdrip v14.xcdatamodel */,
 				F85FF3CB252F9C9A004E6FF1 /* xdrip v13.xcdatamodel */,
 				F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */,
 			);
-			currentVersion = F83275882546225400D305E6 /* xdrip v14.xcdatamodel */;
+			currentVersion = F87F5EFD2560686C00FFA395 /* xdrip v15.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

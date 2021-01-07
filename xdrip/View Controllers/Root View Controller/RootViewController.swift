@@ -228,6 +228,9 @@ final class RootViewController: UIViewController {
     /// in fact it will never be used with a nil value, except when connecting to a cgm transmitter for the first time
     private var nonFixedSlopeEnabled: Bool?
     
+    /// when was the last notification created with bgreading, setting to 1 1 1970 initially to avoid having to unwrap it
+    private var timeStampLastBGNotification = Date(timeIntervalSince1970: 0)
+    
     // MARK: - overriden functions
     
     // set the status bar content colour to light to match new darker theme
@@ -260,7 +263,7 @@ final class RootViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         // this is to force update of userdefaults that are also stored in the shared user defaults
         // these are used by the today widget. After a year or so (september 2021) this can all be deleted
         UserDefaults.standard.urgentLowMarkValueInUserChosenUnit = UserDefaults.standard.urgentLowMarkValueInUserChosenUnit
@@ -306,8 +309,6 @@ final class RootViewController: UIViewController {
                 self.present(alert, animated: true, completion: nil)
                 
             }
-            
-            CGMMiaoMiaoTransmitter.testRange()
             
         })
         
@@ -531,6 +532,10 @@ final class RootViewController: UIViewController {
                 
                 // change value of UserDefaults.standard.transmitterTypeAsString
                 UserDefaults.standard.cgmTransmitterTypeAsString = cgmTransmitter.cgmTransmitterType().rawValue
+
+                // for testing only - for testing make sure there's a transmitter connected,
+                // eg a bubble or mm, not necessarily (better not) installed on a sensor
+                // CGMMiaoMiaoTransmitter.testRange(cGMTransmitterDelegate: self)
                 
             }
             
@@ -598,6 +603,9 @@ final class RootViewController: UIViewController {
             
         }
         
+        // check for flat values, this will only apply to Libre because in case of Dexcom there's always only one element in the glucoseData array
+        glucoseData = glucoseData.checkFlatValues()
+        
         // also for cases where calibration is not needed, we go through this code
         if let activeSensor = activeSensor, let calibrator = calibrator, let bgReadingsAccessor = bgReadingsAccessor {
             
@@ -625,25 +633,61 @@ final class RootViewController: UIViewController {
             
             // start defining timeStampToDelete as of when existing BgReading's will be deleted
             // this value is also used to verify that glucoseData Array has enough readings
-            var timeStampToDelete = Date(timeIntervalSinceNow: -60.0 * (Double)(ConstantsSmoothing.readingsToDeleteInMinutes))
-            
+            var timeStampToDelete = Date(timeIntervalSinceNow: -60.0 * (Double)(ConstantsLibreSmoothing.readingsToDeleteInMinutes))
+
             // now check if we'll delete readings
             // there must be a glucoseData.last, here assigning lastGlucoseData just to unwrap it
             // checking lastGlucoseData.timeStamp < timeStampToDelete guarantees the oldest reading is older than the one we'll delete, so we're sur we have enough readings in glucoseData to refill the BgReadings
             if let lastGlucoseData = glucoseData.last, lastGlucoseData.timeStamp < timeStampToDelete, UserDefaults.standard.smoothLibreValues {
                 
-                // younger than the timestamp of the latest reading
+                // older than the timestamp of the latest reading
                 if let last = glucoseData.last {
                     timeStampToDelete = max(timeStampToDelete, last.timeStamp)
                 }
                 
-                // younger than the timestamp of the latest calibration (would only be applicable if recalibration is used)
+                // older than the timestamp of the latest calibration (would only be applicable if recalibration is used)
                 if let lastCalibrationForActiveSensor = lastCalibrationForActiveSensor {
                     timeStampToDelete = max(timeStampToDelete, lastCalibrationForActiveSensor.timeStamp)
                 }
                 
-                // get the readings to be deleted
-                let lastBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStampToDelete, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+                // there should be one reading per minute for the period that we want to delete readings, otherwise we may not be able to fill up a gap that is created by deleting readings, because the next readings are per 15 minutes. This will typically happen the first time the app runs (or reruns), the first range of readings is only 16 readings not enough to fill up a gap of more than 20 minutes
+                // we calculate the number of minutes between timeStampToDelete and now, use the result as index in glucoseData, the timestamp of that element is a number of minutes away from now, that number should be equal to index (as we expect one reading per minute)
+                // if that's not the case add 1 minute to timeStampToDelete
+                // repeat this until reached
+                let checkTimeStampToDelete = { (glucoseData: [GlucoseData]) -> Bool in
+
+                    // just to avoid infinite loop
+                    if timeStampToDelete > Date() {return true}
+                    
+                    let minutes = Int(abs(timeStampToDelete.timeIntervalSince(Date())/60.0))
+                    
+                    if minutes < glucoseData.count {
+                        
+                        if abs(glucoseData[minutes].timeStamp.timeIntervalSince(timeStampToDelete)) > 1.0 {
+                            // increase timeStampToDelete with 5 minutes, this is in the assumption that ConstantsSmoothing.readingsToDeleteInMinutes is not more than 21, by reducing to 16 we should never have a gap because there's always minimum 16 values per minute
+                            timeStampToDelete = timeStampToDelete.addingTimeInterval(1.0 * 60)
+                            
+                            return false
+                            
+                        }
+                        
+                        return true
+                        
+                    } else {
+                        // should never come here
+                        // increase timeStampToDelete with 5 minutes
+                        timeStampToDelete = timeStampToDelete.addingTimeInterval(1.0 * 60)
+                        
+                        return false
+                    }
+
+                }
+                
+                // repeat the function checkTimeStampToDelete until timeStampToDelete is high enough so that we delete only bgReading's without creating a gap that can't be filled in
+                while !checkTimeStampToDelete(glucoseData) {}
+                
+                // get the readings to be deleted - delete also non-calibrated readings
+                let lastBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStampToDelete, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
                 
                 // delete them
                 for reading in lastBgReadings {
@@ -651,45 +695,60 @@ final class RootViewController: UIViewController {
                     coreDataManager.mainManagedObjectContext.delete(reading)
                     
                 }
+                
+                // as we're deleting readings, glucoseChartPoints need to be updated, otherwise we keep seeing old values
+                // this is the easiest way to achieve it
+                glucoseChartManager?.cleanUpMemory()
 
             }
 
-            // initialize help variables
-            var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
-            
-            // was a new reading created or not
+            // was a new reading created or not ?
             var newReadingCreated = false
             
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-            if let lastReading = bgReadingsAccessor.last(forSensor: activeSensor) {
+            if let lastReading = bgReadingsAccessor.last(forSensor: nil) {
                 timeStampLastBgReading = lastReading.timeStamp
             }
             
-            // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
-            for (index , glucose) in glucoseData.enumerated().reversed() {
+            // iterate through array, elements are ordered by timestamp, first is the youngest, we need to start with the oldest
+            for (index, glucose) in glucoseData.enumerated().reversed() {
                 
                 // we only add new glucose values if 5 minutes - 10 seconds younger than latest already existing reading, or, if it's the latest, it needs to be just younger
                 let checktimestamp = Date(timeInterval: 5.0 * 60.0 - 10.0, since: timeStampLastBgReading)
                 
-                if (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading)))  {
+                // timestamp of glucose being processed must be higher (ie more recent) than checktimestamp except if it's the last one (ie the first in the array), because there we don't care if it's less than 5 minutes different with the last but one
+                if (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading))) {
                     
-                    let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                    
-                    if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                    // check on glucoseLevelRaw > 0 because I've had a case where a faulty sensor was giving negative values
+                    if glucose.glucoseLevelRaw > 0 {
                         
-                        trace("new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ","))
+                        // get latest3BgReadings
+                        var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+                        
+                        let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        
+                        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                            
+                            trace("new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ","))
+                            
+                        }
+                        
+                        // save the newly created bgreading permenantly in coredata
+                        coreDataManager.saveChanges()
+                        
+                        // a new reading was created
+                        newReadingCreated = true
+                        
+                        // set timeStampLastBgReading to new timestamp
+                        timeStampLastBgReading = glucose.timeStamp
+                        
+
+                    } else {
+                        
+                        trace("reading skipped, rawValue <= 0, looks like a faulty sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                         
                     }
-                    
-                    // save the newly created bgreading permenantly in coredata
-                    coreDataManager.saveChanges()
-                    
-                    // a new reading was created
-                    newReadingCreated = true
-                    
-                    // set timeStampLastBgReading to new timestamp
-                    timeStampLastBgReading = glucose.timeStamp
                     
                 }
                 
@@ -718,17 +777,17 @@ final class RootViewController: UIViewController {
                     updateLabelsAndChart(overrideApplicationState: false)
                 }
                 
-                nightScoutUploadManager?.upload()
+                nightScoutUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 healthKitManager?.storeBgReadings()
                 
-                bgReadingSpeaker?.speakNewReading()
+                bgReadingSpeaker?.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
-                dexcomShareUploadManager?.upload()
+                dexcomShareUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 bluetoothPeripheralManager?.sendLatestReading()
                 
-                watchManager?.processNewReading()
+                watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 loopManager?.share()
                 
@@ -1018,12 +1077,12 @@ final class RootViewController: UIViewController {
                 
                 // initiate upload to NightScout, if needed
                 if let nightScoutUploadManager = self.nightScoutUploadManager {
-                    nightScoutUploadManager.upload()
+                    nightScoutUploadManager.upload(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 }
                 
                 // initiate upload to Dexcom Share, if needed
                 if let dexcomShareUploadManager = self.dexcomShareUploadManager {
-                    dexcomShareUploadManager.upload()
+                    dexcomShareUploadManager.upload(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 }
                 
                 // update labels
@@ -1033,7 +1092,7 @@ final class RootViewController: UIViewController {
                 self.bluetoothPeripheralManager?.sendLatestReading()
                 
                 // watchManager should process new reading
-                self.watchManager?.processNewReading()
+                self.watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
             
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
                 self.loopManager?.share()
@@ -1149,7 +1208,7 @@ final class RootViewController: UIViewController {
         }
         
         // get lastReading, with a calculatedValue - no check on activeSensor because in follower mode there is no active sensor
-        let lastReading = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
         
         // if there's no reading for active sensor with calculated value , then no reason to continue
         if lastReading.count == 0 {
@@ -1189,7 +1248,8 @@ final class RootViewController: UIViewController {
         if readingValueForBadge <= 40.0 {readingValueForBadge = 40.0}
         
         // check if notification on home screen is enabled in the settings
-        if UserDefaults.standard.showReadingInNotification && !overrideShowReadingInNotification  {
+        // and also if last notification was long enough ago (longer than ConstantsNotifications.minimiumTimeBetweenTwoReadingsInMinutes), except if there would have been a disconnect since previous notification (simply because I like getting a new reading with a notification by disabling/reenabling bluetooth
+        if UserDefaults.standard.showReadingInNotification && !overrideShowReadingInNotification && (abs(timeStampLastBGNotification.timeIntervalSince(Date())) > ConstantsNotifications.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 || lastConnectionStatusChangeTimeStamp().timeIntervalSince(timeStampLastBGNotification) > 0) {
             
             // Create Notification Content
             let notificationContent = UNMutableNotificationContent()
@@ -1199,9 +1259,9 @@ final class RootViewController: UIViewController {
                 
                 // rescale if unit is mmol
                 if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
-                    readingValueForBadge = readingValueForBadge.mgdlToMmol().roundToDecimal(1)
+                    readingValueForBadge = readingValueForBadge.mgdlToMmol().round(toDecimalPlaces: 1)
                 } else {
-                    readingValueForBadge = readingValueForBadge.roundToDecimal(0)
+                    readingValueForBadge = readingValueForBadge.round(toDecimalPlaces: 0)
                 }
                 
                 notificationContent.badge = NSNumber(value: readingValueForBadge.rawValue)
@@ -1230,6 +1290,9 @@ final class RootViewController: UIViewController {
                     trace("Unable to Add bg reading Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
                 }
             }
+            
+            // set timeStampLastBGNotification to now
+            timeStampLastBGNotification = Date()
         }
         else {
             
@@ -1276,8 +1339,8 @@ final class RootViewController: UIViewController {
         self.minutesLabelOutlet.textColor = UIColor.white
         
         // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's not going to be a latestReading
-        let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-        
+        let latestReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
+            
         // if there's no readings, then give empty fields
         guard latestReadings.count > 0 else {
             valueLabelOutlet.text = "---"
@@ -1289,6 +1352,7 @@ final class RootViewController: UIViewController {
         
         // assign last reading
         let lastReading = latestReadings[0]
+            
         // assign last but one reading
         let lastButOneReading = latestReadings.count > 1 ? latestReadings[1]:nil
         
@@ -1317,15 +1381,18 @@ final class RootViewController: UIViewController {
             
         }
         
+        // to make follow code a bit more readable
+        let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
         // if data is stale (over 11 minutes old), show it as gray colour to indicate that it isn't current
         // if not, then set color, depending on value lower than low mark or higher than high mark
         // set both HIGH and LOW BG values to red as previous yellow for hig is now not so obvious due to in-range colour of green.
         if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
             valueLabelOutlet.textColor = UIColor.lightGray
-        } else if lastReading.calculatedValue >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) || lastReading.calculatedValue <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+        } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
             // BG is higher than urgentHigh or lower than urgentLow objectives
             valueLabelOutlet.textColor = UIColor.red
-        } else if lastReading.calculatedValue >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) || lastReading.calculatedValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+        } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
             // BG is between urgentHigh/high and low/urgentLow objectives
             valueLabelOutlet.textColor = UIColor.yellow
         } else {
@@ -1508,7 +1575,7 @@ final class RootViewController: UIViewController {
         
         // unwrap alerts and check alerts
         if let alertManager = alertManager {
-            
+
             // check if an immediate alert went off that shows the current reading
             if alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds) {
                 
@@ -1517,7 +1584,7 @@ final class RootViewController: UIViewController {
                 // possibily the app is in the foreground now
                 // if user would have opened SnoozeViewController now, then close it, otherwise the alarm picker view will not be shown
                 closeSnoozeViewController()
-
+                
                 // only update badge is required, (if enabled offcourse)
                 createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
                 
@@ -1527,7 +1594,18 @@ final class RootViewController: UIViewController {
                 createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: false)
                 
             }
+
         }
+
+    }
+    
+    // a long function just to get the timestamp of the last disconnect or reconnect. If not known then returns 1 1 1970
+    private func lastConnectionStatusChangeTimeStamp() -> Date  {
+        
+        // this is actually unwrapping of optionals, goal is to get date of last disconnect/reconnect - all optionals should exist so it doesn't matter what is returned true or false
+        guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter, let bluetoothPeripheral = self.bluetoothPeripheralManager?.getBluetoothPeripheral(for: bluetoothTransmitter), let lastConnectionStatusChangeTimeStamp = bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp else {return Date(timeIntervalSince1970: 0)}
+        
+        return lastConnectionStatusChangeTimeStamp
         
     }
     
@@ -1741,10 +1819,13 @@ extension RootViewController:NightScoutFollowerDelegate {
                 }
                 
                 if let bgReadingSpeaker = bgReadingSpeaker {
-                    bgReadingSpeaker.speakNewReading()
+                    bgReadingSpeaker.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 }
                 
                 bluetoothPeripheralManager?.sendLatestReading()
+                
+                // ask watchManager to process new reading, ignore last connection change timestamp because this is follower mode, there is no connection to a transmitter
+                watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: nil)
                 
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
                 self.loopManager?.share()

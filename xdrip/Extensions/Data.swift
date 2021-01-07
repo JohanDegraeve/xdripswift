@@ -98,7 +98,27 @@ extension Data {
     func getByteAt(position:Int) -> Int {
         return Int(self[position])
     }
+ 
+    // from DiaBLE
+    func hexDump(address: Int = -1, header: String = "") -> String {
+        var offset = startIndex
+        var offsetEnd = offset
+        var str = header.isEmpty ? "" : "\(header)\n"
+        while offset < endIndex {
+            _ = formIndex(&offsetEnd, offsetBy: 8, limitedBy: endIndex)
+            if address != -1 { str += String(format: "%04X", address + offset) + "  " }
+            str += "\(self[offset ..< offsetEnd].reduce("", { $0 + String(format: "%02X", $1) + " "}))"
+            str += String(repeating: "   ", count: 8 - distance(from: offset, to: offsetEnd))
+            str += "\(self[offset ..< offsetEnd].reduce(" ", { $0 + ((isprint(Int32($1)) != 0) ? String(Unicode.Scalar($1)) : "." ) }))\n"
+            _ = formIndex(&offset, offsetBy: 8, limitedBy: endIndex)
+        }
+        str.removeLast()
+        return str
+    }
     
+    // from DiaBLE
+    var hexAddress: String { String(self.reduce("", { $0 + String(format: "%02X", $1) + ":"}).dropLast(1)) }
+
 }
 
 

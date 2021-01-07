@@ -116,7 +116,4 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("cannotActiveCGMInFollowerMode", tableName: filename, bundle: Bundle.main, value: "You can not activate a CGM in follower mode", comment: "User tries to add a CGM or connect an already existing CGM, while in follower mode.")
     }()
     
-    static let cgmDeActivateBecauseMovingToFollowerMode: String = {
-        return NSLocalizedString("cgmDeActivateBecauseMovingToFollowerMode", tableName: filename, bundle: Bundle.main, value: "The CGM has been deactivated as you can not have an active CGM in follower mode", comment: "User switches from master to follower, whil e having a CGM active. This is text used in BluetoothPeripheralManager.swift.")
-    }()
 }

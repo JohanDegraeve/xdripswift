@@ -142,5 +142,8 @@ enum ConstantsLog {
     /// soonzeParameter accessor
     static let categoryApplicationDataSnoozeParameter =      "ApplicationDataSnoozeParameter"
     
+    /// libre NFC
+    static let categoryLibreNFC =                    "categoryLibreNFC"
+    
 }
 

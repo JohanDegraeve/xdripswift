@@ -24,11 +24,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NFCReaderUsageDescription</key>
+	<string>DiaBLE uses NFC to scan Libre sensors.</string>
 	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
+	<dict/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Connect to CGM Transmitter and M5Stack</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>

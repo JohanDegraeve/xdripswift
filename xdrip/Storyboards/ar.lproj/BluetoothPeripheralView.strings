@@ -27,4 +27,3 @@
 "transmitterResultResult" = "نتيجة إعادة تعيين جهاز الإرسال";
 "bootLoader" = "محمل الإقلاع";
 "cannotActiveCGMInFollowerMode" = "لا يمكنك تفعيل نظام متابعة سكر الدم المستمرة CGM في وضع المتابعة";
-"cgmDeActivateBecauseMovingToFollowerMode" = "تم تعطيل CGM لأنه لا يمكنك الحصول على CGM نشط في وضع المتابعة";

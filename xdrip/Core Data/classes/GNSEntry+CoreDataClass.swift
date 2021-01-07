@@ -15,20 +15,6 @@ public class GNSEntry: NSManagedObject {
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         
         blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
-        
-    }
-    
-    /// create GNSEntry
-    /// - parameters:
-    init(address: String, name: String, alias: String?, timeStampLastBgReading: Date?, nsManagedObjectContext:NSManagedObjectContext) {
-        
-        let entity = NSEntityDescription.entity(forEntityName: "GNSEntry", in: nsManagedObjectContext)!
-        
-        super.init(entity: entity, insertInto: nsManagedObjectContext)
-        
-        self.timeStampLastBgReading = timeStampLastBgReading
-        
-        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
 
         blePeripheral.webOOPEnabled = false
 

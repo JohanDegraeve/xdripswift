@@ -20,7 +20,7 @@ public class Droplet: NSManagedObject {
     
     /// create Droplet
     /// - parameters:
-    init(address: String, name: String, alias: String?, timeStampLastBgReading: Date?, sensorSerialNumber: String?, webOOPEnabled: Bool, oopWebSite: String?, oopWebToken: String?, nsManagedObjectContext:NSManagedObjectContext) {
+    init(address: String, name: String, alias: String?, sensorSerialNumber: String?, webOOPEnabled: Bool, oopWebSite: String?, oopWebToken: String?, nsManagedObjectContext:NSManagedObjectContext) {
         
         let entity = NSEntityDescription.entity(forEntityName: "Droplet", in: nsManagedObjectContext)!
         

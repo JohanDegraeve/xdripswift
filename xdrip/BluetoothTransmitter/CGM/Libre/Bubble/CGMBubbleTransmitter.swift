@@ -25,9 +25,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMBubble)
     
-    /// timestamp of last received reading. When a new packet is received, then only the more recent readings will be treated
-    private var timeStampLastBgReading:Date
-    
     /// used when processing Bubble data packet
     private var startDate:Date
     // receive buffer for bubble packets
@@ -65,20 +62,22 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// bubble firmware version
     private var firmware: String?
     
+    /// instance of libreDataParser
+    private let libreDataParser: LibreDataParser
+    
     // MARK: - Initialization
     
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - delegate : CGMTransmitterDelegate intance
-    ///     - timeStampLastBgReading : timestamp of last bgReading, if nil then 1 1 1970 is used
     ///     - webOOPEnabled : enabled or not, if nil then default false
     ///     - oopWebSite : oop web site url to use, only used in case webOOPEnabled = true, if nil then default value is used (see Constants)
     ///     - oopWebToken : oop web token to use, only used in case webOOPEnabled = true, if nil then default value is used (see Constants)
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     ///     - cGMBubbleTransmitterDelegate : a CGMBubbleTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBubbleTransmitterDelegate: CGMBubbleTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, timeStampLastBgReading:Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBubbleTransmitterDelegate: CGMBubbleTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameBubble)
@@ -99,9 +98,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         rxBuffer = Data()
         startDate = Date()
         
-        // initialize timeStampLastBgReading
-        self.timeStampLastBgReading = timeStampLastBgReading ?? Date(timeIntervalSince1970: 0)
-        
         // initialize nonFixedSlopeEnabled
         self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
         
@@ -112,6 +108,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         self.oopWebToken = oopWebToken ?? ConstantsLibre.token
         self.oopWebSite = oopWebSite ?? ConstantsLibre.site
         
+        // initiliaze LibreDataParser
+        self.libreDataParser = LibreDataParser()
+
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Bubble)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Bubble, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Bubble, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }
@@ -259,18 +258,11 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                     // inform cGMBubbleTransmitterDelegate about new sensor detected
                                     cGMBubbleTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
                                     
-                                    // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
-                                    timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-                                    
                                 }
 
                             }
 
-                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData:  (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format) { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
-                                
-                                if let timeStampLastBgReading = timeStampLastBgReading {
-                                    self.timeStampLastBgReading = timeStampLastBgReading
-                                }
+                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData:  (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil) { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 if let sensorState = sensorState {
                                     self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
@@ -319,9 +311,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
             
             nonFixedSlopeEnabled = enabled
             
-            // nonFixed value changed, reset timeStampLastBgReading so that all glucose values will be sent to delegate. This is simply to ensure at least one reading will be sent to the delegate immediately.
-            timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-          
         }
     }
     
@@ -331,9 +320,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         if webOOPEnabled != enabled {
             
             webOOPEnabled = enabled
-            
-            // weboop value changed, reset timeStampLastBgReading so that all glucose values will be sent to delegate. This is simply to ensure at least one reading will be sent to the delegate immediately.
-            timeStampLastBgReading = Date(timeIntervalSince1970: 0)
             
         }
         

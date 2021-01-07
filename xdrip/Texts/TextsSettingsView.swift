@@ -44,6 +44,10 @@ class Texts_SettingsView {
         return NSLocalizedString("multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10?", comment: "general settings, should reading be multiplied with 10 yes or no")
     }()
     
+    static let warningChangeFromMasterToFollower: String = {
+        return NSLocalizedString("warningChangeFromMasterToFollower", tableName: filename, bundle: Bundle.main, value: "Switch from master to follower will stop your current sensor. Do you want to continue ?", comment: "general settings, when switching from master to follower, if confirmation is asked, this message will be shown.")
+    }()
+    
     // MARK: - Section Home Screen
     
     static let sectionTitleHomeScreen: String = {
@@ -247,6 +251,10 @@ class Texts_SettingsView {
     
     static let testUrlAndAPIKey: String = {
         return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Nightscout URL and API_SECRET?", comment: "nightscout settings, when clicking the cell, test the url and api key")
+    }()
+
+    static let nightScoutPort: String = {
+        return NSLocalizedString("nightScoutPort", tableName: filename, bundle: Bundle.main, value: "Port", comment: "nightscout settings, port to use")
     }()
 
     // MARK: - Section Speak

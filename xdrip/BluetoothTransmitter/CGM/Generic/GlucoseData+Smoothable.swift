@@ -1,6 +1,6 @@
 import Foundation
 
-extension GlucoseData: Smoothable {
+extension GlucoseData: SavitzkyGolaySmoothable {
     
     var value: Double {
         get {

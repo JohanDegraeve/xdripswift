@@ -50,7 +50,7 @@ extension M5StackSettingsViewController {
         /// bluetooth settings
         case bluetooth
         
-        func viewModel() -> SettingsViewModelProtocol {
+        func viewModel(coreDataManager: CoreDataManager?) -> SettingsViewModelProtocol {
             
             switch self {
                 
@@ -77,7 +77,8 @@ extension M5StackSettingsViewController: UITableViewDelegate {
         
         guard let section = Section(rawValue: indexPath.section) else { fatalError("Unexpected Section") }
         
-        let viewModel = section.viewModel()
+        // coredatamanager not needed in this viewmodel
+        let viewModel = section.viewModel(coreDataManager: nil)
         
         if viewModel.isEnabled(index: indexPath.row) {
             
@@ -103,7 +104,7 @@ extension M5StackSettingsViewController: UITableViewDataSource {
         
         guard let section = Section(rawValue: section) else { fatalError("Unexpected Section") }
         
-        return section.viewModel().numberOfRows()
+        return section.viewModel(coreDataManager: nil).numberOfRows()
         
     }
     
@@ -113,7 +114,7 @@ extension M5StackSettingsViewController: UITableViewDataSource {
         
         guard var cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("Unexpected Table View Cell") }
         
-        let viewModel = section.viewModel()
+        let viewModel = section.viewModel(coreDataManager: nil)
         
         // Configure Cell
         SettingsViewUtilities.configureSettingsCell(cell: &cell, forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withViewModel: viewModel, tableView: tableView)
@@ -126,7 +127,7 @@ extension M5StackSettingsViewController: UITableViewDataSource {
         
         guard let section = Section(rawValue: section) else { fatalError("Unexpected Section") }
         
-        return section.viewModel().sectionTitle()
+        return section.viewModel(coreDataManager: nil).sectionTitle()
         
     }
     

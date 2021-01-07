@@ -157,7 +157,7 @@ class NightScoutFollowManager:NSObject {
         let count = Int(-timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow / 60 + 1)
         
         // ceate endpoint to get latest entries
-        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightScoutUrl, count: count, olderThan: timeStampOfFirstBgReadingToDowload)
+        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightScoutUrl, count: count, olderThan: timeStampOfFirstBgReadingToDowload, token: UserDefaults.standard.nightScoutAPIKey)
         
         // create downloadTask and start download
         if let url = latestEntriesEndpoint.url {

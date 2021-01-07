@@ -8,6 +8,11 @@ extension UInt16 {
         self = UInt16(high) << 8 + UInt16(low)
     }
 
+    /// init from data[low...high]
+    init(_ data: Data) {
+        self = UInt16(data[data.startIndex + 1]) << 8 + UInt16(data[data.startIndex])
+    }
+    
     var data: Data {
         var int = self
         return Data(bytes: &int, count: MemoryLayout<UInt16>.size)

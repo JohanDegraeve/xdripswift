@@ -20,13 +20,11 @@ public class Blucon: NSManagedObject {
     
     /// create Blucon
     /// - parameters:
-    init(address: String, name: String, alias: String?, timeStampLastBgReading: Date?, sensorSerialNumber: String?, webOOPEnabled: Bool, nsManagedObjectContext:NSManagedObjectContext) {
+    init(address: String, name: String, alias: String?, sensorSerialNumber: String?, webOOPEnabled: Bool, nsManagedObjectContext:NSManagedObjectContext) {
         
         let entity = NSEntityDescription.entity(forEntityName: "Blucon", in: nsManagedObjectContext)!
         
         super.init(entity: entity, insertInto: nsManagedObjectContext)
-        
-        self.timeStampLastBgReading = timeStampLastBgReading
         
         blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
 

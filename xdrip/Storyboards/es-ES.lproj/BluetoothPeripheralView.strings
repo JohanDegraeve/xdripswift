@@ -26,4 +26,3 @@
 "transmitterResultResult" = "Resultado del reseteo del Transmisor";
 "bootLoader" = "Bootloader";
 "cannotActiveCGMInFollowerMode" = "No puedes añadir un transmisor MGC estando en modo Follower/Seguidor";
-"cgmDeActivateBecauseMovingToFollowerMode" = "El transmisor MGC ha sido desactivado ya que no se puede dejar activo en Modo Follower/Seguidor";

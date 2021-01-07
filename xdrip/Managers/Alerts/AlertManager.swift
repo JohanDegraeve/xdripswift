@@ -121,7 +121,7 @@ public class AlertManager:NSObject {
         var immediateNotificationCreated = false
         
         // get last bgreading, ignore sensor, because it must also work for follower mode
-        let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 2, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let latestBgReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
         
         // get latest calibration
         var lastCalibration:Calibration?

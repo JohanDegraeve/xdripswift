@@ -107,9 +107,6 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     /// used when processing data packet
     private var timestampFirstPacketReception:Date
 
-    /// timestamp of last received reading. When a new packet is received, then only the more recent readings will be treated
-    private var timeStampLastBgReading:Date
-
     /// battery level Characteristic, needed to be able to read value
     private var batteryLevelCharacteric: CBCharacteristic?
     
@@ -124,6 +121,9 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
 
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
     var emptyArray: [GlucoseData] = []
+    
+    /// instance of libreDataParser
+    private let libreDataParser: LibreDataParser
 
     // MARK: - public functions
     
@@ -133,7 +133,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     ///     - cgmTransmitterDelegate : CGMTransmitterDelegate
     ///     - watlaaBluetoothTransmitterDelegate : the WatlaaBluetoothTransmitterDelegate
     ///     - bluetoothTransmitterDelegate : BluetoothTransmitterDelegate
-    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, timeStampLastBgReading: Date?, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
+    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "watlaa")
@@ -151,9 +151,6 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
         // assign watlaaBluetoothTransmitterDelegate
         self.watlaaBluetoothTransmitterDelegate = watlaaBluetoothTransmitterDelegate
         
-        // initialize timeStampLastBgReading
-        self.timeStampLastBgReading = timeStampLastBgReading ?? Date(timeIntervalSince1970: 0)
-        
         // initialize webOOPEnabled
         self.webOOPEnabled = webOOPEnabled ?? false
 
@@ -167,6 +164,9 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
         // assign sensorSerialNumber
         self.sensorSerialNumber = sensorSerialNumber
 
+        // initiliaze LibreDataParser
+        self.libreDataParser = LibreDataParser()
+        
         // initialize - CBUUID_Receive_Authentication.rawValue and CBUUID_Write_Control.rawValue will not be used in the superclass
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Data_Service), CBUUID(string: CBUUID_Battery_Service), CBUUID(string: CBUUID_Watlaa_Settings_Service)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_ReceiveCharacteristic.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_WriteCharacteristic.rawValue, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
@@ -317,9 +317,6 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                                     
                                     watlaaBluetoothTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
                                     
-                                    // also reset timestamp last reading, to be sure that if new sensor is started, we get historic data
-                                    timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-                                    
                                 }
                                 
                             }
@@ -330,11 +327,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                             // send batteryPercentage to delegate
                             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
                             
-                            LibreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: nil, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, timeStampLastBgReading: timeStampLastBgReading, dataIsDecryptedToLibre1Format: false, completionHandler:  { (timeStampLastBgReading: Date?, sensorState: LibreSensorState?, xDripError: XdripError?) in
-                                
-                                if let timeStampLastBgReading = timeStampLastBgReading {
-                                    self.timeStampLastBgReading = timeStampLastBgReading
-                                }
+                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: nil, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: false, testTimeStamp: nil, completionHandler:  { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 // TODO : use sensorState as in MiaoMiao and Bubble : show the status on bluetoothPeripheralView
                                 

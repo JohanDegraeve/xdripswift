@@ -96,6 +96,47 @@ class LibreMeasurement {
         
     }
     
+    init(rawGlucose: Int, rawTemperature: Int, minuteCounter: Int, date: Date, temperatureAdjustment: Int, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?) {
+        
+        self.rawGlucose = rawGlucose
+        
+        self.rawTemperature = rawTemperature
+        
+        self.slope = 0.1
+        
+        self.offset = 0.0
+        
+        self.glucose = offset + slope * Double(rawGlucose)
+        
+        self.date = date
+        
+        self.minuteCounter = minuteCounter
+        
+        self.rawTemperatureAdjustment = temperatureAdjustment
+        
+        // local algorithm
+        self.temperatureAlgorithmParameterSet = libre1DerivedAlgorithmParameters
+        
+        if let libreDerivedAlgorithmParameterSet = self.temperatureAlgorithmParameterSet {
+            
+            self.oopSlope = libreDerivedAlgorithmParameterSet.slope_slope * Double(rawTemperature) + libreDerivedAlgorithmParameterSet.offset_slope
+            
+            self.oopOffset = libreDerivedAlgorithmParameterSet.slope_offset * Double(rawTemperature) + libreDerivedAlgorithmParameterSet.offset_offset
+            
+            let oopGlucose = oopSlope * Double(rawGlucose) + oopOffset
+            
+            self.temperatureAlgorithmGlucose = oopGlucose * libreDerivedAlgorithmParameterSet.extraSlope + libreDerivedAlgorithmParameterSet.extraOffset
+            
+        } else {
+            
+            self.oopSlope = 0
+            self.oopOffset = 0
+            self.temperatureAlgorithmGlucose = 0
+            
+        }
+
+    }
+    
     func roundedGlucoseValueFromRaw(libreCalibrationInfo: LibreCalibrationInfo) -> Int {
         Int(round(glucoseValueFromRaw(libreCalibrationInfo: libreCalibrationInfo)))
     }

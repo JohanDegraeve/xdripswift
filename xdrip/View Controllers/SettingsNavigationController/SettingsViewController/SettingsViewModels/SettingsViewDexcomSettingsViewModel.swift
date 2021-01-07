@@ -150,7 +150,7 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
         case .dexcomShareAccountName:
             return UserDefaults.standard.dexcomShareAccountName
         case .dexcomSharePassword:
-            return UserDefaults.standard.dexcomSharePassword
+            return "***********"
         case .useUSDexcomShareurl:
             return nil
         case .dexcomShareSerialNumber:

@@ -27,4 +27,3 @@
 "transmitterResultResult" = "Transmitter Reset Result";
 "bootLoader" = "Bootloader";
 "cannotActiveCGMInFollowerMode" = "You can not activate a CGM in Follower Mode";
-"cgmDeActivateBecauseMovingToFollowerMode" = "The CGM has been deactivated as you can not have an active CGM in Follower Mode";

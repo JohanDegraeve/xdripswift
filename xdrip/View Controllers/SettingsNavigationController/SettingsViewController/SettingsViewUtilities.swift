@@ -140,7 +140,14 @@ class SettingsViewUtilities {
             case let .askConfirmation(title, message, actionHandler, cancelHandler):
                 
                 // first ask user confirmation
-                let alert = UIAlertController(title: title, message: message, actionHandler: actionHandler, cancelHandler: cancelHandler)
+                let alert = UIAlertController(title: title, message: message, actionHandler: {
+                    
+                    actionHandler()
+                    
+                    // check if refresh is needed, either complete settingsview or individual section
+                    self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: settingsViewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
+                    
+                }, cancelHandler: cancelHandler)
                 
                 uIViewController.present(alert, animated: true, completion: nil)
                 
