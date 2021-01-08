@@ -176,3 +176,71 @@ extension Array where Element: BgReading {
 
 }
 
+extension Array where Element: GlucoseData {
+    
+    /// returns true if the first howManyToCheck values in the  arrays have equal glucoseLevelRaw
+    func hasEqualValues(howManyToCheck: Int, otherArray: [Double]) -> Bool {
+        
+        // check for the value 0 up to howManyToCheck - 1
+        for index in 0..<howManyToCheck {
+            
+            // if one of the two arrays is shorter than the index, then we can't compare the values, would cause an exception
+            if self.count < index + 1 || otherArray.count < index + 1 {
+                
+                // at least one of the two arrays is too short to compare up to howManyToCheck values
+                // if at least one of them is large enough then it means one of the arrays is longer, means not equal
+                if self.count >= index + 1 || otherArray.count >= index + 1  {
+                    return false
+                } else {
+                    // two arrays fully processed and we got here means equal values
+                    return true
+                }
+                
+            }
+            
+            // found non matching value
+            if self[index].glucoseLevelRaw != otherArray[index] {return false}
+            
+        }
+        
+        // we got here, means equal values
+        return true
+        
+    }
+    
+}
+
+extension Array where Element == Int {
+    
+    /// returns true if the first howManyToCheck values in the  arrays have equal values
+    func hasEqualValues(howManyToCheck: Int, otherArray: [Int]) -> Bool {
+        
+        // check for the value 0 up to howManyToCheck - 1
+        for index in 0..<howManyToCheck {
+            
+            // if one of the two arrays is shorter than the index, then we can't compare the values, would cause an exception
+            if self.count < index + 1 || otherArray.count < index + 1 {
+                
+                // at least one of the two arrays is too short to compare up to howManyToCheck values
+                // if at least one of them is large enough then it means one of the arrays is longer, means not equal
+                if self.count >= index + 1 || otherArray.count >= index + 1  {
+                    return false
+                } else {
+                    // two arrays fully processed and we got here means equal values
+                    return true
+                }
+                
+            }
+            
+            // found non matching value
+            if self[index] != otherArray[index] {return false}
+            
+        }
+        
+        // we got here, means equal values
+        return true
+        
+    }
+    
+}
+

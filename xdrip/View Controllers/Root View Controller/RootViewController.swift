@@ -603,9 +603,6 @@ final class RootViewController: UIViewController {
             
         }
         
-        // check for flat values, this will only apply to Libre because in case of Dexcom there's always only one element in the glucoseData array
-        glucoseData = glucoseData.checkFlatValues()
-        
         // also for cases where calibration is not needed, we go through this code
         if let activeSensor = activeSensor, let calibrator = calibrator, let bgReadingsAccessor = bgReadingsAccessor {
             

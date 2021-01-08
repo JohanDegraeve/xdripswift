@@ -104,6 +104,11 @@ class LibreDataParser {
         // add previously stored values if there are any
         trend = extendWithPreviousRawValues(trend: trend)
         
+        // check if the trend and the previous raw values have at least 5 equal values, if so this is an expired sensor that keeps sending the same values, in that case no further processing
+        if trend.hasEqualValues(howManyToCheck: 5, otherArray: previousRawValues) {
+            return ([GlucoseData](), sensorState, sensorTimeInMinutes)
+        }
+        
         // now, if previousRawValues was not an empty list, trend is a longer list of values because it's been extended with a subrange of previousRawvalues
         // we re-assign previousRawValues to the current list in trend, for next usage
         // but we restricted it to maximum x most recent values, it makes no sense to store more
