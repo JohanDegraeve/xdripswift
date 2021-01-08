@@ -14,12 +14,8 @@
 "settingsviews_transmitterid" = "Transmetteur ID";
 "settingsviews_givetransmitterid" = "Entrer Transmetteur ID";
 "settingsviews_resettransmitter" = "Réinitialiser Transmetteur";
-"settingsviews_webooptransmitter" = "Utiliser l'algorithme FreeStyle Libre?";
-"settingsviews_labelWebOOPSite" = "OOPWeb URL";
-"settingsviews_labelWebOOPtoken" = "OOPWeb Clé";
-"settingsviews_labelWebOOPSiteExplainingText" = "OPWeb URL (Optionnel)";
-"settingsviews_labelWebOOPtokenExplainingText" = "OOPWeb Clé (Optionnel)";
-"labelWebOOP" = "OOPWeb Algorithme";
+"settingsviews_webooptransmitter" = "Utiliser l'algorithme Libre?";
+"labelWebOOP" = "Algorithme xDrip ou Libre";
 "transmitterId8OrHigherNotSupported" = "Transmetteur avec ID 8Gxxxx ou plus récent ne sont pas supportés !";
 "settingsviews_sectiontitlealerting" = "Alarme";
 "settingsviews_row_alert_types" = "Types d'alarme";

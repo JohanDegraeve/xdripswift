@@ -14,7 +14,7 @@
 "settingsviews_transmitterid" = "Transmitter ID:";
 "settingsviews_givetransmitterid" = "Enter Transmitter ID";
 "settingsviews_resettransmitter" = "Reset Transmitter";
-"settingsviews_webooptransmitter" = "Use FreeStyle Libre Algorithm?";
+"settingsviews_webooptransmitter" = "Use Libre Algorithm?";
 "settingsviews_nonfixedtransmitter" = "Use Multi-point Calibration?";
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
 "labelWebOOP" = "xDrip or Libre Algorithm";
