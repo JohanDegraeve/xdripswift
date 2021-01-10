@@ -3,9 +3,6 @@ import CoreData
 
 public class Libre2: NSManagedObject {
     
-    // sensorState, not stored in coreData, will only be available after having received it from the Libre2
-    public var sensorState: LibreSensorState = .unknown
-    
     /// create Libre2
     /// - parameters:
     init(address: String, name: String, alias: String?, nsManagedObjectContext:NSManagedObjectContext) {

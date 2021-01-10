@@ -49,9 +49,6 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// current sensor serial number, if nil then it's not known yet
     private var sensorSerialNumber:String?
     
-    /// temp storage of libreSensortate, value will be stored after NFC scanning, but possible there's no transmitter created yet (if this is a first scan for a new transmitter), so we can't store the state yet in coredata. As soon as transmitter is connected, and if tempSensorState is not nil, it will be sent to the delegate
-    private var tempSensorState: LibreSensorState?
-    
     /// temp storage of libreSensorSerialNumber, value will be stored after NFC scanning, but possible there's no transmitter created yet (if this is a first scan for a new transmitter), so we can't store the serial number yet in coredata. As soon as transmitter is connected,  and if tempSensorSerialNumber is not nil, it will be sent to the delegate
     private var tempSensorSerialNumber: LibreSensorSerialNumber?
     
@@ -145,20 +142,9 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         super.centralManager(central, didConnect: peripheral)
         
-        if let sensorState = tempSensorState {
-            
-            // we need to send the sensorState here. Possibly this is a new transmitter being scanned for, in which case the call to cGMLibre2TransmitterDelegate?.received(sensorStatus: ..) in NFCTagReaderSessionDelegate functions wouldn't have stored the status in coredata, because it' doesn't find the transmitter, so let's store it again, at each connect, if not nil
-            //, value will be stored after NFC scanning, but possible there's no transmitter created yet (if this is a first scan for a new transmitter), so we can't store the state yet. Will do this as soon as transmitter is connected (each time again, although not necessary to do it each time)
-            cGMLibre2TransmitterDelegate?.received(sensorStatus: sensorState, from: self)
-            
-            // set tempSensorState to nil so we don't send it again to the delegate when there's a new connect
-            tempSensorState = nil
-            
-        }
-        
         if let sensorSerialNumber = tempSensorSerialNumber {
             
-            // delegate call, for same reason as for sensorState
+            // we need to send the sensorSerialNumber here. Possibly this is a new transmitter being scanned for, in which case the call to cGMLibre2TransmitterDelegate?.received(sensorSerialNumber: ..) in NFCTagReaderSessionDelegate functions wouldn't have stored the status in coredata, because it' doesn't find the transmitter, so let's store it again, at each connect, if not nil
             cGMLibre2TransmitterDelegate?.received(serialNumber: sensorSerialNumber.serialNumber, from: self)
             
             // set to nil so we don't send it again to the delegate when there's a new connect
@@ -342,17 +328,6 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
     func received(fram: Data) {
         
         trace("received fram :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, fram.toHexString())
-        
-        // first get sensor status and send to delegate
-        if fram.count >= 5 {
-            
-            let sensorState = LibreSensorState(stateByte: fram[4])
-            
-            cGMLibre2TransmitterDelegate?.received(sensorStatus: sensorState, from: self)
-            
-            self.tempSensorState = sensorState
-            
-        }
         
         // if we already know the patchinfo (which we should because normally received(patchInfo: Data gets called before received(fram: Data), then patchInfo should not be nil
         // same for sensorUID

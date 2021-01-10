@@ -9,9 +9,6 @@ class Libre2BluetoothPeripheralViewModel {
         /// Sensor serial number
         case sensorSerialNumber = 0
         
-        /// sensor State
-        case sensorState = 1
-
     }
     
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: "Libre2BluetoothPeripheralViewModel")
@@ -117,12 +114,6 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         switch setting {
             
-        case .sensorState:
-            
-            cell.accessoryType = .none
-            cell.textLabel?.text = Texts_Common.sensorStatus
-            cell.detailTextLabel?.text = libre2.sensorState.translatedDescription
-
         case .sensorSerialNumber:
             
             cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
@@ -145,9 +136,6 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         switch setting {
         
-        case .sensorState:
-            return .nothing
-            
         case .sensorSerialNumber:
             
             // serial text could be longer than screen width, clicking the row allows to see it in a pop up with more text place
@@ -177,16 +165,6 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
 extension Libre2BluetoothPeripheralViewModel: CGMLibre2TransmitterDelegate {
     
-    func received(sensorStatus: LibreSensorState, from cGMLibre2Transmitter: CGMLibre2Transmitter) {
-        
-        // inform also bluetoothPeripheralManager
-        (bluetoothPeripheralManager as? CGMLibre2TransmitterDelegate)?.received(sensorStatus: sensorStatus, from: cGMLibre2Transmitter)
-        
-        // here's the trigger to update the table
-        reloadRow(row: Settings.sensorState.rawValue)
-        
-    }
-
     func received(serialNumber: String, from cGMLibre2Transmitter: CGMLibre2Transmitter) {
         
         // inform also bluetoothPeripheralManager
