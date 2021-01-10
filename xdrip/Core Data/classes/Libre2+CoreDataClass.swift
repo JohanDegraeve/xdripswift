@@ -3,6 +3,9 @@ import CoreData
 
 public class Libre2: NSManagedObject {
     
+    /// sensor time in Minutes if known
+    var sensorTimeInMinutes: Int?
+    
     /// create Libre2
     /// - parameters:
     init(address: String, name: String, alias: String?, nsManagedObjectContext:NSManagedObjectContext) {

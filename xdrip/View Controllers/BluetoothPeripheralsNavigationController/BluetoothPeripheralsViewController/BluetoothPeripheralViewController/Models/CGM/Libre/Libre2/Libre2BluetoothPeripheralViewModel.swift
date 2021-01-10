@@ -9,6 +9,9 @@ class Libre2BluetoothPeripheralViewModel {
         /// Sensor serial number
         case sensorSerialNumber = 0
         
+        /// sensor start time
+        case sensorStartTime = 1
+        
     }
     
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: "Libre2BluetoothPeripheralViewModel")
@@ -120,6 +123,13 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.detailTextLabel?.text = libre2.blePeripheral.sensorSerialNumber
             cell.accessoryType = .disclosureIndicator
 
+        case .sensorStartTime:
+            
+            cell.textLabel?.text = Texts_HomeView.sensorStart
+            if let sensorTimeInMinutes = libre2.sensorTimeInMinutes {
+                cell.detailTextLabel?.text = Date(timeIntervalSinceNow: -Double(sensorTimeInMinutes*60)).toString(timeStyle: .short, dateStyle: .short)
+            }
+            cell.accessoryType = .none
             
         }
         
@@ -142,6 +152,10 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             if let serialNumber = libre2.blePeripheral.sensorSerialNumber {
                 return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " : " + serialNumber)
             }
+
+        case .sensorStartTime:
+            
+            return .nothing
             
         }
         
@@ -164,6 +178,16 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 // MARK: - conform to CGMLibre2TransmitterDelegate
 
 extension Libre2BluetoothPeripheralViewModel: CGMLibre2TransmitterDelegate {
+    
+    func received(sensorTimeInMinutes: Int, from cGMLibre2Transmitter: CGMLibre2Transmitter) {
+        
+        // inform also bluetoothPeripheralManager
+        (bluetoothPeripheralManager as? CGMLibre2TransmitterDelegate)?.received(sensorTimeInMinutes: sensorTimeInMinutes, from: cGMLibre2Transmitter)
+        
+        // here's the trigger to update the table
+        reloadRow(row: Settings.sensorStartTime.rawValue)
+        
+    }
     
     func received(serialNumber: String, from cGMLibre2Transmitter: CGMLibre2Transmitter) {
         

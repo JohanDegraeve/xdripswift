@@ -263,7 +263,11 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
                 // if oop web not enabled, then don't pass libre1DerivedAlgorithmParameters
                 var parsedBLEData = Libre2BLEUtilities.parseBLEData(Data(try Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: rxBuffer)), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ? UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
                 
+                // send glucoseData and sensorTimeInMinutes to cgmTransmitterDelegate
                 cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &parsedBLEData.bleGlucose, transmitterBatteryInfo: nil, sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes))
+                
+                // send sensorTimeInMinutes also to cGMLibre2TransmitterDelegate
+                cGMLibre2TransmitterDelegate?.received(sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes), from: self)
                 
             } catch {
                 
