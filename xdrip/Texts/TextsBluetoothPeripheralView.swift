@@ -93,11 +93,11 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let resetRequired: String = {
-        return NSLocalizedString("resetRequired", tableName: filename, bundle: Bundle.main, value: "Reset Required", comment: "cell text, where user can select to reset a transmitter at next connect. Only for Dexcom")
+        return NSLocalizedString("resetRequired", tableName: filename, bundle: Bundle.main, value: "Reset Transmitter?", comment: "cell text, where user can select to reset a transmitter at next connect. Only for Dexcom")
     }()
     
     static let lastResetTimeStamp: String = {
-        return NSLocalizedString("lastReset", tableName: filename, bundle: Bundle.main, value: "Last Reset", comment: "cell text, shows when last reset was done, if known. Only for Dexcom")
+        return NSLocalizedString("lastReset", tableName: filename, bundle: Bundle.main, value: "Last Reset:", comment: "cell text, shows when last reset was done, if known. Only for Dexcom")
     }()
     
     static let lastResetTimeStampNotKnown: String = {

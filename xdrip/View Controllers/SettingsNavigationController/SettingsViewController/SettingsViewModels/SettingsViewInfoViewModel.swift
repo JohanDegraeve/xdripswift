@@ -27,7 +27,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return Texts_HomeView.info
+        return Texts_SettingsView.sectionTitleAbout
     }
     
     func settingsRowText(index: Int) -> String {

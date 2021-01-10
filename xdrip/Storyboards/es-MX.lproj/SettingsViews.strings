@@ -14,17 +14,13 @@
 "settingsviews_transmitterid" = "ID del Transmisor:";
 "settingsviews_givetransmitterid" = "ID del Transmisor";
 "settingsviews_resettransmitter" = "Resetear Transmisor";
-"settingsviews_webooptransmitter" = "Usar el Servicio OOPWeb?";
-"settingsviews_labelWebOOPSite" = "URL del Servidor OOPWeb:";
-"settingsviews_labelWebOOPtoken" = "Token OOPWeb:";
-"settingsviews_labelWebOOPSiteExplainingText" = "URL del Servidor OOPWeb (opcional):";
-"settingsviews_labelWebOOPtokenExplainingText" = "Token del Servidor OOPWeb (opcional):";
-"labelWebOOP" = "Servicio OOPWeb";
+"settingsviews_webooptransmitter" = "Usar Algoritmo Libre?";
+"labelWebOOP" = "Algoritmo xDrip o Libre";
 "transmitterId8OrHigherNotSupported" = "Los transmisores con ID 8Gxxxx o más nuevos no son compatibles de momento!";
 "settingsviews_sectiontitlealerting" = "Alarma";
 "settingsviews_row_alert_types" = "Tipos de Alarmas";
 "settingsviews_row_alerts" = "Alarmas";
-"settingsviews_sectiontitlehealthkit" = "Integración Apple Health";
+"settingsviews_sectiontitlehealthkit" = "Apple Health";
 "settingsviews_healthkit" = "Grabar Datos en Apple Health?";
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
 "settingsviews_uploadReadingstoDexcomShare" = "Subir Datos a Dexcom Share?";
@@ -75,3 +71,4 @@
 "emailNotConfigured" = "Deberías tener configurado una cuenta de correo antes de enviar el archivo.";
 "emailbodyText" = "Problem Description: ";
 "failedToSendEmail" = "Error al Enviar Correo";
+"nightScoutPort" = "Puerto:";
