@@ -75,7 +75,7 @@ public enum LibreSensorType: String {
             if let info = patchInfo?.hexadecimal() {
                 
                 if let log = log {
-                    trace("    decrypting libre data", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                    trace("    decrypting libre data", log: log, category: ConstantsLog.categoryLibreSensorType, type: .info)
                 }
                 
                 libreData = Data(PreLibre2.decryptFRAM(uid, info.bytes, libreData.bytes))
