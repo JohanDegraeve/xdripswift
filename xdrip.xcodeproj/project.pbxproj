@@ -1487,16 +1487,16 @@
 				F816E0F22433DAA9009EE65B /* BluetoothPeripheralManager+CGMBluconTransmitterDelegate.swift */,
 				F816E10F2437ED21009EE65B /* BluetoothPeripheralManager+CGMBlueReaderTransmitterDelegate.swift */,
 				F878FA7C2405B3CF00BC6DA6 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift */,
+				F816E12D2439E06E009EE65B /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift */,
 				F816E11D24392690009EE65B /* BluetoothPeripheralManager+CGMDropletTransmitterDelegate.swift */,
 				F897E24C23FC871C0075E0E8 /* BluetoothPeripheralManager+CGMG5TransmitterDelegate.swift */,
+				F825286D2443C1000067AF77 /* BluetoothPeripheralManager+CGMG6TransmitterDelegate.swift */,
 				F816E10424368BC3009EE65B /* BluetoothPeripheralManager+CGMGNSEntryTransmitterDelegate.swift */,
+				F80D917124FA9CD5006840B5 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift */,
 				F8C9785A242ABD9800A09483 /* BluetoothPeripheralManager+CGMMiaoMiaoTransmitterDelegate.swift */,
 				F897E24D23FC871C0075E0E8 /* BluetoothPeripheralManager+M5StackBluetoothTransmitterDelegate.swift */,
 				F897E24F23FC871C0075E0E8 /* BluetoothPeripheralManager+WatlaaBluetoothTransmitterDelegate.swift */,
 				F8297F44238DC4AC00D74D66 /* BluetoothPeripheralManaging.swift */,
-				F816E12D2439E06E009EE65B /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift */,
-				F825286D2443C1000067AF77 /* BluetoothPeripheralManager+CGMG6TransmitterDelegate.swift */,
-				F80D917124FA9CD5006840B5 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift */,
 			);
 			path = BluetoothPeripheral;
 			sourceTree = "<group>";
