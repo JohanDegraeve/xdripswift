@@ -6,8 +6,4 @@ extension Watlaa: BluetoothPeripheral {
         return .WatlaaType
     }
     
-    func overrideNeedsOOPWeb() -> Bool {
-        return false
-    }
-    
 }

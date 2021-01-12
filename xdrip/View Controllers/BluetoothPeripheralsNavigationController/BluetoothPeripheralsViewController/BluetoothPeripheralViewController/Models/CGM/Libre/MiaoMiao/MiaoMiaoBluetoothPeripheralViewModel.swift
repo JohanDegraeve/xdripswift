@@ -49,9 +49,6 @@ class MiaoMiaoBluetoothPeripheralViewModel {
         }
     }
     
-    /// closure that the viewmodel should call when it receives a libre sensor type - doesn't need to be necessarily a new sensor type. This is to conform to protocol BluetoothPeripheralViewModel
-    private var onLibreSensorTypeReceived: ((LibreSensorType) -> ())?
-
     // MARK: - deinit
     
     deinit {
@@ -76,9 +73,7 @@ class MiaoMiaoBluetoothPeripheralViewModel {
 
 extension MiaoMiaoBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, onLibreSensorTypeReceived: ((LibreSensorType) -> ())?) {
-        
-        self.onLibreSensorTypeReceived = onLibreSensorTypeReceived
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         
@@ -243,9 +238,6 @@ extension MiaoMiaoBluetoothPeripheralViewModel: CGMMiaoMiaoTransmitterDelegate {
         
         // inform bluetoothPeripheralManager, bluetoothPeripheralManager will store the libreSensorType in the miaomiao object
         (bluetoothPeripheralManager as? CGMMiaoMiaoTransmitterDelegate)?.received(libreSensorType: libreSensorType, from: cGMMiaoMiaoTransmitter)
-        
-        // inform bluetoothPeripheralViewController that sensor type was received
-        onLibreSensorTypeReceived?(libreSensorType)
         
         // here's the trigger to update the table row for sensorType
         reloadRow(row: Settings.sensorType.rawValue)

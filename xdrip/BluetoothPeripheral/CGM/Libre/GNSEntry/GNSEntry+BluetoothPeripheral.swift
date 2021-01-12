@@ -8,8 +8,4 @@ extension GNSEntry: BluetoothPeripheral {
         
     }
  
-    func overrideNeedsOOPWeb() -> Bool {
-        return false
-    }
-    
 }

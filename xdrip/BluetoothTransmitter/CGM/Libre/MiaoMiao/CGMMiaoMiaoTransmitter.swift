@@ -49,12 +49,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// is nonFixed enabled for the transmitter or not
     private var nonFixedSlopeEnabled: Bool
     
-    /// oop website url to use in case oop web would be enabled
-    private var oopWebSite: String
-    
-    /// oop token to use in case oop web would be enabled
-    private var oopWebToken: String
-        
     // current sensor serial number, if nil then it's not known yet
     private var sensorSerialNumber:String?
 
@@ -69,12 +63,10 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - webOOPEnabled : enabled or not
-    ///     - oopWebSite : oop web site url to use, only used in case webOOPEnabled = true
-    ///     - oopWebToken : oop web token to use, only used in case webOOPEnabled = true
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     ///     - cGMMiaoMiaoTransmitterDelegate : a CGMMiaoMiaoTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMMiaoMiaoTransmitterDelegate : CGMMiaoMiaoTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMMiaoMiaoTransmitterDelegate : CGMMiaoMiaoTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, sensorSerialNumber:String?, webOOPEnabled: Bool?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameMiaoMiao)
@@ -97,10 +89,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         
         // initialize webOOPEnabled
         self.webOOPEnabled = webOOPEnabled ?? false
-        
-        // initialize oopWebToken and oopWebSite
-        self.oopWebToken = oopWebToken ?? ConstantsLibre.token
-        self.oopWebSite = oopWebSite ?? ConstantsLibre.site
         
         // initialize nonFixedSlopeEnabled
         self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
@@ -240,7 +228,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 
                             }
                             
-                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 if let sensorState = sensorState {
                                     self.cGMMiaoMiaoTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
@@ -324,14 +312,6 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     
     func isNonFixedSlopeEnabled() -> Bool {
         return nonFixedSlopeEnabled
-    }
-    
-    func setWebOOPSite(oopWebSite: String) {
-        self.oopWebSite = oopWebSite
-    }
-    
-    func setWebOOPToken(oopWebToken: String) {
-        self.oopWebToken = oopWebToken
     }
     
     func requestNewReading() {
@@ -513,7 +493,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                             
                         }
                         
-                        libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: patchInfo, webOOPEnabled: true, oopWebSite: ConstantsLibre.site, oopWebToken: ConstantsLibre.token, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cGMTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: testTimeStamp, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                        libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: patchInfo, webOOPEnabled: true, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cGMTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: testTimeStamp, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                             
                         })
                         

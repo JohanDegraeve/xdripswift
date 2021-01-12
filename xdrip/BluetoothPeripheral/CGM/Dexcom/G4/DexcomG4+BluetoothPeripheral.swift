@@ -8,8 +8,4 @@ extension DexcomG4: BluetoothPeripheral {
         
     }
    
-    func overrideNeedsOOPWeb() -> Bool {
-        return false
-    }
-    
 }

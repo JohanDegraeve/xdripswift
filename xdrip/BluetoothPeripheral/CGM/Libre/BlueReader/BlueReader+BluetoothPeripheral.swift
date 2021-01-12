@@ -10,8 +10,4 @@ extension BlueReader: BluetoothPeripheral {
         
     }
   
-    func overrideNeedsOOPWeb() -> Bool {
-        return false
-    }
-    
 }

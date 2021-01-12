@@ -17,20 +17,9 @@ extension BluetoothPeripheralManager: CGMMiaoMiaoTransmitterDelegate {
         
         guard let miaoMiao = findTransmitter(cGMMiaoMiaoTransmitter: cGMMiaoMiaoTransmitter) else {return}
         
-        // store serial number in miaoMiao.blePeripheral object
+        // store libreSensorType in miaoMiao.blePeripheral object
         miaoMiao.blePeripheral.libreSensorType = libreSensorType
         
-        // if the libreSensorType needs oopweb, then enable oopweb. (User may have set it to false, but if it's one that requires oopweb, then we force to true)
-        // also disable non-fixed slopes, as calibration is not used, it makes no sense to show this as enabled
-        // and only if overrideNeedsOOPWeb is false
-        if libreSensorType.needsWebOOP() && !miaoMiao.overrideNeedsOOPWeb() {
-            
-            miaoMiao.blePeripheral.webOOPEnabled = true
-            
-            miaoMiao.blePeripheral.nonFixedSlopeEnabled = false
-            
-        }
-
         // coredatamanager savechanges needed because webOOPEnabled is stored in coredata
         coreDataManager.saveChanges()
         

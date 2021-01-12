@@ -303,10 +303,6 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
     
-    func setWebOOPSite(oopWebSite: String) {/*not used*/}
-    
-    func setWebOOPToken(oopWebToken: String) {/*not used*/}
-    
     func cgmTransmitterType() -> CGMTransmitterType {
         return .Libre2
     }

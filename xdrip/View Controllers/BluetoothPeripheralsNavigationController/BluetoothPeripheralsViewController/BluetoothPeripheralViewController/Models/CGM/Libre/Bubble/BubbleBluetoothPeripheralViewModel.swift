@@ -49,9 +49,6 @@ class BubbleBluetoothPeripheralViewModel {
         }
     }
     
-    /// closure that the viewmodel should call when it receives a libre sensor type - doesn't need to be necessarily a new sensor type. This will allow the BluetoothPeripheralViewController to delete or add sections, namely oop web related settings.
-    private var onLibreSensorTypeReceived: ((LibreSensorType) -> ())?
-
     // MARK: - deinit
     
     deinit {
@@ -76,9 +73,7 @@ class BubbleBluetoothPeripheralViewModel {
 
 extension BubbleBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, onLibreSensorTypeReceived: ((LibreSensorType) -> ())?) {
-        
-        self.onLibreSensorTypeReceived = onLibreSensorTypeReceived
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         
@@ -303,9 +298,6 @@ extension BubbleBluetoothPeripheralViewModel: CGMBubbleTransmitterDelegate {
         
         // inform bluetoothPeripheralManager, bluetoothPeripheralManager will store the libreSensorType in the bubble object
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(libreSensorType: libreSensorType, from: cGMBubbleTransmitter)
-
-        // inform bluetoothPeripheralViewController that sensor type was received
-        onLibreSensorTypeReceived?(libreSensorType)
 
         // here's the trigger to update the table row for sensorType
         reloadRow(row: Settings.sensorType.rawValue)

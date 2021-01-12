@@ -3,18 +3,6 @@ import Foundation
 /// errors encountered whil processing libre data, complies to XdripError
 enum LibreOOPWebError {
     
-    /// didn't receive data from oop web server
-    case receivedDataIsNil
-    
-    /// in case error is received after calling RLSession.shared.dataTask.resume
-    case genericError(String)
-    
-    /// in case json parsing of oopweb server response failed
-    case jsonParsingFailed
-    
-    /// in case web server returns err
-    case jsonResponseHasError(msg: String?, errcode: Int?)
-    
     /// user tries Libre US which is not suppored
     case libreUSNotSupported
     
@@ -26,26 +14,6 @@ extension LibreOOPWebError: XdripError {
         
         switch self {
             
-        case .receivedDataIsNil:
-            return .HIGH
-            
-        case .genericError:
-            return .HIGH
-            
-        case .jsonParsingFailed:
-            return .LOW
-            
-        case .jsonResponseHasError( _, let errcode):
-            
-            // seems to during starting phase, errcode = 0, return .LOW in that case
-            if let errcode = errcode, errcode == 0 {
-               return .LOW
-            }
-            
-            // for now always return HIGH
-            // maybe letter we change change to MEDIUM or LOW depending on errcode value
-            return .HIGH
-         
         case .libreUSNotSupported:
             return .HIGH
             
@@ -57,29 +25,6 @@ extension LibreOOPWebError: XdripError {
     var errorDescription: String? {
         
         switch self {
-            
-        case .receivedDataIsNil:
-            return TextsLibreErrors.oOPWebServerError + TextsLibreErrors.receivedDataIsNil
-            
-        case .genericError(let description):
-            return TextsLibreErrors.oOPWebServerError + description
-            
-        case .jsonParsingFailed:
-            return TextsLibreErrors.oOPWebServerError + "json parsing failed"
-            
-        case .jsonResponseHasError(let msg, let errcode):
-            
-            var message:String = ""
-            if let msg = msg {
-                message = msg
-            }
-            
-            var errcodeAsInt:Int = 0
-            if let errcode = errcode {
-                errcodeAsInt = errcode
-            }
-            
-            return TextsLibreErrors.oOPWebServerError + " code = " + errcodeAsInt.description + ", message = " + message
             
         case .libreUSNotSupported:
             return TextsLibreErrors.oOPWebServerError + " " + TextsLibreErrors.libreUSNotSupported
