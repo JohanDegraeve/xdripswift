@@ -4,12 +4,12 @@
 "alerttypesettingsview_enabled" = "Habilitado";
 "alerttypesettingsview_vibrate" = "Vibración";
 "alerttypesettingsview_snoozevianotification" = "Silenciar Via Notificación";
-"alerttypesettingsview_defaultsnoozeperiod" = "Tiempde Silencio Por Defecto (mins)";
+"alerttypesettingsview_defaultsnoozeperiod" = "Tiempo de Silencio Por Defecto (mins)";
 "alerttypesettingsview_overridemute" = "Override Mute";
 "alerttypesettingsview_soundname" = "Sonido";
 "alerttypesettingsview_defaultiossound" = "iOS Sound";
 "alerttypesettingsview_givename" = "Nombre de Alarma";
-"alerttypesettingsview_givesnoozeperiod" = "Tiempo de Silencion en Minutos";
+"alerttypesettingsview_givesnoozeperiod" = "Tiempo de Silencio en Minutos";
 "alerttypesettingsview_picksoundname" = "Nombre de Sonido";
 "alertTypeNoSound" = "Sin Sonido";
 "alerttypenamealreadyexistsmessages" = "Ya existe un Tipo de Alarma con este nombre. Usar otro nombre";
