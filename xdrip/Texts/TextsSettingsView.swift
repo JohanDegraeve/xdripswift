@@ -110,35 +110,19 @@ class Texts_SettingsView {
     }()
     
     static let labelWebOOPTransmitter:String = {
-        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use the OOPWeb Service?", comment: "web oop settings in bluetooth peripheral view : enabled or not")
-    }()
-    
-    static let labelWebOOPSite:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPSite", tableName: filename, bundle: Bundle.main, value: "OOPWeb Server URL:", comment: "transmitter settings, the web oop site url")
-    }()
-    
-    static let labelWebOOPtoken:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPtoken", tableName: filename, bundle: Bundle.main, value: "OOPWeb Token:", comment: "transmitter settings, the web oop token")
-    }()
-    
-    static let labelWebOOPSiteExplainingText:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPSiteExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Server URL (optional):", comment: "transmitter settings, the web oop server url, explaining text in dialog")
-    }()
-    
-    static let labelWebOOPtokenExplainingText:String = {
-        return NSLocalizedString("settingsviews_labelWebOOPtokenExplainingText", tableName: filename, bundle: Bundle.main, value: "OOPWeb Token (optional):", comment: "transmitter settings, the web oop token, explaining text in dialog")
+        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use Libre Algorithm?", comment: "web oop settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelWebOOP:String = {
-        return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "OOPWeb Service", comment: "weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section")
+        return NSLocalizedString("settingsviews_labelWebOOP", tableName: filename, bundle: Bundle.main, value: "xDrip or Libre Algorithm", comment: "weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section")
     }()
     
     static let labelNonFixedTransmitter:String = {
-        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Use Non-Fixed Calibration Slopes?", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Use Multi-point Calibration?", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelNonFixed:String = {
-        return NSLocalizedString("settingsviews_labelNonFixed", tableName: filename, bundle: Bundle.main, value: "Non-Fixed Calibration Slopes", comment: "non fixed settings, title of the section")
+        return NSLocalizedString("settingsviews_labelNonFixed", tableName: filename, bundle: Bundle.main, value: "Multi-point Calibration", comment: "non fixed settings, title of the section")
     }()
     
     static let transmitterId8OrHigherNotSupported: String = {
@@ -162,7 +146,7 @@ class Texts_SettingsView {
     // MARK: - Section Healthkit
     
     static let sectionTitleHealthKit: String = {
-        return NSLocalizedString("settingsviews_sectiontitlehealthkit", tableName: filename, bundle: Bundle.main, value: "Apple Health Integration", comment: "healthkit settings, section title")
+        return NSLocalizedString("settingsviews_sectiontitlehealthkit", tableName: filename, bundle: Bundle.main, value: "Apple Health", comment: "healthkit settings, section title")
     }()
     
     static let labelHealthKit:String = {
@@ -291,7 +275,11 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_speakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two readings (mins)", comment: "When clicking the interval setting, a pop up asks for number of minutes between two spoken readings, this is the message displayed in the pop up")
     }()
     
-    // MARK: - Section Info
+    // MARK: - Section About Info
+    
+    static let sectionTitleAbout: String = {
+        return NSLocalizedString("settingsviews_sectiontitleAbout", tableName: filename, bundle: Bundle.main, value: "About xDrip4iOS", comment: "about settings, section title")
+    }()
     
     static let version = {
         return NSLocalizedString("settingsviews_Version", tableName: filename, bundle: Bundle.main, value: "Version:", comment: "used in settings, section Info, title of the version setting")
