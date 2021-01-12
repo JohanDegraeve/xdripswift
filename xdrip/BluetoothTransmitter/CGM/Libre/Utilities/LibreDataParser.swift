@@ -145,9 +145,13 @@ class LibreDataParser {
             // otherwise we apply linear regression to the first element(s) in the history, which will give a less accurate result
             // trend.last is the oldest measurement more recent than the most recent element in history, so we insert it at index 0
             // and only if (trend.last timestamp + 10 minutes) > history.first timestamp
+            var trendAdded = false
             if let firstHistory = history.first, let lastTrend = trend.last, lastTrend.timeStamp.timeIntervalSince(firstHistory.timeStamp) > 10.0 * 60.0  {
                 
                 history.insert(GlucoseData(timeStamp: lastTrend.timeStamp, glucoseLevelRaw: lastTrend.glucoseLevelRaw), at: 0)
+                
+                // need to remove it after applying the smoothing
+                trendAdded = true
 
             }
             
@@ -155,7 +159,9 @@ class LibreDataParser {
             LibreSmoothing.smooth(history: &history, filterWidthPer5MinuteSmoothingSavitzkyGolay: ConstantsLibreSmoothing.libreSmoothingFilterWidthPer15MinutesValues)
             
             // now remove the trend measurement that was inserted
-            history.remove(at: 0)
+            if trendAdded {
+                history.remove(at: 0)
+            }
             
         }
         
