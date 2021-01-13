@@ -1,4 +1,5 @@
 import UIKit
+import OSLog
 
 class Libre2BluetoothPeripheralViewModel {
   
@@ -8,10 +9,12 @@ class Libre2BluetoothPeripheralViewModel {
         /// Sensor serial number
         case sensorSerialNumber = 0
         
-        /// sensor State
-        case sensorState = 1
-
+        /// sensor start time
+        case sensorStartTime = 1
+        
     }
+    
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: "Libre2BluetoothPeripheralViewModel")
     
     /// Libre2 settings willb be in section 0 + numberOfGeneralSections
     private let sectionNumberForLibre2SpecificSettings = 0
@@ -76,9 +79,9 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         if let bluetoothPeripheral = bluetoothPeripheral {
             
-            if let droplet = bluetoothPeripheral as? Libre2 {
+            if let libre2 = bluetoothPeripheral as? Libre2 {
                 
-                if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: droplet, createANewOneIfNecesssary: false), let cGMLibre2Transmitter = blueToothTransmitter as? CGMLibre2Transmitter {
+                if let blueToothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: libre2, createANewOneIfNecesssary: false), let cGMLibre2Transmitter = blueToothTransmitter as? CGMLibre2Transmitter {
                     
                     // set CGMLibre2Transmitter delegate to self.
                     cGMLibre2Transmitter.cGMLibre2TransmitterDelegate = self
@@ -114,18 +117,19 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         switch setting {
             
-        case .sensorState:
-            
-            cell.accessoryType = .none
-            cell.textLabel?.text = Texts_Common.sensorStatus
-            cell.detailTextLabel?.text = libre2.sensorState.translatedDescription
-
         case .sensorSerialNumber:
             
             cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
             cell.detailTextLabel?.text = libre2.blePeripheral.sensorSerialNumber
             cell.accessoryType = .disclosureIndicator
 
+        case .sensorStartTime:
+            
+            cell.textLabel?.text = Texts_HomeView.sensorStart
+            if let sensorTimeInMinutes = libre2.sensorTimeInMinutes {
+                cell.detailTextLabel?.text = Date(timeIntervalSinceNow: -Double(sensorTimeInMinutes*60)).toString(timeStyle: .short, dateStyle: .short)
+            }
+            cell.accessoryType = .none
             
         }
         
@@ -142,15 +146,16 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         switch setting {
         
-        case .sensorState:
-            return .nothing
-            
         case .sensorSerialNumber:
             
             // serial text could be longer than screen width, clicking the row allows to see it in a pop up with more text place
             if let serialNumber = libre2.blePeripheral.sensorSerialNumber {
                 return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " : " + serialNumber)
             }
+
+        case .sensorStartTime:
+            
+            return .nothing
             
         }
         
@@ -174,16 +179,16 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
 extension Libre2BluetoothPeripheralViewModel: CGMLibre2TransmitterDelegate {
     
-    func received(sensorStatus: LibreSensorState, from cGMLibre2Transmitter: CGMLibre2Transmitter) {
+    func received(sensorTimeInMinutes: Int, from cGMLibre2Transmitter: CGMLibre2Transmitter) {
         
         // inform also bluetoothPeripheralManager
-        (bluetoothPeripheralManager as? CGMLibre2TransmitterDelegate)?.received(sensorStatus: sensorStatus, from: cGMLibre2Transmitter)
+        (bluetoothPeripheralManager as? CGMLibre2TransmitterDelegate)?.received(sensorTimeInMinutes: sensorTimeInMinutes, from: cGMLibre2Transmitter)
         
         // here's the trigger to update the table
-        reloadRow(row: Settings.sensorState.rawValue)
+        reloadRow(row: Settings.sensorStartTime.rawValue)
         
     }
-
+    
     func received(serialNumber: String, from cGMLibre2Transmitter: CGMLibre2Transmitter) {
         
         // inform also bluetoothPeripheralManager

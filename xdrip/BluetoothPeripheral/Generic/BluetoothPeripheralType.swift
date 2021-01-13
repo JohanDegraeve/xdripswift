@@ -44,7 +44,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
     case WatlaaType = "Watlaa"
     
     /// Libre 2
-    case Libre2Type = "Bubble test"
+    case Libre2Type = "Libre 2"
 
     /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
     func viewModel() -> BluetoothPeripheralViewModel? {

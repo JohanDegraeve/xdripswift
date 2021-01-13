@@ -18,7 +18,7 @@
 "transmitterbatterylevel" = "Nivel Batería Transmisor";
 "ago" = "atrás";
 "licenseinfo" = "Este programa es gratis y distribuido bajo los términos del GNU General Public License publicado por parte de The Free Software Foundation, versión 3 de la licencia, o bien, cualquier versión posterior.\r\n\nEste programa está distribuido con la intención de que sea útil, pero SIN NINGUN TIPO DE GARANTIA.\r\n\nVer http://www.gnu.org/licenses/gpl.txt para más información.\r\n\r\nInfo: ";
-"info" = "Por Favor, Leed Detenidamente";
+"info" = "Información";
 "transmitterinfo" = "Primero deberías ir a la página de Bluetooth donde puedes añadir y buscar tu transmisor.\r\n\nDespués en la pantalla Home, puedes iniciar tu sensor.";
 "startsensorbeforecalibration" = "No puedes calibrar hasta haber iniciado un sensor.";
 "theresNoCGMTransmitterActive" = "Para calibrar debes tener un transmisor válido conectado.";

@@ -3,8 +3,8 @@ import CoreData
 
 public class Libre2: NSManagedObject {
     
-    // sensorState, not stored in coreData, will only be available after having received it from the Libre2
-    public var sensorState: LibreSensorState = .unknown
+    /// sensor time in Minutes if known
+    var sensorTimeInMinutes: Int?
     
     /// create Libre2
     /// - parameters:

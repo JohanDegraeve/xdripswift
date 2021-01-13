@@ -14,14 +14,6 @@
 "settingsviews_transmitterid" = "رقم هوية جهاز الإرسال:";
 "settingsviews_givetransmitterid" = "أدخل رقم هوية جهاز الإرسال";
 "settingsviews_resettransmitter" = "إعادة تعيين جهاز الإرسال";
-"settingsviews_webooptransmitter" = "استخدم خوارزمية OOPWeb ؟";
-"settingsviews_nonfixedtransmitter" = "استخدام ميول المعايرة غير الثابتة؟";
-"settingsviews_labelNonFixed" = "ميول المعايرة غير الثابتة";
-"settingsviews_labelWebOOPSite" = "رابط موقع OOPWeb :";
-"settingsviews_labelWebOOPtoken" = "رمز OOPWeb :";
-"settingsviews_labelWebOOPSiteExplainingText" = "رابط موقع OOPWeb (اختياري):";
-"settingsviews_labelWebOOPtokenExplainingText" = "رمز OOPWeb (اختياري):";
-"labelWebOOP" = "خدمة OOPWeb";
 "transmitterId8OrHigherNotSupported" = "جهاز الإرسال برمز الهوية 8Gxxxx أو الأحدث غير مدعوم!";
 "settingsviews_sectiontitlealerting" = "التنبيهات";
 "settingsviews_row_alert_types" = "أنواع التنبيهات";

@@ -37,17 +37,20 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// used when processing Libre 2 data packet
     private var startDate:Date
     
-    // receive buffer for Libre 2 packets
+    /// receive buffer for Libre 2 packets
     private var rxBuffer:Data
     
-    // how long to wait for next packet before resetting the rxBuffer
+    /// how long to wait for next packet before resetting the rxBuffer
     private static let maxWaitForpacketInSeconds = 3.0
 
     /// is the transmitter oop web enabled or not
     private var webOOPEnabled: Bool
     
-    // current sensor serial number, if nil then it's not known yet
+    /// current sensor serial number, if nil then it's not known yet
     private var sensorSerialNumber:String?
+    
+    /// temp storage of libreSensorSerialNumber, value will be stored after NFC scanning, but possible there's no transmitter created yet (if this is a first scan for a new transmitter), so we can't store the serial number yet in coredata. As soon as transmitter is connected,  and if tempSensorSerialNumber is not nil, it will be sent to the delegate
+    private var tempSensorSerialNumber: LibreSensorSerialNumber?
     
     // define libreNFC as NSObject, otherwise check on iOS14 wouuld need to be added.
     // it will be casted to LibreNFC when needed
@@ -135,6 +138,22 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
 
     }
     
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        
+        super.centralManager(central, didConnect: peripheral)
+        
+        if let sensorSerialNumber = tempSensorSerialNumber {
+            
+            // we need to send the sensorSerialNumber here. Possibly this is a new transmitter being scanned for, in which case the call to cGMLibre2TransmitterDelegate?.received(sensorSerialNumber: ..) in NFCTagReaderSessionDelegate functions wouldn't have stored the status in coredata, because it' doesn't find the transmitter, so let's store it again, at each connect, if not nil
+            cGMLibre2TransmitterDelegate?.received(serialNumber: sensorSerialNumber.serialNumber, from: self)
+            
+            // set to nil so we don't send it again to the delegate when there's a new connect
+            tempSensorSerialNumber = nil
+            
+        }
+        
+    }
+
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
@@ -225,10 +244,18 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
             do {
                 
                 // if libre1DerivedAlgorithmParameters not nil, but not matching serial number, then assign to nil (copied from LibreDataParser)
-                // we should be able to read libreSensorUID via bluetooth
-                if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber != sensorSerialNumber {
-                    
-                    UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
+                // if weboopenabled, then don't proceed, because weboop needs libre1DerivedAlgorithmParameters
+                // if libre1DerivedAlgorithmParameters is nil, but not weboopenabled, then also no further processing
+                // this may happen in case the serialNumber is not correctly read from NFC or stored in coredata - if all goes well this shouldn't occur
+                if isWebOOPEnabled() {
+
+                    guard let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber == sensorSerialNumber else {
+
+                        trace("web oop enabled but libre1DerivedAlgorithmParameters is nil or libre1DerivedAlgorithmParameters.serialNumber != sensorSerialNumber, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+                        
+                        return
+
+                    }
                     
                 }
                 
@@ -236,7 +263,11 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
                 // if oop web not enabled, then don't pass libre1DerivedAlgorithmParameters
                 var parsedBLEData = Libre2BLEUtilities.parseBLEData(Data(try Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: rxBuffer)), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ? UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
                 
+                // send glucoseData and sensorTimeInMinutes to cgmTransmitterDelegate
                 cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &parsedBLEData.bleGlucose, transmitterBatteryInfo: nil, sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes))
+                
+                // send sensorTimeInMinutes also to cGMLibre2TransmitterDelegate
+                cGMLibre2TransmitterDelegate?.received(sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes), from: self)
                 
             } catch {
                 
@@ -302,15 +333,6 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         
         trace("received fram :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, fram.toHexString())
         
-        // first get sensor status and send to delegate
-        if fram.count >= 5 {
-            
-            let sensorState = LibreSensorState(stateByte: fram[4])
-            
-            cGMLibre2TransmitterDelegate?.received(sensorStatus: sensorState, from: self)
-            
-        }
-        
         // if we already know the patchinfo (which we should because normally received(patchInfo: Data gets called before received(fram: Data), then patchInfo should not be nil
         // same for sensorUID
         if let patchInfo =  UserDefaults.standard.librePatchInfo, let sensorUID = UserDefaults.standard.libreSensorUID, let libreSensorType = LibreSensorType.type(patchInfo: patchInfo.hexEncodedString().uppercased()), let serialNumber = self.sensorSerialNumber {
@@ -333,22 +355,28 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         // store sensorUID as data in UserDefaults
         UserDefaults.standard.libreSensorUID = sensorUID
         
-        // check if it's a new sensor serial number and if yes send to delegate and store it
-        // here it's the sensor serial number as String
-        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID)?.serialNumber
-        
+        // store the sensorUID as tempSensorSerialNumber (as LibreSensorSerialNumber)
+        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID)
         if let receivedSensorSerialNumber = receivedSensorSerialNumber {
+            self.tempSensorSerialNumber = receivedSensorSerialNumber
+        }
+        
+        // sensor serial number as String
+        let receivedSensorSerialNumberAsString = receivedSensorSerialNumber?.serialNumber
+        
+        if let receivedSensorSerialNumberAsString = receivedSensorSerialNumberAsString {
           
-            if sensorSerialNumber != receivedSensorSerialNumber {
+            // is it a new value ?
+            if sensorSerialNumber != receivedSensorSerialNumberAsString {
                 
-                trace("new sensor detected :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, receivedSensorSerialNumber)
+                trace("new sensor detected :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, receivedSensorSerialNumberAsString)
                 
-                self.sensorSerialNumber = receivedSensorSerialNumber
+                self.sensorSerialNumber = receivedSensorSerialNumberAsString
                 
                 cgmTransmitterDelegate?.newSensorDetected()
                 
-                cGMLibre2TransmitterDelegate?.received(serialNumber: receivedSensorSerialNumber, from: self)
-                
+                cGMLibre2TransmitterDelegate?.received(serialNumber: receivedSensorSerialNumberAsString, from: self)
+
             }
             
         } else {
