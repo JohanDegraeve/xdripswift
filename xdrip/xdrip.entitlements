@@ -11,7 +11,7 @@
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.RNX44PP998.loopkit.LoopGroup</string>
+		<string>group.com.${DEVELOPMENT_TEAM}.loopkit.LoopGroup</string>
 	</array>
 </dict>
 </plist>
