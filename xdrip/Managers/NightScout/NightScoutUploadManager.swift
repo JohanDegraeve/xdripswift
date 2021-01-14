@@ -397,7 +397,15 @@ public class NightScoutUploadManager:NSObject {
                                     if let dataAsString = String(bytes: data, encoding: .utf8) {
                                         trace("    in uploadData, %{public}@, data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .error, traceString, dataAsString)
                                     }
+                                    
                                 }
+                            } else {
+                                
+                                // successful case, call completionhandler
+                                if let completionHandler = completionHandler {
+                                    completionHandler()
+                                }
+
                             }
                         }
                         
@@ -410,20 +418,55 @@ public class NightScoutUploadManager:NSObject {
                         // check that response is HTTPURLResponse and error code between 200 and 299
                         if let response = response as? HTTPURLResponse {
                             guard (200...299).contains(response.statusCode) else {
+                                
+                                // if the statuscode = 500 and if data has error code 66 then consider this as successful
+                                // it seems to happen sometimes that an attempt is made to re-upload readings that were already uploaded (meaning with same id). That gives error 66
+                                // in that case consider the upload as successful
+                                if response.statusCode == 500 {
+                                    
+                                    do {
+
+                                        if let data = data, let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                                            
+                                            // try to read description
+                                            if let description = json["description"] as? [String: Any] {
+                                                
+                                                // try to read the code
+                                                if let code = description["code"] as? Int {
+                                                    
+                                                    if code == 66 {
+                                                        
+                                                        trace("    in uploadData, found code = 66, considering the upload as successful", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .error, traceString)
+                                                        
+                                                        success = true
+                                                        
+                                                        return
+                                                        
+                                                    }
+                                                    
+                                                }
+                                                
+                                            }
+                                            
+                                        }
+
+                                    } catch {
+                                            // json decode fails, upload will be considered as failed
+                                    }
+                                    
+                                }
+                                                            
                                 trace("    in uploadData, %{public}@, failed to upload, statuscode = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .error, traceString, response.statusCode.description)
+                                
                                 return
+                                
                             }
                         } else {
                             trace("    in uploadData, %{public}@, response is not HTTPURLResponse", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .error, traceString)
                         }
                         
-                        // successful cases,
+                        // successful cases
                         success = true
-                        
-                        // call completionhandler
-                        if let completionHandler = completionHandler {
-                            completionHandler()
-                        }
                         
                     })
                     
