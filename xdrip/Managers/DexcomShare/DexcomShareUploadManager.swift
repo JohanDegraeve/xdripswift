@@ -116,7 +116,8 @@ class DexcomShareUploadManager:NSObject {
                                     if success {
                                         trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                                         
-                                        self.upload(lastConnectionStatusChangeTimeStamp: nil)
+                                        // set lastConnectionStatusChangeTimeStamp to as late as possible, to make sure that the most recent reading is uploaded if user is testing the credentials
+                                        self.upload(lastConnectionStatusChangeTimeStamp: Date())
                                         
                                     } else {
                                         trace("in observeValue, Dexcom Share credential check failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
@@ -145,8 +146,10 @@ class DexcomShareUploadManager:NSObject {
                                         if success {
                                             
                                             trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                                            self.upload(lastConnectionStatusChangeTimeStamp: nil)
-
+                                            
+                                            // set lastConnectionStatusChangeTimeStamp to as late as possible, to make sure that the most recent reading is uploaded if user is testing the credentials
+                                            self.upload(lastConnectionStatusChangeTimeStamp: Date())
+                                            
                                         } else {
                                             
                                             trace("in observeValue, Dexcom Share credential check failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)

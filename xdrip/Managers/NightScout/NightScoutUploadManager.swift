@@ -76,7 +76,7 @@ public class NightScoutUploadManager:NSObject {
     
     /// uploads latest BgReadings to NightScout, only if nightscout enabled, not master, url and key defined, if schedule enabled then check also schedule
     /// - parameters:
-    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
+    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect
     public func upload(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // check if NightScout is enabled
@@ -149,7 +149,10 @@ public class NightScoutUploadManager:NSObject {
                                 DispatchQueue.main.async {
                                     self.callMessageHandler(withCredentialVerificationResult: success, error: error)
                                     if success {
-                                        self.upload(lastConnectionStatusChangeTimeStamp: nil)
+                                        
+                                        // set lastConnectionStatusChangeTimeStamp to as late as possible, to make sure that the most recent reading is uploaded if user is testing the credentials
+                                        self.upload(lastConnectionStatusChangeTimeStamp: Date())
+                                        
                                     } else {
                                         trace("in observeValue, NightScout credential check failed", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
                                     }
@@ -171,7 +174,10 @@ public class NightScoutUploadManager:NSObject {
                                 testNightScoutCredentials(apiKey: apiKey, siteURL: siteUrl, { (success, error) in
                                     DispatchQueue.main.async {
                                         if success {
-                                            self.upload(lastConnectionStatusChangeTimeStamp: nil)
+                                            
+                                            // set lastConnectionStatusChangeTimeStamp to as late as possible, to make sure that the most recent reading is uploaded if user is testing the credentials
+                                            self.upload(lastConnectionStatusChangeTimeStamp: Date())
+                                            
                                         } else {
                                             trace("in observeValue, NightScout credential check failed", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
                                         }
