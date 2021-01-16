@@ -133,7 +133,7 @@ enum Texts_HomeView {
     }()
     
     static let calibrationNotNecessary:String = {
-        return NSLocalizedString("calibrationNotNecessary", tableName: filename, bundle: Bundle.main, value: "With OOPWeb enabled, calibration is not necessary for the Libre sensor. If you still want to use calibration, then go to the Developer settings and enable 'Override Web OOP Calibration", comment: "if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible")
+        return NSLocalizedString("calibrationNotNecessary", tableName: filename, bundle: Bundle.main, value: "With OOPWeb enabled, calibration is not necessary for the Libre sensor.", comment: "if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible")
     }()
  
     static let dexcomBatteryTooLow: String = {

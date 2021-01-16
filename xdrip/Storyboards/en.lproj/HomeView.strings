@@ -30,6 +30,6 @@
 "transmitterpairingattempttimeout" = "Transmitter did not reply to pairing request.";
 "success" = "Success";
 "failed" = "Failed";
-"calibrationNotNecessary" = "With OOPWeb enabled, calibration is not necessary for the Libre sensor. If you still want to use calibration, then go to the Developer settings and enable 'Override Web OOP Calibration'.";
+"calibrationNotNecessary" = "With OOPWeb enabled, calibration is not necessary for the Libre sensor.";
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
 "sensorAge14Days" = "The Sensor has reached its maximum age.";
