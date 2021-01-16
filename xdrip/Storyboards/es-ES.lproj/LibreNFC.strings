@@ -1,0 +1,5 @@
+"scanComplete" = "Escaneo Completado";
+"holdTopOfIphoneNearSensor" = "Escanear el sensor con tu iPhone";
+"deviceMustSupportNFC" = "Éste iPhone no dispone de NFC";
+"deviceMustSupportIOS14" = "Para conectar a un sensor Libre 2, se debe actualizar este iPhone a iOS14";
+"donotusethelibrelinkapp" = "Conectado a Libre 2.\r\n\r\nSi quieres seguir escaneando con la app official del sensor Libre, es imprescindible deshabilitar el permiso de Bluetooth en la configuración de la app del Libre. \r\n\r\nSi no esté deshabilitado el permiso de Bluetooth, al escanear con la app official, se perderá la conexión entre xDrip4iOS y el sensor Libre 2.";
