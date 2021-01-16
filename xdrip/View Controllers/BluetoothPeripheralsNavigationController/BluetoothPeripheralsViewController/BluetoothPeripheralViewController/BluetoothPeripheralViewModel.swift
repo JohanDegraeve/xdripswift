@@ -9,8 +9,7 @@ protocol BluetoothPeripheralViewModel {
     ///    - bluetoothPeripheralManager : reference to bluetoothPeripheralManaging object
     ///    - tableView : needed to intiate refresh of row
     ///    - bluetoothPeripheralViewController : BluetoothPeripheralViewController
-    ///    - onLibreSensorTypeReceived : closure that the viewmodel should call when it receives a libre sensor type - doesn't need to be necessarily a new sensor type. This will allow the BluetoothPeripheralViewController to delete or add sections, namely oop web related settings
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView,  bluetoothPeripheralViewController: BluetoothPeripheralViewController, onLibreSensorTypeReceived: ((LibreSensorType) -> ())?)
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView,  bluetoothPeripheralViewController: BluetoothPeripheralViewController)
     
     /// - for example  M5StackBluetoothTransmitter has a delegate of type M5StackBluetoothTransmitterDelegate.
     /// - in the configure function, this varaible will be assigned to the viewmodel itself (if there is a M5StackBluetoothTransmitter)

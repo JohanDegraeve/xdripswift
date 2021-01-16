@@ -126,9 +126,7 @@ class DexcomG5BluetoothPeripheralViewModel {
 
 extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
-    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController, onLibreSensorTypeReceived: ((LibreSensorType) -> ())?) {
-        
-        // this type of transmitter does not receive libre sensor types, so the closure onLibreSensorTypeReceived does not need to be stored
+    func configure(bluetoothPeripheral: BluetoothPeripheral?, bluetoothPeripheralManager: BluetoothPeripheralManaging, tableView: UITableView, bluetoothPeripheralViewController: BluetoothPeripheralViewController) {
         
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         

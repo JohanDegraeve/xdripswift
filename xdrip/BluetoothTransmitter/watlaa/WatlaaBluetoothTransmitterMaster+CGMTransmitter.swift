@@ -2,18 +2,6 @@ import Foundation
 
 extension WatlaaBluetoothTransmitter: CGMTransmitter {
  
-    func setWebOOPSite(oopWebSite: String) {
-        
-        self.oopWebSite = oopWebSite
-        
-    }
-    
-    func setWebOOPToken(oopWebToken: String) {
-        
-        self.oopWebToken = oopWebToken
-        
-    }
-    
     func setWebOOPEnabled(enabled: Bool) {
         
         webOOPEnabled = enabled

@@ -53,12 +53,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// gives information about type of sensor (Libre1, Libre2, etc..)
     private var patchInfo: String?
     
-    /// oop website url to use in case oop web would be enabled
-    private var oopWebSite: String
-    
-    /// oop token to use in case oop web would be enabled
-    private var oopWebToken: String
-    
     /// bubble firmware version
     private var firmware: String?
     
@@ -72,12 +66,10 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - delegate : CGMTransmitterDelegate intance
     ///     - webOOPEnabled : enabled or not, if nil then default false
-    ///     - oopWebSite : oop web site url to use, only used in case webOOPEnabled = true, if nil then default value is used (see Constants)
-    ///     - oopWebToken : oop web token to use, only used in case webOOPEnabled = true, if nil then default value is used (see Constants)
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     ///     - cGMBubbleTransmitterDelegate : a CGMBubbleTransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBubbleTransmitterDelegate: CGMBubbleTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMBubbleTransmitterDelegate: CGMBubbleTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, sensorSerialNumber:String?, webOOPEnabled: Bool?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameBubble)
@@ -103,10 +95,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         
         // initialize webOOPEnabled
         self.webOOPEnabled = webOOPEnabled ?? false
-        
-        // initialize oopWebToken and oopWebSite
-        self.oopWebToken = oopWebToken ?? ConstantsLibre.token
-        self.oopWebSite = oopWebSite ?? ConstantsLibre.site
         
         // initiliaze LibreDataParser
         self.libreDataParser = LibreDataParser()
@@ -262,7 +250,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
 
                             }
 
-                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData:  (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil) { (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, libreData:  (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil) { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 if let sensorState = sensorState {
                                     self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
@@ -323,14 +311,6 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
             
         }
         
-    }
-    
-    func setWebOOPSite(oopWebSite: String) {
-        self.oopWebSite = oopWebSite
-    }
-    
-    func setWebOOPToken(oopWebToken: String) {
-        self.oopWebToken = oopWebToken
     }
     
     func cgmTransmitterType() -> CGMTransmitterType {

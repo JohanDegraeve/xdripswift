@@ -11,10 +11,5 @@ protocol BluetoothPeripheral {
     /// a blePeripheral
     var blePeripheral: BLEPeripheral {get}
     
-    /// for libre sensor. LibreSensortype may require oop web (ie needsWebOOP returns true), but if transmitter supports decryption (to Libre 1 format), then user could still decide not to use oop web and do self calibration. So if the transmitter type (which matches a bluetooth peripheral type) supports decryption, then this value will return true in which case user should be able to enable/disable oopweb himself, meaning this overrides "needsOopWeb", it's the user that decides
-    ///
-    /// in the end  maybe the funcions needsWebOOP and overrideNeedsWebOOP can be completely removed
-    func overrideNeedsOOPWeb() -> Bool
-    
 }
 

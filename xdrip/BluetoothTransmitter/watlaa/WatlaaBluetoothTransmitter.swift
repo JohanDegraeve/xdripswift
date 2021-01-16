@@ -81,12 +81,6 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     /// is nonFixed enabled for the transmitter or not
     public var nonFixedSlopeEnabled: Bool
     
-    /// oop website url to use in case oop web would be enabled
-    public var oopWebSite: String
-    
-    /// oop token to use in case oop web would be enabled
-    public var oopWebToken: String
-    
     // MARK: Other private properties
     
     /// for trace
@@ -133,7 +127,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
     ///     - cgmTransmitterDelegate : CGMTransmitterDelegate
     ///     - watlaaBluetoothTransmitterDelegate : the WatlaaBluetoothTransmitterDelegate
     ///     - bluetoothTransmitterDelegate : BluetoothTransmitterDelegate
-    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, sensorSerialNumber:String?, webOOPEnabled: Bool?, oopWebSite: String?, oopWebToken: String?, nonFixedSlopeEnabled: Bool?) {
+    init(address:String?, name: String?, cgmTransmitterDelegate:CGMTransmitterDelegate?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, watlaaBluetoothTransmitterDelegate: WatlaaBluetoothTransmitterDelegate, sensorSerialNumber:String?, webOOPEnabled: Bool?, nonFixedSlopeEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "watlaa")
@@ -156,10 +150,6 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
 
         // initialize nonFixedSlopeEnabled
         self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
-        
-        // initialize oopWebToken and oopWebSite
-        self.oopWebToken = oopWebToken ?? ConstantsLibre.token
-        self.oopWebSite = oopWebSite ?? ConstantsLibre.site
         
         // assign sensorSerialNumber
         self.sensorSerialNumber = sensorSerialNumber
@@ -327,7 +317,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                             // send batteryPercentage to delegate
                             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
                             
-                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: nil, webOOPEnabled: webOOPEnabled, oopWebSite: oopWebSite, oopWebToken: oopWebToken, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: false, testTimeStamp: nil, completionHandler:  { (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: nil, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: false, testTimeStamp: nil, completionHandler:  { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 // TODO : use sensorState as in MiaoMiao and Bubble : show the status on bluetoothPeripheralView
                                 

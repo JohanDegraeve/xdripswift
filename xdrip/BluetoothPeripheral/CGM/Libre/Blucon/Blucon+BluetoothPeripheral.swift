@@ -8,8 +8,4 @@ extension Blucon: BluetoothPeripheral {
         
     }
     
-    func overrideNeedsOOPWeb() -> Bool {
-        return false
-    }
-    
 }

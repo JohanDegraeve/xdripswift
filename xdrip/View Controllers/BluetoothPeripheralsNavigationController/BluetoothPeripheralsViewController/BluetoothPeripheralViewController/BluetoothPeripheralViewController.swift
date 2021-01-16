@@ -228,7 +228,7 @@ class BluetoothPeripheralViewController: UIViewController {
         bluetoothPeripheralManager.setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheral)
         
         // as transmitter is now set to nil, call again configure. Maybe not necessary, but it can't hurt
-        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self, onLibreSensorTypeReceived: libreSensorTypeReceived)
+        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self)
         
         // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
         tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
@@ -239,46 +239,33 @@ class BluetoothPeripheralViewController: UIViewController {
     public func numberOfGeneralSections() -> Int {
         
         // first check if bluetoothPeripheral already known
-        if let bluetoothPeripheral = bluetoothPeripheral {
+        if bluetoothPeripheral != nil {
 
             // bluetoothPeripheral already known
             
-            // if sensor type is known and it requires oop web, then there's no need to show the oop web settings and the non-fixed slope settings
-            if let sensorType = bluetoothPeripheral.blePeripheral.libreSensorType, sensorType.needsWebOOP(), !bluetoothPeripheral.overrideNeedsOOPWeb() {
+            // if it's a cgm transmitter type that supports web oop and non fixed slopes
+            // then show the webOOP section and nonFixed section
+            if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType, expectedBluetoothPeripheralType.canWebOOP(), expectedBluetoothPeripheralType.canUseNonFixedSlope() {
+                
+                // mark web oop and non fixed slope settings sections as shown
+                webOOPSettingsSectionIsShown = true
+                nonFixedSettingsSectionIsShown = true
+                
+                return 3
+                
+                // if bluetoothPeripheral already known,
+                // and it's a cgm transmitter type that supports non fixed slopes but doesn't support weboop
+                // then show only the nonFixed section
+            } else if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType, expectedBluetoothPeripheralType.canUseNonFixedSlope() {
                 
                 // mark web oop and non fixed slope settings sections as not shown
                 webOOPSettingsSectionIsShown = false
-                nonFixedSettingsSectionIsShown = false
+                nonFixedSettingsSectionIsShown = true
                 
-                return 1
+                return 2
                 
-            } else {
-
-                // if it's a cgm transmitter type that supports web oop and non fixed slopes
-                // then show the webOOP section and nonFixed section
-                if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType, expectedBluetoothPeripheralType.canWebOOP(), expectedBluetoothPeripheralType.canUseNonFixedSlope() {
-                    
-                    // mark web oop and non fixed slope settings sections as shown
-                    webOOPSettingsSectionIsShown = true
-                    nonFixedSettingsSectionIsShown = true
-
-                    return 3
-                    
-                    // if bluetoothPeripheral already known,
-                    // and it's a cgm transmitter type that supports non fixed slopes but doesn't support weboop
-                    // then show only the nonFixed section
-                } else if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType, expectedBluetoothPeripheralType.canUseNonFixedSlope() {
-                    
-                    // mark web oop and non fixed slope settings sections as not shown
-                    webOOPSettingsSectionIsShown = false
-                    nonFixedSettingsSectionIsShown = true
-
-                    return 2
-                    
-                }
-
             }
-
+            
         }
         
         // bluetoothPeripheral not yet known, only show first section with name alias, ...
@@ -302,7 +289,7 @@ class BluetoothPeripheralViewController: UIViewController {
         bluetoothPeripheralViewModel = expectedBluetoothPeripheralType?.viewModel()
 
         // configure the bluetoothPeripheralViewModel
-        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self, onLibreSensorTypeReceived: libreSensorTypeReceived)
+        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self)
         
         // assign the self delegate in the transmitter object
         if let bluetoothPeripheral = bluetoothPeripheral, let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) {
@@ -430,7 +417,7 @@ class BluetoothPeripheralViewController: UIViewController {
             bluetoothPeripheral.blePeripheral.transmitterId = self.transmitterIdTempValue
             
             // recall configure in bluetoothPeripheralViewModel
-            self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: self.bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView,  bluetoothPeripheralViewController: self, onLibreSensorTypeReceived: self.libreSensorTypeReceived)
+            self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: self.bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView,  bluetoothPeripheralViewController: self)
             
             // enable the connect button
             self.connectButtonOutlet.enable()
@@ -614,7 +601,7 @@ class BluetoothPeripheralViewController: UIViewController {
                     bluetoothTransmitter.bluetoothTransmitterDelegate = self
                     
                     // call configure in the model, as we have a new transmitter here
-                    bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self, onLibreSensorTypeReceived: libreSensorTypeReceived)
+                    bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self)
                     
                     // connect (probably connection is already done because transmitter has just been created by bluetoothPeripheralManager, this is a transmitter for which mac address is known, so it will by default try to connect
                     bluetoothTransmitter.connect()
@@ -707,89 +694,6 @@ class BluetoothPeripheralViewController: UIViewController {
             
         }
         
-    }
-    
-    /// function called by model, if it receives a libre sensor type
-    /// - parameters:
-    ///     - libreSensorType : will be ued to determine if oop web needs to be enabled or not
-    ///     - oopWebAllowed : if set to true then it overrules the libreSensorType determined vallue,  if false then the libreSensorType determined value is used
-    private func libreSensorTypeReceived(libreSensorType: LibreSensorType) {
-       
-        // if the sensortype needs web oop, and if web oop or non fixed slope settings sections are shown then delete those sections
-        // also check oopWebAllowed, if this is true, it overrules needsWebOOP
-        // and if not, then the other way around
-        
-        // check if overrideNeedsWebOOP needs to be set to true
-        var overrideNeedsWebOOP = false
-        if let bluetoothPeripheral = bluetoothPeripheral, bluetoothPeripheral.overrideNeedsOOPWeb() {
-            overrideNeedsWebOOP = true
-        }
-        
-        if libreSensorType.needsWebOOP() && !overrideNeedsWebOOP {
-            
-            var indexSet = IndexSet()
-            
-            if webOOPSettingsSectionIsShown {
-                
-                indexSet.insert(webOOPSettingsSectionNumber)
-                
-                webOOPSettingsSectionIsShown = false
-                    
-            }
-            
-            if nonFixedSettingsSectionIsShown {
-                
-                indexSet.insert(nonFixedSettingsSectionNumber)
-                
-                nonFixedSettingsSectionIsShown = false
-                
-            }
-            
-            if indexSet.count > 0 {
-
-                tableView.deleteSections(indexSet, with: .none)
-
-            }
-            
-        } else {
-            
-            var indexSet = IndexSet()
-            
-            // unwrap expectedBluetoothPeripheralType, should be non nil here
-            guard let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType else {return}
-            
-            if expectedBluetoothPeripheralType.canWebOOP() {
-                
-                if !webOOPSettingsSectionIsShown {
-
-                    indexSet.insert(webOOPSettingsSectionNumber)
-                    
-                    webOOPSettingsSectionIsShown = true
-
-                }
-                
-            }
-            
-            if expectedBluetoothPeripheralType.canUseNonFixedSlope() {
-                
-                if !nonFixedSettingsSectionIsShown {
-                    
-                    indexSet.insert(nonFixedSettingsSectionNumber)
-                    
-                    nonFixedSettingsSectionIsShown = true
-                    
-                }
-                
-            }
-            
-            if indexSet.count > 0 {
-                
-                tableView.insertSections(indexSet, with: .none)
-                
-            }
-            
-        }
-            
     }
     
 }
@@ -1087,21 +991,6 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     
                 })
                 
-                // check if overrideNeedsWebOOP needs to be set to true
-                var overrideNeedsWebOOP = false
-                if let bluetoothPeripheral = bluetoothPeripheral, bluetoothPeripheral.overrideNeedsOOPWeb() {
-                    overrideNeedsWebOOP = true
-                }
-
-                // if it's a bluetoothPeripheral that supports libre and if it's a libre sensor type that needs oopWeb, then value can not be changed,
-                if let bluetoothPeripheral = self.bluetoothPeripheral, let libreSensorType = bluetoothPeripheral.blePeripheral.libreSensorType {
-                    if libreSensorType.needsWebOOP() && !overrideNeedsWebOOP {
-
-                        cell.accessoryView?.isUserInteractionEnabled = false
-                        
-                    }
-                }
-
                 cell.accessoryType = .none
                 
             }

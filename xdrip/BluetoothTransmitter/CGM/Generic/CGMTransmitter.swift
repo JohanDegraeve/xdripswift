@@ -22,16 +22,6 @@ protocol CGMTransmitter:AnyObject {
     /// is the CGMTransmitter web oop enabled or not
     func isWebOOPEnabled() -> Bool
     
-    /// to set oopWebSite and
-    ///
-    /// for transmitters that don't support webOOP, there's no need to implemented this function
-    /// ---  for transmitters that support webOOP (Bubble, MiaoMiao, ..) this should be implemented
-    func setWebOOPSite(oopWebSite: String)
-
-    /// for transmitters that don't support webOOP, there's no need to implemented this function
-    /// ---  for transmitters that support webOOP (Bubble, MiaoMiao, ..) this should be implemented
-    func setWebOOPToken(oopWebToken: String)
-    
     /// get cgmTransmitterType
     func cgmTransmitterType() -> CGMTransmitterType
     
