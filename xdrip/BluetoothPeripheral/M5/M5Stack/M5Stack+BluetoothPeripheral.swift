@@ -10,8 +10,4 @@ extension M5Stack: BluetoothPeripheral {
         return .M5StackType
     }
     
-    func overrideNeedsOOPWeb() -> Bool {
-        return false
-    }
-    
 }

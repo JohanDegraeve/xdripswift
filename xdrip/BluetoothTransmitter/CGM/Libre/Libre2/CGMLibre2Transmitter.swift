@@ -150,6 +150,9 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
             // set to nil so we don't send it again to the delegate when there's a new connect
             tempSensorSerialNumber = nil
             
+            // user should be informed not to scan with the Libre app
+            bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.donotusethelibrelinkapp)
+            
         }
         
     }
@@ -302,10 +305,6 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         }
         
     }
-    
-    func setWebOOPSite(oopWebSite: String) {/*not used*/}
-    
-    func setWebOOPToken(oopWebToken: String) {/*not used*/}
     
     func cgmTransmitterType() -> CGMTransmitterType {
         return .Libre2

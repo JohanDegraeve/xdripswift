@@ -531,10 +531,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     func setWebOOPEnabled(enabled: Bool) {
     }
     
-    func setWebOOPSite(oopWebSite: String) {}
-    
-    func setWebOOPToken(oopWebToken: String) {}
-
     func cgmTransmitterType() -> CGMTransmitterType {
         return .dexcomG5
     }

@@ -16,7 +16,7 @@ final class RootViewController: UIViewController {
     
     @IBAction func calibrateButtonAction(_ sender: UIButton) {
         
-        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled(), !UserDefaults.standard.overrideWebOOPCalibration {
+        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled() {
             
             let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil)
             
@@ -326,9 +326,6 @@ final class RootViewController: UIViewController {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.multipleAppBadgeValueWith10.rawValue, options: .new, context: nil)
         // also update of unit requires update of badge
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
-        
-        // when overrideWebOOPCalibration changes, sensor needs to be restarted
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.overrideWebOOPCalibration.rawValue, options: .new, context: nil)
         
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -755,8 +752,7 @@ final class RootViewController: UIViewController {
             if newReadingCreated {
                 
                 // only if no webOOPEnabled : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
-                // if overrideWebOOPCalibration true, then override value of isWebOOPEnabled
-                if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && (!cgmTransmitter.isWebOOPEnabled() || UserDefaults.standard.overrideWebOOPCalibration) {
+                if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && !cgmTransmitter.isWebOOPEnabled() {
                     
                     // there must be at least 2 readings
                     let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
@@ -818,7 +814,7 @@ final class RootViewController: UIViewController {
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
         
-        case UserDefaults.Key.isMaster, UserDefaults.Key.overrideWebOOPCalibration, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl :
+        case UserDefaults.Key.isMaster, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl :
             
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -854,25 +850,6 @@ final class RootViewController: UIViewController {
             
             // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
             createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
-            
-        case UserDefaults.Key.overrideWebOOPCalibration:
-            
-            // user changes file of override web oop
-            // apply logic only if web oop is enabled
-            if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled() {
-                
-                trace("in observeValue, overrideWebOOPCalibration value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, UserDefaults.standard.overrideWebOOPCalibration.description)
-                
-                // stop the sensor
-                stopSensor()
-                
-                // assign new calibrator
-                calibrator = getCalibrator(cgmTransmitter: cgmTransmitter)
-                
-                // request a new reading
-                cgmTransmitter.requestNewReading()
-                
-            }
             
         default:
             break
@@ -1118,22 +1095,13 @@ final class RootViewController: UIViewController {
             
         case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa, .Libre2:
             
-            if cgmTransmitter.isWebOOPEnabled() && !UserDefaults.standard.overrideWebOOPCalibration {
+            if cgmTransmitter.isWebOOPEnabled() {
                 
                 // received values are already calibrated
                 
                 trace("in getCalibrator, calibrator = NoCalibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
                 
                 return NoCalibrator()
-                
-            } else if cgmTransmitter.isWebOOPEnabled() && UserDefaults.standard.overrideWebOOPCalibration {
-                
-                // oop web enabled, means readings received are calibrated values
-                // overrideWebOOPCalibration enabled, means recalibration to be done
-                
-                trace("in getCalibrator, calibrator = LibreReCalibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
-                
-                return LibreReCalibrator()
                 
             } else if cgmTransmitter.isNonFixedSlopeEnabled() {
                 

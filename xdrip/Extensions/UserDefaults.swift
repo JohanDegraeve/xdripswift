@@ -227,11 +227,6 @@ extension UserDefaults {
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
         
-        /// if webOOP enabled, what site to use
-        case webOOPsite = "webOOPsite"
-        /// if webOOP enabled, value of the token
-        case webOOPtoken = "webOOPtoken"
-        
         /// case smooth libre values
         case smoothLibreValues = "smoothLibreValues"
         
@@ -246,9 +241,6 @@ extension UserDefaults {
         
         /// used for storing data read with Libre 2 direct
         case previousTemperatureAdjustmentValues = "previousTemperatureAdjustmentValues"
-        
-        /// in case Libre 2 users want to use the local calibration algorithm
-        case overrideWebOOPCalibration = "overrideWebOOPCalibration"
         
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
@@ -1232,42 +1224,6 @@ extension UserDefaults {
         }
     }
     
-    /// web oop site
-    @objc dynamic var webOOPSite:String? {
-        get {
-            return string(forKey: Key.webOOPsite.rawValue)
-        }
-        set {
-            var value = newValue
-            if let newValue = newValue {
-                if !newValue.startsWith("http") {
-                    value = "https://" + newValue
-                }
-            }
-            set(value, forKey: Key.webOOPsite.rawValue)
-        }
-    }
-    
-    /// web oop token
-    @objc dynamic var webOOPtoken:String? {
-        get {
-            return string(forKey: Key.webOOPtoken.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.webOOPtoken.rawValue)
-        }
-    }
-    
-    /// in case Libre 2 users want to use the local calibration algorithm
-    @objc dynamic var overrideWebOOPCalibration: Bool {
-        get {
-            return bool(forKey: Key.overrideWebOOPCalibration.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.overrideWebOOPCalibration.rawValue)
-        }
-    }
-
     /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
     var cgmTransmitterDeviceAddress: String? {
         get {

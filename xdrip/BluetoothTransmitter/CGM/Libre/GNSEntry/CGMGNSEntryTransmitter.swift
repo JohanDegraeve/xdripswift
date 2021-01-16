@@ -246,10 +246,6 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
         nonFixedSlopeEnabled = enabled
     }
     
-    func setWebOOPSite(oopWebSite: String) {}
-    
-    func setWebOOPToken(oopWebToken: String) {}
-    
     func cgmTransmitterType() -> CGMTransmitterType {
         return .GNSentry
     }

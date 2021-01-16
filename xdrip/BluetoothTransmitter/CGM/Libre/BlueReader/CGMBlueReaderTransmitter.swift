@@ -131,10 +131,6 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// this transmitter does not support oopWeb
     func setWebOOPEnabled(enabled: Bool) {}
     
-    func setWebOOPSite(oopWebSite: String) {}
-    
-    func setWebOOPToken(oopWebToken: String) {}
-    
     func cgmTransmitterType() -> CGMTransmitterType {
         return .blueReader
     }
