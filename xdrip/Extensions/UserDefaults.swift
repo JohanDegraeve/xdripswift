@@ -377,6 +377,18 @@ extension UserDefaults {
         }
     }
     
+    /// the highMarkValue in mgdl
+    @objc dynamic var highMarkValue: Double {
+        get {
+            
+            //read currentvalue in mgdl
+            return double(forKey: Key.highMarkValue.rawValue)
+            
+        }
+        
+    }
+
+    
     /// the targetvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var targetMarkValueInUserChosenUnit:Double {
         get {
@@ -421,6 +433,17 @@ extension UserDefaults {
         }
     }
     
+    /// the lowmarkvalue in mgdl
+    @objc dynamic var lowMarkValue: Double {
+        get {
+            
+            //read currentvalue in mgdl
+            return double(forKey: Key.lowMarkValue.rawValue)
+            
+        }
+        
+    }
+    
     /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var urgentLowMarkValueInUserChosenUnit:Double {
         get {
@@ -444,7 +467,18 @@ extension UserDefaults {
 
         }
     }
-    
+ 
+    /// the urgentLowMarkValue in mgdl
+    @objc dynamic var urgentLowMarkValue: Double {
+        get {
+            
+            //read currentvalue in mgdl
+            return double(forKey: Key.urgentLowMarkValue.rawValue)
+            
+        }
+        
+    }
+
     /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var urgentHighMarkValueInUserChosenUnitRounded:String {
         get {
@@ -465,6 +499,17 @@ extension UserDefaults {
         }
     }
     
+    /// the urgentHighMarkValue in mgdl
+    @objc dynamic var urgentHighMarkValue: Double {
+        get {
+            
+            //read currentvalue in mgdl
+            return double(forKey: Key.urgentHighMarkValue.rawValue)
+            
+        }
+        
+    }
+
     /// the highmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var highMarkValueInUserChosenUnitRounded:String {
         get {

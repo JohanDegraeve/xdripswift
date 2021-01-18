@@ -62,9 +62,15 @@ enum ConstantsGlucoseChart {
     /// color for target line
     static let guidelineTargetColor = UIColor.green.withAlphaComponent(0.5)
     
-    /// glucose colors
-    static let glucoseTintColor = UIColor.cyan
+    /// glucose colors - for values in range
+    static let glucoseInRangeColor = UIColor.green
     
+    /// glucose colors - for values higher than urgentHighMarkValue or lower than urgent LowMarkValue
+    static let glucoseUrgentRangeColor = UIColor.red
+
+    /// glucose colors - for values between highMarkValue and urgentHighMarkValue or between urgentLowMarkValue and lowMarkValue
+    static let glucoseNotUrgentRangeColor = UIColor.yellow
+
     /// labels width for vertical axis
     static let yAxisLabelsWidth: CGFloat = 30
     

@@ -6,26 +6,44 @@ import UIKit
 
 public final class GlucoseChartManager {
     
-   // MARK: - private properties
+    /// to hold range of glucose chartpoints
+    /// - urgentRange = above urgentHighMarkValue or below urgentLowMarkValue
+    /// - in range = between lowMarkValue and highMarkValue
+    /// - notUrgentRange = between highMarkValue and urgentHighMarkValue or between urgentLowMarkValue and lowMarkValue
+    /// - firstGlucoseChartPoint is the first ChartPoint considering the three arrays together
+    /// - lastGlucoseChartPoint is the last ChartPoint considering the three arrays together
+    /// - maximumValueInGlucoseChartPoints = the largest x value (ie the highest Glucose value) considering the three arrays together
+    typealias GlucoseChartPointsType = (urgentRange: [ChartPoint], inRange: [ChartPoint], notUrgentRange: [ChartPoint], firstGlucoseChartPoint: ChartPoint?,lastGlucoseChartPoint: ChartPoint?, maximumValueInGlucoseChartPoints: Double?)
     
-    /// chartpoint array with glucose values and timestamp
+    // MARK: - private properties
+    
+    /// glucoseChartPoints to reuse for each iteration, or for each redrawing of glucose chart
     ///
     /// Whenever glucoseChartPoints is assigned a new value, glucoseChart is set to nil
-    private var glucoseChartPoints: [ChartPoint] = [] {
+    private var glucoseChartPoints: GlucoseChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil) {
         didSet {
             glucoseChart = nil
         }
     }
     
+    /// ChartPoints to be shown on chart, procssed only in main thread - urgent Range
+    private var urgentRangeGlucoseChartPoints = [ChartPoint]()
+    
+    /// ChartPoints to be shown on chart, procssed only in main thread - in Range
+    private var inRangeGlucoseChartPoints = [ChartPoint]()
+    
+    /// ChartPoints to be shown on chart, procssed only in main thread - not Urgent Range
+    private var notUrgentRangeGlucoseChartPoints = [ChartPoint]()
+    
     /// for logging
     private var oslog = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
-
+    
     private var chartSettings: ChartSettings?
-
+    
     private let labelsWidthY = ConstantsGlucoseChart.yAxisLabelsWidth
-
+    
     private var chartLabelSettings: ChartLabelSettings?
-
+    
     private var chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings?
     
     /// The latest date on the X-axis
@@ -33,7 +51,7 @@ public final class GlucoseChartManager {
     
     /// The earliest date on the X-axis
     private var startDate: Date
-
+    
     /// the chart with glucose values
     private var glucoseChart: Chart?
     
@@ -89,7 +107,7 @@ public final class GlucoseChartManager {
         
         // for tapping the chart, we're using UILongPressGestureRecognizer because UITapGestureRecognizer doesn't react on touch down. With UILongPressGestureRecognizer and minimumPressDuration set to 0, we get a trigger as soon as the chart is touched
         chartLongPressGestureRecognizer.minimumPressDuration = 0
-
+        
         // initialize enddate
         endDate = Date()
         
@@ -111,7 +129,7 @@ public final class GlucoseChartManager {
     /// update of glucoseChartPoints array will be done on background thread. The actual redrawing of the chartoutlet is  done on the main thread. Also the completionHandler runs in the main thread.
     /// While updating glucoseChartPoints in background thread, the main thread may call again updateGlucoseChartPoints with a new endDate (because the user is panning or zooming). A new block will be added in the operation queue and processed later. If there's multiple operations waiting in the queue, only the last one will be executed. This can be the case when the user is doing a fast panning.
     public func updateGlucoseChartPoints(endDate: Date, startDate: Date?, chartOutlet: BloodGlucoseChartView, completionHandler: (() -> ())?) {
-
+        
         // create a new operation
         let operation = BlockOperation(block: {
             
@@ -123,19 +141,21 @@ public final class GlucoseChartManager {
             // startDateToUse is either parameter value or (if nil), endDate minutes current chartwidth
             let startDateToUse = startDate != nil ? startDate! : Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: endDate)
             
-            // we're going to check if we have already all chartpoints in the array self.glucoseChartPoints for the new start and date time. If not we're going to prepand a new array and/or append a new array
+            // we're going to check if we have already all chartpoints in the arrays self.glucoseChartPoints for the new start and date time. If not we're going to prepand a arrays and/or append a arrays
             
-            // initialize new list of glucoseChartPoints to prepend
-            var newGlucoseChartPointsToPrepend = [ChartPoint]()
-
-            // initialize new list of glucoseChartPoints to append
-            var newGlucoseChartPointsToAppend = [ChartPoint]()
+            // initialize new list of glucoseChartPoints to prepend with empty arrays
+            var newGlucoseChartPointsToPrepend: GlucoseChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
+            
+            // initialize new list of glucoseChartPoints to append with empty arrays
+            var newGlucoseChartPointsToAppend: GlucoseChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
             
             // do we reuse the existing list ? for instance if new startDate > date of currently stored last chartpoint, then we don't reuse the existing list, probably better to reinitialize from scratch to avoid ending up with too long lists
             // and if there's more than a predefined amount of elements already in the array then we restart from scratch because (on an iPhone SE with iOS 13), the panning is getting slowed down when there's more than 1000 elements in the array
-            var reUseExistingChartPointList = self.glucoseChartPoints.count <= ConstantsGlucoseChart.maximumElementsInGlucoseChartPointsArray ? true:false
-
-            if let lastGlucoseChartPoint = self.glucoseChartPoints.last, let lastGlucoseChartPointX = lastGlucoseChartPoint.x as? ChartAxisValueDate {
+            var reUseExistingChartPointList = self.glucoseChartPoints.urgentRange
+                .count + self.glucoseChartPoints.inRange.count + self.glucoseChartPoints.notUrgentRange.count
+                <= ConstantsGlucoseChart.maximumElementsInGlucoseChartPointsArray ? true:false
+            
+            if let lastGlucoseChartPoint = self.glucoseChartPoints.lastGlucoseChartPoint, let lastGlucoseChartPointX = lastGlucoseChartPoint.x as? ChartAxisValueDate {
                 
                 // if reUseExistingChartPointList = false, then we're actually forcing to use a complete new array, because the current array glucoseChartPoints is too big. If true, then we start from timestamp of the last chartpoint
                 let lastGlucoseTimeStamp = reUseExistingChartPointList ? lastGlucoseChartPointX.date : Date(timeIntervalSince1970: 0)
@@ -145,26 +165,50 @@ public final class GlucoseChartManager {
                     
                     // startDate is bigger than the the date of the last currently stored ChartPoint, let's reinitialize the glucosechartpoints
                     reUseExistingChartPointList = false
-                
+                    
                     // use newGlucoseChartPointsToAppend and assign it to new list of chartpoints startDate to endDate
                     newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor)
+                    
+                    // lastChartPointEarlierThanEndDate is the last chartPoint int he array to append
+                    self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
+
+                    // maybe there's a higher value now
+                    self.maximumValueInGlucoseChartPoints = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPoints, glucoseChartPoints: newGlucoseChartPointsToAppend)
                     
                 } else if endDate <= lastGlucoseTimeStamp {
                     // so starDate <= date of last known glucosechartpoint and enddate is also <= that date
                     // no need to append anything
+                    
+                    // lastGlucoseChartPoint is the new latest chartpoint earlier than enddate
+                    self.lastChartPointEarlierThanEndDate = lastGlucoseChartPoint
+                    
+                    // maybe there's a higher value now for maximumValueInGlucoseChartPoints
+                    self.maximumValueInGlucoseChartPoints = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPoints, glucoseChartPoints: newGlucoseChartPointsToAppend)
+                    
                 } else {
                     
                     // append glucseChartpoints with date > x.date up to endDate
                     newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: lastGlucoseTimeStamp, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor)
+                    
+                    // lastChartPointEarlierThanEndDate is the last chartPoint int he array to append
+                    self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
+                    
+                    // maybe there's a higher value now for maximumValueInGlucoseChartPoints
+                    self.maximumValueInGlucoseChartPoints = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPoints, glucoseChartPoints: newGlucoseChartPointsToAppend)
+
                 }
                 
                 // now see if we need to prepend
                 // if reUseExistingChartPointList = false, then it means startDate > date of last know glucosepoint, there's no need to prepend
                 if reUseExistingChartPointList {
                     
-                    if let firstGlucoseChartPoint = self.glucoseChartPoints.first, let firstGlucoseChartPointX = firstGlucoseChartPoint.x as? ChartAxisValueDate, startDateToUse < firstGlucoseChartPointX.date {
+                    if let firstGlucoseChartPoint = self.glucoseChartPoints.firstGlucoseChartPoint, let firstGlucoseChartPointX = firstGlucoseChartPoint.x as? ChartAxisValueDate, startDateToUse < firstGlucoseChartPointX.date {
                         
                         newGlucoseChartPointsToPrepend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: firstGlucoseChartPointX.date, bgReadingsAccessor: self.data().bgReadingsAccessor)
+                        
+                        // maybe there's a higher value now for maximumValueInGlucoseChartPoints
+                        self.maximumValueInGlucoseChartPoints = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPoints, glucoseChartPoints: newGlucoseChartPointsToPrepend)
+
                     }
                     
                 }
@@ -172,65 +216,35 @@ public final class GlucoseChartManager {
             } else {
                 
                 // this should be a case where there's no glucoseChartPoints stored yet, we just create a new array to append
-
+                
                 // get glucosePoints from coredata
                 newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor)
+                
+                // lastChartPointEarlierThanEndDate is the last chartPoint int he array to append
+                self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
+                
+                // maybe there's a higher value now for maximumValueInGlucoseChartPoints
+                self.maximumValueInGlucoseChartPoints = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPoints, glucoseChartPoints: newGlucoseChartPointsToAppend)
+
             }
             
-            // recalculate maximumValueInGlucoseChartPoints, there may be a higher value in newGlucoseChartPointsToAppend
-            for glucoseChartPoint in newGlucoseChartPointsToAppend {
-                
-                self.maximumValueInGlucoseChartPoints = max(self.maximumValueInGlucoseChartPoints, glucoseChartPoint.y.scalar)
-                
-            }
-            
-            // recalculate maximumValueInGlucoseChartPoints, there may be a higher value in newGlucoseChartPointsToPrepend
-            for glucoseChartPoint in newGlucoseChartPointsToPrepend {
-                
-                self.maximumValueInGlucoseChartPoints = max(self.maximumValueInGlucoseChartPoints, glucoseChartPoint.y.scalar)
-                
-            }
-            
-            // closure will iterate through glucoseChartPoints and find latest date earlier than endDate and larger then startdate, if there isn't any it returns nil
-            let findLastChartPointEarlierThanEndDateInArray = { (_ glucoseChartPoints : [ChartPoint]) -> ChartPoint? in
-                
-                for (_, glucoseChartPoint) in glucoseChartPoints.enumerated().reversed() {
-                    
-                    if let chartAxisValueDate = glucoseChartPoint.x as? ChartAxisValueDate {
-                        
-                        if chartAxisValueDate.date < endDate {
-                            
-                            return glucoseChartPoint
-                            
-                        } else if let startDate = startDate, chartAxisValueDate.date < startDate {
-                            
-                            return nil
-                            
-                        }
-                        
-                    }
-                }
-                
-                return nil
-                
-            }
-            
-            // now calculate lastChartPointEarlierThanEndDate by using findLastChartPointEarlierThanEndDateInArray for newGlucoseChartPointsToAppend, newGlucoseChartPointsToPrepend and glucoseChartPoints
-            self.lastChartPointEarlierThanEndDate = findLastChartPointEarlierThanEndDateInArray(newGlucoseChartPointsToAppend)
-            if self.lastChartPointEarlierThanEndDate == nil && reUseExistingChartPointList {
-                self.lastChartPointEarlierThanEndDate = findLastChartPointEarlierThanEndDateInArray(self.glucoseChartPoints)
-            }
-            if self.lastChartPointEarlierThanEndDate == nil {
-                self.lastChartPointEarlierThanEndDate = findLastChartPointEarlierThanEndDateInArray(newGlucoseChartPointsToPrepend)
-            }
+            // now assign glucoseChartPoints = range to prepend + existing array + range to append
+            // do this for urgentRange, inRange and notUrgentRange
+            self.glucoseChartPoints.urgentRange = newGlucoseChartPointsToPrepend.urgentRange + (reUseExistingChartPointList ? self.glucoseChartPoints.urgentRange : [ChartPoint]()) + newGlucoseChartPointsToAppend.urgentRange
+            self.glucoseChartPoints.inRange = newGlucoseChartPointsToPrepend.inRange + (reUseExistingChartPointList ? self.glucoseChartPoints.inRange : [ChartPoint]()) + newGlucoseChartPointsToAppend.inRange
+            self.glucoseChartPoints.notUrgentRange = newGlucoseChartPointsToPrepend.notUrgentRange + (reUseExistingChartPointList ? self.glucoseChartPoints.notUrgentRange : [ChartPoint]()) + newGlucoseChartPointsToAppend.notUrgentRange
             
             DispatchQueue.main.async {
                 
                 // so we're in the main thread, now endDate and startDate and glucoseChartPoints can be safely assigned to value that was passed in the call to updateGlucoseChartPoints
                 self.endDate = endDate
                 self.startDate = startDateToUse
-                self.glucoseChartPoints = newGlucoseChartPointsToPrepend + (reUseExistingChartPointList ? self.glucoseChartPoints : [ChartPoint]()) + newGlucoseChartPointsToAppend
-
+                
+                // also assign urgentRangeGlucoseChartPoints, urgentRangeGlucoseChartPoints and urgentRangeGlucoseChartPoints to the corresponding arrays in glucoseChartPoints - can also be safely done because we're in the main thread
+                self.urgentRangeGlucoseChartPoints = self.glucoseChartPoints.urgentRange
+                self.inRangeGlucoseChartPoints = self.glucoseChartPoints.inRange
+                self.notUrgentRangeGlucoseChartPoints = self.glucoseChartPoints.notUrgentRange
+                
                 // update the chart outlet
                 chartOutlet.reloadChart()
                 
@@ -238,7 +252,7 @@ public final class GlucoseChartManager {
                 if let completionHandler = completionHandler {
                     completionHandler()
                 }
-
+                
             }
             
         })
@@ -247,30 +261,30 @@ public final class GlucoseChartManager {
         data().operationQueue.addOperation {
             operation.start()
         }
-
+        
     }
     
     public func cleanUpMemory() {
         
         trace("in cleanUpMemory", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info)
-
+        
         nillifyData()
         
     }
-
+    
     public func glucoseChartWithFrame(_ frame: CGRect) -> Chart? {
         
         if let chart = glucoseChart, chart.frame != frame {
-
+            
             trace("Glucose chart frame changed to %{public}@", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info,  String(describing: frame))
-
+            
             self.glucoseChart = nil
         }
-
+        
         if glucoseChart == nil {
             glucoseChart = generateGlucoseChartWithFrame(frame)
         }
-
+        
         return glucoseChart
     }
     
@@ -283,7 +297,7 @@ public final class GlucoseChartManager {
         if let uiPanGestureRecognizer = recognizer as? UIPanGestureRecognizer {
             
             handleUiPanGestureRecognizer(uiPanGestureRecognizer: uiPanGestureRecognizer, chartOutlet: chartOutlet, completionHandler: completionHandler)
-
+            
         } else if let uiLongPressGestureRecognizer = recognizer as? UILongPressGestureRecognizer {
             
             handleUiLongPressGestureRecognizer(uiLongPressGestureRecognizer: uiLongPressGestureRecognizer, chartOutlet: chartOutlet)
@@ -293,7 +307,7 @@ public final class GlucoseChartManager {
     }
     
     // MARK: - private functions
-
+    
     private func stopDeceleration() {
         
         // user touches the chart, in case we're handling a decelerating gesture, stop it
@@ -301,7 +315,7 @@ public final class GlucoseChartManager {
         gestureTimer?.suspend()
         gestureTimer = nil
         stopDecelerationNextGestureTimerRun = true
-
+        
     }
     
     private func handleUiLongPressGestureRecognizer(uiLongPressGestureRecognizer: UILongPressGestureRecognizer, chartOutlet: BloodGlucoseChartView) {
@@ -313,11 +327,11 @@ public final class GlucoseChartManager {
         }
         
     }
-
+    
     private func handleUiPanGestureRecognizer(uiPanGestureRecognizer: UIPanGestureRecognizer, chartOutlet: BloodGlucoseChartView, completionHandler: (() -> ())?) {
-
+        
         if uiPanGestureRecognizer.state == .began {
-
+            
             // user touches the chart, possibily chart is still decelerating from a previous pan. Needs to be stopped
             stopDeceleration()
             
@@ -358,16 +372,16 @@ public final class GlucoseChartManager {
             setNewStartAndEndDate(translationX: translationX, chartOutlet: chartOutlet, completionHandler: {
                 
                 uiPanGestureRecognizer.setTranslation(CGPoint.zero, in: chartOutlet)
-
+                
                 // call the completion handler that was created by the original caller, in this case RootViewController created this code block
                 if let completionHandler = completionHandler {
                     completionHandler()
                 }
-
+                
             })
             
         }
-
+        
     }
     
     /// - will call setNewStartAndEndDate with a new translationX value, every x milliseconds, x being 30 milliseconds by default as defined in the constants.
@@ -406,10 +420,10 @@ public final class GlucoseChartManager {
             
             // calculate additional distance to travel the chart - this is the integral function again that is used
             let additionalDistanceToTravel = CGFloat(round(0.001*(
-                
-                Double(velocityX) *  pow(Double(ConstantsGlucoseChart.decelerationRate), timeSinceStart) / log(Double(ConstantsGlucoseChart.decelerationRate))
-                    
-                    - constant))) - distanceTravelled
+                                                            
+                                                            Double(velocityX) *  pow(Double(ConstantsGlucoseChart.decelerationRate), timeSinceStart) / log(Double(ConstantsGlucoseChart.decelerationRate))
+                                                                
+                                                                - constant))) - distanceTravelled
             
             // if less than 2 pixels then stop the gestureTimer
             if abs(additionalDistanceToTravel) < 2 {
@@ -458,13 +472,13 @@ public final class GlucoseChartManager {
     }
     
     private func generateGlucoseChartWithFrame(_ frame: CGRect) -> Chart? {
-
+        
         let xAxisValues = generateXAxisValues()
         
         guard xAxisValues.count > 1 else {return nil}
         
         let xAxisModel = ChartAxisModel(axisValues: xAxisValues, lineColor: ConstantsGlucoseChart.axisLineColor, labelSpaceReservationMode: .fixed(20))
-
+        
         // just to save typing
         let unitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
@@ -490,7 +504,7 @@ public final class GlucoseChartManager {
                 yAxisValues += ConstantsGlucoseChart.secondGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
             }
         }
-
+        
         // if the maxium yAxisValue doesn't support the maximum glucose value, then add the next range
         if yAxisValues.last!.scalar < maximumValueInGlucoseChartPoints {
             if unitIsMgDl {
@@ -528,18 +542,24 @@ public final class GlucoseChartManager {
         
         // high/low/target guidelines
         let urgentHighLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: urgentHighLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.urgentHighMarkValueInUserChosenUnit)])
-
+        
         let highLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: highLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.highMarkValueInUserChosenUnit)])
         
         let targetLineLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: targetLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.targetMarkValueInUserChosenUnit)])
-
+        
         let lowLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: highLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.lowMarkValueInUserChosenUnit)])
-
+        
         let urgentLowLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: urgentHighLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.urgentLowMarkValueInUserChosenUnit)])
         
-        // red/yellow/green circle layers
-        let glucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: glucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseTintColor, optimized: true)
-            
+        // in Range circle layers
+        let inRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: inRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseInRangeColor, optimized: true)
+
+        // urgent Range circle layers
+        let urgentRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: urgentRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseUrgentRangeColor, optimized: true)
+
+        // above target circle layers
+        let notUrgentRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: notUrgentRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseNotUrgentRangeColor, optimized: true)
+
         let layers: [ChartLayer?] = [
             gridLayer,
             xAxisLayer,
@@ -551,7 +571,9 @@ public final class GlucoseChartManager {
             lowLineLayer,
             urgentLowLineLayer,
             // glucosePoint layer(s)
-            glucoseCircles,
+            inRangeGlucoseCircles,
+            notUrgentRangeGlucoseCircles,
+            urgentRangeGlucoseCircles
         ]
         
         return Chart(
@@ -561,9 +583,9 @@ public final class GlucoseChartManager {
             layers: layers.compactMap { $0 }
         )
     }
-
+    
     private func generateXAxisValues() -> [ChartAxisValue] {
-
+        
         // in the comments, assume it is now 13:26 and width is 6 hours, that means startDate = 07:26, endDate = 13:26
         
         /// how many full hours between startdate and enddate
@@ -581,34 +603,81 @@ public final class GlucoseChartManager {
         
         /// now append the endDate as last element, in this example 13:26
         xAxisValues.append(ChartAxisValueDate(date: endDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings))
-         
+        
         /// don't show the first and last hour, because this is usually not something like 13 but rather 13:26
         xAxisValues.first?.hidden = true
         xAxisValues.last?.hidden = true
-
+        
         return xAxisValues
         
     }
     
-    /// gets array of chartpoints that have a calculatedValue > 0 and date > startDate (not equal to) and < endDate (not equal to), from coreData
     /// - returns:
-    ///     - chartpoints for readings that have calculatedvalue > 0, order ascending, ie first element is the oldest
-    private func getGlucoseChartPoints(startDate: Date, endDate: Date, bgReadingsAccessor: BgReadingsAccessor) -> [ChartPoint] {
+    ///     - tuple of three chartpoint arrays, with readings that have calculatedvalue> 0, order ascending, ie first element is the oldest
+    ///     - the three arrays in the tuple according to value compared to lowMarkValue, highMarkValue, urgentHighMarkValue, urgentLowMarkValue stored in UserDefaults
+    ///     - the firstGlucoseChartPoint in the tuple is the oldest ChartPoint in the three arrays
+    ///     - the lastGlucoseChartPoint in the tuple is the most recent ChartPoint in the three arrays
+    private func getGlucoseChartPoints(startDate: Date, endDate: Date, bgReadingsAccessor: BgReadingsAccessor) -> GlucoseChartPointsType {
         
-        return bgReadingsAccessor.getBgReadingsOnPrivateManagedObjectContext(from: startDate, to: endDate).compactMap {
+        // get bgReadings between the two dates
+        let bgReadings = bgReadingsAccessor.getBgReadingsOnPrivateManagedObjectContext(from: startDate, to: endDate)
+
+        // intialize the three arrays
+        var urgentRangeChartPoints = [ChartPoint]()
+        var inRangeChartPoints = [ChartPoint]()
+        var notUrgentRangeChartPoints = [ChartPoint]()
+        
+        // initialize last chartpoint
+        var lastGlucoseChartPoint: ChartPoint?
+        
+        // initialize first chartpoint
+        var firstGlucoseChartPoint: ChartPoint?
+        
+        // initiliaze maximumValueInGlucoseChartPoints
+        var maximumValueInGlucoseChartPoints: Double?
+        
+        for reading in bgReadings {
             
-            ChartPoint(bgReading: $0, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            if reading.calculatedValue > 0.0 {
+                
+                let newGlucoseChartPoint = ChartPoint(bgReading: reading, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                
+                if (reading.calculatedValue < UserDefaults.standard.lowMarkValue && reading.calculatedValue > UserDefaults.standard.urgentLowMarkValue) || (reading.calculatedValue > UserDefaults.standard.highMarkValue && reading.calculatedValue < UserDefaults.standard.urgentHighMarkValue) {
+                    
+                    notUrgentRangeChartPoints.append(newGlucoseChartPoint)
+                    
+                } else if reading.calculatedValue >= UserDefaults.standard.urgentHighMarkValue || reading.calculatedValue <= UserDefaults.standard.urgentLowMarkValue {
+                    
+                    urgentRangeChartPoints.append(newGlucoseChartPoint)
+                    
+                } else {
+                    
+                    inRangeChartPoints.append(newGlucoseChartPoint)
+                    
+                }
+                
+                lastGlucoseChartPoint = (lastGlucoseChartPoint != nil ? max(lastGlucoseChartPoint!, newGlucoseChartPoint) : newGlucoseChartPoint)
+
+                firstGlucoseChartPoint = (firstGlucoseChartPoint != nil ? min(firstGlucoseChartPoint!, newGlucoseChartPoint) : newGlucoseChartPoint)
+                
+                maximumValueInGlucoseChartPoints = (maximumValueInGlucoseChartPoints != nil ? max(maximumValueInGlucoseChartPoints!, reading.calculatedValue) : reading.calculatedValue)
+                
+            }
             
         }
+        
+        return (urgentRangeChartPoints, inRangeChartPoints, notUrgentRangeChartPoints, firstGlucoseChartPoint, lastGlucoseChartPoint, maximumValueInGlucoseChartPoints)
+        
     }
-    
+
+
     /// - set data to nil, will be called eg to clean up memory when going to the background
     /// - all needed variables will will be reinitialized as soon as data() is called
     private func nillifyData() {
         
         stopDeceleration()
         
-        glucoseChartPoints = []
+        glucoseChartPoints = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
         
         chartSettings = nil
         
@@ -624,6 +693,12 @@ public final class GlucoseChartManager {
         
         bgReadingsAccessor = nil
         
+        urgentRangeGlucoseChartPoints = []
+
+        inRangeGlucoseChartPoints = []
+
+        notUrgentRangeGlucoseChartPoints = []
+
     }
     
     /// function which gives is variables that are set back to nil when nillifyData is called
@@ -631,7 +706,7 @@ public final class GlucoseChartManager {
         
         // setup chartSettings
         if chartSettings == nil {
-
+            
             var newChartSettings = ChartSettings()
             newChartSettings.top = ConstantsGlucoseChart.top
             newChartSettings.bottom = ConstantsGlucoseChart.bottom
@@ -640,18 +715,18 @@ public final class GlucoseChartManager {
             newChartSettings.axisTitleLabelsToLabelsSpacing = ConstantsGlucoseChart.axisTitleLabelsToLabelsSpacing
             newChartSettings.labelsToAxisSpacingX = ConstantsGlucoseChart.labelsToAxisSpacingX
             newChartSettings.clipInnerFrame = false
-
+            
             chartSettings = newChartSettings
             
         }
         
         // setup chartPointDateFormatter
         if chartPointDateFormatter == nil {
-
+            
             let dateFormatter = DateFormatter()
             dateFormatter.dateStyle = .none
             dateFormatter.timeStyle = .short
-
+            
             chartPointDateFormatter = dateFormatter
             
         }
@@ -683,7 +758,7 @@ public final class GlucoseChartManager {
             axisLabelTimeFormatter = DateFormatter()
             axisLabelTimeFormatter!.dateFormat = UserDefaults.standard.chartTimeAxisLabelFormat
         }
-
+        
         // initialize bgReadingsAccessor
         if bgReadingsAccessor == nil {
             bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
@@ -691,6 +766,40 @@ public final class GlucoseChartManager {
         
         return (chartSettings!, chartPointDateFormatter!, operationQueue!, chartLabelSettings!, chartGuideLinesLayerSettings!, axisLabelTimeFormatter!, bgReadingsAccessor!)
         
+    }
+    
+    /// finds new maximum, either currentMaximumValueInGlucoseChartPoints, or glucoseChartPoints.maximumValueInGlucoseChartPoints
+    /// - if both input values are nil, then returns constants
+    private func getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: Double?, glucoseChartPoints: GlucoseChartPointsType) -> Double {
+        
+        // check if there's already a value for maximumValueInGlucoseChartPoints
+        if let currentMaximumValueInGlucoseChartPoints = currentMaximumValueInGlucoseChartPoints {
+            
+            // check if there's a new value
+            if let newMaximumValueInGlucoseChartPoints = glucoseChartPoints.maximumValueInGlucoseChartPoints {
+
+                // return the maximum of the two
+                return max(currentMaximumValueInGlucoseChartPoints, newMaximumValueInGlucoseChartPoints)
+
+            } else {
+                
+                return currentMaximumValueInGlucoseChartPoints
+                
+            }
+            
+            
+        } else {
+
+            // there's no currentMaximumValueInGlucoseChartPoints, if glucoseChartPoints.maximumValueInGlucoseChartPoints not nil, return it
+            if let maximumValueInGlucoseChartPoints = glucoseChartPoints.maximumValueInGlucoseChartPoints {
+                return maximumValueInGlucoseChartPoints
+            } else {
+                return ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            }
+            
+
+        }
+
     }
     
 }
