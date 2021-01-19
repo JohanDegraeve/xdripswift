@@ -106,6 +106,9 @@ class LibreDataParser {
         
         // check if the trend and the previous raw values have at least 5 equal values, if so this is an expired sensor that keeps sending the same values, in that case no further processing
         if trend.hasEqualValues(howManyToCheck: 5, otherArray: previousRawValues) {
+            
+            trace("in libreDataProcessor, did detect flat values, returning empty GlucoseData array", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+            
             return ([GlucoseData](), sensorState, sensorTimeInMinutes)
         }
         

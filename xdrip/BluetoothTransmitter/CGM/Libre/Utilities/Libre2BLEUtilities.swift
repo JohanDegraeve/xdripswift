@@ -1,4 +1,8 @@
 import Foundation
+import OSLog
+
+/// for trace
+fileprivate let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLibre2BLEUtilities)
 
 /// - utilities for Libre 2 data processing, here it's for the case where data is read via bluetooth
 /// - if read via NFC or other transmitter, go to PreLibre2
@@ -150,7 +154,11 @@ class Libre2BLEUtilities {
         // check if the rawGlucoseValues and the previousRawGlucoseValues have at least 5 equal values, if so this is an expired sensor that keeps sending the same values, in that case no further processing
         if let previousRawGlucoseValues = UserDefaults.standard.previousRawGlucoseValues {
             if rawGlucoseValues.hasEqualValues(howManyToCheck: 5, otherArray: previousRawGlucoseValues) {
+                
+                trace("in parseBLEData, did detect flat values, returning empty GlucoseData array", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+                
                 return ([GlucoseData](), wearTimeMinutes)
+                
             }
         }
 
