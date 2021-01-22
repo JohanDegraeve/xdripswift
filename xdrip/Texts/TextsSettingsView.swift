@@ -234,11 +234,11 @@ class Texts_SettingsView {
     }()
     
     static let testUrlAndAPIKey: String = {
-        return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Nightscout URL and API_SECRET?", comment: "nightscout settings, when clicking the cell, test the url and api key")
+        return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Connection?", comment: "nightscout settings, when clicking the cell, test the url and api key")
     }()
 
     static let nightScoutPort: String = {
-        return NSLocalizedString("nightScoutPort", tableName: filename, bundle: Bundle.main, value: "Port", comment: "nightscout settings, port to use")
+        return NSLocalizedString("nightScoutPort", tableName: filename, bundle: Bundle.main, value: "Port (optional):", comment: "nightscout settings, port to use")
     }()
 
     // MARK: - Section Speak
