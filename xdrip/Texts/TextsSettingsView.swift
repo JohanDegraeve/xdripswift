@@ -59,7 +59,7 @@ class Texts_SettingsView {
     }()
 
     static let labelUrgentHighValue: String = {
-        return NSLocalizedString("settingsviews_urgenthighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value:", comment: "home screen settings, urgent high value")
+        return NSLocalizedString("settingsviews_urgentHighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value:", comment: "home screen settings, urgent high value")
     }()
     
     static let labelHighValue: String = {
