@@ -84,8 +84,8 @@
 "failedToSendEmail" = "Failed to Send Email";
 "volumeTestSoundPlayerExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.";
 "volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
-"volumeTestSoundPlayer" = "Volume Test (with Override Mute On)";
-"volumeTestiOSSound" = "Volume Test (Current iPhone Volume)";
+"volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
+"volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 "debugLevel" = "Include Debug Level";
-"warningChangeFromMasterToFollower" = "Switch from master to follower will stop your current sensor. Do you want to continue ?";
-"nightScoutPort" = "Port:";
+"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue ?";
+"nightScoutPort" = "Port (optional):";
