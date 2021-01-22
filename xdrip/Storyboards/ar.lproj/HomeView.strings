@@ -30,6 +30,6 @@
 "transmitterpairingattempttimeout" = "لم يستجيب جهاز الإرسال على طلب الاقتران.";
 "success" = "نجاح";
 "failed" = "فشل";
-"calibrationNotNecessary" = "عند تمكين OOPWeb ، لا تكون المعايرة ضرورية لحساس فري ستايل ليبري";
+"calibrationNotNecessary" = "عند تمكينOOPWeb ، لا تكون المعايرة ضرورية لحساس ليبري";
 "dexcomBatteryTooLow" = "بطارية جهاز الإرسال منخفضة جدًا!";
 "sensorAge14Days" = "وصل الحساس إلى الحد الأقصى من عمره.";

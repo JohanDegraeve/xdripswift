@@ -148,5 +148,8 @@ enum ConstantsLog {
     /// for use in cgm transmitter bubble
     static let categoryLibreSensorType =             "categoryLibreSensorType       "
 
+    /// for use in Libre2BLEUtilities
+    static let categoryLibre2BLEUtilities =             "Libre2BLEUtilities       "
+
 }
 
