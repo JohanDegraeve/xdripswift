@@ -40,7 +40,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             return "OSLog"
             
         case .smoothLibreValues:
-            return "Smooth Libre Values"
+            return "Smooth Libre Values?"
             
         }
     }
