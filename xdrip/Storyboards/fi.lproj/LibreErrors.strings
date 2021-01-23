@@ -1,0 +1,4 @@
+"receivedDataIsNil" = "Ei tietoja vastaanotettu OOP-verkkopalvelimelta";
+"oOPWebServerError" = "OOP-verkkopalvelinvirhe: ";
+"libreUSNotSupported" = "Libre US ei ole tuettu";
+"libreSensorNotReady" = "Libre sensori ei ole valmiustilassa";

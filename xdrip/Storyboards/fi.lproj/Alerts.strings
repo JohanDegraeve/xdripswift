@@ -6,7 +6,7 @@
 "alerts_verylowalerttitle" = "Erittäin matala hälytys";
 "alerts_snooze" = "Torkku";
 "alerts_select_snooze_time" = "Valise torkkuaika";
-"alerts_missedreadingalerttitle" = "Missed Reading";
+"alerts_missedreadingalerttitle" = "Puuttuva lukema";
 "alerts_calibrationneeded" = "Kalibrointi tarvitaan";
 "alerts_batterylow" = "Akku vähissä";
 "alertstart" = "Sovelletaan alkaen";

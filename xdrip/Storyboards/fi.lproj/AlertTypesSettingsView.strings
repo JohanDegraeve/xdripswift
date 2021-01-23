@@ -11,5 +11,6 @@
 "alerttypesettingsview_givename" = "Anna nimi";
 "alerttypesettingsview_givesnoozeperiod" = "Anna torkkujakso minuuteissa";
 "alerttypesettingsview_picksoundname" = "Valitse ääni";
+"alertTypeNoSound" = "Ei ääntä";
 "alerttypenamealreadyexistsmessages" = "Tämän niminen hälytystyyppi on jo olemassa. Vaihda nimi";
 "confirmdeletionalerttype" = "Haluatko poistaa hälytystyypin nimellä ";

@@ -510,6 +510,27 @@
 
 /* Begin PBXFileReference section */
 		148E05A6AF0290AE5815B0F9 /* Pods-xdrip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xdrip.debug.xcconfig"; path = "Target Support Files/Pods-xdrip/Pods-xdrip.debug.xcconfig"; sourceTree = "<group>"; };
+		2867F5C725BC209400AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/MainInterface.strings; sourceTree = "<group>"; };
+		2867F5C825BC209400AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		2867F5C925BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Main.strings; sourceTree = "<group>"; };
+		2867F5CA25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Common.strings; sourceTree = "<group>"; };
+		2867F5CB25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Alerts.strings; sourceTree = "<group>"; };
+		2867F5CC25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
+		2867F5CD25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
+		2867F5CE25BC209600AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
+		2867F5CF25BC209600AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/CalibrationRequest.strings; sourceTree = "<group>"; };
+		2867F5D025BC209600AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Common.strings; sourceTree = "<group>"; };
+		2867F5D125BC209700AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		2867F5D225BC209900AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/ErrorMessages.strings; sourceTree = "<group>"; };
+		2867F5D325BC209900AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/HomeView.strings; sourceTree = "<group>"; };
+		2867F5D425BC209A00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		2867F5D525BC209A00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/M5StackView.strings; sourceTree = "<group>"; };
+		2867F5D625BC209A00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/NightScoutTestResult.strings; sourceTree = "<group>"; };
+		2867F5D725BC209B00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/SettingsViews.strings; sourceTree = "<group>"; };
+		2867F5D825BC209B00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/SpeakReading.strings; sourceTree = "<group>"; };
+		2867F5D925BC209B00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LibreErrors.strings; sourceTree = "<group>"; };
+		2867F5DA25BC209C00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Snooze.strings; sourceTree = "<group>"; };
+		2867F5DB25BC209C00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		470CE1FD246802EB00D5CB74 /* es-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-ES"; path = "es-ES.lproj/BluetoothPeripheralsView.strings"; sourceTree = "<group>"; };
 		470CE1FF246802F400D5CB74 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
 		470CE200246803B100D5CB74 /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/BluetoothPeripheralsView.strings"; sourceTree = "<group>"; };
@@ -2631,6 +2652,7 @@
 				pt,
 				de,
 				ar,
+				fi,
 			);
 			mainGroup = F8AC425121ADEBD60078C348;
 			productRefGroup = F8AC425B21ADEBD60078C348 /* Products */;
@@ -3206,6 +3228,7 @@
 				470CE1FF246802F400D5CB74 /* en */,
 				470CE200246803B100D5CB74 /* es-MX */,
 				F86A3C6D247718C700EE7E46 /* ar */,
+				2867F5CD25BC209500AA1E98 /* fi */,
 			);
 			name = BluetoothPeripheralsView.strings;
 			sourceTree = "<group>";
@@ -3216,6 +3239,7 @@
 				4749EB9C25B36E010072DF8B /* en */,
 				4749EBA025B36E080072DF8B /* es-ES */,
 				4749EBA225B36E130072DF8B /* es-MX */,
+				2867F5DB25BC209C00AA1E98 /* fi */,
 			);
 			name = LibreNFC.strings;
 			sourceTree = "<group>";
@@ -3227,6 +3251,7 @@
 				47503385247420B000D2260B /* es-ES */,
 				47503387247420BA00D2260B /* es-MX */,
 				F86A3C6E247718C700EE7E46 /* ar */,
+				2867F5CE25BC209600AA1E98 /* fi */,
 			);
 			name = BluetoothPeripheralView.strings;
 			sourceTree = "<group>";
@@ -3235,6 +3260,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				F870D3D825126A49008967B0 /* Base */,
+				2867F5C725BC209400AA1E98 /* fi */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -3244,6 +3270,7 @@
 			children = (
 				F889CB70236D84AC00A81068 /* en */,
 				F86A3C75247718C700EE7E46 /* ar */,
+				2867F5D525BC209A00AA1E98 /* fi */,
 			);
 			name = M5StackView.strings;
 			sourceTree = "<group>";
@@ -3264,6 +3291,7 @@
 				F8B48B0822B37C83009BCC01 /* zh */,
 				F889CB8E236D89C800A81068 /* de */,
 				F86A3C7A247718C800EE7E46 /* ar */,
+				2867F5C925BC209500AA1E98 /* fi */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -3283,6 +3311,7 @@
 				F8B48B0722B37C83009BCC01 /* zh */,
 				F889CB8D236D89C800A81068 /* de */,
 				F86A3C79247718C800EE7E46 /* ar */,
+				2867F5C825BC209400AA1E98 /* fi */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -3291,6 +3320,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				F8AF11FE24B3B62D00AE5BA2 /* en */,
+				2867F5D925BC209B00AA1E98 /* fi */,
 			);
 			name = LibreErrors.strings;
 			sourceTree = "<group>";
@@ -3303,6 +3333,7 @@
 				F8B48ABC22B2FF36009BCC01 /* es-ES */,
 				F8B48B1122B37C84009BCC01 /* zh */,
 				F86A3C76247718C700EE7E46 /* ar */,
+				2867F5D625BC209A00AA1E98 /* fi */,
 			);
 			name = NightScoutTestResult.strings;
 			sourceTree = "<group>";
@@ -3316,6 +3347,7 @@
 				F8B48B0C22B37C83009BCC01 /* zh */,
 				475DED96244AF92A00F78473 /* en */,
 				F86A3C6B247718C700EE7E46 /* ar */,
+				2867F5CB25BC209500AA1E98 /* fi */,
 			);
 			name = Alerts.strings;
 			sourceTree = "<group>";
@@ -3329,6 +3361,7 @@
 				F8B48AB822B2FF35009BCC01 /* es-ES */,
 				F8B48B0D22B37C84009BCC01 /* zh */,
 				F86A3C6C247718C700EE7E46 /* ar */,
+				2867F5CC25BC209500AA1E98 /* fi */,
 			);
 			name = AlertTypesSettingsView.strings;
 			sourceTree = "<group>";
@@ -3349,6 +3382,7 @@
 				F8B48B0B22B37C83009BCC01 /* zh */,
 				F81D6D4522B67F55005EFAE2 /* pt */,
 				F86A3C78247718C700EE7E46 /* ar */,
+				2867F5D825BC209B00AA1E98 /* fi */,
 			);
 			name = SpeakReading.strings;
 			sourceTree = "<group>";
@@ -3361,6 +3395,7 @@
 				F8B48AB522B2FF35009BCC01 /* es-ES */,
 				F8B48B0A22B37C83009BCC01 /* zh */,
 				F86A3C73247718C700EE7E46 /* ar */,
+				2867F5D325BC209900AA1E98 /* fi */,
 			);
 			name = HomeView.strings;
 			sourceTree = "<group>";
@@ -3373,6 +3408,7 @@
 				F8B48AB422B2FF35009BCC01 /* es-ES */,
 				F8B48B0922B37C83009BCC01 /* zh */,
 				F86A3C6F247718C700EE7E46 /* ar */,
+				2867F5CF25BC209600AA1E98 /* fi */,
 			);
 			name = CalibrationRequest.strings;
 			sourceTree = "<group>";
@@ -3392,6 +3428,7 @@
 				F8B48B1022B37C84009BCC01 /* zh */,
 				F889CB97236D89C800A81068 /* de */,
 				F86A3C74247718C700EE7E46 /* ar */,
+				2867F5D425BC209A00AA1E98 /* fi */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -3407,6 +3444,7 @@
 				F8C5EBED22F5A52400563B5F /* pt-BR */,
 				F8C5EBEE22F5A52800563B5F /* pt */,
 				F86A3C70247718C700EE7E46 /* ar */,
+				2867F5D025BC209600AA1E98 /* fi */,
 			);
 			name = Common.strings;
 			sourceTree = "<group>";
@@ -3419,6 +3457,7 @@
 				F8B48ABA22B2FF35009BCC01 /* es-ES */,
 				F8B48B0F22B37C84009BCC01 /* zh */,
 				F86A3C72247718C700EE7E46 /* ar */,
+				2867F5D225BC209900AA1E98 /* fi */,
 			);
 			name = ErrorMessages.strings;
 			sourceTree = "<group>";
@@ -3435,6 +3474,7 @@
 				F846CDD623046BAE00DCF016 /* pt */,
 				F86A3C77247718C700EE7E46 /* ar */,
 				F817702A2491860F00AA3600 /* fr */,
+				2867F5D725BC209B00AA1E98 /* fi */,
 			);
 			name = SettingsViews.strings;
 			sourceTree = "<group>";
@@ -3450,6 +3490,7 @@
 				F8E53FD5251D361D00052CE5 /* es-ES */,
 				F8E53FD6251D363900052CE5 /* pt-BR */,
 				F8E53FD7251D363B00052CE5 /* pt */,
+				2867F5CA25BC209500AA1E98 /* fi */,
 			);
 			name = Common.strings;
 			sourceTree = "<group>";
@@ -3458,6 +3499,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				F8E6C79224CEC2E3007C1199 /* en */,
+				2867F5DA25BC209C00AA1E98 /* fi */,
 			);
 			name = Snooze.strings;
 			sourceTree = "<group>";
@@ -3472,6 +3514,7 @@
 				F8EEDD612300139800D2D610 /* zh */,
 				F8EEDD622300139A00D2D610 /* pt */,
 				F86A3C71247718C700EE7E46 /* ar */,
+				2867F5D125BC209700AA1E98 /* fi */,
 			);
 			name = DexcomShareTestResult.strings;
 			sourceTree = "<group>";
@@ -3487,7 +3530,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4122;
-				DEVELOPMENT_TEAM = RNX44PP998;
+				DEVELOPMENT_TEAM = XJ7824F34P;
 				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3496,7 +3539,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.5.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "fi.uusiraatikkala.xdripswift.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -3512,7 +3555,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4122;
-				DEVELOPMENT_TEAM = RNX44PP998;
+				DEVELOPMENT_TEAM = XJ7824F34P;
 				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3521,7 +3564,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.5.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.johandegraeve.xdripswift.xDrip4iOS-Widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "fi.uusiraatikkala.xdripswift.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -3661,7 +3704,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4122;
-				DEVELOPMENT_TEAM = RNX44PP998;
+				DEVELOPMENT_TEAM = XJ7824F34P;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3669,7 +3712,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.5.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = fi.uusiraatikkala.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -3691,7 +3734,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4122;
-				DEVELOPMENT_TEAM = RNX44PP998;
+				DEVELOPMENT_TEAM = XJ7824F34P;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3699,7 +3742,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.5.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.johandegraeve.xdripswift;
+				PRODUCT_BUNDLE_IDENTIFIER = fi.uusiraatikkala.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";

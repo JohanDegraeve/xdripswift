@@ -1,0 +1,5 @@
+"scanComplete" = "Skannaus suoritettu";
+"holdTopOfIphoneNearSensor" = "Skannaa pitämällä iOS-laitteen yläosaa anturin lähellä";
+"deviceMustSupportNFC" = "NFC ei ole tuettu tässä iPhonessa";
+"deviceMustSupportIOS14" = "Yhteyden muodostamiseksi Libre2:een tämä iPhone on päivitettävä iOS14:een";
+"donotusethelibrelinkapp" = "Libre2 yhdistetty.\r\n\r\nJos aiot skannata myös virallisella Libre-sovelluksella, kiellä Libre-sovelluksen bluetooth käyttöoikeus. \r\n\r\nMuussa tapauksessa NFC skannaus Libre-sovelluksella ja sallitulla Bluetooth-luvalla katkaisee xDrip4iOS:n ja Libre2:n välisen yhteyden.";
