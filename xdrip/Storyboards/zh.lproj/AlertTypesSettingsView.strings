@@ -6,7 +6,7 @@
 "alerttypesettingsview_snoozevianotification" = "通过通知延后警报"; 
 "alerttypesettingsview_defaultsnoozeperiod" = "缺省的延后时间 (分钟)"; 
 "alerttypesettingsview_overridemute" = "覆盖静音模式"; 
-"alerttypesettingsview_soundname" = "声音"; 
+"alerttypesettingsview_sound" = "声音"; 
 "alerttypesettingsview_defaultiossound" = "iOS 声音"; 
 "alerttypesettingsview_givename" = "起个名称"; 
 "alerttypesettingsview_givesnoozeperiod" = "设定延后周期，以分钟为单位"; 
