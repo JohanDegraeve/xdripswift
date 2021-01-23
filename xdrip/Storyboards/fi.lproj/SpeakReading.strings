@@ -9,8 +9,6 @@
 "trendfortyfiveup" = "ylös";
 "trendsingleup" = "merkittävästi ylöspäin";
 "trenddoubleup" = "dramaattisesti ylöspäin";
-"currenttrend" = "Se on trendi";
+"currenttrend" = "Suunta";
 "deltanoncomputable" = "ei laskettavissa";
 "currentdelta" = "Ero edellisestä lukemasta on";
-"settingsviews_speakRate" = "Puhenopeus";
-"settingsviews_speakRateMessage" = "Arvo välillä 0 ja 1";
