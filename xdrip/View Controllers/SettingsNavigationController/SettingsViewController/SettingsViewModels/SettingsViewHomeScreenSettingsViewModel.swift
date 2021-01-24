@@ -25,14 +25,11 @@ fileprivate enum Setting:Int, CaseIterable {
     //use objectives in graph?
     case useObjectives = 4
     
-    //show colored objective lines?
-    case showColoredObjectives = 5
-    
     //show target line?
-    case showTarget = 6
+    case showTarget = 5
     
     //target value
-    case targetMarkValue = 7
+    case targetMarkValue = 6
     
 }
 
@@ -47,10 +44,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
 
         case .useObjectives:
             return UISwitch(isOn: UserDefaults.standard.useObjectives, action: {(isOn:Bool) in UserDefaults.standard.useObjectives = isOn})
-            
-        case .showColoredObjectives:
-            return UISwitch(isOn: UserDefaults.standard.showColoredObjectives, action: {(isOn:Bool) in UserDefaults.standard.showColoredObjectives = isOn})
-            
+                        
         case .showTarget :
             return UISwitch(isOn: UserDefaults.standard.showTarget, action: {(isOn:Bool) in UserDefaults.standard.showTarget = isOn})
             
@@ -102,15 +96,6 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
                         UserDefaults.standard.useObjectives = true
                     }
                 })
-
-            case .showColoredObjectives:
-                return SettingsSelectedRowAction.callFunction(function: {
-                    if UserDefaults.standard.showColoredObjectives {
-                        UserDefaults.standard.showColoredObjectives = false
-                    } else {
-                        UserDefaults.standard.showColoredObjectives = true
-                    }
-                })
             
             case .showTarget:
                 return SettingsSelectedRowAction.callFunction(function: {
@@ -138,7 +123,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         } else if UserDefaults.standard.useObjectives && !UserDefaults.standard.showTarget {
             return Setting.allCases.count - 1
         } else {
-            return Setting.allCases.count - 3
+            return Setting.allCases.count - 2
         }
     }
     
@@ -161,9 +146,6 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
                 
             case .useObjectives:
                 return Texts_SettingsView.labelUseObjectives
-            
-            case .showColoredObjectives:
-                return Texts_SettingsView.labelShowColoredObjectives
             
             case .showTarget:
                 return Texts_SettingsView.labelShowTarget
@@ -191,9 +173,6 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             return UITableViewCell.AccessoryType.disclosureIndicator
 
         case .useObjectives:
-            return UITableViewCell.AccessoryType.disclosureIndicator
-
-        case .showColoredObjectives:
             return UITableViewCell.AccessoryType.disclosureIndicator
 
         case .showTarget:
@@ -225,7 +204,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .targetMarkValue:
             return UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
-        case .useObjectives, .showColoredObjectives, .showTarget:
+        case .useObjectives, .showTarget:
             return nil
             
         }

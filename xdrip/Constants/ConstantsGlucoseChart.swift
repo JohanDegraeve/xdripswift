@@ -47,17 +47,11 @@ enum ConstantsGlucoseChart {
     // objective/target range guidelines. Will use either standard gray or colored lines
     // make use alpha components to make the perceived brightness of each line be the same to the user (otherwise red appears washed out)
     
-    /// color for urgent high and urgent low line, if showColoredObjectives is not enabled
+    /// color for urgent high and urgent low line
     static let guidelineUrgentHighLow = UIColor.lightGray.withAlphaComponent(0.8)
     
-    /// color for urgent high and urgent low line, if showColoredObjectives is not enabled
+    /// color for urgent high and urgent low line
     static let guidelineHighLow = UIColor.lightGray.withAlphaComponent(1)
-    
-    /// color for urgent high and urgent low line, if showColoredObjectives is enabled
-    static let guidelineUrgentHighLowColor = UIColor.red.withAlphaComponent(0.8)
-    
-    /// color for high and low line, if showColoredObjectives is enabled
-    static let guidelineHighLowColor = UIColor.yellow.withAlphaComponent(0.7)
     
     /// color for target line
     static let guidelineTargetColor = UIColor.green.withAlphaComponent(0.5)

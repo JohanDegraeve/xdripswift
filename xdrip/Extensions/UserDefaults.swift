@@ -44,8 +44,6 @@ extension UserDefaults {
         case lowMarkValue = "lowMarkValue"
         /// urgent low value
         case urgentLowMarkValue = "urgentLowMarkValue"
-        /// master or follower
-        case showColoredObjectives = "showColoredObjectives"
         /// show the target line or hide it?
         case showTarget = "showTarget"
         /// target value
@@ -592,17 +590,6 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.useObjectives.rawValue)
-        }
-    }
-    
-    /// should the Guidelines be shown in color (yellow/red) on the graph?
-    @objc dynamic var showColoredObjectives: Bool {
-        // default value for bool in userdefaults is false, by default we want the guidelines to be shown in grey as per Nightscout
-        get {
-            return !bool(forKey: Key.showColoredObjectives.rawValue)
-        }
-        set {
-            set(!newValue, forKey: Key.showColoredObjectives.rawValue)
         }
     }
     

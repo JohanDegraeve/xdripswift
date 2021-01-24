@@ -534,9 +534,9 @@ public final class GlucoseChartManager {
         let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: data().chartGuideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: yAxisValues)
         
         // high/low/target guideline layer settings and styles
-        let urgentHighLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: UserDefaults.standard.showColoredObjectives ? ConstantsGlucoseChart.guidelineUrgentHighLowColor : ConstantsGlucoseChart.guidelineUrgentHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 2, dotSpacing: 5)
+        let urgentHighLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineUrgentHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 2, dotSpacing: 5)
         
-        let highLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: UserDefaults.standard.showColoredObjectives ? ConstantsGlucoseChart.guidelineHighLowColor : ConstantsGlucoseChart.guidelineHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 4, dotSpacing: 2)
+        let highLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 4, dotSpacing: 2)
         
         let targetLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineTargetColor, linesWidth: UserDefaults.standard.useObjectives ? (UserDefaults.standard.showTarget ? 1 : 0) : 0, dotWidth: 4, dotSpacing: 0)
         
