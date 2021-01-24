@@ -194,6 +194,16 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
     
     // MARK: - UITableViewDataSource and UITableViewDelegate protocol Methods
     
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        
+        if let view = view as? UITableViewHeaderFooterView {
+            
+            view.textLabel?.textColor = ConstantsUI.tableViewHeaderTextColor
+            
+        }
+        
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         // if the alerttype is not enabled, then only show the enable UISwitch and the name of the alerttype

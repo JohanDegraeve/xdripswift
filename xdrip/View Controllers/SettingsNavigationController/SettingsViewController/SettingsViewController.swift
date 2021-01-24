@@ -122,7 +122,7 @@ final class SettingsViewController: UIViewController {
             viewModel.storeRowReloadClosure(rowReloadClosure: {row in
                 
                 self.tableView.reloadRows(at: [IndexPath(row: row, section: section.rawValue)], with: .none)
-                
+                    
             })
 
             // store the viewModel
@@ -230,6 +230,16 @@ final class SettingsViewController: UIViewController {
 extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
     
     // MARK: - UITableViewDataSource protocol Methods
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        
+        if let view = view as? UITableViewHeaderFooterView {
+            
+            view.textLabel?.textColor = ConstantsUI.tableViewHeaderTextColor
+            
+        }
+        
+    }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         

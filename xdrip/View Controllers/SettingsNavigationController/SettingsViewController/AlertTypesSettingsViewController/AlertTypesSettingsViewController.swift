@@ -100,6 +100,16 @@ extension AlertTypesSettingsViewController: UITableViewDataSource, UITableViewDe
     
     // MARK: - UITableViewDataSource and UITableViewDelegate protocol Methods
     
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        
+        if let view = view as? UITableViewHeaderFooterView {
+            
+            view.textLabel?.textColor = ConstantsUI.tableViewHeaderTextColor
+            
+        }
+        
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return alertTypesAccessor.getAllAlertTypes().count
     }

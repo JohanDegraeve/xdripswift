@@ -110,6 +110,16 @@ class AlertSettingsViewControllerData: NSObject, UITableViewDataSource, UITableV
 // UITableViewDataSource and UITableViewDelegate protocol Methods
 extension AlertSettingsViewControllerData {
     
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        
+        if let view = view as? UITableViewHeaderFooterView {
+            
+            view.textLabel?.textColor = ConstantsUI.tableViewHeaderTextColor
+            
+        }
+        
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         // if no need to show alertvalue, then return count 1 less, value is the last row, it won't be shown
