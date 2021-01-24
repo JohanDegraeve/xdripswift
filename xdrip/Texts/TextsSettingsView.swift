@@ -78,10 +78,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_urgentlowValue", tableName: filename, bundle: Bundle.main, value: "Urgent Low Value:", comment: "home screen settings, urgent low value")
     }()
     
-    static let labelShowColoredObjectives: String = {
-        return NSLocalizedString("settingsviews_showcoloredobjectives", tableName: filename, bundle: Bundle.main, value: "Show Colored Lines?", comment: "home screen settings, show colored objectives lines")
-    }()
-    
     static let labelShowTarget: String = {
         return NSLocalizedString("settingsviews_showtarget", tableName: filename, bundle: Bundle.main, value: "Show Target Line?", comment: "home screen settings, show target line")
     }()

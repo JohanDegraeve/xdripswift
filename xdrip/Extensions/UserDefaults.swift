@@ -44,8 +44,6 @@ extension UserDefaults {
         case lowMarkValue = "lowMarkValue"
         /// urgent low value
         case urgentLowMarkValue = "urgentLowMarkValue"
-        /// master or follower
-        case showColoredObjectives = "showColoredObjectives"
         /// show the target line or hide it?
         case showTarget = "showTarget"
         /// target value
@@ -377,6 +375,18 @@ extension UserDefaults {
         }
     }
     
+    /// the highMarkValue in mgdl
+    @objc dynamic var highMarkValue: Double {
+        get {
+            
+            //read currentvalue in mgdl
+            return double(forKey: Key.highMarkValue.rawValue)
+            
+        }
+        
+    }
+
+    
     /// the targetvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var targetMarkValueInUserChosenUnit:Double {
         get {
@@ -421,6 +431,17 @@ extension UserDefaults {
         }
     }
     
+    /// the lowmarkvalue in mgdl
+    @objc dynamic var lowMarkValue: Double {
+        get {
+            
+            //read currentvalue in mgdl
+            return double(forKey: Key.lowMarkValue.rawValue)
+            
+        }
+        
+    }
+    
     /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var urgentLowMarkValueInUserChosenUnit:Double {
         get {
@@ -444,7 +465,18 @@ extension UserDefaults {
 
         }
     }
-    
+ 
+    /// the urgentLowMarkValue in mgdl
+    @objc dynamic var urgentLowMarkValue: Double {
+        get {
+            
+            //read currentvalue in mgdl
+            return double(forKey: Key.urgentLowMarkValue.rawValue)
+            
+        }
+        
+    }
+
     /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var urgentHighMarkValueInUserChosenUnitRounded:String {
         get {
@@ -465,6 +497,17 @@ extension UserDefaults {
         }
     }
     
+    /// the urgentHighMarkValue in mgdl
+    @objc dynamic var urgentHighMarkValue: Double {
+        get {
+            
+            //read currentvalue in mgdl
+            return double(forKey: Key.urgentHighMarkValue.rawValue)
+            
+        }
+        
+    }
+
     /// the highmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var highMarkValueInUserChosenUnitRounded:String {
         get {
@@ -547,17 +590,6 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.useObjectives.rawValue)
-        }
-    }
-    
-    /// should the Guidelines be shown in color (yellow/red) on the graph?
-    @objc dynamic var showColoredObjectives: Bool {
-        // default value for bool in userdefaults is false, by default we want the guidelines to be shown in grey as per Nightscout
-        get {
-            return !bool(forKey: Key.showColoredObjectives.rawValue)
-        }
-        set {
-            set(!newValue, forKey: Key.showColoredObjectives.rawValue)
         }
     }
     

@@ -3,17 +3,40 @@ import SwiftCharts
 
 extension ChartPoint {
     
-    // if bgReading.calculatedValue == 0 then return  nil
-    convenience init?(bgReading: BgReading, formatter: DateFormatter, unitIsMgDl: Bool) {
+    convenience init(bgReading: BgReading, formatter: DateFormatter, unitIsMgDl: Bool) {
         
-        if bgReading.calculatedValue > 0 {
             self.init(
                 x: ChartAxisValueDate(date: bgReading.timeStamp, formatter: formatter),
                 y: ChartAxisValueDouble(bgReading.calculatedValue.mgdlToMmol(mgdl: unitIsMgDl))
             )
-        } else {
-            return nil
-        }
 
     }
+}
+
+extension ChartPoint: Comparable {
+    
+    public static func < (lhs: ChartPoint, rhs: ChartPoint) -> Bool {
+        
+        if let lhs = lhs.x as? ChartAxisValueDate, let rhs = rhs.x as? ChartAxisValueDate {
+            
+            return lhs.date < rhs.date
+            
+        }
+        
+        return false
+        
+    }
+    
+    public static func == (lhs: ChartPoint, rhs: ChartPoint) -> Bool {
+        
+        if let lhs = lhs.x as? ChartAxisValueDate, let rhs = rhs.x as? ChartAxisValueDate {
+            
+            return lhs.date == rhs.date
+            
+        }
+        
+        return false
+        
+    }
+
 }
