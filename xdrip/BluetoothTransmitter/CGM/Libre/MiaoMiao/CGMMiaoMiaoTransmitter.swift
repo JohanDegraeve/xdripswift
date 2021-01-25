@@ -210,7 +210,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
 
                             // get sensor serialNumber and if changed inform delegate
-                            if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
+                            if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)), with: LibreSensorType.type(patchInfo: patchInfo)) {
                                 
                                 // (there will also be a seperate opcode form MiaoMiao because it's able to detect new sensor also)
                                 if libreSensorSerialNumber.serialNumber != sensorSerialNumber {
@@ -228,7 +228,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 
                             }
                             
-                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)), with: LibreSensorType.type(patchInfo: patchInfo)), patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 if let sensorState = sensorState {
                                     self.cGMMiaoMiaoTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
@@ -482,7 +482,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                         //let batteryPercentage = Int(rxBuffer[13])
                         
                         // get sensor serialNumber and if changed inform delegate
-                        if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
+                        if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)), with: LibreSensorType.type(patchInfo: patchInfo)) {
                             
                             // (there will also be a seperate opcode form MiaoMiao because it's able to detect new sensor also)
                             if libreSensorSerialNumber.serialNumber != previousSensorSerialNumber {
@@ -493,7 +493,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                             
                         }
                         
-                        libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: patchInfo, webOOPEnabled: true, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cGMTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: testTimeStamp, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                        libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)), with: LibreSensorType.type(patchInfo: patchInfo)), patchInfo: patchInfo, webOOPEnabled: true, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cGMTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: testTimeStamp, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                             
                         })
                         

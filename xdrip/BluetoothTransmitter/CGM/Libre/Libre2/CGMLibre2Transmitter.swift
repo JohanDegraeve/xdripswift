@@ -332,7 +332,7 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         
         trace("received fram :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, fram.toHexString())
         
-        // if we already know the patchinfo (which we should because normally received(patchInfo: Data gets called before received(fram: Data), then patchInfo should not be nil
+        // if we already know the patchinfo (which we should because normally received(sensorUID: Data, patchInfo: Data) gets called before received(fram: Data), then patchInfo should not be nil
         // same for sensorUID
         if let patchInfo =  UserDefaults.standard.librePatchInfo, let sensorUID = UserDefaults.standard.libreSensorUID, let libreSensorType = LibreSensorType.type(patchInfo: patchInfo.hexEncodedString().uppercased()), let serialNumber = self.sensorSerialNumber {
             
@@ -349,13 +349,13 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         
     }
     
-    func received(sensorUID: Data) {
+    func received(sensorUID: Data, patchInfo: Data) {
         
         // store sensorUID as data in UserDefaults
         UserDefaults.standard.libreSensorUID = sensorUID
         
         // store the sensorUID as tempSensorSerialNumber (as LibreSensorSerialNumber)
-        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID)
+        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))
         if let receivedSensorSerialNumber = receivedSensorSerialNumber {
             self.tempSensorSerialNumber = receivedSensorSerialNumber
         }
@@ -383,14 +383,11 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
             trace("could not created sensor serial number from received sensorUID, sensorUID = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, sensorUID.toHexString())
             
         }
-    }
-    
-    func received(patchInfo: Data) {
         
         trace("patchInfo received :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, patchInfo.toHexString())
         
         UserDefaults.standard.librePatchInfo = patchInfo
-        
+
     }
     
     func streamingEnabled(successful: Bool) {

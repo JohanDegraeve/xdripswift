@@ -189,14 +189,12 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                         self.traceMemorySize(systemInfo: systemInfo)
                                         self.traceBlockSize(systemInfo: systemInfo)
                                         
-                                        // get sensorUID and send to delegate
+                                        // get sensorUID and patchInfo and send to delegate
                                         let sensorUID = Data(tag.identifier.reversed())
-                                        self.libreNFCDelegate?.received(sensorUID: sensorUID)
-                                        self.traceSensorUID(sensorUID: sensorUID)
-                                        
-                                        // get patchInfo and send to delegate
                                         let patchInfo = response
-                                        self.libreNFCDelegate?.received(patchInfo: patchInfo)
+                                        self.libreNFCDelegate?.received(sensorUID: sensorUID, patchInfo: patchInfo)
+
+                                        self.traceSensorUID(sensorUID: sensorUID)
                                         self.tracePatchInfo(patchInfo: patchInfo)
                                         
                                         // send FRAM to delegate
@@ -233,7 +231,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                                         
                                                         if subCmd == .enableStreaming && response.count == 6 {
                                                             
-                                                            let serialNumber: String = LibreSensorSerialNumber(withUID: sensorUID)?.serialNumber ?? "unknown"
+                                                            let serialNumber: String = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))?.serialNumber ?? "unknown"
                                                             
                                                             let debugInfo = "NFC: enabled BLE streaming on Libre 2 " + serialNumber + " unlock code: " + self.unlockCode.description + " MAC address: " + Data(response.reversed()).hexAddress
                                                             xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
@@ -368,14 +366,12 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                     self.traceMemorySize(systemInfo: systemInfo)
                                     self.traceBlockSize(systemInfo: systemInfo)
 
-                                    // get sensorUID and send to delegate
+                                    // get sensorUID and patchInfo and send to delegate
                                     let sensorUID = Data(tag.identifier.reversed())
-                                    self.libreNFCDelegate?.received(sensorUID: sensorUID)
-                                    self.traceSensorUID(sensorUID: sensorUID)
-                                    
-                                    // get patchInfo and send to delegate
                                     let patchInfo = response
-                                    self.libreNFCDelegate?.received(patchInfo: patchInfo)
+                                    self.libreNFCDelegate?.received(sensorUID: sensorUID, patchInfo: patchInfo)
+                                    
+                                    self.traceSensorUID(sensorUID: sensorUID)
                                     self.tracePatchInfo(patchInfo: patchInfo)
  
                                     // send FRAM to delegate
@@ -412,7 +408,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                                     
                                                     if subCmd == .enableStreaming && response.count == 6 {
                                                         
-                                                        let serialNumber: String = LibreSensorSerialNumber(withUID: sensorUID)?.serialNumber ?? "unknown"
+                                                        let serialNumber: String = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))?.serialNumber ?? "unknown"
                                                         
                                                         let debugInfo = "NFC: enabled BLE streaming on Libre 2 " + serialNumber + " unlock code: " + self.unlockCode.description + " MAC address: " + Data(response.reversed()).hexAddress
                                                         xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)

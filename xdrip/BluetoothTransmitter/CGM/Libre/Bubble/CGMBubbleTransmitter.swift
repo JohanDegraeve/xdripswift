@@ -180,7 +180,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         rxBuffer.append(value.subdata(in: 2..<10))
                         
                         // get libreSensorSerialNumber, if this fails, then self.libreSensorSerialNumber will keep it's current value
-                        guard let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8))) else {
+                        guard let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8)), with: LibreSensorType.type(patchInfo: patchInfo)) else {
                             trace("    could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
                             return
                         }
