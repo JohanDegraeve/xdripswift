@@ -835,8 +835,12 @@ final class RootViewController: UIViewController {
         switch keyPathEnum {
         
         case UserDefaults.Key.isMaster :
+            
             changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
             
+            // no sensor needed in follower mode, stop it
+            stopSensor()
+
         case UserDefaults.Key.showReadingInNotification:
             if !UserDefaults.standard.showReadingInNotification {
                 // remove existing notification if any
@@ -1753,7 +1757,9 @@ extension RootViewController:NightScoutFollowerDelegate {
             
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-            if let lastReading = bgReadingsAccessor.last(forSensor: activeSensor) {
+
+            // get lastReading, ignore sensor as this should be nil because this is follower mode
+            if let lastReading = bgReadingsAccessor.last(forSensor: nil) {
                 timeStampLastBgReading = lastReading.timeStamp
             }
             
