@@ -1,0 +1,4 @@
+"receivedDataIsNil" = "No data received from oop web server";
+"oOPWebServerError" = "OOP Web Server error: ";
+"libreUSNotSupported" = "Libre US is not supported";
+"libreSensorNotReady" = "Libre sensor not in status ready";
