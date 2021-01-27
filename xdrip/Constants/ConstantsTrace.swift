@@ -10,7 +10,7 @@ enum ConstantsTrace {
     static let traceFileName = "xdriptrace"
     
     /// maximum size of one trace file, in MB. If size is larger, files will rotate, ie all trace files will be renamed, from xdriptrace.2.log to xdriptrace.3.log, from xdriptrace.1.log to xdriptrace.2.log, from xdriptrace.0.log to xdriptrace.1.log, 
-    static let maximumFileSizeInMB: UInt64 = 4
+    static let maximumFileSizeInMB: UInt64 = 3
     
     /// maximum amount of trace files to hold. When rotating, and if value is 3, then tracefile xdriptrace.2.log will be deleted
     static let maximumAmountOfTraceFiles = 3
