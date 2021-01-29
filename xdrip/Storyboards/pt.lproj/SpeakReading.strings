@@ -1,7 +1,7 @@
-"high" = "high";
-"low" = "low";
-"currentglucose" = "Your current blood glucose is";
-"trendnoncomputable" = "non computable";
+"high" = "hiper";
+"low" = "hipo";
+"currentglucose" = "A sua glicose actual é";
+"trendnoncomputable" = "não computável";
 "trenddoubledown" = "descida rápida";
 "trendsingledown" = "descida lenta";
 "trendfortyfivedown" = "descida";
