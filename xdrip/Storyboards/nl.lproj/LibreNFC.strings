@@ -1,0 +1,5 @@
+"scanComplete" = "Scan Voltooid";
+"holdTopOfIphoneNearSensor" = "Houd de bovenkant van je iOS nabij de sensor";
+"deviceMustSupportNFC" = "Deze iPhone ondersteunt geen NFC";
+"deviceMustSupportIOS14" = "Om te verbinden met Libre 2 moet deze iPhone worden geüpgraded naar iOS 14";
+"donotusethelibrelinkapp" = "Verbonden met Libre 2.\r\n\r\nIndien je de Libre sensor wilt blijven scannen met de officiële Libre app, trek dan de toegang tot bluetooth in voor de Libre app. \r\n\r\nIndien de sensor wordt gescand met de Libre app terwijl deze nog toegang heeft tot bluetooth, verbreekt de verbinding tussen xDrip4iOS en de Libre 2.";
