@@ -1,5 +1,5 @@
-"nightscouttestresult_verificationsuccessfulalerttitle" = "Verification Successful";
-"nightscouttestresult_verificationsuccessfulalertbody" = "Your Nightscout site was verified successfully";
-"nightscouttestresult_verificationerroralerttitle" = "Verification Error";
-"warningAPIKeyOrURLIsnil" = "Your Nightscout URL and API_SECRET must be set before you can run the test";
-"nightScoutAPIKeyAndURLStarted" = "Test Started";
+"nightscouttestresult_verificationsuccessfulalerttitle" = "Verificação bem sucedida";
+"nightscouttestresult_verificationsuccessfulalertbody" = "Site Nightscout verificado com sucesso";
+"nightscouttestresult_verificationerroralerttitle" = "Erro na Verificação";
+"warningAPIKeyOrURLIsnil" = "URL Nightscout e API_SECRET têm que ser definidos antes de correr o teste";
+"nightScoutAPIKeyAndURLStarted" = "Teste Iniciado";
