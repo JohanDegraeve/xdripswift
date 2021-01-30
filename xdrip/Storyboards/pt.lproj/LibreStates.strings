@@ -1,8 +1,7 @@
-"notYetStarted" = "not yet started";
-"starting" = "starting";
-"ready" = "ready";
-"expired" = "expired";
-"shutdown" = "shut down";
-"failure" = "failed";
-"unknown" = "unknown";
-
+"notYetStarted" = "ainda não foi iniciado";
+"starting" = "a iniciar";
+"ready" = "pronto";
+"expired" = "expirou";
+"shutdown" = "desligar";
+"failure" = "falhou";
+"unknown" = "desconhecido";
