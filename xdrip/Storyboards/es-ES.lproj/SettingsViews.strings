@@ -84,3 +84,23 @@
 "debugLevel" = "Incluir Datos Nivel Debug";
 "warningChangeFromMasterToFollower" = "Si cambias el modo de Master a Seguidor se parará la sesión del sensor actual. Quieres continuar?";
 "nightScoutPort" = "Puerto (opcional):";
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test
+"volumeTestSoundPlayerExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.";
+
+/// nightscout settings, where user can set the nightscout api key
+"settingsviews_nightScoutAPIKey" = "API_SECRET:";
+
+/// nightscout settings, where user can set the nightscout url
+"settingsviews_nightScoutUrl" = "URL:";
+
+/// about settings, section title
+"settingsviews_sectiontitleAbout" = "About xDrip4iOS";
+
+/// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
+"volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";

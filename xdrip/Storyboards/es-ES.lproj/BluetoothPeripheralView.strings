@@ -26,3 +26,11 @@
 "transmitterResultResult" = "Resultado del reseteo del Transmisor";
 "bootLoader" = "Bootloader";
 "cannotActiveCGMInFollowerMode" = "No puedes añadir un transmisor MGC estando en modo Follower/Seguidor";
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// BluetoothPeripheral view, text of the cell with the sensor type (only used for Libre)
+"sensorType" = "Sensor Type:";
