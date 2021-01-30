@@ -1,0 +1,5 @@
+"nightscouttestresult_verificationsuccessfulalerttitle" = "Verificatie Succesvol";
+"nightscouttestresult_verificationsuccessfulalertbody" = "Je Nightscout site werd succesvol geverifieerd";
+"nightscouttestresult_verificationerroralerttitle" = "Verificatie Fout";
+"warningAPIKeyOrURLIsnil" = "Je Nightscout URL en API_SECRET moeten worden ingesteld voordat de test kan worden uitgevoerd";
+"nightScoutAPIKeyAndURLStarted" = "Test Gestart";
