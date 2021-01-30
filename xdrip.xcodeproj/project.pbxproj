@@ -641,6 +641,11 @@
 		F81F39B125C5FB4100520946 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/LibreStates.strings; sourceTree = "<group>"; };
 		F81F39B225C5FB4700520946 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Snooze.strings; sourceTree = "<group>"; };
 		F81F39B325C5FB4D00520946 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/LibreNFC.strings; sourceTree = "<group>"; };
+		F81F39C825C6106600520946 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/WatlaaView.strings; sourceTree = "<group>"; };
+		F81F39C925C6107600520946 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LibreErrors.strings; sourceTree = "<group>"; };
+		F81F39CA25C6107900520946 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LibreStates.strings; sourceTree = "<group>"; };
+		F81F39CB25C6107E00520946 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Snooze.strings; sourceTree = "<group>"; };
+		F81F39CC25C6108300520946 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueObserverTimeKeeper.swift; sourceTree = "<group>"; };
 		F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAlertSettingsViewController.swift; sourceTree = "<group>"; };
 		F81F9FFF2289E4990028C70F /* AlertSettingsViewControllerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSettingsViewControllerData.swift; sourceTree = "<group>"; };
@@ -3274,6 +3279,7 @@
 				2867F5DB25BC209C00AA1E98 /* fi */,
 				F81F370F25C1585800520946 /* pt */,
 				F81F39B325C5FB4D00520946 /* nl */,
+				F81F39CC25C6108300520946 /* ar */,
 			);
 			name = LibreNFC.strings;
 			sourceTree = "<group>";
@@ -3298,6 +3304,7 @@
 				F81F370425C1583400520946 /* en */,
 				F81F370625C1583E00520946 /* pt */,
 				F81F39AF25C5FB3200520946 /* nl */,
+				F81F39C825C6106600520946 /* ar */,
 			);
 			name = WatlaaView.strings;
 			sourceTree = "<group>";
@@ -3308,6 +3315,7 @@
 				F81F370925C1584A00520946 /* en */,
 				F81F370D25C1584F00520946 /* pt */,
 				F81F39B125C5FB4100520946 /* nl */,
+				F81F39CA25C6107900520946 /* ar */,
 			);
 			name = LibreStates.strings;
 			sourceTree = "<group>";
@@ -3383,6 +3391,7 @@
 				2867F5D925BC209B00AA1E98 /* fi */,
 				F81F370725C1584200520946 /* pt */,
 				F81F39B025C5FB3B00520946 /* nl */,
+				F81F39C925C6107600520946 /* ar */,
 			);
 			name = LibreErrors.strings;
 			sourceTree = "<group>";
@@ -3575,6 +3584,7 @@
 				2867F5DA25BC209C00AA1E98 /* fi */,
 				F81F370E25C1585500520946 /* pt */,
 				F81F39B225C5FB4700520946 /* nl */,
+				F81F39CB25C6107E00520946 /* ar */,
 			);
 			name = Snooze.strings;
 			sourceTree = "<group>";
