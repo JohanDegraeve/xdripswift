@@ -23,7 +23,7 @@
 "settingsviews_webooptransmitter" = "Utilizar Algoritmo do Libre?";
 "settingsviews_nonfixedtransmitter" = "Activar Calibração Multi-ponto?";
 "settingsviews_labelNonFixed" = "Calibração Multi-ponto";
-"labelWebOOP" = "xDrip or Algoritmo do Libre";
+"settingsviews_labelWebOOP" = "xDrip or Algoritmo do Libre";
 "transmitterId8OrHigherNotSupported" = "Transmissores com ID 8Gxxxx ou mais recentes, não são suportados!";
 "settingsviews_sectiontitlealerting" = "Alarme";
 "settingsviews_row_alert_types" = "Tipos de Alarmes";

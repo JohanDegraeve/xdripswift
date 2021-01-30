@@ -26,7 +26,7 @@
 "settingsviews_webooptransmitter" = "Gebruik Libre Algoritme?";
 "settingsviews_nonfixedtransmitter" = "Schakel Meerpuntskalibratie In?";
 "settingsviews_labelNonFixed" = "Meerpuntskalibratie";
-"labelWebOOP" = "xDrip of Libre Algoritme";
+"settingsviews_labelWebOOP" = "xDrip of Libre Algoritme";
 "transmitterId8OrHigherNotSupported" = "Transmitters met ID 8Gxxxx of nieuwer zijn momenteel niet ondersteund!";
 "settingsviews_sectiontitlealerting" = "Alarm";
 "settingsviews_row_alert_types" = "Alarm Types";

@@ -15,7 +15,7 @@
 "settingsviews_givetransmitterid" = "Entrer Transmetteur ID";
 "settingsviews_resettransmitter" = "Réinitialiser Transmetteur";
 "settingsviews_webooptransmitter" = "Utiliser l'algorithme Libre?";
-"labelWebOOP" = "Algorithme xDrip ou Libre";
+"settingsviews_labelWebOOP" = "Algorithme xDrip ou Libre";
 "transmitterId8OrHigherNotSupported" = "Transmetteur avec ID 8Gxxxx ou plus récent ne sont pas supportés !";
 "settingsviews_sectiontitlealerting" = "Alarme";
 "settingsviews_row_alert_types" = "Types d'alarme";
