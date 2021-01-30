@@ -87,5 +87,5 @@
 "volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 "debugLevel" = "Include Debug Level";
-"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue ?";
+"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
 "nightScoutPort" = "Port (optional):";
