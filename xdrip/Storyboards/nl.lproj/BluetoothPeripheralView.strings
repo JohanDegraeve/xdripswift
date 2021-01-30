@@ -26,3 +26,11 @@
 "lastResetNotKnown" = "Laatste Reset Tijdstip onbekend";
 "transmitterResultResult" = "Transmitter Reset Resultaat";
 "cannotActiveCGMInFollowerMode" = "Je kunt een CGM in Volg Modus niet activeren";
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// row in bluetoothperipheral view, title
+"bootLoader" = "Bootloader";
