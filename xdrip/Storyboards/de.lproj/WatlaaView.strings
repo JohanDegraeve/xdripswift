@@ -4,8 +4,5 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// row text for overview snooze. Not snoozed alarm
-"not_snoozed" = "Not snoozed";
-
-/// row text for overview snooze. Snoozed alarm, until .. followed by timestamp
-"snoozed_until" = "Snoozed till";
+/// when Watlaa list is shown, title of the view
+"watlaaViewscreenTitle" = "Watlaa";
