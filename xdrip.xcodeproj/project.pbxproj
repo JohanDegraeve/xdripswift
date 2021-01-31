@@ -821,7 +821,6 @@
 		F830992723C32A13005741DF /* TextsWatlaaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsWatlaaView.swift; sourceTree = "<group>"; };
 		F830992F23C928E0005741DF /* WatlaaBluetoothTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatlaaBluetoothTransmitterDelegate.swift; sourceTree = "<group>"; };
 		F83275882546225400D305E6 /* xdrip v14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v14.xcdatamodel"; sourceTree = "<group>"; };
-		F846CDD523046BAC00DCF016 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SettingsViews.strings"; sourceTree = "<group>"; };
 		F846CDD623046BAE00DCF016 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBluetoothPairing.swift; sourceTree = "<group>"; };
 		F857A329253E2D9E00951BB2 /* LibreAlgorithmThresholds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreAlgorithmThresholds.swift; sourceTree = "<group>"; };
@@ -1022,7 +1021,6 @@
 		F8B48ACB22B37C00009BCC01 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
 		F8B48ACE22B37C01009BCC01 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F8B48AD322B37C01009BCC01 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
-		F8B48AE222B37C37009BCC01 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SpeakReading.strings"; sourceTree = "<group>"; };
 		F8B48AE322B37C49009BCC01 /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		F8B48AE422B37C49009BCC01 /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/Main.strings"; sourceTree = "<group>"; };
 		F8B48AE722B37C49009BCC01 /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/SpeakReading.strings"; sourceTree = "<group>"; };
@@ -1068,7 +1066,6 @@
 		F8BECB04235CE5D80060DAE1 /* GlucoseChartManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlucoseChartManager.swift; sourceTree = "<group>"; };
 		F8BECB11235CEA9B0060DAE1 /* TimeInterval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInterval.swift; sourceTree = "<group>"; };
 		F8C5EBE622F38F0E00563B5F /* Trace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Trace.swift; sourceTree = "<group>"; };
-		F8C5EBED22F5A52400563B5F /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Common.strings"; sourceTree = "<group>"; };
 		F8C5EBEE22F5A52800563B5F /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Common.strings; sourceTree = "<group>"; };
 		F8C9784C2428052D00A09483 /* CGMSensorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMSensorType.swift; sourceTree = "<group>"; };
 		F8C9784F242A9FD500A09483 /* MiaoMiaoBluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MiaoMiaoBluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
@@ -1121,7 +1118,6 @@
 		F8EEDD562300136F00D2D610 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
 		F8EEDD592300138700D2D610 /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/DexcomShareTestResult.strings"; sourceTree = "<group>"; };
 		F8EEDD5A2300139000D2D610 /* es-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-ES"; path = "es-ES.lproj/DexcomShareTestResult.strings"; sourceTree = "<group>"; };
-		F8EEDD5D2300139500D2D610 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/DexcomShareTestResult.strings"; sourceTree = "<group>"; };
 		F8EEDD612300139800D2D610 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
 		F8EEDD622300139A00D2D610 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
 		F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCalibrator.swift; sourceTree = "<group>"; };
@@ -3483,7 +3479,6 @@
 				F8B48AB622B2FF35009BCC01 /* es-ES */,
 				F8B48AC222B37BE6009BCC01 /* sl */,
 				F8B48ACE22B37C01009BCC01 /* ru */,
-				F8B48AE222B37C37009BCC01 /* pt-BR */,
 				F8B48AE722B37C49009BCC01 /* pl-PL */,
 				F8B48AF322B37C5C009BCC01 /* it */,
 				F8B48AFF22B37C67009BCC01 /* fr */,
@@ -3557,7 +3552,6 @@
 				F8B48AAD22B2FF24009BCC01 /* es-MX */,
 				F8B48AB922B2FF35009BCC01 /* es-ES */,
 				F8B48B0E22B37C84009BCC01 /* zh */,
-				F8C5EBED22F5A52400563B5F /* pt-BR */,
 				F8C5EBEE22F5A52800563B5F /* pt */,
 				F86A3C70247718C700EE7E46 /* ar */,
 				2867F5D025BC209600AA1E98 /* fi */,
@@ -3590,7 +3584,6 @@
 				F8B48AB122B2FF24009BCC01 /* es-MX */,
 				F8B48ABD22B2FF36009BCC01 /* es-ES */,
 				F8B48B1222B37C84009BCC01 /* zh */,
-				F846CDD523046BAC00DCF016 /* pt-BR */,
 				F846CDD623046BAE00DCF016 /* pt */,
 				F86A3C77247718C700EE7E46 /* ar */,
 				F817702A2491860F00AA3600 /* fr */,
@@ -3636,7 +3629,6 @@
 				F8EEDD562300136F00D2D610 /* en */,
 				F8EEDD592300138700D2D610 /* es-MX */,
 				F8EEDD5A2300139000D2D610 /* es-ES */,
-				F8EEDD5D2300139500D2D610 /* pt-BR */,
 				F8EEDD612300139800D2D610 /* zh */,
 				F8EEDD622300139A00D2D610 /* pt */,
 				F86A3C71247718C700EE7E46 /* ar */,
