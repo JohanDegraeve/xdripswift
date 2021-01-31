@@ -26,6 +26,7 @@
 "lastResetNotKnown" = "Laatste Reset Tijdstip onbekend";
 "transmitterResultResult" = "Transmitter Reset Resultaat";
 "cannotActiveCGMInFollowerMode" = "Je kunt een CGM in Volg Modus niet activeren";
-// There's no real translation for the English word Bootloader:
-// @see https://nl.wikipedia.org/wiki/Bootloader
+/// # Remark
+/// The English word Bootloader does not have a sufficient Dutch translation.
+/// [Wikipedia (Bootloader)](https://nl.wikipedia.org/wiki/Bootloader)
 "bootLoader" = "Bootloader";
