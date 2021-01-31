@@ -22,3 +22,41 @@
 "name" = "Nombre:";
 "delete" = "Borrar";
 "unknown" = "Desconocido";
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// red
+"red" = "red";
+
+/// green
+"green" = "green";
+
+/// for settings row, literally hardware
+"hardware" = "Hardware";
+
+/// WiFi
+"WiFi" = "WiFi";
+
+/// whenever invalid value is given by user somewhere in a field
+"invalidValue" = "Invalid Value";
+
+/// for settings row, literally firmware
+"firmware" = "Firmware";
+
+/// white
+"white" = "white";
+
+/// to show the sensor status
+"sensorStatus" = "Sensor status:";
+
+/// on
+"on" = "On";
+
+/// yellow
+"yellow" = "yellow";
+
+/// 
+"off" = "Off";

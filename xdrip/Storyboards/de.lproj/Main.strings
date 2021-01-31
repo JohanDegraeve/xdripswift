@@ -124,3 +124,29 @@
 
 /* Class = "UIButton"; normalTitle = "Transmitter"; ObjectID = "zWo-AR-qJE"; */
 "zWo-AR-qJE.normalTitle" = "Transmitter";
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// 
+"NDk-cv-Gan.text" = "Loaded by SecondViewController";
+
+/// 
+"zEq-FU-wV5.text" = "Second View";
+
+/// 
+"acW-dT-cKf.title" = "Home";
+
+/// 
+"KQZ-1w-vlD.text" = "First View";
+
+/// 
+"sgT-p5-hUt.title" = "Bluetooth";
+
+/// 
+"A5M-7J-77L.text" = "Loaded by FirstViewController";
+
+/// 
+"cPa-gy-q4n.title" = "Settings";
