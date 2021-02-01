@@ -90,3 +90,10 @@
 "settingsviews_showcoloredobjectives" = "Näytä värilliset tavoiteviivat ";
 "settingsviews_showtarget" = "Näytä kohdeviiva";
 "settingsviews_targetValue" = "Tavoitearvo";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// 
+"settingsviews_urgentLowValue" = "Urgent Low Value:";

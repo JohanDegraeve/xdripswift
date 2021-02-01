@@ -1,0 +1,16 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// 
+"calibration_title" = "Calibration";
+
+/// If user must calibrate, this is the title of the notification
+"calibration_notification_title" = "Calibration";
+
+/// If user must calibrate, this is the body of the notification
+"calibration_notification_body" = "Click the Notification to Calibrate";
+
+/// When calibration alert goess off, user clicks the notification, app opens, dialog pops up, this is the text in the dialog
+"enter_calibration_value" = "Enter Calibration Value";

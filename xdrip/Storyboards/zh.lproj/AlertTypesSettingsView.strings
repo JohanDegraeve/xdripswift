@@ -13,3 +13,10 @@
 "alerttypesettingsview_picksoundname" = "选择声音名称"; 
 "alerttypenamealreadyexistsmessages" = "警报类型的名称重复了，请换一个名称"; 
 "confirmdeletionalerttype" = "你想要删掉警报类型，名称为 ";  
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// 
+"alertTypeNoSound" = "No Sound";

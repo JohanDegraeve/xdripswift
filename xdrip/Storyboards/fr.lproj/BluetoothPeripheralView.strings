@@ -27,3 +27,10 @@
 "bootLoader" = "Bootloader";
 "cannotActiveCGMInFollowerMode" = "Vous ne pouvez pas activer le capteur en mode Suiveur";
 "cgmDeActivateBecauseMovingToFollowerMode" = "Le capteur a été désactivé en raison d'un passage en mode Suiveur";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// BluetoothPeripheral view, text of the cell with the sensor type (only used for Libre)
+"sensorType" = "Sensor Type:";
