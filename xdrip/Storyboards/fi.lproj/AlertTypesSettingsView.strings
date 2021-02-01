@@ -14,3 +14,10 @@
 "alertTypeNoSound" = "Ei ääntä";
 "alerttypenamealreadyexistsmessages" = "Tämän niminen hälytystyyppi on jo olemassa. Vaihda nimi";
 "confirmdeletionalerttype" = "Haluatko poistaa hälytystyypin nimellä ";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// when editing an alert type, field title for Sound
+"alerttypesettingsview_sound" = "Sound";
