@@ -25,7 +25,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>
-	<string>DiaBLE uses NFC to scan Libre sensors.</string>
+	<string>xDrip4iOS uses NFC to scan Libre sensors.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
