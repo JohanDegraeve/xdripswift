@@ -4,8 +4,8 @@
 "settingsviews_masterorfollower" = "Mestre ou Seguidor?";
 "settingsviews_master" = "Mestre";
 "settingsviews_follower" = "Seguidor";
-"showReadingInNotification" = "Mostrar Glic nas Notificações?";
-"labelShowReadingInAppBadge" = "Mostrar Glic no Distintivo da App?";
+"showReadingInNotification" = "Mostrar Glicose nas Notificações?";
+"labelShowReadingInAppBadge" = "Mostrar Glicose no Distintivo da App?";
 "multipleAppBadgeValueWith10" = "Multiplicar Distintivo da App por 10?";
 "settingsviews_urgentHighValue" = "Valor Hiper Urgente:";
 "settingsviews_highValue" = "Valor Hiper:";
@@ -51,7 +51,7 @@
 "uploadSensorStartTime" = "Enviar Hora de Início de Sensor?";
 "testUrlAndAPIKey" = "Verificar Ligação?";
 "settingsviews_sectiontitlespeak" = "Voz";
-"settingsviews_speakBgReadings" = "Falar Leituras Glic?";
+"settingsviews_speakBgReadings" = "Falar Leituras Glicose?";
 "settingsviews_speakBgReadingslanguage" = "Idioma:";
 "settingsviews_speakreadingslanguageselection" = "Escolher Idioma";
 "settingsviews_speakTrend" = "Falar Tendência?";
