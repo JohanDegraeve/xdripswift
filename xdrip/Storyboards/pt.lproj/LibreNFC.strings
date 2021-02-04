@@ -3,3 +3,10 @@
 "deviceMustSupportNFC" = "Este iPhone não suporta NFC";
 "deviceMustSupportIOS14" = "Para ligar ao Libre 2, este iPhone precisa de ser actualizado para iOS14";
 "donotusethelibrelinkapp" = "Ligado ao Libre 2.\r\n\r\nSe quiser fazer leituras NFC com a app oficial do Libre, então desactive permissão Bluetooth para a app oficial do Libre. \r\n\r\nSenão, as leituras NFC com a app do Libre com a permissão do bluetooth activada vai romper a ligação entre xDrip4iOS e o Libre 2.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.
+"connectedLibre2DoesNotMatchScannedLibre2" = "You seem to have scanned a new sensor, but xDrip4iOS is having the Bluetooth connection to the old sensor.\r\n\r\nTo solve this :\r\n- Click 'disconnect'\r\n- Go back to previous screen and add a new CGM of type Libre 2 and scan again.\r\n\r\nxDrip4iOS should now connect to the new sensor.";

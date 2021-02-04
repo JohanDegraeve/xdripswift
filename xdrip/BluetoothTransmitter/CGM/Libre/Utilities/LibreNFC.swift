@@ -760,6 +760,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                 UInt8((unlockCode >> 16) & 0xFF),
                 UInt8((unlockCode >> 24) & 0xFF)
             ]
+            
             y = UInt16(patchInfo[4...5]) ^ UInt16(b[1], b[0])
             
         } else {

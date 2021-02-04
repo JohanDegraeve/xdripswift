@@ -251,7 +251,7 @@ extension UserDefaults {
         /// Libre Unlock count
         case libreActiveSensorUnlockCount = "activeSensorUnlockCount"
         
-        /// - Libre sensor id - used in Libre 2 setup - should be read first eg via bubble or mm and then used in Libre 2 communication
+        /// - Libre sensor id - used in Libre 2 setup
         /// - stored as data as read from transmitter
         case libreSensorUID = "libreSensorUID"
         

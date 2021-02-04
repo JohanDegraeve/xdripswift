@@ -150,8 +150,19 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
             // set to nil so we don't send it again to the delegate when there's a new connect
             tempSensorSerialNumber = nil
             
-            // user should be informed not to scan with the Libre app
-            bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.donotusethelibrelinkapp)
+            // for Libre 2, the device name includes the sensor id
+            // if tempSensorSerialNumber != deviceName, then it means the user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user
+            // compare only the last 10 characters. Normally it should be 10, but for some reason, xDrip4iOS does not correctly decode the sensor uid, the first character is not correct
+            if let deviceName = deviceName, sensorSerialNumber.serialNumber.suffix(9).uppercased() != deviceName.suffix(9) {
+                
+                bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.connectedLibre2DoesNotMatchScannedLibre2)
+                
+            } else {
+
+                // user should be informed not to scan with the Libre app
+                bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.donotusethelibrelinkapp)
+
+            }
             
         }
         
@@ -206,7 +217,7 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             UserDefaults.standard.libreActiveSensorUnlockCount += 1
             
-            trace("sensorid =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.toHexString(), librePatchInfo.toHexString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
+            trace("sensorid as data =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.toHexString(), librePatchInfo.toHexString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
             
             let unLockPayLoad = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: UserDefaults.standard.libreActiveSensorUnlockCode, unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount))
             
