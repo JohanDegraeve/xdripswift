@@ -161,18 +161,14 @@
 /* Class = "UIButton"; normalTitle = "Transmitter"; ObjectID = "zWo-AR-qJE"; */
 "zWo-AR-qJE.normalTitle" = "Transmissor";
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+/// 
+"NDk-cv-Gan.text" = "Carregado pelo ControladoVistaSecundária";
 
 /// 
-"NDk-cv-Gan.text" = "Loaded by SecondViewController";
+"A5M-7J-77L.text" = "Carregado pelo ControladorVistaPrincipal";
 
 /// 
-"A5M-7J-77L.text" = "Loaded by FirstViewController";
+"KQZ-1w-vlD.text" = "Vista Principal";
 
 /// 
-"KQZ-1w-vlD.text" = "First View";
-
-/// 
-"zEq-FU-wV5.text" = "Second View";
+"zEq-FU-wV5.text" = "Vista Secundária";
