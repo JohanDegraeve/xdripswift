@@ -150,8 +150,12 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                     
                                     if let error = error {
                                         
-                                        self.trace(systemError: error, ownErrorString: "error while reading multiple blocks (#\(i * requestBlocks) - #\(i * requestBlocks + (i == requests - 1 ? (remainder == 0 ? requestBlocks : remainder) : requestBlocks) - (requestBlocks > 1 ? 1 : 0))):", invalidateSession: true, session: session)
+                                        let debugInfo = "error while reading multiple blocks (#\(i * requestBlocks) - #\(i * requestBlocks + (i == requests - 1 ? (remainder == 0 ? requestBlocks : remainder) : requestBlocks) - (requestBlocks > 1 ? 1 : 0))):"
                                         
+                                        xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
+                                        
+                                        self.trace(systemError: error, ownErrorString: TextsLibreNFC.nfcErrorRetryScan, invalidateSession: true, session: session)
+                                                                                
                                         if i != requests - 1 { return }
                                         
                                     } else {
@@ -326,9 +330,13 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                 blockArray, error in
                                 
                                 if let error = error {
+
+                                    let debugInfo = "error while reading multiple blocks (#\(i * requestBlocks) - #\(i * requestBlocks + (i == requests - 1 ? (remainder == 0 ? requestBlocks : remainder) : requestBlocks) - (requestBlocks > 1 ? 1 : 0))):"
                                     
-                                    self.trace(systemError: error, ownErrorString: "error while reading multiple blocks (#\(i * requestBlocks) - #\(i * requestBlocks + (i == requests - 1 ? (remainder == 0 ? requestBlocks : remainder) : requestBlocks) - (requestBlocks > 1 ? 1 : 0))):", invalidateSession: true, session: session)
+                                    xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
                                     
+                                    self.trace(systemError: error, ownErrorString: TextsLibreNFC.nfcErrorRetryScan, invalidateSession: true, session: session)
+
                                     if i != requests - 1 { return }
                                     
                                 } else {
