@@ -23,6 +23,9 @@ final class RootViewController: UIViewController {
             self.present(alert, animated: true, completion: nil)
             
         } else {
+            
+            trace("calibration : user clicks calibrate button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            
             requestCalibration(userRequested: true)
         }
         
@@ -764,7 +767,11 @@ final class RootViewController: UIViewController {
                     let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
                     
                     if latestReadings.count > 1 {
+
+                        trace("calibration : two readings received, no calibrations exist yet and not weboopenabled, request calibation to user", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+
                         createInitialCalibrationRequest()
+                        
                     }
                     
                 } else {
@@ -1051,14 +1058,24 @@ final class RootViewController: UIViewController {
             if let calibrator = self.calibrator {
                 
                 if latestCalibrations.count == 0 {
+                    
+                    trace("calibration : initial calibration, creating two calibrations", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                    
                     // calling initialCalibration will create two calibrations, they are returned also but we don't need them
                     _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDoubleConvertedToMgDl, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDoubleConvertedToMgDl, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    
                 } else {
+                    
                     // it's not the first calibration
                     if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
+
+                        trace("calibration : creating calibrations", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                        
                         // calling createNewCalibration will create a new  calibration, it is returned but we don't need it
                         _ = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        
                     }
+                    
                 }
                 
                 // this will store the newly created calibration(s) in coredata
