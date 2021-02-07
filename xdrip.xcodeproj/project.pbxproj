@@ -737,6 +737,23 @@
 		F81F3BE625D0934200520946 /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/LibreStates.strings"; sourceTree = "<group>"; };
 		F81F3BE725D0934A00520946 /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/Snooze.strings"; sourceTree = "<group>"; };
 		F81F3BE825D0935000520946 /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/LibreNFC.strings"; sourceTree = "<group>"; };
+		F81F3BE925D093A400520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Alerts.strings; sourceTree = "<group>"; };
+		F81F3BEA25D093AD00520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
+		F81F3BEB25D093B200520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
+		F81F3BEC25D093B700520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
+		F81F3BED25D093BB00520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/CalibrationRequest.strings; sourceTree = "<group>"; };
+		F81F3BEE25D093C000520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Common.strings; sourceTree = "<group>"; };
+		F81F3BEF25D093C700520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/DexcomShareTestResult.strings; sourceTree = "<group>"; };
+		F81F3BF025D093CB00520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/ErrorMessages.strings; sourceTree = "<group>"; };
+		F81F3BF125D093D000520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/HomeView.strings; sourceTree = "<group>"; };
+		F81F3BF225D093E300520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/M5StackView.strings; sourceTree = "<group>"; };
+		F81F3BF325D093EA00520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/NightScoutTestResult.strings; sourceTree = "<group>"; };
+		F81F3BF425D093F200520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SettingsViews.strings; sourceTree = "<group>"; };
+		F81F3BF525D093F800520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/WatlaaView.strings; sourceTree = "<group>"; };
+		F81F3BF625D0940200520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LibreErrors.strings; sourceTree = "<group>"; };
+		F81F3BF725D0940500520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LibreStates.strings; sourceTree = "<group>"; };
+		F81F3BF825D0940900520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Snooze.strings; sourceTree = "<group>"; };
+		F81F3BF925D0940E00520946 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueObserverTimeKeeper.swift; sourceTree = "<group>"; };
 		F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAlertSettingsViewController.swift; sourceTree = "<group>"; };
 		F81F9FFF2289E4990028C70F /* AlertSettingsViewControllerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSettingsViewControllerData.swift; sourceTree = "<group>"; };
@@ -3331,6 +3348,7 @@
 				CE1B2FD725D0264A00F642F5 /* fr */,
 				F81F3BC925D0923A00520946 /* it */,
 				F81F3BDA25D092CC00520946 /* pl-PL */,
+				F81F3BEB25D093B200520946 /* ru */,
 			);
 			name = BluetoothPeripheralsView.strings;
 			sourceTree = "<group>";
@@ -3348,6 +3366,7 @@
 				CE1B2FCF25D0264900F642F5 /* fr */,
 				F81F3BD725D0929700520946 /* it */,
 				F81F3BE825D0935000520946 /* pl-PL */,
+				F81F3BF925D0940E00520946 /* ru */,
 			);
 			name = LibreNFC.strings;
 			sourceTree = "<group>";
@@ -3365,6 +3384,7 @@
 				F81F3BC525D090D800520946 /* de */,
 				F81F3BCA25D0924300520946 /* it */,
 				F81F3BDB25D092CF00520946 /* pl-PL */,
+				F81F3BEC25D093B700520946 /* ru */,
 			);
 			name = BluetoothPeripheralView.strings;
 			sourceTree = "<group>";
@@ -3397,6 +3417,7 @@
 				CE1B2FCE25D0264900F642F5 /* fr */,
 				F81F3BD325D0928200520946 /* it */,
 				F81F3BE425D0932F00520946 /* pl-PL */,
+				F81F3BF525D093F800520946 /* ru */,
 			);
 			name = WatlaaView.strings;
 			sourceTree = "<group>";
@@ -3414,6 +3435,7 @@
 				F81F3BC625D091EA00520946 /* fi */,
 				F81F3BD525D0928E00520946 /* it */,
 				F81F3BE625D0934200520946 /* pl-PL */,
+				F81F3BF725D0940500520946 /* ru */,
 			);
 			name = LibreStates.strings;
 			sourceTree = "<group>";
@@ -3441,6 +3463,7 @@
 				CE1B2FDD25D0264B00F642F5 /* fr */,
 				F81F3BD025D0926000520946 /* it */,
 				F81F3BE125D092FB00520946 /* pl-PL */,
+				F81F3BF225D093E300520946 /* ru */,
 			);
 			name = M5StackView.strings;
 			sourceTree = "<group>";
@@ -3499,6 +3522,7 @@
 				CE1B2FD025D0264900F642F5 /* fr */,
 				F81F3BD425D0928A00520946 /* it */,
 				F81F3BE525D0933500520946 /* pl-PL */,
+				F81F3BF625D0940200520946 /* ru */,
 			);
 			name = LibreErrors.strings;
 			sourceTree = "<group>";
@@ -3517,6 +3541,7 @@
 				CE1B2FD925D0264A00F642F5 /* fr */,
 				F81F3BD125D0926F00520946 /* it */,
 				F81F3BE225D0930600520946 /* pl-PL */,
+				F81F3BF325D093EA00520946 /* ru */,
 			);
 			name = NightScoutTestResult.strings;
 			sourceTree = "<group>";
@@ -3535,6 +3560,7 @@
 				CE1B2FC825D0261500F642F5 /* fr */,
 				F81F3BC725D0922D00520946 /* it */,
 				F81F3BD825D092C500520946 /* pl-PL */,
+				F81F3BE925D093A400520946 /* ru */,
 			);
 			name = Alerts.strings;
 			sourceTree = "<group>";
@@ -3553,6 +3579,7 @@
 				CE1B2FCD25D0264900F642F5 /* fr */,
 				F81F3BC825D0923500520946 /* it */,
 				F81F3BD925D092C900520946 /* pl-PL */,
+				F81F3BEA25D093AD00520946 /* ru */,
 			);
 			name = AlertTypesSettingsView.strings;
 			sourceTree = "<group>";
@@ -3591,6 +3618,7 @@
 				CE1B2FDB25D0264A00F642F5 /* fr */,
 				F81F3BCF25D0925500520946 /* it */,
 				F81F3BE025D092E800520946 /* pl-PL */,
+				F81F3BF125D093D000520946 /* ru */,
 			);
 			name = HomeView.strings;
 			sourceTree = "<group>";
@@ -3609,6 +3637,7 @@
 				CE1B2FD625D0264A00F642F5 /* fr */,
 				F81F3BCB25D0924600520946 /* it */,
 				F81F3BDC25D092D800520946 /* pl-PL */,
+				F81F3BED25D093BB00520946 /* ru */,
 			);
 			name = CalibrationRequest.strings;
 			sourceTree = "<group>";
@@ -3647,6 +3676,7 @@
 				CE1B2FD825D0264A00F642F5 /* fr */,
 				F81F3BCC25D0924B00520946 /* it */,
 				F81F3BDD25D092DD00520946 /* pl-PL */,
+				F81F3BEE25D093C000520946 /* ru */,
 			);
 			name = Common.strings;
 			sourceTree = "<group>";
@@ -3665,6 +3695,7 @@
 				CE1B2FD325D0264900F642F5 /* fr */,
 				F81F3BCE25D0925200520946 /* it */,
 				F81F3BDF25D092E400520946 /* pl-PL */,
+				F81F3BF025D093CB00520946 /* ru */,
 			);
 			name = ErrorMessages.strings;
 			sourceTree = "<group>";
@@ -3683,6 +3714,7 @@
 				F81F3A6F25C9E5A800520946 /* es */,
 				F81F3BD225D0927700520946 /* it */,
 				F81F3BE325D0932700520946 /* pl-PL */,
+				F81F3BF425D093F200520946 /* ru */,
 			);
 			name = SettingsViews.strings;
 			sourceTree = "<group>";
@@ -3716,6 +3748,7 @@
 				CE1B2FDE25D0264B00F642F5 /* fr */,
 				F81F3BD625D0929300520946 /* it */,
 				F81F3BE725D0934A00520946 /* pl-PL */,
+				F81F3BF825D0940900520946 /* ru */,
 			);
 			name = Snooze.strings;
 			sourceTree = "<group>";
@@ -3734,6 +3767,7 @@
 				CE1B2FDA25D0264A00F642F5 /* fr */,
 				F81F3BCD25D0924E00520946 /* it */,
 				F81F3BDE25D092E000520946 /* pl-PL */,
+				F81F3BEF25D093C700520946 /* ru */,
 			);
 			name = DexcomShareTestResult.strings;
 			sourceTree = "<group>";
