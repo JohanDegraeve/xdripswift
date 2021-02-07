@@ -1,16 +1,12 @@
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
 /// This is for the notification that is created when there is an error while trying to reach the oop web server. The body text starts with this string, and will be followed by the text defined here
-"libreUSNotSupported" = "Libre US is not supported";
+"libreUSNotSupported" = "Libre US n'est pas supporté";
 
 /// Error message, in case libre sensor is not in status ready (or expired)
-"libreSensorNotReady" = "Libre sensor not in status ready";
+"libreSensorNotReady" = "Capteur Libre n'est pas en statut prêt";
 
 /// In case oop web server responds without data
-"receivedDataIsNil" = "No data received from oop web server";
+"receivedDataIsNil" = "Pas de données reçues de la part de OOP serveur";
 
 /// This is for the notification that is created when there is an error while trying to reach the oop web server. The body text starts with this string, and will be followed by the error message received from iOS
-"oOPWebServerError" = "OOP Web Server error: ";
+"oOPWebServerError" = "Erreur OOP Web Server: ";

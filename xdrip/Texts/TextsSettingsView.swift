@@ -75,7 +75,7 @@ class Texts_SettingsView {
     }()
     
     static let labelUrgentLowValue: String = {
-        return NSLocalizedString("settingsviews_urgentlowValue", tableName: filename, bundle: Bundle.main, value: "Urgent Low Value:", comment: "home screen settings, urgent low value")
+        return NSLocalizedString("settingsviews_urgentLowValue", tableName: filename, bundle: Bundle.main, value: "Urgent Low Value:", comment: "home screen settings, urgent low value")
     }()
     
     static let labelShowTarget: String = {

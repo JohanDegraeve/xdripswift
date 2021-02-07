@@ -74,54 +74,50 @@
 "emailbodyText" = "Description du problème";
 "failedToSendEmail" = "Echec d'envoi du Email";
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
 /// nightscout settings, port to use
-"nightScoutPort" = "Port (optional):";
+"nightScoutPort" = "Port (Optionnel):";
 
 /// home screen settings, urgent high value
-"settingsviews_urgentHighValue" = "Urgent High Value:";
+"settingsviews_urgentHighValue" = "Urgent Valeur Haute";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
-"volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
+"volumeTestiOSSoundExplanation" =" Le son d'une alarme est joué actuellement avec le même volume que celui qui sera utilisé pour le type d'alarme avec 'Ignorer Mode Silencieux' = Off\n\n(Utilisé aussi dans le cas de l'alarme Lecture manquante).\n\n Presser l'un des boutons Volume pour arrêter, puis changer le volume avec les boutons au niveau souhaité et tester à nouveau";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
-"settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration?";
+"settingsviews_nonfixedtransmitter" = "Permettre la calibration multi-point ?";
 
 /// in Settings, to enable debug level in trace file
-"debugLevel" = "Include Debug Level";
+"debugLevel" = "Inclure le mode Debug";
 
 /// about settings, section title
-"settingsviews_sectiontitleAbout" = "About xDrip4iOS";
+"settingsviews_sectiontitleAbout" = "A propos xDrip4iOS";
 
 /// 
-"settingsviews_urgentLowValue" = "Urgent Low Value:";
+"settingsviews_urgentLowValue" = "Urgent Valeur Faible";
 
 /// home screen settings, target value
-"settingsviews_targetValue" = "Target Value:";
+"settingsviews_targetValue" = "Valeur cible:";
 
 /// home screen settings, show target line
-"settingsviews_showtarget" = "Show Target Line?";
+"settingsviews_showtarget" = "Montrer la ligne Cible?";
 
 /// non fixed settings, title of the section
-"settingsviews_labelNonFixed" = "Multi-point Calibration";
+"settingsviews_labelNonFixed" = "Calibration Multi-point";
 
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
-"volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
+"volumeTestSoundPlayer" = "Test Volume (Si Ignorer Mode silencieux)";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
-"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
+"warningChangeFromMasterToFollower" = "Changer de maître à suiveur arrête le capteur en cours. Voulez-vous continuer ? ?";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test
-"volumeTestSoundPlayerExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.";
+"volumeTestSoundPlayerExplanation" = "Le son d'une alarme est joué actuellement avec le même volume que celui qui sera utilisé pour le type d'alarme avec 'Ignorer Mode Silencieux' = On\n\n(Utilisé pour toutes les alarmes à l'exception de l'alarme Lecture manquante).\n\n Presser l'un des boutons Volume pour arrêter, puis changer le volume avec les boutons au niveau souhaité et tester à nouveau";
 
 /// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Show Objectives in Graph?";
+"settingsviews_useobjectives" = "Montrer les valeurs cibles ?";
 
 /// 
-"settingsviews_showcoloredobjectives" = "Show Colored Lines?";
+"settingsviews_showcoloredobjectives" = "Montrer les lignes colorées ?";
 
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
-"volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
+"volumeTestiOSSound" = "Test Volume (Volume actuel iPhone)";
