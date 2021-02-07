@@ -701,6 +701,7 @@
 		F81F3A7325C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LibreStates.strings; sourceTree = "<group>"; };
 		F81F3A7425C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Snooze.strings; sourceTree = "<group>"; };
 		F81F3A7525C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LibreNFC.strings; sourceTree = "<group>"; };
+		F81F3BC525D090D800520946 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
 		F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueObserverTimeKeeper.swift; sourceTree = "<group>"; };
 		F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAlertSettingsViewController.swift; sourceTree = "<group>"; };
 		F81F9FFF2289E4990028C70F /* AlertSettingsViewControllerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSettingsViewControllerData.swift; sourceTree = "<group>"; };
@@ -3322,6 +3323,7 @@
 				F81F39A825C5FAEF00520946 /* nl */,
 				F81F3A6625C9E5A800520946 /* es */,
 				CE1B2FDF25D0264B00F642F5 /* fr */,
+				F81F3BC525D090D800520946 /* de */,
 			);
 			name = BluetoothPeripheralView.strings;
 			sourceTree = "<group>";
