@@ -161,18 +161,14 @@
 /* Class = "UIButton"; normalTitle = "Transmitter"; ObjectID = "zWo-AR-qJE"; */
 "zWo-AR-qJE.normalTitle" = "Lähetin";
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+/// 
+"NDk-cv-Gan.text" = "Ladattu SecondViewControllerissa";
 
 /// 
-"NDk-cv-Gan.text" = "Loaded by SecondViewController";
+"KQZ-1w-vlD.text" = "Ensimmäinen näyttö";
 
 /// 
-"KQZ-1w-vlD.text" = "First View";
+"A5M-7J-77L.text" = "Ladattu FirstViewControllerissa";
 
 /// 
-"A5M-7J-77L.text" = "Loaded by FirstViewController";
-
-/// 
-"zEq-FU-wV5.text" = "Second View";
+"zEq-FU-wV5.text" = "Toinen näyttö";

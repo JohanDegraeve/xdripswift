@@ -2,7 +2,7 @@
 "settingsviews_sectiontitlegeneral" = "Yleinen";
 "settingsviews_sectiontitlehomescreen" = "Kotinäyttö";
 "settingsviews_selectbgunit" = "Verensokeriyksikkö:";
-"settingsviews_urgentlowValue" = "Erittäin matala lukema:";
+"settingsviews_urgentLowValue" = "Erittäin matala lukema:";
 "settingsviews_lowValue" = "Matala lukema:";
 "settingsviews_highValue" = "Korkea lukema:";
 "settingsviews_urgentHighValue" = "Erittäin korkea lukema:";
@@ -90,10 +90,3 @@
 "settingsviews_showcoloredobjectives" = "Näytä värilliset tavoiteviivat ";
 "settingsviews_showtarget" = "Näytä kohdeviiva";
 "settingsviews_targetValue" = "Tavoitearvo";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// 
-"settingsviews_urgentLowValue" = "Urgent Low Value:";
