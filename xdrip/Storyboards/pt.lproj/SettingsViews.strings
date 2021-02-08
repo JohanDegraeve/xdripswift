@@ -82,9 +82,9 @@
 "emailNotConfigured" = "Tem que configurar uma conta de e-mail no seu dispositivo iOS.";
 "emailbodyText" = "Descrição de Problema: ";
 "failedToSendEmail" = "Falha no Envio de e-mail";
-"volumeTestSoundPlayerExplanation" = "Um som de alarme está a ser tocado com o mesmo volume que vai ser tocado para um Tipo de Alarme com 'Sobrepôr Silêncio' = Ligado\n\n(Usado para todos os alarmes excepto alertas de Leituras Perdidas os quais usam sempe o volume do iOS.)\n\Altere o volume com os botões de volume e pressione no OK quando terminado.";
-"volumeTestiOSSoundExplanation" = "Um som de alarme está a ser tocado com o mesmo volume que vai tocado para um Tipo de Alarme com 'Sobrepôr Silêncio' = Desligado\n\n(Também utilizado sempre para alarmes de Leituras Perdidas que usam sempre o volume do iOS.)\n\nPression num dos botões de volume para parar o som, depois altere o volume com os botões de volume para o volume pretendido e teste novamente.";
-"volumeTestSoundPlayer" = "Testar Volume (Se Sobrepôr Silêncio Ligado)";
+"volumeTestSoundPlayerExplanation" = "Um som de alarme está a ser tocado com o mesmo volume que vai ser tocado para um Tipo de Alarme com 'Sobrepor Silêncio' = Ligado\n\n(Usado para todos os alarmes excepto alertas de Leituras Perdidas os quais usam sempe o volume do iOS.)\n\Altere o volume com os botões de volume e pressione no OK quando terminado.";
+"volumeTestiOSSoundExplanation" = "Um som de alarme está a ser tocado com o mesmo volume que vai tocado para um Tipo de Alarme com 'Sobrepor Silêncio' = Desligado\n\n(Também utilizado sempre para alarmes de Leituras Perdidas que usam sempre o volume do iOS.)\n\nPression num dos botões de volume para parar o som, depois altere o volume com os botões de volume para o volume pretendido e teste novamente.";
+"volumeTestSoundPlayer" = "Testar Volume (Se Sobrepor Silêncio Ligado)";
 "volumeTestiOSSound" = "Testar Volume (Volume actual do iPhone)";
 "debugLevel" = "Incluir Nível de Depuração";
 "warningChangeFromMasterToFollower" = "Aterar de Mestre para Seguidor vai parar o actual sensor. Deseja continuar?";
