@@ -11,7 +11,7 @@
 "bluetoothisnoton" = "Bluetooth ei ole päällä. Kytke ensin bluetooth päälle ja yritä uudelleen.";
 "bluetoothIsNotAuthorized" = "Bluetoothia ei ole sallittu xDrip4iOS:lle. Mene asetuksiin, etsi xDrip4iOS sovellus ja salli Bluetooth.";
 "startScanningInfo" = "Scanning Started.\n\nKeep xDrip4iOS open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
-"sensorstart" = "Sensori aloitettu";
+"sensorstart" = "Sensori aloitus";
 "notstarted" = "Ei aloitettu";
 "notknown" = "Tuntematon";
 "lastconnection" = "Viimeinen yhteys";
@@ -20,8 +20,8 @@
 "licenseinfo" = "This program is free software distributed under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\r\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.\r\n\nSee http://www.gnu.org/licenses/gpl.txt for more details.\r\n\r\nInfo: ";
 "info" = "Info";
 "transmitterinfo" = "Siirry ensin bluetooth näyttöön, jossa voit lisätä ja skannata lähettimen.\r\n\nPalaa sitten koti näyttöön  ja aloita sensori.";
-"startsensorbeforecalibration" = "Et voi kalibroida, ellet ole käynnistänyt sensoria.";
-"theresNoCGMTransmitterActive" = "Et voi kalibroida, ellei lähetintä ole yhdistetty.";
+"startsensorbeforecalibration" = "Et voi kalibroida, koska sensoria ei ole aloitettu.";
+"theresNoCGMTransmitterActive" = "Et voi kalibroida, koska lähetintä ole yhdistetty.";
 "theremustbeareadingbeforecalibration" = "Tarvitaan vähintään kaksi lukemaa ennen kalibrointia. Sinua pyydetään kalibroimaan heti, kun lukema saapuu.";
 "sensornotdetected" = "Sensoria ei havaittu. Tarkista, onko lähetin hyvin sijoitettu sensoriin.";
 "transmitternotpaired" = "Lähetintä ei ole muodostettu pariksi tämän iPhonen kanssa. Avaa sovellus.";
