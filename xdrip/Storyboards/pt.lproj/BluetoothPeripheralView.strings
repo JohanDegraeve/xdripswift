@@ -9,7 +9,7 @@
 "bluetoothPeripheralAlias" = "Pseudónimo:";
 "SensorSerialNumber" = "Nº. de Série do Sensor:";
 "sensorType" = "Tipo de Sensor:";
-"serialNumber" = "Número de Sériee:";
+"serialNumber" = "Número de Série:";
 "battery" = "Bateria:";
 "needsTransmitterId" = "Em falta ID do Transmissor";
 "scan" = "Pesquisar";
