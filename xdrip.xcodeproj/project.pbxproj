@@ -79,6 +79,8 @@
 		F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81D6D5122C27F18005EFAE2 /* BgReading+DexcomShare.swift */; };
 		F81F370325C1583400520946 /* WatlaaView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F81F370525C1583400520946 /* WatlaaView.strings */; };
 		F81F370825C1584A00520946 /* LibreStates.strings in Resources */ = {isa = PBXBuildFile; fileRef = F81F370A25C1584A00520946 /* LibreStates.strings */; };
+		F81F3C4225D1D91300520946 /* CoreNFC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F81F3C4125D1D91300520946 /* CoreNFC.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		F81F3C4325D1DA1300520946 /* CoreNFC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F81F3C4125D1D91300520946 /* CoreNFC.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */; };
 		F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */; };
 		F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FFF2289E4990028C70F /* AlertSettingsViewControllerData.swift */; };
@@ -777,6 +779,7 @@
 		F81F3C0E25D096A900520946 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/M5StackView.strings; sourceTree = "<group>"; };
 		F81F3C0F25D096BC00520946 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
 		F81F3C1025D096C000520946 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
+		F81F3C4125D1D91300520946 /* CoreNFC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreNFC.framework; path = System/Library/Frameworks/CoreNFC.framework; sourceTree = SDKROOT; };
 		F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueObserverTimeKeeper.swift; sourceTree = "<group>"; };
 		F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAlertSettingsViewController.swift; sourceTree = "<group>"; };
 		F81F9FFF2289E4990028C70F /* AlertSettingsViewControllerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSettingsViewControllerData.swift; sourceTree = "<group>"; };
@@ -1268,6 +1271,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F81F3C4325D1DA1300520946 /* CoreNFC.framework in Frameworks */,
 				F870D3D325126A49008967B0 /* NotificationCenter.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1276,6 +1280,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F81F3C4225D1D91300520946 /* CoreNFC.framework in Frameworks */,
 				A48D2DE552F4A356AA32746A /* Pods_xdrip.framework in Frameworks */,
 				F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */,
 			);
@@ -1287,6 +1292,7 @@
 		48C0E851274A3BB6D42C6F20 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F81F3C4125D1D91300520946 /* CoreNFC.framework */,
 				F821CF9622AE589E005C1E43 /* HealthKit.framework */,
 				662BEA7F7991B9BD2E7D3EA4 /* Pods_xdrip.framework */,
 				F870D3D225126A49008967B0 /* NotificationCenter.framework */,

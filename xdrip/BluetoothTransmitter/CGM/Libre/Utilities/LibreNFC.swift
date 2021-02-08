@@ -1,6 +1,8 @@
 import Foundation
-import CoreNFC
 import OSLog
+
+#if canImport(CoreNFC)
+import CoreNFC
 
 // source : https://github.com/gui-dos/DiaBLE/tree/master/DiaBLE
 
@@ -790,3 +792,5 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     }
     
 }
+
+#endif

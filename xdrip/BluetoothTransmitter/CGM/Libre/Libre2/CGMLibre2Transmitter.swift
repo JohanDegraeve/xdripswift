@@ -1,13 +1,15 @@
 import Foundation
 import os
 import CoreBluetooth
+
+#if canImport(CoreNFC)
 import CoreNFC
 
 class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
-    /// service to be discovered
+    /// service to be discoveredMARK: - NFCTagReaderSessionDelegate function
     private let CBUUID_Service_Libre2: String = "FDE3"
     
     /// receive characteristic
@@ -335,7 +337,16 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     
 }
 
-// MARK: - NFCTagReaderSessionDelegate functions
+#else
+
+class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
+    
+}
+
+#endif
+
+
+// MARK: - LibreNFCDelegate functions
 
 extension CGMLibre2Transmitter: LibreNFCDelegate {
     
