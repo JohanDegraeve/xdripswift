@@ -5,7 +5,7 @@
 "alerttypesettingsview_vibrate" = "Vibrar?";
 "alerttypesettingsview_snoozevianotification" = "Permitir Silenciar via Notificação?";
 "alerttypesettingsview_defaultsnoozeperiod" = "Tempo Padrão Silenciar (mins)";
-"alerttypesettingsview_overridemute" = "Sobrepôr Silêncio?";
+"alerttypesettingsview_overridemute" = "Sobrepor Silêncio?";
 "alerttypesettingsview_sound" = "Som";
 "alerttypesettingsview_defaultiossound" = "Som iOS";
 "alerttypesettingsview_givename" = "Nome de Alarme";
