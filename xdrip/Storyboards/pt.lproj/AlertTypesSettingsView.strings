@@ -12,5 +12,5 @@
 "alerttypesettingsview_givesnoozeperiod" = "Tempo Silenciar em Minutos";
 "alerttypesettingsview_picksoundname" = "Nome do Som";
 "alertTypeNoSound" = "Sem Som";
-"alerttypenamealreadyexistsmessages" = "Um Tipo de Alarme com estee nome já existe. Utilize um nome diferente";
+"alerttypenamealreadyexistsmessages" = "Um Tipo de Alarme com este nome já existe. Utilize um nome diferente";
 "confirmdeletionalerttype" = "Eliminar Tipo de Alarme: ";
