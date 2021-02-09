@@ -5,12 +5,12 @@
 "alerttypesettingsview_vibrate" = "Vibrar?";
 "alerttypesettingsview_snoozevianotification" = "Permitir Silenciar via Notificação?";
 "alerttypesettingsview_defaultsnoozeperiod" = "Tempo Padrão Silenciar (mins)";
-"alerttypesettingsview_overridemute" = "Sobrepôr Silêncio?";
+"alerttypesettingsview_overridemute" = "Sobrepor Silêncio?";
 "alerttypesettingsview_sound" = "Som";
 "alerttypesettingsview_defaultiossound" = "Som iOS";
 "alerttypesettingsview_givename" = "Nome de Alarme";
 "alerttypesettingsview_givesnoozeperiod" = "Tempo Silenciar em Minutos";
 "alerttypesettingsview_picksoundname" = "Nome do Som";
 "alertTypeNoSound" = "Sem Som";
-"alerttypenamealreadyexistsmessages" = "Um Tipo de Alarme com estee nome já existe. Utilize um nome diferente";
+"alerttypenamealreadyexistsmessages" = "Um Tipo de Alarme com este nome já existe. Utilize um nome diferente";
 "confirmdeletionalerttype" = "Eliminar Tipo de Alarme: ";
