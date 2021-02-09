@@ -9,7 +9,7 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
-    /// service to be discoveredMARK: - NFCTagReaderSessionDelegate function
+    /// service to be discovered
     private let CBUUID_Service_Libre2: String = "FDE3"
     
     /// receive characteristic
