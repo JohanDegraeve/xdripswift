@@ -450,12 +450,9 @@ final class RootViewController: UIViewController {
         
         // instantiate calibrations
         calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
-        guard let calibrationsAccessor = calibrationsAccessor else {
-            fatalError("In setupApplicationData, failed to initialize calibrationsAccessor")
-        }
         
         // instanstiate Housekeeper
-        houseKeeper = HouseKeeper(bgReadingsAccessor: bgReadingsAccessor, calibrationsAccessor: calibrationsAccessor)
+        houseKeeper = HouseKeeper(coreDataManager: coreDataManager)
         
         // setup nightscout synchronizer
         nightScoutUploadManager = NightScoutUploadManager(coreDataManager: coreDataManager, messageHandler: { (title:String, message:String) in

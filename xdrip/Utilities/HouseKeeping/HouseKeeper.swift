@@ -1,5 +1,6 @@
 import Foundation
 import os
+import CoreData
 
 /// housekeeping like remove old readings from coredata
 class HouseKeeper {
@@ -14,45 +15,63 @@ class HouseKeeper {
     
     /// CalibrationsAccessor instance
     private var calibrationsAccessor:CalibrationsAccessor
+    
+    /// CoreDataManager instance
+    private var coreDataManager: CoreDataManager
 
     // up to which date shall we delete old calibrations
     private var toDate: Date
 
     // MARK: - intializer
     
-    init(bgReadingsAccessor: BgReadingsAccessor, calibrationsAccessor: CalibrationsAccessor) {
+    init(coreDataManager: CoreDataManager) {
         
-        self.bgReadingsAccessor = bgReadingsAccessor
+        self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         
-        self.calibrationsAccessor = calibrationsAccessor
+        self.calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         
-        self.toDate = Date(timeIntervalSinceNow: -ConstantsHousekeeping.retentionPeriodBgReadingsInDays*24*3600)
+        self.coreDataManager = coreDataManager
+        
+        self.toDate = Date(timeIntervalSinceNow: -ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsInDays*24*3600)
         
     }
     
     // MARK: - public functions
     
-    /// housekeeping activities to be done only once per app start up like delete old readings
+    /// - housekeeping activities to be done only once per app start up like delete old readings and calibrations in CoreData
+    /// - cleanups are done asynchronously (ie function returns without waiting for the actual deletions
     public func doAppStartUpHouseKeeping() {
         
-        DispatchQueue.global().async {
+        // create private managed object context
+        let managedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        managedObjectContext.parent = coreDataManager.mainManagedObjectContext
+
+        // delete old readings on the private managedObjectContext, asynchronously
+        managedObjectContext.perform {
             
             // delete old readings
-            self.deleteOldReadings()
-            
-            // delete old calibrations
-            self.deleteOldCalibrations()
+            self.deleteOldReadings(on: managedObjectContext)
             
         }
+        
+        // delete old calibrations on the private managedObjectContext, asynchronously
+        managedObjectContext.perform {
+            
+            // delete old calibrations
+            self.deleteOldCalibrations(on: managedObjectContext)
+            
+        }
+        
     }
     
     // MARK: - private functions
     
     /// deletes old readings. Readings older than ConstantsHousekeeping.retentionPeriodBgReadingsInDays will be deleted
-    private func deleteOldReadings() {
+    ///     - managedObjectContext : the ManagedObjectContext to use
+    private func deleteOldReadings(on managedObjectContext: NSManagedObjectContext) {
         
         // get old readings to delete
-        let oldReadings = self.bgReadingsAccessor.getBgReadingsOnPrivateManagedObjectContext(from: nil, to: self.toDate)
+        let oldReadings = self.bgReadingsAccessor.getBgReadings(from: nil, to: self.toDate, on: managedObjectContext)
         
         if oldReadings.count > 0 {
             
@@ -63,17 +82,17 @@ class HouseKeeper {
         // delete them
         for oldReading in oldReadings {
             
-            bgReadingsAccessor.deleteReadingOnPrivateManagedObjectContext(bgReading: oldReading)
+            bgReadingsAccessor.delete(bgReading: oldReading, on: managedObjectContext)
             
         }
         
     }
     
     /// deletes old calibrations. Readings older than ConstantsHousekeeping.retentionPeriodBgReadingsInDays will be deleted
-    private func deleteOldCalibrations() {
+    private func deleteOldCalibrations(on managedObjectContext: NSManagedObjectContext) {
         
         // get old calibrations to delete
-        let oldCalibrations = self.calibrationsAccessor.getCalibrationsOnPrivateManagedObjectContext(from: nil, to: self.toDate)
+        let oldCalibrations = self.calibrationsAccessor.getCalibrations(from: nil, to: self.toDate, on: managedObjectContext)
         
         if oldCalibrations.count > 0 {
             
@@ -90,7 +109,7 @@ class HouseKeeper {
 
             } else {
 
-                calibrationsAccessor.deleteCalibrationOnPrivateManagedObjectContext(calibration: oldCalibration)
+                calibrationsAccessor.delete(calibration: oldCalibration, on: managedObjectContext)
 
             }
             

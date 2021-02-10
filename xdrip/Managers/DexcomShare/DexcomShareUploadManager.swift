@@ -367,6 +367,9 @@ class DexcomShareUploadManager:NSObject {
             "TA" : -5
         ]
         
+        // store the timestamp of the last reading to upload, here in the main thread, because we use a bgReading for it, which is retrieved in the main mangedObjectContext
+        let timeStampLastReadingToUpload = bgReadingsToUpload.first != nil ? bgReadingsToUpload.first!.timeStamp : nil
+
         do {
             
             // create upload data in json format
@@ -392,10 +395,7 @@ class DexcomShareUploadManager:NSObject {
                         if data.count == 0 {
                             
                             // success
-                            if let lastReading = bgReadingsToUpload.first {
-                                trace("    upload succeeded, setting timeStampLatestDexcomShareUploadedBgReading to %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, lastReading.timeStamp.description(with: .current))
-                                UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading = lastReading.timeStamp
-                            }
+                            self.setTimeStampLastReadingToUpload(timeStampLastReadingToUpload: timeStampLastReadingToUpload)
                             
                             return
 
@@ -480,10 +480,8 @@ class DexcomShareUploadManager:NSObject {
                             }
                             
                             // success
-                            if let lastReading = bgReadingsToUpload.first {
-                                trace("    upload succeeded, setting timeStampLatestDexcomShareUploadedBgReading to %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, lastReading.timeStamp.description(with: .current))
-                                UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading = lastReading.timeStamp
-                            }
+                            self.setTimeStampLastReadingToUpload(timeStampLastReadingToUpload: timeStampLastReadingToUpload)
+                            
                             return
                         }
                     } else {
@@ -491,10 +489,8 @@ class DexcomShareUploadManager:NSObject {
                         // don't think we should every come here
                         trace("    no data received, considered successful upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
 
-                        if let lastReading = bgReadingsToUpload.first {
-                            trace("    upload succeeded, setting timeStampLatestDexcomShareUploadedBgReading to %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, lastReading.timeStamp.description(with: .current))
-                            UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading = lastReading.timeStamp
-                        }
+                        self.setTimeStampLastReadingToUpload(timeStampLastReadingToUpload: timeStampLastReadingToUpload)
+                        
                         return
                         
                     }
@@ -516,6 +512,15 @@ class DexcomShareUploadManager:NSObject {
 
     }
     
+    /// sets UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading = timeStampLastReadingToUpload, if not nil
+    private func setTimeStampLastReadingToUpload(timeStampLastReadingToUpload: Date?) {
+        
+        if let timeStampLastReadingToUpload = timeStampLastReadingToUpload {
+            trace("    upload succeeded, setting timeStampLatestDexcomShareUploadedBgReading to %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, timeStampLastReadingToUpload.description(with: .current))
+            UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading = timeStampLastReadingToUpload
+        }
+        
+    }
     
     /// test dexcom share credentials (accountname, password) - the credentials must be not nil in userdefaults, otherwise completion is called with error
     ///
