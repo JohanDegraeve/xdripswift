@@ -25,7 +25,7 @@ class TextsLibreNFC {
     }()
     
     static let connectedLibre2DoesNotMatchScannedLibre2: String = {
-        return NSLocalizedString("connectedLibre2DoesNotMatchScannedLibre2", tableName: filename, bundle: Bundle.main, value: "You seem to have scanned a new sensor, but xDrip4iOS is having the Bluetooth connection to the old sensor.\r\n\r\nTo solve this :\r\n- Click 'disconnect'\r\n- Go back to previous screen and add a new CGM of type Libre 2 and scan again.\r\n\r\nxDrip4iOS should now connect to the new sensor.", comment: "The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.")
+        return NSLocalizedString("connectedLibre2DoesNotMatchScannedLibre2", tableName: filename, bundle: Bundle.main, value: "You seem to have scanned a new sensor, but xDrip4iOS is having the Bluetooth connection to the old sensor.\r\n\r\nTo solve this :\r\n- Click 'disconnect' or 'stop scanning'\r\n- Go back to previous screen and add a new CGM of type Libre 2 and scan again.\r\n\r\nxDrip4iOS should now connect to the new sensor.", comment: "The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.")
     }()
     
     static let nfcErrorRetryScan: String = {
