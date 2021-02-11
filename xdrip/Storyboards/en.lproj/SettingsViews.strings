@@ -89,3 +89,8 @@
 "debugLevel" = "Include Debug Level";
 "warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
 "nightScoutPort" = "Port (optional):";
+"developerSettings" = "Developer Settings";
+"smoothLibreValues" = "Smooth Libre Values?";
+"nslog" = "NSLog";
+"oslog" = "OSLog";
+ 
