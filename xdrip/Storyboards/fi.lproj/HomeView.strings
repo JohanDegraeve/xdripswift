@@ -32,4 +32,3 @@
 "failed" = "Epäonnistui";
 "calibrationNotNecessary" = "Libre sensorin kalibrointia ei tarvita kun OOPWeb on käytössä.";
 "dexcomBatteryTooLow" = "Lähettimen varaus on liian matala!";
-"sensorAge14Days" = "Sensorin maksimi-ikä saavutettu.";

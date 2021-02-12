@@ -31,8 +31,6 @@
 "success" = "نجاح";
 "failed" = "فشل";
 "dexcomBatteryTooLow" = "بطارية جهاز الإرسال منخفضة جدًا!";
-"sensorAge14Days" = "وصل الحساس إلى الحد الأقصى من عمره.";
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

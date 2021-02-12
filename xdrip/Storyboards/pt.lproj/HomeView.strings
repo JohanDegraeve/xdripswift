@@ -32,4 +32,3 @@
 "failed" = "Falhou";
 "calibrationNotNecessary" = "Quando se usa Algoritmo do Libre, não é necessário calibrar o sensor.";
 "dexcomBatteryTooLow" = "O Nível de Bateria do Transmissor está muito baixo!";
-"sensorAge14Days" = "O sensor atingiu o limite da sua idade.";
