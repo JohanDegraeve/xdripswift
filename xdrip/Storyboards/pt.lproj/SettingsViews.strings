@@ -89,26 +89,8 @@
 "debugLevel" = "Incluir Nível de Depuração";
 "warningChangeFromMasterToFollower" = "Aterar de Mestre para Seguidor vai parar o actual sensor. Deseja continuar?";
 "nightScoutPort" = "Porto (opcional):";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// deloper settings, row title for 'Smooth Libre Values?'
-"smoothLibreValues" = "Smooth Libre Values?";
-
-/// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
+"smoothLibreValues" = "Suavizar Valores do Libre?";
 "oslog" = "OSLog";
-
-/// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
 "nslog" = "NSLog";
-
-/// Developer Settings, section title
-"developerSettings" = "Developer Settings";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// home screen settings, section title
-"settingsviews_sectiontitlehomescreen" = "Home Screen";
+"developerSettings" = "Definições de Programador";
+"settingsviews_sectiontitlehomescreen" = "Ecrã Inicial";
