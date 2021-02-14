@@ -321,7 +321,14 @@ class LibreDataParser {
                 
                 trace("    not processing data as sensor does not have the state ready or expired", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
                 
-                cgmTransmitterDelegate?.errorOccurred(xDripError: LibreError.sensorNotReady)
+                // initialize xDripError, to be used in calls to cgmTransmitterDelegate.errorOccurred and completionHandler
+                let xDripError = LibreError.sensorNotReady
+                
+                // call cgmTransmitterDelegate (this is actually the RootViewController passed in via the BluetoothTransmitter
+                cgmTransmitterDelegate?.errorOccurred(xDripError: xDripError)
+                
+                // call completionHandler, to inform caller about sensorState and xDripError
+                completionHandler(sensorState, xDripError)
                 
                 return
                 
@@ -339,6 +346,7 @@ class LibreDataParser {
         }
         
         // if sensor time < 60, return an empty glucose data array
+        // should probably not happen because we only get here if status = .ready or .expired ?
         if let sensorTimeInMinutes = result.sensorTimeInMinutes {
             
             guard sensorTimeInMinutes >= 60 else {
