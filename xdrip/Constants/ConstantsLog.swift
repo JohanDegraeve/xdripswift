@@ -106,6 +106,9 @@ enum ConstantsLog {
     /// bluereader
     static let categoryCGMBlueReader =               "CGMBlueReader                 "
     
+    /// atom
+    static let categoryCGMAtom =                     "categoryCGMAtom               "
+    
     /// LibreOOPClient
     static let categoryLibreOOPClient =              "LibreOOPClient                "
     
