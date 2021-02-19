@@ -176,10 +176,12 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         // as serialNumber is always the first packet being sent, resetRxBuffer (just in case it wasn't done yet
                         resetRxBuffer()
                         
-                        // this is actually the sensor serial number, adding it to rxBuffer (we could also not add it and set bubbleHeaderLength to 0 - this is historuc
+                        // this is actually the sensor serial number, adding it to rxBuffer (we could also not add it and set bubbleHeaderLength to 0 - this is historic
                         rxBuffer.append(value.subdata(in: 2..<10))
                         
                         // get libreSensorSerialNumber, if this fails, then self.libreSensorSerialNumber will keep it's current value
+                        // Bubble sends the patchInfo only in a second step, which means patchInfo is nil here, as a result, the sensorSerialNumber will maybe not be correct (eg for Libre 2), because the function LibreSensorType.type uses the patchInfo
+                        // libreSensorSerialNumber will be recalculated when receiving the patchInfo
                         guard let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8)), with: LibreSensorType.type(patchInfo: patchInfo)) else {
                             trace("    could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
                             return
@@ -275,11 +277,20 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 trace("    received patchInfo %{public}@ ", log: log, category: ConstantsLog.categoryCGMBubble, type: .info, patchInfo)
                             }
 
-                        }
-                        
-                        // send libreSensorType to delegate
-                        if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
-                            cGMBubbleTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
+                            // send libreSensorType to delegate
+                            if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
+                                cGMBubbleTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
+                            }
+                            
+                            // we have the patchInfo now, so recalculate the sensorSerialNumber
+                            guard let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8)), with: LibreSensorType.type(patchInfo: patchInfo)) else {
+                                trace("    could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                                return
+                            }
+                            
+                            // assign self.libreSensorSerialNumber to received libreSensorSerialNumber
+                            self.libreSensorSerialNumber = libreSensorSerialNumber
+
                         }
                         
                     }
