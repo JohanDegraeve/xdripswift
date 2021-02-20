@@ -357,6 +357,9 @@ class LibreDataParser {
                 
                 cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)
                 
+                // call completion handler to make sure the sensor state is handled, set state to .starting, because result.sensorState has value .ready here which is not correct
+                completionHandler(.starting, result.xDripError)
+                
                 return
                 
             }
