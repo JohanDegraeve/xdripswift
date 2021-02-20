@@ -258,7 +258,7 @@ class BluetoothPeripheralManager: NSObject {
                             
                             // create an instance of CGMAtomTransmitter, CGMAtomTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
                             // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMAtomTransmitter(address: atom.blePeripheral.address, name: atom.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMAtomTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, webOOPEnabled: atom.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: atom.blePeripheral.nonFixedSlopeEnabled, firmWare: atom.firmware), at: index)
+                            bluetoothTransmitters.insert(CGMAtomTransmitter(address: atom.blePeripheral.address, name: atom.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMAtomTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: atom.blePeripheral.sensorSerialNumber, webOOPEnabled: atom.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: atom.blePeripheral.nonFixedSlopeEnabled, firmWare: atom.firmware), at: index)
                             
                             // if AtomType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                             if bluetoothPeripheralType.category() == .CGM {
@@ -655,7 +655,7 @@ class BluetoothPeripheralManager: NSObject {
                         
                         if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
                             
-                            newTransmitter = CGMAtomTransmitter(address: atom.blePeripheral.address, name: atom.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMAtomTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, webOOPEnabled: atom.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: atom.blePeripheral.nonFixedSlopeEnabled, firmWare: atom.firmware)
+                            newTransmitter = CGMAtomTransmitter(address: atom.blePeripheral.address, name: atom.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMAtomTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: atom.blePeripheral.sensorSerialNumber, webOOPEnabled: atom.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: atom.blePeripheral.nonFixedSlopeEnabled, firmWare: atom.firmware)
                             
                         } else {
                             
@@ -891,7 +891,7 @@ class BluetoothPeripheralManager: NSObject {
                 fatalError("in createNewTransmitter, AtomType, cgmTransmitterDelegate is nil")
             }
             
-            return CGMAtomTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMAtomTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, webOOPEnabled: nil, nonFixedSlopeEnabled: nil, firmWare: nil)
+            return CGMAtomTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMAtomTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: nil, webOOPEnabled: nil, nonFixedSlopeEnabled: nil, firmWare: nil)
             
         case .DropletType:
             

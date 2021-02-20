@@ -62,6 +62,9 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// firmware, if received
     private var firmWare: String?
     
+    /// current sensor serial number, if nil then it's not known yet
+    private var sensorSerialNumber:String?
+    
     // MARK: - Initialization
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
@@ -71,13 +74,17 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     ///     - cGMAtomTransmitterDelegate : a CGMAtomTransmitterDelegate
     ///     - firmWare : firmWare if known
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMAtomTransmitterDelegate : CGMAtomTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, webOOPEnabled: Bool?, nonFixedSlopeEnabled: Bool?, firmWare: String?) {
+    ///     - sensorSerialNumber : sensor serial number, if nil then it's not yet known
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMAtomTransmitterDelegate : CGMAtomTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate,  sensorSerialNumber:String?, webOOPEnabled: Bool?, nonFixedSlopeEnabled: Bool?, firmWare: String?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: expectedDeviceNameAtom)
         if let address = address {
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
         }
+        
+        // initialize sensorSerialNumber
+        self.sensorSerialNumber = sensorSerialNumber
         
         // assign firmWare
         self.firmWare = firmWare
@@ -291,19 +298,9 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                             
                         }
 
-                        // assign self.serialNumber
+                        // assign self.sensorSerialNumberAsData - not yet calculating the serialNumber, because the value depends on the patchInfo which we receive only in a second step
                         self.sensorSerialNumberAsData = value[2..<10]
 
-                        guard let sensorSerialNumberAsData = sensorSerialNumberAsData, let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorSerialNumberAsData, with: LibreSensorType.type(patchInfo: patchInfo)) else {
-                            
-                            trace("in peripheral didUpdateValueFor, could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
-                            
-                            return
-                            
-                        }
-                        
-                        // call to delegate, received sensor serialNumber
-                        cGMAtomTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
                         
                     case .patchInfo:
                         
@@ -328,7 +325,9 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                         }
                         
                         if let patchInfo = patchInfo {
+                            
                             trace("    received patchInfo %{public}@ ", log: log, category: ConstantsLog.categoryCGMBubble, type: .info, patchInfo)
+                            
                         }
                         
                         // send libreSensorType to delegate
@@ -343,6 +342,22 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                             
                             // call to delegate, received sensor serialNumber
                             cGMAtomTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
+                            
+                            if self.sensorSerialNumber != libreSensorSerialNumber.serialNumber {
+                                
+                                // assign self.sensorSerialNumber to libreSensorSerialNumber.serialNumber
+                                self.sensorSerialNumber = libreSensorSerialNumber.serialNumber
+                                
+                                // call delegate, to inform that a new sensor is detected
+                                cgmTransmitterDelegate?.newSensorDetected()
+                                
+                            }
+
+                        } else {
+                            
+                            trace("in peripheral didUpdateValueFor, could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                            
+                            return
                             
                         }
                     
