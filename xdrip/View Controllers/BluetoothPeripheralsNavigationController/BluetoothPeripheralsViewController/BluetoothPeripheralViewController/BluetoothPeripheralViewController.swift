@@ -173,7 +173,7 @@ class BluetoothPeripheralViewController: UIViewController {
             // if needs transmitterId, but no transmitterId is given by user, then button allows to set transmitter id, row text = "needs transmitter id"
             if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType, expectedBluetoothPeripheralType.needsTransmitterId(), transmitterId == nil {
                 
-                connectButtonOutlet?.setTitle(Texts_SettingsView.labelTransmitterId, for: .normal)
+                connectButtonOutlet?.setTitle(Texts_SettingsView.labelTransmitterIdTextForButton, for: .normal)
                 
                 return Texts_BluetoothPeripheralView.needsTransmitterId
                 

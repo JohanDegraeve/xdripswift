@@ -6,6 +6,7 @@
 "settingsviews_sectiontitletransmitter" = "发射器";
 "settingsviews_transmittertype" = "发射器类型";
 "settingsviews_transmitterid" = "发射器ID";
+"settingsviews_transmitterid_text_for_button" = "发射器ID";
 "settingsviews_givetransmitterid" = "输入发射器ID";
 "settingsviews_sectiontitlealerting" = "警报设置";
 "settingsviews_row_alert_types" = "警报类型";

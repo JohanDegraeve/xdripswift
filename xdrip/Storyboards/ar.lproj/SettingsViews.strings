@@ -12,6 +12,7 @@
 "settingsviews_sectiontitletransmitter" = "جهاز الإرسال";
 "settingsviews_transmittertype" = "نوع جهاز الإرسال:";
 "settingsviews_transmitterid" = "رقم هوية جهاز الإرسال:";
+"settingsviews_transmitterid_text_for_button" = "رقم هوية جهاز الإرسال";
 "settingsviews_givetransmitterid" = "أدخل رقم هوية جهاز الإرسال";
 "settingsviews_resettransmitter" = "إعادة تعيين جهاز الإرسال";
 "transmitterId8OrHigherNotSupported" = "جهاز الإرسال برمز الهوية 8Gxxxx أو الأحدث غير مدعوم!";
