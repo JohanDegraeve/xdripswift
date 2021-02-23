@@ -252,7 +252,7 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                         
                     case .transmitterInfo:
                         
-                        trace("in peripheral didUpdateValueFor, transmitterInfo received, shound't happen ?", log: log, category: ConstantsLog.categoryCGMAtom, type: .error)
+                        trace("in peripheral didUpdateValueFor, transmitterInfo received", log: log, category: ConstantsLog.categoryCGMAtom, type: .error)
                         
                         let transmitterBatteryPercentage = Int(value[4])
                         
