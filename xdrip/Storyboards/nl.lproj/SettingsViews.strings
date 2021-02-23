@@ -19,8 +19,6 @@
 "settingsviews_showcoloredobjectives" = "Toon Gekleurde Lijnen?";
 "settingsviews_showtarget" = "Toon Doel Lijn?";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
-"settingsviews_transmittertype" = "Transmitter Type:";
-"settingsviews_transmitterid" = "Transmitter ID:";
 "settingsviews_givetransmitterid" = "Voer Transmitter ID In";
 "settingsviews_resettransmitter" = "Reset Transmitter";
 "settingsviews_webooptransmitter" = "Gebruik Libre Algoritme?";
