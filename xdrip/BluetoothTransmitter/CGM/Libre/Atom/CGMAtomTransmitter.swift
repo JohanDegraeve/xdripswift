@@ -237,7 +237,7 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 
                             }
                             
-                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: sensorSerialNumberAsData, with: LibreSensorType.type(patchInfo: patchInfo)), patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer[0..<344]), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: sensorSerialNumberAsData, with: LibreSensorType.type(patchInfo: patchInfo))?.serialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer[0..<344]), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 if let sensorState = sensorState {
                                     self.cGMAtomTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
