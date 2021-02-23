@@ -7,7 +7,7 @@
 "m5StackSoftWareHelpText" = "Ir Para";
 "m5StackViewscreenTitle" = "M5Stack";
 "m5StickCViewscreenTitle" = "M5StickC";
-"deviceMustBeConnectedToPowerOff" = "M5Stack precisas estar ligado para o encerrar";
+"deviceMustBeConnectedToPowerOff" = "M5Stack precisa estar ligado para o encerrar";
 "powerOffConfirm" = "Tem a certeza que deseja encerrar o M5Stack?";
 "powerOff" = "Encerrar";
 "connectToWiFi" = "Ligar ao WiFi";

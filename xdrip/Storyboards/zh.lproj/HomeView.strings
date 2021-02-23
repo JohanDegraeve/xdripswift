@@ -26,9 +26,6 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Error message shown in pop up, when sensor age has reached 14.5 days
-"sensorAge14Days" = "The Sensor has reached its maximum age.";
-
 /// After clicking scan button, this message will appear
 "startScanningInfo" = "Scanning Started.\n\nKeep xDrip4iOS open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
 

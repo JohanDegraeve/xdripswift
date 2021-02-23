@@ -10,7 +10,7 @@
 "scanbluetoothdeviceongoing" = "A Pesquisar Transmissor...";
 "bluetoothisnoton" = "Bluetooth esta desligado. Ligue primeiro o bluetooth e tente novamente.";
 "bluetoothIsNotAuthorized" = "Não deu permissão do Bluetooth para xDrip4iOS. Vá a definições, procure pela app xDrip4iOS, e active o Bluetooth.";
-"startScanningInfo" = "A Pesquisa Iniciou.\n\n Mantenha xDrip4iOS em primeiro plano até que a ligação seja feita.\n\n (Não é necessário desligar Bloqueio Automátic. Apenas não pressione no botão Home e não bloqueie o iPhone)";
+"startScanningInfo" = "A Pesquisa Iniciou.\n\n Mantenha xDrip4iOS em primeiro plano até que a ligação seja feita.\n\n (Não é necessário desligar Bloqueio Automático. Apenas não pressione no botão Home e não bloqueie o iPhone)";
 "sensorstart" = "Sensor Iniciado";
 "notstarted" = "Não Iniciado";
 "notknown" = "Não Conhecido";
@@ -32,4 +32,3 @@
 "failed" = "Falhou";
 "calibrationNotNecessary" = "Quando se usa Algoritmo do Libre, não é necessário calibrar o sensor.";
 "dexcomBatteryTooLow" = "O Nível de Bateria do Transmissor está muito baixo!";
-"sensorAge14Days" = "O sensor atingiu o limite da sua idade.";

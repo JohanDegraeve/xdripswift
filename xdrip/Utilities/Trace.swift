@@ -433,7 +433,15 @@ class Trace {
                             traceInfo.appendStringAndNewLine("    batteryLevel : " + miaoMiao.batteryLevel.description)
                             
                         }
-
+                        
+                    case .AtomType:
+                        if let miaoMiao = blePeripheral.atom {
+                            
+                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("    batteryLevel : " + miaoMiao.batteryLevel.description)
+                            
+                        }
+                        
                     case .WatlaaType:
                         if let watlaa = blePeripheral.watlaa {
                             

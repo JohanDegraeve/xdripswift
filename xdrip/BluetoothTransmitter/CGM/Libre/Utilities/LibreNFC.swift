@@ -1,6 +1,8 @@
 import Foundation
-import CoreNFC
 import OSLog
+
+#if canImport(CoreNFC)
+import CoreNFC
 
 // source : https://github.com/gui-dos/DiaBLE/tree/master/DiaBLE
 
@@ -196,6 +198,18 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                         // get sensorUID and patchInfo and send to delegate
                                         let sensorUID = Data(tag.identifier.reversed())
                                         let patchInfo = response
+                                        
+                                        // patchInfo should have length 6, which sometimes is not the case, as there are occuring crashes in nfcCommand and Libre2BLEUtilities.streamingUnlockPayload
+                                        guard patchInfo.count >= 6 else {
+                                            
+                                            xdrip.trace("received pachinfo has length < 6", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info)
+                                            
+                                            self.trace(systemError: nil, ownErrorString: TextsLibreNFC.nfcErrorRetryScan, invalidateSession: true, session: session)
+                                            
+                                            return
+
+                                        }
+                                                                                    
                                         self.libreNFCDelegate?.received(sensorUID: sensorUID, patchInfo: patchInfo)
 
                                         self.traceSensorUID(sensorUID: sensorUID)
@@ -377,6 +391,18 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                     // get sensorUID and patchInfo and send to delegate
                                     let sensorUID = Data(tag.identifier.reversed())
                                     let patchInfo = response
+                                    
+                                    // patchInfo should have length 6, which sometimes is not the case, as there are occuring crashes in nfcCommand and Libre2BLEUtilities.streamingUnlockPayload
+                                    guard patchInfo.count >= 6 else {
+                                        
+                                        xdrip.trace("received pachinfo has length < 6", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info)
+                                        
+                                        self.trace(systemError: nil, ownErrorString: TextsLibreNFC.nfcErrorRetryScan, invalidateSession: true, session: session)
+                                        
+                                        return
+                                        
+                                    }
+
                                     self.libreNFCDelegate?.received(sensorUID: sensorUID, patchInfo: patchInfo)
                                     
                                     self.traceSensorUID(sensorUID: sensorUID)
@@ -649,17 +675,19 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
         }
     }
 
-    private func trace(systemError: Error, ownErrorString: String, invalidateSession: Bool, session: NFCTagReaderSession) {
+    private func trace(systemError: Error?, ownErrorString: String, invalidateSession: Bool, session: NFCTagReaderSession) {
         
-        xdrip.trace("NFC: error : %{public}@", log: log, category: ConstantsLog.categoryLibreNFC, type: .info, systemError.localizedDescription)
+        if let systemError = systemError {
+
+            xdrip.trace("NFC: error : %{public}@", log: log, category: ConstantsLog.categoryLibreNFC, type: .info, systemError.localizedDescription)
+
+        }
 
         if invalidateSession {
             
             xdrip.trace("   will invalide session", log: log, category: ConstantsLog.categoryLibreNFC, type: .info)
-            
 
-            session.invalidate(errorMessage: "\(ownErrorString) : \(systemError.localizedDescription)")
-
+            session.invalidate(errorMessage: "\(ownErrorString) : \(systemError != nil ? systemError!.localizedDescription : "")")
             
         }
         
@@ -790,3 +818,5 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     }
     
 }
+
+#endif

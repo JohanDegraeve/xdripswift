@@ -1,9 +1,9 @@
 "common_Ok" = "OK";
-"common_cancel" = "Cancel";
+"common_cancel" = "Cancelar";
 "common_mgdl" = "mg/dl";
 "common_mmol" = "mmol/l";
 "common_bloodglucoseunit" = "Unidade de Glicose";
-"common_bloodglucoseunit_short" = "Unid. Glic";
+"common_bloodglucoseunit_short" = "Unid. Glicose";
 "common_password" = "Senha:";
 "common_default" = "Padrão";
 "common_high" = "HIPER";
@@ -13,7 +13,7 @@
 "common_minutes" = "mins";
 "common_minute" = "min";
 "common_day" = "dia";
-"common_week" = "week";
+"common_week" = "semana";
 "warning" ="Aviso!";
 "update" = "Editar";
 "add" = "Adicionar";

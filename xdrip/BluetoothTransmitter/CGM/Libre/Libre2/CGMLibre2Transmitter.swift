@@ -1,6 +1,8 @@
 import Foundation
 import os
 import CoreBluetooth
+
+#if canImport(CoreNFC)
 import CoreNFC
 
 class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
@@ -335,7 +337,16 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     
 }
 
-// MARK: - NFCTagReaderSessionDelegate functions
+#else
+
+class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
+    
+}
+
+#endif
+
+
+// MARK: - LibreNFCDelegate functions
 
 extension CGMLibre2Transmitter: LibreNFCDelegate {
     

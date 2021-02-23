@@ -299,12 +299,18 @@ public class NightScoutUploadManager:NSObject {
             // map readings to dictionaryRepresentation
             let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map({$0.dictionaryRepresentationForNightScoutUpload})
             
+            // store the timestamp of the last reading to upload, here in the main thread, because we use a bgReading for it, which is retrieved in the main mangedObjectContext
+            let timeStampLastReadingToUpload = bgReadingsToUpload.first != nil ? bgReadingsToUpload.first!.timeStamp : nil
+            
             uploadData(dataToUpload: bgReadingsDictionaryRepresentation, traceString: "uploadBgReadingsToNightScout", siteURL: siteURL, path: nightScoutEntriesPath, apiKey: apiKey, completionHandler: {
                 
                 // change timeStampLatestNightScoutUploadedBgReading
-                if let lastReading = bgReadingsToUpload.first {
-                    trace("    in uploadBgReadingsToNightScout, upload succeeded, setting timeStampLatestNightScoutUploadedBgReading to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, lastReading.timeStamp.description(with: .current))
-                    UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading = lastReading.timeStamp
+                if let timeStampLastReadingToUpload = timeStampLastReadingToUpload {
+                    
+                    trace("    in uploadBgReadingsToNightScout, upload succeeded, setting timeStampLatestNightScoutUploadedBgReading to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, timeStampLastReadingToUpload.description(with: .current))
+                    
+                    UserDefaults.standard.timeStampLatestNightScoutUploadedBgReading = timeStampLastReadingToUpload
+                    
                 }
                 
             })
@@ -343,12 +349,18 @@ public class NightScoutUploadManager:NSObject {
             // 2 records are uploaded to nightscout for each calibration: a cal record and a mbg record
             let calibrationsDictionaryRepresentation = calibrationsToUpload.map({$0.dictionaryRepresentationForCalRecordNightScoutUpload}) + calibrationsToUpload.map({$0.dictionaryRepresentationForMbgRecordNightScoutUpload})
             
+            // store the timestamp of the last calibration to upload, here in the main thread, because we use a Calibration for it, which is retrieved in the main mangedObjectContext
+            let timeStampLastCalibrationToUpload = calibrationsToUpload.first != nil ? calibrationsToUpload.first!.timeStamp : nil
+
             uploadData(dataToUpload: calibrationsDictionaryRepresentation, traceString: "uploadCalibrationsToNightScout", siteURL: siteURL, path: nightScoutEntriesPath, apiKey: apiKey, completionHandler: {
                 
                 // change timeStampLatestNightScoutUploadedCalibration
-                if let lastCalibration = calibrationsToUpload.first {
-                    trace("    in uploadCalibrationsToNightScout, upload succeeded, setting timeStampLatestNightScoutUploadedCalibration to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, lastCalibration.timeStamp.description(with: .current))
-                    UserDefaults.standard.timeStampLatestNightScoutUploadedCalibration = lastCalibration.timeStamp
+                if let timeStampLastCalibrationToUpload = timeStampLastCalibrationToUpload {
+                    
+                    trace("    in uploadCalibrationsToNightScout, upload succeeded, setting timeStampLatestNightScoutUploadedCalibration to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, timeStampLastCalibrationToUpload.description(with: .current))
+                    
+                    UserDefaults.standard.timeStampLatestNightScoutUploadedCalibration = timeStampLastCalibrationToUpload
+                    
                 }
                 
             })

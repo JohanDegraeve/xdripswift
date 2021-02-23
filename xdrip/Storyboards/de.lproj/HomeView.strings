@@ -61,9 +61,6 @@
 /// To give result about transitter result in notification body, failed
 "failed" = "Failed";
 
-/// Error message shown in pop up, when sensor age has reached 14.5 days
-"sensorAge14Days" = "The Sensor has reached its maximum age.";
-
 /// when user manually starts sensor, this is the message that explains that time should be correct
 "startsensortimeinfo" = "In the next dialogs, you will need to set the date and time the sensor was inserted. It is important that you set the date and time as correct as possible.";
 

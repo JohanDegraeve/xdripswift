@@ -32,8 +32,6 @@
 "failed" = "Error";
 "calibrationNotNecessary" = "Habilitando el uso del algoritmo Libre, no será necesario calibrar el sensor";
 "dexcomBatteryTooLow" = "El nivel de batería del Transmisor es demasiado bajo!";
-"sensorAge14Days" = "El sensor ha llegado a su fin.";
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

@@ -32,4 +32,3 @@
 "failed" = "Mislukt";
 "calibrationNotNecessary" = "Indien het Libre algoritme wordt gebruikt is kalibratie van de sensor niet nodig.";
 "dexcomBatteryTooLow" = "Het Transmitter batterijniveau is te laag!";
-"sensorAge14Days" = "De Sensor heeft zijn maximale levensduur bereikt.";

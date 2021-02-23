@@ -12,17 +12,11 @@ class BgReadingsAccessor {
     /// CoreDataManager to use
     private let coreDataManager:CoreDataManager
     
-    /// to be used when fetch request needs to run on a background thread
-    private let privateManagedObjectContext: NSManagedObjectContext
-    
     // MARK: - initializer
     
     init(coreDataManager:CoreDataManager) {
         
         self.coreDataManager = coreDataManager
-        
-        privateManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateManagedObjectContext.persistentStoreCoordinator = coreDataManager.mainManagedObjectContext.persistentStoreCoordinator
         
     }
     
@@ -144,13 +138,14 @@ class BgReadingsAccessor {
         }
     }
     
-    /// gets readings on a managedObjectContext that is created with concurrencyType: .privateQueueConcurrencyType
+    /// gets bgReadings, synchronously, in the managedObjectContext's thread
     /// - returns:
     ///        readings sorted by timestamp, ascending (ie first is oldest)
     /// - parameters:
     ///     - to : if specified, only return readings with timestamp  smaller than fromDate (not equal to)
     ///     - from : if specified, only return readings with timestamp greater than fromDate (not equal to)
-    func getBgReadingsOnPrivateManagedObjectContext(from: Date?, to: Date?) -> [BgReading] {
+    ///     - managedObjectContext : the ManagedObjectContext to use
+    func getBgReadings(from: Date?, to: Date?, on managedObjectContext: NSManagedObjectContext) -> [BgReading] {
         
         let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: true)]
@@ -169,13 +164,13 @@ class BgReadingsAccessor {
         
         var bgReadings = [BgReading]()
         
-        privateManagedObjectContext.performAndWait {
+        managedObjectContext.performAndWait {
             do {
                 // Execute Fetch Request
                 bgReadings = try fetchRequest.execute()
             } catch {
                 let fetchError = error as NSError
-                trace("in getBgReadingOnPrivateManagedObjectContext, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
+                trace("in getBgReadings, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
             }
         }
         
@@ -183,16 +178,26 @@ class BgReadingsAccessor {
 
     }
     
-    // deletes readings, to be used for readings retrieved with getBgReadingsOnPrivateManagedObjectContext, to be called on background thread
-    func deleteReadingOnPrivateManagedObjectContext(bgReading: BgReading) {
+    /// deletes bgReading, synchronously, in the managedObjectContext's thread
+    ///     - bgReading : bgReading to delete
+    ///     - managedObjectContext : the ManagedObjectContext to use
+    func delete(bgReading: BgReading, on managedObjectContext: NSManagedObjectContext) {
         
-        privateManagedObjectContext.delete(bgReading)
-        
-        // save changes to coredata
-        do {
-            try self.privateManagedObjectContext.save()
-        } catch {
-            trace("in deleteReadingOnPrivateManagedObjectContext,  Unable to Save Changes of Private Managed Object Context, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
+        managedObjectContext.performAndWait {
+            
+            managedObjectContext.delete(bgReading)
+            
+            // save changes to coredata
+            do {
+                
+                try managedObjectContext.save()
+                
+            } catch {
+                
+                trace("in delete bgReading,  Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
+                
+            }
+
         }
         
     }

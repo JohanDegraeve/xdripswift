@@ -6,7 +6,7 @@
 "alerttypesettingsview_snoozevianotification" = "Torkku notifikaation kautta";
 "alerttypesettingsview_defaultsnoozeperiod" = "Oletus torkkujakso (min)";
 "alerttypesettingsview_overridemute" = "Ohita mykistys";
-"alerttypesettingsview_soundname" = "Ääni";
+"alerttypesettingsview_sound" = "Ääni";
 "alerttypesettingsview_defaultiossound" = "iOS äänet";
 "alerttypesettingsview_givename" = "Anna nimi";
 "alerttypesettingsview_givesnoozeperiod" = "Anna torkkujakso minuuteissa";
@@ -14,10 +14,3 @@
 "alertTypeNoSound" = "Ei ääntä";
 "alerttypenamealreadyexistsmessages" = "Tämän niminen hälytystyyppi on jo olemassa. Vaihda nimi";
 "confirmdeletionalerttype" = "Haluatko poistaa hälytystyypin nimellä ";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// when editing an alert type, field title for Sound
-"alerttypesettingsview_sound" = "Sound";

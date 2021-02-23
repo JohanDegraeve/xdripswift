@@ -2,7 +2,7 @@
 "settingsviews_sectiontitlegeneral" = "Yleinen";
 "settingsviews_sectiontitlehomescreen" = "Kotinäyttö";
 "settingsviews_selectbgunit" = "Verensokeriyksikkö:";
-"settingsviews_urgentlowValue" = "Erittäin matala lukema:";
+"settingsviews_urgentLowValue" = "Erittäin matala lukema:";
 "settingsviews_lowValue" = "Matala lukema:";
 "settingsviews_highValue" = "Korkea lukema:";
 "settingsviews_urgentHighValue" = "Erittäin korkea lukema:";
@@ -95,5 +95,14 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// 
-"settingsviews_urgentLowValue" = "Urgent Low Value:";
+/// deloper settings, row title for 'Smooth Libre Values?'
+"smoothLibreValues" = "Smooth Libre Values?";
+
+/// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
+"oslog" = "OSLog";
+
+/// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
+"nslog" = "NSLog";
+
+/// Developer Settings, section title
+"developerSettings" = "Developer Settings";
