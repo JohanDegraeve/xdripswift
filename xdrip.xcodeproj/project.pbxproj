@@ -3909,7 +3909,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.5.19;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.${DEVELOPMENT_TEAM}.xDrip4iOS-Widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.${DEVELOPMENT_TEAM}.xdripswift.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -3934,7 +3934,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.5.19;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.${DEVELOPMENT_TEAM}.xDrip4iOS-Widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.${DEVELOPMENT_TEAM}.xdripswift.xDrip4iOS-Widget";
 				PRODUCT_NAME = xDrip4iOS;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
