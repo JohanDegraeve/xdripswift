@@ -137,11 +137,7 @@
 "nslog" = "NSLog";
 
 /// Developer Settings, section title
-"developerSettings" = "Developer Settings";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"developerSettings" = "Paramètres Développeur";
 
 /// home screen settings, section title
-"settingsviews_sectiontitlehomescreen" = "Home Screen";
+"settingsviews_sectiontitlehomescreen" = "Ecran d'accueil";
