@@ -237,7 +237,7 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 
                             }
                             
-                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: sensorSerialNumberAsData, with: LibreSensorType.type(patchInfo: patchInfo)), patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer[0..<344]), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: sensorSerialNumberAsData, with: LibreSensorType.type(patchInfo: patchInfo))?.serialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer[0..<344]), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 if let sensorState = sensorState {
                                     self.cGMAtomTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
@@ -252,7 +252,7 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                         
                     case .transmitterInfo:
                         
-                        trace("in peripheral didUpdateValueFor, transmitterInfo received, shound't happen ?", log: log, category: ConstantsLog.categoryCGMAtom, type: .error)
+                        trace("in peripheral didUpdateValueFor, transmitterInfo received", log: log, category: ConstantsLog.categoryCGMAtom, type: .error)
                         
                         let transmitterBatteryPercentage = Int(value[4])
                         

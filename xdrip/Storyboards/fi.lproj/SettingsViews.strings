@@ -15,6 +15,7 @@
 "settingsviews_sectiontitletransmitter" = "Lähetin";
 "settingsviews_transmittertype" = "Lähettimen tyyppi:";
 "settingsviews_transmitterid" = "Lähettimen ID:";
+"settingsviews_transmitterid_text_for_button" = "Lähettimen ID";
 "settingsviews_givetransmitterid" = "Anna lähetettimen ID";
 "settingsviews_resettransmitter" = "Nollaa lähetin";
 "settingsviews_webooptransmitter" = "Käytä Libre algorithmiä?";

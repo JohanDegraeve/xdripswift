@@ -18,6 +18,7 @@
 "settingsviews_sectiontitletransmitter" = "Transmisor";
 "settingsviews_transmittertype" = "Tipo de Transmisor:";
 "settingsviews_transmitterid" = "ID del Transmisor:";
+"settingsviews_transmitterid_text_for_button" = "ID del Transmisor";
 "settingsviews_givetransmitterid" = "ID del Transmisor";
 "settingsviews_resettransmitter" = "Resetear Transmisor";
 "settingsviews_webooptransmitter" = "Usar Algoritmo Libre?";

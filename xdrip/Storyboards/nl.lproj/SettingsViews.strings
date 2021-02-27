@@ -1,5 +1,6 @@
 "settingsviews_transmittertype" = "Zender Type";
 "settingsviews_transmitterid" = "Zender-ID";
+"settingsviews_transmitterid_text_for_button" = "Zender-ID";
 
 "settingsviews_settingstitle" = "Instellingen";
 "settingsviews_sectiontitlegeneral" = "Algemeen";
@@ -19,8 +20,6 @@
 "settingsviews_showcoloredobjectives" = "Toon Gekleurde Lijnen?";
 "settingsviews_showtarget" = "Toon Doel Lijn?";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
-"settingsviews_transmittertype" = "Transmitter Type:";
-"settingsviews_transmitterid" = "Transmitter ID:";
 "settingsviews_givetransmitterid" = "Voer Transmitter ID In";
 "settingsviews_resettransmitter" = "Reset Transmitter";
 "settingsviews_webooptransmitter" = "Gebruik Libre Algoritme?";
