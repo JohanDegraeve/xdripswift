@@ -1,9 +1,7 @@
 "dexcomsharetestresult_verificationsuccessfulalerttitle" = "Verificação Com Sucesso";
 "dexcomsharetestresult_verificationsuccessfulalertbody" = "Sua conta Dexcom Share foi verificada com sucesso";
 "dexcomsharetestresult_verificationerroralerttitle" = "Erro de Verificação";
-"dexcomsharetestresult_SSO_AuthenticateAccountNotFound" = "Conta Não Encontrada";
 "dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Máximo de logins atingidos. Aguarde 10 minutos para tentar novamente.";
-"dexcomsharetestresult_SSO_AuthenticatePasswordInvalid" = "Senha Inválida";
 "dexcomsharetestresult_uploadErrorWarning" = "Erro Envio Dexcom Share";
 "dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Número de série Dexcom Share não corresponde com o número desta conta. Verifique o Número de série nas configurações.";
 "dexcomsharetestresult_monitored_receiver_not_assigned_1" = "Parece que o ID do Transmissor ou Número de Série";

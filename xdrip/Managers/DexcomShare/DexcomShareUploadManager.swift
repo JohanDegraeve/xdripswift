@@ -688,9 +688,9 @@ class DexcomShareUploadManager:NSObject {
         guard let errorText = errorText else {return nil}
         
         if errorText.uppercased() == "SSO_AuthenticateAccountNotFound".uppercased() {
-            return Texts_DexcomShareTestResult.authenticateAccountNotFound
+            return Texts_Common.invalidAccountOrPassword
         } else if errorText.uppercased() == "SSO_AuthenticatePasswordInvalid".uppercased() {
-            return Texts_DexcomShareTestResult.authenticatePasswordInvalid
+            return Texts_Common.invalidAccountOrPassword
         } else if errorText.uppercased() == "SSO_AuthenticateMaxAttemptsExceeed".uppercased() {
             return Texts_DexcomShareTestResult.authenticateMaxAttemptsExceeded
         } else {

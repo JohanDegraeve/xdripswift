@@ -33,3 +33,5 @@
 "hardware" = "Hardware";
 "unknown" = "Onbekend";
 "sensorStatus" = "Sensor status:";
+/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
+"invalidAccountOrPassword" = "Verkeerde account en/of paswoord";

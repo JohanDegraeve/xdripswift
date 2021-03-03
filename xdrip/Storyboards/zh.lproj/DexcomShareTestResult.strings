@@ -1,9 +1,7 @@
 "dexcomsharetestresult_verificationsuccessfulalerttitle" = "账号验证成功";
 "dexcomsharetestresult_verificationsuccessfulalertbody" = "你的德康账号已经验证通过";
 "dexcomsharetestresult_verificationerroralerttitle" = "账号验证错误";
-"dexcomsharetestresult_SSO_AuthenticateAccountNotFound" = "没有查到到这个账号";
 "dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "超过最大登陆尝试次数限制. 等待10分钟然后再试.";
-"dexcomsharetestresult_SSO_AuthenticatePasswordInvalid" = "密码错误";
 "dexcomsharetestresult_uploadErrorWarning" = "上传到德康服务器遇到错误";
 "dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Dexcom Share 序列号与这个账号的序列号不匹配，检查序列号设置";
 "dexcomsharetestresult_monitored_receiver_not_assigned_1" = "看起来发射器ID或者序列号";
