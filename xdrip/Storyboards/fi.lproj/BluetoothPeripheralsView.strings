@@ -1,0 +1,5 @@
+"screenTitle" = "Bluetooth";
+"selectCategory" = "Valitse laitetyyppi";
+"selectType" = "Valitse lähettimen tyyppi";
+"batteryLevel" = "Varaustaso";
+"noMultipleActiveCGMsAllowed" = "Sinulla voi olla vain yksi CGM-lähetin, joka on yhdistetty tai jota etsitään.\nVarmista muut CGM-lähettimet ja napsauta 'Lopeta skannaus', 'Katkaise yhteys' tai vain poista ne";

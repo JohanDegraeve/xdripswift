@@ -1,0 +1,130 @@
+"settingsviews_settingstitle" = "Configuración";
+"settingsviews_sectiontitlegeneral" = "General";
+"settingsviews_selectbgunit" = "Seleccionar Unidades:";
+"settingsviews_masterorfollower" = "Master o Seguidor?";
+"settingsviews_master" = "Master";
+"settingsviews_follower" = "Seguidor";
+"showReadingInNotification" = "Mostrar en Notificaciones?";
+"labelShowReadingInAppBadge" = "Mostrar en el icono de la app?";
+"multipleAppBadgeValueWith10" = "Multiplicar valor por 10 en el icono de la app?";
+"settingsviews_urgentHighValue" = "Valor de Glucemia Alta (Urgente):";
+"settingsviews_highValue" = "Valor de Glucemia Alta:";
+"settingsviews_targetValue" = "Valor Objectivo:";
+"settingsviews_lowValue" = "Valor de Glucemia Baja:";
+"settingsviews_urgentLowValue" = "Valor de Glucemia Baja (Urgente):";
+"settingsviews_useobjectives" = "Mostrar Objetivos?";
+"settingsviews_showcoloredobjectives" = "Mostrar Colores?";
+"settingsviews_showtarget" = "Mostrar Línea Target?";
+"settingsviews_sectiontitletransmitter" = "Transmisor";
+"settingsviews_transmittertype" = "Tipo de Transmisor:";
+"settingsviews_transmitterid" = "ID del Transmisor:";
+"settingsviews_transmitterid_text_for_button" = "ID del Transmisor";
+"settingsviews_givetransmitterid" = "ID del Transmisor";
+"settingsviews_resettransmitter" = "Resetear Transmisor";
+"settingsviews_webooptransmitter" = "Usar Algoritmo Libre?";
+"settingsviews_nonfixedtransmitter" = "Habilitar Calibración Multi-punto?";
+"settingsviews_labelNonFixed" = "Calibración Multi-punto";
+"settingsviews_labelWebOOP" = "Algoritmo xDrip o Libre";
+"transmitterId8OrHigherNotSupported" = "Los transmisores con ID 8Gxxxx o más nuevos no son compatibles de momento!";
+"settingsviews_sectiontitlealerting" = "Alarma";
+"settingsviews_row_alert_types" = "Tipos de Alarmas";
+"settingsviews_row_alerts" = "Alarmas";
+"settingsviews_sectiontitlehealthkit" = "Apple Health";
+"settingsviews_healthkit" = "Grabar Datos en Apple Health?";
+"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Subir Datos a Dexcom Share?";
+"settingsviews_dexcomShareSerialNumber" = "Número de Serie del Receptor:";
+"settingsviews_useUSDexcomShareurl" = "Usar Servidores Dexcom EEUU?";
+"settingsviews_dexcomShareAccountName" = "Nombre de Cuenta:";
+"settingsviews_giveDexcomShareAccountName" = "Entrar el Nombre de tu Cuenta Dexcom Share";
+"settingsviews_giveDexcomSharePassword" = "Entrar la  Contraseña para tu Cuenta Dexcom Share";
+"settingsviews_giveDexcomShareSerialNumber" = "Entrar el número de serie del receptor Dexcom:";
+"settingsviews_sectiontitlenightscout" = "NightScout";
+"settingsviews_nightScoutEnabled" = "Habilitar Nightscout?";
+"settingsviews_useSchedule" = "Fijar Horario de Subida de Datos?";
+"schedule" = "Horario:";
+"settingsviews_giveNightScoutUrl" = "Entrar tu URL NightScout";
+"settingsviews_giveNightScoutAPIKey" = "Entrar tu API_SECRET";
+"editScheduleTimePickerSubtitle" = "Cambiar: ";
+"timeScheduleViewTitle" = "Fijar horario para ";
+"uploadSensorStartTime" = "Subir Hora de Inicio de Sensor?";
+"testUrlAndAPIKey" = "Comprobar Conexión?";
+"settingsviews_sectiontitlespeak" = "Voz";
+"settingsviews_speakBgReadings" = "Anunciar Lecturas Glucemia";
+"settingsviews_speakBgReadingslanguage" = "Idioma";
+"settingsviews_speakreadingslanguageselection" = "Seleccionar Idioma";
+"settingsviews_speakTrend" = "Anunciar Tendencia";
+"settingsviews_speakDelta" = "Anunciar Delta";
+"settingsviews_speakInterval" = "Intervalo";
+"settingsviews_speakIntervalMessage" = "Intervalo mínimo entre dos lecturas (mins)";
+"settingsviews_Version" = "Versión:";
+"settingsviews_license" = "Licencia";
+"settingsviews_build" = "Compilación:";
+"m5stack_settingsviews_settingstitle" = "Configuración M5 Stack";
+"m5stack_settingsviews_textColor" = "Color del Texto";
+"m5stack_settingsviews_backGroundColor" = "Color del Fondo";
+"m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
+"m5stack_settingsviews_giveBluetoothPassword" = "Entrar Contraseña Bluetooth";
+"m5stack_settingsviews_brightness" = "Brillo de Pantalla Brightness";
+"appleWatchSectionTitle" = "Apple Watch";
+"createCalendarEvent" = "Crear Eventos en el Calendario?";
+"calenderId" = "Qué calendario se debe usar?";
+"displayTrendInCalendarEvent" = "Mostrar Tendencia?";
+"displayUnitInCalendarEvent" = "Mostrar Unidad?";
+"displayDeltaInCalendarEvent" = "Mostrar Delta?";
+"infoCalendarAccessDeniedByUser" = "Has denegado previamente permiso para acceder al calendario.\n\nPara habilitarlo de nuevo, ir a Configuración en tu iPhone, Privacidad, Calendarios y habilitarlo.";
+"infoCalendarAccessRestricted" = "No se puede autorizar a que xDrip4iOS tenga acceso a tu calendario. Podría ser debido a que restricciones tipo Controles Parentales o similares lo están impidiendo.";
+"sectionTitleTrace" = "Rastrear/Issue Reporting";
+"sendTraceFile" = "Enviar Archivo de Rastreo";
+"describeProblem" = "Explicar en detalle porqué es necesario enviar este archivo de rastreo. Si ya has reportando previamente este problema en el grupo de Facebook 'xDrip4iOS', confirmar tu Nombre en Facebook dentro del cuerpo del correo";
+"emailNotConfigured" = "Deberías tener configurado una cuenta de correo antes de enviar el archivo.";
+"emailbodyText" = "Problem Description: ";
+"failedToSendEmail" = "Error al Enviar Correo";
+"volumeTestSoundPlayer" = "Comprobar Volumen (en Modo Silencio)";
+"volumeTestiOSSound" = "Comprobar Volumen (volumen actual del iPhone)";
+"debugLevel" = "Incluir Datos Nivel Debug";
+"warningChangeFromMasterToFollower" = "Si cambias el modo de Master a Seguidor se parará la sesión del sensor actual. Quieres continuar?";
+"nightScoutPort" = "Puerto (opcional):";
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test
+"volumeTestSoundPlayerExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.";
+
+/// nightscout settings, where user can set the nightscout api key
+"settingsviews_nightScoutAPIKey" = "API_SECRET:";
+
+/// nightscout settings, where user can set the nightscout url
+"settingsviews_nightScoutUrl" = "URL:";
+
+/// about settings, section title
+"settingsviews_sectiontitleAbout" = "About xDrip4iOS";
+
+/// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
+"volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// deloper settings, row title for 'Smooth Libre Values?'
+"smoothLibreValues" = "Smooth Libre Values?";
+
+/// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
+"oslog" = "OSLog";
+
+/// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
+"nslog" = "NSLog";
+
+/// Developer Settings, section title
+"developerSettings" = "Developer Settings";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// home screen settings, section title
+"settingsviews_sectiontitlehomescreen" = "Home Screen";

@@ -1,0 +1,116 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// literally 'OK'
+"common_Ok" = "OK";
+
+/// blood glucose unit in short, for text field title
+"common_bloodglucoseunit_short" = "BG Unit";
+
+/// for settings row, literally firmware
+"firmware" = "Firmware";
+
+/// literal translation needed
+"common_minute" = "min";
+
+/// on
+"on" = "On";
+
+/// red
+"red" = "red";
+
+/// mmol/l
+"common_mmol" = "mmol/l";
+
+/// the word LOW, in capitals
+"common_low" = "LOW";
+
+/// literal translation needed
+"common_day" = "day";
+
+/// 
+"off" = "Off";
+
+/// for settings row, literally hardware
+"hardware" = "Hardware";
+
+/// literal translation needed
+"common_week" = "week";
+
+/// to show the sensor status
+"sensorStatus" = "Sensor status:";
+
+/// can be used in several screens, just the words Bloodglucose unit
+"common_bloodglucoseunit" = "Blood Glucose Unit";
+
+/// literal translation needed
+"common_hours" = "hours";
+
+/// literally default, will be the name of default alerttypes that will be created during initial app launch
+"common_default" = "Default";
+
+/// literally add
+"add" = "Add";
+
+/// literal translation needed
+"common_hour" = "hour";
+
+/// yellow
+"yellow" = "yellow";
+
+/// literally update
+"update" = "Edit";
+
+/// 
+"delete" = "Delete";
+
+/// literally password
+"common_password" = "Password:";
+
+/// literally no, without capital
+"no" = "No";
+
+/// green
+"green" = "green";
+
+/// name
+"name" = "Name:";
+
+/// literal translation needed
+"common_minutes" = "mins";
+
+/// literally yes, without capital
+"yes" = "Yes";
+
+/// literally 'Cancel'
+"common_cancel" = "Cancel";
+
+/// literally warning
+"warning" = "Warning!";
+
+/// white
+"white" = "white";
+
+/// WiFi
+"WiFi" = "WiFi";
+
+/// mg/dl
+"common_mgdl" = "mg/dl";
+
+/// whenever invalid value is given by user somewhere in a field
+"invalidValue" = "Invalid Value";
+
+/// general usage
+"unknown" = "Unknown";
+
+/// the word HIGH, in capitals
+"common_high" = "HIGH";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
+"invalidAccountOrPassword" = "Invalid account or password";

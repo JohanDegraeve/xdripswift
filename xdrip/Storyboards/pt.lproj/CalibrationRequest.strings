@@ -1,0 +1,4 @@
+ "enter_calibration_value" = "Introduzir Valor de Calibração";
+"calibration_title" = "Calibração";
+"calibration_notification_title" = "Calibração";
+"calibration_notification_body" = "Pressione na Notificação para Calibrar";

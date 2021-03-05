@@ -1,3 +1,0 @@
-"error_message_Dexcom_transmitter_id_invalid_characters" = "Lähettimen id:ssa ainoastaan merkkejä a-z, A-Z, 0-9";
-"error_message_transmitter_id_should_have_length_6" = "Lähettimen id:n pituus on oltava 6";
-"error_message_transmitter_id_should_have_length_5" = "Lähettimen id:n pituus on oltava 5";

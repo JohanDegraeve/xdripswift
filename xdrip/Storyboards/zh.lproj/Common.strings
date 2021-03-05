@@ -16,3 +16,67 @@
 "warning" ="警报 !";
 "update" = "更新";
 "add" = "添加";
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// for settings row, literally firmware
+"firmware" = "Firmware";
+
+/// for settings row, literally hardware
+"hardware" = "Hardware";
+
+/// on
+"on" = "On";
+
+/// red
+"red" = "red";
+
+/// 
+"off" = "Off";
+
+/// to show the sensor status
+"sensorStatus" = "Sensor status:";
+
+/// yellow
+"yellow" = "yellow";
+
+/// 
+"delete" = "Delete";
+
+/// literally no, without capital
+"no" = "No";
+
+/// green
+"green" = "green";
+
+/// name
+"name" = "Name:";
+
+/// literally yes, without capital
+"yes" = "Yes";
+
+/// literally 'Cancel'
+"common_cancel" = "Cancel";
+
+/// white
+"white" = "white";
+
+/// WiFi
+"WiFi" = "WiFi";
+
+/// whenever invalid value is given by user somewhere in a field
+"invalidValue" = "Invalid Value";
+
+/// general usage
+"unknown" = "Unknown";
+
+/// literally 'OK'
+"common_Ok" = "OK";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
+"invalidAccountOrPassword" = "Invalid account or password";

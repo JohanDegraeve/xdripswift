@@ -173,7 +173,7 @@ class BluetoothPeripheralViewController: UIViewController {
             // if needs transmitterId, but no transmitterId is given by user, then button allows to set transmitter id, row text = "needs transmitter id"
             if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType, expectedBluetoothPeripheralType.needsTransmitterId(), transmitterId == nil {
                 
-                connectButtonOutlet?.setTitle(Texts_SettingsView.labelTransmitterId, for: .normal)
+                connectButtonOutlet?.setTitle(Texts_SettingsView.labelTransmitterIdTextForButton, for: .normal)
                 
                 return Texts_BluetoothPeripheralView.needsTransmitterId
                 
@@ -232,7 +232,7 @@ class BluetoothPeripheralViewController: UIViewController {
         
         // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
         tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
-        
+
     }
     
     /// the BluetoothPeripheralViewController has already a few sections defined (eg bluetooth, weboop). This is the amount of sections defined in BluetoothPeripheralViewController.
@@ -894,6 +894,8 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     cell.textLabel?.text = Texts_BluetoothPeripheralView.connectedAt
                     cell.detailTextLabel?.text = ""
                 }
+                
+                cell.accessoryType = .none
 
             }
 
@@ -972,9 +974,6 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                         
                         bluetoothPeripheralManager.receivedNewValue(webOOPEnabled: isOn, for: bluetoothPeripheral)
                         
-                        tableView.reloadSections(IndexSet(integer: self.webOOPSettingsSectionNumber), with: .none)
-                        
-                        
                         // if user switches on web oop, then we need to force also use of non-fixed slopes to off
                         if isOn {
 
@@ -985,7 +984,8 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                         }
 
                         // reload the section for nonFixedSettingsSectionNumber, even though the value may not have changed, because possibly isUserInteractionEnabled needs to be set to false for the nonFixedSettingsSectionNumber UISwitch
-                        tableView.reloadSections(IndexSet(integer: self.nonFixedSettingsSectionNumber), with: .none)
+                        // also reload webOOPSettingsSectionNumber
+                        tableView.reloadSections(IndexSet(arrayLiteral: self.nonFixedSettingsSectionNumber, self.webOOPSettingsSectionNumber), with: .none)
 
                     }
                     
@@ -1188,11 +1188,8 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         // handled in BluetoothPeripheralManager
         bluetoothPeripheralManager?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
         
-        // refresh row with status
-        tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
-        
-        // refresh row with connection timestamp
-        tableView.reloadRows(at: [IndexPath(row: Setting.connectOrDisconnectTimeStamp.rawValue, section: 0)], with: .none)
+        // refresh complete first section (only status and connection timestamp changed but reload complete section)
+        tableView.reloadSections(IndexSet(integer: 0), with: .none)
         
     }
     
@@ -1201,12 +1198,9 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         // handled in BluetoothPeripheralManager
         bluetoothPeripheralManager?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
         
-        // refresh row with status
-        tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+        // refresh complete first section (only status and connection timestamp changed but reload complete section)
+        tableView.reloadSections(IndexSet(integer: 0), with: .none)
 
-        // refresh row with connection timestamp
-         tableView.reloadRows(at: [IndexPath(row: Setting.connectOrDisconnectTimeStamp.rawValue, section: 0)], with: .none)
-        
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
@@ -1216,10 +1210,8 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         
         // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
         // do this whenever the bluetooth status changes
-        tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
-        
-        // same explanation for connection timestamp
-        tableView.reloadRows(at: [IndexPath(row: Setting.connectOrDisconnectTimeStamp.rawValue, section: 0)], with: .none)
+        // refresh complete first section (only status and connection timestamp changed but reload complete section)
+        tableView.reloadSections(IndexSet(integer: 0), with: .none)
 
     }
     

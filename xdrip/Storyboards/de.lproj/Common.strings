@@ -1,0 +1,117 @@
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// blood glucose unit in short, for text field title
+"common_bloodglucoseunit_short" = "BG Unit";
+
+/// literal translation needed
+"common_hour" = "hour";
+
+/// for settings row, literally hardware
+"hardware" = "Hardware";
+
+/// 
+"delete" = "Delete";
+
+/// to show the sensor status
+"sensorStatus" = "Sensor status:";
+
+/// yellow
+"yellow" = "yellow";
+
+/// literal translation needed
+"common_minute" = "min";
+
+/// literally yes, without capital
+"yes" = "Yes";
+
+/// literal translation needed
+"common_minutes" = "mins";
+
+/// green
+"green" = "green";
+
+/// general usage
+"unknown" = "Unknown";
+
+/// red
+"red" = "red";
+
+/// literally no, without capital
+"no" = "No";
+
+/// literally add
+"add" = "Add";
+
+/// can be used in several screens, just the words Bloodglucose unit
+"common_bloodglucoseunit" = "Blood Glucose Unit";
+
+/// literally update
+"update" = "Edit";
+
+/// literally password
+"common_password" = "Password:";
+
+/// literal translation needed
+"common_hours" = "hours";
+
+/// the word LOW, in capitals
+"common_low" = "LOW";
+
+/// whenever invalid value is given by user somewhere in a field
+"invalidValue" = "Invalid Value";
+
+/// for settings row, literally firmware
+"firmware" = "Firmware";
+
+/// literally 'OK'
+"common_Ok" = "OK";
+
+/// literal translation needed
+"common_day" = "day";
+
+/// WiFi
+"WiFi" = "WiFi";
+
+/// on
+"on" = "On";
+
+/// white
+"white" = "white";
+
+/// name
+"name" = "Name:";
+
+/// mmol/l
+"common_mmol" = "mmol/l";
+
+/// 
+"off" = "Off";
+
+/// literally 'Cancel'
+"common_cancel" = "Cancel";
+
+/// literally default, will be the name of default alerttypes that will be created during initial app launch
+"common_default" = "Default";
+
+/// literally warning
+"warning" = "Warning!";
+
+/// mg/dl
+"common_mgdl" = "mg/dl";
+
+/// literal translation needed
+"common_week" = "week";
+
+/// the word HIGH, in capitals
+"common_high" = "HIGH";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
+"invalidAccountOrPassword" = "Invalid account or password";

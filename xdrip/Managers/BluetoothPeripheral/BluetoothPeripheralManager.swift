@@ -247,6 +247,33 @@ class BluetoothPeripheralManager: NSObject {
                         
                     }
                  
+                case .AtomType:
+                    
+                    if let atom = blePeripheral.atom {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: atom)
+                        
+                        if atom.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMAtomTransmitter, CGMAtomTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMAtomTransmitter(address: atom.blePeripheral.address, name: atom.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMAtomTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: atom.blePeripheral.sensorSerialNumber, webOOPEnabled: atom.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: atom.blePeripheral.nonFixedSlopeEnabled, firmWare: atom.firmware), at: index)
+                            
+                            // if AtomType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
                 case .DexcomG4Type:
                     
                     if let dexcomG4 = blePeripheral.dexcomG4 {
@@ -486,7 +513,7 @@ class BluetoothPeripheralManager: NSObject {
                     // no need to send reading to watlaa in master mode
                     break
                     
-                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .Libre2Type:
+                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .Libre2Type, .AtomType:
                     // cgm's don't receive reading, they send it
                     break
                     
@@ -622,6 +649,21 @@ class BluetoothPeripheralManager: NSObject {
                         }
                     }
                     
+                case .AtomType:
+                    
+                    if let atom = bluetoothPeripheral as? Atom {
+                        
+                        if let cgmTransmitterDelegate = cgmTransmitterDelegate  {
+                            
+                            newTransmitter = CGMAtomTransmitter(address: atom.blePeripheral.address, name: atom.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMAtomTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: atom.blePeripheral.sensorSerialNumber, webOOPEnabled: atom.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: atom.blePeripheral.nonFixedSlopeEnabled, firmWare: atom.firmware)
+                            
+                        } else {
+                            
+                            trace("in getBluetoothTransmitter, case AtomType but cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+                            
+                        }
+                    }
+                    
                 case .DropletType:
                     
                     if let droplet = bluetoothPeripheral as? Droplet {
@@ -752,6 +794,11 @@ class BluetoothPeripheralManager: NSObject {
                     return .MiaoMiaoType
                 }
                 
+            case .AtomType:
+                if bluetoothTransmitter is CGMAtomTransmitter {
+                    return .AtomType
+                }
+                
             case .BluconType:
                 if bluetoothTransmitter is CGMBluconTransmitter {
                     return .BluconType
@@ -837,6 +884,14 @@ class BluetoothPeripheralManager: NSObject {
             }
             
             return CGMMiaoMiaoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate,  sensorSerialNumber: nil, webOOPEnabled: nil, nonFixedSlopeEnabled: nil)
+            
+        case .AtomType:
+            
+            guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, AtomType, cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMAtomTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMAtomTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: nil, webOOPEnabled: nil, nonFixedSlopeEnabled: nil, firmWare: nil)
             
         case .DropletType:
             
@@ -1117,7 +1172,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .WatlaaType, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .Libre2Type:
+            case .WatlaaType, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .Libre2Type, .AtomType:
                 
                 // nothing to check
                 break

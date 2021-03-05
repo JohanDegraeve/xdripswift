@@ -20,25 +20,12 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string>com.alekst1d.xdripswift</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>xdrip</string>
-			</array>
-		</dict>
-	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>
-	<string>DiaBLE uses NFC to scan Libre sensors.</string>
+	<string>xDrip4iOS uses NFC to scan Libre sensors.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict/>
 	<key>NSBluetoothAlwaysUsageDescription</key>

@@ -292,7 +292,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                             let batteryPercentage = Int(rxBuffer[13])
                             
                             // get sensor serialNumber and if changed inform delegate
-                            if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))) {
+                            if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)), with: nil) {
                                 
                                 // verify serial number
                                 // (there will also be a seperate opcode form MiaoMiao because it's able to detect new sensor also)
@@ -317,7 +317,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                             // send batteryPercentage to delegate
                             cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
                             
-                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13))), patchInfo: nil, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: false, testTimeStamp: nil, completionHandler:  { (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)), with: nil)?.serialNumber, patchInfo: nil, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: false, testTimeStamp: nil, completionHandler:  { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 // TODO : use sensorState as in MiaoMiao and Bubble : show the status on bluetoothPeripheralView
                                 

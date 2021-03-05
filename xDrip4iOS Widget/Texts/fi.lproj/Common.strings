@@ -1,0 +1,7 @@
+"common_mgdl" = "mg/dl";
+"common_mmol" = "mmol/l";
+"common_high" = "KORKEA";
+"common_low" = "MATALA";
+"common_minutes" = "minuuttia";
+"common_minute" = "min";
+"ago" = "sitten";

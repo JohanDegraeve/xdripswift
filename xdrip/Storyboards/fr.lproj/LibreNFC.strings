@@ -1,0 +1,20 @@
+/// after scanning NFC, scan complete message
+"scanComplete" = "Scan réalisé";
+
+/// when NFC scanning is started, this message will appear
+"holdTopOfIphoneNearSensor" = "Positionner le haut de votre iPhone près du capteur à scanner";
+
+/// Device must support at least iOS 14.0
+"deviceMustSupportIOS14" = "Pour connecter au Libre 2, votre iPhone doit être mis à jour à la version IOS14";
+
+/// Device must support NFC
+"deviceMustSupportNFC" = "Cet iPhone ne supporte pas le NFC";
+
+/// After Libre NFC scanning, and after successful bluetooth connection, this message will be shown to explain that he or she should not allow bluetooth permission on the Libre app
+"donotusethelibrelinkapp" = "Connecté au Libre 2.\r\n\r\nSi vous voulez conserver la possitibilité de scanner votre capteur avec l'application officielle Libre, il est nécessaire de desactiver l'autorisation du bluetooth à l'application Libre. \r\n\r\nSinon, scanner en NFC avec l'app Libre car l'autorisation de bluetooth de l'app Libre provoquera une coupure de fonctionnement entre xDrip4iOS et le capteur Libre 2.";
+
+/// The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.
+"connectedLibre2DoesNotMatchScannedLibre2" = "Il semble que vous avez scanné un nouveau capteur mais xDrip4iOS a une connexion Bluetooth avec un ancien capteur.\r\n\r\nPour résoudre :\r\n- Cliquez 'Déconnecter' ou 'Stopper Scan'\r\n- Retourner dans l'écran précédent et ajouter un new CGM de type Libre 2 et scanner en NFC à nouveau.\r\n\r\nxDrip4iOS devrait se connecter au capteur Libre 2.";
+
+/// Sometimes NFC scanning creates errors, retrying solves the problem. This is to explain this to the user
+"nfcErrorRetryScan" = "Erreur durant le scan du capteur. Cliquez 'Scan' en haut à gauche et scanner à nouveau votre capteur.";

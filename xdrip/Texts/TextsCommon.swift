@@ -149,4 +149,8 @@ class Texts_Common {
         return NSLocalizedString("sensorStatus", tableName: filename, bundle: Bundle.main, value: "Sensor status:", comment: "to show the sensor status")
     }()
     
+    static let invalidAccountOrPassword = {
+        return NSLocalizedString("invalidAccountOrPassword", tableName: filename, bundle: Bundle.main, value: "Invalid account or password", comment: "Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share")
+    }()
+    
 }

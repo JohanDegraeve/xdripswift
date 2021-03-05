@@ -1,0 +1,9 @@
+"dexcomsharetestresult_verificationsuccessfulalerttitle" = "Todennettu onnistuneesti";
+"dexcomsharetestresult_verificationsuccessfulalertbody" = "Dexcom Share tilisi on vahvistettu onnistuneesti";
+"dexcomsharetestresult_verificationerroralerttitle" = "Todentamimisessa virhe";
+"dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Maksimimäärä kirjautumisyrityksiä. Odota 10 minuuttia ja yritä uudestaan.";
+"dexcomsharetestresult_uploadErrorWarning" = "Dexcom Share lataus virhe";
+"dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Dexcom Share sarjanumero ei vastaa tämän tilin sarjanumeroa. Varmista sarjanumero asetuksissa.";
+"dexcomsharetestresult_monitored_receiver_not_assigned_1" = "Näyttää lähettimen tunnuksen tai sarjanumeron";
+"dexcomsharetestresult_monitored_receiver_not_assigned_2" = "ei ole osoitettu";
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Rekisteröi lähetin (G5) tai Share-vastaanotin (G4) virallisella Dexcom-sovelluksella\r\n\r\nKäytät todennäköisesti väärää URL-osoitetta, tarkista asetus 'Käytä USA URL-osoitetta?'";

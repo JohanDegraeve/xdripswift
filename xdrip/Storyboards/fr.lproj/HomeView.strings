@@ -1,7 +1,7 @@
 "presnooze" = "Snooze";
 "sensor" = "Capteur";
 "calibrate" = "Calibrer";
-"statusactiontitle" = "Status";
+"statusactiontitle" = "Statut";
 "scanbluetoothdeviceactiontitle" = "Scanner le transmetteur";
 "forgetbluetoothdeviceactiontitle" = "Oublier le transmetteur";
 "startsensor" = "Débuter Capteur";
@@ -32,4 +32,3 @@
 "failed" = "Echec";
 "calibrationNotNecessary" = "Avec l'activation d'OOPWeb, la calibration n'est plus nécessaire pour le capteur Libre.";
 "dexcomBatteryTooLow" = "La batterie du transmetteur est trop faible!";
-"sensorAge14Days" = "Le capteur a atteint son age maximale.";

@@ -12,6 +12,7 @@
 "settingsviews_sectiontitletransmitter" = "جهاز الإرسال";
 "settingsviews_transmittertype" = "نوع جهاز الإرسال:";
 "settingsviews_transmitterid" = "رقم هوية جهاز الإرسال:";
+"settingsviews_transmitterid_text_for_button" = "رقم هوية جهاز الإرسال";
 "settingsviews_givetransmitterid" = "أدخل رقم هوية جهاز الإرسال";
 "settingsviews_resettransmitter" = "إعادة تعيين جهاز الإرسال";
 "transmitterId8OrHigherNotSupported" = "جهاز الإرسال برمز الهوية 8Gxxxx أو الأحدث غير مدعوم!";
@@ -76,3 +77,70 @@
 "volumeTestSoundPlayer" = "اختبار مستوى الصوت (مع تفعيل تجاوز وضع الصامت)";
 "volumeTestiOSSound" = "اختبار مستوى الصوت (مستوى الصوت الحالي للآيفون)";
 "debugLevel" = "تضمين مستوى التصحيح";
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// home screen settings, urgent high value
+"settingsviews_urgentHighValue" = "Urgent High Value:";
+
+/// 
+"settingsviews_urgentLowValue" = "Urgent Low Value:";
+
+/// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
+"settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration?";
+
+/// home screen settings, use objectives in graph
+"settingsviews_useobjectives" = "Show Objectives in Graph?";
+
+/// non fixed settings, title of the section
+"settingsviews_labelNonFixed" = "Multi-point Calibration";
+
+/// 
+"settingsviews_showcoloredobjectives" = "Show Colored Lines?";
+
+/// nightscout settings, port to use
+"nightScoutPort" = "Port (optional):";
+
+/// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
+"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
+
+/// home screen settings, show target line
+"settingsviews_showtarget" = "Show Target Line?";
+
+/// about settings, section title
+"settingsviews_sectiontitleAbout" = "About xDrip4iOS";
+
+/// web oop settings in bluetooth peripheral view : enabled or not
+"settingsviews_webooptransmitter" = "Use Libre Algorithm?";
+
+/// 
+"settingsviews_labelWebOOP" = "xDrip or Libre Algorithm";
+
+/// home screen settings, target value
+"settingsviews_targetValue" = "Target Value:";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// deloper settings, row title for 'Smooth Libre Values?'
+"smoothLibreValues" = "Smooth Libre Values?";
+
+/// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
+"oslog" = "OSLog";
+
+/// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
+"nslog" = "NSLog";
+
+/// Developer Settings, section title
+"developerSettings" = "Developer Settings";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// home screen settings, section title
+"settingsviews_sectiontitlehomescreen" = "Home Screen";

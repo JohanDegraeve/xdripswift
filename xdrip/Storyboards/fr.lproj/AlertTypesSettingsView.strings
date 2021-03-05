@@ -15,3 +15,5 @@
 "alerttypenamealreadyexistsmessages" = "Une alerte avec le même nom existe. Utilisez un libellé différent";
 "confirmdeletionalerttype" = "Supprimer le type d'alerte: ";
 
+/// when editing an alert type, field title for Sound
+"alerttypesettingsview_sound" = "Son";

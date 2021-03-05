@@ -1,0 +1,109 @@
+"settingsviews_settingstitle" = "Asetukset";
+"settingsviews_sectiontitlegeneral" = "Yleinen";
+"settingsviews_sectiontitlehomescreen" = "Kotinäyttö";
+"settingsviews_selectbgunit" = "Verensokeriyksikkö:";
+"settingsviews_urgentLowValue" = "Erittäin matala lukema:";
+"settingsviews_lowValue" = "Matala lukema:";
+"settingsviews_highValue" = "Korkea lukema:";
+"settingsviews_urgentHighValue" = "Erittäin korkea lukema:";
+"settingsviews_masterorfollower" = "Isäntä vai seuraaja?";
+"settingsviews_master" = "Isäntä";
+"settingsviews_follower" = "Seuraaja";
+"showReadingInNotification" = "Näytä lukema ilmoituksissa?";
+"labelShowReadingInAppBadge" = "Näytä lukema kuvakkeessa?";
+"multipleAppBadgeValueWith10" = "Kerrotaanko kuvake lukemat 10:llä?";
+"settingsviews_sectiontitletransmitter" = "Lähetin";
+"settingsviews_transmittertype" = "Lähettimen tyyppi:";
+"settingsviews_transmitterid" = "Lähettimen ID:";
+"settingsviews_transmitterid_text_for_button" = "Lähettimen ID";
+"settingsviews_givetransmitterid" = "Anna lähetettimen ID";
+"settingsviews_resettransmitter" = "Nollaa lähetin";
+"settingsviews_webooptransmitter" = "Käytä Libre algorithmiä?";
+"settingsviews_nonfixedtransmitter" = "Käytä monipistekalibrointia?";
+"settingsviews_labelNonFixed" = "Monipistekalibrointi";
+"settingsviews_labelWebOOP" = "xDrip vai Libre algorithmi";
+"transmitterId8OrHigherNotSupported" = "Lähettimet ID:llä 8Gxxxx tai uudemmat eivät ole tuettu!";
+"settingsviews_sectiontitlealerting" = "Hälytys";
+"settingsviews_row_alert_types" = "Hälytystyypit";
+"settingsviews_row_alerts" = "Hälytykset";
+"settingsviews_sectiontitlehealthkit" = "Apple Health";
+"settingsviews_healthkit" = "Kirjoita data Apple Healthiin?";
+"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Lähetä Dexcom Share palveluun?";
+"settingsviews_dexcomShareSerialNumber" = "Vastaanottimen sarjanumero:";
+"settingsviews_useUSDexcomShareurl" = "Käytä Dexcom US palvelimia?";
+"settingsviews_dexcomShareAccountName" = "Käyttäjätunnus:";
+"settingsviews_giveDexcomShareAccountName" = "Anna Dexcom Sharen käyttäjätunnus";
+"settingsviews_giveDexcomSharePassword" = "Anna Dexcom Sharen salasana";
+"settingsviews_giveDexcomShareSerialNumber" = "Anna Dexcom vastaanottimen sarjanumero";
+"settingsviews_sectiontitlenightscout" = "NightScout";
+"settingsviews_nightScoutEnabled" = "Ota Nightscout käyttöön?";
+"settingsviews_nightScoutUrl" = "URL:";
+"settingsviews_useSchedule" = "Käytä lähetysaikataulua?";
+"schedule" = "Aikataulu:";
+"settingsviews_giveNightScoutUrl" = "Anna NightScout palvelimesi URL";
+"settingsviews_nightScoutAPIKey" = "API_SECRET:";
+"settingsviews_giveNightScoutAPIKey" = "Anna API_SECRET";
+"editScheduleTimePickerSubtitle" = "Muuta: ";
+"timeScheduleViewTitle" = "Päällä/pois aikataulu ";
+"uploadSensorStartTime" = "Lähetä sensorin aloitusaika?";
+"testUrlAndAPIKey" = "Testaa Nightscout URL ja API_SECRET?";
+"settingsviews_sectiontitlespeak" = "Ääni";
+"settingsviews_speakBgReadings" = "Puhu vs. lukemat?";
+"settingsviews_speakBgReadingslanguage" = "Kieli:";
+"settingsviews_speakreadingslanguageselection" = "Valitse kieli";
+"settingsviews_speakTrend" = "Puhu suunta?";
+"settingsviews_speakDelta" = "Puhu erotus?";
+"settingsviews_speakInterval" = "Intervalli:";
+"settingsviews_speakIntervalMessage" = "Kahden lukeman välinen vähimmäisväli minuutteina";
+"settingsviews_sectiontitleAbout" = "xDrip4iOS info";
+"settingsviews_Version" = "Versio:";
+"settingsviews_license" = "Lisenssi";
+"settingsviews_build" = "Build:";
+"m5stack_settingsviews_settingstitle" = "M5 Stack asetukset";
+"m5stack_settingsviews_textColor" = "Tekstiväri";
+"m5stack_settingsviews_backGroundColor" = "Taustaväri";
+"m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
+"m5stack_settingsviews_giveBluetoothPassword" = "Anna bluetooth salasana";
+"m5stack_settingsviews_brightness" = "Näytön kirkkaus";
+"appleWatchSectionTitle" = "Apple Watch";
+"createCalendarEvent" = "Luo kalenteritapahtumat?";
+"calenderId" = "Käytettävä kalenteri?";
+"displayTrendInCalendarEvent" = "Näytä suunta?";
+"displayUnitInCalendarEvent" = "Näytä yksikkö?";
+"displayDeltaInCalendarEvent" = "Näytä erotus?";
+"infoCalendarAccessDeniedByUser" = "Olet aiemmin kieltänyt pääsyn kalenteriin.\n\nOttaaksesi sen käyttöön, siirry laitteen asetuksiin, tietosuojaan, kalentereihin ja ota käyttöön.";
+"infoCalendarAccessRestricted" = "Et voi antaa xDrip4iOS:lle valtuutusta käyttää kalenteriasi. Tämä johtuu mahdollisesti aktiivisista rajoituksista, kuten vanhempien valvonnasta";
+"sectionTitleTrace" = "Ongelmien raportointi";
+"sendTraceFile" = "Lähetä ongelmaraportti";
+"describeProblem" = "Selitä mahdollisimman yksityiskohtaisesti, miksi sinun on lähetettävä jäljitystiedosto. Jos olet jo ilmoittanut ongelmastasi Facebook-tukiryhmässä 'xDrip4iOS', mainitse facebook-nimesi sähköpostissa";
+"emailNotConfigured" = "Sinun on määritettävä sähköpostitili iOS-laitteellasi.";
+"emailbodyText" = "Ongelman kuvaus: ";
+"failedToSendEmail" = "Sähköpostin lähetys epäonnistui";
+"volumeTestSoundPlayerExplanation" = "Hälytysääni toistetaan nyt samalla äänenvoimakkuudella, jota käytetään hälytystyyppiin, jossa 'Ohita mykistys' = Päällä\n\n(Käytetään kaikkiin hälytyksiin paitsi 'puuttuva lukema' hälytyksiin, joissa käytetään aina iOS-äänenvoimakkuutta)\n\nMuuta äänenvoimakkuutta äänenvoimakkuuspainikkeilla ja paina OK, kun olet valmis.";
+"volumeTestiOSSoundExplanation" = "Hälytysääni toistetaan nyt samalla äänenvoimakkuudella, jota käytetään hälytystyyppiin, jossa 'Ohita mykistys' = Pois\n\n(Käytetään myös 'puuttuva lukuma' hälytysten yhteydessä, jotka käyttävät iOS-äänenvoimakkuutta)\n\nPysäytä ääni painamalla yhtä äänenvoimakkuuspainikkeista, muuta sitten äänenvoimakkuus haluamallesi äänenvoimakkuuspainikkeella ja testaa uudelleen.";
+"volumeTestSoundPlayer" = "Testaa ääni (kun mykistys on ohitettu)";
+"volumeTestiOSSound" = "Testaa ääni (nykyinen iPhone voimakkuus)";
+"debugLevel" = "Sisällytä debug taso";
+"warningChangeFromMasterToFollower" = "Vaihtaminen masterista seuraajaan pysäyttää nykyisen anturin. Haluatko jatkaa?";
+"nightScoutPort" = "Portti:";
+"settingsviews_useobjectives" = "Käytä tavoitteita kaaviossa";
+"settingsviews_showcoloredobjectives" = "Näytä värilliset tavoiteviivat ";
+"settingsviews_showtarget" = "Näytä kohdeviiva";
+"settingsviews_targetValue" = "Tavoitearvo";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// deloper settings, row title for 'Smooth Libre Values?'
+"smoothLibreValues" = "Smooth Libre Values?";
+
+/// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
+"oslog" = "OSLog";
+
+/// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
+"nslog" = "NSLog";
+
+/// Developer Settings, section title
+"developerSettings" = "Developer Settings";

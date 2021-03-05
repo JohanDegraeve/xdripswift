@@ -1,6 +1,6 @@
 Project in development.
 
-If you want to participate to the testing, send an email to xdrip@proximus.be
+for info, send an email to xdrip@proximus.be
 
 Current Status :
 

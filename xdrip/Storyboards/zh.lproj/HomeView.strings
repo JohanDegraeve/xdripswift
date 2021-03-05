@@ -21,3 +21,43 @@
 "startsensorbeforecalibration" = "探头未启动结束之前，无法输入校准值.";
 "theremustbeareadingbeforecalibration" = "在输入指血之前，必须测两次血糖. 当输入一个指血值时，会要求你再次输入另外一个.";
 "sensornotdetected" = "未检测到探头. 请检查发射器是否正确安装在探头上.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// After clicking scan button, this message will appear
+"startScanningInfo" = "Scanning Started.\n\nKeep xDrip4iOS open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
+
+/// If transmitter needs pairing, user needs to click the notification
+"transmitternotpaired" = "The Transmitter is not paired with this iPhone. Open the application.";
+
+/// when user starts scanning for bluetooth device, but bluetooth is not authorized
+"bluetoothIsNotAuthorized" = "You did not give bluetooth permission for xDrip4iOS. Go to the settings, find the xDrip4iOS app, and enable Bluetooth.";
+
+/// To give info to user that the transmitter pairing requeset timed out
+"transmitterpairingattempttimeout" = "Transmitter did not reply to pairing request.";
+
+/// To give info to user that the transmitter is successfully paired
+"transmitterpairingsuccessful" = "The Transmitter was successfully paired.";
+
+/// When user has no CGM transmitter created with 'Always connect', and tries to calibrate, then this message is shown
+"theresNoCGMTransmitterActive" = "You cannot calibrate unless you have a transmitter connected.";
+
+/// If transmitter needs pairing, a notification was fired, user clicked it more than 60 seconds later, which is too late
+"transmitterpairingtoolate" = "Too late! The Transmitter has already been disconnected. You should get a new pairing request in a few minutes.";
+
+/// Literally 'Sensor', used as name in the button in the home screen, but also in text in pop ups
+"sensor" = "Sensor";
+
+/// To give result about transitter result in notification body, successful
+"success" = "Success";
+
+/// Error message in case Dexcom G5 (and G6?) battery is too low. This is deteced by wrong G5 values 2096896
+"dexcomBatteryTooLow" = "The Transmitter battery is too low!";
+
+/// if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible
+"calibrationNotNecessary" = "When using the Libre algoritm, it is not necessary to calibrate the sensor.";
+
+/// To give result about transitter result in notification body, failed
+"failed" = "Failed";

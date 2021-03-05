@@ -16,16 +16,8 @@ class Texts_DexcomShareTestResult {
         return NSLocalizedString("dexcomsharetestresult_verificationerroralerttitle", tableName: filename, bundle: Bundle.main, value: "Verification Error", comment: "POP up after verifying DexcomShare credentials, to say that verification of url and password was not successful - this is the title")
     }()
     
-    static let authenticateAccountNotFound: String = {
-        return NSLocalizedString("dexcomsharetestresult_SSO_AuthenticateAccountNotFound", tableName: filename, bundle: Bundle.main, value: "Account Not Found", comment: "if dexcom share login fails due to account not found")
-    }()
-    
     static let authenticateMaxAttemptsExceeded: String = {
         return NSLocalizedString("dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed", tableName: filename, bundle: Bundle.main, value: "Maximum login attempts exceeded. Wait 10 minutes and try again.", comment: "if dexcom share login fails , too many attempts")
-    }()
-    
-    static let authenticatePasswordInvalid: String = {
-        return NSLocalizedString("dexcomsharetestresult_SSO_AuthenticatePasswordInvalid", tableName: filename, bundle: Bundle.main, value: "Invalid Password", comment: "if dexcom share login fails due to invalid password")
     }()
     
     static let uploadErrorWarning: String = {

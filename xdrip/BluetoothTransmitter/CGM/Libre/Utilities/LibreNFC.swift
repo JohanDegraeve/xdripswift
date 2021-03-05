@@ -1,6 +1,8 @@
 import Foundation
-import CoreNFC
 import OSLog
+
+#if canImport(CoreNFC)
+import CoreNFC
 
 // source : https://github.com/gui-dos/DiaBLE/tree/master/DiaBLE
 
@@ -150,8 +152,12 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                     
                                     if let error = error {
                                         
-                                        self.trace(systemError: error, ownErrorString: "error while reading multiple blocks (#\(i * requestBlocks) - #\(i * requestBlocks + (i == requests - 1 ? (remainder == 0 ? requestBlocks : remainder) : requestBlocks) - (requestBlocks > 1 ? 1 : 0))):", invalidateSession: true, session: session)
+                                        let debugInfo = "error while reading multiple blocks (#\(i * requestBlocks) - #\(i * requestBlocks + (i == requests - 1 ? (remainder == 0 ? requestBlocks : remainder) : requestBlocks) - (requestBlocks > 1 ? 1 : 0))):"
                                         
+                                        xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
+                                        
+                                        self.trace(systemError: error, ownErrorString: TextsLibreNFC.nfcErrorRetryScan, invalidateSession: true, session: session)
+                                                                                
                                         if i != requests - 1 { return }
                                         
                                     } else {
@@ -189,14 +195,24 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                         self.traceMemorySize(systemInfo: systemInfo)
                                         self.traceBlockSize(systemInfo: systemInfo)
                                         
-                                        // get sensorUID and send to delegate
+                                        // get sensorUID and patchInfo and send to delegate
                                         let sensorUID = Data(tag.identifier.reversed())
-                                        self.libreNFCDelegate?.received(sensorUID: sensorUID)
-                                        self.traceSensorUID(sensorUID: sensorUID)
-                                        
-                                        // get patchInfo and send to delegate
                                         let patchInfo = response
-                                        self.libreNFCDelegate?.received(patchInfo: patchInfo)
+                                        
+                                        // patchInfo should have length 6, which sometimes is not the case, as there are occuring crashes in nfcCommand and Libre2BLEUtilities.streamingUnlockPayload
+                                        guard patchInfo.count >= 6 else {
+                                            
+                                            xdrip.trace("received pachinfo has length < 6", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info)
+                                            
+                                            self.trace(systemError: nil, ownErrorString: TextsLibreNFC.nfcErrorRetryScan, invalidateSession: true, session: session)
+                                            
+                                            return
+
+                                        }
+                                                                                    
+                                        self.libreNFCDelegate?.received(sensorUID: sensorUID, patchInfo: patchInfo)
+
+                                        self.traceSensorUID(sensorUID: sensorUID)
                                         self.tracePatchInfo(patchInfo: patchInfo)
                                         
                                         // send FRAM to delegate
@@ -233,7 +249,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                                         
                                                         if subCmd == .enableStreaming && response.count == 6 {
                                                             
-                                                            let serialNumber: String = LibreSensorSerialNumber(withUID: sensorUID)?.serialNumber ?? "unknown"
+                                                            let serialNumber: String = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))?.serialNumber ?? "unknown"
                                                             
                                                             let debugInfo = "NFC: enabled BLE streaming on Libre 2 " + serialNumber + " unlock code: " + self.unlockCode.description + " MAC address: " + Data(response.reversed()).hexAddress
                                                             xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
@@ -328,9 +344,13 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                 blockArray, error in
                                 
                                 if let error = error {
+
+                                    let debugInfo = "error while reading multiple blocks (#\(i * requestBlocks) - #\(i * requestBlocks + (i == requests - 1 ? (remainder == 0 ? requestBlocks : remainder) : requestBlocks) - (requestBlocks > 1 ? 1 : 0))):"
                                     
-                                    self.trace(systemError: error, ownErrorString: "error while reading multiple blocks (#\(i * requestBlocks) - #\(i * requestBlocks + (i == requests - 1 ? (remainder == 0 ? requestBlocks : remainder) : requestBlocks) - (requestBlocks > 1 ? 1 : 0))):", invalidateSession: true, session: session)
+                                    xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
                                     
+                                    self.trace(systemError: error, ownErrorString: TextsLibreNFC.nfcErrorRetryScan, invalidateSession: true, session: session)
+
                                     if i != requests - 1 { return }
                                     
                                 } else {
@@ -368,14 +388,24 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                     self.traceMemorySize(systemInfo: systemInfo)
                                     self.traceBlockSize(systemInfo: systemInfo)
 
-                                    // get sensorUID and send to delegate
+                                    // get sensorUID and patchInfo and send to delegate
                                     let sensorUID = Data(tag.identifier.reversed())
-                                    self.libreNFCDelegate?.received(sensorUID: sensorUID)
-                                    self.traceSensorUID(sensorUID: sensorUID)
-                                    
-                                    // get patchInfo and send to delegate
                                     let patchInfo = response
-                                    self.libreNFCDelegate?.received(patchInfo: patchInfo)
+                                    
+                                    // patchInfo should have length 6, which sometimes is not the case, as there are occuring crashes in nfcCommand and Libre2BLEUtilities.streamingUnlockPayload
+                                    guard patchInfo.count >= 6 else {
+                                        
+                                        xdrip.trace("received pachinfo has length < 6", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info)
+                                        
+                                        self.trace(systemError: nil, ownErrorString: TextsLibreNFC.nfcErrorRetryScan, invalidateSession: true, session: session)
+                                        
+                                        return
+                                        
+                                    }
+
+                                    self.libreNFCDelegate?.received(sensorUID: sensorUID, patchInfo: patchInfo)
+                                    
+                                    self.traceSensorUID(sensorUID: sensorUID)
                                     self.tracePatchInfo(patchInfo: patchInfo)
  
                                     // send FRAM to delegate
@@ -412,7 +442,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                                     
                                                     if subCmd == .enableStreaming && response.count == 6 {
                                                         
-                                                        let serialNumber: String = LibreSensorSerialNumber(withUID: sensorUID)?.serialNumber ?? "unknown"
+                                                        let serialNumber: String = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))?.serialNumber ?? "unknown"
                                                         
                                                         let debugInfo = "NFC: enabled BLE streaming on Libre 2 " + serialNumber + " unlock code: " + self.unlockCode.description + " MAC address: " + Data(response.reversed()).hexAddress
                                                         xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
@@ -645,17 +675,19 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
         }
     }
 
-    private func trace(systemError: Error, ownErrorString: String, invalidateSession: Bool, session: NFCTagReaderSession) {
+    private func trace(systemError: Error?, ownErrorString: String, invalidateSession: Bool, session: NFCTagReaderSession) {
         
-        xdrip.trace("NFC: error : %{public}@", log: log, category: ConstantsLog.categoryLibreNFC, type: .info, systemError.localizedDescription)
+        if let systemError = systemError {
+
+            xdrip.trace("NFC: error : %{public}@", log: log, category: ConstantsLog.categoryLibreNFC, type: .info, systemError.localizedDescription)
+
+        }
 
         if invalidateSession {
             
             xdrip.trace("   will invalide session", log: log, category: ConstantsLog.categoryLibreNFC, type: .info)
-            
 
-            session.invalidate(errorMessage: "\(ownErrorString) : \(systemError.localizedDescription)")
-
+            session.invalidate(errorMessage: "\(ownErrorString) : \(systemError != nil ? systemError!.localizedDescription : "")")
             
         }
         
@@ -764,6 +796,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                 UInt8((unlockCode >> 16) & 0xFF),
                 UInt8((unlockCode >> 24) & 0xFF)
             ]
+            
             y = UInt16(patchInfo[4...5]) ^ UInt16(b[1], b[0])
             
         } else {
@@ -785,3 +818,5 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     }
     
 }
+
+#endif

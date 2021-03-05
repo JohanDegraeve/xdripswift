@@ -1,0 +1,174 @@
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "0QS-QO-ffs"; */
+"0QS-QO-ffs.text" = "Título";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "0oo-Gz-k2G"; */
+"0oo-Gz-k2G.normalTitle" = "Cancelar";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "1DE-2P-Qfh"; */
+"1DE-2P-Qfh.title" = "Título";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "2fU-HY-PwD"; */
+"2fU-HY-PwD.text" = "Detalhe";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "5ta-po-Bsd"; */
+"5ta-po-Bsd.text" = "Detalhe";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "7NI-o7-nWK"; */
+"7NI-o7-nWK.text" = "Etiqueta";
+
+/* Class = "UILabel"; text = "delta"; ObjectID = "7Wo-wd-80o"; */
+"7Wo-wd-80o.text" = "delta";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "7vO-nL-nIV"; */
+"7vO-nL-nIV.text" = "Título";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "8Bd-7p-ZRp"; */
+"8Bd-7p-ZRp.text" = "Etiqueta";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "8jK-jB-QOG"; */
+"8jK-jB-QOG.text" = "Etiqueta";
+
+/* Class = "UIBarButtonItem"; title = "I"; ObjectID = "Fis-6U-di6"; */
+"Fis-6U-di6.title" = "I";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Hay-Q1-7fh"; */
+"Hay-Q1-7fh.text" = "Etiqueta";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "I1p-t1-Yls"; */
+"I1p-t1-Yls.text" = "Subtítulo";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "Mfz-72-6g0"; */
+"Mfz-72-6g0.text" = "Detalhe";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "N1U-VA-CRw"; */
+"N1U-VA-CRw.text" = "Detalhe";
+
+/* Class = "UIButton"; normalTitle = "OK"; ObjectID = "N9b-EE-lZm"; */
+"N9b-EE-lZm.normalTitle" = "OK";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "Pom-Rr-Zcn"; */
+"Pom-Rr-Zcn.text" = "Título";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "QMQ-3c-w3T"; */
+"QMQ-3c-w3T.text" = "Etiqueta";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "S45-Yf-BHe"; */
+"S45-Yf-BHe.text" = "Título";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "SQk-hK-fHN"; */
+"SQk-hK-fHN.text" = "Detalhe";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "Tpl-mr-dqb"; */
+"Tpl-mr-dqb.text" = "Detalhe";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "WNo-rU-sXx"; */
+"WNo-rU-sXx.text" = "Título";
+
+/* Class = "UILabel"; text = "---"; ObjectID = "We3-bN-ffR"; */
+"We3-bN-ffR.text" = "---";
+
+/* Class = "UIButton"; normalTitle = "Connect"; ObjectID = "WtR-0P-RyL"; */
+"WtR-0P-RyL.normalTitle" = "Ligar";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "YQZ-eK-OoJ"; */
+"YQZ-eK-OoJ.title" = "Título";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "Z96-ov-isg"; */
+"Z96-ov-isg.text" = "Detalhe";
+
+/* Class = "UITabBarItem"; title = "Home"; ObjectID = "acW-dT-cKf"; */
+"acW-dT-cKf.title" = "Início";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "b1J-rJ-H3K"; */
+"b1J-rJ-H3K.normalTitle" = "Cancelar";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "bT9-HM-Wcp"; */
+"bT9-HM-Wcp.text" = "Etiqueta";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "c4h-5z-5mU"; */
+"c4h-5z-5mU.text" = "Título";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "cFe-Nd-8MW"; */
+"cFe-Nd-8MW.text" = "Label";
+
+/* Class = "UITabBarItem"; title = "Settings"; ObjectID = "cPa-gy-q4n"; */
+"cPa-gy-q4n.title" = "Definições";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "cVj-Us-dOZ"; */
+"cVj-Us-dOZ.text" = "Detalhe";
+
+/* Class = "UIViewController"; title = "M5 Stack Settings View Controller"; ObjectID = "d2Q-Tq-3zC"; */
+"d2Q-Tq-3zC.title" = "M5 Stack Definições Aspecto Controlador";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "ekz-vj-3BZ"; */
+"ekz-vj-3BZ.text" = "Título";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "etA-fM-tGh"; */
+"etA-fM-tGh.title" = "Título";
+
+/* Class = "UIButton"; normalTitle = "Presnooze"; ObjectID = "fSY-nc-amN"; */
+"fSY-nc-amN.normalTitle" = "Pré-Silenciar";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "goS-0m-pgb"; */
+"goS-0m-pgb.text" = "Título";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "hfQ-Tt-xNH"; */
+"hfQ-Tt-xNH.text" = "Título";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "iIy-f4-6Ww"; */
+"iIy-f4-6Ww.text" = "Etiqueta";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "jx2-oc-XfQ"; */
+"jx2-oc-XfQ.text" = "Título";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "lBP-cK-gbT"; */
+"lBP-cK-gbT.title" = "Título";
+
+/* Class = "UIButton"; normalTitle = "Calibrate"; ObjectID = "mSJ-jy-nHJ"; */
+"mSJ-jy-nHJ.normalTitle" = "Calibrar";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "raE-D9-ezV"; */
+"raE-D9-ezV.text" = "Detalhe";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "sBg-yb-0Iy"; */
+"sBg-yb-0Iy.text" = "Detalhe";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "sdE-1o-OHh"; */
+"sdE-1o-OHh.text" = "Etiqueta";
+
+/* Class = "UITabBarItem"; title = "Bluetooth"; ObjectID = "sgT-p5-hUt"; */
+"sgT-p5-hUt.title" = "Bluetooth";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "skm-we-lQ3"; */
+"skm-we-lQ3.text" = "Detalhe";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "tIz-Hj-yxH"; */
+"tIz-Hj-yxH.text" = "Título";
+
+/* Class = "UIButton"; normalTitle = "OK"; ObjectID = "uqL-UP-KZF"; */
+"uqL-UP-KZF.normalTitle" = "OK";
+
+/* Class = "UILabel"; text = "x mins ago"; ObjectID = "uyn-2k-K74"; */
+"uyn-2k-K74.text" = "x mins atrás";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "vbi-WE-Mvc"; */
+"vbi-WE-Mvc.text" = "Título";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "wi3-X0-YuZ"; */
+"wi3-X0-YuZ.title" = "Título";
+
+/* Class = "UIButton"; normalTitle = "Transmitter"; ObjectID = "zWo-AR-qJE"; */
+"zWo-AR-qJE.normalTitle" = "Transmissor";
+
+/// 
+"NDk-cv-Gan.text" = "Carregado pelo ControladoVistaSecundária";
+
+/// 
+"A5M-7J-77L.text" = "Carregado pelo ControladorVistaPrincipal";
+
+/// 
+"KQZ-1w-vlD.text" = "Vista Principal";
+
+/// 
+"zEq-FU-wV5.text" = "Vista Secundária";

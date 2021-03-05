@@ -1,0 +1,9 @@
+"dexcomsharetestresult_verificationsuccessfulalerttitle" = "Verificatie Succesvol";
+"dexcomsharetestresult_verificationsuccessfulalertbody" = "Je Dexcom Share account was succesvol geverifieerd";
+"dexcomsharetestresult_verificationerroralerttitle" = "Verificatie Fout";
+"dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Maximum login pogingen overschreden. Wacht 10 minuten en probeer opnieuw.";
+"dexcomsharetestresult_uploadErrorWarning" = "Dexcom Share Upload Fout";
+"dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Het Dexcom Share Serie Nummer komt niet overeen met het serienummer van dit account. Verifieer het Serie Nummer in de instellingen.";
+"dexcomsharetestresult_monitored_receiver_not_assigned_1" = "Het lijkt er op dat het Transmitter ID of serie nummer";
+"dexcomsharetestresult_monitored_receiver_not_assigned_2" = "niet is toegewezen om";
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "De officiele Dexcom app te gebruiken om de Transmitter (G5) of Share receiver (G4) te koppelen.\r\n\r\nWaarschijnlijk gebruik je de verkeerde URL, verifieer de instelling 'Gebruik US URL?'";

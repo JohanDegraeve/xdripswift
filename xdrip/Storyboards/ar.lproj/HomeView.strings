@@ -30,6 +30,11 @@
 "transmitterpairingattempttimeout" = "لم يستجيب جهاز الإرسال على طلب الاقتران.";
 "success" = "نجاح";
 "failed" = "فشل";
-"calibrationNotNecessary" = "عند تمكينOOPWeb ، لا تكون المعايرة ضرورية لحساس ليبري";
 "dexcomBatteryTooLow" = "بطارية جهاز الإرسال منخفضة جدًا!";
-"sensorAge14Days" = "وصل الحساس إلى الحد الأقصى من عمره.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible
+"calibrationNotNecessary" = "When using the Libre algoritm, it is not necessary to calibrate the sensor.";

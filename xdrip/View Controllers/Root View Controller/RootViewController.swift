@@ -23,6 +23,9 @@ final class RootViewController: UIViewController {
             self.present(alert, animated: true, completion: nil)
             
         } else {
+            
+            trace("calibration : user clicks calibrate button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            
             requestCalibration(userRequested: true)
         }
         
@@ -327,6 +330,12 @@ final class RootViewController: UIViewController {
         // also update of unit requires update of badge
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
         
+        // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of graph
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentLowMarkValue.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.lowMarkValue.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.highMarkValue.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentHighMarkValue.rawValue, options: .new, context: nil)
+
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
         
@@ -441,12 +450,9 @@ final class RootViewController: UIViewController {
         
         // instantiate calibrations
         calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
-        guard let calibrationsAccessor = calibrationsAccessor else {
-            fatalError("In setupApplicationData, failed to initialize calibrationsAccessor")
-        }
         
         // instanstiate Housekeeper
-        houseKeeper = HouseKeeper(bgReadingsAccessor: bgReadingsAccessor, calibrationsAccessor: calibrationsAccessor)
+        houseKeeper = HouseKeeper(coreDataManager: coreDataManager)
         
         // setup nightscout synchronizer
         nightScoutUploadManager = NightScoutUploadManager(coreDataManager: coreDataManager, messageHandler: { (title:String, message:String) in
@@ -758,7 +764,11 @@ final class RootViewController: UIViewController {
                     let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
                     
                     if latestReadings.count > 1 {
+
+                        trace("calibration : two readings received, no calibrations exist yet and not weboopenabled, request calibation to user", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+
                         createInitialCalibrationRequest()
+                        
                     }
                     
                 } else {
@@ -829,8 +839,12 @@ final class RootViewController: UIViewController {
         switch keyPathEnum {
         
         case UserDefaults.Key.isMaster :
+            
             changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
             
+            // no sensor needed in follower mode, stop it
+            stopSensor()
+
         case UserDefaults.Key.showReadingInNotification:
             if !UserDefaults.standard.showReadingInNotification {
                 // remove existing notification if any
@@ -850,6 +864,11 @@ final class RootViewController: UIViewController {
             
             // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
             createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
+            
+        case UserDefaults.Key.urgentLowMarkValue, UserDefaults.Key.lowMarkValue, UserDefaults.Key.highMarkValue, UserDefaults.Key.urgentHighMarkValue:
+            
+            // redraw chart is necessary
+            updateChartWithResetEndDate()
             
         default:
             break
@@ -1036,14 +1055,24 @@ final class RootViewController: UIViewController {
             if let calibrator = self.calibrator {
                 
                 if latestCalibrations.count == 0 {
+                    
+                    trace("calibration : initial calibration, creating two calibrations", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                    
                     // calling initialCalibration will create two calibrations, they are returned also but we don't need them
                     _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDoubleConvertedToMgDl, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDoubleConvertedToMgDl, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    
                 } else {
+                    
                     // it's not the first calibration
                     if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
+
+                        trace("calibration : creating calibrations", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                        
                         // calling createNewCalibration will create a new  calibration, it is returned but we don't need it
                         _ = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        
                     }
+                    
                 }
                 
                 // this will store the newly created calibration(s) in coredata
@@ -1093,7 +1122,7 @@ final class RootViewController: UIViewController {
             
             return DexcomCalibrator()
             
-        case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa, .Libre2:
+        case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa, .Libre2, .Atom:
             
             if cgmTransmitter.isWebOOPEnabled() {
                 
@@ -1742,7 +1771,9 @@ extension RootViewController:NightScoutFollowerDelegate {
             
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-            if let lastReading = bgReadingsAccessor.last(forSensor: activeSensor) {
+
+            // get lastReading, ignore sensor as this should be nil because this is follower mode
+            if let lastReading = bgReadingsAccessor.last(forSensor: nil) {
                 timeStampLastBgReading = lastReading.timeStamp
             }
             

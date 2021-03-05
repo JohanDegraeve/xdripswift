@@ -24,7 +24,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
     }
 
     func sectionTitle() -> String? {
-        return "Developer Settings"
+        return Texts_SettingsView.developerSettings
     }
     
     func settingsRowText(index: Int) -> String {
@@ -34,13 +34,13 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         switch setting {
             
         case .NSLogEnabled:
-            return "NSLog"
+            return Texts_SettingsView.nsLog
             
         case .OSLogEnabled:
-            return "OSLog"
+            return Texts_SettingsView.osLog
             
         case .smoothLibreValues:
-            return "Smooth Libre Values"
+            return Texts_SettingsView.smoothLibreValues
             
         }
     }

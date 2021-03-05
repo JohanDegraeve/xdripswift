@@ -1,4 +1,116 @@
-"settingsviews_lowValue" = "Lage Waarde";
-"settingsviews_highValue" = "Hoge Waarde";
 "settingsviews_transmittertype" = "Zender Type";
 "settingsviews_transmitterid" = "Zender-ID";
+"settingsviews_transmitterid_text_for_button" = "Zender-ID";
+
+"settingsviews_settingstitle" = "Instellingen";
+"settingsviews_sectiontitlegeneral" = "Algemeen";
+"settingsviews_selectbgunit" = "Bloedglucose Eenheden:";
+"settingsviews_masterorfollower" = "Master of Volger?";
+"settingsviews_master" = "Master";
+"settingsviews_follower" = "Volger";
+"showReadingInNotification" = "Toon BG in Notificaties?";
+"labelShowReadingInAppBadge" = "Toon BG in de App Badge?";
+"multipleAppBadgeValueWith10" = "Vermenigvuldig App Badge Meting met 10?";
+"settingsviews_urgentHighValue" = "Urgent Hoge Waarde:";
+"settingsviews_highValue" = "Hoge Waarde:";
+"settingsviews_targetValue" = "Doel Waarde:";
+"settingsviews_lowValue" = "Lage Waarde:";
+"settingsviews_urgentLowValue" = "Urgent Lage Waarde:";
+"settingsviews_useobjectives" = "Toon Doelen in Grafiek?";
+"settingsviews_showcoloredobjectives" = "Toon Gekleurde Lijnen?";
+"settingsviews_showtarget" = "Toon Doel Lijn?";
+"settingsviews_sectiontitletransmitter" = "Transmitter";
+"settingsviews_givetransmitterid" = "Voer Transmitter ID In";
+"settingsviews_resettransmitter" = "Reset Transmitter";
+"settingsviews_webooptransmitter" = "Gebruik Libre Algoritme?";
+"settingsviews_nonfixedtransmitter" = "Schakel Meerpuntskalibratie In?";
+"settingsviews_labelNonFixed" = "Meerpuntskalibratie";
+"settingsviews_labelWebOOP" = "xDrip of Libre Algoritme";
+"transmitterId8OrHigherNotSupported" = "Transmitters met ID 8Gxxxx of nieuwer zijn momenteel niet ondersteund!";
+"settingsviews_sectiontitlealerting" = "Alarm";
+"settingsviews_row_alert_types" = "Alarm Types";
+"settingsviews_row_alerts" = "Alarmen";
+"settingsviews_sectiontitlehealthkit" = "Apple Gezondheid";
+"settingsviews_healthkit" = "Schrijf Data naar Apple Gezondheid?";
+"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Uploaden naar Dexcom Share?";
+"settingsviews_dexcomShareSerialNumber" = "Ontvanger Serie Nummer:";
+"settingsviews_useUSDexcomShareurl" = "Gebruik Dexcom US Servers?";
+"settingsviews_dexcomShareAccountName" = "Account Naam:";
+"settingsviews_giveDexcomShareAccountName" = "Voer Dexcom Share Account Nama In";
+"settingsviews_giveDexcomSharePassword" = "Voer Dexcom Share Wachtwoord In";
+"settingsviews_giveDexcomShareSerialNumber" = "Voer het Dexcom Ontvanger Serie Nummer In";
+"settingsviews_sectiontitlenightscout" = "NightScout";
+"settingsviews_nightScoutEnabled" = "Nightscout Inschakelen?";
+"settingsviews_nightScoutUrl" = "URL:";
+"settingsviews_useSchedule" = "Gebruik Upload Schema?";
+"schedule" = "Schema:";
+"settingsviews_giveNightScoutUrl" = "Voer NightScout URL In";
+"settingsviews_nightScoutAPIKey" = "API_SECRET:";
+"settingsviews_giveNightScoutAPIKey" = "Voer API_SECRET In";
+"editScheduleTimePickerSubtitle" = "Wijzig: ";
+"timeScheduleViewTitle" = "Aan/Uit Tijdschema Voor ";
+"uploadSensorStartTime" = "Upload Sensor Start Tijd?";
+"testUrlAndAPIKey" = "Test Verbinding?";
+"settingsviews_sectiontitlespeak" = "Spraak";
+"settingsviews_speakBgReadings" = "Spreek BG Metingen Uit?";
+"settingsviews_speakBgReadingslanguage" = "Taal:";
+"settingsviews_speakreadingslanguageselection" = "Selecteer Taal";
+"settingsviews_speakTrend" = "Spreek Trend Uit?";
+"settingsviews_speakDelta" = "Spreek Delta Uit?";
+"settingsviews_speakInterval" = "Interval:";
+"settingsviews_speakIntervalMessage" = "Minimum interval tussen twee metingen, in minuten";
+"settingsviews_sectiontitleAbout" = "Over xDrip4iOS";
+"settingsviews_Version" = "Versie:";
+"settingsviews_license" = "Licentie";
+"settingsviews_build" = "Build:";
+"m5stack_settingsviews_settingstitle" = "M5 Stack Instellingen";
+"m5stack_settingsviews_textColor" = "Tekstkleur";
+"m5stack_settingsviews_backGroundColor" = "Achtergrondkleur";
+"m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
+"m5stack_settingsviews_giveBluetoothPassword" = "Voer Bluetooth Wachtwoord In";
+"m5stack_settingsviews_brightness" = "Schermhelderheid";
+"appleWatchSectionTitle" = "Apple Watch";
+"createCalendarEvent" = "Creëer Agenda Activiteit?";
+"calenderId" = "Te Gebruiken Agenda?";
+"displayTrendInCalendarEvent" = "Toon Trend?";
+"displayUnitInCalendarEvent" = "Toon Eenheid?";
+"displayDeltaInCalendarEvent" = "Toon Delta?";
+"infoCalendarAccessDeniedByUser" = "In het verleden heb je toegang geweigerd tot je Agenda.\n\nOm toestemming te geven, ga naar iPhone Instellingen, Privacy, Agenda's en schakel in.";
+"infoCalendarAccessRestricted" = "Geen toegang voor xDrip4iOS tot je agenda. Dit komt waarschijnlijk door actieve beperkingen zoals Ouderlijk Toezicht.";
+"sectionTitleTrace" = "Probleemrapportage";
+"sendTraceFile" = "Verstuur Probleemrapportage";
+"describeProblem" = "Leg uit waarom je de log bestanden verstuurd met zoveel mogelijk details als mogelijk (in het Engels). Als je het probleem ook in de Facebook support groep 'xDrip4iOS' hebt gerapporteerd, benoem dan ook je facebook naam in de e-mail.";
+"emailNotConfigured" = "Je moet een e-mail account configureren op je iOS apparaat.";
+"emailbodyText" = "Probleembeschrijving: ";
+"failedToSendEmail" = "Email versturen mislukt";
+"volumeTestSoundPlayerExplanation" = "Een alarm geluid wordt nu afgespeeld met hetzelfde volume als wordt gebruikt voor een Alarm Type met 'Dempen Negeren' aan.\n\n(Gebruikt voor alle alarmen behalve Gemiste Meting alarmen welke altijd het iOS volume gebruiken.)\n\nVerander het volume met de volumeknoppen en druk OK indien correct.";
+"volumeTestiOSSoundExplanation" = "Een alarm geluid wordt nu afgespeeld met hetzelfde volume als wordt gebruikt voor een Alarm Type met 'Dempen Negeren' uit.\n\n(Ook gebruikt voor Gemiste Meting alarmen welke het iOS volume gebruiken.)\n\nVStop het geluid met een van de volumeknoppen, pas het volume aan en test opnieuw.";
+"volumeTestSoundPlayer" = "Test Volume (Indien Dempen Negeren Aan)";
+"volumeTestiOSSound" = "Test Volume (Huidig iPhone Volume)";
+"debugLevel" = "Inclusief Debug Niveau";
+"warningChangeFromMasterToFollower" = "Wisselen van Master naar Volger stopt de huidige sensor. Wil je doorgaan ?";
+"nightScoutPort" = "Port (Optioneel):";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// deloper settings, row title for 'Smooth Libre Values?'
+"smoothLibreValues" = "Smooth Libre Values?";
+
+/// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
+"oslog" = "OSLog";
+
+/// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
+"nslog" = "NSLog";
+
+/// Developer Settings, section title
+"developerSettings" = "Developer Settings";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// home screen settings, section title
+"settingsviews_sectiontitlehomescreen" = "Home Screen";

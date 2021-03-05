@@ -1,6 +1,8 @@
 import Foundation
 import os
 import CoreBluetooth
+
+#if canImport(CoreNFC)
 import CoreNFC
 
 class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
@@ -150,8 +152,19 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
             // set to nil so we don't send it again to the delegate when there's a new connect
             tempSensorSerialNumber = nil
             
-            // user should be informed not to scan with the Libre app
-            bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.donotusethelibrelinkapp)
+            // for Libre 2, the device name includes the sensor id
+            // if tempSensorSerialNumber != deviceName, then it means the user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user
+            // compare only the last 10 characters. Normally it should be 10, but for some reason, xDrip4iOS does not correctly decode the sensor uid, the first character is not correct
+            if let deviceName = deviceName, sensorSerialNumber.serialNumber.suffix(9).uppercased() != deviceName.suffix(9) {
+                
+                bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.connectedLibre2DoesNotMatchScannedLibre2)
+                
+            } else {
+
+                // user should be informed not to scan with the Libre app
+                bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.donotusethelibrelinkapp)
+
+            }
             
         }
         
@@ -206,7 +219,7 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             UserDefaults.standard.libreActiveSensorUnlockCount += 1
             
-            trace("sensorid =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.toHexString(), librePatchInfo.toHexString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
+            trace("sensorid as data =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.toHexString(), librePatchInfo.toHexString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
             
             let unLockPayLoad = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: UserDefaults.standard.libreActiveSensorUnlockCode, unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount))
             
@@ -324,7 +337,16 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     
 }
 
-// MARK: - NFCTagReaderSessionDelegate functions
+#else
+
+class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
+    
+}
+
+#endif
+
+
+// MARK: - LibreNFCDelegate functions
 
 extension CGMLibre2Transmitter: LibreNFCDelegate {
     
@@ -332,7 +354,7 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         
         trace("received fram :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, fram.toHexString())
         
-        // if we already know the patchinfo (which we should because normally received(patchInfo: Data gets called before received(fram: Data), then patchInfo should not be nil
+        // if we already know the patchinfo (which we should because normally received(sensorUID: Data, patchInfo: Data) gets called before received(fram: Data), then patchInfo should not be nil
         // same for sensorUID
         if let patchInfo =  UserDefaults.standard.librePatchInfo, let sensorUID = UserDefaults.standard.libreSensorUID, let libreSensorType = LibreSensorType.type(patchInfo: patchInfo.hexEncodedString().uppercased()), let serialNumber = self.sensorSerialNumber {
             
@@ -349,13 +371,13 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         
     }
     
-    func received(sensorUID: Data) {
+    func received(sensorUID: Data, patchInfo: Data) {
         
         // store sensorUID as data in UserDefaults
         UserDefaults.standard.libreSensorUID = sensorUID
         
         // store the sensorUID as tempSensorSerialNumber (as LibreSensorSerialNumber)
-        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID)
+        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))
         if let receivedSensorSerialNumber = receivedSensorSerialNumber {
             self.tempSensorSerialNumber = receivedSensorSerialNumber
         }
@@ -383,14 +405,11 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
             trace("could not created sensor serial number from received sensorUID, sensorUID = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, sensorUID.toHexString())
             
         }
-    }
-    
-    func received(patchInfo: Data) {
         
         trace("patchInfo received :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, patchInfo.toHexString())
         
         UserDefaults.standard.librePatchInfo = patchInfo
-        
+
     }
     
     func streamingEnabled(successful: Bool) {

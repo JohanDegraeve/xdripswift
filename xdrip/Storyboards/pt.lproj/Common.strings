@@ -1,17 +1,42 @@
 "common_Ok" = "OK";
 "common_cancel" = "Cancelar";
+"common_mgdl" = "mg/dl";
+"common_mmol" = "mmol/l";
+"common_bloodglucoseunit" = "Unidade de Glicose";
+"common_bloodglucoseunit_short" = "Unid. Glicose";
 "common_password" = "Senha:";
 "common_default" = "Padrão";
-"common_high" = "ALTA";
-"common_low" = "BAIXA";
+"common_high" = "HIPER";
+"common_low" = "HIPO";
 "common_hour" = "hora";
 "common_hours" = "horas";
 "common_minutes" = "mins";
 "common_minute" = "min";
 "common_day" = "dia";
 "common_week" = "semana";
-"warning" ="Alarme!";
-"update" = "Atualização";
+"warning" ="Aviso!";
+"update" = "Editar";
 "add" = "Adicionar";
 "yes" = "Sim";
 "no" = "Não";
+"red" = "vermelho";
+"green" = "verde";
+"white" = "branco";
+"yellow" = "amarelo";
+"name" = "Nome:";
+"WiFi" = "WiFi";
+"on" = "Lig.";
+"off" = "Desl.";
+"delete" = "Apagar";
+"invalidValue" = "Valor Inválido";
+"firmware" = "Firmware";
+"hardware" = "Hardware";
+"unknown" = "Desconhecido";
+"sensorStatus" = "Estado do Sensor:";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
+"invalidAccountOrPassword" = "Invalid account or password";

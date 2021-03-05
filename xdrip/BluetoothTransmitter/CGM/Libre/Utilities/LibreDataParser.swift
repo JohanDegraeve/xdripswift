@@ -30,7 +30,7 @@ class LibreDataParser {
     ///     - sensorTimeInMinutes: age of sensor in minutes
     ///     - libre1DerivedAlgorithmParameters : if nil then oop web is not used
     ///     - testTimeStamp : if set, then the most recent reading will get this timestamp
-    public func parseLibre1Data(libreData: Data, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?, testTimeStamp: Date?) -> (glucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int) {
+    private func parseLibre1Data(libreData: Data, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?, testTimeStamp: Date?) -> (glucoseData:[GlucoseData], sensorState:LibreSensorState, sensorTimeInMinutes:Int) {
         
         let ourTime = testTimeStamp == nil ? Date() : testTimeStamp!
         let indexTrend:Int = libreData.getByteAt(position: 26) & 0xFF
@@ -186,7 +186,7 @@ class LibreDataParser {
     ///     - testTimeStamp : if set, then the most recent reading will get this timestamp
     ///     - dataIsDecryptedToLibre1Format : example if transmitter is Libre 2, data is already decrypted to Libre 1 format
     ///     - completionHandler : called with sensorState and xDripError
-    public func libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber?, patchInfo: String?, webOOPEnabled: Bool, libreData: Data, cgmTransmitterDelegate : CGMTransmitterDelegate?, dataIsDecryptedToLibre1Format: Bool, testTimeStamp: Date?, completionHandler:@escaping ((_ sensorState: LibreSensorState?, _ xDripError: XdripError?) -> ())) {
+    public func libreDataProcessor(libreSensorSerialNumber: String?, patchInfo: String?, webOOPEnabled: Bool, libreData: Data, cgmTransmitterDelegate : CGMTransmitterDelegate?, dataIsDecryptedToLibre1Format: Bool, testTimeStamp: Date?, completionHandler:@escaping ((_ sensorState: LibreSensorState?, _ xDripError: XdripError?) -> ())) {
 
         // get libreSensorType, if this fails then it must be an unknown Libre sensor type in which case we don't proceed
         guard let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) else {
@@ -246,7 +246,7 @@ class LibreDataParser {
             let parsedLibre1Data = parseLibre1Data(libreData: libreData, libre1DerivedAlgorithmParameters: nil, testTimeStamp: testTimeStamp)
             
             // handle the result
-            handleGlucoseData(result: (parsedLibre1Data.glucoseData, parsedLibre1Data.sensorTimeInMinutes, parsedLibre1Data.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+            handleGlucoseData(result: (parsedLibre1Data.glucoseData, parsedLibre1Data.sensorTimeInMinutes, parsedLibre1Data.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, completionHandler: completionHandler)
             
         } else {
             
@@ -263,10 +263,10 @@ class LibreDataParser {
     /// - parameters:
     ///     - libreData : either Libre 1 data or decrypted Libre 2 data
     ///     - testTimeStamp : if set, then the most recent reading will get this timestamp
-    private func libre1DataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber, libreSensorType: LibreSensorType, libreData: Data, cgmTransmitterDelegate: CGMTransmitterDelegate?, testTimeStamp: Date?, completionHandler:@escaping ((_ sensorState: LibreSensorState?, _ xDripError: XdripError?) -> ())) {
+    private func libre1DataProcessor(libreSensorSerialNumber: String, libreSensorType: LibreSensorType, libreData: Data, cgmTransmitterDelegate: CGMTransmitterDelegate?, testTimeStamp: Date?, completionHandler:@escaping ((_ sensorState: LibreSensorState?, _ xDripError: XdripError?) -> ())) {
         
         // if libre1DerivedAlgorithmParameters not nil, but not matching serial number, then assign to nil
-        if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber != libreSensorSerialNumber.serialNumber {
+        if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber != libreSensorSerialNumber {
             
             UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
             
@@ -275,7 +275,7 @@ class LibreDataParser {
         // if libre1DerivedAlgorithmParameters == nil, then calculate them
         if UserDefaults.standard.libre1DerivedAlgorithmParameters == nil {
             
-            UserDefaults.standard.libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(bytes: libreData, serialNumber: libreSensorSerialNumber.serialNumber)
+            UserDefaults.standard.libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(bytes: libreData, serialNumber: libreSensorSerialNumber)
             
         }
         
@@ -293,7 +293,7 @@ class LibreDataParser {
         let parsedLibre1Data = parseLibre1Data(libreData: libreData, libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters, testTimeStamp: testTimeStamp)
         
         // handle the result
-        handleGlucoseData(result: (parsedLibre1Data.glucoseData, parsedLibre1Data.sensorTimeInMinutes, parsedLibre1Data.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, libreSensorSerialNumber: libreSensorSerialNumber, completionHandler: completionHandler)
+        handleGlucoseData(result: (parsedLibre1Data.glucoseData, parsedLibre1Data.sensorTimeInMinutes, parsedLibre1Data.sensorState, nil), cgmTransmitterDelegate: cgmTransmitterDelegate, completionHandler: completionHandler)
         
         return
 
@@ -311,7 +311,7 @@ class LibreDataParser {
     ///     - libreSensorSerialNumber, if available
     ///
     /// if result.errorDescription not nil, then delegate function error will be called
-    private func handleGlucoseData(result: (glucoseData:[GlucoseData], sensorTimeInMinutes:Int?, sensorState: LibreSensorState?, xDripError:XdripError?), cgmTransmitterDelegate : CGMTransmitterDelegate?, libreSensorSerialNumber:LibreSensorSerialNumber?, completionHandler:((_ sensorState: LibreSensorState?, _ xDripError: XdripError?) -> ())) {
+    private func handleGlucoseData(result: (glucoseData:[GlucoseData], sensorTimeInMinutes:Int?, sensorState: LibreSensorState?, xDripError:XdripError?), cgmTransmitterDelegate : CGMTransmitterDelegate?, completionHandler:((_ sensorState: LibreSensorState?, _ xDripError: XdripError?) -> ())) {
         
         // trace the sensor state
         if let sensorState = result.sensorState {
@@ -321,7 +321,14 @@ class LibreDataParser {
                 
                 trace("    not processing data as sensor does not have the state ready or expired", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
                 
-                cgmTransmitterDelegate?.errorOccurred(xDripError: LibreError.sensorNotReady)
+                // initialize xDripError, to be used in calls to cgmTransmitterDelegate.errorOccurred and completionHandler
+                let xDripError = LibreError.sensorNotReady
+                
+                // call cgmTransmitterDelegate (this is actually the RootViewController passed in via the BluetoothTransmitter
+                cgmTransmitterDelegate?.errorOccurred(xDripError: xDripError)
+                
+                // call completionHandler, to inform caller about sensorState and xDripError
+                completionHandler(sensorState, xDripError)
                 
                 return
                 
@@ -339,6 +346,7 @@ class LibreDataParser {
         }
         
         // if sensor time < 60, return an empty glucose data array
+        // should probably not happen because we only get here if status = .ready or .expired ?
         if let sensorTimeInMinutes = result.sensorTimeInMinutes {
             
             guard sensorTimeInMinutes >= 60 else {
@@ -348,6 +356,9 @@ class LibreDataParser {
                 var emptyArray = [GlucoseData]()
                 
                 cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)
+                
+                // call completion handler to make sure the sensor state is handled, set state to .starting, because result.sensorState has value .ready here which is not correct
+                completionHandler(.starting, result.xDripError)
                 
                 return
                 

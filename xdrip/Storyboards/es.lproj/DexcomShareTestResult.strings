@@ -1,0 +1,9 @@
+"dexcomsharetestresult_verificationsuccessfulalerttitle" = "Verificación Completada!";
+"dexcomsharetestresult_verificationsuccessfulalertbody" = "Tu cuenta Dexcom Share ha sido verificado con éxito";
+"dexcomsharetestresult_verificationerroralerttitle" = "Error de Verificación";
+"dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Has Excedido el máximo número de intentos. Esperar 10 minutos e intentarlo de nuevo.";
+"dexcomsharetestresult_uploadErrorWarning" = "Error de Subida Dexcom Share";
+"dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "El número de serie en Dexcom Share no coincide con él de esta cuenta. Verificar el número de serie en la configuración.";
+"dexcomsharetestresult_monitored_receiver_not_assigned_1" = "Parece ser que la ID del Transmisor o Número de Serie";
+"dexcomsharetestresult_monitored_receiver_not_assigned_2" = "no está asignado a";
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Usar la aplicación oficial de Dexcom para registrar el Transmisor (G5) or Share Receiver (G4)\r\n\r\nEs posible que estás usanod una URL incorrecta, comprobar la opción 'Usar URL EEUU?'";

@@ -1,0 +1,69 @@
+"common_Ok" = "OK";
+"common_cancel" = "Cancelar";
+"common_mgdl" = "mg/dl";
+"common_mmol" = "mmol/l";
+"common_bloodglucoseunit" = "Unidades de Glucemia:";
+"common_bloodglucoseunit_short" = "Unidad";
+"common_password" = "Contraseña:";
+"common_default" = "Por Defecto";
+"common_high" = "ALTA";
+"common_low" = "BAJA";
+"common_hour" = "hora";
+"common_hours" = "horas";
+"common_minutes" = "mins";
+"common_minute" = "min";
+"common_day" = "día";
+"common_week" = "semana";
+"warning" ="Aviso!";
+"update" = "Editar";
+"add" = "Añadir";
+"yes" = "Sí";
+"no" = "No";
+"name" = "Nombre:";
+"delete" = "Borrar";
+"unknown" = "Desconocido";
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// red
+"red" = "red";
+
+/// green
+"green" = "green";
+
+/// for settings row, literally hardware
+"hardware" = "Hardware";
+
+/// WiFi
+"WiFi" = "WiFi";
+
+/// whenever invalid value is given by user somewhere in a field
+"invalidValue" = "Invalid Value";
+
+/// for settings row, literally firmware
+"firmware" = "Firmware";
+
+/// white
+"white" = "white";
+
+/// to show the sensor status
+"sensorStatus" = "Sensor status:";
+
+/// on
+"on" = "On";
+
+/// yellow
+"yellow" = "yellow";
+
+/// 
+"off" = "Off";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
+"invalidAccountOrPassword" = "Invalid account or password";

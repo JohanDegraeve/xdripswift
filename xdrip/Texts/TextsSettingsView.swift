@@ -59,7 +59,7 @@ class Texts_SettingsView {
     }()
 
     static let labelUrgentHighValue: String = {
-        return NSLocalizedString("settingsviews_urgenthighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value:", comment: "home screen settings, urgent high value")
+        return NSLocalizedString("settingsviews_urgentHighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value:", comment: "home screen settings, urgent high value")
     }()
     
     static let labelHighValue: String = {
@@ -75,11 +75,7 @@ class Texts_SettingsView {
     }()
     
     static let labelUrgentLowValue: String = {
-        return NSLocalizedString("settingsviews_urgentlowValue", tableName: filename, bundle: Bundle.main, value: "Urgent Low Value:", comment: "home screen settings, urgent low value")
-    }()
-    
-    static let labelShowColoredObjectives: String = {
-        return NSLocalizedString("settingsviews_showcoloredobjectives", tableName: filename, bundle: Bundle.main, value: "Show Colored Lines?", comment: "home screen settings, show colored objectives lines")
+        return NSLocalizedString("settingsviews_urgentLowValue", tableName: filename, bundle: Bundle.main, value: "Urgent Low Value:", comment: "home screen settings, urgent low value")
     }()
     
     static let labelShowTarget: String = {
@@ -99,6 +95,10 @@ class Texts_SettingsView {
 
     static let labelTransmitterId:String = {
         return NSLocalizedString("settingsviews_transmitterid", tableName: filename, bundle: Bundle.main, value: "Transmitter ID:", comment: "transmitter settings, just the words that explain that the settings is about transmitter id")
+    }()
+    
+    static let labelTransmitterIdTextForButton:String = {
+        return NSLocalizedString("settingsviews_transmitterid_text_for_button", tableName: filename, bundle: Bundle.main, value: "Transmitter ID", comment: "transmitter settings, this is for the button, when clicked then user will be requested to give transmitter id. The only difference with settingsviews_transmitterid is that ':' is not added")
     }()
     
     static let labelGiveTransmitterId:String = {
@@ -234,11 +234,11 @@ class Texts_SettingsView {
     }()
     
     static let testUrlAndAPIKey: String = {
-        return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Nightscout URL and API_SECRET?", comment: "nightscout settings, when clicking the cell, test the url and api key")
+        return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Connection?", comment: "nightscout settings, when clicking the cell, test the url and api key")
     }()
 
     static let nightScoutPort: String = {
-        return NSLocalizedString("nightScoutPort", tableName: filename, bundle: Bundle.main, value: "Port", comment: "nightscout settings, port to use")
+        return NSLocalizedString("nightScoutPort", tableName: filename, bundle: Bundle.main, value: "Port (optional):", comment: "nightscout settings, port to use")
     }()
 
     // MARK: - Section Speak
@@ -399,6 +399,24 @@ class Texts_SettingsView {
 
     static let volumeTestiOSSoundExplanation: String = {
         return NSLocalizedString("volumeTestiOSSoundExplanation", tableName: filename, bundle: Bundle.main, value: "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test")
+    }()
+    
+    // MARK: - Section Developer
+    
+    static let developerSettings: String = {
+        return NSLocalizedString("developerSettings", tableName: filename, bundle: Bundle.main, value: "Developer Settings", comment: "Developer Settings, section title")
+    }()
+    
+    static let smoothLibreValues: String = {
+        return NSLocalizedString("smoothLibreValues", tableName: filename, bundle: Bundle.main, value: "Smooth Libre Values?", comment: "deloper settings, row title for 'Smooth Libre Values?'")
+    }()
+    
+    static let nsLog: String = {
+        return NSLocalizedString("nslog", tableName: filename, bundle: Bundle.main, value: "NSLog", comment: "deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog")
+    }()
+    
+    static let osLog: String = {
+        return NSLocalizedString("oslog", tableName: filename, bundle: Bundle.main, value: "OSLog", comment: "deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog")
     }()
     
 }

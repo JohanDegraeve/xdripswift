@@ -1,0 +1,14 @@
+"high" = "korkea";
+"low" = "matala";
+"currentglucose" = "Nykyinen verensokeri on";
+"trendnoncomputable" = "ei laskettavissa";
+"trenddoubledown" = "dramaattisesti alaspäin";
+"trendsingledown" = "merkittävästi alaspäin";
+"trendfortyfivedown" = "alas";
+"trendflat" = "tasainen";
+"trendfortyfiveup" = "ylös";
+"trendsingleup" = "merkittävästi ylöspäin";
+"trenddoubleup" = "dramaattisesti ylöspäin";
+"currenttrend" = "Suunta";
+"deltanoncomputable" = "ei laskettavissa";
+"currentdelta" = "Ero edellisestä lukemasta on";

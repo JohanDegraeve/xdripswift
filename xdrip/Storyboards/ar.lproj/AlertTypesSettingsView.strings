@@ -6,7 +6,7 @@
 "alerttypesettingsview_snoozevianotification" = "الغفوة عبر الإشعارات";
 "alerttypesettingsview_defaultsnoozeperiod" = "مدة الغفوة الإفتراض (دقائق)";
 "alerttypesettingsview_overridemute" = "تخطي وضع الصامت";
-"alerttypesettingsview_soundname" = "النغمة";
+"alerttypesettingsview_sound" = "النغمة";
 "alerttypesettingsview_defaultiossound" = "نغمة النظام";
 "alerttypesettingsview_givename" = "اسم التنبيه";
 "alerttypesettingsview_givesnoozeperiod" = "مدة الغفوة بالدقائق";

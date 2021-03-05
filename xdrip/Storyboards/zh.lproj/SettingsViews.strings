@@ -6,6 +6,7 @@
 "settingsviews_sectiontitletransmitter" = "发射器";
 "settingsviews_transmittertype" = "发射器类型";
 "settingsviews_transmitterid" = "发射器ID";
+"settingsviews_transmitterid_text_for_button" = "发射器ID";
 "settingsviews_givetransmitterid" = "输入发射器ID";
 "settingsviews_sectiontitlealerting" = "警报设置";
 "settingsviews_row_alert_types" = "警报类型";
@@ -33,3 +34,198 @@
 "settingsviews_masterorfollower" = "主控端或者关注者 ?";
 "settingsviews_master" = "主控端";
 "settingsviews_follower" = "关注者";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// When creating schedule for Nightscout or Dexcom Share upload, this is the top label text
+"timeScheduleViewTitle" = "On/Off Time Schedule for ";
+
+/// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
+"volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
+
+/// nightscout settings, port to use
+"nightScoutPort" = "Port (optional):";
+
+/// home screen settings, urgent high value
+"settingsviews_urgentHighValue" = "Urgent High Value:";
+
+/// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
+"volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
+
+/// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
+"settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration?";
+
+/// web oop settings in bluetooth peripheral view : enabled or not
+"settingsviews_webooptransmitter" = "Use Libre Algorithm?";
+
+/// Apple Watch Settings - text in row where user needs to say if unit should be displayed or not
+"displayUnitInCalendarEvent" = "Display Unit?";
+
+/// When clicking the interval setting, a pop up asks for number of minutes between two spoken readings, this is the message displayed in the pop up
+"settingsviews_speakIntervalMessage" = "Minimum interval between two readings, in minutes";
+
+/// Apple Watch Settings - text in row where create event is enabled or disabled 
+"createCalendarEvent" = "Create Calendar Events?";
+
+/// in Settings, section title for Trace
+"sectionTitleTrace" = "Issue Reporting";
+
+/// user tries to send trace file but there's no native email account configured
+"emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
+
+/// in Settings, to enable debug level in trace file
+"debugLevel" = "Include Debug Level";
+
+/// Apple Watch Settings - text in row where user needs to say if delta should be displayed or not
+"displayDeltaInCalendarEvent" = "Display Delta?";
+
+/// about settings, section title
+"settingsviews_sectiontitleAbout" = "About xDrip4iOS";
+
+/// general settings, should reading be shown in notification yes or no
+"showReadingInNotification" = "Show BG in Notifications?";
+
+/// 
+"settingsviews_urgentLowValue" = "Urgent Low Value:";
+
+/// weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section
+"settingsviews_labelWebOOP" = "xDrip or Libre Algorithm";
+
+/// nightscout or dexcom share settings, where user can select to edit the schedule
+"schedule" = "Schedule:";
+
+/// In case user tries to send trace file via email but error occurs.
+"failedToSendEmail" = "Failed to Send Email";
+
+/// shown on top of the first settings screen
+"m5stack_settingsviews_settingstitle" = "M5 Stack Settings";
+
+/// M5 stack bluetooth  settings, pop up that asks user to enter the password
+"m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth Password";
+
+/// used in settings, section Info, title of the version setting
+"settingsviews_Version" = "Version:";
+
+/// used in settings, section Info, title of the build setting
+"settingsviews_build" = "Build:";
+
+/// nightscout settings, where user can select to use schedule or not
+"settingsviews_useSchedule" = "Use Upload Schedule?";
+
+/// home screen settings, target value
+"settingsviews_targetValue" = "Target Value:";
+
+/// home screen settings, show target line
+"settingsviews_showtarget" = "Show Target Line?";
+
+/// used in settings, section Info, title of the license setting
+"settingsviews_license" = "License";
+
+/// M5 stack setting, brightness
+"m5stack_settingsviews_brightness" = "Screen Brightness";
+
+/// in Settings, row title to send settings
+"sendTraceFile" = "Send Issue Report";
+
+/// nightscout settings, title of row
+"uploadSensorStartTime" = "Upload Sensor Start Time?";
+
+/// name of setting for text color
+"m5stack_settingsviews_textColor" = "Text Color";
+
+/// transmitter settings, to explain that settings is about resetting the transmitter
+"settingsviews_resettransmitter" = "Reset Transmitter";
+
+/// general settings, should reading be multiplied with 10 yes or no
+"multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";
+
+/// non fixed settings, title of the section
+"settingsviews_labelNonFixed" = "Multi-point Calibration";
+
+/// nightscout settings, when clicking the cell, test the url and api key
+"testUrlAndAPIKey" = "Test Connection?";
+
+/// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
+"infoCalendarAccessRestricted" = "You cannot give authorization to xDrip4iOS to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
+
+/// default text in email body, when user wants to send trace file.
+"emailbodyText" = "Problem Description: ";
+
+/// speak settings, where user can select the language
+"settingsviews_speakBgReadingslanguage" = "Language:";
+
+/// speak reading settings, text in pop up where user can select the language
+"settingsviews_speakreadingslanguageselection" = "Select Language";
+
+/// general settings, should reading be shown in app badge yes or no
+"labelShowReadingInAppBadge" = "Show BG in the App Badge?";
+
+/// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
+"volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
+
+/// healthkit settings, literally 'healthkit'
+"settingsviews_healthkit" = "Write Data to Apple Health?";
+
+/// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
+"m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
+
+/// Apple Watch Settings - section title
+"appleWatchSectionTitle" = "Apple Watch";
+
+/// Text in pop up shown when user wants to send the trace file
+"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group 'xDrip4iOS', then mention your facebook name in the e-mail";
+
+/// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
+"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
+
+/// used for editing schedule for NightScout upload and Dexcom Share upload
+"editScheduleTimePickerSubtitle" = "Change: ";
+
+/// Apple Watch Settings - text in row where user needs to select a calendar
+"calenderId" = "Calendar To Use?";
+
+/// name of setting for back ground color
+"m5stack_settingsviews_backGroundColor" = "Background Color";
+
+/// If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown
+"infoCalendarAccessDeniedByUser" = "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it.";
+
+/// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test
+"volumeTestSoundPlayerExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.";
+
+/// home screen settings, use objectives in graph
+"settingsviews_useobjectives" = "Show Objectives in Graph?";
+
+/// Apple Watch Settings - text in row where user needs to say if trend should be displayed or not
+"displayTrendInCalendarEvent" = "Display Trend?";
+
+/// 
+"settingsviews_showcoloredobjectives" = "Show Colored Lines?";
+
+/// User sets a transmitter id with id 8G or higher. This is not supported
+"transmitterId8OrHigherNotSupported" = "Transmitters with ID 8Gxxxx or newer are not currently supported!";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// deloper settings, row title for 'Smooth Libre Values?'
+"smoothLibreValues" = "Smooth Libre Values?";
+
+/// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
+"oslog" = "OSLog";
+
+/// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
+"nslog" = "NSLog";
+
+/// Developer Settings, section title
+"developerSettings" = "Developer Settings";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// home screen settings, section title
+"settingsviews_sectiontitlehomescreen" = "Home Screen";

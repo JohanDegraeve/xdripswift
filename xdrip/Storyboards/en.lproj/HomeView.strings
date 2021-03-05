@@ -11,7 +11,7 @@
 "bluetoothisnoton" = "Bluetooth is not on. Switch on bluetooth first and then try again.";
 "bluetoothIsNotAuthorized" = "You did not give bluetooth permission for xDrip4iOS. Go to the settings, find the xDrip4iOS app, and enable Bluetooth.";
 "startScanningInfo" = "Scanning Started.\n\nKeep xDrip4iOS open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
-"sensorstart" = "Sensor Start";
+"sensorstart" = "Sensor Started";
 "notstarted" = "Not Started";
 "notknown" = "Not Known";
 "lastconnection" = "Last Connection";
@@ -30,6 +30,5 @@
 "transmitterpairingattempttimeout" = "Transmitter did not reply to pairing request.";
 "success" = "Success";
 "failed" = "Failed";
-"calibrationNotNecessary" = "With OOPWeb enabled, calibration is not necessary for the Libre sensor.";
+"calibrationNotNecessary" = "When using the Libre algoritm, it is not necessary to calibrate the sensor.";
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
-"sensorAge14Days" = "The Sensor has reached its maximum age.";

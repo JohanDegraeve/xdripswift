@@ -1,9 +1,7 @@
 "dexcomsharetestresult_verificationsuccessfulalerttitle" = "تم التحقق بنجاح";
 "dexcomsharetestresult_verificationsuccessfulalertbody" = "تم التحقق من حسابك في ديكسكوم شير بنجاح";
 "dexcomsharetestresult_verificationerroralerttitle" = "خطأ في التحقق";
-"dexcomsharetestresult_SSO_AuthenticateAccountNotFound" = "لم يتم إيجاد الحساب";
 "dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "تجاوزت محاولات تسجيل الدخول. انتظر 10 دقائق ثم حاول مرة أخرى.";
-"dexcomsharetestresult_SSO_AuthenticatePasswordInvalid" = "كلمة المرور غير صحيحة";
 "dexcomsharetestresult_uploadErrorWarning" = "خطأ في تحميل ديكسكوم شير";
 "dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "الرقم التسلسلي لديكسكوم شير لا يتطابق مع الرقم التسلسلي لهذا الحساب. تأكد من الرقم التسلسلي في الإعدادات.";
 "dexcomsharetestresult_monitored_receiver_not_assigned_1" = "يبدو أنه معرف حهاز الإرسال أو الرقم التسلسلي";

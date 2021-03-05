@@ -1,0 +1,42 @@
+"common_Ok" = "OK";
+"common_cancel" = "Peruuta";
+"common_mgdl" = "mg/dl";
+"common_mmol" = "mmol/l";
+"common_bloodglucoseunit" = "Verensokeri yksikkö";
+"common_bloodglucoseunit_short" = "Vs.yksikkö";
+"common_password" = "Salasana:";
+"common_default" = "Oletus";
+"common_high" = "KORKEA";
+"common_low" = "MATALA";
+"common_hour" = "tunti";
+"common_hours" = "tuntia";
+"common_minutes" = "minuuttia";
+"common_minute" = "min";
+"common_day" = "päivä";
+"common_week" = "viikko";
+"warning" ="Varoitus!";
+"update" = "Muokkaa";
+"add" = "Lisää";
+"yes" = "Kyllä";
+"no" = "Ei";
+"red" = "punainen";
+"green" = "vihreä";
+"white" = "valkoinen";
+"yellow" = "keltainen";
+"name" = "Nimi:";
+"WiFi" = "WiFi";
+"on" = "Päällä";
+"off" = "Pois";
+"delete" = "Poista";
+"invalidValue" = "Virheellinen arvo";
+"firmware" = "Laiteohjelmisto";
+"hardware" = "Laitteisto";
+"unknown" = "tuntematon";
+"sensorStatus" = "Sensorin tila:";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
+"invalidAccountOrPassword" = "Invalid account or password";

@@ -1,0 +1,7 @@
+"failure" = "epäonnistui";
+"shutdown" = "sammuttaa";
+"starting" = "aloittamassa";
+"expired" = "vanhentunut";
+"unknown" = "tuntematon";
+"ready" = "valmis";
+"notYetStarted" = "ei aloitettu";

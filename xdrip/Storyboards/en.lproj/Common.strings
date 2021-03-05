@@ -33,3 +33,4 @@
 "hardware" = "Hardware";
 "unknown" = "Unknown";
 "sensorStatus" = "Sensor status:";
+"invalidAccountOrPassword" = "Invalid account or password";
