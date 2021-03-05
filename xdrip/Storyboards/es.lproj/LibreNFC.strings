@@ -3,18 +3,5 @@
 "deviceMustSupportNFC" = "Este iPhone no dispone de NFC";
 "deviceMustSupportIOS14" = "Para conectar a un sensor Libre 2, se debe actualizar este iPhone a iOS14";
 "donotusethelibrelinkapp" = "Conectado a Libre 2.\r\n\r\nSi quieres seguir escaneando con la app official del sensor Libre, es imprescindible deshabilitar el permiso de Bluetooth en la configuración de la app del Libre. \r\n\r\nSi no está deshabilitado el permiso de Bluetooth, al escanear con la app official, se perderá la conexión entre xDrip4iOS y el sensor Libre 2.";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.
-"connectedLibre2DoesNotMatchScannedLibre2" = "You seem to have scanned a new sensor, but xDrip4iOS is having the Bluetooth connection to the old sensor.\r\n\r\nTo solve this :\r\n- Click 'disconnect' or 'stop scanning'\r\n- Go back to previous screen and add a new CGM of type Libre 2 and scan again.\r\n\r\nxDrip4iOS should now connect to the new sensor.";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Sometimes NFC scanning creates errors, retrying solves the problem. This is to explain this to the user
-"nfcErrorRetryScan" = "Error occured while scanning the sensor. Click 'Scan' top left or click 'back' and add the Libre 2 again, and scan again.";
-
+"connectedLibre2DoesNotMatchScannedLibre2" = "Parece que acabas de escanear un sensor nuevo pero xDrip4iOS sigue conectado por bluetooth al sensor anterior\r\n\r\nPara solucionar este problema:\r\n- Haz click en 'Disconectar' or 'Detener Escaneo'\r\n- Volver a la pantalla anterior, añadir un nuevo Libre 2 y volver a escanear.\r\n\r\nxDrip4iOS debe conectarse al sensor nuevo.";
+"nfcErrorRetryScan" = "Se ha producido un error al escanear el sensor. Haz click en 'Escanear' o si sigue fallando, haz click en 'Atrás', añadir de nuevo el Libre 2 y escanear otra vez.";

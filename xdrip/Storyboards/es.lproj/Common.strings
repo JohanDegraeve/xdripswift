@@ -22,48 +22,15 @@
 "name" = "Nombre:";
 "delete" = "Borrar";
 "unknown" = "Desconocido";
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// red
-"red" = "red";
-
-/// green
-"green" = "green";
-
-/// for settings row, literally hardware
+"red" = "rojo";
+"green" = "verde";
 "hardware" = "Hardware";
-
-/// WiFi
 "WiFi" = "WiFi";
-
-/// whenever invalid value is given by user somewhere in a field
-"invalidValue" = "Invalid Value";
-
-/// for settings row, literally firmware
+"invalidValue" = "Valor Erroneo Value";
 "firmware" = "Firmware";
-
-/// white
-"white" = "white";
-
-/// to show the sensor status
-"sensorStatus" = "Sensor status:";
-
-/// on
+"white" = "blanco";
+"sensorStatus" = "Estado Sensor:";
 "on" = "On";
-
-/// yellow
-"yellow" = "yellow";
-
-/// 
+"yellow" = "amarillo";
 "off" = "Off";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
-"invalidAccountOrPassword" = "Invalid account or password";
+"invalidAccountOrPassword" = "Cuenta y/o contraseña incorrecta";

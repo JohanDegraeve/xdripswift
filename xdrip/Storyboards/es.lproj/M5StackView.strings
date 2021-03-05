@@ -1,45 +1,13 @@
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// user clicks power off in M5Stack view, confirmation is needed
-"powerOffConfirm" = "Are you sure you want to power off the M5Stack?";
-
-/// in case user tires to power off the M5Stack via xdrip but it's not connected
-"deviceMustBeConnectedToPowerOff" = "M5Stack must be connected to be able to power it off";
-
-/// cell text, to power off
-"powerOff" = "Power Off";
-
-/// when M5Stack list is shown, title of the view
+"powerOffConfirm" = "Apagar el M5Stack?";
+"deviceMustBeConnectedToPowerOff" = "El M5Stack debe estar conectado para poderlo apagar";
+"powerOff" = "Apagar";
 "m5StackViewscreenTitle" = "M5Stack";
-
-/// in case M5Stack authentication failed
-"authenticationFailureWarning" = "Authentication to M5Stack Failed, either set the pre-configured password in the Settings, or, if the M5Stack does not have a preconfigured password then reset the M5Stack. M5Stack will disconnect now. You can make a new attempt by clicking ";
-
-/// In m5StickC view, one line allows to show info where to find M5Stack software, this is the text in the cell
-"m5StickCSoftWhereHelpCellText" = "Where to find the M5StickC software?";
-
-/// in case M5Stack authentication failed, and M5Stack is generating a random password
-"m5StackResetRequiredWarning" = "M5Stack must be reset in order to generate a new temporary password. When done click ";
-
-/// this is the text shown when clicking the cell 'where to find M5Stack software'
-"m5StackSoftWareHelpText" = "Go to";
-
-/// In m5Stack view, one line allows to show info where to find M5Stack software, this is the text in the cell
-"m5StackSoftWhereHelpCellText" = "Where to find the M5Stack software?";
-
-/// when Bluetooth Peripheral list is shown, title of the view
+"authenticationFailureWarning" = "Fallo de autenticación to M5Stack Failed, debes configurar la contraseña o bien resetear el M5Stack. M5Stack se desconectará. Puedes intentarlo otra vez haciendo click ";
+"m5StickCSoftWhereHelpCellText" = "Dónde encontrar información sobre el M5StickC?";
+"m5StackResetRequiredWarning" = "Se debe resetear el M5Stack para poder generar una nueva contraseña provisional. Una vez hecho, haz click en  ";
+"m5StackSoftWareHelpText" = "Ir a";
+"m5StackSoftWhereHelpCellText" = "Dónde encontrar información sobre el M5Stack?";
 "screenTitle" = "M5Stack";
-
-/// in case M5Stack authentication failed, and M5Stack is expecting user configured password
-"blePasswordMissingWarning" = "You need to set the password in the Settings";
-
-/// text for cell in settings view, connect to wifi yes or no
-"connectToWiFi" = "Connect to WiFi";
-
-/// when M5Stickc list is shown, title of the view
+"blePasswordMissingWarning" = "Debes configurar la contraseña en Configuración";
+"connectToWiFi" = "Conectar a WiFi";
 "m5StickCViewscreenTitle" = "M5StickC";
