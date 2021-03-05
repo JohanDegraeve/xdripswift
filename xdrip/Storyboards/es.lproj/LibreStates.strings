@@ -1,26 +1,7 @@
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Possible Libre Sensor states
-"starting" = "starting";
-
-/// Possible Libre Sensor states
-"expired" = "expired";
-
-/// Possible Libre Sensor states
-"shutdown" = "shut down";
-
-/// Possible Libre Sensor states
-"ready" = "ready";
-
-/// Possible Libre Sensor states
-"failure" = "failed";
-
-/// general usage
-"unknown" = "unknown";
-
-/// Possible Libre Sensor states
-"notYetStarted" = "not yet started";
+"starting" = "iniciando";
+"expired" = "caducado";
+"shutdown" = "parado";
+"ready" = "listo";
+"failure" = "error";
+"unknown" = "desconocido";
+"notYetStarted" = "sin iniciar";

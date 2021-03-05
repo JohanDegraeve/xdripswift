@@ -7,7 +7,7 @@
 "aliasAlreadyExists" = "Il y a déjà un périphérique avec cet alias";
 "confirmDeletionPeripheral" = "Voulez-vous supprimer ce périphérique: ";
 "bluetoothPeripheralAlias" = "Alias";
-"SensorSerialNumber" = "Numéro de série de capteur";
+"SensorSerialNumber" = "Numéro de série";
 "serialNumber" = "Numéro de série";
 "battery" = "Batterie";
 "needsTransmitterId" = "ID du transmetteur manquant";
