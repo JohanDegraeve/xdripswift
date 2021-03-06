@@ -209,8 +209,13 @@ final class BluetoothPeripheralsViewController: UIViewController {
 
     /// calls tableView.reloadRows for the row where bluetoothPeripheral is shown
     private func updateRow(for bluetoothPeripheral: BluetoothPeripheral) {
-        
-        tableView.reloadRows(at: [IndexPath(row: getIndexInSection(for: bluetoothPeripheral), section: bluetoothPeripheral.bluetoothPeripheralType().category().index())], with: .none)
+
+        // possibly an instance of BluetoothPeripheralViewController is on top of this UIViewController, in which case it's better not to update the rows (xcode creates warnings if this would be done)
+        if isViewLoaded && (view.window != nil) {
+
+            tableView.reloadRows(at: [IndexPath(row: getIndexInSection(for: bluetoothPeripheral), section: bluetoothPeripheral.bluetoothPeripheralType().category().index())], with: .none)
+
+        }
 
     }
     

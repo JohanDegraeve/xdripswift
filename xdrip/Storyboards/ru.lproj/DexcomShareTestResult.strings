@@ -12,17 +12,11 @@
 /// POP up after verifying DexcomShare credentials, to say that verification of url and password was not successful - this is the title
 "dexcomsharetestresult_verificationerroralerttitle" = "Verification Error";
 
-/// if dexcom share login fails due to account not found
-"dexcomsharetestresult_SSO_AuthenticateAccountNotFound" = "Account Not Found";
-
 /// If serial number is not assigned to the account, this is the 2nd part in a series of 3 to form a complete sentence
 "dexcomsharetestresult_monitored_receiver_not_assigned_2" = "is not assigned to";
 
 /// If dexcom share upload fails because serial number does not match for the account
 "dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "The Dexcom Share Serial Number does not match the serial number for this account. Verify the Serial Number in the settings.";
-
-/// if dexcom share login fails due to invalid password
-"dexcomsharetestresult_SSO_AuthenticatePasswordInvalid" = "Invalid Password";
 
 /// If serial number is not assigned to the account, this is the 3rd part in a series of 3 to form a complete sentence
 "dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Use the official Dexcom app to register the Transmitter (G5) or Share receiver (G4)\r\n\r\nYou are possibly just using the wrong URL, verify the setting 'Use US URL?'";

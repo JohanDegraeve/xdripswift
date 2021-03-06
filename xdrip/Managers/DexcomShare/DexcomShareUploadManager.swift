@@ -598,7 +598,16 @@ class DexcomShareUploadManager:NSObject {
                         
                         //there's no error, means decoded should now have the value of the new sessionid
                         if let dexcomShareSessionId = decoded as? String {
-                            
+
+                            // when giving random username/password, there's no error but dexcomShareSessionId equals "00000000-0000-0000-0000-000000000000", in that case create errorCode "SSO_AuthenticatePasswordInvalid"
+                            guard dexcomShareSessionId != "00000000-0000-0000-0000-000000000000" else {
+                                
+                                completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "SSO_AuthenticatePasswordInvalid"]))
+                                
+                                return
+                                
+                            }
+
                             // success is a JSON-encoded string containing the dexcomShareSessionId
                             trace("    successful login", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                             self.dexcomShareSessionId = dexcomShareSessionId
@@ -679,9 +688,9 @@ class DexcomShareUploadManager:NSObject {
         guard let errorText = errorText else {return nil}
         
         if errorText.uppercased() == "SSO_AuthenticateAccountNotFound".uppercased() {
-            return Texts_DexcomShareTestResult.authenticateAccountNotFound
+            return Texts_Common.invalidAccountOrPassword
         } else if errorText.uppercased() == "SSO_AuthenticatePasswordInvalid".uppercased() {
-            return Texts_DexcomShareTestResult.authenticatePasswordInvalid
+            return Texts_Common.invalidAccountOrPassword
         } else if errorText.uppercased() == "SSO_AuthenticateMaxAttemptsExceeed".uppercased() {
             return Texts_DexcomShareTestResult.authenticateMaxAttemptsExceeded
         } else {

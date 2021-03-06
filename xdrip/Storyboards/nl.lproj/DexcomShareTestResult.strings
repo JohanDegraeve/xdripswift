@@ -1,9 +1,7 @@
 "dexcomsharetestresult_verificationsuccessfulalerttitle" = "Verificatie Succesvol";
 "dexcomsharetestresult_verificationsuccessfulalertbody" = "Je Dexcom Share account was succesvol geverifieerd";
 "dexcomsharetestresult_verificationerroralerttitle" = "Verificatie Fout";
-"dexcomsharetestresult_SSO_AuthenticateAccountNotFound" = "Account Niet Gevonden";
 "dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Maximum login pogingen overschreden. Wacht 10 minuten en probeer opnieuw.";
-"dexcomsharetestresult_SSO_AuthenticatePasswordInvalid" = "Ongeldig Wachtwoord";
 "dexcomsharetestresult_uploadErrorWarning" = "Dexcom Share Upload Fout";
 "dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Het Dexcom Share Serie Nummer komt niet overeen met het serienummer van dit account. Verifieer het Serie Nummer in de instellingen.";
 "dexcomsharetestresult_monitored_receiver_not_assigned_1" = "Het lijkt er op dat het Transmitter ID of serie nummer";
