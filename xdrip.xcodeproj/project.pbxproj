@@ -1212,7 +1212,6 @@
 		F8E53FD1251D360200052CE5 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Common.strings; sourceTree = "<group>"; };
 		F8E53FD2251D360300052CE5 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Common.strings; sourceTree = "<group>"; };
 		F8E53FD3251D361600052CE5 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Common.strings; sourceTree = "<group>"; };
-		F8E53FD6251D363900052CE5 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Common.strings"; sourceTree = "<group>"; };
 		F8E53FD7251D363B00052CE5 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Common.strings; sourceTree = "<group>"; };
 		F8E53FE8251F7B8800052CE5 /* Texts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Texts.swift; sourceTree = "<group>"; };
 		F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsHousekeeping.swift; sourceTree = "<group>"; };
@@ -2844,7 +2843,6 @@
 				nl,
 				sl,
 				ru,
-				"pt-BR",
 				"pl-PL",
 				it,
 				fr,
@@ -3846,7 +3844,6 @@
 				F8E53FD1251D360200052CE5 /* ar */,
 				F8E53FD2251D360300052CE5 /* zh */,
 				F8E53FD3251D361600052CE5 /* nl */,
-				F8E53FD6251D363900052CE5 /* pt-BR */,
 				F8E53FD7251D363B00052CE5 /* pt */,
 				2867F5CA25BC209500AA1E98 /* fi */,
 				F81F3A6225C9E5A800520946 /* es */,
