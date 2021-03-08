@@ -984,6 +984,9 @@
 		F889CB8D236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F889CB8E236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
 		F889CB97236D89C800A81068 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		F88EC12325F6CFB200DF0EAF /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/SettingsViews.strings; sourceTree = "<group>"; };
+		F88EC12425F6CFC200DF0EAF /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/WatlaaView.strings; sourceTree = "<group>"; };
+		F88EC12525F6CFC500DF0EAF /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/WatlaaView.strings; sourceTree = "<group>"; };
 		F890E079247687AE008FB2EC /* URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URL.swift; sourceTree = "<group>"; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
 		F897AAFA2201018800CDDD10 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
@@ -3519,6 +3522,8 @@
 				F81F3BE425D0932F00520946 /* pl-PL */,
 				F81F3BF525D093F800520946 /* ru */,
 				F81F3C0D25D0969700520946 /* zh */,
+				F88EC12425F6CFC200DF0EAF /* fi */,
+				F88EC12525F6CFC500DF0EAF /* sl */,
 			);
 			name = WatlaaView.strings;
 			sourceTree = "<group>";
@@ -3829,6 +3834,7 @@
 				F81F3BD225D0927700520946 /* it */,
 				F81F3BE325D0932700520946 /* pl-PL */,
 				F81F3BF425D093F200520946 /* ru */,
+				F88EC12325F6CFB200DF0EAF /* sl */,
 			);
 			name = SettingsViews.strings;
 			sourceTree = "<group>";
