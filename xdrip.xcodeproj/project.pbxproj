@@ -987,6 +987,11 @@
 		F88EC12325F6CFB200DF0EAF /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F88EC12425F6CFC200DF0EAF /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/WatlaaView.strings; sourceTree = "<group>"; };
 		F88EC12525F6CFC500DF0EAF /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/WatlaaView.strings; sourceTree = "<group>"; };
+		F88EC17325FABAAE00DF0EAF /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Common.strings; sourceTree = "<group>"; };
+		F88EC17425FABAB000DF0EAF /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Common.strings; sourceTree = "<group>"; };
+		F88EC17525FABAB300DF0EAF /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/Common.strings"; sourceTree = "<group>"; };
+		F88EC17625FABAB700DF0EAF /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Common.strings; sourceTree = "<group>"; };
+		F88EC17725FABAB800DF0EAF /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Common.strings; sourceTree = "<group>"; };
 		F890E079247687AE008FB2EC /* URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URL.swift; sourceTree = "<group>"; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
 		F897AAFA2201018800CDDD10 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
@@ -3848,6 +3853,11 @@
 				2867F5CA25BC209500AA1E98 /* fi */,
 				F81F3A6225C9E5A800520946 /* es */,
 				CE1B2FE425D026B400F642F5 /* fr */,
+				F88EC17325FABAAE00DF0EAF /* de */,
+				F88EC17425FABAB000DF0EAF /* it */,
+				F88EC17525FABAB300DF0EAF /* pl-PL */,
+				F88EC17625FABAB700DF0EAF /* ru */,
+				F88EC17725FABAB800DF0EAF /* sl */,
 			);
 			name = Common.strings;
 			sourceTree = "<group>";
