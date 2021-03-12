@@ -9,8 +9,8 @@
 "startsensortimeinfo" = "In de volgende stappen voer je de datum en tijd in dat de sensor was aangebracht. Het is belangrijk dat de datum en tijd zo correct mogelijk worden ingesteld.";
 "scanbluetoothdeviceongoing" = "Scannen naar Transmitter...";
 "bluetoothisnoton" = "Bluetooth staat niet aan. Schakel bluetooth eerst in en probeer opnieuw.";
-"bluetoothIsNotAuthorized" = "Je hebt geen bluetooth toegang gegeven voor xDrip4iOS. Ga naar instellingen, zoek de xDrip4iOS app en schakel bluetooth toegang in.";
-"startScanningInfo" = "Scannen Gestart.\n\Houd xDrip4iOS open in the voorgrond tot een verbinding is gemaakt.\n\n(Je hoeft Automatische Vergrendeling niet uit te zetten. Druk niet op de home knop en vergrendel je iPhone niet.)";
+"bluetoothIsNotAuthorized" = "Je hebt geen bluetooth toegang gegeven voor xDrip4iO5. Ga naar instellingen, zoek de xDrip4iO5 app en schakel bluetooth toegang in.";
+"startScanningInfo" = "Scannen Gestart.\n\Houd xDrip4iO5 open in the voorgrond tot een verbinding is gemaakt.\n\n(Je hoeft Automatische Vergrendeling niet uit te zetten. Druk niet op de home knop en vergrendel je iPhone niet.)";
 "sensorstart" = "Sensor Gestart";
 "notstarted" = "Niet Gestart";
 "notknown" = "Niet Bekend";

@@ -49,11 +49,11 @@ enum Texts_HomeView {
     }()
     
     static let bluetoothIsNotAuthorized: String = {
-        return NSLocalizedString("bluetoothIsNotAuthorized", tableName: filename, bundle: Bundle.main, value: "You did not give bluetooth permission for xDrip4iOS. Go to the settings, find the xDrip4iOS app, and enable Bluetooth.", comment: "when user starts scanning for bluetooth device, but bluetooth is not authorized")
+        return NSLocalizedString("bluetoothIsNotAuthorized", tableName: filename, bundle: Bundle.main, value: "You did not give bluetooth permission for xDrip4iO5. Go to the settings, find the xDrip4iO5 app, and enable Bluetooth.", comment: "when user starts scanning for bluetooth device, but bluetooth is not authorized")
     }()
     
     static let startScanningInfo: String = {
-        return NSLocalizedString("startScanningInfo", tableName: filename, bundle: Bundle.main, value: "Scanning Started.\n\nKeep xDrip4iOS open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)", comment: "After clicking scan button, this message will appear")
+        return NSLocalizedString("startScanningInfo", tableName: filename, bundle: Bundle.main, value: "Scanning Started.\n\nKeep xDrip4iO5 open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)", comment: "After clicking scan button, this message will appear")
     }()
    
     static let sensorStart:String = {

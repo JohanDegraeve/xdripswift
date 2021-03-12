@@ -11,7 +11,7 @@
 "bluetoothisnoton" = "Bluetooth is not on. Switch on bluetooth first and then try again.";
 
 /// After clicking scan button, this message will appear
-"startScanningInfo" = "Scanning Started.\n\nKeep xDrip4iOS open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
+"startScanningInfo" = "Scanning Started.\n\nKeep xDrip4iO5 open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
 
 /// when user clicks transmitterButton, this is the action to forget the device, so that user can scan for a new device, in case user switches device
 "forgetbluetoothdeviceactiontitle" = "Forget Transmitter";
@@ -80,7 +80,7 @@
 "statusactiontitle" = "Status";
 
 /// when user starts scanning for bluetooth device, but bluetooth is not authorized
-"bluetoothIsNotAuthorized" = "You did not give bluetooth permission for xDrip4iOS. Go to the settings, find the xDrip4iOS app, and enable Bluetooth.";
+"bluetoothIsNotAuthorized" = "You did not give bluetooth permission for xDrip4iO5. Go to the settings, find the xDrip4iO5 app, and enable Bluetooth.";
 
 /// Text in button on home screen
 "presnooze" = "Snooze";

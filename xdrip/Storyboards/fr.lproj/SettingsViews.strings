@@ -67,10 +67,10 @@
 "displayUnitInCalendarEvent" = "Afficher Unité?";
 "displayDeltaInCalendarEvent" = "Afficher Variation?";
 "infoCalendarAccessDeniedByUser" = "Vous avez refusé l'accès au calendrier.\n\nPour permettre cette fonctionnalités, modifiez les autorissations dans les réglages de votre iPhone.";
-"infoCalendarAccessRestricted" = "Vous n'avez pas donné les autorisations à xDrip4IOS pour accéder à votre calendrier. Cela peut aussi être du à une restriction parentale.";
+"infoCalendarAccessRestricted" = "Vous n'avez pas donné les autorisations à xDrip4iO5 pour accéder à votre calendrier. Cela peut aussi être du à une restriction parentale.";
 "sectionTitleTrace" = "Trace";
 "sendTraceFile" = "Envoyer le fichier Trace";
-"describeProblem" = "Décrire la raison de l'envoi du fichier de trace avec un maximum de détail. Si vous avez déjà reporté un probème via Facebook - dans le groupe'xDrip4iOS'-, merci de mentionner votre nom facebook dans l'email";
+"describeProblem" = "Décrire la raison de l'envoi du fichier de trace avec un maximum de détail. Si vous avez déjà reporté un probème via Facebook - dans le groupe'xDrip4iO5'-, merci de mentionner votre nom facebook dans l'email";
 "emailNotConfigured" = "Vous devez configurer un email sur votre compte IOS.";
 "emailbodyText" = "Description du problème";
 "failedToSendEmail" = "Echec d'envoi du Email";
@@ -91,7 +91,7 @@
 "debugLevel" = "Inclure le mode Debug";
 
 /// about settings, section title
-"settingsviews_sectiontitleAbout" = "A propos xDrip4iOS";
+"settingsviews_sectiontitleAbout" = "A propos xDrip4iO5";
 
 /// 
 "settingsviews_urgentLowValue" = "Urgent Valeur Faible";
