@@ -71,13 +71,22 @@ class DexcomShareUploadManager:NSObject {
     public func upload(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // check if dexcomShare is enabled
-        guard UserDefaults.standard.uploadReadingstoDexcomShare else {return}
+        guard UserDefaults.standard.uploadReadingstoDexcomShare else {
+            trace("in upload, uploadReadingstoDexcomShare not enabled", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+            return
+        }
         
         // check if master is enabled
-        guard UserDefaults.standard.isMaster else {return}
+        guard UserDefaults.standard.isMaster else {
+            trace("in upload, not master, no upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+            return
+        }
         
         // check if accountname and password and serial number exist
-        guard UserDefaults.standard.dexcomShareSerialNumber != nil, UserDefaults.standard.dexcomShareAccountName != nil, UserDefaults.standard.dexcomSharePassword != nil else {return}
+        guard UserDefaults.standard.dexcomShareSerialNumber != nil, UserDefaults.standard.dexcomShareAccountName != nil, UserDefaults.standard.dexcomSharePassword != nil else {
+            trace("in upload, not master, no upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+            return
+        }
         
         // if schedule is on, check if upload is needed according to schedule
         if UserDefaults.standard.dexcomShareUseSchedule {
