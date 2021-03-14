@@ -152,6 +152,8 @@ extension AlertSettingsViewControllerData {
                 cell.accessoryType = UITableViewCell.AccessoryType.none
             } else {
                 cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+                // set color of disclosureIndicator to ConstantsUI.disclosureIndicatorColor
+                cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
             }
         case .value:
             // note that value will not be shown if alerttype not enabled or alertkind doesn't need a value, means if that's the case, setting will never be .value
@@ -162,10 +164,15 @@ extension AlertSettingsViewControllerData {
                 cell.detailTextLabel?.text = value.description
             }
             cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            // set color of disclosureIndicator to ConstantsUI.disclosureIndicatorColor
+            cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+            
         case .alertType:
             cell.textLabel?.text = Texts_Alerts.alerttype
             cell.detailTextLabel?.text = AlertSettingsViewControllerData.getAlertType(alertType: alertType).name
             cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            // set color of disclosureIndicator to ConstantsUI.disclosureIndicatorColor
+            cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
         }
         
         return cell

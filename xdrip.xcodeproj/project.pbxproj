@@ -252,6 +252,7 @@
 		F870D3EE2513B786008967B0 /* Trace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3ED2513B786008967B0 /* Trace.swift */; };
 		F8797CEA255B43960033956B /* GlucoseData+Smoothable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8797CE9255B43960033956B /* GlucoseData+Smoothable.swift */; };
 		F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F889CB71236D84AC00A81068 /* M5StackView.strings */; };
+		F88EC27025FEB8B900DF0EAF /* DTCustomColoredAccessory.m in Sources */ = {isa = PBXBuildFile; fileRef = F88EC26E25FEB8B800DF0EAF /* DTCustomColoredAccessory.m */; };
 		F890E07A247687AE008FB2EC /* URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = F890E079247687AE008FB2EC /* URL.swift */; };
 		F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */; };
 		F897AAFB2201018800CDDD10 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897AAFA2201018800CDDD10 /* String.swift */; };
@@ -989,6 +990,8 @@
 		F88EC12325F6CFB200DF0EAF /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F88EC12425F6CFC200DF0EAF /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/WatlaaView.strings; sourceTree = "<group>"; };
 		F88EC12525F6CFC500DF0EAF /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/WatlaaView.strings; sourceTree = "<group>"; };
+		F88EC26E25FEB8B800DF0EAF /* DTCustomColoredAccessory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTCustomColoredAccessory.m; sourceTree = "<group>"; };
+		F88EC26F25FEB8B800DF0EAF /* DTCustomColoredAccessory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTCustomColoredAccessory.h; sourceTree = "<group>"; };
 		F890E079247687AE008FB2EC /* URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URL.swift; sourceTree = "<group>"; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
 		F897AAFA2201018800CDDD10 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
@@ -1823,6 +1826,15 @@
 			path = Texts;
 			sourceTree = "<group>";
 		};
+		F88EC26D25FEB7F900DF0EAF /* CustomColoredDisclosureIndicator */ = {
+			isa = PBXGroup;
+			children = (
+				F88EC26F25FEB8B800DF0EAF /* DTCustomColoredAccessory.h */,
+				F88EC26E25FEB8B800DF0EAF /* DTCustomColoredAccessory.m */,
+			);
+			path = CustomColoredDisclosureIndicator;
+			sourceTree = "<group>";
+		};
 		F8A2BBFB25D9D36C001D1E78 /* Atom */ = {
 			isa = PBXGroup;
 			children = (
@@ -2364,6 +2376,7 @@
 		F8EA6C8021B723A80082976B /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				F88EC26D25FEB7F900DF0EAF /* CustomColoredDisclosureIndicator */,
 				F8AF11F624B1E6D700AE5BA2 /* Errors */,
 				F85FF38F25288860004E6FF1 /* HouseKeeping */,
 				F8F7B8EE259A84A300C47B04 /* KalmanFilter */,
@@ -3366,6 +3379,7 @@
 				F8A389E7232ECE7E0010F405 /* SettingsViewUtilities.swift in Sources */,
 				F8A2BC3125DB0D6D001D1E78 /* BluetoothPeripheralManager+M5StackBluetoothTransmitterDelegate.swift in Sources */,
 				F8A2BC2D25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMG5TransmitterDelegate.swift in Sources */,
+				F88EC27025FEB8B900DF0EAF /* DTCustomColoredAccessory.m in Sources */,
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				F816E12C2439DFBA009EE65B /* DexcomG4+CoreDataProperties.swift in Sources */,
 				F8A2BC3425DB0D6D001D1E78 /* BluetoothPeripheralManager+WatlaaBluetoothTransmitterDelegate.swift in Sources */,

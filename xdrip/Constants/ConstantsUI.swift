@@ -9,4 +9,7 @@ enum ConstantsUI {
     /// color to use as background when a row is selected
     static let tableRowSelectedBackGroundColor = UIColor.systemBlue
     
+    /// color to use for disclosure indicator in settings views
+    static let disclosureIndicatorColor = UIColor.systemBlue
+    
 }

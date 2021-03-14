@@ -186,6 +186,7 @@ extension TimeScheduleViewController: UITableViewDataSource {
             cell.accessoryType = .none
         } else {
             cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
         }
         
         return cell

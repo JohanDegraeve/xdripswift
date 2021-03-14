@@ -110,6 +110,10 @@ extension GNSEntryBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         // default value for accessoryView is nil
         cell.accessoryView = nil
         
+        // create disclosureIndicator in color ConstantsUI.disclosureIndicatorColor
+        // will be used whenever accessoryType is to be set to disclosureIndicator
+        let disclosureAaccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+
         guard let setting = Settings(rawValue: rawValue) else { fatalError("GNSEntryBluetoothPeripheralViewModel update, unexpected setting") }
         
         switch setting {
@@ -124,13 +128,15 @@ extension GNSEntryBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.textLabel?.text = Texts_Common.firmware
             cell.detailTextLabel?.text = gNSEntry.firmwareVersion
             cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = disclosureAaccessoryView
             
         case .serialNumber:
             
             cell.textLabel?.text = Texts_BluetoothPeripheralView.serialNumber
             cell.detailTextLabel?.text = gNSEntry.serialNumber
             cell.accessoryType = .disclosureIndicator
-            
+            cell.accessoryView = disclosureAaccessoryView
+
         }
 
     }
