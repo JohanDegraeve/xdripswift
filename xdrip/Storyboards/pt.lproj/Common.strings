@@ -33,10 +33,4 @@
 "hardware" = "Hardware";
 "unknown" = "Desconhecido";
 "sensorStatus" = "Estado do Sensor:";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
-"invalidAccountOrPassword" = "Invalid account or password";
+"invalidAccountOrPassword" = "Conta ou Senha inválida";
