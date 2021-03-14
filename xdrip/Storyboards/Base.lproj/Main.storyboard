@@ -136,7 +136,7 @@
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="g4X-8R-g01">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="759"/>
-                                <color key="backgroundColor" white="0.15" alpha="1.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" white="0.14999999999999999" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="blue" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SettingsCell" textLabel="tIz-Hj-yxH" detailTextLabel="Tpl-mr-dqb" style="IBUITableViewCellStyleValue1" id="zQ9-Zy-4Lu" customClass="SettingsTableViewCell" customModule="xdrip" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="55.5" width="414" height="43.5"/>
@@ -161,7 +161,7 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
-                                        <color key="backgroundColor" white="0.15" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="backgroundColor" white="0.14999999999999999" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
@@ -236,15 +236,14 @@
                             </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="EeK-ZH-OUl"/>
-                        <color key="backgroundColor" white="0.15" alpha="1.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.14999999999999999" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="QMQ-3c-w3T" firstAttribute="leading" secondItem="FhS-oK-gA5" secondAttribute="leading" id="29M-fi-6OW"/>
-                            <constraint firstAttribute="trailing" secondItem="QMQ-3c-w3T" secondAttribute="trailing" id="6z5-n3-UU1"/>
+                            <constraint firstAttribute="leading" secondItem="FhS-oK-gA5" secondAttribute="leading" id="29M-fi-6OW"/>
                             <constraint firstItem="Obg-wT-x7O" firstAttribute="top" secondItem="iIy-f4-6Ww" secondAttribute="bottom" constant="20" id="BXm-QO-DsV"/>
                             <constraint firstItem="iIy-f4-6Ww" firstAttribute="top" secondItem="bT9-HM-Wcp" secondAttribute="bottom" constant="15" id="Ecv-M2-lBk" userLabel="Picker View Sub Title.top = Picker View Main Title.bottom + 30"/>
                             <constraint firstItem="bT9-HM-Wcp" firstAttribute="centerX" secondItem="FhS-oK-gA5" secondAttribute="centerX" id="LV5-rD-z3I"/>
                             <constraint firstItem="iIy-f4-6Ww" firstAttribute="centerX" secondItem="FhS-oK-gA5" secondAttribute="centerX" id="MqF-Fb-uay"/>
-                            <constraint firstItem="QMQ-3c-w3T" firstAttribute="top" secondItem="FhS-oK-gA5" secondAttribute="top" id="NLK-bM-JIx"/>
+                            <constraint firstAttribute="top" secondItem="FhS-oK-gA5" secondAttribute="top" id="NLK-bM-JIx"/>
                             <constraint firstItem="bT9-HM-Wcp" firstAttribute="top" secondItem="EeK-ZH-OUl" secondAttribute="top" constant="90" id="NT8-5a-jNK"/>
                             <constraint firstItem="Obg-wT-x7O" firstAttribute="leading" secondItem="EeK-ZH-OUl" secondAttribute="leading" id="OdZ-8Q-Ejb"/>
                             <constraint firstItem="Obg-wT-x7O" firstAttribute="trailing" secondItem="EeK-ZH-OUl" secondAttribute="trailing" id="WKt-Jy-Djx"/>
@@ -319,14 +318,13 @@
                             </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="ebF-p9-ctE"/>
-                        <color key="backgroundColor" white="0.15" alpha="1.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.14999999999999999" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="8Bd-7p-ZRp" firstAttribute="centerX" secondItem="Yuo-xZ-z1z" secondAttribute="centerX" id="2sl-HH-sF0"/>
-                            <constraint firstItem="sdE-1o-OHh" firstAttribute="top" secondItem="Yuo-xZ-z1z" secondAttribute="top" id="DUY-rc-VOh"/>
+                            <constraint firstAttribute="top" secondItem="Yuo-xZ-z1z" secondAttribute="top" id="DUY-rc-VOh"/>
                             <constraint firstItem="ebF-p9-ctE" firstAttribute="trailing" secondItem="N9b-EE-lZm" secondAttribute="trailing" constant="20" id="KXF-jp-Zpw"/>
                             <constraint firstItem="b1J-rJ-H3K" firstAttribute="top" secondItem="439-P7-OU7" secondAttribute="bottom" constant="20" id="N03-m2-XUE"/>
-                            <constraint firstItem="sdE-1o-OHh" firstAttribute="leading" secondItem="Yuo-xZ-z1z" secondAttribute="leading" id="Nd3-XX-oyN"/>
-                            <constraint firstAttribute="trailing" secondItem="sdE-1o-OHh" secondAttribute="trailing" id="ZJh-zQ-D7N"/>
+                            <constraint firstAttribute="leading" secondItem="Yuo-xZ-z1z" secondAttribute="leading" id="Nd3-XX-oyN"/>
                             <constraint firstItem="8Bd-7p-ZRp" firstAttribute="top" secondItem="7NI-o7-nWK" secondAttribute="bottom" constant="20" id="f17-PK-Tbk"/>
                             <constraint firstItem="7NI-o7-nWK" firstAttribute="top" secondItem="ebF-p9-ctE" secondAttribute="top" constant="90" id="fQe-nX-8mm"/>
                             <constraint firstItem="ebF-p9-ctE" firstAttribute="trailing" secondItem="439-P7-OU7" secondAttribute="trailing" id="gU4-ZL-rSD"/>
@@ -1176,9 +1174,6 @@
         <image name="Bluetooth" width="30" height="30"/>
         <image name="Home" width="30" height="30"/>
         <image name="Settings" width="30" height="30"/>
-        <systemColor name="groupTableViewBackgroundColor">
-            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
         <systemColor name="systemGreenColor">
             <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
