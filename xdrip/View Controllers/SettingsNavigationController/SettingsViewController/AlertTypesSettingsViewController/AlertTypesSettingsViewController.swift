@@ -126,6 +126,8 @@ extension AlertTypesSettingsViewController: UITableViewDataSource, UITableViewDe
         // clicking the cell will always open a new screen which allows the user to edit the alert type
         cell.accessoryType = .disclosureIndicator
         
+        cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+        
         return cell
     }
     
