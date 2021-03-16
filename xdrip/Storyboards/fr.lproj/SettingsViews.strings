@@ -123,6 +123,12 @@
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
 "volumeTestiOSSound" = "Test Volume (Volume actuel iPhone)";
 
+/// Developer Settings, section title
+"developerSettings" = "Paramètres Développeur";
+
+/// home screen settings, section title
+"settingsviews_sectiontitlehomescreen" = "Ecran d'accueil";
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,13 +141,3 @@
 
 /// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
 "nslog" = "NSLog";
-
-/// Developer Settings, section title
-"developerSettings" = "Developer Settings";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// home screen settings, section title
-"settingsviews_sectiontitlehomescreen" = "Home Screen";
