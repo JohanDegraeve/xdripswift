@@ -61,6 +61,11 @@ public class AlertManager:NSObject {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - for closure that will stop playing sound
     private let applicationManagerKeyStopPlayingSound = "AlertManager-stopplayingsound"
     
+    /// - for each alertKind, what is the timestamp it went off the last time
+    /// - if nil then wasn't firted since last app launch
+    /// - except for alertKind which are launched with a delay (only missed reading is in that case), for such alertKind the value will always be nil
+    private var lastAlertTimeStamp = [Date?] (repeating: nil, count: AlertKind.allCases.count)
+    
     // MARK: - initializer
     
     init(coreDataManager:CoreDataManager, soundPlayer:SoundPlayer?) {
@@ -469,6 +474,8 @@ public class AlertManager:NSObject {
     /// will check if the alert of type alertKind needs to be fired and also fires it, plays the sound, and if yes returns true, otherwise false
     private func checkAlertAndFire(alertKind:AlertKind, lastBgReading:BgReading?, lastButOneBgREading:BgReading?, lastCalibration:Calibration?, transmitterBatteryInfo:TransmitterBatteryInfo?) -> Bool {
 
+        trace("in checkAlertAndFire for alert = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+        
         /// This is only for missed reading alert. How many minutes between now and the moment the snooze expires (meaning when is it not snoozed anymore)
         ///
         /// will be initialized later
@@ -497,6 +504,18 @@ public class AlertManager:NSObject {
             
         }
         
+        // if alertKind was raised recently, then don't reraise
+        if let lastAlertTimeStamp = lastAlertTimeStamp[alertKind.rawValue] {
+            
+            if abs(lastAlertTimeStamp.timeIntervalSince(Date())) < ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes * 60.0 {
+                
+                trace("in checkAlertAndFire, not raising alert %{public}@ because it was raised less than %{public}@ minutes ago", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes.description)
+                
+                return false
+                
+            }
+            
+        }
 
         // get the applicable current and next alertType from core data
         let (currentAlertEntry, nextAlertEntry) = alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor)
@@ -635,6 +654,13 @@ public class AlertManager:NSObject {
                 if let error = error {
                     trace("Unable to Add Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
                 }
+            }
+            
+            // set lastAlertTimeStamp for the alertKind, except if it's a delayed alert (for delayed alerts it looks a bit risky to me)
+            if delayInSecondsToUse == 0 {
+                
+                lastAlertTimeStamp[alertKind.rawValue] = Date()
+                
             }
 
             // if vibrate required , and if delay is nil, then vibrate
