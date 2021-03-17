@@ -115,9 +115,15 @@ class WatchManager: NSObject {
         event.calendar = calendar
         
         do{
+            
             try eventStore.save(event, span: .thisEvent)
+            
+            timeStampLastProcessedReading = lastReading[0].timeStamp
+            
         } catch let error {
+            
             trace("in createCalendarEvent, error while saving : %{public}@", log: log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
+            
         }
 
     }
