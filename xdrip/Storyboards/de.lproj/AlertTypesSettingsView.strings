@@ -32,7 +32,7 @@
 "alerttypesettingsview_name" = "Name";
 
 /// when adding a new alert type, but the name is already used for another alert type, this is the error messages
-"alerttypenamealreadyexistsmessages" = "Diesen Alarmnamen gibt es bereits. Bitte anderen Namen wählen";
+"alerttypenamealreadyexistsmessages" = "Diesen Namen gibt es bereits. Bitte anderen Namen wählen";
 
 /// when editing the name of an alert type, 
 "alerttypesettingsview_givename" = "Alarm Name";
