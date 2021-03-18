@@ -2,7 +2,7 @@
 "notYetStarted" = "noch nicht gestartet";
 
 /// general usage
-"unknown" = "unbekannt";
+"unknown" = "Unbekannt";
 
 /// Possible Libre Sensor states
 "failure" = "Fehler";
