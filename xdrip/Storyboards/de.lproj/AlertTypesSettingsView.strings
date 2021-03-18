@@ -11,7 +11,7 @@
 "alerttypesettingsview_snoozevianotification" = "erlaube Schlummern für Benachrichtigung?";
 
 /// when editing an alert type, field title for Override Mute
-"alerttypesettingsview_overridemute" = "Ruhezustand überschreiben";
+"alerttypesettingsview_overridemute" = "Ruhemodus überschreiben";
 
 /// when editing an alert type, field title for Snooze Period
 "alerttypesettingsview_defaultsnoozeperiod" = "Standard Schlummerzeit (Minuten)";
