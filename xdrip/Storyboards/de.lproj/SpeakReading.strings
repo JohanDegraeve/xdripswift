@@ -1,47 +1,43 @@
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+/// For speak reading functionality
+"trenddoubleup" = "Dramtisch Hoch";
 
 /// For speak reading functionality
-"trenddoubleup" = "dramatically upward";
+"trendflat" = "Flach";
 
 /// For speak reading functionality
-"trendflat" = "flat";
+"currentglucose" = "Ihr Blutzucker ist";
 
 /// For speak reading functionality
-"currentglucose" = "Your current blood glucose is";
+"trendnoncomputable" = "Nicht zu ermitteln";
 
 /// For speak reading functionality
-"trendnoncomputable" = "non computable";
+"trendfortyfivedown" = "Niedrig";
 
 /// For speak reading functionality
-"trendfortyfivedown" = "down";
+"currenttrend" = "Bewegt sich ";
 
 /// For speak reading functionality
-"currenttrend" = "It's trending";
-
-/// For speak reading functionality
-"trendsingledown" = "significantly downward";
+"trendsingledown" = "Signifikant nach unten";
 
 /// the word low
-"low" = "low";
+"low" = "niedrig";
 
 /// For speak reading functionality
-"trenddoubledown" = "dramatically downward";
+"trenddoubledown" = "Dramatisch Niedrig";
 
 /// For speak reading functionality
-"deltanoncomputable" = "non computable";
+"deltanoncomputable" = "nicht zu ermitteln";
 
 /// For speak reading functionality
-"trendsingleup" = "significantly upward";
+"trendsingleup" = "Signifikant nach oben";
 
 /// 
-"trendfortyfiveup" = "up";
+"trendfortyfiveup" = "hoch";
 
 /// For speak reading functionality
-"currentdelta" = "Difference from last reading is";
+"currentdelta" = "Die Differenz zum letzten Wert beträgt";
 
 /// the word high
-"high" = "high";
+"high" = "hoch";
