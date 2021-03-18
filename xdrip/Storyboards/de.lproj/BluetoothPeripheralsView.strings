@@ -9,7 +9,7 @@
 "noMultipleActiveCGMsAllowed" = "Es kann immer nur ein Transmitter zeitgleich verbunden sein.\n Soll ein neuer Transmitter verwendet werden, stoppen sie den aktuellen Transmitter oder löschen Sie die Verbindung.";
 
 /// when clicking add button in screen with list of bluetoothperipherals, after having selected the category, a new pop up appears, this is the title of pop up where user  needs to select bluetooth peripheral type
-"selectType" = "transmitter wählen";
+"selectType" = "Transmitter wählen";
 
 /// when Bluetooth Peripheral list is shown, title of the view
 "screenTitle" = "Bluetooth";
