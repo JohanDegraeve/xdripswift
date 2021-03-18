@@ -126,10 +126,6 @@
 "zWo-AR-qJE.normalTitle" = "Transmitter";
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
 /// 
 "NDk-cv-Gan.text" = "Geladen von SecondViewController";
 
@@ -137,7 +133,7 @@
 "zEq-FU-wV5.text" = "Zweite Ansicht";
 
 /// 
-"acW-dT-cKf.title" = "Zu Hause";
+"acW-dT-cKf.title" = "Home";
 
 /// 
 "KQZ-1w-vlD.text" = "Erste Ansicht";
