@@ -1,26 +1,20 @@
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
 /// Possible Libre Sensor states
-"notYetStarted" = "not yet started";
+"notYetStarted" = "noch nicht gestartet";
 
 /// general usage
-"unknown" = "unknown";
+"unknown" = "Unbekannt";
 
 /// Possible Libre Sensor states
-"failure" = "failed";
+"failure" = "Fehler";
 
 /// Possible Libre Sensor states
-"shutdown" = "shut down";
+"shutdown" = "Abgeschalten";
 
 /// Possible Libre Sensor states
-"expired" = "expired";
+"expired" = "Abgelaufen";
 
 /// Possible Libre Sensor states
-"starting" = "starting";
+"starting" = "Beim starten";
 
 /// Possible Libre Sensor states
-"ready" = "ready";
+"ready" = "Bereit";

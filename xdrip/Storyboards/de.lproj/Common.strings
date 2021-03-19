@@ -1,68 +1,63 @@
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
 /// blood glucose unit in short, for text field title
-"common_bloodglucoseunit_short" = "BG Unit";
+"common_bloodglucoseunit_short" = "BZ Einheit";
 
 /// literal translation needed
-"common_hour" = "hour";
+"common_hour" = "Stunde";
 
 /// for settings row, literally hardware
 "hardware" = "Hardware";
 
 /// 
-"delete" = "Delete";
+"delete" = "Löschen";
 
 /// to show the sensor status
-"sensorStatus" = "Sensor status:";
+"sensorStatus" = "Sensor Status:";
 
 /// yellow
-"yellow" = "yellow";
+"yellow" = "gelb";
 
 /// literal translation needed
 "common_minute" = "min";
 
 /// literally yes, without capital
-"yes" = "Yes";
+"yes" = "ja";
 
 /// literal translation needed
-"common_minutes" = "mins";
+"common_minutes" = "min";
 
 /// green
-"green" = "green";
+"green" = "grün";
 
 /// general usage
-"unknown" = "Unknown";
+"unknown" = "Unbekannt";
 
 /// red
-"red" = "red";
+"red" = "rot";
 
 /// literally no, without capital
-"no" = "No";
+"no" = "nein";
 
 /// literally add
-"add" = "Add";
+"add" = "Hinzufügen";
 
 /// can be used in several screens, just the words Bloodglucose unit
-"common_bloodglucoseunit" = "Blood Glucose Unit";
+"common_bloodglucoseunit" = "Blutzucker Einheit";
 
 /// literally update
-"update" = "Edit";
+"update" = "Editieren";
 
 /// literally password
-"common_password" = "Password:";
+"common_password" = "Passwort:";
 
 /// literal translation needed
-"common_hours" = "hours";
+"common_hours" = "Stunden";
 
 /// the word LOW, in capitals
-"common_low" = "LOW";
+"common_low" = "NIEDRIG";
 
 /// whenever invalid value is given by user somewhere in a field
-"invalidValue" = "Invalid Value";
+"invalidValue" = "Ungültiger Wert";
 
 /// for settings row, literally firmware
 "firmware" = "Firmware";
@@ -71,16 +66,16 @@
 "common_Ok" = "OK";
 
 /// literal translation needed
-"common_day" = "day";
+"common_day" = "Tag";
 
 /// WiFi
 "WiFi" = "WiFi";
 
 /// on
-"on" = "On";
+"on" = "An";
 
 /// white
-"white" = "white";
+"white" = "weiß";
 
 /// name
 "name" = "Name:";
@@ -89,29 +84,25 @@
 "common_mmol" = "mmol/l";
 
 /// 
-"off" = "Off";
+"off" = "Aus";
 
 /// literally 'Cancel'
-"common_cancel" = "Cancel";
+"common_cancel" = "Abbrechen";
 
 /// literally default, will be the name of default alerttypes that will be created during initial app launch
-"common_default" = "Default";
+"common_default" = "Standard";
 
 /// literally warning
-"warning" = "Warning!";
+"warning" = "Warnung!";
 
 /// mg/dl
 "common_mgdl" = "mg/dl";
 
 /// literal translation needed
-"common_week" = "week";
+"common_week" = "Woche";
 
 /// the word HIGH, in capitals
-"common_high" = "HIGH";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"common_high" = "HOCH";
 
 /// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
-"invalidAccountOrPassword" = "Invalid account or password";
+"invalidAccountOrPassword" = "Konto oder Passwort ungültig";
