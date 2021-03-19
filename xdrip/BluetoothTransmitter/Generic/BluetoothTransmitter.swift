@@ -516,8 +516,16 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManager(_ central: CBCentralManager,
                         willRestoreState dict: [String : Any]) {
         
-        trace("in wilRestoreState", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
-        
+        trace("in willRestoreState", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+        // Attempt to restore state
+        if let peripheralsObject = dict[CBCentralManagerRestoredStatePeripheralsKey] {
+          let peripherals = peripheralsObject as! Array<CBPeripheral>
+          if peripherals.count > 0 {
+            // use first entry
+            peripheral = peripherals[0]
+            peripheral?.delegate = self
+          }
+        }
     }
 
     // MARK: - helpers
