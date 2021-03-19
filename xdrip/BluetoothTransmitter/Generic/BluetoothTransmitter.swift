@@ -516,6 +516,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManager(_ central: CBCentralManager,
                         willRestoreState dict: [String : Any]) {
         
+        // looks like this is not written to the trace file, probably because it is the first function call after app start and so there's no tracefile yet ?
         trace("in wilRestoreState", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         
     }
