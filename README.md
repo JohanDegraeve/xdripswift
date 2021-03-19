@@ -11,6 +11,8 @@ Current Status :
     - Blucon
     - Bubble
     - Droplet 1
+    - Atom
+    - Libre 2
 - 6 hour graph with readings
 - Alerting
 - Upload to Nightscout
