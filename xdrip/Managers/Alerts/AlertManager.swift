@@ -61,11 +61,6 @@ public class AlertManager:NSObject {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - for closure that will stop playing sound
     private let applicationManagerKeyStopPlayingSound = "AlertManager-stopplayingsound"
     
-    /// - for each alertKind, what is the timestamp it went off the last time
-    /// - if nil then wasn't firted since last app launch
-    /// - except for alertKind which are launched with a delay (only missed reading is in that case), for such alertKind the value will always be nil
-    private var lastAlertTimeStamp = [Date?] (repeating: nil, count: AlertKind.allCases.count)
-    
     // MARK: - initializer
     
     init(coreDataManager:CoreDataManager, soundPlayer:SoundPlayer?) {
@@ -435,7 +430,11 @@ public class AlertManager:NSObject {
             // first check if the alert needs to fire, even if the alert would be snoozed, this will ensure logging.
             if checkAlertAndFireHelper(alertKind) {return true}
             
-            trace("in checkAlertGroupAndFire before calling getSnoozeValue, snoozePeriodInMinutes = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes.description)
+            if let remainingSeconds = getSnoozeParameters(alertKind: alertKind).getSnoozeValue().remainingSeconds {
+
+                trace("in checkAlertGroupAndFire before calling getSnoozeValue for alert %{public}@, remaining seconds = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), remainingSeconds.description)
+
+            }
             
             // if alertKind is snoozed then we don't want to check the next alert (example if verylow is snoozed then don't check low)
             if getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed {return false}
@@ -481,7 +480,11 @@ public class AlertManager:NSObject {
         /// will be initialized later
         var minimumDelayInSecondsToUse:Int?
         
-        trace("in checkAlertAndFire before calling getSnoozeValue, snoozePeriodInMinutes = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes.description)
+        if let remainingSeconds = getSnoozeParameters(alertKind: alertKind).getSnoozeValue().remainingSeconds {
+
+            trace("in checkAlertAndFire before calling getSnoozeValue for alert %{public}@, remaining seconds = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), remainingSeconds.description)
+
+        }
 
         // check if snoozed
         if getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed {
@@ -504,19 +507,6 @@ public class AlertManager:NSObject {
             
         }
         
-        // if alertKind was raised recently, then don't reraise
-        if let lastAlertTimeStamp = lastAlertTimeStamp[alertKind.rawValue] {
-            
-            if abs(lastAlertTimeStamp.timeIntervalSince(Date())) < ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes * 60.0 {
-                
-                trace("in checkAlertAndFire, not raising alert %{public}@ because it was raised less than %{public}@ minutes ago", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes.description)
-                
-                return false
-                
-            }
-            
-        }
-
         // get the applicable current and next alertType from core data
         let (currentAlertEntry, nextAlertEntry) = alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor)
         
@@ -656,13 +646,15 @@ public class AlertManager:NSObject {
                 }
             }
             
-            // set lastAlertTimeStamp for the alertKind, except if it's a delayed alert (for delayed alerts it looks a bit risky to me)
+            // snooze default period, to avoid that alert goes off every minute for Libre 2, except if it's a delayed alert (for delayed alerts it looks a bit risky to me)
             if delayInSecondsToUse == 0 {
                 
-                lastAlertTimeStamp[alertKind.rawValue] = Date()
+                trace("in checkAlert, snoozing alert %{public}@ for %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes.description)
+                
+                getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes)
                 
             }
-
+            
             // if vibrate required , and if delay is nil, then vibrate
             if delayInSecondsToUse == 0, currentAlertEntry.alertType.vibrate {
                 AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
