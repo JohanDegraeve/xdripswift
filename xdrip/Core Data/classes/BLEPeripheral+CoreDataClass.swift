@@ -11,7 +11,7 @@ public class BLEPeripheral: NSManagedObject {
     public var libreSensorType: LibreSensorType?
 
     /// create BLEPeripheral, shouldconnect default value = true
-    init(address: String, name: String, alias: String?, nsManagedObjectContext:NSManagedObjectContext) {
+    init(address: String, name: String, alias: String?, bluetoothPeripheralType: BluetoothPeripheralType, nsManagedObjectContext:NSManagedObjectContext) {
         
         let entity = NSEntityDescription.entity(forEntityName: "BLEPeripheral", in: nsManagedObjectContext)!
 
@@ -23,7 +23,7 @@ public class BLEPeripheral: NSManagedObject {
         self.alias = alias
         self.parameterUpdateNeededAtNextConnect = false
      
-        webOOPEnabled = ConstantsLibre.defaultWebOOPEnabled
+        webOOPEnabled = ConstantsLibre.defaultWebOOPEnabled && bluetoothPeripheralType.canWebOOP()
         
         nonFixedSlopeEnabled = ConstantsLibre.defaultNonFixedSlopeEnabled
         

@@ -17,7 +17,7 @@ public class Bubble: NSManagedObject {
         
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         
-        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, bluetoothPeripheralType: .BubbleType, nsManagedObjectContext: nsManagedObjectContext)
         
     }
     
@@ -29,7 +29,7 @@ public class Bubble: NSManagedObject {
         
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         
-        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, bluetoothPeripheralType: .BubbleType, nsManagedObjectContext: nsManagedObjectContext)
 
         blePeripheral.webOOPEnabled = webOOPEnabled
 

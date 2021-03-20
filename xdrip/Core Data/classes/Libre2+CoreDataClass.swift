@@ -14,7 +14,7 @@ public class Libre2: NSManagedObject {
         
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         
-        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, bluetoothPeripheralType: .Libre2Type, nsManagedObjectContext: nsManagedObjectContext)
         
     }
     
@@ -26,7 +26,7 @@ public class Libre2: NSManagedObject {
         
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         
-        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, bluetoothPeripheralType: .Libre2Type, nsManagedObjectContext: nsManagedObjectContext)
 
         blePeripheral.webOOPEnabled = webOOPEnabled
 

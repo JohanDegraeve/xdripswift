@@ -18,7 +18,7 @@ public class Watlaa: NSManagedObject {
         
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         
-        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, bluetoothPeripheralType: .WatlaaType, nsManagedObjectContext: nsManagedObjectContext)
         
     }
 
