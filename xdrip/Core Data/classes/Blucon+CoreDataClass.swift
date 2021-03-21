@@ -18,20 +18,6 @@ public class Blucon: NSManagedObject {
         
     }
     
-    /// create Blucon
-    /// - parameters:
-    init(address: String, name: String, alias: String?, sensorSerialNumber: String?, webOOPEnabled: Bool, nsManagedObjectContext:NSManagedObjectContext) {
-        
-        let entity = NSEntityDescription.entity(forEntityName: "Blucon", in: nsManagedObjectContext)!
-        
-        super.init(entity: entity, insertInto: nsManagedObjectContext)
-        
-        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, bluetoothPeripheralType: .BluconType, nsManagedObjectContext: nsManagedObjectContext)
-
-        blePeripheral.webOOPEnabled = webOOPEnabled
-
-    }
-    
     private override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {
         super.init(entity: entity, insertInto: context)
     }

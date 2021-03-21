@@ -21,20 +21,6 @@ public class Bubble: NSManagedObject {
         
     }
     
-    /// create Bubble
-    /// - parameters:
-    init(address: String, name: String, alias: String?, sensorSerialNumber: String?, webOOPEnabled: Bool, nsManagedObjectContext:NSManagedObjectContext) {
-        
-        let entity = NSEntityDescription.entity(forEntityName: "Bubble", in: nsManagedObjectContext)!
-        
-        super.init(entity: entity, insertInto: nsManagedObjectContext)
-        
-        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, bluetoothPeripheralType: .BubbleType, nsManagedObjectContext: nsManagedObjectContext)
-
-        blePeripheral.webOOPEnabled = webOOPEnabled
-
-    }
-    
     private override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {
         super.init(entity: entity, insertInto: context)
     }
