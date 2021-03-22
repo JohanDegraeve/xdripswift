@@ -32,7 +32,7 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_follower", tableName: filename, bundle: Bundle.main, value: "Follower", comment: "general settings, literally follower")
     }()
     
-    static let labelShowReadingInNotification: String = {
+    static let showReadingInNotification: String = {
         return NSLocalizedString("showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Show BG in Notifications?", comment: "general settings, should reading be shown in notification yes or no")
     }()
     
