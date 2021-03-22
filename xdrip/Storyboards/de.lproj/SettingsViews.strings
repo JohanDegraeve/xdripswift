@@ -198,8 +198,8 @@
 "settingsviews_givetransmitterid" = "Eingabe Transmitter ID";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test
-"volumeTestSoundPlayerExplanation" = "Ein Alarm mit eingestellter Systemlautstärke wird gespielt (auch im Stummmodus).\n\n(Dieser Alarm gilt für alle Alarme mit Ausnahme von verpasster Datenübertragung.)\n\n .)\n\nMit Ok können sie den Test beenden, danach können Sie die Lautstärke wie gewünscht einstellen und noch einmal testen..";
-  \n\n\n\≈
+"volumeTestSoundPlayerExplanation" = "Ein Alarm mit eingestellter Systemlautstärke wird gespielt (auch im Stummmodus).\n\n(Dieser Alarm gilt für alle Alarme mit Ausnahme von verpasster Datenübertragung.)\n\nMit Ok können sie den Test beenden, danach können Sie die Lautstärke wie gewünscht einstellen und noch einmal testen..";
+
  /// speak settings, where user can enable or disable speak delta
 "settingsviews_speakDelta" = "Delta vorlesen?";
 
