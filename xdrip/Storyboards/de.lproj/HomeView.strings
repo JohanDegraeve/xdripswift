@@ -8,7 +8,7 @@
 "startScanningInfo" = "Scannen gestartet.\n\nxDrip4iO5 im Vordergrund lassen bis die Verbindung erstellt wurde.\n\n Automatisches Sperren kann, aktiviert bleiben. Einfach nur nicht die App schließen oder das iPhone manuell sperren)";
 
 /// when user clicks transmitterButton, this is the action to forget the device, so that user can scan for a new device, in case user switches device
-"forgetbluetoothdeviceactiontitle" = "Transmitter vergessen";
+"forgetbluetoothdeviceactiontitle" = "Transmitter löschen";
 
 /// If transmitter needs pairing, user needs to click the notification
 "transmitternotpaired" = "Der Transmitter ist noch nicht mit diesem Gerät verbunden. Program öffnen.";
