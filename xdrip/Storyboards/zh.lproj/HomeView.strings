@@ -27,13 +27,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// After clicking scan button, this message will appear
-"startScanningInfo" = "Scanning Started.\n\nKeep xDrip4iOS open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
+"startScanningInfo" = "Scanning Started.\n\nKeep xDrip4iO5 open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
 
 /// If transmitter needs pairing, user needs to click the notification
 "transmitternotpaired" = "The Transmitter is not paired with this iPhone. Open the application.";
 
 /// when user starts scanning for bluetooth device, but bluetooth is not authorized
-"bluetoothIsNotAuthorized" = "You did not give bluetooth permission for xDrip4iOS. Go to the settings, find the xDrip4iOS app, and enable Bluetooth.";
+"bluetoothIsNotAuthorized" = "You did not give bluetooth permission for xDrip4iO5. Go to the settings, find the xDrip4iO5 app, and enable Bluetooth.";
 
 /// To give info to user that the transmitter pairing requeset timed out
 "transmitterpairingattempttimeout" = "Transmitter did not reply to pairing request.";

@@ -7,7 +7,7 @@
 "aliasAlreadyExists" = "Já existe um dispositivo bluetooth com este pseudónimo";
 "confirmDeletionPeripheral" = "Deseja eliminar este dispositivo bluetooth: ";
 "bluetoothPeripheralAlias" = "Pseudónimo:";
-"SensorSerialNumber" = "Nº. de Série do Sensor:";
+"SensorSerialNumber" = "Nº. de Série:";
 "sensorType" = "Tipo de Sensor:";
 "serialNumber" = "Número de Série:";
 "battery" = "Bateria:";

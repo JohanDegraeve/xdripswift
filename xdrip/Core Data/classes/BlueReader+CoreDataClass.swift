@@ -11,7 +11,7 @@ public class BlueReader: NSManagedObject {
         
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         
-        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+        blePeripheral = BLEPeripheral(address: address, name: name, alias: nil, bluetoothPeripheralType: .BlueReaderType, nsManagedObjectContext: nsManagedObjectContext)
         
         blePeripheral.webOOPEnabled = false
         

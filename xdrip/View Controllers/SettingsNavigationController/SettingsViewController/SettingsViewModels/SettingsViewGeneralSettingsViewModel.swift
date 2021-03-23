@@ -142,7 +142,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
             return Texts_SettingsView.labelMasterOrFollower
             
         case .showReadingInNotification:
-            return Texts_SettingsView.labelShowReadingInNotification
+            return Texts_SettingsView.showReadingInNotification
             
         case .showReadingInAppBadge:
             return Texts_SettingsView.labelShowReadingInAppBadge

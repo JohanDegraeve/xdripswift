@@ -1,0 +1,20 @@
+/// literal translation needed
+"common_minute" = "min";
+
+/// the word HIGH, in capitals
+"common_high" = "HOCH";
+
+/// the word LOW, in capitals
+"common_low" = "NIEDRIG";
+
+/// literal translation needed
+"common_minutes" = "Minuten";
+
+/// mmol/l
+"common_mmol" = "mmol/l";
+
+/// mg/dl
+"common_mgdl" = "mg/dl";
+
+/// where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'
+"ago" = "her";

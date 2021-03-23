@@ -8,5 +8,5 @@ enum ConstantsHomeView {
     static let infoEmailAddress = "xdrip@proximus.be"
     
     /// application name, appears in licenseInfo as title
-    static let applicationName = "xDrip4iOS"
+    static let applicationName = "xDrip4iO5"
 }

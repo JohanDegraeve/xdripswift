@@ -126,27 +126,23 @@
 "zWo-AR-qJE.normalTitle" = "Transmitter";
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+/// 
+"NDk-cv-Gan.text" = "Geladen von SecondViewController";
 
 /// 
-"NDk-cv-Gan.text" = "Loaded by SecondViewController";
-
-/// 
-"zEq-FU-wV5.text" = "Second View";
+"zEq-FU-wV5.text" = "Zweite Ansicht";
 
 /// 
 "acW-dT-cKf.title" = "Home";
 
 /// 
-"KQZ-1w-vlD.text" = "First View";
+"KQZ-1w-vlD.text" = "Erste Ansicht";
 
 /// 
 "sgT-p5-hUt.title" = "Bluetooth";
 
 /// 
-"A5M-7J-77L.text" = "Loaded by FirstViewController";
+"A5M-7J-77L.text" = "Geladen von FirstViewController";
 
 /// 
-"cPa-gy-q4n.title" = "Settings";
+"cPa-gy-q4n.title" = "Einstellungen";

@@ -1,92 +1,87 @@
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
 /// cell text, if user needs to set the transmitter id
-"needsTransmitterId" = "Missing Transmitter ID";
+"needsTransmitterId" = "Transmitter ID benötigt";
 
 /// BluetoothPeripheral view, this is a name of a BluetoothPeripheral assigned by the user, to recognize the device
 "bluetoothPeripheralAlias" = "Alias:";
 
 /// text in status row, if ready to start scanning
-"readyToScan" = "Ready to Scan";
+"readyToScan" = "Bereit zum scannen";
 
 /// text in button to start scanning
-"scan" = "Scan";
+"scan" = "Scannen";
 
 /// cell text, where user can select to reset a transmitter at next connect. Only for Dexcom
-"resetRequired" = "Reset Transmitter?";
+"resetRequired" = "Transmitter zurücksetzten?";
 
 /// text in status row, when not connected and app is not scanning
-"notTryingToConnect" = "Not Scanning";
+"notTryingToConnect" = "Es wird nicht gescannt";
 
 /// when Bluetooth Peripheral is shown, title of the cell with the status
 "status" = "Status:";
 
 /// text in status rown, when not connect but app is trying to connect
-"tryingToConnect" = "Scanning";
+"tryingToConnect" = "Scannen";
 
 /// BluetoothPeripheral view, text of the cell with the serial number (this is not the sensor serial number
-"serialNumber" = "Serial Number:";
+"serialNumber" = "Seriennummer:";
 
 /// cell text, where the connection timestamp is shown
-"connectedAt" = "Connected At:";
+"connectedAt" = "Verbunden um:";
 
 /// text in button top right, this button will disable automatic connect
-"donotconnect" = "Stop Scanning";
+"donotconnect" = "Scannen stoppen";
 
 /// BluetoothPeripheral view, text of the cell with the sensor serial number
-"SensorSerialNumber" = "Sensor Serial Number:";
+"SensorSerialNumber" = "Sensor Seriennummer:";
 
 /// cell text, shows when last reset was done, if known. Only for Dexcom
-"lastResetNotKnown" = "Last Reset Timestamp is not known";
+"lastResetNotKnown" = "Zuletzt zurückgesetzt";
 
 /// button text, to disconnect
-"disconnect" = "Disconnect";
+"disconnect" = "Nicht verbunden";
 
 /// Bluetooth Peripheral view, when user clicks alias field
-"aliasAlreadyExists" = "There is already a bluetooth device with this alias";
+"aliasAlreadyExists" = "Dieser Alias wiird bereits von einem anderen Gerät verwendet";
 
 /// button text, to connect
-"connect" = "Connect";
+"connect" = "Verbinden";
 
 /// row in bluetoothperipheral view, title
 "bootLoader" = "Bootloader";
 
 /// Bluetooth Peripheral view, when user clicks the trash button - this is not the complete sentence, it will be followed either by 'name' or 'alias', depending on the availability of an alias
-"confirmDeletionPeripheral" = "Do you want to delete bluetooth device: ";
+"confirmDeletionPeripheral" = "Möchten Sie das Gerät löschen?";
 
 /// text in status row, if scanning ongoing
-"scanning" = "Scanning";
+"scanning" = "Am scannnen";
 
 /// cell text, shows when last reset was done, if known. Only for Dexcom
-"lastReset" = "Last Reset:";
+"lastReset" = "Zuletzt zurückgesetzt:";
 
 /// To give result about transitter result in notification body
-"transmitterResultResult" = "Transmitter Reset Result";
+"transmitterResultResult" = "Ergebnis für zurückgesetzten Transmitter";
 
 /// cell text, where the disconnection timestamp is shown
-"disConnectedAt" = "Disconnected At:";
+"disConnectedAt" = "Nicht verbunden seit:";
 
 /// BluetoothPeripheral view, text of the cell with the sensor type (only used for Libre)
-"sensorType" = "Sensor Type:";
+"sensorType" = "Sensor Typ:";
 
 /// when Bluetooth Peripheral is shown, connection status, connected
-"connected" = "Connected";
+"connected" = "Verbunden";
 
 /// User tries to add a CGM or connect an already existing CGM, while in follower mode.
-"cannotActiveCGMInFollowerMode" = "You can not activate a CGM in Follower Mode";
+"cannotActiveCGMInFollowerMode" = "CGM kann im Follower Mode nicht aktiviert werden";
 
 /// Bluetooth Peripheral view, when user clicks alias field
-"selectAliasText" = "Choose an alias for this bluetooth device, the name will be shown in the app and is easier for you to recognize";
+"selectAliasText" = "Wählen sie einen Alias, dieser wird in der App angezeigt und ist leichter zu sehen";
 
 /// 
-"notConnected" = "Not Connected";
+"notConnected" = "Nicht verbunden";
 
 /// 
-"battery" = "Battery:";
+"battery" = "Batterie:";
 
 /// when M5Stack is shown, title of the cell with the address
-"address" = "Address:";
+"address" = "Adresse:";

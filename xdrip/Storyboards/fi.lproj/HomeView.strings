@@ -9,8 +9,8 @@
 "startsensortimeinfo" = "Seuraavissa valintaikkunoissa sinun on asetettava päiväys ja aika, jolloin anturi on asetettu. On tärkeää, että asetat päivämäärän ja ajan mahdollisimman oikein. Tämä on tärkeää tarkkuuden kannalta.";
 "scanbluetoothdeviceongoing" = "Skannataan lähetintä...";
 "bluetoothisnoton" = "Bluetooth ei ole päällä. Kytke ensin bluetooth päälle ja yritä uudelleen.";
-"bluetoothIsNotAuthorized" = "Bluetoothia ei ole sallittu xDrip4iOS:lle. Mene asetuksiin, etsi xDrip4iOS sovellus ja salli Bluetooth.";
-"startScanningInfo" = "Scanning Started.\n\nKeep xDrip4iOS open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
+"bluetoothIsNotAuthorized" = "Bluetoothia ei ole sallittu xDrip4iO5:lle. Mene asetuksiin, etsi xDrip4iO5 sovellus ja salli Bluetooth.";
+"startScanningInfo" = "Scanning Started.\n\nKeep xDrip4iO5 open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
 "sensorstart" = "Sensori aloitus";
 "notstarted" = "Ei aloitettu";
 "notknown" = "Tuntematon";

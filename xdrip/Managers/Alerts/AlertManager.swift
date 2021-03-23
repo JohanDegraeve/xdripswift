@@ -430,7 +430,11 @@ public class AlertManager:NSObject {
             // first check if the alert needs to fire, even if the alert would be snoozed, this will ensure logging.
             if checkAlertAndFireHelper(alertKind) {return true}
             
-            trace("in checkAlertGroupAndFire before calling getSnoozeValue, snoozePeriodInMinutes = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes.description)
+            if let remainingSeconds = getSnoozeParameters(alertKind: alertKind).getSnoozeValue().remainingSeconds {
+
+                trace("in checkAlertGroupAndFire before calling getSnoozeValue for alert %{public}@, remaining seconds = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), remainingSeconds.description)
+
+            }
             
             // if alertKind is snoozed then we don't want to check the next alert (example if verylow is snoozed then don't check low)
             if getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed {return false}
@@ -469,12 +473,18 @@ public class AlertManager:NSObject {
     /// will check if the alert of type alertKind needs to be fired and also fires it, plays the sound, and if yes returns true, otherwise false
     private func checkAlertAndFire(alertKind:AlertKind, lastBgReading:BgReading?, lastButOneBgREading:BgReading?, lastCalibration:Calibration?, transmitterBatteryInfo:TransmitterBatteryInfo?) -> Bool {
 
+        trace("in checkAlertAndFire for alert = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+        
         /// This is only for missed reading alert. How many minutes between now and the moment the snooze expires (meaning when is it not snoozed anymore)
         ///
         /// will be initialized later
         var minimumDelayInSecondsToUse:Int?
         
-        trace("in checkAlertAndFire before calling getSnoozeValue, snoozePeriodInMinutes = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes.description)
+        if let remainingSeconds = getSnoozeParameters(alertKind: alertKind).getSnoozeValue().remainingSeconds {
+
+            trace("in checkAlertAndFire before calling getSnoozeValue for alert %{public}@, remaining seconds = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), remainingSeconds.description)
+
+        }
 
         // check if snoozed
         if getSnoozeParameters(alertKind: alertKind).getSnoozeValue().isSnoozed {
@@ -497,7 +507,6 @@ public class AlertManager:NSObject {
             
         }
         
-
         // get the applicable current and next alertType from core data
         let (currentAlertEntry, nextAlertEntry) = alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor)
         
@@ -636,7 +645,16 @@ public class AlertManager:NSObject {
                     trace("Unable to Add Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
                 }
             }
-
+            
+            // snooze default period, to avoid that alert goes off every minute for Libre 2, except if it's a delayed alert (for delayed alerts it looks a bit risky to me)
+            if delayInSecondsToUse == 0 {
+                
+                trace("in checkAlert, snoozing alert %{public}@ for %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes.description)
+                
+                getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes)
+                
+            }
+            
             // if vibrate required , and if delay is nil, then vibrate
             if delayInSecondsToUse == 0, currentAlertEntry.alertType.vibrate {
                 AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);

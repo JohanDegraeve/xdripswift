@@ -512,16 +512,30 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
         
     }
+    
+    func centralManager(_ central: CBCentralManager,
+                        willRestoreState dict: [String : Any]) {
+        
+        // looks like this is not written to the trace file, probably because it is the first function call after app start and so there's no tracefile yet ?
+        trace("in wilRestoreState", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+        
+    }
 
+    // MARK: - helpers
+    
     /// to ask transmitter that it initiates pairing
     ///
     /// to be overriden. For transmitter types that don't need pairing, or that don't need pairing initiated by user/view controller, this function does not need to be overriden
     func initiatePairing() {return}
-
-    // MARK: - helpers
     
     private func initialize() {
-        centralManager = CBCentralManager(delegate: self, queue: nil, options: [CBCentralManagerOptionShowPowerAlertKey: true])
+        
+        // create centralManager with a CBCentralManagerOptionRestoreIdentifierKey. This to ensure that iOS relaunches the app whenever it's killed either due to a crash or due to lack of memory
+        // iOS will restart the app as soon as a bluetooth transmitter tries to connect (which is under normal circumtances immediately
+        // the function willRestoreState (see below) is an empty function and that seems to be enough to make it work
+        // see https://developer.apple.com/library/archive/qa/qa1962/_index.html
+        centralManager = CBCentralManager(delegate: self, queue: nil, options: [CBCentralManagerOptionShowPowerAlertKey: true, CBCentralManagerOptionRestoreIdentifierKey: String((0..<24).map{ _ in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".randomElement()!})])
+        
     }
     
     // MARK: - enum's

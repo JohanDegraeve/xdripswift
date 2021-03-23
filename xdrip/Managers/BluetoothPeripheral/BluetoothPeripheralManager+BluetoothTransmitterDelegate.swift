@@ -221,6 +221,14 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         // create bluetoothPeripheral
         let newBluetoothPeripheral = getTransmitterType(for: tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral).createNewBluetoothPeripheral(withAddress: deviceAddressNewTransmitter, withName: deviceNameNewTransmitter, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+
+        // bluetoothTransmitter has initially been created with webOOPEnabled = false (possibily it's not even a CGM transmitter
+        // if it's a CGM transmitter being created here, then we need to reassign webOOPEnabled to the value in the blePeripheral
+        if let bluetoothTransmitterAsCGM = bluetoothTransmitter as? CGMTransmitter {
+            
+            bluetoothTransmitterAsCGM.setWebOOPEnabled(enabled: newBluetoothPeripheral.blePeripheral.webOOPEnabled)
+            
+        }
         
         trace("in didconnect to, created a new bluetoothperipheral", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
         

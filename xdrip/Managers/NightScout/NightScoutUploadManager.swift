@@ -266,8 +266,13 @@ public class NightScoutUploadManager:NSObject {
             
             // sensor successfully uploaded, change value in coredata
             trace("in uploadActiveSensorToNightScout, activeSensor uploaded to NS", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
-            sensor.uploadedToNS = true
-            self.coreDataManager.saveChanges()
+            
+            DispatchQueue.main.async {
+                
+                sensor.uploadedToNS = true
+                self.coreDataManager.saveChanges()
+
+            }
             
         })
         
