@@ -22,22 +22,22 @@
 "trendsingledown" = "Signifikant nach unten";
 
 /// the word low
-"low" = "niedrig";
+"low" = "Niedrig";
 
 /// For speak reading functionality
 "trenddoubledown" = "Dramatisch Niedrig";
 
 /// For speak reading functionality
-"deltanoncomputable" = "nicht zu ermitteln";
+"deltanoncomputable" = "Nicht zu ermitteln";
 
 /// For speak reading functionality
 "trendsingleup" = "Signifikant nach oben";
 
 /// 
-"trendfortyfiveup" = "hoch";
+"trendfortyfiveup" = "Hoch";
 
 /// For speak reading functionality
 "currentdelta" = "Die Differenz zum letzten Wert beträgt";
 
 /// the word high
-"high" = "hoch";
+"high" = "Hoch";

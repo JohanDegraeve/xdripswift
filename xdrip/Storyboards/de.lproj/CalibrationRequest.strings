@@ -6,7 +6,7 @@
 "calibration_title" = "Kalibrieren";
 
 /// If user must calibrate, this is the body of the notification
-"calibration_notification_body" = "Zum kalibrieren bestätigen sie die Benachrichtigung";
+"calibration_notification_body" = "Zum kalibrieren bestätigen Sie die Benachrichtigung";
 
 /// When calibration alert goess off, user clicks the notification, app opens, dialog pops up, this is the text in the dialog
 "enter_calibration_value" = "Eingabe Kalibrierungswert";
