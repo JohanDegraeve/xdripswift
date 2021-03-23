@@ -14,7 +14,7 @@
 "powerOffConfirm" = "Sind Sie sicher das sie M5Stack herunterfahren wollen?";
 
 /// in case M5Stack authentication failed, and M5Stack is expecting user configured password
-"blePasswordMissingWarning" = "Bitte setzten ein Passwort via Einstellungen";
+"blePasswordMissingWarning" = "Bitte setzten Sie ein Passwort";
 
 /// text for cell in settings view, connect to wifi yes or no
 "connectToWiFi" = "Verbinden mit WiFi";
