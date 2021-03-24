@@ -1,0 +1,17 @@
+"alerttypessettingsview_screentitle" = "Typ av larm";
+"alerttypesettingsview_screentitle" = "Ändra larmtyp";
+"alerttypesettingsview_name" = "Namn";
+"alerttypesettingsview_enabled" = "På?";
+"alerttypesettingsview_vibrate" = "Vibrera?";
+"alerttypesettingsview_snoozevianotification" = "Tillåt Snoozande via notis?";
+"alerttypesettingsview_defaultsnoozeperiod" = "Standard Snooza-tid (minuter)";
+"alerttypesettingsview_overridemute" = "Åsidosätt tyst läge?";
+"alerttypesettingsview_sound" = "Ljud";
+"alerttypesettingsview_defaultiossound" = "iOS-ljud";
+"alerttypesettingsview_givename" = "Larmnamn";
+"alerttypesettingsview_givesnoozeperiod" = "Snooza-tid i miunuter";
+"alerttypesettingsview_picksoundname" = "Namn på ljud";
+"alertTypeNoSound" = "Inget ljud";
+"alerttypenamealreadyexistsmessages" = "En larmtyp med detta namn finns redan. Använd ett annat namn.";
+"confirmdeletionalerttype" = "Ta bort larmtyp: ";
+

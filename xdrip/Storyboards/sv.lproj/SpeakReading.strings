@@ -1,0 +1,14 @@
+"high" = "högt";
+"low" = "lågt";
+"currentglucose" = "Ditt nuvarande blodsocker är";
+"trendnoncomputable" = "går ej att beräkna";
+"trenddoubledown" = "snabbt sjunkande";
+"trendsingledown" = "tydligt sjunkande";
+"trendfortyfivedown" = "nedåt";
+"trendflat" = "jämnt";
+"trendfortyfiveup" = "uppåt";
+"trendsingleup" = "tydligt stigande";
+"trenddoubleup" = "snabbt stigande";
+"currenttrend" = "Det visar en trend";
+"deltanoncomputable" = "går ej att beräkna";
+"currentdelta" = "Förändring från senaste avläsning är";
