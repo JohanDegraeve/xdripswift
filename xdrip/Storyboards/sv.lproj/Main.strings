@@ -1,9 +1,9 @@
 
 /* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "0oo-Gz-k2G"; */
-"0oo-Gz-k2G.normalTitle" = "Cancel";
+"0oo-Gz-k2G.normalTitle" = "Avbryt";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "2fU-HY-PwD"; */
-"2fU-HY-PwD.text" = "Detail";
+"2fU-HY-PwD.text" = "Detalj";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "7NI-o7-nWK"; */
 "7NI-o7-nWK.text" = "Label";
@@ -24,7 +24,7 @@
 "I1p-t1-Yls.text" = "Subtitle";
 
 /* Class = "UIButton"; normalTitle = "Button"; ObjectID = "N9b-EE-lZm"; */
-"N9b-EE-lZm.normalTitle" = "Button";
+"N9b-EE-lZm.normalTitle" = "Knapp";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "S45-Yf-BHe"; */
 "S45-Yf-BHe.text" = "Title";
@@ -45,7 +45,7 @@
 "Z96-ov-isg.text" = "Detail";
 
 /* Class = "UIButton"; normalTitle = "Button"; ObjectID = "b1J-rJ-H3K"; */
-"b1J-rJ-H3K.normalTitle" = "Button";
+"b1J-rJ-H3K.normalTitle" = "Knapp";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "bT9-HM-Wcp"; */
 "bT9-HM-Wcp.text" = "Label";
@@ -60,7 +60,7 @@
 "etA-fM-tGh.title" = "Title";
 
 /* Class = "UIButton"; normalTitle = "Presnooze"; ObjectID = "fSY-nc-amN"; */
-"fSY-nc-amN.normalTitle" = "Presnooze";
+"fSY-nc-amN.normalTitle" = "Försnooza";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "hfQ-Tt-xNH"; */
 "hfQ-Tt-xNH.text" = "Title";
@@ -75,7 +75,7 @@
 "lBP-cK-gbT.title" = "Title";
 
 /* Class = "UIButton"; normalTitle = "Calibrate"; ObjectID = "mSJ-jy-nHJ"; */
-"mSJ-jy-nHJ.normalTitle" = "Calibrate";
+"mSJ-jy-nHJ.normalTitle" = "Kalibrera";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "sBg-yb-0Iy"; */
 "sBg-yb-0Iy.text" = "Detail";
@@ -93,7 +93,7 @@
 "wi3-X0-YuZ.title" = "Title";
 
 /* Class = "UIButton"; normalTitle = "Transmitter"; ObjectID = "zWo-AR-qJE"; */
-"zWo-AR-qJE.normalTitle" = "Transmitter";
+"zWo-AR-qJE.normalTitle" = "Sändare";
 
 
 /* Class = "UILabel"; text = "Loaded by FirstViewController"; ObjectID = "A5M-7J-77L"; */
@@ -106,10 +106,10 @@
 "NDk-cv-Gan.text" = "Chargé par SecondViewController";
 
 /* Class = "UITabBarItem"; title = "Home"; ObjectID = "acW-dT-cKf"; */
-"acW-dT-cKf.title" = "Accueil";
+"acW-dT-cKf.title" = "Hem";
 
 /* Class = "UITabBarItem"; title = "Settings"; ObjectID = "cPa-gy-q4n"; */
-"cPa-gy-q4n.title" = "Réglages";
+"cPa-gy-q4n.title" = "Inställningar";
 
 /* Class = "UITabBarItem"; title = "Bluetooth"; ObjectID = "sgT-p5-hUt"; */
 "sgT-p5-hUt.title" = "Bluetooth";
