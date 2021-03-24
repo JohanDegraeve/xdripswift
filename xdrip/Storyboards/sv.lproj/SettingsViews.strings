@@ -59,7 +59,7 @@
 "settingsviews_speakDelta" = "Läs upp delta?";
 "settingsviews_speakInterval" = "Intervall:";
 "settingsviews_speakIntervalMessage" = "Minsta intervall mellan två avläsningar, i minuter";
-"settingsviews_sectiontitleAbout" = "Om xDrip4iO5";
+"settingsviews_sectiontitleAbout" = "Om %@";
 "settingsviews_Version" = "Version:";
 "settingsviews_license" = "Licens";
 "settingsviews_build" = "Kompilering:";
@@ -76,10 +76,10 @@
 "displayUnitInCalendarEvent" = "Visa enhet?";
 "displayDeltaInCalendarEvent" = "Visa delta?";
 "infoCalendarAccessDeniedByUser" = "Du har tidigare nekat tillgång till din kalender.\n\nFör att tillåta tillgång gå till 'Inställningar', 'Integritet', 'Kalendrar' och sätt på";
-"infoCalendarAccessRestricted" = "Du kan inte ge auktorisation till xDrip4iO5 att få tillgång till din kalender. Detta beror möjligtvis på inställda begränsningar i Skärmtidsinställningar.";
+"infoCalendarAccessRestricted" = "Du kan inte ge auktorisation till %@ att få tillgång till din kalender. Detta beror möjligtvis på inställda begränsningar i Skärmtidsinställningar.";
 "sectionTitleTrace" = "Problemrapportering";
 "sendTraceFile" = "Skicka problemrapport";
-"describeProblem" = "Förklara varför du behöver skicka rapporten så detaljerat som möjligt. Om du redan har rapporterat problemet på Facebook-gruppen 'xDrip4iO5', så skriv även ned ditt Facebook-namn i mejlet";
+"describeProblem" = "Förklara varför du behöver skicka rapporten så detaljerat som möjligt. Om du redan har rapporterat problemet på Facebook-gruppen '%@', så skriv även ned ditt Facebook-namn i mejlet";
 "emailNotConfigured" = "Du måste ställa in ett e-postkonto på din iOS-enhet.";
 "emailbodyText" = "Problembeskrivning: ";
 "failedToSendEmail" = "Misslyckades att skicka mejl";

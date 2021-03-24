@@ -9,8 +9,8 @@
 "startsensortimeinfo" = "I nästa dialog kommer du att behöva ange datum och tid för när sensor fördes in. Det är viktigt att ange tiden så precist som möjligt.";
 "scanbluetoothdeviceongoing" = "Scannar efter sändare...";
 "bluetoothisnoton" = "Bluetooth är inte på. Sätt på bluetooth först och försök igen.";
-"bluetoothIsNotAuthorized" = "Du har inte givit tillåtelse för att använda bluetooth. Gå till inställningar, hitta xDrip4iO5-appen, och sätt på Bluetooth.";
-"startScanningInfo" = "Scanning startad.\n\nHåll xDrip4iO5 öppen i bakgrunden tills en anslutning har skapats.\n\n(Du behöver inte stänga av autolås. Tryck bara inte på hemknappen och lås inte din telefon)";
+"bluetoothIsNotAuthorized" = "Du har inte givit tillåtelse för att använda bluetooth. Gå till inställningar, hitta %@-appen, och sätt på Bluetooth.";
+"startScanningInfo" = "Scanning startad.\n\nHåll %@ öppen i bakgrunden tills en anslutning har skapats.\n\n(Du behöver inte stänga av autolås. Tryck bara inte på hemknappen och lås inte din telefon)";
 "sensorstart" = "Sensor startad";
 "notstarted" = "Inte startad";
 "notknown" = "Inte känd";
