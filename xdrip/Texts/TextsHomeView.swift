@@ -49,11 +49,11 @@ enum Texts_HomeView {
     }()
     
     static let bluetoothIsNotAuthorized: String = {
-        return NSLocalizedString("bluetoothIsNotAuthorized", tableName: filename, bundle: Bundle.main, value: "You did not give bluetooth permission for xDrip4iO5. Go to the settings, find the xDrip4iO5 app, and enable Bluetooth.", comment: "when user starts scanning for bluetooth device, but bluetooth is not authorized")
+        return String(format: NSLocalizedString("bluetoothIsNotAuthorized", tableName: filename, bundle: Bundle.main, value: "You did not give bluetooth permission for %@. Go to the settings, find the %@ app, and enable Bluetooth.", comment: "when user starts scanning for bluetooth device, but bluetooth is not authorized"), ConstantsHomeView.applicationName, ConstantsHomeView.applicationName)
     }()
     
     static let startScanningInfo: String = {
-        return NSLocalizedString("startScanningInfo", tableName: filename, bundle: Bundle.main, value: "Scanning Started.\n\nKeep xDrip4iO5 open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)", comment: "After clicking scan button, this message will appear")
+        return String(format: NSLocalizedString("startScanningInfo", tableName: filename, bundle: Bundle.main, value: "Scanning Started.\n\nKeep %@ open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)", comment: "After clicking scan button, this message will appear"), ConstantsHomeView.applicationName)
     }()
    
     static let sensorStart:String = {
@@ -81,7 +81,7 @@ enum Texts_HomeView {
     }()
 
     static let licenseInfo:String = {
-        return NSLocalizedString("licenseinfo", tableName: filename, bundle: Bundle.main, value: "This program is free software distributed under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\r\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.\r\n\nSee http://www.gnu.org/licenses/gpl.txt for more details.\r\n\r\nInfo: ", comment: "for home view, license info")
+        return String(format: NSLocalizedString("licenseinfo", tableName: filename, bundle: Bundle.main, value: "This program is free software distributed under the terms of the GNU General Public License as %@ published by the Free Software Foundation, either version 3 of the License, or any later version.\r\n\nThis program is distributed in the hope that it will be useful, but WITHOUT %@ ANY WARRANTY.\r\n\nSee http://www.gnu.org/licenses/gpl.txt for more details.\r\n\r\nInfo: ", comment: "for home view, license info"), ConstantsHomeView.applicationName, ConstantsHomeView.applicationName)
     }()
 
     static let info:String = {

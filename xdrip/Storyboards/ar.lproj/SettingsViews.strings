@@ -65,10 +65,10 @@
 "displayUnitInCalendarEvent" = "عرض الوحدة؟";
 "displayDeltaInCalendarEvent" = "عرض الفرق؟";
 "infoCalendarAccessDeniedByUser" = "لقد رفضت الوصول إلى التقويم الخاص بك مسبقًا.\n\nلتمكينه ، انتقل إلى إعدادات جهازك ثم الخصوصية ثم التقويم ثم قم بتمكينه.";
-"infoCalendarAccessRestricted" = "لا يمكنك منح إذن لـ xDrip4iO5 للوصول إلى التقويم الخاص بك. قد يكون هذا بسبب القيود النشطة مثل وجود أدوات الرقابة الأبوية.";
+"infoCalendarAccessRestricted" = "لا يمكنك منح إذن لـ %@ للوصول إلى التقويم الخاص بك. قد يكون هذا بسبب القيود النشطة مثل وجود أدوات الرقابة الأبوية.";
 "sectionTitleTrace" = "الإبلاغ عن المشاكل";
 "sendTraceFile" = "إرسال تقرير المشكلة";
-"describeProblem" = "اشرح سبب حاجتك لإرسال ملف التتبع بأكبر قدر ممكن من التفاصيل. إذا كنت قد ذكرت بالفعل مشكلتك في مجموعة دعم الفيسبوك xDrip4iO5، اذكر اسم الفيسبوك الخاص بك في البريد الإلكتروني";
+"describeProblem" = "اشرح سبب حاجتك لإرسال ملف التتبع بأكبر قدر ممكن من التفاصيل. إذا كنت قد ذكرت بالفعل مشكلتك في مجموعة دعم الفيسبوك %@، اذكر اسم الفيسبوك الخاص بك في البريد الإلكتروني";
 "emailNotConfigured" = "يجب عليك تفعيل حساب البريد الإلكتروني على جهازك.";
 "emailbodyText" = "وصف المشكلة: ";
 "failedToSendEmail" = "فشل في إرسال البريد الإلكتروني";
@@ -111,7 +111,7 @@
 "settingsviews_showtarget" = "Show Target Line?";
 
 /// about settings, section title
-"settingsviews_sectiontitleAbout" = "About xDrip4iO5";
+"settingsviews_sectiontitleAbout" = "About %@";
 
 /// web oop settings in bluetooth peripheral view : enabled or not
 "settingsviews_webooptransmitter" = "Use Libre Algorithm?";

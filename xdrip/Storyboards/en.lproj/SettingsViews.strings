@@ -59,7 +59,7 @@
 "settingsviews_speakDelta" = "Speak Delta?";
 "settingsviews_speakInterval" = "Interval:";
 "settingsviews_speakIntervalMessage" = "Minimum interval between two readings, in minutes";
-"settingsviews_sectiontitleAbout" = "About xDrip4iO5";
+"settingsviews_sectiontitleAbout" = "About %@";
 "settingsviews_Version" = "Version:";
 "settingsviews_license" = "License";
 "settingsviews_build" = "Build:";
@@ -76,10 +76,10 @@
 "displayUnitInCalendarEvent" = "Display Unit?";
 "displayDeltaInCalendarEvent" = "Display Delta?";
 "infoCalendarAccessDeniedByUser" = "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it.";
-"infoCalendarAccessRestricted" = "You cannot give authorization to xDrip4iO5 to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
+"infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 "sectionTitleTrace" = "Issue Reporting";
 "sendTraceFile" = "Send Issue Report";
-"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group 'xDrip4iO5', then mention your facebook name in the e-mail";
+"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
 "emailbodyText" = "Problem Description: ";
 "failedToSendEmail" = "Failed to Send Email";

@@ -278,7 +278,7 @@ class Texts_SettingsView {
     // MARK: - Section About Info
     
     static let sectionTitleAbout: String = {
-        return NSLocalizedString("settingsviews_sectiontitleAbout", tableName: filename, bundle: Bundle.main, value: "About xDrip4iO5", comment: "about settings, section title")
+        return String(format: NSLocalizedString("settingsviews_sectiontitleAbout", tableName: filename, bundle: Bundle.main, value: "About %@", comment: "about settings, section title"), ConstantsHomeView.applicationName)
     }()
     
     static let version = {
@@ -354,7 +354,7 @@ class Texts_SettingsView {
     }()
     
     static let infoCalendarAccessRestricted: String = {
-        return NSLocalizedString("infoCalendarAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to xDrip4iO5 to access your calendar. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown")
+        return String(format: NSLocalizedString("infoCalendarAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
     }()
     
     static let sectionTitleTrace: String = {
@@ -370,7 +370,7 @@ class Texts_SettingsView {
     }()
     
     static let describeProblem: String = {
-        return NSLocalizedString("describeProblem", tableName: filename, bundle: Bundle.main, value: "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group 'xDrip4iO5', then mention your facebook name in the e-mail", comment: "Text in pop up shown when user wants to send the trace file")
+        return String(format: NSLocalizedString("describeProblem", tableName: filename, bundle: Bundle.main, value: "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail", comment: "Text in pop up shown when user wants to send the trace file"), ConstantsHomeView.applicationName)
     }()
     
     static let emailNotConfigured: String = {

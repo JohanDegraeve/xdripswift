@@ -5,7 +5,7 @@
 "bluetoothisnoton" = "Bluetooth ist aus. Bitte Bluetooth starten und erneut versuchen.";
 
 /// After clicking scan button, this message will appear
-"startScanningInfo" = "Scannen gestartet.\n\nxDrip4iO5 geöffnet lassen bis die Verbindung erstellt wurde.\n\n Automatisches Sperren aktiv bleiben einfach nur nicht die App schließen oder das iPhone manuell sperren)";
+"startScanningInfo" = "Scannen gestartet.\n\n%@ geöffnet lassen bis die Verbindung erstellt wurde.\n\n Automatisches Sperren aktiv bleiben einfach nur nicht die App schließen oder das iPhone manuell sperren)";
 
 /// when user clicks transmitterButton, this is the action to forget the device, so that user can scan for a new device, in case user switches device
 "forgetbluetoothdeviceactiontitle" = "Transmitter vergessen";
@@ -74,7 +74,7 @@
 "statusactiontitle" = "Status";
 
 /// when user starts scanning for bluetooth device, but bluetooth is not authorized
-"bluetoothIsNotAuthorized" = "xDrip4iO5 hat keine Bluetooth Berechtigung. Gehe über Einstellung, xDrip4iO5 App, Bluetooth aktivieren.";
+"bluetoothIsNotAuthorized" = "%@ hat keine Bluetooth Berechtigung. Gehe über Einstellung, %@ App, Bluetooth aktivieren.";
 
 /// Text in button on home screen
 "presnooze" = "Schlummern";
