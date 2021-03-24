@@ -45,7 +45,7 @@
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
 
 /// If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown
-"infoCalendarAccessDeniedByUser" = "Keine Freigabe für Kalender.\n\nZum Freigeben: Einstellungen, Datenschutz, Kalender, xDrip4iOS aktivieren .";
+"infoCalendarAccessDeniedByUser" = "Keine Freigabe für Kalender.\n\nZum Freigeben: Einstellungen, Datenschutz, Kalender und aktivieren.";
 
 /// 
 "settingsviews_urgentLowValue" = "Niedriger Wert dringend:";
@@ -117,7 +117,7 @@
 "displayTrendInCalendarEvent" = "Trend anzeigen?";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
-"infoCalendarAccessRestricted" = "Richtlinien auf ihrem Gerät verhindern das Sie xDrip4iO5 Zugang zu ihrem Kalender geben.";
+"infoCalendarAccessRestricted" = "Richtlinien auf ihrem Gerät verhindern das Sie %@ Zugang zu ihrem Kalender geben.";
 
 /// in Settings, to enable debug level in trace file
 "debugLevel" = "Debug Level hinzufügen";
@@ -246,7 +246,7 @@
 "settingsviews_useSchedule" = "Upload Planer nutzen?";
 
 /// about settings, section title
-"settingsviews_sectiontitleAbout" = "Über xDrip4iO5";
+"settingsviews_sectiontitleAbout" = "Über %@";
 
 /// Apple Watch Settings - section title
 "appleWatchSectionTitle" = "Apple Watch";

@@ -9,8 +9,8 @@
 "startsensortimeinfo" = "En los próximos pasos, deberías definir la fecha y hora cuando iniciaste el sensor. Es importante que se haga de la forma más precisa posible.";
 "scanbluetoothdeviceongoing" = "Buscando transmisor...";
 "bluetoothisnoton" = "Bluetooth está apagado. Habilitar Bluetooth antes de continuar.";
-"bluetoothIsNotAuthorized" = "xDrip4iO5 no tiene permiso para usar bluetooth. Ir a Configuración en tu iPhone, buscar la aplicación xDrip4iO5 y autorizar el uso de Bluetooth";
-"startScanningInfo" = "Buscando tu transmisor...\n\nMantened xDrip4iO5 abierto en primer plano hasta que conecte.\n\n(No hay que deshabilitar nada, simplemente no cambias a otra aplicación ni bloqueas la pantalla de tu iPhone)";
+"bluetoothIsNotAuthorized" = "%@ no tiene permiso para usar bluetooth. Ir a Configuración en tu iPhone, buscar la aplicación %@ y autorizar el uso de Bluetooth";
+"startScanningInfo" = "Buscando tu transmisor...\n\nMantened %@v abierto en primer plano hasta que conecte.\n\n(No hay que deshabilitar nada, simplemente no cambias a otra aplicación ni bloqueas la pantalla de tu iPhone)";
 "sensorstart" = "Sensor Iniciado";
 "notstarted" = "No Iniciado";
 "notknown" = "Desconocido";
@@ -22,7 +22,7 @@
 "transmitterinfo" = "Primero deberías ir a la página de Bluetooth donde puedes añadir y buscar tu transmisor.\r\n\nDespués en la pantalla Home, puedes iniciar tu sensor.";
 "startsensorbeforecalibration" = "No puedes calibrar hasta haber iniciado un sensor.";
 "theresNoCGMTransmitterActive" = "Para calibrar debes tener un transmisor válido conectado.";
-"theremustbeareadingbeforecalibration" = "Debe hacer mínimo dos lecturas antes de poder calibrar. xDrip4iO5 te pedirá una calibración en cuanto reciba otra lectura";
+"theremustbeareadingbeforecalibration" = "Debe hacer mínimo dos lecturas antes de poder calibrar. Podrás entrar una calibración en cuanto reciba otra lectura";
 "sensornotdetected" = "Sensor no detectado. Comprobar que el transmisor está correctamente colocado encima del sensor.";
 "transmitternotpaired" = "El Tranmissor no está conectado a este iPhone. Abrid la aplicación.";
 "transmitterpairingtoolate" = "Demasiado tarde! Tu transmisor ya ha sido desconectado. Recibirás una solicitud para emparejar de nuevo en breve.";

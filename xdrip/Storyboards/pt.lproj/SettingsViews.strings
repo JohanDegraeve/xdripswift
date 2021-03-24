@@ -59,7 +59,7 @@
 "settingsviews_speakDelta" = "Falar Delta?";
 "settingsviews_speakInterval" = "Intervalo:";
 "settingsviews_speakIntervalMessage" = "Intervalo minímo entre duas leituras, em minutos";
-"settingsviews_sectiontitleAbout" = "Sobre xDrip4iO5";
+"settingsviews_sectiontitleAbout" = "Sobre %@";
 "settingsviews_Version" = "Versão:";
 "settingsviews_license" = "Licença";
 "settingsviews_build" = "Build:";
@@ -76,10 +76,10 @@
 "displayUnitInCalendarEvent" = "Mostrar Unidade?";
 "displayDeltaInCalendarEvent" = "Mostrar Delta?";
 "infoCalendarAccessDeniedByUser" = "Anteriormente negou accesso ao Calendário.\n\nPara activá-lo vá às definições do seu dispositivo, privacidade, calendários e active-o.";
-"infoCalendarAccessRestricted" = "Não pode autorizar xDrip4iO5 para aceder ao calendário. Possivelmente por restrições activas tais como controlo parental.";
+"infoCalendarAccessRestricted" = "Não pode autorizar %@ para aceder ao calendário. Possivelmente por restrições activas tais como controlo parental.";
 "sectionTitleTrace" = "Reportar Problema";
 "sendTraceFile" = "Enviar Relatório de Problema";
-"describeProblem" = "Explique porque precisa de enviar o ficheiro de rastreio com o máximo de informação possível. Se já reportou o problema no grupo de Facebook 'xDrip4iO5', então mencione o seu nome utilizado no Facebook";
+"describeProblem" = "Explique porque precisa de enviar o ficheiro de rastreio com o máximo de informação possível. Se já reportou o problema no grupo de Facebook '%@', então mencione o seu nome utilizado no Facebook";
 "emailNotConfigured" = "Tem que configurar uma conta de e-mail no seu dispositivo iOS.";
 "emailbodyText" = "Descrição de Problema: ";
 "failedToSendEmail" = "Falha no Envio de e-mail";
