@@ -45,7 +45,7 @@
 "common_bloodglucoseunit" = "Blutzucker Einheit";
 
 /// literally update
-"update" = "Editieren";
+"update" = "Bearbeiten";
 
 /// literally password
 "common_password" = "Passwort:";

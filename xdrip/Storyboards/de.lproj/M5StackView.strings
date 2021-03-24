@@ -11,10 +11,10 @@
 "authenticationFailureWarning" = "Authentifizierung auf M5Stack ist fehlgeschlagen, entweder benutzen Sie das vorkonfigurierte Passwort, oder sollte der M5Stack kein vorkonfiguriertes Passwort haben, setzten Sie den M5Stack bitte zurück. M5Stack wird jetzt getrennt. Neuer Versuch starten, klicken. ";
 
 /// user clicks power off in M5Stack view, confirmation is needed
-"powerOffConfirm" = "Sind Sie sich das sie M5Stack herunterfahren wollen?";
+"powerOffConfirm" = "Sind Sie sicher das sie M5Stack herunterfahren wollen?";
 
 /// in case M5Stack authentication failed, and M5Stack is expecting user configured password
-"blePasswordMissingWarning" = "Bitte setzten ein Passwort via Einstellungen";
+"blePasswordMissingWarning" = "Bitte setzten Sie ein Passwort";
 
 /// text for cell in settings view, connect to wifi yes or no
 "connectToWiFi" = "Verbinden mit WiFi";
@@ -28,8 +28,8 @@
 /// when M5Stack list is shown, title of the view
 "m5StackViewscreenTitle" = "M5Stack";
 
-/// when M5Stickc list is shown, title of the view
-"m5StickCViewscreenTitle" = "M5StickC";
+/// when M5Stick list is shown, title of the view
+"m5StickCViewscreenTitle" = "M5Stick";
 
 /// In m5Stack view, one line allows to show info where to find M5Stack software, this is the text in the cell
 "m5StackSoftWhereHelpCellText" = "Wo finde ich die M5Stack Software?";

@@ -21,16 +21,16 @@
 "status" = "Status:";
 
 /// text in status rown, when not connect but app is trying to connect
-"tryingToConnect" = "Scannen";
+"tryingToConnect" = "Suchen";
 
 /// BluetoothPeripheral view, text of the cell with the serial number (this is not the sensor serial number
 "serialNumber" = "Seriennummer:";
 
 /// cell text, where the connection timestamp is shown
-"connectedAt" = "Verbunden um:";
+"connectedAt" = "Verbunden am:";
 
 /// text in button top right, this button will disable automatic connect
-"donotconnect" = "Scannen stoppen";
+"donotconnect" = "Scannen abbrechen";
 
 /// BluetoothPeripheral view, text of the cell with the sensor serial number
 "SensorSerialNumber" = "Sensor Seriennummer:";
@@ -39,10 +39,10 @@
 "lastResetNotKnown" = "Zuletzt zurückgesetzt";
 
 /// button text, to disconnect
-"disconnect" = "Nicht verbunden";
+"disconnect" = "Verbindung trennen";
 
 /// Bluetooth Peripheral view, when user clicks alias field
-"aliasAlreadyExists" = "Dieser Alias wiird bereits von einem anderen Gerät verwendet";
+"aliasAlreadyExists" = "Dieser Alias wird bereits von einer anderen Verbindung verwendet";
 
 /// button text, to connect
 "connect" = "Verbinden";
@@ -75,7 +75,7 @@
 "cannotActiveCGMInFollowerMode" = "CGM kann im Follower Mode nicht aktiviert werden";
 
 /// Bluetooth Peripheral view, when user clicks alias field
-"selectAliasText" = "Wählen sie einen Alias, dieser wird in der App angezeigt und ist leichter zu sehen";
+"selectAliasText" = "Wählen Sie einen Alias, dieser wird in der App angezeigt und ist leichter zu sehen";
 
 /// 
 "notConnected" = "Nicht verbunden";
