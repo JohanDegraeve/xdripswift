@@ -1,12 +1,12 @@
 
 /// when NFC scanning is started, this message will appear
-"holdTopOfIphoneNearSensor" = "Halten sie ihr iOS Gerät mit der Ohrhörerseite an ihren Sensor";
+"holdTopOfIphoneNearSensor" = "Halten Sie ihr iOS Gerät mit der Ohrhörerseite an ihren Sensor";
 
 /// Device must support NFC
 "deviceMustSupportNFC" = "Dieses iPhone unterstützt kein NFC";
 
 /// After Libre NFC scanning, and after successful bluetooth connection, this message will be shown to explain that he or she should not allow bluetooth permission on the Libre app
-"donotusethelibrelinkapp" = "Verbunden mit Libre 2.\r\n\r\nWenn sie die Original Libre App weiterhin zum scannen verwenden möchten, deaktivieren Sie die Bluetooth Verbindung der Libre App. \r\n\r\Ansonsten verlieren sie die Verbindung zwischen %@ und dem Libre 2.";
+"donotusethelibrelinkapp" = "Verbunden mit Libre 2.\r\n\r\nWenn Sie die Original Libre App weiterhin zum scannen verwenden möchten, deaktivieren Sie die Bluetooth Verbindung der Libre App. \r\n\r\Ansonsten verlieren Sie die Verbindung zwischen %@ und dem Libre 2.";
 
 /// after scanning NFC, scan complete message
 "scanComplete" = "Scan abgeschlossen";
@@ -15,8 +15,8 @@
 "deviceMustSupportIOS14" = "Um dieses Geräte mit Libre 2 zu verdbinden updated Sie ihr Gerät bitte mit iOS14";
 
 /// The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.
-"connectedLibre2DoesNotMatchScannedLibre2" = "Es wurde ein neuer Sensor erkannt, während %@ noch mit einem anderen Sensor per Bluetooth verbunden ist.\r\n\r\nUm dieses Problem zu beheben stoppen Sie den Suchlauf bzw. beenden Sie die Verbindung.\r\n\r\nKehren sie zum vorherigen Bildschirm zurück und verbinden ein neues CGM vom Typ Libre 2\r\n\r\n%@ wird sich dann mit dem neuen Sensor verbinden.";
+"connectedLibre2DoesNotMatchScannedLibre2" = "Es wurde ein neuer Sensor erkannt, während %@ noch mit einem anderen Sensor per Bluetooth verbunden ist.\r\n\r\nUm dieses Problem zu beheben stoppen Sie den Suchlauf bzw. beenden Sie die Verbindung.\r\n\r\nKehren Sie zum vorherigen Bildschirm zurück und verbinden ein neues CGM vom Typ Libre 2\r\n\r\n%@ wird sich dann mit dem neuen Sensor verbinden.";
 
 /// Sometimes NFC scanning creates errors, retrying solves the problem. This is to explain this to the user
-"nfcErrorRetryScan" = "Fehler während des Scanvorgangs. Gehen sie links oben auf Scannen oder gehen sie zurück und fügen einen Libre 2 erneut hinzu und versuchen dann ein weiters mal zu scannen";
+"nfcErrorRetryScan" = "Fehler während des Scanvorgangs. Gehen Sie links oben auf Scannen oder gehen Sie zurück und fügen einen Libre 2 erneut hinzu und versuchen dann ein weiters mal zu scannen";
 

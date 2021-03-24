@@ -5,10 +5,10 @@
 "bluetoothisnoton" = "Bluetooth ist aus. Bitte Bluetooth starten und erneut versuchen.";
 
 /// After clicking scan button, this message will appear
-"startScanningInfo" = "Scannen gestartet.\n\n%@ geöffnet lassen bis die Verbindung erstellt wurde.\n\n Automatisches Sperren aktiv bleiben einfach nur nicht die App schließen oder das iPhone manuell sperren)";
+"startScanningInfo" = "Scannen gestartet.\n\n%@ im Vordergrund lassen bis die Verbindung erstellt wurde.\n\n Automatisches Sperren kann, aktiviert bleiben. Einfach nur nicht die App schließen oder das iPhone manuell sperren)";
 
 /// when user clicks transmitterButton, this is the action to forget the device, so that user can scan for a new device, in case user switches device
-"forgetbluetoothdeviceactiontitle" = "Transmitter vergessen";
+"forgetbluetoothdeviceactiontitle" = "Transmitter löschen";
 
 /// If transmitter needs pairing, user needs to click the notification
 "transmitternotpaired" = "Der Transmitter ist noch nicht mit diesem Gerät verbunden. Program öffnen.";
@@ -23,10 +23,10 @@
 "sensorstart" = "Sensor gestartet";
 
 /// for home view, miaomiao doesn't detect a sensor
-"sensornotdetected" = "Der Sensor wurde nicht gefunden. Prüfen sie den korrekten sitz des Transmitters im Sensor.";
+"sensornotdetected" = "Der Sensor wurde nicht gefunden. Prüfen Sie den korrekten sitz des Transmitters im Sensor.";
 
 /// for home view, title of pop up that gives info about how to select the transmitter. Simply the word Info
-"info" = "Bitte lesen";
+"info" = "Info";
 
 /// for home view, user clicks calibrate but there's no sensor started yet
 "startsensorbeforecalibration" = "Die Kalibrierung ist erst nach dem Start eines Sensors möglich.";
@@ -41,7 +41,7 @@
 "scanbluetoothdeviceactiontitle" = "Transmitter scannen";
 
 /// for home view, Info how to start : set transmitter and id, then go back to home screen, start scanning
-"transmitterinfo" = "Bitte zuerst via Bluettoh einen Sensor bzw. Transmitter verbinden.\r\n\nDanach können sie den Sensor hier starten.";
+"transmitterinfo" = "Bitte zuerst via Bluettoh einen Sensor bzw. Transmitter verbinden.\r\n\nDanach können Sie den Sensor hier starten.";
 
 /// when user manually starts scanning, this is the message that scanning is ongoing
 "scanbluetoothdeviceongoing" = "Suche nach Transmitter...";
@@ -56,7 +56,7 @@
 "failed" = "Fehlgeschlagen";
 
 /// when user manually starts sensor, this is the message that explains that time should be correct
-"startsensortimeinfo" = "Auf der nächsten Seite müßen sie Zeit und Datum eingeben zu der der Sensor gestartet wurde. Es ist wichtig Zeit und Datum so genau wie möglich ein zu geben.";
+"startsensortimeinfo" = "Auf der nächsten Seite müßen Sie Zeit und Datum eingeben zu der der Sensor gestartet wurde. Es ist wichtig Zeit und Datum so genau wie möglich ein zu geben.";
 
 /// for home view, where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'
 "ago" = "her";

@@ -27,7 +27,7 @@
 "settingsviews_master" = "Master";
 
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
-"volumeTestiOSSound" = "Lautstärke Test (aktuelle iPhone Lautstärke)";
+"volumeTestiOSSound" = "Lautstärke Test";
 
 /// transmitter settings, just the words that explain that the settings is about transmitter id
 "settingsviews_transmitterid" = "Transmitter ID:";
@@ -39,7 +39,7 @@
 "settingsviews_giveDexcomShareAccountName" = "Eingabe Dexcom Share Account Name";
 
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
-"volumeTestSoundPlayer" = "Lautstärke Test (bei aktiviertem Stummmodus)";
+"volumeTestSoundPlayer" = "Lautstärke Test (im Stummmodus)";
 
 /// healthkit settings, section title
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
@@ -105,7 +105,7 @@
 "editScheduleTimePickerSubtitle" = "Ändern: ";
 
 /// alerting settings, row alert types
-"settingsviews_row_alert_types" = "Alarm Typen";
+"settingsviews_row_alert_types" = "Eigene Alarme";
 
 /// general settings, section title
 "settingsviews_sectiontitlegeneral" = "Haupteinstellungen";
@@ -123,10 +123,10 @@
 "debugLevel" = "Debug Level hinzufügen";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
-"warningChangeFromMasterToFollower" = " Der wechsel von Master zu Follower beendet die aktuelle Verbindung zu ihrem Sensor.Möchten sie dennoch wechseln?";
+"warningChangeFromMasterToFollower" = " Der wechsel von Master zu Follower beendet die aktuelle Verbindung zu ihrem Sensor.Möchten Sie dennoch wechseln?";
 
 /// nightscout or dexcom share settings, where user can select to edit the schedule
-"schedule" = "Planmäßig:";
+"schedule" = "Upload Plan:";
 
 /// nightscout settings, port to use
 "nightScoutPort" = "Port (Optional):";
@@ -153,7 +153,7 @@
 "displayUnitInCalendarEvent" = "Einheiten anzeigen?";
 
 /// Text in pop up shown when user wants to send the trace file
-"describeProblem" = "Helfen Sie uns in dem sie uns so viele Innformationen als möglich mitteilen. Sollte sie das Problem schon in unsere Facebook Gruppe gemeldet haben teilen sie uns bitte ihren Facebook Namen per Email mit.";
+"describeProblem" = "Helfen Sie uns in dem sie uns so viele Innformationen als möglich mitteilen. Sollten Sie das Problem schon in unsere Facebook Gruppe gemeldet haben, teilen Sie uns bitte ihren Facebook Namen per Email mit.";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share password
 "settingsviews_giveDexcomSharePassword" = "Eingabe Dexcom Share Passwort";
@@ -174,7 +174,7 @@
 "settingsviews_speakBgReadings" = "BZ Werte vorlesen?";
 
 /// home screen settings, urgent high value
-"settingsviews_urgentHighValue" = "Hohe Werte Dringend:";
+"settingsviews_urgentHighValue" = "Hohe Werte dringend:";
 
 /// name of setting for text color
 "m5stack_settingsviews_textColor" = "Text Color";
@@ -200,7 +200,7 @@
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test
 "volumeTestSoundPlayerExplanation" = "Ein Alarm mit eingestellter Systemlautstärke wird gespielt (auch im Stummmodus).\n\n(Dieser Alarm gilt für alle Alarme mit Ausnahme von verpasster Datenübertragung.)\n\nMit Ok können sie den Test beenden, danach können Sie die Lautstärke wie gewünscht einstellen und noch einmal testen..";
 
- /// speak settings, where user can enable or disable speak delta
+/// speak settings, where user can enable or disable speak delta
 "settingsviews_speakDelta" = "Delta vorlesen?";
 
 /// User sets a transmitter id with id 8G or higher. This is not supported
@@ -221,8 +221,8 @@
 /// In case user tries to send trace file via email but error occurs.
 "failedToSendEmail" = "Email senden fehlgeschlagen";
 
-/// alerting settings, row alerts
-"settingsviews_row_alerts" = "Alarme";
+/// alerting settings, row alerts (thresholds)
+"settingsviews_row_alerts" = "Schwellwerte";
 
 /// general settings, should reading be shown in app badge yes or no
 "labelShowReadingInAppBadge" = "BZ Werte auf der App-Kachel anzeigen?";
@@ -234,7 +234,7 @@
 "settingsviews_giveDexcomShareSerialNumber" = "Eingabe der Dexcom Receiver Seriennummer";
 
 /// Apple Watch Settings - text in row where user needs to select a calendar
-"calenderId" = "Kalender auswahl?";
+"calenderId" = "Kalender auswählen?";
 
 /// in Settings, row title to send settings
 "sendTraceFile" = "Fehlerbericht senden";
