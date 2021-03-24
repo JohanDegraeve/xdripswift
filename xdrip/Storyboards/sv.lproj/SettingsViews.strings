@@ -83,8 +83,8 @@
 "emailNotConfigured" = "Du måste ställa in ett e-postkonto på din iOS-enhet.";
 "emailbodyText" = "Problembeskrivning: ";
 "failedToSendEmail" = "Misslyckades att skicka mejl";
-"volumeTestSoundPlayerExplanation" = "Ett larmljud spelas nu upp med samma volym som kommer att användas för att larm med 'Förbigå tyst läge' = På\n\n(Används för alla larm förutom 'Saknad avläsning' som alltid använder inställda iOS-volym.)\n\nÄndra volymen med volymknapparna och tryck 'OK' när färdig.";
-"volumeTestiOSSoundExplanation" = "Ett larmljud spelas nu upp med samma volym som kommer att användas för att larm med 'Förbigå tyst läge' = På\n\n(Används för alla larm förutom 'Saknad avläsning' som alltid använder inställda iOS-volym.)\n\nTryck på en av volymknapparna för att stänga av ljudet, ändra sedan volymen med volymknapparna till önskad volym och försök igen.";
+"volumeTestSoundPlayerExplanation" = "Ett larmljud spelas nu upp med samma volym som kommer att användas för larm med 'Förbigå tyst läge' = På\n\n(Används för alla larm förutom 'Saknad avläsning' som alltid använder inställd iOS-volym.)\n\nÄndra volymen med volymknapparna och tryck 'OK' när färdig.";
+"volumeTestiOSSoundExplanation" = "Ett larmljud spelas nu upp med samma volym som kommer att användas för larm med 'Förbigå tyst läge' = På\n\n(Används för alla larm förutom 'Saknad avläsning' som alltid använder inställd iOS-volym.)\n\nTryck på en av volymknapparna för att stänga av ljudet, ändra sedan volymen med volymknapparna till önskad volym och försök igen.";
 "volumeTestSoundPlayer" = "Testa volym (om 'Förbigå tyst läge' är på)";
 "volumeTestiOSSound" = "Testa volym (nuvarande iPhone-volym)";
 "debugLevel" = "Inkludera felsökningsnivå";
