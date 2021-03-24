@@ -1,0 +1,9 @@
+"dexcomsharetestresult_verificationsuccessfulalerttitle" = "Veriering lyckades";
+"dexcomsharetestresult_verificationsuccessfulalertbody" = "Ditt Dexcom Share-konto har blivit verifierat";
+"dexcomsharetestresult_verificationerroralerttitle" = "Verifikationsfel";
+"dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Maximalt antal inloggningsförsök har överskridits. Vänta 10 minuter och försök igen.";
+"dexcomsharetestresult_uploadErrorWarning" = "Dexcom Share uppladdningsfel";
+"dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Ditt Dexcom Share serienummer matchar inte serienumret för detta konto. Kontrollera ditt angivna serienummer bland dina inställningar.";
+"dexcomsharetestresult_monitored_receiver_not_assigned_1" = "Det verkas som att ditt sändar-ID eller serienummer";
+"dexcomsharetestresult_monitored_receiver_not_assigned_2" = "inte tilldelats";
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Använd Dexcom appen för att registrera sändaren eller Share-mottagare (G4)\r\n\r\nDu använder troligen bara fel URL, kontrollera inställning 'Använd USA-URL?'";

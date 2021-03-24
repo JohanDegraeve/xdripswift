@@ -1,0 +1,13 @@
+"screenTitle" = "M5Stack";
+"authenticationFailureWarning" = "Autentisering till M5Stack misslyckades, ställ antingen in det förinställda lösenrdet i inställningar, eller, om M5Stack inte har något förinställt lösenord, återställ M5Stack. M5Stack kommer att koppla ifrån nu. Du kan göra ett nytt försök genom att klicka ";
+"blePasswordMissingWarning" = "Du behöver ställa in ett lösenord i inställningar";
+"m5StackResetRequiredWarning" = "M5Stack måste återställas för att generera ett nytt tillfälligt lösenord. När du är färdig klicka ";
+"m5StackSoftWhereHelpCellText" = "Var hittar du mjukvara till M5Stack?";
+"m5StickCSoftWhereHelpCellText" = "Var hittar du mjukvara till M5StickC?";
+"m5StackSoftWareHelpText" = "Gå till";
+"m5StackViewscreenTitle" = "M5Stack";
+"m5StickCViewscreenTitle" = "M5StickC";
+"deviceMustBeConnectedToPowerOff" = "M5Stack måste vara ansluten för att kunna stängas av";
+"powerOffConfirm" = "Är du säker på att du vill bryta strömmen till din M5Stack?";
+"powerOff" = "Stäng av";
+"connectToWiFi" = "Anslut till Wi-Fi";

@@ -1,0 +1,7 @@
+"scanComplete" = "Scanning klar";
+"holdTopOfIphoneNearSensor" = "Håll överdelen av din iOS-enhet nära sensorn för att scanna";
+"deviceMustSupportNFC" = "Denna iPhone stöder inte NFC";
+"deviceMustSupportIOS14" = "För att ansluta till Libre 2 behövs uppgradering till iOS 14.";
+"donotusethelibrelinkapp" = "Ansluten till Libre 2.\r\n\r\nOm du vill forstätta att ibland scanna med Libre link-appen behöver du neka tillgång till bluetooth i Libre-appen.\r\n\r\nAnnars om du scannar med NFC och med tillgång till bluetooth på i Libre-appen, kommer anslutning mellan xDrip4iO5 och Libre 2 att brytas.";
+"connectedLibre2DoesNotMatchScannedLibre2" = "Du verkar ha scannat en ny sensor, men xDrip4iO5 är ansluten till gammal sensor med bluetooth.\r\n\r\nFör att lösa detta :\r\n- Klicka 'koppla ifrån' eller 'sluta scanna'\r\n- Gå tillbaka till tidigare skärm och lägg till en ny CGM av Libre 2 typ och scanna därefter igen.\r\n\r\nxDrip4iO5 ska nu kunna ansluta till den nya sensorn.";
+"nfcErrorRetryScan" = "Fel inträffade vid scanning av sensorn. KLicka 'Scanna' uppe till vänster eller klicka 'tillbaka' och lägg till Libre 2 igen, och scanna igen.";

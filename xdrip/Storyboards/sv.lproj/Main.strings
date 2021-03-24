@@ -1,0 +1,118 @@
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "0oo-Gz-k2G"; */
+"0oo-Gz-k2G.normalTitle" = "Cancel";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "2fU-HY-PwD"; */
+"2fU-HY-PwD.text" = "Detail";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "7NI-o7-nWK"; */
+"7NI-o7-nWK.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "7Wo-wd-80o"; */
+"7Wo-wd-80o.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "8Bd-7p-ZRp"; */
+"8Bd-7p-ZRp.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "8jK-jB-QOG"; */
+"8jK-jB-QOG.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Hay-Q1-7fh"; */
+"Hay-Q1-7fh.text" = "Label";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "I1p-t1-Yls"; */
+"I1p-t1-Yls.text" = "Subtitle";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "N9b-EE-lZm"; */
+"N9b-EE-lZm.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "S45-Yf-BHe"; */
+"S45-Yf-BHe.text" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "SQk-hK-fHN"; */
+"SQk-hK-fHN.text" = "Detail";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "WNo-rU-sXx"; */
+"WNo-rU-sXx.text" = "Title";
+
+/* Class = "UILabel"; text = "---"; ObjectID = "We3-bN-ffR"; */
+"We3-bN-ffR.text" = "---";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "YQZ-eK-OoJ"; */
+"YQZ-eK-OoJ.title" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "Z96-ov-isg"; */
+"Z96-ov-isg.text" = "Detail";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "b1J-rJ-H3K"; */
+"b1J-rJ-H3K.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "bT9-HM-Wcp"; */
+"bT9-HM-Wcp.text" = "Label";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "c4h-5z-5mU"; */
+"c4h-5z-5mU.text" = "Title";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "ekz-vj-3BZ"; */
+"ekz-vj-3BZ.text" = "Title";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "etA-fM-tGh"; */
+"etA-fM-tGh.title" = "Title";
+
+/* Class = "UIButton"; normalTitle = "Presnooze"; ObjectID = "fSY-nc-amN"; */
+"fSY-nc-amN.normalTitle" = "Presnooze";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "hfQ-Tt-xNH"; */
+"hfQ-Tt-xNH.text" = "Title";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "iIy-f4-6Ww"; */
+"iIy-f4-6Ww.text" = "Label";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "jx2-oc-XfQ"; */
+"jx2-oc-XfQ.text" = "Title";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "lBP-cK-gbT"; */
+"lBP-cK-gbT.title" = "Title";
+
+/* Class = "UIButton"; normalTitle = "Calibrate"; ObjectID = "mSJ-jy-nHJ"; */
+"mSJ-jy-nHJ.normalTitle" = "Calibrate";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "sBg-yb-0Iy"; */
+"sBg-yb-0Iy.text" = "Detail";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "skm-we-lQ3"; */
+"skm-we-lQ3.text" = "Detail";
+
+/* Class = "UIButton"; normalTitle = "Ok"; ObjectID = "uqL-UP-KZF"; */
+"uqL-UP-KZF.normalTitle" = "Ok";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "uyn-2k-K74"; */
+"uyn-2k-K74.text" = "Label";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "wi3-X0-YuZ"; */
+"wi3-X0-YuZ.title" = "Title";
+
+/* Class = "UIButton"; normalTitle = "Transmitter"; ObjectID = "zWo-AR-qJE"; */
+"zWo-AR-qJE.normalTitle" = "Transmitter";
+
+
+/* Class = "UILabel"; text = "Loaded by FirstViewController"; ObjectID = "A5M-7J-77L"; */
+"A5M-7J-77L.text" = "Chargé par FirstViewController";
+
+/* Class = "UILabel"; text = "First View"; ObjectID = "KQZ-1w-vlD"; */
+"KQZ-1w-vlD.text" = "Première Vue";
+
+/* Class = "UILabel"; text = "Loaded by SecondViewController"; ObjectID = "NDk-cv-Gan"; */
+"NDk-cv-Gan.text" = "Chargé par SecondViewController";
+
+/* Class = "UITabBarItem"; title = "Home"; ObjectID = "acW-dT-cKf"; */
+"acW-dT-cKf.title" = "Accueil";
+
+/* Class = "UITabBarItem"; title = "Settings"; ObjectID = "cPa-gy-q4n"; */
+"cPa-gy-q4n.title" = "Réglages";
+
+/* Class = "UITabBarItem"; title = "Bluetooth"; ObjectID = "sgT-p5-hUt"; */
+"sgT-p5-hUt.title" = "Bluetooth";
+
+/* Class = "UILabel"; text = "Second View"; ObjectID = "zEq-FU-wV5"; */
+"zEq-FU-wV5.text" = "Seconde Vue";

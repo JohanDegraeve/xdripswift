@@ -1,0 +1,5 @@
+"nightscouttestresult_verificationsuccessfulalerttitle" = "Verifiering yckades";
+"nightscouttestresult_verificationsuccessfulalertbody" = "Din Nightscout-sida har verifierats framångsrikt";
+"nightscouttestresult_verificationerroralerttitle" = "Verifikationsfel";
+"warningAPIKeyOrURLIsnil" = "Din Nightscout URL och din API_SECRET måste ställas in innan du kan köra testet";
+"nightScoutAPIKeyAndURLStarted" = "Testet har startat";
