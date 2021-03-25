@@ -55,7 +55,7 @@
 "displayUnitInCalendarEvent" = "Display Unit?";
 
 /// about settings, section title
-"settingsviews_sectiontitleAbout" = "About xDrip4iO5";
+"settingsviews_sectiontitleAbout" = "About %@";
 
 /// Apple Watch Settings - text in row where user needs to say if delta should be displayed or not
 "displayDeltaInCalendarEvent" = "Display Delta?";
@@ -184,7 +184,7 @@
 "testUrlAndAPIKey" = "Test Connection?";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
-"infoCalendarAccessRestricted" = "You cannot give authorization to xDrip4iO5 to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
+"infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 
 /// default text in email body, when user wants to send trace file.
 "emailbodyText" = "Problem Description: ";
@@ -226,7 +226,7 @@
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
 
 /// Text in pop up shown when user wants to send the trace file
-"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group 'xDrip4iO5', then mention your facebook name in the e-mail";
+"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
 "warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";

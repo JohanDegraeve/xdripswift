@@ -56,7 +56,7 @@
 "settingsviews_speakDelta" = "Puhu erotus?";
 "settingsviews_speakInterval" = "Intervalli:";
 "settingsviews_speakIntervalMessage" = "Kahden lukeman välinen vähimmäisväli minuutteina";
-"settingsviews_sectiontitleAbout" = "xDrip4iO5 info";
+"settingsviews_sectiontitleAbout" = "%@ info";
 "settingsviews_Version" = "Versio:";
 "settingsviews_license" = "Lisenssi";
 "settingsviews_build" = "Build:";
@@ -73,10 +73,10 @@
 "displayUnitInCalendarEvent" = "Näytä yksikkö?";
 "displayDeltaInCalendarEvent" = "Näytä erotus?";
 "infoCalendarAccessDeniedByUser" = "Olet aiemmin kieltänyt pääsyn kalenteriin.\n\nOttaaksesi sen käyttöön, siirry laitteen asetuksiin, tietosuojaan, kalentereihin ja ota käyttöön.";
-"infoCalendarAccessRestricted" = "Et voi antaa xDrip4iO5:lle valtuutusta käyttää kalenteriasi. Tämä johtuu mahdollisesti aktiivisista rajoituksista, kuten vanhempien valvonnasta";
+"infoCalendarAccessRestricted" = "Et voi antaa %@:lle valtuutusta käyttää kalenteriasi. Tämä johtuu mahdollisesti aktiivisista rajoituksista, kuten vanhempien valvonnasta";
 "sectionTitleTrace" = "Ongelmien raportointi";
 "sendTraceFile" = "Lähetä ongelmaraportti";
-"describeProblem" = "Selitä mahdollisimman yksityiskohtaisesti, miksi sinun on lähetettävä jäljitystiedosto. Jos olet jo ilmoittanut ongelmastasi Facebook-tukiryhmässä 'xDrip4iO5', mainitse facebook-nimesi sähköpostissa";
+"describeProblem" = "Selitä mahdollisimman yksityiskohtaisesti, miksi sinun on lähetettävä jäljitystiedosto. Jos olet jo ilmoittanut ongelmastasi Facebook-tukiryhmässä '%@', mainitse facebook-nimesi sähköpostissa";
 "emailNotConfigured" = "Sinun on määritettävä sähköpostitili iOS-laitteellasi.";
 "emailbodyText" = "Ongelman kuvaus: ";
 "failedToSendEmail" = "Sähköpostin lähetys epäonnistui";

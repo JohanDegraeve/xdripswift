@@ -154,7 +154,7 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             // for Libre 2, the device name includes the sensor id
             // if tempSensorSerialNumber != deviceName, then it means the user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user
-            // compare only the last 10 characters. Normally it should be 10, but for some reason, xDrip4iO5 does not correctly decode the sensor uid, the first character is not correct
+            // compare only the last 10 characters. Normally it should be 10, but for some reason, xDrip4iOS does not correctly decode the sensor uid, the first character is not correct
             if let deviceName = deviceName, sensorSerialNumber.serialNumber.suffix(9).uppercased() != deviceName.suffix(9) {
                 
                 bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.connectedLibre2DoesNotMatchScannedLibre2)

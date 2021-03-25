@@ -60,7 +60,7 @@
 "settingsviews_speakDelta" = "Spreek Delta Uit?";
 "settingsviews_speakInterval" = "Interval:";
 "settingsviews_speakIntervalMessage" = "Minimum interval tussen twee metingen, in minuten";
-"settingsviews_sectiontitleAbout" = "Over xDrip4iO5";
+"settingsviews_sectiontitleAbout" = "Over %@";
 "settingsviews_Version" = "Versie:";
 "settingsviews_license" = "Licentie";
 "settingsviews_build" = "Build:";
@@ -77,10 +77,10 @@
 "displayUnitInCalendarEvent" = "Toon Eenheid?";
 "displayDeltaInCalendarEvent" = "Toon Delta?";
 "infoCalendarAccessDeniedByUser" = "In het verleden heb je toegang geweigerd tot je Agenda.\n\nOm toestemming te geven, ga naar iPhone Instellingen, Privacy, Agenda's en schakel in.";
-"infoCalendarAccessRestricted" = "Geen toegang voor xDrip4iO5 tot je agenda. Dit komt waarschijnlijk door actieve beperkingen zoals Ouderlijk Toezicht.";
+"infoCalendarAccessRestricted" = "Geen toegang voor %@ tot je agenda. Dit komt waarschijnlijk door actieve beperkingen zoals Ouderlijk Toezicht.";
 "sectionTitleTrace" = "Probleemrapportage";
 "sendTraceFile" = "Verstuur Probleemrapportage";
-"describeProblem" = "Leg uit waarom je de log bestanden verstuurd met zoveel mogelijk details als mogelijk (in het Engels). Als je het probleem ook in de Facebook support groep 'xDrip4iO5' hebt gerapporteerd, benoem dan ook je facebook naam in de e-mail.";
+"describeProblem" = "Leg uit waarom je de log bestanden verstuurd met zoveel mogelijk details als mogelijk (in het Engels). Als je het probleem ook in de Facebook support groep '%@' hebt gerapporteerd, benoem dan ook je facebook naam in de e-mail.";
 "emailNotConfigured" = "Je moet een e-mail account configureren op je iOS apparaat.";
 "emailbodyText" = "Probleembeschrijving: ";
 "failedToSendEmail" = "Email versturen mislukt";

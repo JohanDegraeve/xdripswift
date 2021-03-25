@@ -9,8 +9,8 @@
 "startsensortimeinfo" = "In the next dialogs, you will need to set the date and time the sensor was inserted. It is important that you set the date and time as correct as possible.";
 "scanbluetoothdeviceongoing" = "Scan en cours du transmetteur...";
 "bluetoothisnoton" = "Bluetooth n'est pas actif. Allumez avant le bluetooth first et retentez";
-"bluetoothIsNotAuthorized" = "Vous n'avez pas donné l'autorisation d'utiliser le Bluetooth à xDrip4iO5. Allez dans les réglages, trouver xDrip4iO5 et autorisez le Bluetooth";
-"startScanningInfo" = "Scan débuté.\n\nLaissez xDrip4iO5 ouvert en premier plan jusqu'à ce qu'une connexion soit faite.\n\n(Inutile de désactiver le verrouillage automatique. Ne pressez pas le bouton Home et ne verrouillez pas votre iPhone";
+"bluetoothIsNotAuthorized" = "Vous n'avez pas donné l'autorisation d'utiliser le Bluetooth à %@. Allez dans les réglages, trouver %@ et autorisez le Bluetooth";
+"startScanningInfo" = "Scan débuté.\n\nLaissez %@ ouvert en premier plan jusqu'à ce qu'une connexion soit faite.\n\n(Inutile de désactiver le verrouillage automatique. Ne pressez pas le bouton Home et ne verrouillez pas votre iPhone";
 "sensorstart" = "Capteur démarré";
 "notstarted" = "Non démarré";
 "notknown" = "Inconnu";

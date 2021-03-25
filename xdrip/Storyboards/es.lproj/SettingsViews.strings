@@ -73,10 +73,10 @@
 "displayUnitInCalendarEvent" = "Mostrar Unidad?";
 "displayDeltaInCalendarEvent" = "Mostrar Delta?";
 "infoCalendarAccessDeniedByUser" = "Has denegado previamente permiso para acceder al calendario.\n\nPara habilitarlo de nuevo, ir a Configuración en tu iPhone, Privacidad, Calendarios y habilitarlo.";
-"infoCalendarAccessRestricted" = "No se puede autorizar a que xDrip4iO5 tenga acceso a tu calendario. Podría ser debido a que restricciones tipo Controles Parentales o similares lo están impidiendo.";
+"infoCalendarAccessRestricted" = "No se puede autorizar a que %@ tenga acceso a tu calendario. Podría ser debido a que restricciones tipo Controles Parentales o similares lo están impidiendo.";
 "sectionTitleTrace" = "Rastrear/Issue Reporting";
 "sendTraceFile" = "Enviar Archivo de Rastreo";
-"describeProblem" = "Explicar en detalle porqué es necesario enviar este archivo de rastreo. Si ya has reportando previamente este problema en el grupo de Facebook 'xDrip4iO5', confirmar tu Nombre en Facebook dentro del cuerpo del correo";
+"describeProblem" = "Explicar en detalle porqué es necesario enviar este archivo de rastreo. Si ya has reportando previamente este problema en el grupo de Facebook '%@', confirmar tu Nombre en Facebook dentro del cuerpo del correo";
 "emailNotConfigured" = "Deberías tener configurado una cuenta de correo antes de enviar el archivo.";
 "emailbodyText" = "Problem Description: ";
 "failedToSendEmail" = "Error al Enviar Correo";
@@ -88,7 +88,7 @@
 "volumeTestSoundPlayerExplanation" = "Se está reproduciendo una alamra con el mismo volumen que usar un Tipo de Alarma con la opción de 'Ignorar Mode Silencio?' habilitado\n\nCambiar el volume con los botones del iPhone y apretar OK para confirmar";
 "settingsviews_nightScoutAPIKey" = "API_SECRET:";
 "settingsviews_nightScoutUrl" = "URL:";
-"settingsviews_sectiontitleAbout" = "Sobre xDrip4iO5";
+"settingsviews_sectiontitleAbout" = "Sobre %@";
 "volumeTestiOSSoundExplanation" = "Se está reproduciendo una alamra con el mismo volumen que usar un Tipo de Alarma con la opción de 'Ignorar Mode Silencio?' deshabilitado\n\nCambiar el volume con los botones del iPhone y apretar OK para confirmar";
 "smoothLibreValues" = "Suavizar valores Libre?";
 "oslog" = "OSLog";
