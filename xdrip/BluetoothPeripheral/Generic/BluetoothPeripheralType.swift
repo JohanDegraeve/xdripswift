@@ -12,15 +12,24 @@ enum BluetoothPeripheralType: String, CaseIterable {
     
     /// M5StickC
     case M5StickCType = "M5StickC"
+
+    /// Libre 2
+    case Libre2Type = "Libre 2 Direct"
     
-    /// DexcomG4
-    case DexcomG4Type = "Dexcom G4 (bridge)"
+    /// MiaoMiao
+    case MiaoMiaoType = "MiaoMiao"
+    
+    /// bubble
+    case BubbleType = "Bubble / Bubble Mini"
+    
+    /// DexcomG6
+    case DexcomG6Type = "Dexcom G6"
     
     /// DexcomG5
     case DexcomG5Type = "Dexcom G5"
     
-    /// DexcomG6
-    case DexcomG6Type = "Dexcom G6"
+    /// DexcomG4
+    case DexcomG4Type = "Dexcom G4 (Bridge)"
     
     /// Blucon
     case BluconType = "Blucon"
@@ -28,23 +37,14 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// BlueReader
     case BlueReaderType = "BlueReader"
     
-    /// bubble
-    case BubbleType = "Bubble"
-    
     /// Droplet
     case DropletType = "Droplet"
     
     /// GNSentry
     case GNSentryType = "GNSentry"
-    
-    /// MiaoMiao
-    case MiaoMiaoType = "MiaoMiao"
       
     /// watlaa master
     case WatlaaType = "Watlaa"
-    
-    /// Libre 2
-    case Libre2Type = "Libre 2"
     
     /// Atom
     case AtomType = "Atom"
