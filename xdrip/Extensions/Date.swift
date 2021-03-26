@@ -35,7 +35,7 @@ extension Date {
         let minute = calendar.component(.minute, from: self)
         let seconds = calendar.component(.second, from: self)
         let timeInterval = TimeInterval(-Double(hour * 3600 + minute * 60 + seconds))
-        return Date(timeIntervalSinceNow: timeInterval)
+        return Date(timeInterval: timeInterval, since: self)
     }
     
     func ISOStringFromDate() -> String {
@@ -66,5 +66,5 @@ extension Date {
         return Date(timeIntervalSinceReferenceDate:
             (timeIntervalSinceReferenceDate / 3600.0).rounded(.down) * 3600.0)
     }
-
+    
 }
