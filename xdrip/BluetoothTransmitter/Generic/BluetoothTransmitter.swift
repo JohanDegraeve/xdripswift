@@ -515,9 +515,12 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     func centralManager(_ central: CBCentralManager,
                         willRestoreState dict: [String : Any]) {
-        
-        // looks like this is not written to the trace file, probably because it is the first function call after app start and so there's no tracefile yet ?
-        trace("in wilRestoreState", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+
+        // willRestoreState must be defined, otherwise the app would crash (because the centralManager was created with a CBCentralManagerOptionRestoreIdentifierKey)
+        // even if it's an empty function
+        // trace is called here because it allows us to see in the issue reports if there was a restart after app crash or removed from memory - in all other cases (force closed by user) this function is not called
+
+        trace("in willRestoreState", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         
     }
 
@@ -531,10 +534,40 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     private func initialize() {
         
         // create centralManager with a CBCentralManagerOptionRestoreIdentifierKey. This to ensure that iOS relaunches the app whenever it's killed either due to a crash or due to lack of memory
-        // iOS will restart the app as soon as a bluetooth transmitter tries to connect (which is under normal circumtances immediately
+        // iOS will restart the app as soon as a bluetooth transmitter tries to connect (which is under normal circumtances immediately)
         // the function willRestoreState (see below) is an empty function and that seems to be enough to make it work
         // see https://developer.apple.com/library/archive/qa/qa1962/_index.html
-        centralManager = CBCentralManager(delegate: self, queue: nil, options: [CBCentralManagerOptionShowPowerAlertKey: true, CBCentralManagerOptionRestoreIdentifierKey: String((0..<24).map{ _ in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".randomElement()!})])
+        //
+        // the value used for CBCentralManagerOptionRestoreIdentifierKey depends :
+        // - when scanning for a new device (or peripheral), use a random string. Disadvantage of using a random string is that willRestoreState doesn't get called when the app relaunches, because not the same value will be used (as it's a random string)
+        // - when scanning for (better : trying to connect to) a known device, the device's mac address is used. In that case, after restart, it will be the same value. In this case the function willRestoreState gets called
+        //
+        // additional notes :
+        // - the only reason why it's good to see willRestoreState starting, is because there's a trace statement in it. This allows to see in trace files if there was a restart after crash or being thrown out of memory
+        
+        /// restore identifier key to use
+        var cBCentralManagerOptionRestoreIdentifierKeyToUse: String?
+        
+        if let deviceAddress = deviceAddress {
+            
+            trace("in initialize, creating centralManager for peripheral with address %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceAddress)
+            
+            // if it's an existing device, then restore identifier key will contain the device address, which is unique worldwide
+            // the application name is also in the identifier key
+            cBCentralManagerOptionRestoreIdentifierKeyToUse = ConstantsHomeView.applicationName + "-" + deviceAddress
+            
+        } else {
+
+            trace("in initialize, creating centralManager for new peripheral", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+
+            // if it's a new device, then restore identifier key will contain random string
+            // the application name is also in the identifier key
+            cBCentralManagerOptionRestoreIdentifierKeyToUse = ConstantsHomeView.applicationName + "-" + String((0..<24).map{ _ in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".randomElement()!})
+            
+        }
+        
+        
+        centralManager = CBCentralManager(delegate: self, queue: nil, options: [CBCentralManagerOptionShowPowerAlertKey: true, CBCentralManagerOptionRestoreIdentifierKey: cBCentralManagerOptionRestoreIdentifierKeyToUse!])
         
     }
     
