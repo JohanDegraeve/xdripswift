@@ -154,5 +154,8 @@ enum ConstantsLog {
     /// for use in Libre2BLEUtilities
     static let categoryLibre2BLEUtilities =             "Libre2BLEUtilities       "
 
+    /// for use in Libre2BLEUtilities
+    static let categoryAppDelegate =                    "AppDelegate              "
+
 }
 
