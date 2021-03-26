@@ -495,6 +495,8 @@
 		F8F9724723A69A8000C3F17D /* BluetoothPeripheralCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F9724623A69A8000C3F17D /* BluetoothPeripheralCategory.swift */; };
 		F8F9724923A69DAE00C3F17D /* M5StickC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F9724823A69DAE00C3F17D /* M5StickC.swift */; };
 		F8FDD6CB2553385000625B49 /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FDD6CA2553385000625B49 /* Array.swift */; };
+		F8FDFEA9260DE1A70047597D /* DTCustomColoredAccessory.m in Sources */ = {isa = PBXBuildFile; fileRef = F8FDFEA8260DE1A70047597D /* DTCustomColoredAccessory.m */; };
+		F8FDFEAD260DE1B90047597D /* ConstantsUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1312,6 +1314,9 @@
 		F8F9724623A69A8000C3F17D /* BluetoothPeripheralCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralCategory.swift; sourceTree = "<group>"; };
 		F8F9724823A69DAE00C3F17D /* M5StickC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M5StickC.swift; sourceTree = "<group>"; };
 		F8FDD6CA2553385000625B49 /* Array.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
+		F8FDFEA7260DE1A70047597D /* DTCustomColoredAccessory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTCustomColoredAccessory.h; sourceTree = "<group>"; };
+		F8FDFEA8260DE1A70047597D /* DTCustomColoredAccessory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTCustomColoredAccessory.m; sourceTree = "<group>"; };
+		F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsUI.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2354,6 +2359,7 @@
 		F8EA6C7D21B70DEA0082976B /* Constants */ = {
 			isa = PBXGroup;
 			children = (
+				F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */,
 				F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */,
 				F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */,
 				F8A1585222EDB602007F5B5D /* ConstantsBloodGlucose.swift */,
@@ -2391,6 +2397,7 @@
 		F8EA6C8021B723A80082976B /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				F8FDFEA6260DE1A70047597D /* CustomColoredDisclosureIndicator */,
 				F8AF11F624B1E6D700AE5BA2 /* Errors */,
 				F85FF38F25288860004E6FF1 /* HouseKeeping */,
 				F8F7B8EE259A84A300C47B04 /* KalmanFilter */,
@@ -2792,6 +2799,15 @@
 				F8F9723D23A593C000C3F17D /* M5StickCBluetoothPeripheralViewModel.swift */,
 			);
 			path = M5StickC;
+			sourceTree = "<group>";
+		};
+		F8FDFEA6260DE1A70047597D /* CustomColoredDisclosureIndicator */ = {
+			isa = PBXGroup;
+			children = (
+				F8FDFEA7260DE1A70047597D /* DTCustomColoredAccessory.h */,
+				F8FDFEA8260DE1A70047597D /* DTCustomColoredAccessory.m */,
+			);
+			path = CustomColoredDisclosureIndicator;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3394,6 +3410,7 @@
 				F8A389E7232ECE7E0010F405 /* SettingsViewUtilities.swift in Sources */,
 				F8A2BC3125DB0D6D001D1E78 /* BluetoothPeripheralManager+M5StackBluetoothTransmitterDelegate.swift in Sources */,
 				F8A2BC2D25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMG5TransmitterDelegate.swift in Sources */,
+				F8FDFEA9260DE1A70047597D /* DTCustomColoredAccessory.m in Sources */,
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				F816E12C2439DFBA009EE65B /* DexcomG4+CoreDataProperties.swift in Sources */,
 				F8A2BC3425DB0D6D001D1E78 /* BluetoothPeripheralManager+WatlaaBluetoothTransmitterDelegate.swift in Sources */,
@@ -3448,6 +3465,7 @@
 				F8A1585F22EDB81E007F5B5D /* ConstantsLog.swift in Sources */,
 				F8A1586522EDB89D007F5B5D /* ConstantsDefaultAlertTypeSettings.swift in Sources */,
 				F816E11624391A02009EE65B /* Droplet+BluetoothPeripheral.swift in Sources */,
+				F8FDFEAD260DE1B90047597D /* ConstantsUI.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

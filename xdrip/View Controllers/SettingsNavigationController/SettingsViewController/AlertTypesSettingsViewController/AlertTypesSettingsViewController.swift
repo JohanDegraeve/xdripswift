@@ -100,6 +100,16 @@ extension AlertTypesSettingsViewController: UITableViewDataSource, UITableViewDe
     
     // MARK: - UITableViewDataSource and UITableViewDelegate protocol Methods
     
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        
+        if let view = view as? UITableViewHeaderFooterView {
+            
+            view.textLabel?.textColor = ConstantsUI.tableViewHeaderTextColor
+            
+        }
+        
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return alertTypesAccessor.getAllAlertTypes().count
     }
@@ -115,6 +125,8 @@ extension AlertTypesSettingsViewController: UITableViewDataSource, UITableViewDe
         
         // clicking the cell will always open a new screen which allows the user to edit the alert type
         cell.accessoryType = .disclosureIndicator
+        
+        cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
         
         return cell
     }

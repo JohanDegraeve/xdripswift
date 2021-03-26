@@ -119,6 +119,10 @@ extension AtomBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         // default value for accessoryView is nil
         cell.accessoryView = nil
         
+        // create disclosureIndicator in color ConstantsUI.disclosureIndicatorColor
+        // will be used whenever accessoryType is to be set to disclosureIndicator
+        let disclosureAaccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+        
         guard let setting = Settings(rawValue: rawValue) else { fatalError("AtomBluetoothPeripheralViewModel update, unexpected setting") }
         
         switch setting {
@@ -161,18 +165,21 @@ extension AtomBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.textLabel?.text = Texts_Common.firmware
             cell.detailTextLabel?.text = atom.firmware
             cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = disclosureAaccessoryView
             
         case .hardWare:
             
             cell.textLabel?.text = Texts_Common.hardware
             cell.detailTextLabel?.text = atom.hardware
             cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = disclosureAaccessoryView
             
         case .sensorSerialNumber:
             
             cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
             cell.detailTextLabel?.text = atom.blePeripheral.sensorSerialNumber
             cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = disclosureAaccessoryView
             
         }
         

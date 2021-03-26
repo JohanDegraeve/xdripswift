@@ -194,6 +194,16 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
     
     // MARK: - UITableViewDataSource and UITableViewDelegate protocol Methods
     
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        
+        if let view = view as? UITableViewHeaderFooterView {
+            
+            view.textLabel?.textColor = ConstantsUI.tableViewHeaderTextColor
+            
+        }
+        
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         // if the alerttype is not enabled, then only show the enable UISwitch and the name of the alerttype
@@ -212,6 +222,10 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
         // default value for accessoryView is nil
         cell.accessoryView = nil
         
+        // create disclosureIndicator in color ConstantsUI.disclosureIndicatorColor
+        // will be used whenever accessoryType is to be set to disclosureIndicator
+        let disclosureAaccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+
         // configure the cell depending on setting
         switch setting {
             
@@ -219,6 +233,8 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
             cell.textLabel?.text = Texts_AlertTypeSettingsView.alertTypeName
             cell.detailTextLabel?.text = name
             cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            cell.accessoryView = disclosureAaccessoryView
+            
         case .enabled:
             cell.textLabel?.text = Texts_AlertTypeSettingsView.alertTypeEnabled
             cell.detailTextLabel?.text = nil
@@ -250,10 +266,14 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
             cell.textLabel?.text = Texts_AlertTypeSettingsView.alertTypeDefaultSnoozePeriod
             cell.detailTextLabel?.text = snoozePeriod.description
             cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            cell.accessoryView = disclosureAaccessoryView
+            
         case .soundName:
             cell.textLabel?.text = Texts_AlertTypeSettingsView.alertTypeSound
             cell.detailTextLabel?.text = soundName != nil ? soundName! == "" ? Texts_AlertTypeSettingsView.alertTypeNoSound : soundName! : Texts_AlertTypeSettingsView.alertTypeDefaultIOSSound
             cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            cell.accessoryView = disclosureAaccessoryView
+            
         case .overridemute:
             cell.textLabel?.text = Texts_AlertTypeSettingsView.alertTypeOverrideMute
             cell.detailTextLabel?.text = nil

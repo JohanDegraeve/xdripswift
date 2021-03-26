@@ -120,7 +120,21 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
-        return UITableViewCell.AccessoryType.none
+        
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+        
+        switch setting {
+
+        case .alertTypes, .alerts:
+            
+            return .disclosureIndicator
+            
+        case .volumeTestSoundPlayer, .volumeTestiOSSound:
+            
+            return .none
+            
+        }
+        
     }
     
     func detailedText(index: Int) -> String? {
