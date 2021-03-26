@@ -85,8 +85,13 @@ extension SnoozeViewController: UITableViewDataSource {
                 fatalError("In SnoozeViewController, remainingSeconds is nil but alert is snoozed")
             }
 
-            // if snooze period longer than 24 hours then show data and time when it ends, if less than only show time
-            cell.textLabel?.text = TextsSnooze.snoozed_until + " " + Date(timeIntervalSinceNow: Double(remainingSeconds)).toString(timeStyle: .short, dateStyle: remainingSeconds > 24 * 60 * 60 ? .short : .none)
+            // till when snoozed, as Date
+            let snoozedTillDate = Date(timeIntervalSinceNow: Double(remainingSeconds))
+            
+            // if snoozed till after 00:00 then show date and time when it ends, else only show time
+            let showDate = snoozedTillDate.toMidnight() > Date()
+            
+            cell.textLabel?.text = TextsSnooze.snoozed_until + " " + snoozedTillDate.toString(timeStyle: .short, dateStyle: showDate ? .short : .none)
             
         } else {
 
