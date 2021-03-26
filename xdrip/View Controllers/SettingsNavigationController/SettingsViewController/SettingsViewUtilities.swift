@@ -14,23 +14,20 @@ class SettingsViewUtilities {
         // first the two textfields
         cell.textLabel?.text = viewModel.settingsRowText(index: rowIndex)
         cell.detailTextLabel?.text = viewModel.detailedText(index: rowIndex)
-        
+
         // if not enabled, then no need to adding anything else
         if viewModel.isEnabled(index: rowIndex) {
-            
+
+            // get accessoryView
+            cell.accessoryView = viewModel.uiView(index: rowIndex)
+
             // setting enabled, get accessory type and accessory view
             cell.accessoryType = viewModel.accessoryType(index: rowIndex)
             
-            switch cell.accessoryType {
-            case .checkmark, .detailButton, .detailDisclosureButton, .disclosureIndicator:
-                cell.selectionStyle = .gray
-            case .none:
-                cell.selectionStyle = .none
-            @unknown default:
-                cell.selectionStyle = .none
+            //if accessoryType = disclosure indicator then use custom disclosureIndicator in ConstantsUI.disclosureIndicatorColor
+            if cell.accessoryType == .disclosureIndicator {
+                cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
             }
-            
-            cell.accessoryView = viewModel.uiView(index: rowIndex)
             
             // if uiview is an uiswitch then a reload must be initiated whenever the switch changes, either complete view or just the section
             if let view = cell.accessoryView as? UISwitch {

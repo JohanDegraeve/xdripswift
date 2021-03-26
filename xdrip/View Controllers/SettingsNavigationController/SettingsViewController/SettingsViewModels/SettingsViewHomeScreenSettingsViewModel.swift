@@ -173,10 +173,10 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             return UITableViewCell.AccessoryType.disclosureIndicator
 
         case .useObjectives:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+            return UITableViewCell.AccessoryType.none
 
         case .showTarget:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+            return UITableViewCell.AccessoryType.none
                 
         case .targetMarkValue:
             return UITableViewCell.AccessoryType.disclosureIndicator

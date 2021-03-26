@@ -42,7 +42,7 @@ struct SettingsViewM5StackSettingsViewModel: SettingsViewModelProtocol {
         switch setting {
             
         case .m5stack:
-            return UITableViewCell.AccessoryType.none
+            return .disclosureIndicator
             
         }
         

@@ -292,6 +292,16 @@ final class BluetoothPeripheralsViewController: UIViewController {
 
 extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableViewDelegate {
     
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        
+        if let view = view as? UITableViewHeaderFooterView {
+            
+            view.textLabel?.textColor = ConstantsUI.tableViewHeaderTextColor
+            
+        }
+        
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
         return numberOfRows(inSection: section)
@@ -317,9 +327,10 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         // detail is the connection status
         cell.detailTextLabel?.text = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: false, connectButtonOutlet: nil, expectedBluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType(), transmitterId: nil, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
 
-        // clicking the cell will always open a new screen which allows the user to edit the alert type
-        cell.accessoryType = .disclosureIndicator
-        
+        // clicking the cell will always open a new screen which allows the user to edit the alert type - add disclosureIndicator
+        // set color of disclosureIndicator to ConstantsUI.disclosureIndicatorColor
+        cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+
         return cell
         
     }

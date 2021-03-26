@@ -71,6 +71,16 @@ extension M5StackSettingsViewController {
 
 extension M5StackSettingsViewController: UITableViewDelegate {
     
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        
+        if let view = view as? UITableViewHeaderFooterView {
+            
+            view.textLabel?.textColor = ConstantsUI.tableViewHeaderTextColor
+            
+        }
+        
+    }
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         tableView.deselectRow(at: indexPath, animated: true)
@@ -89,13 +99,6 @@ extension M5StackSettingsViewController: UITableViewDelegate {
         }
     }
     
-    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        
-        // apple doc says : Use this method to respond to taps in the detail button accessory view of a row. The table view does not call this method for other types of accessory views.
-        // when user clicks on of the detail buttons, then consider this as row selected, for now - as it's only license that is using this button for now
-        self.tableView(tableView, didSelectRowAt: indexPath)
-        
-    }
 }
 
 extension M5StackSettingsViewController: UITableViewDataSource {
