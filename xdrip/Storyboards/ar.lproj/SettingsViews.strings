@@ -47,8 +47,8 @@
 "settingsviews_speakreadingslanguageselection" = "اختر اللغة";
 "settingsviews_speakTrend" = "نطق الاتجاه؟";
 "settingsviews_speakDelta" = "نطق الفرق؟";
-"settingsviews_speakInterval" = "الفاصل الزمني:";
-"settingsviews_speakIntervalMessage" = "الفاصل الزمني الأدنى بين قراءتين بالدقائق";
+"settingsviews_IntervalTitle" = "الفاصل الزمني:";
+"settingsviews_IntervalMessage" = "الفاصل الزمني الأدنى بين قراءتين بالدقائق";
 "settingsviews_Version" = "الإصدار:";
 "settingsviews_license" = "رخصة";
 "settingsviews_build" = "رقم الإصدار:";

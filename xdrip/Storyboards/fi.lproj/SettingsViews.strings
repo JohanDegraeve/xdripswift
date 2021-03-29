@@ -54,8 +54,8 @@
 "settingsviews_speakreadingslanguageselection" = "Valitse kieli";
 "settingsviews_speakTrend" = "Puhu suunta?";
 "settingsviews_speakDelta" = "Puhu erotus?";
-"settingsviews_speakInterval" = "Intervalli:";
-"settingsviews_speakIntervalMessage" = "Kahden lukeman välinen vähimmäisväli minuutteina";
+"settingsviews_IntervalTitle" = "Intervalli:";
+"settingsviews_IntervalMessage" = "Kahden lukeman välinen vähimmäisväli minuutteina";
 "settingsviews_sectiontitleAbout" = "%@ info";
 "settingsviews_Version" = "Versio:";
 "settingsviews_license" = "Lisenssi";

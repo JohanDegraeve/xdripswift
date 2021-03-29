@@ -59,6 +59,17 @@ class WatchManager: NSObject {
             return
         }
         
+        // if an interval is defined, and if time since last created event is less than interval, then don't create a new event
+        // substract 10 seconds, because user will probably select a multiple of 5, and also readings usually arrive every 5 minutes
+        // example user selects 10 minutes interval, next reading will arrive in exactly 10 minutes, time interval to be checked will be 590 seconds
+        if Int(Date().timeIntervalSince(timeStampLastProcessedReading)) < (UserDefaults.standard.calendarInterval * 60 - 10) {
+            
+            trace("in createCalendarEvent, less than %{public}@ minutes since last event, will not create a new event", log: log, category: ConstantsLog.categoryWatchManager, type: .info, UserDefaults.standard.calendarInterval.description)
+            
+            return
+            
+        }
+        
         // get 2 last Readings, with a calculatedValue
         let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
         
@@ -68,15 +79,6 @@ class WatchManager: NSObject {
             return
         }
         
-        // check if timeStampLastProcessedReading is at least minimiumTimeBetweenTwoReadingsInMinutes earlier than now (or it's at least minimiumTimeBetweenTwoReadingsInMinutes minutes ago that event was created for reading) - otherwise don't create event
-        // exception : there's been a disconnect/reconnect after the last processed reading (if lastConnectionStatusChangeTimeStamp != nil)
-        if (abs(timeStampLastProcessedReading.timeIntervalSince(Date())) < ConstantsWatch.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 && (lastConnectionStatusChangeTimeStamp != nil ? lastConnectionStatusChangeTimeStamp! : Date(timeIntervalSince1970: 0)).timeIntervalSince(timeStampLastProcessedReading) < 0) {
-            
-            trace("in createCalendarEvent, no new calendar event will be created because it's too close to previous event", log: log, category: ConstantsLog.categoryWatchManager, type: .info)
-            return
-            
-        }
-
         // latest reading should be less than 5 minutes old
         guard abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 5 * 60 else {
             trace("in createCalendarEvent, the latest reading is older than 5 minutes", log: log, category: ConstantsLog.categoryWatchManager, type: .info)

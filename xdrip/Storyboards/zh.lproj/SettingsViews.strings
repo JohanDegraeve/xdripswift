@@ -30,7 +30,7 @@
 "settingsviews_speakBgReadings" = "语音播报血糖值";
 "settingsviews_speakTrend" = "语音播报趋势";
 "settingsviews_speakDelta" = "语音播报偏移量";
-"settingsviews_speakInterval" = "间隔时间";
+"settingsviews_IntervalTitle" = "间隔时间";
 "settingsviews_masterorfollower" = "主控端或者关注者 ?";
 "settingsviews_master" = "主控端";
 "settingsviews_follower" = "关注者";
@@ -63,8 +63,8 @@
 /// Apple Watch Settings - text in row where user needs to say if unit should be displayed or not
 "displayUnitInCalendarEvent" = "Display Unit?";
 
-/// When clicking the interval setting, a pop up asks for number of minutes between two spoken readings, this is the message displayed in the pop up
-"settingsviews_speakIntervalMessage" = "Minimum interval between two readings, in minutes";
+/// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
+"settingsviews_IntervalMessage" = "Minimum interval between two readings, in minutes";
 
 /// Apple Watch Settings - text in row where create event is enabled or disabled 
 "createCalendarEvent" = "Create Calendar Events?";

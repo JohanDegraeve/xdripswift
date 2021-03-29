@@ -2,20 +2,24 @@ import UIKit
 
 fileprivate enum Setting:Int, CaseIterable {
     
-    //blood glucose  unit
+    /// blood glucose  unit
     case bloodGlucoseUnit = 0
     
-    // choose between master and follower
+    /// choose between master and follower
     case masterFollower = 1
     
-    // should reading be shown in notification
+    /// should reading be shown in notification
     case showReadingInNotification = 2
     
-    // show reading in app badge
-    case showReadingInAppBadge = 3
+    /// - minimum time between two readings, for which notification should be created (in minutes)
+    /// - except if there's been a disconnect, in that case this value is not taken into account
+    case notificationInterval = 3
     
-    // if reading is shown in app badge, should value be multiplied with 10 yes or no
-    case multipleAppBadgeValueWith10 = 4
+    /// show reading in app badge
+    case showReadingInAppBadge = 4
+    
+    /// if reading is shown in app badge, should value be multiplied with 10 yes or no
+    case multipleAppBadgeValueWith10 = 5
     
 }
 
@@ -111,6 +115,10 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return SettingsSelectedRowAction.nothing
             
+        case .notificationInterval:
+            
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_IntervalTitle, message: Texts_SettingsView.settingsviews_IntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.notificationInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.notificationInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
+            
         }
     }
     
@@ -150,6 +158,9 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .multipleAppBadgeValueWith10:
             return Texts_SettingsView.multipleAppBadgeValueWith10
             
+        case .notificationInterval:
+            return Texts_SettingsView.settingsviews_IntervalTitle
+            
         }
     }
     
@@ -166,6 +177,9 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
             
         case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return UITableViewCell.AccessoryType.none
+            
+        case .notificationInterval:
+            return UITableViewCell.AccessoryType.disclosureIndicator
             
         }
     }
@@ -184,6 +198,8 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return nil
             
+        case .notificationInterval:
+            return UserDefaults.standard.notificationInterval.description
         }
     }
     
@@ -206,6 +222,9 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
             return UISwitch(isOn: UserDefaults.standard.multipleAppBadgeValueWith10, action: {(isOn:Bool) in UserDefaults.standard.multipleAppBadgeValueWith10 = isOn})
 
         case .bloodGlucoseUnit, .masterFollower:
+            return nil
+            
+        case .notificationInterval:
             return nil
             
         }

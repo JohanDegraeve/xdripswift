@@ -267,12 +267,12 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_speakDelta", tableName: filename, bundle: Bundle.main, value: "Speak Delta?", comment: "speak settings, where user can enable or disable speak delta")
     }()
 
-    static let labelSpeakInterval = {
-        return NSLocalizedString("settingsviews_speakInterval", tableName: filename, bundle: Bundle.main, value: "Interval:", comment: "speak settings, where user can set the speak interval, speak each reading, each two readings ...")
+    static let settingsviews_IntervalTitle = {
+        return NSLocalizedString("settingsviews_IntervalTitle", tableName: filename, bundle: Bundle.main, value: "Interval:", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch")
     }()
     
-    static let speakIntervalMessage = {
-        return NSLocalizedString("settingsviews_speakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two readings (mins)", comment: "When clicking the interval setting, a pop up asks for number of minutes between two spoken readings, this is the message displayed in the pop up")
+    static let settingsviews_IntervalMessage = {
+        return NSLocalizedString("settingsviews_IntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two readings (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch")
     }()
     
     // MARK: - Section About Info

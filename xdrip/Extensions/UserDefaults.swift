@@ -32,6 +32,9 @@ extension UserDefaults {
         /// should reading by multiplied by 10
         case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
         
+        /// minimum time between two notifications, set by user
+        case notificationInterval = "notificationInterval"
+        
         // Home Screen and graph settings
         
         /// show the objectives and make them display on the graph? Or just hide it all because it's too complicated to waste time with?
@@ -161,6 +164,9 @@ extension UserDefaults {
         
         /// should units be displayed yes or no
         case displayUnitInCalendarEvent = "displayUnits"
+        
+        /// calendar interval
+        case calendarInterval = "calendarInterval"
         
         // Other Settings (not user configurable)
         
@@ -300,6 +306,16 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showReadingInNotification.rawValue)
+        }
+    }
+    
+    /// speak readings interval in minutes
+    @objc dynamic var notificationInterval: Int {
+        get {
+            return integer(forKey: Key.notificationInterval.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.notificationInterval.rawValue)
         }
     }
 
@@ -1008,6 +1024,18 @@ extension UserDefaults {
             set(newValue, forKey: Key.displayUnitInCalendarEvent.rawValue)
         }
     }
+    
+    /// speak readings interval in minutes
+    @objc dynamic var calendarInterval: Int {
+        get {
+            return integer(forKey: Key.calendarInterval.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.calendarInterval.rawValue)
+        }
+    }
+    
+
     
     // MARK: - =====  Other Settings ======
     

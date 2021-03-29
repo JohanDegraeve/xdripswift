@@ -20,6 +20,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// should units be displayed yes or no
     case displayUnits = 4
     
+    /// minimum time between two readings, for which event should be created (in minutes)
+    case calendarInterval = 5
+
 }
 
 class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
@@ -62,6 +65,9 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
             
         case .displayUnits:
             return Texts_SettingsView.displayUnitInCalendarEvent
+            
+        case .calendarInterval:
+            return Texts_SettingsView.settingsviews_IntervalTitle
 
         }
 
@@ -104,6 +110,9 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
         case .displayTrend, .displayDelta, .displayUnits:
             return UITableViewCell.AccessoryType.none
             
+        case .calendarInterval:
+            return UITableViewCell.AccessoryType.disclosureIndicator
+            
         }
     }
 
@@ -118,6 +127,9 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
             
         case .createCalendarEvent, .displayTrend, .displayDelta, .displayUnits:
             return nil
+            
+        case .calendarInterval:
+            return UserDefaults.standard.calendarInterval.description
 
         }
     }
@@ -193,6 +205,9 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
             
         case .displayUnits:
             return UISwitch(isOn: UserDefaults.standard.displayUnitInCalendarEvent, action: {(isOn:Bool) in UserDefaults.standard.displayUnitInCalendarEvent = isOn})
+            
+        case .calendarInterval:
+            return nil
             
         }
         
@@ -283,6 +298,10 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                     UserDefaults.standard.calenderId = data[index]
                 }
             }, cancelHandler: nil, didSelectRowHandler: nil)
+
+        case .calendarInterval:
+        
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_IntervalTitle, message: Texts_SettingsView.settingsviews_IntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.calendarInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.calendarInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
 
         }
         

@@ -57,8 +57,8 @@
 "settingsviews_speakreadingslanguageselection" = "Välj språk";
 "settingsviews_speakTrend" = "Läs upp trend?";
 "settingsviews_speakDelta" = "Läs upp delta?";
-"settingsviews_speakInterval" = "Intervall:";
-"settingsviews_speakIntervalMessage" = "Minsta intervall mellan två avläsningar, i minuter";
+"settingsviews_IntervalTitle" = "Intervall:";
+"settingsviews_IntervalMessage" = "Minsta intervall mellan två avläsningar, i minuter";
 "settingsviews_sectiontitleAbout" = "Om %@";
 "settingsviews_Version" = "Version:";
 "settingsviews_license" = "Licens";

@@ -57,8 +57,8 @@
 "settingsviews_speakreadingslanguageselection" = "Escolher Idioma";
 "settingsviews_speakTrend" = "Falar Tendência?";
 "settingsviews_speakDelta" = "Falar Delta?";
-"settingsviews_speakInterval" = "Intervalo:";
-"settingsviews_speakIntervalMessage" = "Intervalo minímo entre duas leituras, em minutos";
+"settingsviews_IntervalTitle" = "Intervalo:";
+"settingsviews_IntervalMessage" = "Intervalo minímo entre duas leituras, em minutos";
 "settingsviews_sectiontitleAbout" = "Sobre %@";
 "settingsviews_Version" = "Versão:";
 "settingsviews_license" = "Licença";

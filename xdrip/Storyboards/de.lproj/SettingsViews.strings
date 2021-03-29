@@ -131,8 +131,8 @@
 /// nightscout settings, port to use
 "nightScoutPort" = "Port (Optional):";
 
-/// speak settings, where user can set the speak interval, speak each reading, each two readings ...
-"settingsviews_speakInterval" = "Intervall:";
+/// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
+"settingsviews_IntervalTitle" = "Intervall:";
 
 /// general settings, literally follower
 "settingsviews_follower" = "Follower";
@@ -212,8 +212,8 @@
 /// dexcom share settings, where user can set the dexcom share account name
 "settingsviews_dexcomShareAccountName" = "Benutzer Name:";
 
-/// When clicking the interval setting, a pop up asks for number of minutes between two spoken readings, this is the message displayed in the pop up
-"settingsviews_speakIntervalMessage" = "Mindestabstand zwischen zwei vorgelesenen Werten in Minuten";
+/// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
+"settingsviews_IntervalMessage" = "Mindestabstand zwischen zwei Werten in Minuten";
 
 /// shown on top of the first settings screen
 "m5stack_settingsviews_settingstitle" = "M5 Stack Einstellungen";
