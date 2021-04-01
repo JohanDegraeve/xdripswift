@@ -64,7 +64,7 @@ extension Double: RawRepresentable {
         
         if mgdl {
             
-            return self
+            return self.round(toDecimalPlaces: 0)
             
         } else {
             

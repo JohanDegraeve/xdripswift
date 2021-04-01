@@ -32,17 +32,29 @@ enum ConstantsGlucoseChart {
     /// if the maximum in initialGlucoseValueRangeInMgDl isn't enough to show all values, if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
     static let thirdGlucoseValueRangeInMmol = [21.0, 23.0]
     
-    /// axis line color    (make white to match new dark UI theme)
-    static let axisLineColor = UIColor.darkGray
+    /// axis line color
+    static let axisLineColor = UIColor.gray
     
-    /// axis line label    (make white to match new dark UI theme)
+    /// axis line label
     static let axisLabelColor = UIColor.white
+    
+    /// axis line label for objective values
+    static let axisLabelColorObjectives = UIColor.white
+    
+    /// axis line label the target value if needed
+    static let axisLabelColorTarget = UIColor.green.withAlphaComponent(0.5)
+    
+    /// axis line label for dimmed secondary values (non-objective values)
+    static let axisLabelColorDimmed = UIColor.gray.withAlphaComponent(0.8)
+    
+    /// axis line label for any values that we don't need to display
+    static let axisLabelColorHidden = UIColor.clear
     
     /// grid color to use if useObjectives is not enabled
     static let gridColor = UIColor.darkGray
     
     /// grid color to use if useObjectives is enabled
-    static let gridColorObjectives = UIColor.darkGray.withAlphaComponent(0.4)
+    static let gridColorObjectives = UIColor.darkGray.withAlphaComponent(0.5)
     
     // objective/target range guidelines. Will use either standard gray or colored lines
     // make use alpha components to make the perceived brightness of each line be the same to the user (otherwise red appears washed out)
@@ -54,7 +66,7 @@ enum ConstantsGlucoseChart {
     static let guidelineHighLow = UIColor.lightGray.withAlphaComponent(1)
     
     /// color for target line
-    static let guidelineTargetColor = UIColor.green.withAlphaComponent(0.5)
+    static let guidelineTargetColor = UIColor.green.withAlphaComponent(0.3)
     
     /// glucose colors - for values in range
     static let glucoseInRangeColor = UIColor.green
