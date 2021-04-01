@@ -45,6 +45,14 @@ public final class GlucoseChartManager {
     
     private var chartLabelSettings: ChartLabelSettings?
     
+    private var chartLabelSettingsObjectives: ChartLabelSettings?
+    
+    private var chartLabelSettingsTarget: ChartLabelSettings?
+    
+    private var chartLabelSettingsDimmed: ChartLabelSettings?
+    
+    private var chartLabelSettingsHidden: ChartLabelSettings?
+    
     private var chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings?
     
     /// The latest date on the X-axis
@@ -89,7 +97,8 @@ public final class GlucoseChartManager {
     
     /// - the maximum value in glucoseChartPoints array between start and endPoint
     /// - the value will never get smaller during the run time of the app
-    private var maximumValueInGlucoseChartPoints:Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+    /// - in mgdl
+     private var maximumValueInGlucoseChartPointsInMgDl: Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
     
     /// - if glucoseChartPoints.count > 0, then this is the latest one that has timestamp less than endDate.
     private(set) var lastChartPointEarlierThanEndDate: ChartPoint?
@@ -180,7 +189,7 @@ public final class GlucoseChartManager {
                     self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
 
                     // maybe there's a higher value now
-                    self.maximumValueInGlucoseChartPoints = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPoints, glucoseChartPoints: newGlucoseChartPointsToAppend)
+                    self.maximumValueInGlucoseChartPointsInMgDl = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPointsInMgDl, glucoseChartPoints: newGlucoseChartPointsToAppend)
                     
                 } else if endDate <= lastGlucoseTimeStamp {
                     // so starDate <= date of last known glucosechartpoint and enddate is also <= that date
@@ -190,8 +199,8 @@ public final class GlucoseChartManager {
                     self.lastChartPointEarlierThanEndDate = lastGlucoseChartPoint
                     
                     // maybe there's a higher value now for maximumValueInGlucoseChartPoints
-                    self.maximumValueInGlucoseChartPoints = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPoints, glucoseChartPoints: newGlucoseChartPointsToAppend)
-                    
+                    self.maximumValueInGlucoseChartPointsInMgDl = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPointsInMgDl, glucoseChartPoints: newGlucoseChartPointsToAppend)
+
                 } else {
                     
                     // append glucseChartpoints with date > x.date up to endDate
@@ -201,7 +210,7 @@ public final class GlucoseChartManager {
                     self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
                     
                     // maybe there's a higher value now for maximumValueInGlucoseChartPoints
-                    self.maximumValueInGlucoseChartPoints = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPoints, glucoseChartPoints: newGlucoseChartPointsToAppend)
+                    self.maximumValueInGlucoseChartPointsInMgDl = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPointsInMgDl, glucoseChartPoints: newGlucoseChartPointsToAppend)
 
                 }
                 
@@ -214,7 +223,7 @@ public final class GlucoseChartManager {
                         newGlucoseChartPointsToPrepend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: firstGlucoseChartPointX.date, bgReadingsAccessor: self.data().bgReadingsAccessor, on: managedObjectContext)
                         
                         // maybe there's a higher value now for maximumValueInGlucoseChartPoints
-                        self.maximumValueInGlucoseChartPoints = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPoints, glucoseChartPoints: newGlucoseChartPointsToPrepend)
+                        self.maximumValueInGlucoseChartPointsInMgDl = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPointsInMgDl, glucoseChartPoints: newGlucoseChartPointsToPrepend)
 
                     }
                     
@@ -231,7 +240,7 @@ public final class GlucoseChartManager {
                 self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
                 
                 // maybe there's a higher value now for maximumValueInGlucoseChartPoints
-                self.maximumValueInGlucoseChartPoints = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPoints, glucoseChartPoints: newGlucoseChartPointsToAppend)
+                self.maximumValueInGlucoseChartPointsInMgDl = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPointsInMgDl, glucoseChartPoints: newGlucoseChartPointsToAppend)
 
             }
             
@@ -489,40 +498,91 @@ public final class GlucoseChartManager {
         // just to save typing
         let unitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
-        // create yAxisValues, start with 38 mgdl, this is to make sure we show a bit lower than the real lowest value which is usually 40 mgdl, make the label hidden
-        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgdlToMmol(mgdl: unitIsMgDl), labelSettings: data().chartLabelSettings)
-        firstYAxisValue.hidden = true
+        // create yAxisValues, start with 38 mgdl, this is to make sure we show a bit lower than the real lowest value which is usually 40 mgdl, make the label hidden. We must do this with by using a clear color label setting as the hidden property doesn't work (even if we don't know why).
+        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgdlToMmol(mgdl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
         
         // create now the yAxisValues and add the first
         var yAxisValues = [firstYAxisValue as ChartAxisValue]
         
-        // add first series
-        if unitIsMgDl {
-            yAxisValues += ConstantsGlucoseChart.initialGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
+        // if the user is using objectives, then let's construct the y axis array based on their objective values. Then, after leaving a prudent gap as required, we can add in the standard grid values as secondary axis values in a darker font (to keep the focus on the objective values)
+        if UserDefaults.standard.useObjectives {
+            
+            // if the user has a low urgent value > 50 (which *should* be the case), let's add a dimmed axis value of 40 to give the graph more context. If not, then just ignore it and their low urgent value will become the lowest label value
+            if UserDefaults.standard.urgentLowMarkValueInUserChosenUnit >= (unitIsMgDl ? 50 : 2.7) {
+                yAxisValues += [ChartAxisValueDouble(unitIsMgDl ? 40 : 2.2, labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
+            }
+            
+            // start by adding the objective values as the axis values
+            yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
+            
+            yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
+            
+            // if the user is showing the Target guideline, then let's label that too
+            if UserDefaults.standard.showTarget {
+                yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsTarget) as ChartAxisValue]
+            }
+            
+            yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
+            
+            yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
+            
+            // once the objectives are added, let's build up with standard values every 50mg/dl (minimum 200mg/dl. We'll make these secondary values a dimmer color so that they don't stand out as much as the objective values. As there are more values on the axis (>250mg/dl) and they labels get more compressed, leave more space between the urgent high objective value and the standard grid value
+            if UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 130 : 8) {
+                yAxisValues += [ChartAxisValueDouble((unitIsMgDl ? 150 : 9) , labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
+            }
+            
+            // this will be the last default value of 200. If there is an objective "nearby" at > 180, then add the 200 guideline, but hide the label so that we don't crowd the axis
+            if UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 180 : 11) {
+                yAxisValues += [ChartAxisValueDouble((unitIsMgDl ? 200 : 12), labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
+            } else {
+                yAxisValues += [ChartAxisValueDouble((unitIsMgDl ? 200 : 12), labelSettings: data().chartLabelSettingsHidden) as ChartAxisValue]
+            }
+            
+            // now that we've build up the axis values to a minimum 200mg / 12 mmol, then we should continue as needed until we've covered the maximum glucose value to be displayed.
+            if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 240 : 14)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
+                yAxisValues += [ChartAxisValueDouble((unitIsMgDl ? 250 : 15), labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
+            }
+            
+            if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 280 : 17)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
+                yAxisValues += [ChartAxisValueDouble((unitIsMgDl ? 300 : 18), labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
+            }
+            
+            if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 330 : 20)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
+                yAxisValues += [ChartAxisValueDouble((unitIsMgDl ? 350 : 21), labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
+            }
+            
+            if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 380 : 23)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
+                yAxisValues += [ChartAxisValueDouble((unitIsMgDl ? 400 : 24), labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
+            }
+            
         } else {
-            yAxisValues += ConstantsGlucoseChart.initialGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
-        }
-        
-        // if the maxium yAxisValue doesn't support the maximum glucose value, then add the next range
-        if yAxisValues.last!.scalar < maximumValueInGlucoseChartPoints {
+            
+            // objectives are not being used, so let's just build the standard grid. All axis values are considered equally important so don't make any of them dimmer.
             if unitIsMgDl {
-                yAxisValues += ConstantsGlucoseChart.secondGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
+                yAxisValues += ConstantsGlucoseChart.initialGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
             } else {
-                yAxisValues += ConstantsGlucoseChart.secondGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
+                yAxisValues += ConstantsGlucoseChart.initialGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
             }
-        }
-        
-        // if the maxium yAxisValue doesn't support the maximum glucose value, then add the next range
-        if yAxisValues.last!.scalar < maximumValueInGlucoseChartPoints {
-            if unitIsMgDl {
-                yAxisValues += ConstantsGlucoseChart.thirdGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
-            } else {
-                yAxisValues += ConstantsGlucoseChart.thirdGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
+            
+            // if the maxium yAxisValue doesn't support the maximum glucose value, then add the next range
+            if yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+                if unitIsMgDl {
+                    yAxisValues += ConstantsGlucoseChart.secondGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
+                } else {
+                    yAxisValues += ConstantsGlucoseChart.secondGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
+                }
             }
-        }
+            
+            // if the maxium yAxisValue doesn't support the maximum glucose value, then add the next range
+            if yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
+                  if unitIsMgDl {
+                    yAxisValues += ConstantsGlucoseChart.thirdGlucoseValueRangeInMgDl.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
+                } else {
+                    yAxisValues += ConstantsGlucoseChart.thirdGlucoseValueRangeInMmol.map { ChartAxisValueDouble($0, labelSettings: data().chartLabelSettings)}
+                }
+            }
         
-        // the last label should not be visible
-        yAxisValues.last?.hidden = true
+        }
         
         let yAxisModel = ChartAxisModel(axisValues: yAxisValues, lineColor: ConstantsGlucoseChart.axisLineColor, labelSpaceReservationMode: .fixed(labelsWidthY))
         
@@ -534,25 +594,24 @@ public final class GlucoseChartManager {
         // now that we know innerFrame we can set innerFrameWidth
         innerFrameWidth = Double(innerFrame.width)
         
-        
         chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: UserDefaults.standard.useObjectives ? ConstantsGlucoseChart.gridColorObjectives : ConstantsGlucoseChart.gridColor,  linesWidth: 0.5)
         
         // Grid lines
         let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: data().chartGuideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: yAxisValues)
         
         // high/low/target guideline layer settings and styles
-        let urgentHighLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineUrgentHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 2, dotSpacing: 5)
+        let urgentHighLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineUrgentHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 3, dotSpacing: 7)
         
-        let highLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 4, dotSpacing: 2)
+        let highLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineHighLow, linesWidth: UserDefaults.standard.useObjectives ? 1 : 0, dotWidth: 4, dotSpacing: 3)
         
-        let targetLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineTargetColor, linesWidth: UserDefaults.standard.useObjectives ? (UserDefaults.standard.showTarget ? 1 : 0) : 0, dotWidth: 4, dotSpacing: 0)
+        let targetLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineTargetColor, linesWidth: (UserDefaults.standard.useObjectives ? (UserDefaults.standard.showTarget ? 1 : 0) : 0), dotWidth: 12, dotSpacing: 6)
         
         // high/low/target guidelines
         let urgentHighLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: urgentHighLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.urgentHighMarkValueInUserChosenUnit)])
         
         let highLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: highLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.highMarkValueInUserChosenUnit)])
         
-        let targetLineLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: targetLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.targetMarkValueInUserChosenUnit)])
+        let targetLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: targetLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.targetMarkValueInUserChosenUnit)])
         
         let lowLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: highLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.lowMarkValueInUserChosenUnit)])
         
@@ -577,7 +636,7 @@ public final class GlucoseChartManager {
             targetLineLayer,
             lowLineLayer,
             urgentLowLineLayer,
-            // glucosePoint layer(s)
+            // glucosePoint layers
             inRangeGlucoseCircles,
             notUrgentRangeGlucoseCircles,
             urgentRangeGlucoseCircles
@@ -715,7 +774,7 @@ public final class GlucoseChartManager {
     }
     
     /// function which gives is variables that are set back to nil when nillifyData is called
-    private func data() -> (chartSettings: ChartSettings, chartPointDateFormatter: DateFormatter, operationQueue: OperationQueue, chartLabelSettings: ChartLabelSettings, chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings, axisLabelTimeFormatter: DateFormatter, bgReadingsAccessor: BgReadingsAccessor){
+    private func data() -> (chartSettings: ChartSettings, chartPointDateFormatter: DateFormatter, operationQueue: OperationQueue, chartLabelSettings: ChartLabelSettings,  chartLabelSettingsObjectives: ChartLabelSettings, chartLabelSettingsTarget: ChartLabelSettings,  chartLabelSettingsDimmed: ChartLabelSettings, chartLabelSettingsHidden: ChartLabelSettings, chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings, axisLabelTimeFormatter: DateFormatter, bgReadingsAccessor: BgReadingsAccessor){
         
         // setup chartSettings
         if chartSettings == nil {
@@ -753,11 +812,43 @@ public final class GlucoseChartManager {
             operationQueue!.maxConcurrentOperationCount = 1
         }
         
-        // intialize chartlabelsettings
+        // intialize chartlabelsettings - this is used for the standard grid labels
         if chartLabelSettings == nil {
             chartLabelSettings = ChartLabelSettings(
                 font: .systemFont(ofSize: 14),
                 fontColor: ConstantsGlucoseChart.axisLabelColor
+            )
+        }
+        
+        // intialize chartlabelsettingsObjectives - this is used for the objective label
+        if chartLabelSettingsObjectives == nil {
+            chartLabelSettingsObjectives = ChartLabelSettings(
+                font: .systemFont(ofSize: 14),
+                fontColor: ConstantsGlucoseChart.axisLabelColorObjectives
+            )
+        }
+        
+        // intialize chartlabelsettingsTarget - this is used for the target label (if needed)
+        if chartLabelSettingsTarget == nil {
+            chartLabelSettingsTarget = ChartLabelSettings(
+                font: .systemFont(ofSize: 14),
+                fontColor: ConstantsGlucoseChart.axisLabelColorTarget
+            )
+        }
+        
+        // intialize chartlabelsettingsDimmed - used for secondary values that aren't objectives
+        if chartLabelSettingsDimmed == nil {
+            chartLabelSettingsDimmed = ChartLabelSettings(
+                font: .systemFont(ofSize: 14),
+                fontColor: ConstantsGlucoseChart.axisLabelColorDimmed
+            )
+        }
+        
+        // intialize chartlabelsettingsHidden - used to hide the first 38mg/dl value etc
+        if chartLabelSettingsHidden == nil {
+            chartLabelSettingsHidden = ChartLabelSettings(
+                font: .systemFont(ofSize: 14),
+                fontColor: ConstantsGlucoseChart.axisLabelColorHidden
             )
         }
         
@@ -777,7 +868,7 @@ public final class GlucoseChartManager {
             bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         }
         
-        return (chartSettings!, chartPointDateFormatter!, operationQueue!, chartLabelSettings!, chartGuideLinesLayerSettings!, axisLabelTimeFormatter!, bgReadingsAccessor!)
+        return (chartSettings!, chartPointDateFormatter!, operationQueue!, chartLabelSettings!, chartLabelSettingsObjectives!, chartLabelSettingsTarget!, chartLabelSettingsDimmed!, chartLabelSettingsHidden!, chartGuideLinesLayerSettings!, axisLabelTimeFormatter!, bgReadingsAccessor!)
         
     }
     
@@ -800,7 +891,6 @@ public final class GlucoseChartManager {
                 
             }
             
-            
         } else {
 
             // there's no currentMaximumValueInGlucoseChartPoints, if glucoseChartPoints.maximumValueInGlucoseChartPoints not nil, return it
@@ -810,7 +900,6 @@ public final class GlucoseChartManager {
                 return ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             }
             
-
         }
 
     }
