@@ -770,6 +770,14 @@ public final class GlucoseChartManager {
         inRangeGlucoseChartPoints = []
 
         notUrgentRangeGlucoseChartPoints = []
+        
+        chartLabelSettingsObjectives = nil
+        
+        chartLabelSettingsTarget = nil
+        
+        chartLabelSettingsDimmed = nil
+        
+        chartLabelSettingsHidden = nil
 
     }
     
