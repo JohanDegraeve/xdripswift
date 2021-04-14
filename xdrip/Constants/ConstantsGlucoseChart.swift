@@ -45,7 +45,7 @@ enum ConstantsGlucoseChart {
     static let axisLabelColorTarget = UIColor.green.withAlphaComponent(0.5)
     
     /// axis line label for dimmed secondary values (non-objective values)
-    static let axisLabelColorDimmed = UIColor.gray.withAlphaComponent(0.8)
+    static let axisLabelColorDimmed = UIColor.gray
     
     /// axis line label for any values that we don't need to display
     static let axisLabelColorHidden = UIColor.clear
@@ -60,10 +60,10 @@ enum ConstantsGlucoseChart {
     // make use alpha components to make the perceived brightness of each line be the same to the user (otherwise red appears washed out)
     
     /// color for urgent high and urgent low line
-    static let guidelineUrgentHighLow = UIColor.lightGray.withAlphaComponent(0.8)
+    static let guidelineUrgentHighLow = UIColor.lightGray
     
     /// color for urgent high and urgent low line
-    static let guidelineHighLow = UIColor.lightGray.withAlphaComponent(1)
+    static let guidelineHighLow = UIColor.white
     
     /// color for target line
     static let guidelineTargetColor = UIColor.green.withAlphaComponent(0.3)
