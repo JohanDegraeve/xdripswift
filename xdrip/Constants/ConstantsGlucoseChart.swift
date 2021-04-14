@@ -62,7 +62,7 @@ enum ConstantsGlucoseChart {
     /// color for urgent high and urgent low line
     static let guidelineUrgentHighLow = UIColor.lightGray
     
-    /// color for urgent high and urgent low line
+    /// color for high and low line
     static let guidelineHighLow = UIColor.white
     
     /// color for target line
