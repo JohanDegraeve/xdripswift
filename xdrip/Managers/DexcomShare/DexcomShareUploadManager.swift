@@ -84,7 +84,7 @@ class DexcomShareUploadManager:NSObject {
         
         // check if accountname and password and serial number exist
         guard UserDefaults.standard.dexcomShareSerialNumber != nil, UserDefaults.standard.dexcomShareAccountName != nil, UserDefaults.standard.dexcomSharePassword != nil else {
-            trace("in upload, not master, no upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+            trace("in upload, dexcomShareSerialNumber or dexcomShareAccountName or dexcomSharePassword is nil", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
             return
         }
         
@@ -92,6 +92,9 @@ class DexcomShareUploadManager:NSObject {
         if UserDefaults.standard.dexcomShareUseSchedule {
             if let schedule = UserDefaults.standard.dexcomShareSchedule {
                 if !schedule.indicatesOn(forWhen: Date()) {
+                    
+                    trace("in upload, schedule indicates not on", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+                    
                     return
                 }
             }
