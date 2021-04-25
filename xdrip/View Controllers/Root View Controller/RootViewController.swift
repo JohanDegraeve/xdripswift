@@ -6,6 +6,7 @@ import UserNotifications
 import SwiftCharts
 import HealthKitUI
 import AVFoundation
+import PieCharts
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController {
@@ -54,6 +55,21 @@ final class RootViewController: UIViewController {
     
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
+    
+    /// outlets for statistics view
+    @IBOutlet weak var statisticsView: UIView!
+    @IBOutlet weak var spacerView: UIView!
+    @IBOutlet weak var pieChartOutlet: PieChart!
+    @IBOutlet weak var lowStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var inRangeStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var highStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var averageStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var a1CStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var cVStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var lowLabelOutlet: UILabel!
+    @IBOutlet weak var highLabelOutlet: UILabel!
+    @IBOutlet weak var pieChartLabelOutlet: UILabel!
+    @IBOutlet weak var timePeriodLabelOutlet: UILabel!
     
     /// user long pressed the value label
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
@@ -255,12 +271,21 @@ final class RootViewController: UIViewController {
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
         
+        // show the statistics view as required. If not, hide it and show the small spacer view to maintain the chart seperated from the tab bar
+        statisticsView.isHidden = !UserDefaults.standard.showStatistics
+        spacerView.isHidden = UserDefaults.standard.showStatistics
+        
+        // animate the pie chart as it comes into view
+        updateStatistics(animatePieChart: true)
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
         
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
+        
+        //updateLabelsAndChart(overrideApplicationState: true)
         
     }
     
@@ -1335,12 +1360,18 @@ final class RootViewController: UIViewController {
         // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's not going to be a latestReading
         let latestReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
         
-        // if there's no readings, then give empty fields
+        // if there's no readings, then give empty fields and make sure the text isn't styled with strikethrough
         guard latestReadings.count > 0 else {
-            valueLabelOutlet.text = "---"
+            
             valueLabelOutlet.textColor = UIColor.darkGray
             minutesLabelOutlet.text = ""
             diffLabelOutlet.text = ""
+                
+            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: "---")
+            attributeString.addAttribute(.strikethroughStyle, value: 0, range: NSMakeRange(0, attributeString.length))
+            
+            valueLabelOutlet.attributedText = attributeString
+            
             return
         }
         
@@ -1405,6 +1436,14 @@ final class RootViewController: UIViewController {
         
         // update the chart up to now
         updateChartWithResetEndDate()
+        
+        
+        // finally we need to update the statistics view
+       
+        
+        // send the bg readings array to the updateStatistics function to calculate and update all of the outlets
+        //updateStatistics(glucoseValues: glucoseValues, animatePieChart: false)
+        updateStatistics(animatePieChart: false)
         
     }
     
@@ -1603,6 +1642,187 @@ final class RootViewController: UIViewController {
         
     }
     
+    
+    // helper function to calculate the statistics and update the pie chart and label outlets
+    private func updateStatistics(animatePieChart: Bool = false) {
+        
+        // if the user doesn't want to see the statistics, then just return without doing anything
+        if !UserDefaults.standard.showStatistics {
+            return
+        }
+        
+        // declare all needed variables
+        var lowStatisticValue: Double = 0
+        var inRangeStatisticValue: Double = 0
+        var highStatisticValue: Double = 0
+        var averageStatisticValue: Double = 0
+        var a1CStatisticValue: Double = 0
+        var cVStatisticValue: Double = 0
+        var daysToUseStatistics: Int = 0
+        var glucoseValues: [Double] = []
+        let fromDate: Date
+        let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        var lowLimitForTIR : Double = 0
+        var highLimitForTIR: Double = 0
+        
+        guard let bgReadingsAccessor = bgReadingsAccessor else {return}
+        
+        
+        // get the maximum number of calculation days requested by the user
+        daysToUseStatistics = UserDefaults.standard.daysToUseStatistics
+        
+        
+        // if the user has selected 0 (today) then set the start date to the previous midnight
+        if daysToUseStatistics == 0 {
+            fromDate = Calendar(identifier: .gregorian).startOfDay(for: Date())
+        } else {
+            fromDate = Date(timeIntervalSinceNow: -3600.0 * 24.0 * Double(daysToUseStatistics))
+        }
+        
+        
+        // now that we know when the start getting glucose values from, lets import them from the bgReadingsAccessor and if valid, store them in the glucoseValues array
+        let readings = bgReadingsAccessor.getBgReadings(from: fromDate, to: nil, on: coreDataManager!.mainManagedObjectContext)
+        
+        // if there are no available readings, return without doing anything
+        if readings.count == 0 {
+            return
+        }
+        
+        // step though all values, check them to validity, convert if necessary and append them to the glucoseValues array
+        for reading in readings {
+            
+            var value = reading.calculatedValue
+            
+            if value != 0.0 {
+                if !isMgDl {
+                    value = value * ConstantsBloodGlucose.mgDlToMmoll
+                }
+                glucoseValues.append(value)
+            }
+        }
+        
+        
+        // let's set up the Low and High labels with the correct limits (either user-specified or the standardised values). This also sets up the correct values to use for the TIR calculations
+        if UserDefaults.standard.useStandardStatisticsRange {
+            if isMgDl {
+                lowLimitForTIR = ConstantsStatistics.standardisedLowValueForTIRInMgDl
+                highLimitForTIR = ConstantsStatistics.standardisedHighValueForTIRInMgDl
+            } else {
+                lowLimitForTIR = ConstantsStatistics.standardisedLowValueForTIRInMmol
+                highLimitForTIR = ConstantsStatistics.standardisedHighValueForTIRInMmol
+            }
+        } else {
+                lowLimitForTIR = UserDefaults.standard.lowMarkValueInUserChosenUnit
+                highLimitForTIR = UserDefaults.standard.highMarkValueInUserChosenUnit
+        }
+        
+        
+        // set the "label" labels with the low/high user values
+        lowLabelOutlet.text = "(<" + (isMgDl ? Int(lowLimitForTIR).description : lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+        highLabelOutlet.text = "(>" + (isMgDl ? Int(highLimitForTIR).description : highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+        
+        
+        // calculate low %
+        lowStatisticValue = Double((glucoseValues.lazy.filter { $0 < lowLimitForTIR }.count * 200) / (glucoseValues.count * 2))
+        
+        
+        // calculate high %
+        highStatisticValue = Double((glucoseValues.lazy.filter { $0 > highLimitForTIR }.count * 200) / (glucoseValues.count * 2))
+        
+        
+        // calculate TIR % (let's be lazy and just subtract the other two values from 100)
+        inRangeStatisticValue = 100 - lowStatisticValue - highStatisticValue
+        
+        
+        // calculate average glucose value
+        averageStatisticValue = Double(glucoseValues.reduce(0, +)) / Double(glucoseValues.count)
+        
+        
+        // calculate standard deviation (we won't show this but we need it to calculate CV)
+        var sum: Double = 0;
+        
+        for glucoseValue in glucoseValues {
+            sum += (Double(glucoseValue.value) - averageStatisticValue) * (Double(glucoseValue.value) - averageStatisticValue)
+        }
+        
+        let stdDeviationStatisticValue = sqrt(sum / Double(glucoseValues.count))
+        
+        
+        // calculate Coeffecient of Variation
+        cVStatisticValue = ((stdDeviationStatisticValue) / averageStatisticValue) * 100
+        
+        
+        // calculate an estimated HbA1C value using either IFCC (e.g 49 mmol/mol) or NGSP (e.g 5.8%) methods: http://www.ngsp.org/ifccngsp.asp
+        if UserDefaults.standard.useIFCCA1C {
+            a1CStatisticValue = (((46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7) - 2.152) / 0.09148
+        } else {
+            a1CStatisticValue = (46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7
+        }
+        
+        
+        // set all label outlets
+        lowStatisticLabelOutlet.text = Int(lowStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+        
+        inRangeStatisticLabelOutlet.text = Int(inRangeStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+        
+        highStatisticLabelOutlet.text = Int(highStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+        
+        averageStatisticLabelOutlet.text = (isMgDl ? Int(averageStatisticValue.round(toDecimalPlaces: 0)).description : averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
+        
+        if UserDefaults.standard.useIFCCA1C {
+            a1CStatisticLabelOutlet.text = Int(a1CStatisticValue.round(toDecimalPlaces: 0)).description + " mmol"
+        } else {
+            a1CStatisticLabelOutlet.text = a1CStatisticValue.round(toDecimalPlaces: 1).description + "%"
+        }
+        
+        cVStatisticLabelOutlet.text = Int(cVStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+        
+        //use this outlet to show number of days calculated under the pie chart
+        switch daysToUseStatistics {
+        case 0:
+            timePeriodLabelOutlet.text = "Today"
+
+        case 1:
+            timePeriodLabelOutlet.text = "24 hours"
+
+        default:
+            timePeriodLabelOutlet.text = String(Int(daysToUseStatistics)) + " days"
+        }
+        
+        pieChartOutlet.clear()
+        
+        // if the user is 100% in range, show the easter egg and make them smile
+        if inRangeStatisticValue < 100 {
+            pieChartOutlet.innerRadius = 0
+            pieChartLabelOutlet.text = ""
+            pieChartOutlet.strokeWidth = 0.3
+        } else {
+            // open up the inside of the chart so that we can fit the smiley face in
+            pieChartOutlet.innerRadius = 25
+            pieChartLabelOutlet.font = UIFont.boldSystemFont(ofSize: 32)
+            pieChartLabelOutlet.text = "😎"
+            // hide the stroke width to make sure we get a full, unbroken circle
+            pieChartOutlet.strokeWidth = 0
+        }
+        
+        // disable the chart animation if it's just a normal update, enable it if the call comes from didAppear()
+        if animatePieChart {
+            pieChartOutlet.animDuration = 0.4
+        } else {
+            pieChartOutlet.animDuration = 0
+        }
+        
+        // draw the pie chart slices
+        pieChartOutlet.models = [
+            // define low slice
+            PieSliceModel(value: Double(lowStatisticValue), color: ConstantsStatistics.pieChartLowSliceColor),
+            // define in range slice
+            PieSliceModel(value: Double(inRangeStatisticValue), color: ConstantsStatistics.pieChartInRangeSliceColor),
+            // define high slice
+            PieSliceModel(value: Double(highStatisticValue), color: ConstantsStatistics.pieChartHighSliceColor)
+        ]
+    }
+
 }
 
 // MARK: - conform to CGMTransmitter protocol

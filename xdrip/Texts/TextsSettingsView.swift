@@ -82,6 +82,32 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_showtarget", tableName: filename, bundle: Bundle.main, value: "Show Target Line?", comment: "home screen settings, show target line")
     }()
     
+    // MARK: - Section Statistics
+    
+    static let sectionTitleStatistics: String = {
+        return NSLocalizedString("settingsviews_sectiontitlestatistics", tableName: filename, bundle: Bundle.main, value: "Statistics", comment: "statistics settings, section title")
+    }()
+
+    static let labelShowStatistics: String = {
+        return NSLocalizedString("settingsviews_showStatistics", tableName: filename, bundle: Bundle.main, value: "Show Statistics?", comment: "statistics settings, show statistics on home screen")
+    }()
+
+    static let labelDaysToUseStatisticsTitle: String = {
+        return NSLocalizedString("settingsviews_daysToUseStatisticsTitle", tableName: filename, bundle: Bundle.main, value: "Days to Calculate?", comment: "statistics settings, how many days to use for calculations")
+    }()
+    
+    static let labelDaysToUseStatisticsMessage: String = {
+        return NSLocalizedString("settingsviews_daysToUseStatisticsMessage", tableName: filename, bundle: Bundle.main, value: "How many days should we use to calculate the statistics? (Enter 0 to calculate today since midnight)", comment: "statistics settings, how many days to use for calculations")
+    }()
+    
+    static let labelUseStandardStatisticsRange: String = {
+        return String(format: NSLocalizedString("settingsviews_useStandardStatisticsRange", tableName: filename, bundle: Bundle.main, value: "Use Standard Range (%@-%@)?", comment: "statistics settings, use standard range?"), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Int(ConstantsStatistics.standardisedLowValueForTIRInMgDl).description : ConstantsStatistics.standardisedLowValueForTIRInMmol.round(toDecimalPlaces: 1).description, UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Int(ConstantsStatistics.standardisedHighValueForTIRInMgDl).description : ConstantsStatistics.standardisedHighValueForTIRInMmol.round(toDecimalPlaces: 1).description)
+    }()
+    
+    static let labelUseIFFCA1C: String = {
+        return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "Calculate A1C using IFFC method?", comment: "statistics settings, use IFCC method for A1C?")
+    }()
+    
     
     // MARK: - Section Transmitter
     
