@@ -70,6 +70,8 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var highLabelOutlet: UILabel!
     @IBOutlet weak var pieChartLabelOutlet: UILabel!
     @IBOutlet weak var timePeriodLabelOutlet: UILabel!
+    // TEST
+    @IBOutlet weak var testLabel: UILabel!
     
     /// user long pressed the value label
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
@@ -223,6 +225,9 @@ final class RootViewController: UIViewController {
     /// - will be nillified each time the app goes to the background, to avoid unnecessary ram usage (which seems to cause app getting killed)
     /// - will be reinitialized each time the app comes to the foreground
     private var glucoseChartManager: GlucoseChartManager?
+    
+    /// statisticsManager instance
+    private var statisticsManager:StatisticsManager?
     
     /// dateformatter for minutesLabelOutlet, when user is panning the chart
     private let dateTimeFormatterForMinutesLabelWhenPanning: DateFormatter = {
@@ -583,6 +588,9 @@ final class RootViewController: UIViewController {
         
         // initialize glucoseChartManager
         glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
+        
+        // initialize statisticsManager
+        statisticsManager = StatisticsManager()
         
         // initialize chartGenerator in chartOutlet
         self.chartOutlet.chartGenerator = { [weak self] (frame) in
@@ -1651,133 +1659,62 @@ final class RootViewController: UIViewController {
             return
         }
         
-        // declare all needed variables
-        var lowStatisticValue: Double = 0
-        var inRangeStatisticValue: Double = 0
-        var highStatisticValue: Double = 0
-        var averageStatisticValue: Double = 0
-        var a1CStatisticValue: Double = 0
-        var cVStatisticValue: Double = 0
-        var daysToUseStatistics: Int = 0
-        var glucoseValues: [Double] = []
-        let fromDate: Date
-        let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-        var lowLimitForTIR : Double = 0
-        var highLimitForTIR: Double = 0
+        // check that coreDataManager has been initialised. If not, return without doing anything
+        guard let coreDataManager = coreDataManager else { return }
         
-        guard let bgReadingsAccessor = bgReadingsAccessor else {return}
+        // declare constants/variables
+        let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        var daysToUseStatistics: Int = 0
+        var fromDate: Date = Date()
         
         
         // get the maximum number of calculation days requested by the user
         daysToUseStatistics = UserDefaults.standard.daysToUseStatistics
         
         
-        // if the user has selected 0 (today) then set the start date to the previous midnight
+        // if the user has selected 0 (to chose "today") then set the fromDate to the previous midnight
         if daysToUseStatistics == 0 {
             fromDate = Calendar(identifier: .gregorian).startOfDay(for: Date())
         } else {
             fromDate = Date(timeIntervalSinceNow: -3600.0 * 24.0 * Double(daysToUseStatistics))
         }
         
+        // declare the
+        let statistics = statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil, coreDataManager: coreDataManager)
         
-        // now that we know when the start getting glucose values from, lets import them from the bgReadingsAccessor and if valid, store them in the glucoseValues array
-        let readings = bgReadingsAccessor.getBgReadings(from: fromDate, to: nil, on: coreDataManager!.mainManagedObjectContext)
-        
-        // if there are no available readings, return without doing anything
-        if readings.count == 0 {
-            return
-        }
-        
-        // step though all values, check them to validity, convert if necessary and append them to the glucoseValues array
-        for reading in readings {
+        // return gracefully if the returned stats array is empty
+        guard statistics != nil else { return }
             
-            var value = reading.calculatedValue
-            
-            if value != 0.0 {
-                if !isMgDl {
-                    value = value * ConstantsBloodGlucose.mgDlToMmoll
-                }
-                glucoseValues.append(value)
-            }
-        }
+        
+        // We now have the returned statistics data so let's start preparing the UI
+        
+        // TEST label
+        testLabel.text = "Readings used: " + Int(statistics!.numberOfReadingsUsed).description + " / " + Int(statistics!.numberOfReadingsAvailable).description + " (Filter >= " + ConstantsStatistics.minimumFilterTimeBetweenReadings.description + "min)"
+        
+
+        // set the low/high "label" labels with the low/high user values that the user has chosen to use
+        lowLabelOutlet.text = "(<" + (isMgDl ? Int(statistics!.lowLimitForTIR).description : statistics!.lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+        highLabelOutlet.text = "(>" + (isMgDl ? Int(statistics!.highLimitForTIR).description : statistics!.highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
         
         
-        // let's set up the Low and High labels with the correct limits (either user-specified or the standardised values). This also sets up the correct values to use for the TIR calculations
-        if UserDefaults.standard.useStandardStatisticsRange {
-            if isMgDl {
-                lowLimitForTIR = ConstantsStatistics.standardisedLowValueForTIRInMgDl
-                highLimitForTIR = ConstantsStatistics.standardisedHighValueForTIRInMgDl
-            } else {
-                lowLimitForTIR = ConstantsStatistics.standardisedLowValueForTIRInMmol
-                highLimitForTIR = ConstantsStatistics.standardisedHighValueForTIRInMmol
-            }
-        } else {
-                lowLimitForTIR = UserDefaults.standard.lowMarkValueInUserChosenUnit
-                highLimitForTIR = UserDefaults.standard.highMarkValueInUserChosenUnit
-        }
+        // set all label outlets with the correctly formatted calculated values
+        lowStatisticLabelOutlet.text = Int(statistics!.lowStatisticValue.round(toDecimalPlaces: 0)).description + "%"
         
+        inRangeStatisticLabelOutlet.text = Int(statistics!.inRangeStatisticValue.round(toDecimalPlaces: 0)).description + "%"
         
-        // set the "label" labels with the low/high user values
-        lowLabelOutlet.text = "(<" + (isMgDl ? Int(lowLimitForTIR).description : lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
-        highLabelOutlet.text = "(>" + (isMgDl ? Int(highLimitForTIR).description : highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+        highStatisticLabelOutlet.text = Int(statistics!.highStatisticValue.round(toDecimalPlaces: 0)).description + "%"
         
-        
-        // calculate low %
-        lowStatisticValue = Double((glucoseValues.lazy.filter { $0 < lowLimitForTIR }.count * 200) / (glucoseValues.count * 2))
-        
-        
-        // calculate high %
-        highStatisticValue = Double((glucoseValues.lazy.filter { $0 > highLimitForTIR }.count * 200) / (glucoseValues.count * 2))
-        
-        
-        // calculate TIR % (let's be lazy and just subtract the other two values from 100)
-        inRangeStatisticValue = 100 - lowStatisticValue - highStatisticValue
-        
-        
-        // calculate average glucose value
-        averageStatisticValue = Double(glucoseValues.reduce(0, +)) / Double(glucoseValues.count)
-        
-        
-        // calculate standard deviation (we won't show this but we need it to calculate CV)
-        var sum: Double = 0;
-        
-        for glucoseValue in glucoseValues {
-            sum += (Double(glucoseValue.value) - averageStatisticValue) * (Double(glucoseValue.value) - averageStatisticValue)
-        }
-        
-        let stdDeviationStatisticValue = sqrt(sum / Double(glucoseValues.count))
-        
-        
-        // calculate Coeffecient of Variation
-        cVStatisticValue = ((stdDeviationStatisticValue) / averageStatisticValue) * 100
-        
-        
-        // calculate an estimated HbA1C value using either IFCC (e.g 49 mmol/mol) or NGSP (e.g 5.8%) methods: http://www.ngsp.org/ifccngsp.asp
-        if UserDefaults.standard.useIFCCA1C {
-            a1CStatisticValue = (((46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7) - 2.152) / 0.09148
-        } else {
-            a1CStatisticValue = (46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7
-        }
-        
-        
-        // set all label outlets
-        lowStatisticLabelOutlet.text = Int(lowStatisticValue.round(toDecimalPlaces: 0)).description + "%"
-        
-        inRangeStatisticLabelOutlet.text = Int(inRangeStatisticValue.round(toDecimalPlaces: 0)).description + "%"
-        
-        highStatisticLabelOutlet.text = Int(highStatisticValue.round(toDecimalPlaces: 0)).description + "%"
-        
-        averageStatisticLabelOutlet.text = (isMgDl ? Int(averageStatisticValue.round(toDecimalPlaces: 0)).description : averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
+        averageStatisticLabelOutlet.text = (isMgDl ? Int(statistics!.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics!.averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
         
         if UserDefaults.standard.useIFCCA1C {
-            a1CStatisticLabelOutlet.text = Int(a1CStatisticValue.round(toDecimalPlaces: 0)).description + " mmol"
+            a1CStatisticLabelOutlet.text = Int(statistics!.a1CStatisticValue.round(toDecimalPlaces: 0)).description + " mmol"
         } else {
-            a1CStatisticLabelOutlet.text = a1CStatisticValue.round(toDecimalPlaces: 1).description + "%"
+            a1CStatisticLabelOutlet.text = statistics!.a1CStatisticValue.round(toDecimalPlaces: 1).description + "%"
         }
         
-        cVStatisticLabelOutlet.text = Int(cVStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+        cVStatisticLabelOutlet.text = Int(statistics!.cVStatisticValue.round(toDecimalPlaces: 0)).description + "%"
         
-        //use this outlet to show number of days calculated under the pie chart
+        // show number of days calculated under the pie chart
         switch daysToUseStatistics {
         case 0:
             timePeriodLabelOutlet.text = "Today"
@@ -1786,13 +1723,14 @@ final class RootViewController: UIViewController {
             timePeriodLabelOutlet.text = "24 hours"
 
         default:
-            timePeriodLabelOutlet.text = String(Int(daysToUseStatistics)) + " days"
+            timePeriodLabelOutlet.text = String(statistics!.numberOfDaysUsed) + "/" + String(Int(daysToUseStatistics)) + " days"
         }
         
+        // let's remove the old pie chart
         pieChartOutlet.clear()
         
         // if the user is 100% in range, show the easter egg and make them smile
-        if inRangeStatisticValue < 100 {
+        if statistics!.inRangeStatisticValue < 100 {
             pieChartOutlet.innerRadius = 0
             pieChartLabelOutlet.text = ""
             pieChartOutlet.strokeWidth = 0.3
@@ -1815,15 +1753,17 @@ final class RootViewController: UIViewController {
         // draw the pie chart slices
         pieChartOutlet.models = [
             // define low slice
-            PieSliceModel(value: Double(lowStatisticValue), color: ConstantsStatistics.pieChartLowSliceColor),
+            PieSliceModel(value: Double(statistics!.lowStatisticValue), color: ConstantsStatistics.pieChartLowSliceColor),
             // define in range slice
-            PieSliceModel(value: Double(inRangeStatisticValue), color: ConstantsStatistics.pieChartInRangeSliceColor),
+            PieSliceModel(value: Double(statistics!.inRangeStatisticValue), color: ConstantsStatistics.pieChartInRangeSliceColor),
             // define high slice
-            PieSliceModel(value: Double(highStatisticValue), color: ConstantsStatistics.pieChartHighSliceColor)
+            PieSliceModel(value: Double(statistics!.highStatisticValue), color: ConstantsStatistics.pieChartHighSliceColor)
         ]
+        
     }
 
 }
+
 
 // MARK: - conform to CGMTransmitter protocol
 
