@@ -105,7 +105,7 @@ class Texts_SettingsView {
     }()
     
     static let labelUseIFFCA1C: String = {
-        return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "Calculate A1C using IFFC method?", comment: "statistics settings, use IFCC method for A1C?")
+        return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "Show A1C in mmols/mol?", comment: "statistics settings, use IFCC method for A1C?")
     }()
     
     

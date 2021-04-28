@@ -290,6 +290,7 @@ final class RootViewController: UIViewController {
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
         
+        // adding this a test to see if it stops the "blank charts" that sometimes happen when switching to the screen.
         //updateLabelsAndChart(overrideApplicationState: true)
         
     }
@@ -1729,36 +1730,53 @@ final class RootViewController: UIViewController {
         // let's remove the old pie chart
         pieChartOutlet.clear()
         
-        // if the user is 100% in range, show the easter egg and make them smile
-        if statistics!.inRangeStatisticValue < 100 {
-            pieChartOutlet.innerRadius = 0
-            pieChartLabelOutlet.text = ""
-            pieChartOutlet.strokeWidth = 0.3
-        } else {
-            // open up the inside of the chart so that we can fit the smiley face in
-            pieChartOutlet.innerRadius = 25
-            pieChartLabelOutlet.font = UIFont.boldSystemFont(ofSize: 32)
-            pieChartLabelOutlet.text = "😎"
-            // hide the stroke width to make sure we get a full, unbroken circle
-            pieChartOutlet.strokeWidth = 0
-        }
-        
         // disable the chart animation if it's just a normal update, enable it if the call comes from didAppear()
         if animatePieChart {
-            pieChartOutlet.animDuration = 0.4
+            pieChartOutlet.animDuration = ConstantsStatistics.pieChartAnimationSpeed
         } else {
             pieChartOutlet.animDuration = 0
         }
         
-        // draw the pie chart slices
-        pieChartOutlet.models = [
-            // define low slice
-            PieSliceModel(value: Double(statistics!.lowStatisticValue), color: ConstantsStatistics.pieChartLowSliceColor),
-            // define in range slice
-            PieSliceModel(value: Double(statistics!.inRangeStatisticValue), color: ConstantsStatistics.pieChartInRangeSliceColor),
-            // define high slice
-            PieSliceModel(value: Double(statistics!.highStatisticValue), color: ConstantsStatistics.pieChartHighSliceColor)
-        ]
+        // if the user is 100% in range, show the easter egg and make them smile
+        if statistics!.inRangeStatisticValue < 100 {
+            
+            pieChartOutlet.innerRadius = 0
+            
+            pieChartLabelOutlet.text = ""
+            
+            pieChartOutlet.strokeWidth = 0.5
+            
+            pieChartOutlet.models = [
+                PieSliceModel(value: Double(statistics!.lowStatisticValue), color: ConstantsStatistics.pieChartLowSliceColor),
+                PieSliceModel(value: Double(statistics!.inRangeStatisticValue), color: ConstantsStatistics.pieChartInRangeSliceColor),
+                PieSliceModel(value: Double(statistics!.highStatisticValue), color: ConstantsStatistics.pieChartHighSliceColor)
+            ]
+            
+        } else {
+            
+            // open up the inside of the chart so that we can fit the smiley face in
+            pieChartOutlet.innerRadius = 16
+            
+            pieChartOutlet.strokeWidth = 1
+            
+            pieChartOutlet.models = [
+                // make a fancy green circle with lines in and no real purpose at all
+                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
+                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
+                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
+                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
+                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
+                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
+                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
+                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
+                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
+            ]
+            
+            pieChartLabelOutlet.font = UIFont.boldSystemFont(ofSize: 28)
+            
+            pieChartLabelOutlet.text = "😎"
+            
+        }
         
     }
 

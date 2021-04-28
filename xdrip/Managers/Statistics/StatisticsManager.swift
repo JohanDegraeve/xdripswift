@@ -63,33 +63,37 @@ public final class StatisticsManager {
         numberOfReadingsAvailable = Double(readings.count)
         
         // get the minimum time between readings. This is to avoid getting too many extra 60-second readings from the Libre 2 Direct - they will take up a lot more processing time and don't add anything to the accuracy of the results so we'll just filter them out.
-        let minimumTimeBetweenReadings: Double = ConstantsStatistics.minimumFilterTimeBetweenReadings
+        let minimumTimeBetweenReadings: Double = ConstantsStatistics.minimumFilterTimeBetweenReadings * 60
         
         // get the timestamp of the first reading
-        var previousValueTimeStamp = readings.first?.timeStamp
+        let firstValueTimeStamp = readings.first?.timeStamp
+        var previousValueTimeStamp = firstValueTimeStamp
         
         // step though all values, check them to validity, convert if necessary and append them to the glucoseValues array
         for reading in readings {
             
-            var value = reading.calculatedValue
+            var calculatedValue = reading.calculatedValue
+
+            let currentTimeStamp = reading.timeStamp
             
-            if value != 0.0 {
+            if calculatedValue != 0.0 {
                 
                 // get the difference between the previous value's timestamp and the new one
-                let minutesDifference = Calendar.current.dateComponents([.minute], from: previousValueTimeStamp!, to: reading.timeStamp)
+                let secondsDifference = Calendar.current.dateComponents([.second], from: previousValueTimeStamp!, to: currentTimeStamp)
                 
                 //if the current values timestamp is more than the minimum filter time, then add it to the glucoseValues array. Include a check to ensure that the first reading is added despite there not being any difference to itself
-                if (Double(minutesDifference.minute!) >= minimumTimeBetweenReadings) || (previousValueTimeStamp == readings.first?.timeStamp) {
+                if (Double(secondsDifference.second!) >= minimumTimeBetweenReadings) || (previousValueTimeStamp == firstValueTimeStamp) {
                     
                     if !isMgDl {
-                        value = value * ConstantsBloodGlucose.mgDlToMmoll
+                        calculatedValue = calculatedValue * ConstantsBloodGlucose.mgDlToMmoll
                     }
-                    glucoseValues.append(value)
                     
-                    }
-                
+                    glucoseValues.append(calculatedValue)
+                    
+                }
+            
                 // update the timestamp for the next loop
-                previousValueTimeStamp = reading.timeStamp
+                previousValueTimeStamp = currentTimeStamp
                 
             }
         }

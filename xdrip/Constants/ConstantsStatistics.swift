@@ -13,13 +13,13 @@ import UIKit
 enum ConstantsStatistics {
     
     /// animation speed when drawing the pie chart
-    static let pieChartAnimationSpeed = 0.6
+    static let pieChartAnimationSpeed = 0.5
     
     /// pie slice color for low
     static let pieChartLowSliceColor = UIColor.systemYellow
     
     /// pie slice color for in range
-    static let pieChartInRangeSliceColor = UIColor.green.withAlphaComponent(0.7)
+    static let pieChartInRangeSliceColor = UIColor.init(red: 0.0, green: 0.6, blue: 0.0, alpha: 1)
     
     /// pie slice color for high
     static let pieChartHighSliceColor = UIColor.systemRed
@@ -31,7 +31,7 @@ enum ConstantsStatistics {
     static let standardisedLowValueForTIRInMmol = 3.9
     static let standardisedHighValueForTIRInMmol = 10.0
     
-    static let minimumFilterTimeBetweenReadings: Double = 4.7
+    static let minimumFilterTimeBetweenReadings: Double = 4.99
     
 }
 
