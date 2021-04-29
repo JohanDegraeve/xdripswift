@@ -9,6 +9,12 @@
 "showReadingInNotification" = "Afficher Glyc dans notification?";
 "labelShowReadingInAppBadge" = "Afficher Glyc dans le badge?";
 "multipleAppBadgeValueWith10" = "Multiplier par 10 dans le badge?";
+"settingsviews_sectiontitlestatistics" = "Statistiques";
+"settingsviews_showStatistics" = "Visualiser les statistiques?";
+"settingsviews_daysToUseStatisticsTitle" = "Visualiser les statistiques?";
+"settingsviews_daysToUseStatisticsMessage" = "Nombre maximum de jours utilisés pour le calcul des statistiques?\n\n(Saisir 0 pour aujourd'hui depuis minuit)";
+"settingsviews_useStandardStatisticsRange" = "Utiliser la gamme standard? (%@-%@)";
+"settingsviews_useIFCCA1C" = "Visualiser A1c en mmol/mol?";
 "settingsviews_sectiontitletransmitter" = "Transmetteur";
 "settingsviews_transmittertype" = "Type de Transmetteur";
 "settingsviews_transmitterid" = "Transmetteur ID";
