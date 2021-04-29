@@ -101,7 +101,7 @@ class Texts_SettingsView {
     }()
     
     static let labelUseStandardStatisticsRange: String = {
-        return String(format: NSLocalizedString("settingsviews_useStandardStatisticsRange", tableName: filename, bundle: Bundle.main, value: "Use Standard Range? (%@-%@)", comment: "statistics settings, use standard range?"), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Int(ConstantsStatistics.standardisedLowValueForTIRInMgDl).description : ConstantsStatistics.standardisedLowValueForTIRInMmol.round(toDecimalPlaces: 1).description, UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Int(ConstantsStatistics.standardisedHighValueForTIRInMgDl).description : ConstantsStatistics.standardisedHighValueForTIRInMmol.round(toDecimalPlaces: 1).description)
+        return NSLocalizedString("settingsviews_useStandardStatisticsRange", tableName: filename, bundle: Bundle.main, value: "Use Standard Range?", comment: "statistics settings, use standard range?")
     }()
     
     static let labelUseIFFCA1C: String = {
