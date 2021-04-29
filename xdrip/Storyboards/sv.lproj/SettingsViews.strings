@@ -18,7 +18,7 @@
 "settingsviews_sectiontitlestatistics" = "Statistik";
 "settingsviews_showStatistics" = "Visa statistik?";
 "settingsviews_daysToUseStatisticsTitle" = "Dagar att beräkna?";
-"settingsviews_daysToUseStatisticsMessage" = "Maximalt antal dagar att använda för beräkning av statistik?\n\n(ange 0 för att beräkna sedan midnatt)";
+"settingsviews_daysToUseStatisticsMessage" = "Maximalt antal dagar för beräkning av statistik?\n\n(ange 0 för beräkning sedan midnatt)";
 "settingsviews_useStandardStatisticsRange" = "Använd standardintervall?";
 "settingsviews_useIFCCA1C" = "Visa A1c som mmol/mol (IFCC)";
 "settingsviews_sectiontitletransmitter" = "Sändare";
