@@ -1752,29 +1752,31 @@ final class RootViewController: UIViewController {
                 PieSliceModel(value: Double(statistics!.highStatisticValue), color: ConstantsStatistics.pieChartHighSliceColor)
             ]
             
-        } else {
+        } else if ConstantsStatistics.showInRangeEasterEgg {
             
             // open up the inside of the chart so that we can fit the smiley face in
             pieChartOutlet.innerRadius = 16
             
-            pieChartOutlet.strokeWidth = 1
+            pieChartOutlet.strokeWidth = 0
             
             pieChartOutlet.models = [
-                // make a fancy green circle with lines in and no real purpose at all
-                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
-                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
-                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
-                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
-                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
-                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
-                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
-                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor),
                 PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
             ]
             
-            pieChartLabelOutlet.font = UIFont.boldSystemFont(ofSize: 28)
+            pieChartLabelOutlet.font = UIFont.boldSystemFont(ofSize: 26)
             
             pieChartLabelOutlet.text = "😎"
+            
+        } else {
+            
+            // the easter egg isn't wanted so just show a green circle at 100%
+            pieChartOutlet.strokeWidth = 0
+            
+            pieChartOutlet.models = [
+                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
+            ]
+            
+            pieChartLabelOutlet.text = ""
             
         }
         

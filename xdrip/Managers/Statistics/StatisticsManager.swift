@@ -35,9 +35,10 @@ public final class StatisticsManager {
         var cVStatisticValue: Double = 0
         var lowLimitForTIR: Double = 0
         var highLimitForTIR: Double = 0
+        var numberOfDaysUsed: Int = 0
+        // TEST: these two variables are used for debugging. They can be removed from the method for release
         var numberOfReadingsAvailable: Double = 0
         var numberOfReadingsUsed: Double = 0
-        var numberOfDaysUsed: Int = 0
         
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
@@ -51,19 +52,13 @@ public final class StatisticsManager {
         if readings.count == 0 {
             return nil
         }
-//
-//        let daysOfReadings = Calendar.current.dateComponents([.day], from: readings.first!.timeStamp, to: Date())
-//        numberOfDaysUsed = daysOfReadings.day!
   
+        // let's calculate the actual first day of readings in bgReadings. Although the user wants to use 60 days to calculate, maybe we only have 4 days of data. This will be returned from the method and used in the UI
         numberOfDaysUsed = Calendar.current.dateComponents([.day], from: readings.first!.timeStamp, to: Date()).day!
         
-        //let interval = nowDate.timeIntervalSinceDate(readings.first!.timeStamp as Date)
         
-        // TEST
-        numberOfReadingsAvailable = Double(readings.count)
-        
-        // get the minimum time between readings. This is to avoid getting too many extra 60-second readings from the Libre 2 Direct - they will take up a lot more processing time and don't add anything to the accuracy of the results so we'll just filter them out.
-        let minimumTimeBetweenReadings: Double = ConstantsStatistics.minimumFilterTimeBetweenReadings * 60
+        // get the minimum time between readings (convert to seconds). This is to avoid getting too many extra 60-second readings from the Libre 2 Direct - they will take up a lot more processing time and don't add anything to the accuracy of the results so we'll just filter them out if they exist.
+        let minimumSecondsBetweenReadings: Double = ConstantsStatistics.minimumFilterTimeBetweenReadings * 60
         
         // get the timestamp of the first reading
         let firstValueTimeStamp = readings.first?.timeStamp
@@ -72,8 +67,8 @@ public final class StatisticsManager {
         // step though all values, check them to validity, convert if necessary and append them to the glucoseValues array
         for reading in readings {
             
+            // declare and initialise the date variables needed
             var calculatedValue = reading.calculatedValue
-
             let currentTimeStamp = reading.timeStamp
             
             if calculatedValue != 0.0 {
@@ -82,7 +77,7 @@ public final class StatisticsManager {
                 let secondsDifference = Calendar.current.dateComponents([.second], from: previousValueTimeStamp!, to: currentTimeStamp)
                 
                 //if the current values timestamp is more than the minimum filter time, then add it to the glucoseValues array. Include a check to ensure that the first reading is added despite there not being any difference to itself
-                if (Double(secondsDifference.second!) >= minimumTimeBetweenReadings) || (previousValueTimeStamp == firstValueTimeStamp) {
+                if (Double(secondsDifference.second!) >= minimumSecondsBetweenReadings) || (previousValueTimeStamp == firstValueTimeStamp) {
                     
                     if !isMgDl {
                         calculatedValue = calculatedValue * ConstantsBloodGlucose.mgDlToMmoll
@@ -90,15 +85,16 @@ public final class StatisticsManager {
                     
                     glucoseValues.append(calculatedValue)
                     
+                    // update the timestamp for the next loop
+                    previousValueTimeStamp = currentTimeStamp
+                    
                 }
-            
-                // update the timestamp for the next loop
-                previousValueTimeStamp = currentTimeStamp
                 
             }
         }
         
         // TEST
+        numberOfReadingsAvailable = Double(readings.count)
         numberOfReadingsUsed = Double(glucoseValues.count)
         
         

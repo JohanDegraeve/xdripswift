@@ -31,7 +31,10 @@ enum ConstantsStatistics {
     static let standardisedLowValueForTIRInMmol = 3.9
     static let standardisedHighValueForTIRInMmol = 10.0
     
-    static let minimumFilterTimeBetweenReadings: Double = 4.99
+    // minimum filter time in minutes
+    static let minimumFilterTimeBetweenReadings: Double = 4.5
     
+    // minimum filter time in minutes
+    static let showInRangeEasterEgg: Bool = true
 }
 
