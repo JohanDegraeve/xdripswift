@@ -1412,31 +1412,44 @@ final class RootViewController: UIViewController {
     private func createAndPresentSensorButtonActionSheet() {
         
         // initialize list of actions
-        var listOfActions = [String : ((UIAlertAction) -> Void)]()
+        var listOfActions = [UIAlertAction]()
         
         // first action is to show the status
-        listOfActions[Texts_HomeView.statusActionTitle] = {(UIAlertAction) in self.showStatus()}
+        let sensorStatusAction = UIAlertAction(title: Texts_HomeView.statusActionTitle, style: .default) { (UIAlertAction) in
+            self.showStatus()
+        }
+        listOfActions.append(sensorStatusAction)
         
         // next action is to start or stop the sensor, can also be omitted depending on type of device - also not applicable for follower mode
         if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
             if cgmTransmitter.cgmTransmitterType().allowManualSensorStart() && UserDefaults.standard.isMaster {
                 // user needs to start and stop the sensor manually
+                var startStopAction: UIAlertAction
+                
                 if activeSensor != nil {
-                    listOfActions[Texts_HomeView.stopSensorActionTitle] = {(UIAlertAction) in
-                        
+                    startStopAction = UIAlertAction(title: Texts_HomeView.stopSensorActionTitle, style: .default) { (UIAlertAction) in
                         trace("in createAndPresentSensorButtonActionSheet, user clicked stop sensor, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                         
                         self.stopSensor()
-                        
                     }
                 } else {
-                    listOfActions[Texts_HomeView.startSensorActionTitle] = {(UIAlertAction) in self.startSensorAskUserForStarttime()}
+                    startStopAction = UIAlertAction(title: Texts_HomeView.startSensorActionTitle, style: .default) { (UIAlertAction) in
+                        self.startSensorAskUserForStarttime()
+                    }
                 }
+                
+                listOfActions.append(startStopAction)
             }
         }
+
+        let cancelAction = UIAlertAction(title: Texts_Common.Cancel, style: .cancel, handler: nil)
+        listOfActions.append(cancelAction)
         
         // create and present new alertController of type actionsheet
-        let actionSheet = UIAlertController(title: nil, message: nil, actions: listOfActions, cancelAction: (Texts_Common.Cancel, nil))
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        for action in listOfActions {
+            actionSheet.addAction(action)
+        }
         
         // following is required for iPad, as explained here https://stackoverflow.com/questions/28089898/actionsheet-not-working-ipad
         // otherwise it crashes on iPad when clicking transmitter button
