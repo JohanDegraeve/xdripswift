@@ -733,6 +733,8 @@ final class RootViewController: UIViewController {
                     
                     coreDataManager.mainManagedObjectContext.delete(reading)
                     
+                    coreDataManager.saveChanges()
+                    
                 }
                 
                 // as we're deleting readings, glucoseChartPoints need to be updated, otherwise we keep seeing old values
