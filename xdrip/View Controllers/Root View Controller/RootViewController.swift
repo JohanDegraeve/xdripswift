@@ -227,7 +227,7 @@ final class RootViewController: UIViewController {
     private var glucoseChartManager: GlucoseChartManager?
     
     /// statisticsManager instance
-    private var statisticsManager:StatisticsManager?
+    private var statisticsManager: StatisticsManager?
     
     /// dateformatter for minutesLabelOutlet, when user is panning the chart
     private let dateTimeFormatterForMinutesLabelWhenPanning: DateFormatter = {
@@ -280,8 +280,10 @@ final class RootViewController: UIViewController {
         statisticsView.isHidden = !UserDefaults.standard.showStatistics
         spacerView.isHidden = UserDefaults.standard.showStatistics
         
-        // animate the pie chart as it comes into view
+        // update statistics related outlets
         updateStatistics(animatePieChart: true)
+        
+
         
     }
     
@@ -289,9 +291,6 @@ final class RootViewController: UIViewController {
         
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
-        
-        // adding this a test to see if it stops the "blank charts" that sometimes happen when switching to the screen.
-        //updateLabelsAndChart(overrideApplicationState: true)
         
     }
     
@@ -321,6 +320,9 @@ final class RootViewController: UIViewController {
             
             // update label texts, minutes ago, diff and value
             self.updateLabelsAndChart(overrideApplicationState: true)
+            
+            // update statistics related outlets
+            self.updateStatistics(animatePieChart: true)
             
             // create badge counter
             self.createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
@@ -417,6 +419,9 @@ final class RootViewController: UIViewController {
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             
             self.updateLabelsAndChart(overrideApplicationState: true)
+            
+            // update statistics related outlets
+            self.updateStatistics(animatePieChart: false)
             
         })
         
@@ -591,7 +596,7 @@ final class RootViewController: UIViewController {
         glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
         
         // initialize statisticsManager
-        statisticsManager = StatisticsManager()
+        statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
         
         // initialize chartGenerator in chartOutlet
         self.chartOutlet.chartGenerator = { [weak self] (frame) in
@@ -812,6 +817,10 @@ final class RootViewController: UIViewController {
                     
                     // update all text in  first screen
                     updateLabelsAndChart(overrideApplicationState: false)
+                    
+                    // update statistics related outlets
+                    updateStatistics(animatePieChart: false)
+                    
                 }
                 
                 nightScoutUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
@@ -1446,14 +1455,6 @@ final class RootViewController: UIViewController {
         // update the chart up to now
         updateChartWithResetEndDate()
         
-        
-        // finally we need to update the statistics view
-       
-        
-        // send the bg readings array to the updateStatistics function to calculate and update all of the outlets
-        //updateStatistics(glucoseValues: glucoseValues, animatePieChart: false)
-        updateStatistics(animatePieChart: false)
-        
     }
     
     /// when user clicks transmitter button, this will create and present the actionsheet, contents depend on type of transmitter and sensor status
@@ -1660,9 +1661,6 @@ final class RootViewController: UIViewController {
             return
         }
         
-        // check that coreDataManager has been initialised. If not, return without doing anything
-        guard let coreDataManager = coreDataManager else { return }
-        
         // declare constants/variables
         let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         var daysToUseStatistics: Int = 0
@@ -1680,105 +1678,102 @@ final class RootViewController: UIViewController {
             fromDate = Date(timeIntervalSinceNow: -3600.0 * 24.0 * Double(daysToUseStatistics))
         }
         
-        // declare the
-        let statistics = statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil, coreDataManager: coreDataManager)
-        
-        // return gracefully if the returned stats array is empty
-        guard statistics != nil else { return }
+        // statisticsManager will calculate the statistics in background thread and call the callback function in the main thread
+        statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil, callback: { statistics in
             
-        
-        // We now have the returned statistics data so let's start preparing the UI
-        
-        // TEST label
-        testLabel.text = "Readings used: " + Int(statistics!.numberOfReadingsUsed).description + " / " + Int(statistics!.numberOfReadingsAvailable).description + " (Filter >= " + ConstantsStatistics.minimumFilterTimeBetweenReadings.description + "min)"
-        
+            // TEST label
+            self.testLabel.text = "Readings used: " + Int(statistics.numberOfReadingsUsed).description + " / " + Int(statistics.numberOfReadingsAvailable).description + " (Filter >= " + ConstantsStatistics.minimumFilterTimeBetweenReadings.description + "min)"
+            
+            
+            // set the low/high "label" labels with the low/high user values that the user has chosen to use
+            self.lowLabelOutlet.text = "(<" + (isMgDl ? Int(statistics.lowLimitForTIR).description : statistics.lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+            self.highLabelOutlet.text = "(>" + (isMgDl ? Int(statistics.highLimitForTIR).description : statistics.highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+            
+            
+            // set all label outlets with the correctly formatted calculated values
+            self.lowStatisticLabelOutlet.text = Int(statistics.lowStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+            
+            self.inRangeStatisticLabelOutlet.text = Int(statistics.inRangeStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+            
+            self.highStatisticLabelOutlet.text = Int(statistics.highStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+            
+            self.averageStatisticLabelOutlet.text = (isMgDl ? Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics.averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
+            
+            if UserDefaults.standard.useIFCCA1C {
+                self.a1CStatisticLabelOutlet.text = Int(statistics.a1CStatisticValue.round(toDecimalPlaces: 0)).description + " mmol"
+            } else {
+                self.a1CStatisticLabelOutlet.text = statistics.a1CStatisticValue.round(toDecimalPlaces: 1).description + "%"
+            }
+            
+            self.cVStatisticLabelOutlet.text = Int(statistics.cVStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+            
+            // show number of days calculated under the pie chart
+            switch daysToUseStatistics {
+            case 0:
+                self.timePeriodLabelOutlet.text = "Today"
+                
+            case 1:
+                self.timePeriodLabelOutlet.text = "24 hours"
+                
+            default:
+                self.timePeriodLabelOutlet.text = String(statistics.numberOfDaysUsed) + "/" + String(Int(daysToUseStatistics)) + " days"
+            }
+            
+            // let's remove the old pie chart
+            self.pieChartOutlet.clear()
+            
+            // disable the chart animation if it's just a normal update, enable it if the call comes from didAppear()
+            if animatePieChart {
+                self.pieChartOutlet.animDuration = ConstantsStatistics.pieChartAnimationSpeed
+            } else {
+                self.pieChartOutlet.animDuration = 0
+            }
+            
+            // if the user is 100% in range, show the easter egg and make them smile
+            if statistics.inRangeStatisticValue < 100 {
+                
+                self.pieChartOutlet.innerRadius = 0
+                
+                self.pieChartLabelOutlet.text = ""
+                
+                self.pieChartOutlet.strokeWidth = 0.5
+                
+                self.pieChartOutlet.models = [
+                    PieSliceModel(value: Double(statistics.lowStatisticValue), color: ConstantsStatistics.pieChartLowSliceColor),
+                    PieSliceModel(value: Double(statistics.inRangeStatisticValue), color: ConstantsStatistics.pieChartInRangeSliceColor),
+                    PieSliceModel(value: Double(statistics.highStatisticValue), color: ConstantsStatistics.pieChartHighSliceColor)
+                ]
+                
+            } else if ConstantsStatistics.showInRangeEasterEgg {
+                
+                // open up the inside of the chart so that we can fit the smiley face in
+                self.pieChartOutlet.innerRadius = 16
+                
+                self.pieChartOutlet.strokeWidth = 0
+                
+                self.pieChartOutlet.models = [
+                    PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
+                ]
+                
+                self.pieChartLabelOutlet.font = UIFont.boldSystemFont(ofSize: 26)
+                
+                self.pieChartLabelOutlet.text = "😎"
+                
+            } else {
+                
+                // the easter egg isn't wanted so just show a green circle at 100%
+                self.pieChartOutlet.strokeWidth = 0
+                
+                self.pieChartOutlet.models = [
+                    PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
+                ]
+                
+                self.pieChartLabelOutlet.text = ""
+                
+            }
+            
+        })
 
-        // set the low/high "label" labels with the low/high user values that the user has chosen to use
-        lowLabelOutlet.text = "(<" + (isMgDl ? Int(statistics!.lowLimitForTIR).description : statistics!.lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
-        highLabelOutlet.text = "(>" + (isMgDl ? Int(statistics!.highLimitForTIR).description : statistics!.highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
-        
-        
-        // set all label outlets with the correctly formatted calculated values
-        lowStatisticLabelOutlet.text = Int(statistics!.lowStatisticValue.round(toDecimalPlaces: 0)).description + "%"
-        
-        inRangeStatisticLabelOutlet.text = Int(statistics!.inRangeStatisticValue.round(toDecimalPlaces: 0)).description + "%"
-        
-        highStatisticLabelOutlet.text = Int(statistics!.highStatisticValue.round(toDecimalPlaces: 0)).description + "%"
-        
-        averageStatisticLabelOutlet.text = (isMgDl ? Int(statistics!.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics!.averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
-        
-        if UserDefaults.standard.useIFCCA1C {
-            a1CStatisticLabelOutlet.text = Int(statistics!.a1CStatisticValue.round(toDecimalPlaces: 0)).description + " mmol"
-        } else {
-            a1CStatisticLabelOutlet.text = statistics!.a1CStatisticValue.round(toDecimalPlaces: 1).description + "%"
-        }
-        
-        cVStatisticLabelOutlet.text = Int(statistics!.cVStatisticValue.round(toDecimalPlaces: 0)).description + "%"
-        
-        // show number of days calculated under the pie chart
-        switch daysToUseStatistics {
-        case 0:
-            timePeriodLabelOutlet.text = "Today"
-
-        case 1:
-            timePeriodLabelOutlet.text = "24 hours"
-
-        default:
-            timePeriodLabelOutlet.text = String(statistics!.numberOfDaysUsed) + "/" + String(Int(daysToUseStatistics)) + " days"
-        }
-        
-        // let's remove the old pie chart
-        pieChartOutlet.clear()
-        
-        // disable the chart animation if it's just a normal update, enable it if the call comes from didAppear()
-        if animatePieChart {
-            pieChartOutlet.animDuration = ConstantsStatistics.pieChartAnimationSpeed
-        } else {
-            pieChartOutlet.animDuration = 0
-        }
-        
-        // if the user is 100% in range, show the easter egg and make them smile
-        if statistics!.inRangeStatisticValue < 100 {
-            
-            pieChartOutlet.innerRadius = 0
-            
-            pieChartLabelOutlet.text = ""
-            
-            pieChartOutlet.strokeWidth = 0.5
-            
-            pieChartOutlet.models = [
-                PieSliceModel(value: Double(statistics!.lowStatisticValue), color: ConstantsStatistics.pieChartLowSliceColor),
-                PieSliceModel(value: Double(statistics!.inRangeStatisticValue), color: ConstantsStatistics.pieChartInRangeSliceColor),
-                PieSliceModel(value: Double(statistics!.highStatisticValue), color: ConstantsStatistics.pieChartHighSliceColor)
-            ]
-            
-        } else if ConstantsStatistics.showInRangeEasterEgg {
-            
-            // open up the inside of the chart so that we can fit the smiley face in
-            pieChartOutlet.innerRadius = 16
-            
-            pieChartOutlet.strokeWidth = 0
-            
-            pieChartOutlet.models = [
-                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
-            ]
-            
-            pieChartLabelOutlet.font = UIFont.boldSystemFont(ofSize: 26)
-            
-            pieChartLabelOutlet.text = "😎"
-            
-        } else {
-            
-            // the easter egg isn't wanted so just show a green circle at 100%
-            pieChartOutlet.strokeWidth = 0
-            
-            pieChartOutlet.models = [
-                PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
-            ]
-            
-            pieChartLabelOutlet.text = ""
-            
-        }
         
     }
 
@@ -1986,6 +1981,9 @@ extension RootViewController:NightScoutFollowerDelegate {
                 
                 // update all text in  first screen
                 updateLabelsAndChart(overrideApplicationState: false)
+                
+                // update statistics related outlets
+                updateStatistics(animatePieChart: false)
                 
                 // check alerts, create notification, set app badge
                 checkAlertsCreateNotificationAndSetAppBadge()
