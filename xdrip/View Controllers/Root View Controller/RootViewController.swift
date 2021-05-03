@@ -66,6 +66,12 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var averageStatisticLabelOutlet: UILabel!
     @IBOutlet weak var a1CStatisticLabelOutlet: UILabel!
     @IBOutlet weak var cVStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var lowTitleLabelOutlet: UILabel!
+    @IBOutlet weak var inRangeTitleLabelOutlet: UILabel!
+    @IBOutlet weak var highTitleLabelOutlet: UILabel!
+    @IBOutlet weak var averageTitleLabelOutlet: UILabel!
+    @IBOutlet weak var a1cTitleLabelOutlet: UILabel!
+    @IBOutlet weak var cvTitleLabelOutlet: UILabel!
     @IBOutlet weak var lowLabelOutlet: UILabel!
     @IBOutlet weak var highLabelOutlet: UILabel!
     @IBOutlet weak var pieChartLabelOutlet: UILabel!
@@ -1681,6 +1687,15 @@ final class RootViewController: UIViewController {
         // statisticsManager will calculate the statistics in background thread and call the callback function in the main thread
         statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil, callback: { statistics in
             
+            // set the title labels to their correct localization
+            self.lowTitleLabelOutlet.text = Texts_Common.lowStatistics
+            self.inRangeTitleLabelOutlet.text = Texts_Common.inRangeStatistics
+            self.highTitleLabelOutlet.text = Texts_Common.highStatistics
+            self.averageTitleLabelOutlet.text = Texts_Common.averageStatistics
+            self.a1cTitleLabelOutlet.text = Texts_Common.a1cStatistics
+            self.cvTitleLabelOutlet.text = Texts_Common.cvStatistics
+            
+            
             // set the low/high "label" labels with the low/high user values that the user has chosen to use
             self.lowLabelOutlet.text = "(<" + (isMgDl ? Int(statistics.lowLimitForTIR).description : statistics.lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
             self.highLabelOutlet.text = "(>" + (isMgDl ? Int(statistics.highLimitForTIR).description : statistics.highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
@@ -1706,13 +1721,13 @@ final class RootViewController: UIViewController {
             // show number of days calculated under the pie chart
             switch daysToUseStatistics {
             case 0:
-                self.timePeriodLabelOutlet.text = "Today"
+                self.timePeriodLabelOutlet.text = Texts_Common.today
                 
             case 1:
-                self.timePeriodLabelOutlet.text = "24 hours"
+                self.timePeriodLabelOutlet.text = "24 " + Texts_Common.hours
                 
             default:
-                self.timePeriodLabelOutlet.text = statistics.numberOfDaysUsed.description + " days"
+                self.timePeriodLabelOutlet.text = statistics.numberOfDaysUsed.description + " " + Texts_Common.days
             }
             
             // let's remove the old pie chart

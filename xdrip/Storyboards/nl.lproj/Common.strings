@@ -13,6 +13,8 @@
 "common_minutes" = "minuten";
 "common_minute" = "min";
 "common_day" = "dag";
+"common_days" = "dagen";
+"common_today" = "Vandaag";
 "common_week" = "week";
 "warning" ="Waarschuwing!";
 "update" = "Bewerk";
@@ -35,3 +37,9 @@
 "sensorStatus" = "Sensor status:";
 /// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
 "invalidAccountOrPassword" = "Verkeerde account en/of paswoord";
+"common_statistics_low" = "Laag";
+"common_statistics_inRange" = "In Bereik";
+"common_statistics_high" = "Hoog";
+"common_statistics_average" = "Gemiddelde";
+"common_statistics_a1c" = "HbA1c";
+"common_statistics_cv" = "CV";

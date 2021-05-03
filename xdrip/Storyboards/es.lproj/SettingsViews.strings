@@ -20,7 +20,7 @@
 "settingsviews_daysToUseStatisticsTitle" = "Días a Calcular?";
 "settingsviews_daysToUseStatisticsMessage" = "Máximos días a intentar usar para calcular las estadísticas?\n\n(Entrar 0 para calcular el día de hoy desde las 00:00hrs)";
 "settingsviews_useStandardStatisticsRange" = "Usar Rango Estándar?";
-"settingsviews_useIFCCA1C" = "Ver A1c en mmols/mol?";
+"settingsviews_useIFCCA1C" = "Ver HbA1c en mmols/mol?";
 "settingsviews_sectiontitletransmitter" = "Transmisor";
 "settingsviews_transmittertype" = "Tipo de Transmisor:";
 "settingsviews_transmitterid" = "ID del Transmisor:";

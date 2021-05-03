@@ -657,7 +657,7 @@ extension UserDefaults {
     
     /// should the statistics view be shown on the home screen?
     @objc dynamic var useIFCCA1C: Bool {
-        // default value for bool in userdefaults is false, by default we want the A1C to be calculated in "not IFCC" way (false)
+        // default value for bool in userdefaults is false, by default we want the HbA1c to be calculated in "not IFCC" way (false)
         get {
             return bool(forKey: Key.useIFCCA1C.rawValue)
         }
