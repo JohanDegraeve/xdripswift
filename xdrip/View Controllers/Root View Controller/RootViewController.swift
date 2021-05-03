@@ -70,8 +70,6 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var highLabelOutlet: UILabel!
     @IBOutlet weak var pieChartLabelOutlet: UILabel!
     @IBOutlet weak var timePeriodLabelOutlet: UILabel!
-    // TEST
-    @IBOutlet weak var testLabel: UILabel!
     
     /// user long pressed the value label
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
