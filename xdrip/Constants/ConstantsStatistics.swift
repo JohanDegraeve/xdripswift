@@ -31,10 +31,12 @@ enum ConstantsStatistics {
     static let standardisedLowValueForTIRInMmol = 3.9
     static let standardisedHighValueForTIRInMmol = 10.0
     
-    // minimum filter time in minutes
+    // minimum filter time in minutes (used for Libre 2 readings)
     static let minimumFilterTimeBetweenReadings: Double = 4.5
     
-    // minimum filter time in minutes
+    // should we show the easter egg when the user is 100% in range?
     static let showInRangeEasterEgg: Bool = true
+    // and if we want to show it, how many hours after midnight should we wait before showing it?
+    static let minimumHoursInDayBeforeShowingEasterEgg = 12.0 // midday
 }
 

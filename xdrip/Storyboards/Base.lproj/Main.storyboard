@@ -41,9 +41,9 @@
                                                 </connections>
                                             </button>
                                             <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="---" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="We3-bN-ffR">
-                                                <rect key="frame" x="130.66666666666669" y="88" width="128.66666666666669" height="119.66666666666669"/>
+                                                <rect key="frame" x="137" y="78" width="116" height="107.66666666666669"/>
                                                 <gestureRecognizers/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="100"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="90"/>
                                                 <color key="textColor" systemColor="systemGreenColor"/>
                                                 <nil key="highlightedColor"/>
                                                 <connections>
@@ -51,19 +51,19 @@
                                                 </connections>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="x mins ago" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uyn-2k-K74">
-                                                <rect key="frame" x="10.000000000000007" y="57.999999999999993" width="110.66666666666669" height="28.666666666666664"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                                <rect key="frame" x="10" y="48" width="102" height="26.333333333333329"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" text="delta" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Wo-wd-80o">
-                                                <rect key="frame" x="328.66666666666669" y="57.999999999999993" width="51.333333333333314" height="28.666666666666664"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                                <rect key="frame" x="332.66666666666669" y="48" width="47.333333333333314" height="26.333333333333329"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0nE-AX-r0w" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
-                                                <rect key="frame" x="10" y="207.66666666666666" width="380" height="399.33333333333337"/>
+                                                <rect key="frame" x="10" y="185.66666666666666" width="380" height="421.33333333333337"/>
                                                 <gestureRecognizers/>
                                                 <connections>
                                                     <outletCollection property="gestureRecognizers" destination="Fi5-iu-Usk" appends="YES" id="Rkv-hK-sLH"/>
@@ -78,24 +78,15 @@
                                                     <action selector="sensorButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="iJp-CH-PZa"/>
                                                 </connections>
                                             </button>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ows-5K-wOT">
-                                                <rect key="frame" x="10" y="190" width="370" height="17"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                <color key="textColor" systemColor="systemTealColor"/>
-                                                <nil key="highlightedColor"/>
-                                            </label>
                                         </subviews>
                                         <constraints>
                                             <constraint firstAttribute="trailing" secondItem="7Wo-wd-80o" secondAttribute="trailing" constant="10" id="28x-56-97G"/>
                                             <constraint firstAttribute="trailing" secondItem="0nE-AX-r0w" secondAttribute="trailing" id="4Kt-zl-bbl"/>
                                             <constraint firstAttribute="bottom" secondItem="0nE-AX-r0w" secondAttribute="bottom" constant="10" id="86E-Yy-8YS"/>
                                             <constraint firstItem="zWo-AR-qJE" firstAttribute="leading" secondItem="fSY-nc-amN" secondAttribute="trailing" constant="10" id="HOO-JC-f24"/>
-                                            <constraint firstItem="uyn-2k-K74" firstAttribute="top" secondItem="fSY-nc-amN" secondAttribute="bottom" constant="20" id="KZy-wg-NK7"/>
+                                            <constraint firstItem="uyn-2k-K74" firstAttribute="top" secondItem="fSY-nc-amN" secondAttribute="bottom" constant="10" id="KZy-wg-NK7"/>
                                             <constraint firstItem="7Wo-wd-80o" firstAttribute="centerY" secondItem="uyn-2k-K74" secondAttribute="centerY" id="Qpl-lB-gwg"/>
-                                            <constraint firstAttribute="trailing" secondItem="ows-5K-wOT" secondAttribute="trailing" constant="10" id="Qw5-1Q-0Dx"/>
                                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="leading" secondItem="zWo-AR-qJE" secondAttribute="trailing" constant="10" id="UPW-rd-nx0"/>
-                                            <constraint firstItem="ows-5K-wOT" firstAttribute="top" secondItem="C16-NQ-F1Y" secondAttribute="top" constant="190" id="Ull-Fs-oqR"/>
-                                            <constraint firstItem="ows-5K-wOT" firstAttribute="leading" secondItem="C16-NQ-F1Y" secondAttribute="leading" constant="10" id="dLO-6n-WKp"/>
                                             <constraint firstItem="0nE-AX-r0w" firstAttribute="leading" secondItem="C16-NQ-F1Y" secondAttribute="leading" constant="10" id="e97-Zw-ipJ"/>
                                             <constraint firstItem="0nE-AX-r0w" firstAttribute="top" secondItem="We3-bN-ffR" secondAttribute="bottom" id="emW-PI-WrN"/>
                                             <constraint firstItem="fSY-nc-amN" firstAttribute="leading" secondItem="C16-NQ-F1Y" secondAttribute="leading" constant="10" id="fHd-mZ-AJJ"/>
@@ -103,7 +94,7 @@
                                             <constraint firstItem="uyn-2k-K74" firstAttribute="leading" secondItem="C16-NQ-F1Y" secondAttribute="leading" constant="10" id="mYE-7c-E2l"/>
                                             <constraint firstItem="fSY-nc-amN" firstAttribute="centerY" secondItem="zWo-AR-qJE" secondAttribute="centerY" id="pSL-SK-9aa"/>
                                             <constraint firstItem="fSY-nc-amN" firstAttribute="top" secondItem="C16-NQ-F1Y" secondAttribute="top" id="sLJ-ZS-7xf"/>
-                                            <constraint firstItem="We3-bN-ffR" firstAttribute="top" secondItem="mSJ-jy-nHJ" secondAttribute="bottom" constant="50" id="uCk-q2-8I3"/>
+                                            <constraint firstItem="We3-bN-ffR" firstAttribute="top" secondItem="mSJ-jy-nHJ" secondAttribute="bottom" constant="40" id="uCk-q2-8I3"/>
                                             <constraint firstItem="We3-bN-ffR" firstAttribute="centerX" secondItem="C16-NQ-F1Y" secondAttribute="centerX" id="vhA-TS-y2Z"/>
                                         </constraints>
                                     </view>
@@ -298,7 +289,7 @@
                                                                         <real key="value" value="25"/>
                                                                     </userDefinedRuntimeAttribute>
                                                                     <userDefinedRuntimeAttribute type="number" keyPath="strokeWidth">
-                                                                        <real key="value" value="0.20000000000000001"/>
+                                                                        <real key="value" value="0.0"/>
                                                                     </userDefinedRuntimeAttribute>
                                                                     <userDefinedRuntimeAttribute type="number" keyPath="referenceAngle">
                                                                         <real key="value" value="270"/>
@@ -372,7 +363,6 @@
                         <outlet property="sensorButtonOutlet" destination="zWo-AR-qJE" id="uuB-WI-JKe"/>
                         <outlet property="spacerView" destination="jwh-ZZ-8vp" id="Bcu-Wd-0ZR"/>
                         <outlet property="statisticsView" destination="MtJ-rx-OB9" id="u5w-qN-5Tq"/>
-                        <outlet property="testLabel" destination="ows-5K-wOT" id="XQo-MU-fhD"/>
                         <outlet property="timePeriodLabelOutlet" destination="On3-dy-RgB" id="hAe-Kx-vnM"/>
                         <outlet property="valueLabelOutlet" destination="We3-bN-ffR" id="wtY-sZ-mev"/>
                     </connections>
@@ -1456,9 +1446,6 @@
         </systemColor>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemTealColor">
-            <color red="0.35294117647058826" green="0.78431372549019607" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemYellowColor">
             <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

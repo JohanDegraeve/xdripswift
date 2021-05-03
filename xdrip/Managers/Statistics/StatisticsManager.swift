@@ -72,9 +72,6 @@ public final class StatisticsManager {
             var lowLimitForTIR: Double = 0
             var highLimitForTIR: Double = 0
             var numberOfDaysUsed: Int = 0
-            // TEST: these two variables are used for debugging. They can be removed from the method for release
-            var numberOfReadingsAvailable: Double = 0
-            var numberOfReadingsUsed: Double = 0
             
             // initialize bgReadingsAccessor
             let bgReadingsAccessor = BgReadingsAccessor(coreDataManager: self.coreDataManager)
@@ -91,9 +88,8 @@ public final class StatisticsManager {
             // we need to use the same context to perform next piece of code which will use those bgReadings, in order to stay thread-safe
             managedObjectContext.performAndWait {
                 
-                // let's calculate the actual first day of readings in bgReadings. Although the user wants to use 60 days to calculate, maybe we only have 4 days of data. This will be returned from the method and used in the UI
-                numberOfDaysUsed = Calendar.current.dateComponents([.day], from: readings.first!.timeStamp, to: Date()).day!
-                
+                // let's calculate the actual first day of readings in bgReadings. Although the user wants to use 60 days to calculate, maybe we only have 4 days of data. This will be returned from the method and used in the UI. To ensure we calculate the whole days used, we should subtract 5 minutes from the fromDate
+                numberOfDaysUsed = Calendar.current.dateComponents([.day], from: readings.first!.timeStamp - 5 * 60, to: Date()).day!
                 
                 // get the minimum time between readings (convert to seconds). This is to avoid getting too many extra 60-second readings from the Libre 2 Direct - they will take up a lot more processing time and don't add anything to the accuracy of the results so we'll just filter them out if they exist.
                 let minimumSecondsBetweenReadings: Double = ConstantsStatistics.minimumFilterTimeBetweenReadings * 60
@@ -130,10 +126,6 @@ public final class StatisticsManager {
                         
                     }
                 }
-                
-                // TEST
-                numberOfReadingsAvailable = Double(readings.count)
-                numberOfReadingsUsed = Double(glucoseValues.count)
                 
                 
                 // let's set up the which values will finally be used to calculate TIR. It can be either user-specified or the standardised values
@@ -192,7 +184,7 @@ public final class StatisticsManager {
             
             // call callback in main thread, this callback will update the UI
             DispatchQueue.main.async {
-                callback( Statistics(lowStatisticValue: lowStatisticValue, highStatisticValue: highStatisticValue, inRangeStatisticValue: inRangeStatisticValue, averageStatisticValue: averageStatisticValue, a1CStatisticValue: a1CStatisticValue, cVStatisticValue: cVStatisticValue, lowLimitForTIR: lowLimitForTIR, highLimitForTIR: highLimitForTIR, numberOfDaysUsed: numberOfDaysUsed, numberOfReadingsAvailable: numberOfReadingsAvailable, numberOfReadingsUsed: numberOfReadingsUsed))
+                callback( Statistics(lowStatisticValue: lowStatisticValue, highStatisticValue: highStatisticValue, inRangeStatisticValue: inRangeStatisticValue, averageStatisticValue: averageStatisticValue, a1CStatisticValue: a1CStatisticValue, cVStatisticValue: cVStatisticValue, lowLimitForTIR: lowLimitForTIR, highLimitForTIR: highLimitForTIR, numberOfDaysUsed: numberOfDaysUsed))
             }
 
         })
@@ -218,8 +210,6 @@ public final class StatisticsManager {
         var lowLimitForTIR: Double
         var highLimitForTIR: Double
         var numberOfDaysUsed: Int
-        var numberOfReadingsAvailable: Double
-        var numberOfReadingsUsed: Double
         
     }
     

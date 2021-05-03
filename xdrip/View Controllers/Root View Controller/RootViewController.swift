@@ -1683,10 +1683,6 @@ final class RootViewController: UIViewController {
         // statisticsManager will calculate the statistics in background thread and call the callback function in the main thread
         statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil, callback: { statistics in
             
-            // TEST label
-            self.testLabel.text = "Readings used: " + Int(statistics.numberOfReadingsUsed).description + " / " + Int(statistics.numberOfReadingsAvailable).description + " (Filter >= " + ConstantsStatistics.minimumFilterTimeBetweenReadings.description + "min)"
-            
-            
             // set the low/high "label" labels with the low/high user values that the user has chosen to use
             self.lowLabelOutlet.text = "(<" + (isMgDl ? Int(statistics.lowLimitForTIR).description : statistics.lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
             self.highLabelOutlet.text = "(>" + (isMgDl ? Int(statistics.highLimitForTIR).description : statistics.highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
@@ -1718,7 +1714,7 @@ final class RootViewController: UIViewController {
                 self.timePeriodLabelOutlet.text = "24 hours"
                 
             default:
-                self.timePeriodLabelOutlet.text = String(statistics.numberOfDaysUsed) + "/" + String(Int(daysToUseStatistics)) + " days"
+                self.timePeriodLabelOutlet.text = statistics.numberOfDaysUsed.description + " days"
             }
             
             // let's remove the old pie chart
@@ -1731,41 +1727,38 @@ final class RootViewController: UIViewController {
                 self.pieChartOutlet.animDuration = 0
             }
             
+            // we want to calculate how many hours have passed since midnight so that we can decide if we should show the easter egg. The user will almost always be in range at 01hrs in the morning so we don't want to show it until mid-morning or midday so that there is some sense of achievement
+            let currentHoursSinceMidnight = Calendar.current.dateComponents([.hour], from: Calendar(identifier: .gregorian).startOfDay(for: Date()), to: Date()).hour!
+            
             // if the user is 100% in range, show the easter egg and make them smile
             if statistics.inRangeStatisticValue < 100 {
                 
+                // set the reference angle of the pie chart to ensure that the in range slice is centered
+                self.pieChartOutlet.referenceAngle = 90.0 - (1.8 * CGFloat(statistics.inRangeStatisticValue))
+                
                 self.pieChartOutlet.innerRadius = 0
-                
-                self.pieChartLabelOutlet.text = ""
-                
-                self.pieChartOutlet.strokeWidth = 0.5
-                
                 self.pieChartOutlet.models = [
-                    PieSliceModel(value: Double(statistics.lowStatisticValue), color: ConstantsStatistics.pieChartLowSliceColor),
                     PieSliceModel(value: Double(statistics.inRangeStatisticValue), color: ConstantsStatistics.pieChartInRangeSliceColor),
+                    PieSliceModel(value: Double(statistics.lowStatisticValue), color: ConstantsStatistics.pieChartLowSliceColor),
                     PieSliceModel(value: Double(statistics.highStatisticValue), color: ConstantsStatistics.pieChartHighSliceColor)
                 ]
                 
-            } else if ConstantsStatistics.showInRangeEasterEgg {
+                self.pieChartLabelOutlet.text = ""
+                
+            } else if ConstantsStatistics.showInRangeEasterEgg && (Double(currentHoursSinceMidnight) >= ConstantsStatistics.minimumHoursInDayBeforeShowingEasterEgg) {
                 
                 // open up the inside of the chart so that we can fit the smiley face in
                 self.pieChartOutlet.innerRadius = 16
-                
-                self.pieChartOutlet.strokeWidth = 0
-                
                 self.pieChartOutlet.models = [
                     PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
                 ]
                 
                 self.pieChartLabelOutlet.font = UIFont.boldSystemFont(ofSize: 26)
-                
                 self.pieChartLabelOutlet.text = "😎"
                 
             } else {
                 
                 // the easter egg isn't wanted so just show a green circle at 100%
-                self.pieChartOutlet.strokeWidth = 0
-                
                 self.pieChartOutlet.models = [
                     PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
                 ]
