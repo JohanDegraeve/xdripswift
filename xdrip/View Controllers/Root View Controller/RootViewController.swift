@@ -1656,6 +1656,9 @@ final class RootViewController: UIViewController {
     // helper function to calculate the statistics and update the pie chart and label outlets
     private func updateStatistics(animatePieChart: Bool = false) {
         
+        // don't calculate statis if app is not running in the foreground
+        guard UIApplication.shared.applicationState == .active else {return}
+        
         // if the user doesn't want to see the statistics, then just return without doing anything
         if !UserDefaults.standard.showStatistics {
             return
