@@ -47,6 +47,8 @@ public final class GlucoseChartManager {
     
     private var chartLabelSettingsObjectives: ChartLabelSettings?
     
+    private var chartLabelSettingsObjectivesSecondary: ChartLabelSettings?
+    
     private var chartLabelSettingsTarget: ChartLabelSettings?
     
     private var chartLabelSettingsDimmed: ChartLabelSettings?
@@ -513,7 +515,7 @@ public final class GlucoseChartManager {
             }
             
             // start by adding the objective values as the axis values
-            yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
+            yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectivesSecondary) as ChartAxisValue]
             
             yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
             
@@ -524,7 +526,7 @@ public final class GlucoseChartManager {
             
             yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
             
-            yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
+            yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectivesSecondary) as ChartAxisValue]
             
             // once the objectives are added, let's build up with standard values every 50mg/dl (minimum 200mg/dl. We'll make these secondary values a dimmer color so that they don't stand out as much as the objective values. As there are more values on the axis (>250mg/dl) and they labels get more compressed, leave more space between the urgent high objective value and the standard grid value
             if UserDefaults.standard.urgentHighMarkValueInUserChosenUnit < (unitIsMgDl ? 135 : 8.1) {
@@ -773,6 +775,8 @@ public final class GlucoseChartManager {
         
         chartLabelSettingsObjectives = nil
         
+        chartLabelSettingsObjectivesSecondary = nil
+        
         chartLabelSettingsTarget = nil
         
         chartLabelSettingsDimmed = nil
@@ -782,7 +786,7 @@ public final class GlucoseChartManager {
     }
     
     /// function which gives is variables that are set back to nil when nillifyData is called
-    private func data() -> (chartSettings: ChartSettings, chartPointDateFormatter: DateFormatter, operationQueue: OperationQueue, chartLabelSettings: ChartLabelSettings,  chartLabelSettingsObjectives: ChartLabelSettings, chartLabelSettingsTarget: ChartLabelSettings,  chartLabelSettingsDimmed: ChartLabelSettings, chartLabelSettingsHidden: ChartLabelSettings, chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings, axisLabelTimeFormatter: DateFormatter, bgReadingsAccessor: BgReadingsAccessor){
+    private func data() -> (chartSettings: ChartSettings, chartPointDateFormatter: DateFormatter, operationQueue: OperationQueue, chartLabelSettings: ChartLabelSettings,  chartLabelSettingsObjectives: ChartLabelSettings,  chartLabelSettingsObjectivesSecondary: ChartLabelSettings, chartLabelSettingsTarget: ChartLabelSettings,  chartLabelSettingsDimmed: ChartLabelSettings, chartLabelSettingsHidden: ChartLabelSettings, chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings, axisLabelTimeFormatter: DateFormatter, bgReadingsAccessor: BgReadingsAccessor){
         
         // setup chartSettings
         if chartSettings == nil {
@@ -831,7 +835,15 @@ public final class GlucoseChartManager {
         // intialize chartlabelsettingsObjectives - this is used for the objective label
         if chartLabelSettingsObjectives == nil {
             chartLabelSettingsObjectives = ChartLabelSettings(
-                font: .boldSystemFont(ofSize: 14),
+                font: .boldSystemFont(ofSize: 15),
+                fontColor: ConstantsGlucoseChart.axisLabelColorObjectives
+            )
+        }
+        
+        // intialize chartlabelsettingsObjectivesSecondary - this is used for the high/low objective labels. Show in the same colour, but not bold
+        if chartLabelSettingsObjectivesSecondary == nil {
+            chartLabelSettingsObjectivesSecondary = ChartLabelSettings(
+                font: .systemFont(ofSize: 14),
                 fontColor: ConstantsGlucoseChart.axisLabelColorObjectives
             )
         }
@@ -876,7 +888,7 @@ public final class GlucoseChartManager {
             bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         }
         
-        return (chartSettings!, chartPointDateFormatter!, operationQueue!, chartLabelSettings!, chartLabelSettingsObjectives!, chartLabelSettingsTarget!, chartLabelSettingsDimmed!, chartLabelSettingsHidden!, chartGuideLinesLayerSettings!, axisLabelTimeFormatter!, bgReadingsAccessor!)
+        return (chartSettings!, chartPointDateFormatter!, operationQueue!, chartLabelSettings!, chartLabelSettingsObjectives!, chartLabelSettingsObjectivesSecondary!, chartLabelSettingsTarget!, chartLabelSettingsDimmed!, chartLabelSettingsHidden!, chartGuideLinesLayerSettings!, axisLabelTimeFormatter!, bgReadingsAccessor!)
         
     }
     
