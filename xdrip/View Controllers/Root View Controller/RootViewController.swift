@@ -56,6 +56,27 @@ final class RootViewController: UIViewController {
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
     
+    /// outlets for chart time period selector
+    @IBOutlet weak var segmentedControlChartHours: UISegmentedControl!
+    
+    @IBAction func indexChanged(_ sender: Any) {
+        
+        switch segmentedControlChartHours.selectedSegmentIndex
+            {
+            case 0:
+                UserDefaults.standard.chartWidthInHours = 3.0
+            case 1:
+                UserDefaults.standard.chartWidthInHours = 6.0
+            case 2:
+                UserDefaults.standard.chartWidthInHours = 12.0
+            case 3:
+                UserDefaults.standard.chartWidthInHours = 24.0
+            default:
+                break
+            }
+               
+    }
+    
     /// outlets for statistics view
     @IBOutlet weak var statisticsView: UIView!
     @IBOutlet weak var spacerView: UIView!
@@ -277,6 +298,8 @@ final class RootViewController: UIViewController {
         
         super.viewWillAppear(animated)
         
+        
+        
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
         
@@ -308,6 +331,21 @@ final class RootViewController: UIViewController {
         UserDefaults.standard.lowMarkValueInUserChosenUnit = UserDefaults.standard.lowMarkValueInUserChosenUnit
         UserDefaults.standard.highMarkValueInUserChosenUnit = UserDefaults.standard.highMarkValueInUserChosenUnit
         UserDefaults.standard.bloodGlucoseUnitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
+        
+        switch UserDefaults.standard.chartWidthInHours
+            {
+            case 3.0:
+                segmentedControlChartHours.selectedSegmentIndex = 0
+            case 6.0:
+                segmentedControlChartHours.selectedSegmentIndex = 1
+            case 12.0:
+                segmentedControlChartHours.selectedSegmentIndex = 2
+            case 24.0:
+                segmentedControlChartHours.selectedSegmentIndex = 3
+            default:
+                break
+            }
         
         
         // enable or disable the buttons 'sensor' and 'calibrate' on top, depending on master or follower
@@ -357,8 +395,9 @@ final class RootViewController: UIViewController {
         
         // observe setting changes
         // changing from follower to master or vice versa
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new
-                                          , context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
+
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.KeysCharts.chartWidthInHours.rawValue, options: .new, context: nil)
         
         // bg reading notification and badge, and multiplication factor
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showReadingInNotification.rawValue, options: .new, context: nil)
@@ -921,6 +960,21 @@ final class RootViewController: UIViewController {
             
         default:
             break
+            
+        }
+        
+        guard let keyPathEnumCharts = UserDefaults.KeysCharts(rawValue: keyPath) else {return}
+        
+        switch keyPathEnumCharts {
+        
+            case UserDefaults.KeysCharts.chartWidthInHours:
+                
+                // redraw chart is necessary
+                updateChartWithResetEndDate()
+                
+            default:
+                break
+                
         }
         
     }
