@@ -1761,11 +1761,8 @@ final class RootViewController: UIViewController {
         var daysToUseStatistics: Int = 0
         var fromDate: Date = Date()
         
-        debuglogging("in updateStatistics")
-        
         // get the maximum number of calculation days requested by the user
         daysToUseStatistics = UserDefaults.standard.daysToUseStatistics
-        
         
         // if the user has selected 0 (to chose "today") then set the fromDate to the previous midnight
         if daysToUseStatistics == 0 {
