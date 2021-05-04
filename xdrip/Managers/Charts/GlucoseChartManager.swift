@@ -58,7 +58,7 @@ public final class GlucoseChartManager {
     private var chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings?
     
     /// The latest date on the X-axis
-    private var endDate: Date
+    private(set) var endDate: Date
     
     /// The earliest date on the X-axis
     private var startDate: Date
@@ -662,9 +662,21 @@ public final class GlucoseChartManager {
         /// create array that goes from 1 to number of full hours, as helper to map to array of ChartAxisValueDate - array will go from 1 to 6
         let mappingArray = Array(1...amountOfFullHours)
         
+        /// set the stride count interval to make sure we don't add too many labels to the x-axis if the user wants to view >6 hours
+        var intervalBetweenAxisValues: Int = 1
+            
+        switch UserDefaults.standard.chartWidthInHours {
+            case 12.0:
+                intervalBetweenAxisValues = 2
+            case 24.0:
+                intervalBetweenAxisValues = 4
+            default:
+                break
+        }
+        
         /// first, for each int in mappingArray, we create a ChartAxisValueDate, which will have as date one of the hours, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
         let startDateLower = startDate.toLowerHour()
-        var xAxisValues: [ChartAxisValue] = mappingArray.map { ChartAxisValueDate(date: Date(timeInterval: Double($0)*3600, since: startDateLower), formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings) }
+        var xAxisValues: [ChartAxisValue] = stride(from: 1, to: mappingArray.count + 1, by: intervalBetweenAxisValues).map { ChartAxisValueDate(date: Date(timeInterval: Double($0)*3600, since: startDateLower), formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings) }
         
         /// insert the start Date as first element, in this example 07:26
         xAxisValues.insert(ChartAxisValueDate(date: startDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings), at: 0)
@@ -682,7 +694,7 @@ public final class GlucoseChartManager {
     
     /// - returns:
     ///     - tuple of three chartpoint arrays, with readings that have calculatedvalue> 0, order ascending, ie first element is the oldest
-    ///     - the three arrays in the tuple according to value compared to lowMarkValue, highMarkValue, urgentHighMarkValue, urgentLowMarkValue stored in UserDefaults
+    ///     - the three arrays in the tuple according to value compared to lowMarkValue, highMarkValue,  urgentHighMarkValue, urgentLowMarkValue stored in UserDefaults
     ///     - the firstGlucoseChartPoint in the tuple is the oldest ChartPoint in the three arrays
     ///     - the lastGlucoseChartPoint in the tuple is the most recent ChartPoint in the three arrays
     private func getGlucoseChartPoints(startDate: Date, endDate: Date, bgReadingsAccessor: BgReadingsAccessor, on managedObjectContext: NSManagedObjectContext) -> GlucoseChartPointsType {

@@ -61,6 +61,7 @@ final class RootViewController: UIViewController {
     
     @IBAction func indexChanged(_ sender: Any) {
         
+        // update the chart period in hours
         switch segmentedControlChartHours.selectedSegmentIndex
             {
             case 0:
@@ -332,7 +333,7 @@ final class RootViewController: UIViewController {
         UserDefaults.standard.highMarkValueInUserChosenUnit = UserDefaults.standard.highMarkValueInUserChosenUnit
         UserDefaults.standard.bloodGlucoseUnitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
-        
+        // update the segmented control of the chart hours
         switch UserDefaults.standard.chartWidthInHours
             {
             case 3.0:
@@ -397,6 +398,7 @@ final class RootViewController: UIViewController {
         // changing from follower to master or vice versa
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
 
+        // see if the user has changed the chart x axis timescale
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.KeysCharts.chartWidthInHours.rawValue, options: .new, context: nil)
         
         // bg reading notification and badge, and multiplication factor
@@ -901,13 +903,40 @@ final class RootViewController: UIViewController {
         
     }
     
-    // MARK:- observe function
+    /// used by observevalue for UserDefaults.KeysCharts
+    private func evaluateUserDefaultsChange(keyPathEnumCharts: UserDefaults.KeysCharts) {
+        
+        // first check keyValueObserverTimeKeeper
+        switch keyPathEnumCharts {
+        
+        case UserDefaults.KeysCharts.chartWidthInHours, UserDefaults.KeysCharts.chartTimeAxisLabelFormat :
+            
+            if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnumCharts.rawValue, withMinimumDelayMilliSeconds: 200) {
+                return
+            }
+            
+        }
+        
+        switch keyPathEnumCharts {
+        
+        case UserDefaults.KeysCharts.chartWidthInHours:
+            
+            // redraw chart is necessary
+            if let glucoseChartManager = glucoseChartManager {
+                
+                glucoseChartManager.updateGlucoseChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, completionHandler: nil)
+
+            }
+            
+        default:
+            break
+            
+        }
+        
+    }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
-        guard let keyPath = keyPath else {return}
-        
-        guard let keyPathEnum = UserDefaults.Key(rawValue: keyPath) else {return}
+    /// used by observevalue for UserDefaults.Key
+    private func evaluateUserDefaultsChange(keyPathEnum: UserDefaults.Key) {
         
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
@@ -932,7 +961,7 @@ final class RootViewController: UIViewController {
             
             // no sensor needed in follower mode, stop it
             stopSensor()
-
+            
         case UserDefaults.Key.showReadingInNotification:
             if !UserDefaults.standard.showReadingInNotification {
                 // remove existing notification if any
@@ -962,19 +991,22 @@ final class RootViewController: UIViewController {
             break
             
         }
+    }
+    
+    // MARK:- observe function
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
-        guard let keyPathEnumCharts = UserDefaults.KeysCharts(rawValue: keyPath) else {return}
+        guard let keyPath = keyPath else {return}
         
-        switch keyPathEnumCharts {
-        
-            case UserDefaults.KeysCharts.chartWidthInHours:
-                
-                // redraw chart is necessary
-                updateChartWithResetEndDate()
-                
-            default:
-                break
-                
+        if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
+            
+            evaluateUserDefaultsChange(keyPathEnum: keyPathEnum)
+            
+        } else if let keyPathEnumCharts = UserDefaults.KeysCharts(rawValue: keyPath) {
+            
+            evaluateUserDefaultsChange(keyPathEnumCharts: keyPathEnumCharts)
+            
         }
         
     }
