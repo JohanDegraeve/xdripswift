@@ -285,7 +285,7 @@ final class RootViewController: UIViewController {
         spacerView.isHidden = UserDefaults.standard.showStatistics
         
         // update statistics related outlets
-        updateStatistics(animatePieChart: true)
+        updateStatistics(animatePieChart: true, overrideApplicationState: true)
         
 
         
@@ -326,7 +326,7 @@ final class RootViewController: UIViewController {
             self.updateLabelsAndChart(overrideApplicationState: true)
             
             // update statistics related outlets
-            self.updateStatistics(animatePieChart: true)
+            self.updateStatistics(animatePieChart: true, overrideApplicationState: true)
             
             // create badge counter
             self.createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
@@ -1660,10 +1660,10 @@ final class RootViewController: UIViewController {
     
     
     // helper function to calculate the statistics and update the pie chart and label outlets
-    private func updateStatistics(animatePieChart: Bool = false) {
+    private func updateStatistics(animatePieChart: Bool = false, overrideApplicationState: Bool = false) {
         
         // don't calculate statis if app is not running in the foreground
-        guard UIApplication.shared.applicationState == .active else {return}
+        guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
         
         // if the user doesn't want to see the statistics, then just return without doing anything
         if !UserDefaults.standard.showStatistics {
@@ -1675,6 +1675,7 @@ final class RootViewController: UIViewController {
         var daysToUseStatistics: Int = 0
         var fromDate: Date = Date()
         
+        debuglogging("in updateStatistics")
         
         // get the maximum number of calculation days requested by the user
         daysToUseStatistics = UserDefaults.standard.daysToUseStatistics
