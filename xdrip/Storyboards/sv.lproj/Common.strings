@@ -13,6 +13,8 @@
 "common_minutes" = "minuter";
 "common_minute" = "min";
 "common_day" = "dag";
+"common_days" = "dagar";
+"common_today" = "Idag";
 "common_week" = "vecka";
 "warning" ="Varning!";
 "update" = "Ändra";
@@ -34,3 +36,10 @@
 "unknown" = "Okänd";
 "sensorStatus" = "Sensorstatus:";
 "invalidAccountOrPassword" = "Ogitigt konto eller lösenord";
+"common_statistics_low" = "Lågt";
+"common_statistics_inRange" = "Normalvärde";
+"common_statistics_high" = "Högt";
+"common_statistics_average" = "Medel";
+"common_statistics_a1c" = "HbA1c";
+"common_statistics_cv" = "CV";
+

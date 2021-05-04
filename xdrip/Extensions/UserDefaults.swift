@@ -35,7 +35,7 @@ extension UserDefaults {
         /// minimum time between two notifications, set by user
         case notificationInterval = "notificationInterval"
         
-        // Home Screen and graph settings
+        // Home Screen and main chart settings
         
         /// show the objectives and make them display on the graph? Or just hide it all because it's too complicated to waste time with?
         case useObjectives = "useObjectives"
@@ -51,6 +51,17 @@ extension UserDefaults {
         case showTarget = "showTarget"
         /// target value
         case targetMarkValue = "targetMarkValue"
+        
+        // Statistics settings
+        
+        /// show the statistics? How many days should we use for the calculations?
+        case showStatistics = "showStatistics"
+        /// show the objective lines in color or grey?
+        case daysToUseStatistics = "daysToUseStatistics"
+        /// use IFCC way to show A1C?
+        case useIFCCA1C = "useIFCCA1C"
+        /// use the "standard" range of 70-180mg/dl to calculate the statistics?
+        case useStandardStatisticsRange = "useStandardStatisticsRange"
         
         // Transmitter
         
@@ -617,6 +628,52 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showTarget.rawValue)
+        }
+    }
+    
+    // MARK: Statistics Settings
+    
+    
+    /// should the statistics view be shown on the home screen?
+    @objc dynamic var showStatistics: Bool {
+        // default value for bool in userdefaults is false, by default we want the statistics view to show (true)
+        get {
+            return !bool(forKey: Key.showStatistics.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showStatistics.rawValue)
+        }
+    }
+
+    /// days to use for the statistics calculations
+    @objc dynamic var daysToUseStatistics: Int {
+        get {
+            return integer(forKey: Key.daysToUseStatistics.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.daysToUseStatistics.rawValue)
+        }
+    }
+    
+    /// should the statistics view be shown on the home screen?
+    @objc dynamic var useIFCCA1C: Bool {
+        // default value for bool in userdefaults is false, by default we want the HbA1c to be calculated in "not IFCC" way (false)
+        get {
+            return bool(forKey: Key.useIFCCA1C.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.useIFCCA1C.rawValue)
+        }
+    }
+    
+    /// should the statistics view be shown on the home screen?
+    @objc dynamic var useStandardStatisticsRange: Bool {
+        // default value for bool in userdefaults is false, by default we want the statistics view to calculate using the user low+high values (false)
+        get {
+            return bool(forKey: Key.useStandardStatisticsRange.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.useStandardStatisticsRange.rawValue)
         }
     }
     

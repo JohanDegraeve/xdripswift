@@ -65,6 +65,14 @@ class Texts_Common {
         return NSLocalizedString("common_day", tableName: filename, bundle: Bundle.main, value: "day", comment: "literal translation needed")
     }()
     
+    static let days = {
+        return NSLocalizedString("common_days", tableName: filename, bundle: Bundle.main, value: "days", comment: "literal translation needed")
+    }()
+    
+    static let today = {
+        return NSLocalizedString("common_today", tableName: filename, bundle: Bundle.main, value: "Today", comment: "the word today")
+    }()
+    
     static let week = {
         return NSLocalizedString("common_week", tableName: filename, bundle: Bundle.main, value: "week", comment: "literal translation needed")
     }()
@@ -153,4 +161,28 @@ class Texts_Common {
         return NSLocalizedString("invalidAccountOrPassword", tableName: filename, bundle: Bundle.main, value: "Invalid account or password", comment: "Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share")
     }()
     
+
+    static let lowStatistics = {
+        return NSLocalizedString("common_statistics_low", tableName: filename, bundle: Bundle.main, value: "Low", comment: "the word low")
+    }()
+    
+    static let inRangeStatistics = {
+        return NSLocalizedString("common_statistics_inRange", tableName: filename, bundle: Bundle.main, value: "In Range", comment: "the words in range")
+    }()
+    
+    static let highStatistics = {
+        return NSLocalizedString("common_statistics_high", tableName: filename, bundle: Bundle.main, value: "High", comment: "the word high")
+    }()
+    
+    static let averageStatistics = {
+        return NSLocalizedString("common_statistics_average", tableName: filename, bundle: Bundle.main, value: "Average", comment: "the word average")
+    }()
+    
+    static let a1cStatistics = {
+        return NSLocalizedString("common_statistics_a1c", tableName: filename, bundle: Bundle.main, value: "HbA1c", comment: "phrase HbA1c")
+    }()
+    
+    static let cvStatistics = {
+        return NSLocalizedString("common_statistics_cv", tableName: filename, bundle: Bundle.main, value: "CV", comment: "coefficient of variation")
+    }()
 }

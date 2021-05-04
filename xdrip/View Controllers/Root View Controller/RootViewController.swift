@@ -6,6 +6,7 @@ import UserNotifications
 import SwiftCharts
 import HealthKitUI
 import AVFoundation
+import PieCharts
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController {
@@ -54,6 +55,27 @@ final class RootViewController: UIViewController {
     
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
+    
+    /// outlets for statistics view
+    @IBOutlet weak var statisticsView: UIView!
+    @IBOutlet weak var spacerView: UIView!
+    @IBOutlet weak var pieChartOutlet: PieChart!
+    @IBOutlet weak var lowStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var inRangeStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var highStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var averageStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var a1CStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var cVStatisticLabelOutlet: UILabel!
+    @IBOutlet weak var lowTitleLabelOutlet: UILabel!
+    @IBOutlet weak var inRangeTitleLabelOutlet: UILabel!
+    @IBOutlet weak var highTitleLabelOutlet: UILabel!
+    @IBOutlet weak var averageTitleLabelOutlet: UILabel!
+    @IBOutlet weak var a1cTitleLabelOutlet: UILabel!
+    @IBOutlet weak var cvTitleLabelOutlet: UILabel!
+    @IBOutlet weak var lowLabelOutlet: UILabel!
+    @IBOutlet weak var highLabelOutlet: UILabel!
+    @IBOutlet weak var pieChartLabelOutlet: UILabel!
+    @IBOutlet weak var timePeriodLabelOutlet: UILabel!
     
     /// user long pressed the value label
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
@@ -208,6 +230,9 @@ final class RootViewController: UIViewController {
     /// - will be reinitialized each time the app comes to the foreground
     private var glucoseChartManager: GlucoseChartManager?
     
+    /// statisticsManager instance
+    private var statisticsManager: StatisticsManager?
+    
     /// dateformatter for minutesLabelOutlet, when user is panning the chart
     private let dateTimeFormatterForMinutesLabelWhenPanning: DateFormatter = {
         let dateFormatter = DateFormatter()
@@ -255,6 +280,15 @@ final class RootViewController: UIViewController {
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
         
+        // show the statistics view as required. If not, hide it and show the small spacer view to maintain the chart seperated from the tab bar
+        statisticsView.isHidden = !UserDefaults.standard.showStatistics
+        spacerView.isHidden = UserDefaults.standard.showStatistics
+        
+        // update statistics related outlets
+        updateStatistics(animatePieChart: true, overrideApplicationState: true)
+        
+
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -290,6 +324,9 @@ final class RootViewController: UIViewController {
             
             // update label texts, minutes ago, diff and value
             self.updateLabelsAndChart(overrideApplicationState: true)
+            
+            // update statistics related outlets
+            self.updateStatistics(animatePieChart: true, overrideApplicationState: true)
             
             // create badge counter
             self.createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
@@ -386,6 +423,9 @@ final class RootViewController: UIViewController {
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             
             self.updateLabelsAndChart(overrideApplicationState: true)
+            
+            // update statistics related outlets
+            self.updateStatistics(animatePieChart: false)
             
         })
         
@@ -559,6 +599,9 @@ final class RootViewController: UIViewController {
         // initialize glucoseChartManager
         glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
         
+        // initialize statisticsManager
+        statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
+        
         // initialize chartGenerator in chartOutlet
         self.chartOutlet.chartGenerator = { [weak self] (frame) in
             return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
@@ -694,6 +737,8 @@ final class RootViewController: UIViewController {
                     
                     coreDataManager.mainManagedObjectContext.delete(reading)
                     
+                    coreDataManager.saveChanges()
+                    
                 }
                 
                 // as we're deleting readings, glucoseChartPoints need to be updated, otherwise we keep seeing old values
@@ -778,6 +823,10 @@ final class RootViewController: UIViewController {
                     
                     // update all text in  first screen
                     updateLabelsAndChart(overrideApplicationState: false)
+                    
+                    // update statistics related outlets
+                    updateStatistics(animatePieChart: false)
+                    
                 }
                 
                 nightScoutUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
@@ -1335,12 +1384,18 @@ final class RootViewController: UIViewController {
         // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's not going to be a latestReading
         let latestReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
         
-        // if there's no readings, then give empty fields
+        // if there's no readings, then give empty fields and make sure the text isn't styled with strikethrough
         guard latestReadings.count > 0 else {
-            valueLabelOutlet.text = "---"
+            
             valueLabelOutlet.textColor = UIColor.darkGray
             minutesLabelOutlet.text = ""
             diffLabelOutlet.text = ""
+                
+            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: "---")
+            attributeString.addAttribute(.strikethroughStyle, value: 0, range: NSMakeRange(0, attributeString.length))
+            
+            valueLabelOutlet.attributedText = attributeString
+            
             return
         }
         
@@ -1616,7 +1671,136 @@ final class RootViewController: UIViewController {
         
     }
     
+    
+    // helper function to calculate the statistics and update the pie chart and label outlets
+    private func updateStatistics(animatePieChart: Bool = false, overrideApplicationState: Bool = false) {
+        
+        // don't calculate statis if app is not running in the foreground
+        guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
+        
+        // if the user doesn't want to see the statistics, then just return without doing anything
+        if !UserDefaults.standard.showStatistics {
+            return
+        }
+        
+        // declare constants/variables
+        let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        var daysToUseStatistics: Int = 0
+        var fromDate: Date = Date()
+        
+        // get the maximum number of calculation days requested by the user
+        daysToUseStatistics = UserDefaults.standard.daysToUseStatistics
+        
+        // if the user has selected 0 (to chose "today") then set the fromDate to the previous midnight
+        if daysToUseStatistics == 0 {
+            fromDate = Calendar(identifier: .gregorian).startOfDay(for: Date())
+        } else {
+            fromDate = Date(timeIntervalSinceNow: -3600.0 * 24.0 * Double(daysToUseStatistics))
+        }
+        
+        // statisticsManager will calculate the statistics in background thread and call the callback function in the main thread
+        statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil, callback: { statistics in
+            
+            // set the title labels to their correct localization
+            self.lowTitleLabelOutlet.text = Texts_Common.lowStatistics
+            self.inRangeTitleLabelOutlet.text = Texts_Common.inRangeStatistics
+            self.highTitleLabelOutlet.text = Texts_Common.highStatistics
+            self.averageTitleLabelOutlet.text = Texts_Common.averageStatistics
+            self.a1cTitleLabelOutlet.text = Texts_Common.a1cStatistics
+            self.cvTitleLabelOutlet.text = Texts_Common.cvStatistics
+            
+            
+            // set the low/high "label" labels with the low/high user values that the user has chosen to use
+            self.lowLabelOutlet.text = "(<" + (isMgDl ? Int(statistics.lowLimitForTIR).description : statistics.lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+            self.highLabelOutlet.text = "(>" + (isMgDl ? Int(statistics.highLimitForTIR).description : statistics.highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+            
+            
+            // set all label outlets with the correctly formatted calculated values
+            self.lowStatisticLabelOutlet.text = Int(statistics.lowStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+            
+            self.inRangeStatisticLabelOutlet.text = Int(statistics.inRangeStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+            
+            self.highStatisticLabelOutlet.text = Int(statistics.highStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+            
+            self.averageStatisticLabelOutlet.text = (isMgDl ? Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics.averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
+            
+            if UserDefaults.standard.useIFCCA1C {
+                self.a1CStatisticLabelOutlet.text = Int(statistics.a1CStatisticValue.round(toDecimalPlaces: 0)).description + " mmol"
+            } else {
+                self.a1CStatisticLabelOutlet.text = statistics.a1CStatisticValue.round(toDecimalPlaces: 1).description + "%"
+            }
+            
+            self.cVStatisticLabelOutlet.text = Int(statistics.cVStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+            
+            // show number of days calculated under the pie chart
+            switch daysToUseStatistics {
+            case 0:
+                self.timePeriodLabelOutlet.text = Texts_Common.today
+                
+            case 1:
+                self.timePeriodLabelOutlet.text = "24 " + Texts_Common.hours
+                
+            default:
+                self.timePeriodLabelOutlet.text = statistics.numberOfDaysUsed.description + " " + Texts_Common.days
+            }
+            
+            // let's remove the old pie chart
+            self.pieChartOutlet.clear()
+            
+            // disable the chart animation if it's just a normal update, enable it if the call comes from didAppear()
+            if animatePieChart {
+                self.pieChartOutlet.animDuration = ConstantsStatistics.pieChartAnimationSpeed
+            } else {
+                self.pieChartOutlet.animDuration = 0
+            }
+            
+            // we want to calculate how many hours have passed since midnight so that we can decide if we should show the easter egg. The user will almost always be in range at 01hrs in the morning so we don't want to show it until mid-morning or midday so that there is some sense of achievement
+            let currentHoursSinceMidnight = Calendar.current.dateComponents([.hour], from: Calendar(identifier: .gregorian).startOfDay(for: Date()), to: Date()).hour!
+            
+            // if the user is 100% in range, show the easter egg and make them smile
+            if statistics.inRangeStatisticValue < 100 {
+                
+                // set the reference angle of the pie chart to ensure that the in range slice is centered
+                self.pieChartOutlet.referenceAngle = 90.0 - (1.8 * CGFloat(statistics.inRangeStatisticValue))
+                
+                self.pieChartOutlet.innerRadius = 0
+                self.pieChartOutlet.models = [
+                    PieSliceModel(value: Double(statistics.inRangeStatisticValue), color: ConstantsStatistics.pieChartInRangeSliceColor),
+                    PieSliceModel(value: Double(statistics.lowStatisticValue), color: ConstantsStatistics.pieChartLowSliceColor),
+                    PieSliceModel(value: Double(statistics.highStatisticValue), color: ConstantsStatistics.pieChartHighSliceColor)
+                ]
+                
+                self.pieChartLabelOutlet.text = ""
+                
+            } else if ConstantsStatistics.showInRangeEasterEgg && (Double(currentHoursSinceMidnight) >= ConstantsStatistics.minimumHoursInDayBeforeShowingEasterEgg) {
+                
+                // open up the inside of the chart so that we can fit the smiley face in
+                self.pieChartOutlet.innerRadius = 16
+                self.pieChartOutlet.models = [
+                    PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
+                ]
+                
+                self.pieChartLabelOutlet.font = UIFont.boldSystemFont(ofSize: 26)
+                self.pieChartLabelOutlet.text = "😎"
+                
+            } else {
+                
+                // the easter egg isn't wanted so just show a green circle at 100%
+                self.pieChartOutlet.models = [
+                    PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
+                ]
+                
+                self.pieChartLabelOutlet.text = ""
+                
+            }
+            
+        })
+
+        
+    }
+
 }
+
 
 // MARK: - conform to CGMTransmitter protocol
 
@@ -1819,6 +2003,9 @@ extension RootViewController:NightScoutFollowerDelegate {
                 
                 // update all text in  first screen
                 updateLabelsAndChart(overrideApplicationState: false)
+                
+                // update statistics related outlets
+                updateStatistics(animatePieChart: false)
                 
                 // check alerts, create notification, set app badge
                 checkAlertsCreateNotificationAndSetAppBadge()

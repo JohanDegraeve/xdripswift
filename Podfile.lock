@@ -1,16 +1,19 @@
 PODS:
   - ActionClosurable (2.0.0)
   - CryptoSwift (1.3.8)
+  - PieCharts (0.0.7)
   - SwiftCharts (0.6.5)
 
 DEPENDENCIES:
   - ActionClosurable (from `https://github.com/takasek/ActionClosurable.git`)
   - CryptoSwift (~> 1.0)
+  - PieCharts
   - SwiftCharts (~> 0.6.5)
 
 SPEC REPOS:
   trunk:
     - CryptoSwift
+    - PieCharts
     - SwiftCharts
 
 EXTERNAL SOURCES:
@@ -25,8 +28,9 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   ActionClosurable: 92729a0f0bb4b38d2744319ea8282a3ce8fb1e0a
   CryptoSwift: 01b0f0cba1d5c212e5a335ff6c054fb75a204f00
+  PieCharts: 30e50dfa7dc19e5b84e9878d32089673ef5d0453
   SwiftCharts: 2e755ea292f0b87d3e4b2c1eb5afc080a20cdc15
 
-PODFILE CHECKSUM: 53c167b7f8be72aa4e6d555f141e0b6d33700680
+PODFILE CHECKSUM: d199a5e42b5bd5339d95109143a11c57ebc2101e
 
-COCOAPODS: 1.10.0.rc.1
+COCOAPODS: 1.10.1

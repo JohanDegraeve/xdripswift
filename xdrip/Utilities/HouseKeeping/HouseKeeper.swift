@@ -84,6 +84,8 @@ class HouseKeeper {
             
             bgReadingsAccessor.delete(bgReading: oldReading, on: managedObjectContext)
             
+            coreDataManager.saveChanges()
+            
         }
         
     }
@@ -110,6 +112,8 @@ class HouseKeeper {
             } else {
 
                 calibrationsAccessor.delete(calibration: oldCalibration, on: managedObjectContext)
+                
+                coreDataManager.saveChanges()
 
             }
             

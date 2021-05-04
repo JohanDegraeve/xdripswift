@@ -15,6 +15,12 @@
 "settingsviews_useobjectives" = "Mostra Objectivos no Gráfico?";
 "settingsviews_showcoloredobjectives" = "Mostrar Linhas Coloridas?";
 "settingsviews_showtarget" = "Mostrar Linha Alvo?";
+"settingsviews_sectiontitlestatistics" = "Estatísticas";
+"settingsviews_showStatistics" = "Mostrar Estatísticas?";
+"settingsviews_daysToUseStatisticsTitle" = "Dias para Calcular?";
+"settingsviews_daysToUseStatisticsMessage" = "Máximo de dias que devemos tentar usar para calcular as estatísticas?\n\n(Introduza 0 para calcular desde a meia-noite de hoje)";
+"settingsviews_useStandardStatisticsRange" = "Usar Intervalo Padrão?";
+"settingsviews_useIFCCA1C" = "Mostar A1C em mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmissor";
 "settingsviews_transmittertype" = "Tipo de Transmissor:";
 "settingsviews_transmitterid" = "ID de Transmissor:";

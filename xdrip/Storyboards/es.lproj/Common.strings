@@ -13,6 +13,8 @@
 "common_minutes" = "mins";
 "common_minute" = "min";
 "common_day" = "día";
+"common_days" = "días";
+"common_today" = "Hoy";
 "common_week" = "semana";
 "warning" ="Aviso!";
 "update" = "Editar";
@@ -34,3 +36,9 @@
 "yellow" = "amarillo";
 "off" = "Off";
 "invalidAccountOrPassword" = "Cuenta y/o contraseña incorrecta";
+"common_statistics_low" = "Baja";
+"common_statistics_inRange" = "En Rango";
+"common_statistics_high" = "Alta";
+"common_statistics_average" = "Promedio";
+"common_statistics_a1c" = "HbA1c";
+"common_statistics_cv" = "CV";
