@@ -37,6 +37,6 @@ enum ConstantsStatistics {
     // should we show the easter egg when the user is 100% in range?
     static let showInRangeEasterEgg: Bool = true
     // and if we want to show it, how many hours after midnight should we wait before showing it?
-    static let minimumHoursInDayBeforeShowingEasterEgg = 12.0 // midday
+    static let minimumHoursInDayBeforeShowingEasterEgg = 16.0 // 16:00hrs in the afternoon
 }
 

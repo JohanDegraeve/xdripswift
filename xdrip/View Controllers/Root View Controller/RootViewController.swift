@@ -1845,7 +1845,12 @@ final class RootViewController: UIViewController {
                 
                 self.pieChartLabelOutlet.text = ""
                 
-            } else if ConstantsStatistics.showInRangeEasterEgg && (Double(currentHoursSinceMidnight) >= ConstantsStatistics.minimumHoursInDayBeforeShowingEasterEgg) {
+            } else if ConstantsStatistics.showInRangeEasterEgg && ((Double(currentHoursSinceMidnight) >= ConstantsStatistics.minimumHoursInDayBeforeShowingEasterEgg) || (UserDefaults.standard.daysToUseStatistics > 0)) {
+                
+                // if we want to show easter eggs check if one of the following two conditions is true:
+                //      - at least 16 hours (for example) have passed since midnight if the user is showing only Today and is still 100% in range
+                //      - if the user is showing >= 1 full days and they are still 100% in range
+                // the idea is to avoid that the easter egg appears after just a few minutes of being in range (at 00:15hrs for example) as this has no merit.
                 
                 // open up the inside of the chart so that we can fit the smiley face in
                 self.pieChartOutlet.innerRadius = 16
@@ -1859,6 +1864,7 @@ final class RootViewController: UIViewController {
             } else {
                 
                 // the easter egg isn't wanted so just show a green circle at 100%
+                self.pieChartOutlet.innerRadius = 0
                 self.pieChartOutlet.models = [
                     PieSliceModel(value: 1, color: ConstantsStatistics.pieChartInRangeSliceColor)
                 ]
