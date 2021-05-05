@@ -132,18 +132,11 @@
                                             <constraint firstItem="Nhe-d1-2e7" firstAttribute="centerY" secondItem="x9u-yg-PXE" secondAttribute="centerY" id="vZU-6X-8GM"/>
                                         </constraints>
                                     </view>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jwh-ZZ-8vp">
-                                        <rect key="frame" x="0.0" y="627" width="390" height="10"/>
-                                        <color key="backgroundColor" white="0.050000000000000003" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="10" id="cW7-Q7-SmH"/>
-                                        </constraints>
-                                    </view>
                                     <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MtJ-rx-OB9" userLabel="Statistics View">
-                                        <rect key="frame" x="0.0" y="637" width="390" height="80"/>
+                                        <rect key="frame" x="0.0" y="627" width="390" height="90"/>
                                         <subviews>
                                             <stackView opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="ZF3-Ii-L0R">
-                                                <rect key="frame" x="8" y="4" width="374" height="72"/>
+                                                <rect key="frame" x="8" y="9" width="374" height="72"/>
                                                 <subviews>
                                                     <stackView opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="SZT-uZ-ehB">
                                                         <rect key="frame" x="0.0" y="0.0" width="93.666666666666671" height="72"/>
@@ -355,16 +348,13 @@
                                         <constraints>
                                             <constraint firstItem="ZF3-Ii-L0R" firstAttribute="centerY" secondItem="MtJ-rx-OB9" secondAttribute="centerY" id="ThK-6J-pNb"/>
                                             <constraint firstItem="ZF3-Ii-L0R" firstAttribute="leading" secondItem="MtJ-rx-OB9" secondAttribute="leadingMargin" id="pfd-vL-nLE"/>
-                                            <constraint firstAttribute="height" constant="80" id="tou-bG-mYJ"/>
+                                            <constraint firstAttribute="height" constant="90" id="tou-bG-mYJ"/>
                                             <constraint firstAttribute="trailingMargin" secondItem="ZF3-Ii-L0R" secondAttribute="trailing" id="x6Q-4Q-45y"/>
                                         </constraints>
                                     </view>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="jwh-ZZ-8vp" secondAttribute="trailing" id="6LY-Vg-rsM"/>
                                     <constraint firstItem="x9u-yg-PXE" firstAttribute="top" secondItem="C16-NQ-F1Y" secondAttribute="bottom" id="WZ6-cn-zwk"/>
-                                    <constraint firstItem="jwh-ZZ-8vp" firstAttribute="leading" secondItem="TCd-nD-ZjE" secondAttribute="leading" id="b5q-JM-Pd8"/>
-                                    <constraint firstItem="MtJ-rx-OB9" firstAttribute="top" secondItem="jwh-ZZ-8vp" secondAttribute="bottom" id="cBu-tK-9LF"/>
                                 </constraints>
                             </stackView>
                         </subviews>
@@ -403,7 +393,6 @@
                         <outlet property="preSnoozeButtonOutlet" destination="fSY-nc-amN" id="T25-Z1-3Ad"/>
                         <outlet property="segmentedControlChartHours" destination="9LS-Vp-uGd" id="ymu-eS-Vpb"/>
                         <outlet property="sensorButtonOutlet" destination="zWo-AR-qJE" id="uuB-WI-JKe"/>
-                        <outlet property="spacerView" destination="jwh-ZZ-8vp" id="Bcu-Wd-0ZR"/>
                         <outlet property="statisticsView" destination="MtJ-rx-OB9" id="u5w-qN-5Tq"/>
                         <outlet property="timePeriodLabelOutlet" destination="On3-dy-RgB" id="hAe-Kx-vnM"/>
                         <outlet property="valueLabelOutlet" destination="We3-bN-ffR" id="wtY-sZ-mev"/>

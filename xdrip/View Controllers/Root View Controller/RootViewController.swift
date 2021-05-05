@@ -82,7 +82,6 @@ final class RootViewController: UIViewController {
     
     /// outlets for statistics view
     @IBOutlet weak var statisticsView: UIView!
-    @IBOutlet weak var spacerView: UIView!
     @IBOutlet weak var pieChartOutlet: PieChart!
     @IBOutlet weak var lowStatisticLabelOutlet: UILabel!
     @IBOutlet weak var inRangeStatisticLabelOutlet: UILabel!
@@ -306,9 +305,8 @@ final class RootViewController: UIViewController {
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
         
-        // show the statistics view as required. If not, hide it and show the small spacer view to maintain the chart seperated from the tab bar
+        // show the statistics view as required. If not, hide it
         statisticsView.isHidden = !UserDefaults.standard.showStatistics
-        spacerView.isHidden = UserDefaults.standard.showStatistics
         
         // update statistics related outlets
         updateStatistics(animatePieChart: true, overrideApplicationState: true)
