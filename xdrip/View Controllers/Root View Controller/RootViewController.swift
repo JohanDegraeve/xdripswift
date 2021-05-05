@@ -65,13 +65,15 @@ final class RootViewController: UIViewController {
         switch segmentedControlChartHours.selectedSegmentIndex
             {
             case 0:
-                UserDefaults.standard.chartWidthInHours = 3.0
+                UserDefaults.standard.chartWidthInHours = 2
             case 1:
-                UserDefaults.standard.chartWidthInHours = 6.0
+                UserDefaults.standard.chartWidthInHours = 4
             case 2:
-                UserDefaults.standard.chartWidthInHours = 12.0
+                UserDefaults.standard.chartWidthInHours = 6
             case 3:
-                UserDefaults.standard.chartWidthInHours = 24.0
+                UserDefaults.standard.chartWidthInHours = 12
+            case 4:
+                UserDefaults.standard.chartWidthInHours = 24
             default:
                 break
             }
@@ -333,21 +335,40 @@ final class RootViewController: UIViewController {
         UserDefaults.standard.highMarkValueInUserChosenUnit = UserDefaults.standard.highMarkValueInUserChosenUnit
         UserDefaults.standard.bloodGlucoseUnitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
+        
         // update the segmented control of the chart hours
         switch UserDefaults.standard.chartWidthInHours
             {
-            case 3.0:
+            case 2:
                 segmentedControlChartHours.selectedSegmentIndex = 0
-            case 6.0:
+            case 4:
                 segmentedControlChartHours.selectedSegmentIndex = 1
-            case 12.0:
+            case 6:
                 segmentedControlChartHours.selectedSegmentIndex = 2
-            case 24.0:
+            case 12:
                 segmentedControlChartHours.selectedSegmentIndex = 3
+            case 24:
+                segmentedControlChartHours.selectedSegmentIndex = 4
             default:
                 break
             }
         
+        // format the segmented control of the chart hours if possible (should normally be ok)
+        if #available(iOS 13.0, *) {
+            
+            // set the basic formatting. We basically want it to dissapear into the background
+            segmentedControlChartHours.backgroundColor = UIColor.black
+            segmentedControlChartHours.tintColor = UIColor.black
+            segmentedControlChartHours.layer.borderWidth = 0
+
+            // format the unselected segments
+            segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.gray], for:.normal)
+            
+            // format the selected segment
+            segmentedControlChartHours.selectedSegmentTintColor = UIColor.lightGray
+            segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.black], for:.selected)
+        
+        }
         
         // enable or disable the buttons 'sensor' and 'calibrate' on top, depending on master or follower
         changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
