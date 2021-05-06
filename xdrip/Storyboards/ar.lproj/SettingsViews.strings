@@ -79,68 +79,56 @@
 "debugLevel" = "تضمين مستوى التصحيح";
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
 /// home screen settings, urgent high value
-"settingsviews_urgentHighValue" = "Urgent High Value:";
+"settingsviews_urgentHighValue" = "قيمة الحد الأعلى الخطر:";
 
 /// 
-"settingsviews_urgentLowValue" = "Urgent Low Value:";
+"settingsviews_urgentLowValue" = "قيمة الحد الأدنى الخطر:";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
-"settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration?";
+"settingsviews_nonfixedtransmitter" = "تفعيل المعايرة متعددة النقاط ?";
 
-/// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Show Objectives in Graph?";
+/// home screen settings, use objectives in gإظهار الأهداف في الرسم البيانيraph
+"settingsviews_useobjectives" = "إظهار الأهداف في الرسم البياني?";
 
 /// non fixed settings, title of the section
-"settingsviews_labelNonFixed" = "Multi-point Calibration";
+"settingsviews_labelNonFixed" = "المعايرة متعددة النقاط";
 
 /// 
-"settingsviews_showcoloredobjectives" = "Show Colored Lines?";
+"settingsviews_showcoloredobjectives" = "عرض خطوط ملونة?";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port (optional):";
+"nightScoutPort" = "المنفذ (اختياري):";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
-"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
+"warningChangeFromMasterToFollower" = "سيؤدي التبديل من رئيسي إلى متابعة، إلى إيقاف الحساس الحالي. هل تريد الاستمرار ?";
 
 /// home screen settings, show target line
-"settingsviews_showtarget" = "Show Target Line?";
+"settingsviews_showtarget" = "عرض خط الهدف?";
 
 /// about settings, section title
-"settingsviews_sectiontitleAbout" = "About %@";
+"settingsviews_sectiontitleAbout" = "عن %@";
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Libre Algorithm?";
+"settingsviews_webooptransmitter" = "استخدم خوارزمية ليبري?";
 
 /// 
-"settingsviews_labelWebOOP" = "xDrip or Libre Algorithm";
+"settingsviews_labelWebOOP" = "خوارزمية xDrip أو Libre";
 
 /// home screen settings, target value
-"settingsviews_targetValue" = "Target Value:";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"settingsviews_targetValue" = "قيمة الهدف:";
 
 /// deloper settings, row title for 'Smooth Libre Values?'
-"smoothLibreValues" = "Smooth Libre Values?";
+"smoothLibreValues" = "تناسق قيم اليبري ?";
 
 /// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
-"oslog" = "OSLog";
+"oslog" = "OSتقرير";
 
 /// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
-"nslog" = "NSLog";
+"nslog" = "NSتقرير";
 
 /// Developer Settings, section title
-"developerSettings" = "Developer Settings";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"developerSettings" = "إعدادات المطور";
 
 /// home screen settings, section title
-"settingsviews_sectiontitlehomescreen" = "Home Screen";
+"settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";
