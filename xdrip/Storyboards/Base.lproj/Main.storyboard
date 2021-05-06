@@ -101,32 +101,61 @@
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="x9u-yg-PXE">
                                         <rect key="frame" x="0.0" y="593" width="390" height="34"/>
                                         <subviews>
-                                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" translatesAutoresizingMaskIntoConstraints="NO" id="Nhe-d1-2e7">
-                                                <rect key="frame" x="189" y="6" width="191" height="22"/>
+                                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="Nhe-d1-2e7">
+                                                <rect key="frame" x="10" y="6" width="370" height="22"/>
                                                 <subviews>
-                                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" apportionsSegmentWidthsByContent="YES" segmentControlStyle="plain" translatesAutoresizingMaskIntoConstraints="NO" id="9LS-Vp-uGd">
-                                                        <rect key="frame" x="0.0" y="0.0" width="191" height="23"/>
-                                                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qG7-Ub-mzA">
+                                                        <rect key="frame" x="0.0" y="0.0" width="194" height="22"/>
+                                                        <subviews>
+                                                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" apportionsSegmentWidthsByContent="YES" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Xuy-hn-ozf">
+                                                                <rect key="frame" x="0.0" y="0.0" width="194" height="23"/>
+                                                                <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <segments>
+                                                                    <segment title="Today"/>
+                                                                    <segment title="1d"/>
+                                                                    <segment title="7d"/>
+                                                                    <segment title="30d"/>
+                                                                    <segment title="90d"/>
+                                                                </segments>
+                                                                <color key="selectedSegmentTintColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <connections>
+                                                                    <action selector="statisticsDaysChanged:" destination="9pv-A4-QxB" eventType="valueChanged" id="Bjo-mU-B96"/>
+                                                                </connections>
+                                                            </segmentedControl>
+                                                        </subviews>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="22" id="B42-pC-AfL"/>
+                                                            <constraint firstAttribute="trailing" secondItem="Xuy-hn-ozf" secondAttribute="trailing" id="QWd-g8-loY"/>
+                                                            <constraint firstItem="Xuy-hn-ozf" firstAttribute="leading" secondItem="qG7-Ub-mzA" secondAttribute="leading" id="iqj-Qp-UZ4"/>
+                                                            <constraint firstItem="Xuy-hn-ozf" firstAttribute="top" secondItem="qG7-Ub-mzA" secondAttribute="top" id="jtW-gF-x0v"/>
+                                                            <constraint firstAttribute="bottom" secondItem="Xuy-hn-ozf" secondAttribute="bottom" id="l9p-sL-yv3"/>
                                                         </constraints>
+                                                    </view>
+                                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" apportionsSegmentWidthsByContent="YES" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="9LS-Vp-uGd">
+                                                        <rect key="frame" x="214" y="0.0" width="156" height="23"/>
+                                                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <segments>
-                                                            <segment title="2h"/>
-                                                            <segment title="4h"/>
+                                                            <segment title="3h"/>
                                                             <segment title="6h"/>
                                                             <segment title="12h"/>
                                                             <segment title="24h"/>
                                                         </segments>
                                                         <color key="selectedSegmentTintColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <connections>
-                                                            <action selector="indexChanged:" destination="9pv-A4-QxB" eventType="valueChanged" id="wIA-Nf-ke2"/>
+                                                            <action selector="chartHoursChanged:" destination="9pv-A4-QxB" eventType="valueChanged" id="u3m-7t-iOS"/>
                                                         </connections>
                                                     </segmentedControl>
                                                 </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="qG7-Ub-mzA" firstAttribute="top" secondItem="Nhe-d1-2e7" secondAttribute="top" id="MjJ-nf-Zvr"/>
+                                                    <constraint firstAttribute="height" constant="22" id="QmU-pO-lNN"/>
+                                                    <constraint firstItem="qG7-Ub-mzA" firstAttribute="leading" secondItem="Nhe-d1-2e7" secondAttribute="leading" id="aMu-dw-PHP"/>
+                                                    <constraint firstAttribute="bottom" secondItem="qG7-Ub-mzA" secondAttribute="bottom" id="kLZ-yE-xmp"/>
+                                                </constraints>
                                             </stackView>
                                         </subviews>
-                                        <color key="backgroundColor" white="0.050000000000000003" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
+                                            <constraint firstItem="Nhe-d1-2e7" firstAttribute="leading" secondItem="x9u-yg-PXE" secondAttribute="leading" constant="10" id="JQW-9I-ceH"/>
                                             <constraint firstAttribute="trailing" secondItem="Nhe-d1-2e7" secondAttribute="trailing" constant="10" id="R8E-s8-2gf"/>
                                             <constraint firstAttribute="height" constant="34" id="t1J-yU-usJ"/>
                                             <constraint firstItem="Nhe-d1-2e7" firstAttribute="centerY" secondItem="x9u-yg-PXE" secondAttribute="centerY" id="vZU-6X-8GM"/>
@@ -344,7 +373,7 @@
                                                 </subviews>
                                             </stackView>
                                         </subviews>
-                                        <color key="backgroundColor" white="0.050000000000000003" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstItem="ZF3-Ii-L0R" firstAttribute="centerY" secondItem="MtJ-rx-OB9" secondAttribute="centerY" id="ThK-6J-pNb"/>
                                             <constraint firstItem="ZF3-Ii-L0R" firstAttribute="leading" secondItem="MtJ-rx-OB9" secondAttribute="leadingMargin" id="pfd-vL-nLE"/>
@@ -392,6 +421,8 @@
                         <outlet property="pieChartOutlet" destination="vm5-IB-4CY" id="t8a-2d-t5l"/>
                         <outlet property="preSnoozeButtonOutlet" destination="fSY-nc-amN" id="T25-Z1-3Ad"/>
                         <outlet property="segmentedControlChartHours" destination="9LS-Vp-uGd" id="ymu-eS-Vpb"/>
+                        <outlet property="segmentedControlStatisticsDays" destination="Xuy-hn-ozf" id="vOk-4p-M8g"/>
+                        <outlet property="segmentedControlStatisticsDaysView" destination="qG7-Ub-mzA" id="shD-NU-LBm"/>
                         <outlet property="sensorButtonOutlet" destination="zWo-AR-qJE" id="uuB-WI-JKe"/>
                         <outlet property="statisticsView" destination="MtJ-rx-OB9" id="u5w-qN-5Tq"/>
                         <outlet property="timePeriodLabelOutlet" destination="On3-dy-RgB" id="hAe-Kx-vnM"/>
