@@ -21,7 +21,7 @@
                                 <rect key="frame" x="0.0" y="44" width="390" height="717"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="C16-NQ-F1Y">
-                                        <rect key="frame" x="0.0" y="0.0" width="390" height="593"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="390" height="585"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mSJ-jy-nHJ">
                                                 <rect key="frame" x="230" y="0.0" width="82" height="38"/>
@@ -63,7 +63,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0nE-AX-r0w" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
-                                                <rect key="frame" x="10" y="185.66666666666666" width="380" height="407.33333333333337"/>
+                                                <rect key="frame" x="10" y="185.66666666666666" width="380" height="399.33333333333337"/>
                                                 <gestureRecognizers/>
                                                 <connections>
                                                     <outletCollection property="gestureRecognizers" destination="Fi5-iu-Usk" appends="YES" id="Rkv-hK-sLH"/>
@@ -90,29 +90,29 @@
                                             <constraint firstItem="0nE-AX-r0w" firstAttribute="top" secondItem="We3-bN-ffR" secondAttribute="bottom" id="emW-PI-WrN"/>
                                             <constraint firstItem="fSY-nc-amN" firstAttribute="leading" secondItem="C16-NQ-F1Y" secondAttribute="leading" constant="10" id="fHd-mZ-AJJ"/>
                                             <constraint firstItem="mSJ-jy-nHJ" firstAttribute="centerY" secondItem="zWo-AR-qJE" secondAttribute="centerY" id="hPs-MO-gHa"/>
-                                            <constraint firstAttribute="bottom" secondItem="0nE-AX-r0w" secondAttribute="bottom" id="jUy-gT-ppE"/>
                                             <constraint firstItem="uyn-2k-K74" firstAttribute="leading" secondItem="C16-NQ-F1Y" secondAttribute="leading" constant="10" id="mYE-7c-E2l"/>
                                             <constraint firstItem="fSY-nc-amN" firstAttribute="centerY" secondItem="zWo-AR-qJE" secondAttribute="centerY" id="pSL-SK-9aa"/>
                                             <constraint firstItem="fSY-nc-amN" firstAttribute="top" secondItem="C16-NQ-F1Y" secondAttribute="top" id="sLJ-ZS-7xf"/>
                                             <constraint firstItem="We3-bN-ffR" firstAttribute="top" secondItem="mSJ-jy-nHJ" secondAttribute="bottom" constant="40" id="uCk-q2-8I3"/>
                                             <constraint firstItem="We3-bN-ffR" firstAttribute="centerX" secondItem="C16-NQ-F1Y" secondAttribute="centerX" id="vhA-TS-y2Z"/>
+                                            <constraint firstAttribute="bottom" secondItem="0nE-AX-r0w" secondAttribute="bottom" id="w6l-ym-Sl2"/>
                                         </constraints>
                                     </view>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="x9u-yg-PXE">
-                                        <rect key="frame" x="0.0" y="593" width="390" height="34"/>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="x9u-yg-PXE" userLabel="segmentControlsView">
+                                        <rect key="frame" x="0.0" y="585" width="390" height="34"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="Nhe-d1-2e7">
-                                                <rect key="frame" x="10" y="6" width="370" height="22"/>
+                                                <rect key="frame" x="10" y="4.6666666666666288" width="370" height="25"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qG7-Ub-mzA">
-                                                        <rect key="frame" x="0.0" y="0.0" width="194" height="22"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="194" height="25"/>
                                                         <subviews>
                                                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" apportionsSegmentWidthsByContent="YES" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Xuy-hn-ozf">
-                                                                <rect key="frame" x="0.0" y="0.0" width="194" height="23"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="194" height="26"/>
                                                                 <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <segments>
                                                                     <segment title="Today"/>
-                                                                    <segment title="1d"/>
+                                                                    <segment title="24h"/>
                                                                     <segment title="7d"/>
                                                                     <segment title="30d"/>
                                                                     <segment title="90d"/>
@@ -131,7 +131,7 @@
                                                         </constraints>
                                                     </view>
                                                     <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" apportionsSegmentWidthsByContent="YES" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="9LS-Vp-uGd">
-                                                        <rect key="frame" x="214" y="0.0" width="156" height="23"/>
+                                                        <rect key="frame" x="214" y="0.0" width="156" height="26"/>
                                                         <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <segments>
                                                             <segment title="3h"/>
@@ -147,7 +147,7 @@
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="qG7-Ub-mzA" firstAttribute="top" secondItem="Nhe-d1-2e7" secondAttribute="top" id="MjJ-nf-Zvr"/>
-                                                    <constraint firstAttribute="height" constant="22" id="QmU-pO-lNN"/>
+                                                    <constraint firstAttribute="height" constant="25" id="QmU-pO-lNN"/>
                                                     <constraint firstItem="qG7-Ub-mzA" firstAttribute="leading" secondItem="Nhe-d1-2e7" secondAttribute="leading" id="aMu-dw-PHP"/>
                                                     <constraint firstAttribute="bottom" secondItem="qG7-Ub-mzA" secondAttribute="bottom" id="kLZ-yE-xmp"/>
                                                 </constraints>
@@ -159,6 +159,13 @@
                                             <constraint firstAttribute="trailing" secondItem="Nhe-d1-2e7" secondAttribute="trailing" constant="10" id="R8E-s8-2gf"/>
                                             <constraint firstAttribute="height" constant="34" id="t1J-yU-usJ"/>
                                             <constraint firstItem="Nhe-d1-2e7" firstAttribute="centerY" secondItem="x9u-yg-PXE" secondAttribute="centerY" id="vZU-6X-8GM"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P8h-sd-0mD">
+                                        <rect key="frame" x="0.0" y="619" width="390" height="8"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="8" id="j1I-lJ-Iyl"/>
                                         </constraints>
                                     </view>
                                     <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MtJ-rx-OB9" userLabel="Statistics View">
@@ -417,6 +424,7 @@
                         <outlet property="lowStatisticLabelOutlet" destination="4LK-sw-cBS" id="0gk-05-iOl"/>
                         <outlet property="lowTitleLabelOutlet" destination="B0Q-ux-IHf" id="ATk-vB-TVw"/>
                         <outlet property="minutesLabelOutlet" destination="uyn-2k-K74" id="XXm-rq-Suy"/>
+                        <outlet property="optionalSpacerView" destination="P8h-sd-0mD" id="5c8-yM-gzt"/>
                         <outlet property="pieChartLabelOutlet" destination="c1z-wL-Eye" id="tBn-RJ-oiQ"/>
                         <outlet property="pieChartOutlet" destination="vm5-IB-4CY" id="t8a-2d-t5l"/>
                         <outlet property="preSnoozeButtonOutlet" destination="fSY-nc-amN" id="T25-Z1-3Ad"/>

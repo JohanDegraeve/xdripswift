@@ -16,6 +16,9 @@
 "common_days" = "dagar";
 "common_today" = "Idag";
 "common_week" = "vecka";
+"common_hourshort" = "h";
+"common_dayshort" = "d";
+"common_todayshort" = "Idag";
 "warning" ="Varning!";
 "update" = "Ändra";
 "add" = "Lägg till";

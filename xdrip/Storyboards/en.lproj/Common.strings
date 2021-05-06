@@ -16,6 +16,9 @@
 "common_days" = "days";
 "common_today" = "Today";
 "common_week" = "week";
+"common_hourshort" = "h";
+"common_dayshort" = "d";
+"common_todayshort" = "Today";
 "warning" ="Warning!";
 "update" = "Edit";
 "add" = "Add";

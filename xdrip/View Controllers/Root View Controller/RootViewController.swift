@@ -104,6 +104,7 @@ final class RootViewController: UIViewController {
         
     }
     
+    @IBOutlet weak var optionalSpacerView: UIView!
     
     /// outlets for statistics view
     @IBOutlet weak var statisticsView: UIView!
@@ -330,9 +331,10 @@ final class RootViewController: UIViewController {
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
         
-        // show the statistics view as required. If not, hide it
+        // show the statistics view as required. If not, hide it and show the spacer view to keep segmentedControlChartHours separated a bit more away from the main Tab bar
         statisticsView.isHidden = !UserDefaults.standard.showStatistics
         segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
+        optionalSpacerView.isHidden = UserDefaults.standard.showStatistics
         
         // update statistics related outlets
         updateStatistics(animatePieChart: true, overrideApplicationState: true)
@@ -359,6 +361,18 @@ final class RootViewController: UIViewController {
         UserDefaults.standard.highMarkValueInUserChosenUnit = UserDefaults.standard.highMarkValueInUserChosenUnit
         UserDefaults.standard.bloodGlucoseUnitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
+        
+        // set the localized text of the segmented controls
+        segmentedControlChartHours.setTitle("3" + Texts_Common.hourshort, forSegmentAt: 0)
+        segmentedControlChartHours.setTitle("6" + Texts_Common.hourshort, forSegmentAt: 1)
+        segmentedControlChartHours.setTitle("12" + Texts_Common.hourshort, forSegmentAt: 2)
+        segmentedControlChartHours.setTitle("24" + Texts_Common.hourshort, forSegmentAt:3)
+        
+        segmentedControlStatisticsDays.setTitle(Texts_Common.todayshort, forSegmentAt: 0)
+        segmentedControlStatisticsDays.setTitle("24" + Texts_Common.hourshort, forSegmentAt: 1)
+        segmentedControlStatisticsDays.setTitle("7" + Texts_Common.dayshort, forSegmentAt: 2)
+        segmentedControlStatisticsDays.setTitle("30" + Texts_Common.dayshort, forSegmentAt:3)
+        segmentedControlStatisticsDays.setTitle("90" + Texts_Common.dayshort, forSegmentAt:4)
                
         // update the segmented control of the chart hours
         switch UserDefaults.standard.chartWidthInHours
@@ -392,8 +406,6 @@ final class RootViewController: UIViewController {
              default:
                  break
              }
-        
-        //segmentedControlChartHours.setTitle("hello", forSegmentAt: 1)
         
                 
         // format the segmented control of the chart hours if possible (should normally be ok)

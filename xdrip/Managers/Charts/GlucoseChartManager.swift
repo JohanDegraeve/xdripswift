@@ -624,10 +624,8 @@ public final class GlucoseChartManager {
         var glucoseCircleDiameter: CGFloat = 0
             
         switch UserDefaults.standard.chartWidthInHours {
-            case 2:
-                glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter2h
-            case 4:
-                glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter4h
+            case 3:
+                glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter3h
             case 6:
                 glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter6h
             case 12:

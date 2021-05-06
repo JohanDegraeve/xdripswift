@@ -15,14 +15,11 @@ fileprivate enum Setting:Int, CaseIterable {
     //show the statistics on the home screen?
     case showStatistics = 0
     
-    //how many days should we use to calculate the statistics?
-    case daysToUseStatistics = 1
-    
     //should we use the user values for High + Low, or use the standard range?
-    case useStandardStatisticsRange = 2
+    case useStandardStatisticsRange = 1
     
     //urgent low value
-    case useIFCCA1C = 3
+    case useIFCCA1C = 2
     
 }
 
@@ -43,9 +40,6 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
             
         case .useIFCCA1C :
             return UISwitch(isOn: UserDefaults.standard.useIFCCA1C, action: {(isOn:Bool) in UserDefaults.standard.useIFCCA1C = isOn})
-            
-        case  .daysToUseStatistics:
-            return nil
             
         }
     }
@@ -71,9 +65,6 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-                
-            case .daysToUseStatistics:
-                return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelDaysToUseStatisticsTitle, message: Texts_SettingsView.labelDaysToUseStatisticsMessage, keyboardType: .numberPad, text: UserDefaults.standard.daysToUseStatistics.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.daysToUseStatistics = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
                 
             case .showStatistics:
                 return SettingsSelectedRowAction.callFunction(function: {
@@ -115,7 +106,7 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
         if UserDefaults.standard.showStatistics {
             return Setting.allCases.count
         } else {
-            return Setting.allCases.count - 3
+            return Setting.allCases.count - 2
         }
     }
     
@@ -126,9 +117,6 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
                 
             case .showStatistics:
                 return Texts_SettingsView.labelShowStatistics
-
-            case .daysToUseStatistics:
-                return Texts_SettingsView.labelDaysToUseStatisticsTitle
                     
             case .useStandardStatisticsRange:
                 return Texts_SettingsView.labelUseStandardStatisticsRange
@@ -147,9 +135,6 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
         case .showStatistics:
             return UITableViewCell.AccessoryType.none
             
-        case .daysToUseStatistics:
-            return UITableViewCell.AccessoryType.disclosureIndicator
-            
         case .useStandardStatisticsRange:
             return UITableViewCell.AccessoryType.none
             
@@ -163,9 +148,6 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 
         switch setting {
-            
-        case .daysToUseStatistics:
-            return UserDefaults.standard.daysToUseStatistics.description
             
         case .showStatistics, .useStandardStatisticsRange, .useIFCCA1C:
             return nil

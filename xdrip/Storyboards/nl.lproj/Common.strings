@@ -16,6 +16,9 @@
 "common_days" = "dagen";
 "common_today" = "Vandaag";
 "common_week" = "week";
+"common_hourshort" = "u";
+"common_dayshort" = "d";
+"common_todayshort" = "Vandaag";
 "warning" ="Waarschuwing!";
 "update" = "Bewerk";
 "add" = "Voeg toe";
