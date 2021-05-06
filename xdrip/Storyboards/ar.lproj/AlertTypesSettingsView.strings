@@ -1,9 +1,9 @@
 "alerttypessettingsview_screentitle" = "أنواع التنبيهات";
 "alerttypesettingsview_screentitle" = "تعديل نوع التنبيه";
 "alerttypesettingsview_name" = "الاسم";
-"alerttypesettingsview_enabled" = "تفعيل";
-"alerttypesettingsview_vibrate" = "هزاز";
-"alerttypesettingsview_snoozevianotification" = "الغفوة عبر الإشعارات";
+"alerttypesettingsview_enabled" = "تفعيل؟";
+"alerttypesettingsview_vibrate" = "هزاز؟";
+"alerttypesettingsview_snoozevianotification" = "السماح للغفوة عبر الإشعارات؟";
 "alerttypesettingsview_defaultsnoozeperiod" = "مدة الغفوة الإفتراض (دقائق)";
 "alerttypesettingsview_overridemute" = "تخطي وضع الصامت";
 "alerttypesettingsview_sound" = "النغمة";
