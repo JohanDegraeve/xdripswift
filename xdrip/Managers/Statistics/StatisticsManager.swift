@@ -98,14 +98,18 @@ public final class StatisticsManager {
                 let firstValueTimeStamp = readings.first?.timeStamp
                 var previousValueTimeStamp = firstValueTimeStamp
                 
-                // step though all values, check them to validity, convert if necessary and append them to the glucoseValues array
+                // add filter values to ensure that any clearly invalid glucose data is not included into the array and used in the calculations
+                let minValidReading: Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
+                let maxValidReading: Double = 450
+                
+                // step though all values, check them for validity, convert if necessary and append them to the glucoseValues array
                 for reading in readings {
                     
                     // declare and initialise the date variables needed
                     var calculatedValue = reading.calculatedValue
                     let currentTimeStamp = reading.timeStamp
                     
-                    if calculatedValue != 0.0 {
+                    if (calculatedValue != 0.0) && (calculatedValue >= minValidReading) && (calculatedValue <= maxValidReading) {
                         
                         // get the difference between the previous value's timestamp and the new one
                         let secondsDifference = Calendar.current.dateComponents([.second], from: previousValueTimeStamp!, to: currentTimeStamp)
