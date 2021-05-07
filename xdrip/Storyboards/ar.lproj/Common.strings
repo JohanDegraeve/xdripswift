@@ -43,3 +43,16 @@
 "common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
 
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// the word today
+"common_todayshort" = "Today";
+
+/// literal translation needed
+"common_dayshort" = "d";
+
+/// literal translation needed
+"common_hourshort" = "h";
