@@ -340,10 +340,16 @@
                                                                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                         <nil key="highlightedColor"/>
                                                                     </label>
+                                                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="U7P-eg-yrE">
+                                                                        <rect key="frame" x="28" y="7.3333333333333712" width="37" height="37"/>
+                                                                        <color key="color" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                    </activityIndicatorView>
                                                                 </subviews>
                                                                 <constraints>
                                                                     <constraint firstItem="c1z-wL-Eye" firstAttribute="centerX" secondItem="vm5-IB-4CY" secondAttribute="centerX" constant="1" id="1R7-wH-bAY"/>
                                                                     <constraint firstItem="c1z-wL-Eye" firstAttribute="centerY" secondItem="vm5-IB-4CY" secondAttribute="centerY" id="M2h-e5-a4d"/>
+                                                                    <constraint firstItem="U7P-eg-yrE" firstAttribute="centerX" secondItem="vm5-IB-4CY" secondAttribute="centerX" id="S2z-CT-baj"/>
+                                                                    <constraint firstItem="U7P-eg-yrE" firstAttribute="centerY" secondItem="vm5-IB-4CY" secondAttribute="centerY" id="u7U-8d-Idr"/>
                                                                 </constraints>
                                                                 <userDefinedRuntimeAttributes>
                                                                     <userDefinedRuntimeAttribute type="number" keyPath="innerRadius">
@@ -406,6 +412,7 @@
                     <connections>
                         <outlet property="a1CStatisticLabelOutlet" destination="n2x-3q-js1" id="ByB-6w-57i"/>
                         <outlet property="a1cTitleLabelOutlet" destination="9Ud-mR-3u4" id="Zdj-A6-o6o"/>
+                        <outlet property="activityMonitorOutlet" destination="U7P-eg-yrE" id="Otj-00-LvX"/>
                         <outlet property="averageStatisticLabelOutlet" destination="6JK-yH-Ykh" id="spm-SF-8p7"/>
                         <outlet property="averageTitleLabelOutlet" destination="na4-pU-1Ik" id="Ieo-0G-9qU"/>
                         <outlet property="cVStatisticLabelOutlet" destination="Vdh-xP-Z0Y" id="wT9-MZ-QcV"/>

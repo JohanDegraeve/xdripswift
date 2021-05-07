@@ -13,7 +13,13 @@ import UIKit
 enum ConstantsStatistics {
     
     /// animation speed when drawing the pie chart
-    static let pieChartAnimationSpeed = 0.5
+    static let pieChartAnimationSpeed = 0.3
+    
+    /// label colors for the statistics
+    static let labelLowColor = UIColor.systemYellow
+    static let labelInRangeColor = UIColor.systemGreen
+    static let labelHighColor = UIColor.systemRed
+    
     
     /// pie slice color for low
     static let pieChartLowSliceColor = UIColor.systemYellow

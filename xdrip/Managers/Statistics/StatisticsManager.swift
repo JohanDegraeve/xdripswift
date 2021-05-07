@@ -182,9 +182,11 @@ public final class StatisticsManager {
 
             }
             
-            // call callback in main thread, this callback will update the UI
-            DispatchQueue.main.async {
-                callback( Statistics(lowStatisticValue: lowStatisticValue, highStatisticValue: highStatisticValue, inRangeStatisticValue: inRangeStatisticValue, averageStatisticValue: averageStatisticValue, a1CStatisticValue: a1CStatisticValue, cVStatisticValue: cVStatisticValue, lowLimitForTIR: lowLimitForTIR, highLimitForTIR: highLimitForTIR, numberOfDaysUsed: numberOfDaysUsed))
+            // call callback in main thread, this callback will only update the UI when the user hasn't requested more statistics updates in the meantime (this will only apply if they are reaaaallly quick at tapping the segmented control)
+            if self.operationQueue.operations.count <= 1 {
+                DispatchQueue.main.async {
+                    callback( Statistics(lowStatisticValue: lowStatisticValue, highStatisticValue: highStatisticValue, inRangeStatisticValue: inRangeStatisticValue, averageStatisticValue: averageStatisticValue, a1CStatisticValue: a1CStatisticValue, cVStatisticValue: cVStatisticValue, lowLimitForTIR: lowLimitForTIR, highLimitForTIR: highLimitForTIR, numberOfDaysUsed: numberOfDaysUsed))
+                }
             }
 
         })

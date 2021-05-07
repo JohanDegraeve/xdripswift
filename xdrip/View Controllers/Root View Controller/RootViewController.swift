@@ -125,6 +125,7 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var highLabelOutlet: UILabel!
     @IBOutlet weak var pieChartLabelOutlet: UILabel!
     @IBOutlet weak var timePeriodLabelOutlet: UILabel!
+    @IBOutlet weak var activityMonitorOutlet: UIActivityIndicatorView!
     
     /// user long pressed the value label
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
@@ -1879,6 +1880,23 @@ final class RootViewController: UIViewController {
             fromDate = Date(timeIntervalSinceNow: -3600.0 * 24.0 * Double(daysToUseStatistics))
         }
         
+        
+        // let's clean up statistics UI before calling the Statistics Manager
+        // we'll also show the activity monitor and change the statistics label colors to gray
+        self.pieChartOutlet.clear()
+        self.activityMonitorOutlet.isHidden = false
+        self.lowStatisticLabelOutlet.textColor = UIColor.lightGray
+        self.lowStatisticLabelOutlet.text = "-"
+        self.inRangeStatisticLabelOutlet.textColor = UIColor.lightGray
+        self.inRangeStatisticLabelOutlet.text = "-"
+        self.highStatisticLabelOutlet.textColor = UIColor.lightGray
+        self.highStatisticLabelOutlet.text = "-"
+        self.averageStatisticLabelOutlet.text = "-"
+        self.a1CStatisticLabelOutlet.text = "-"
+        self.cVStatisticLabelOutlet.text = "-"
+        self.timePeriodLabelOutlet.text = "---"
+        
+        
         // statisticsManager will calculate the statistics in background thread and call the callback function in the main thread
         statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil, callback: { statistics in
             
@@ -1897,10 +1915,13 @@ final class RootViewController: UIViewController {
             
             
             // set all label outlets with the correctly formatted calculated values
+            self.lowStatisticLabelOutlet.textColor = ConstantsStatistics.labelLowColor
             self.lowStatisticLabelOutlet.text = Int(statistics.lowStatisticValue.round(toDecimalPlaces: 0)).description + "%"
             
+            self.inRangeStatisticLabelOutlet.textColor = ConstantsStatistics.labelInRangeColor
             self.inRangeStatisticLabelOutlet.text = Int(statistics.inRangeStatisticValue.round(toDecimalPlaces: 0)).description + "%"
             
+            self.highStatisticLabelOutlet.textColor = ConstantsStatistics.labelHighColor
             self.highStatisticLabelOutlet.text = Int(statistics.highStatisticValue.round(toDecimalPlaces: 0)).description + "%"
             
             self.averageStatisticLabelOutlet.text = (isMgDl ? Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics.averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
@@ -1925,8 +1946,6 @@ final class RootViewController: UIViewController {
                 self.timePeriodLabelOutlet.text = statistics.numberOfDaysUsed.description + " " + Texts_Common.days
             }
             
-            // let's remove the old pie chart
-            self.pieChartOutlet.clear()
             
             // disable the chart animation if it's just a normal update, enable it if the call comes from didAppear()
             if animatePieChart {
@@ -1937,6 +1956,9 @@ final class RootViewController: UIViewController {
             
             // we want to calculate how many hours have passed since midnight so that we can decide if we should show the easter egg. The user will almost always be in range at 01hrs in the morning so we don't want to show it until mid-morning or midday so that there is some sense of achievement
             let currentHoursSinceMidnight = Calendar.current.dateComponents([.hour], from: Calendar(identifier: .gregorian).startOfDay(for: Date()), to: Date()).hour!
+            
+            
+            self.activityMonitorOutlet.isHidden = true
             
             // if the user is 100% in range, show the easter egg and make them smile
             if statistics.inRangeStatisticValue < 100 {
