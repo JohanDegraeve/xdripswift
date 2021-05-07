@@ -1,36 +1,22 @@
 
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
 /// when NFC scanning is started, this message will appear
-"holdTopOfIphoneNearSensor" = "Hold the top of your iOS device near the sensor to scan";
+"holdTopOfIphoneNearSensor" = "ثبت أعلى الجهاز بقرب الحساس ليتم المسح";
 
 /// after scanning NFC, scan complete message
-"scanComplete" = "Scan Complete";
+"scanComplete" = "تم إكتمال المسح";
 
 /// Device must support NFC
-"deviceMustSupportNFC" = "This iPhone does not support NFC";
+"deviceMustSupportNFC" = "هذا الآيفون لا يدعم خاصية NFC";
 
 /// After Libre NFC scanning, and after successful bluetooth connection, this message will be shown to explain that he or she should not allow bluetooth permission on the Libre app
-"donotusethelibrelinkapp" = "Connected to Libre 2.\r\n\r\nIf you want to keeping scanning sometimes the Libre sensor with the official Libre app, then disallow bluetooth permission for the Libre app. \r\n\r\nOtherwise, scanning the NFC with the Libre app and with the bluetooth permission allowed will break the connection between %@ and the Libre 2.";
+"donotusethelibrelinkapp" = "متصل بليبري 2.\r\n\r\nإذا كنت ترغب في إجراء المسح أحيانًا لحساس ليبري باستخدام تطبيق ليبري الرسمي, إذن يلزم تعطيل خاصية البلوتوث في تطبيق ليبري . \r\n\r\nخلاف ذلك ، فإن مسح الحساس باستخدام تطبيق ليبري والبلوتوث مفعل بالتطبيق سيؤدي إلى قطع الاتصال بين %@ و حساس ليبري 2.";
 
 /// Device must support at least iOS 14.0
-"deviceMustSupportIOS14" = "To connect to Libre 2, this iPhone needs upgrading to iOS14";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"deviceMustSupportIOS14" = "للربط مع حساس ليبري 2, هذا الآيفون يلزم تحديثه إلى iOS14 على الآقل";
 
 /// The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.
-"connectedLibre2DoesNotMatchScannedLibre2" = "You seem to have scanned a new sensor, but %@ is having the Bluetooth connection to the old sensor.\r\n\r\nTo solve this :\r\n- Click 'disconnect' or 'stop scanning'\r\n- Go back to previous screen and add a new CGM of type Libre 2 and scan again.\r\n\r\n%@ should now connect to the new sensor.";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"connectedLibre2DoesNotMatchScannedLibre2" = "يبدو أنك مسحت حساس جديد, لكن %@ لديه اتصال بالحساس القديم.\r\n\r\nلحل هذا :\r\n- اضغط على 'قطع الاتصال' أو 'إيقاف المسح'\r\n-  ارجع إلى الشاشة السابقة وأضف CGM جديدًا من نوع Libre 2 وقم بالمسح مرة أخرى.\r\n\r\n%@ يجب الآن الاتصال بالحساس الجديد.";
 
 /// Sometimes NFC scanning creates errors, retrying solves the problem. This is to explain this to the user
-"nfcErrorRetryScan" = "Error occured while scanning the sensor. Click 'Scan' top left or click 'back' and add the Libre 2 again, and scan again.";
+"nfcErrorRetryScan" = "حدث خطأ أثناء مسح الحساس. انقر فوق "مسح" أعلى اليسار أو انقر فوق "رجوع" وأضف Libre 2 مرة أخرى ، وقم بالمسح مرة أخرى.";
 

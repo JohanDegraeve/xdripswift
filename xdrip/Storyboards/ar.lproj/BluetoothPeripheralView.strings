@@ -7,7 +7,7 @@
 "aliasAlreadyExists" = "يوجد بالفعل جهاز بلوتوث يحمل هذا الاسم المستعار";
 "confirmDeletionPeripheral" = "هل تريد حذف جهاز البلوتوث: ";
 "bluetoothPeripheralAlias" = "المعرف:";
-"SensorSerialNumber" = "الرقم التسلسلي للحساس:";
+"SensorSerialNumber" = "الرقم التسلسلي:";
 "sensorType" = "نوع الحساس:";
 "serialNumber" = "الرقم التسلسلي:";
 "battery" = "البطارية:";
@@ -21,7 +21,7 @@
 "connect" = "متصل";
 "connectedAt" = "متصل في:";
 "disConnectedAt" = "غير متصل في:";
-"resetRequired" = "مطلوب إعادة التعيين";
+"resetRequired" = "إعادة تعيين المرسل؟";
 "lastReset" = "آخر إعادة تعيين:";
 "lastResetNotKnown" = "الطابع الزمني لآخر تعيين غير معروف";
 "transmitterResultResult" = "نتيجة إعادة تعيين جهاز الإرسال";
