@@ -1,12 +1,2 @@
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// row text for overview snooze. Snoozed alarm, until .. followed by timestamp
-"snoozed_until" = "Snoozed till";
-
-/// row text for overview snooze. Not snoozed alarm
-"not_snoozed" = "Not snoozed";
+"snoozed_until" = "غفوة حتى";
+"not_snoozed" = "لا يوجد غفوة ";

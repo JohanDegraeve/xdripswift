@@ -3,6 +3,10 @@ UserInterfaceState.xcuserstate
 iBreakpoints_v2.xcbkptlist
 xdrip.xcodeproj/xcuserdata/johandegraeve.xcuserdatad/xcdebugger/
 
+# Ruby version settings
+.ruby-version
+.ruby-gemset
+
 #####
 # OS X temporary files that should never be committed
 

@@ -1,11 +1,4 @@
 "receivedDataIsNil" = "لم يتم استقبال بيانات من سيرفر OOP Web";
 "oOPWebServerError" = "خطأ في سيرفر OOP Web: ";
 "libreUSNotSupported" = "الليبري الأمريكي غير مدعوم";
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Error message, in case libre sensor is not in status ready (or expired)
-"libreSensorNotReady" = "Libre sensor not in status ready";
+"libreSensorNotReady" = "حساس الليبري غير جاهز أو منتهي";
