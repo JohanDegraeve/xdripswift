@@ -45,6 +45,10 @@ class Texts_Common {
         return NSLocalizedString("common_low", tableName: filename, bundle: Bundle.main, value: "LOW", comment: "the word LOW, in capitals")
     }()
     
+    static let hourshort = {
+        return NSLocalizedString("common_hourshort", tableName: filename, bundle: Bundle.main, value: "h", comment: "literal translation needed")
+    }()
+    
     static let hour = {
         return NSLocalizedString("common_hour", tableName: filename, bundle: Bundle.main, value: "hour", comment: "literal translation needed")
     }()
@@ -61,6 +65,10 @@ class Texts_Common {
         return NSLocalizedString("common_minute", tableName: filename, bundle: Bundle.main, value: "min", comment: "literal translation needed")
     }()
     
+    static let dayshort = {
+        return NSLocalizedString("common_dayshort", tableName: filename, bundle: Bundle.main, value: "d", comment: "literal translation needed")
+    }()
+    
     static let day = {
         return NSLocalizedString("common_day", tableName: filename, bundle: Bundle.main, value: "day", comment: "literal translation needed")
     }()
@@ -71,6 +79,10 @@ class Texts_Common {
     
     static let today = {
         return NSLocalizedString("common_today", tableName: filename, bundle: Bundle.main, value: "Today", comment: "the word today")
+    }()
+    
+    static let todayshort = {
+        return NSLocalizedString("common_todayshort", tableName: filename, bundle: Bundle.main, value: "Today", comment: "the word today")
     }()
     
     static let week = {

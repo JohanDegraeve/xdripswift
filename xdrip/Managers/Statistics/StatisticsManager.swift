@@ -98,14 +98,18 @@ public final class StatisticsManager {
                 let firstValueTimeStamp = readings.first?.timeStamp
                 var previousValueTimeStamp = firstValueTimeStamp
                 
-                // step though all values, check them to validity, convert if necessary and append them to the glucoseValues array
+                // add filter values to ensure that any clearly invalid glucose data is not included into the array and used in the calculations
+                let minValidReading: Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
+                let maxValidReading: Double = 450
+                
+                // step though all values, check them for validity, convert if necessary and append them to the glucoseValues array
                 for reading in readings {
                     
                     // declare and initialise the date variables needed
                     var calculatedValue = reading.calculatedValue
                     let currentTimeStamp = reading.timeStamp
                     
-                    if calculatedValue != 0.0 {
+                    if (calculatedValue != 0.0) && (calculatedValue >= minValidReading) && (calculatedValue <= maxValidReading) {
                         
                         // get the difference between the previous value's timestamp and the new one
                         let secondsDifference = Calendar.current.dateComponents([.second], from: previousValueTimeStamp!, to: currentTimeStamp)
@@ -182,9 +186,11 @@ public final class StatisticsManager {
 
             }
             
-            // call callback in main thread, this callback will update the UI
-            DispatchQueue.main.async {
-                callback( Statistics(lowStatisticValue: lowStatisticValue, highStatisticValue: highStatisticValue, inRangeStatisticValue: inRangeStatisticValue, averageStatisticValue: averageStatisticValue, a1CStatisticValue: a1CStatisticValue, cVStatisticValue: cVStatisticValue, lowLimitForTIR: lowLimitForTIR, highLimitForTIR: highLimitForTIR, numberOfDaysUsed: numberOfDaysUsed))
+            // call callback in main thread, this callback will only update the UI when the user hasn't requested more statistics updates in the meantime (this will only apply if they are reaaaallly quick at tapping the segmented control)
+            if self.operationQueue.operations.count <= 1 {
+                DispatchQueue.main.async {
+                    callback( Statistics(lowStatisticValue: lowStatisticValue, highStatisticValue: highStatisticValue, inRangeStatisticValue: inRangeStatisticValue, averageStatisticValue: averageStatisticValue, a1CStatisticValue: a1CStatisticValue, cVStatisticValue: cVStatisticValue, lowLimitForTIR: lowLimitForTIR, highLimitForTIR: highLimitForTIR, numberOfDaysUsed: numberOfDaysUsed))
+                }
             }
 
         })

@@ -58,7 +58,7 @@ public final class GlucoseChartManager {
     private var chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings?
     
     /// The latest date on the X-axis
-    private var endDate: Date
+    private(set) var endDate: Date
     
     /// The earliest date on the X-axis
     private var startDate: Date
@@ -619,14 +619,31 @@ public final class GlucoseChartManager {
         
         let urgentLowLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: urgentHighLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.urgentLowMarkValueInUserChosenUnit)])
         
+        
+        // as the user can modify the chart width in hours, we should slightly reduce the size of the glucose points so that the chart isn't crowded when using 12h or 24h options
+        var glucoseCircleDiameter: CGFloat = 0
+            
+        switch UserDefaults.standard.chartWidthInHours {
+            case 3:
+                glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter3h
+            case 6:
+                glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter6h
+            case 12:
+                glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter12h
+            case 24:
+                glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter24h
+            default:
+                glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter6h
+        }
+        
         // in Range circle layers
-        let inRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: inRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseInRangeColor, optimized: true)
+        let inRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: inRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseInRangeColor, optimized: true)
 
         // urgent Range circle layers
-        let urgentRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: urgentRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseUrgentRangeColor, optimized: true)
+        let urgentRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: urgentRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseUrgentRangeColor, optimized: true)
 
         // above target circle layers
-        let notUrgentRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: notUrgentRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: ConstantsGlucoseChart.glucoseCircleDiameter, height: ConstantsGlucoseChart.glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseNotUrgentRangeColor, optimized: true)
+        let notUrgentRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: notUrgentRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseNotUrgentRangeColor, optimized: true)
 
         let layers: [ChartLayer?] = [
             gridLayer,
@@ -662,9 +679,21 @@ public final class GlucoseChartManager {
         /// create array that goes from 1 to number of full hours, as helper to map to array of ChartAxisValueDate - array will go from 1 to 6
         let mappingArray = Array(1...amountOfFullHours)
         
+        /// set the stride count interval to make sure we don't add too many labels to the x-axis if the user wants to view >6 hours
+        var intervalBetweenAxisValues: Int = 1
+            
+        switch UserDefaults.standard.chartWidthInHours {
+            case 12.0:
+                intervalBetweenAxisValues = 2
+            case 24.0:
+                intervalBetweenAxisValues = 4
+            default:
+                break
+        }
+        
         /// first, for each int in mappingArray, we create a ChartAxisValueDate, which will have as date one of the hours, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
         let startDateLower = startDate.toLowerHour()
-        var xAxisValues: [ChartAxisValue] = mappingArray.map { ChartAxisValueDate(date: Date(timeInterval: Double($0)*3600, since: startDateLower), formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings) }
+        var xAxisValues: [ChartAxisValue] = stride(from: 1, to: mappingArray.count + 1, by: intervalBetweenAxisValues).map { ChartAxisValueDate(date: Date(timeInterval: Double($0)*3600, since: startDateLower), formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings) }
         
         /// insert the start Date as first element, in this example 07:26
         xAxisValues.insert(ChartAxisValueDate(date: startDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings), at: 0)
@@ -682,7 +711,7 @@ public final class GlucoseChartManager {
     
     /// - returns:
     ///     - tuple of three chartpoint arrays, with readings that have calculatedvalue> 0, order ascending, ie first element is the oldest
-    ///     - the three arrays in the tuple according to value compared to lowMarkValue, highMarkValue, urgentHighMarkValue, urgentLowMarkValue stored in UserDefaults
+    ///     - the three arrays in the tuple according to value compared to lowMarkValue, highMarkValue,  urgentHighMarkValue, urgentLowMarkValue stored in UserDefaults
     ///     - the firstGlucoseChartPoint in the tuple is the oldest ChartPoint in the three arrays
     ///     - the lastGlucoseChartPoint in the tuple is the most recent ChartPoint in the three arrays
     private func getGlucoseChartPoints(startDate: Date, endDate: Date, bgReadingsAccessor: BgReadingsAccessor, on managedObjectContext: NSManagedObjectContext) -> GlucoseChartPointsType {

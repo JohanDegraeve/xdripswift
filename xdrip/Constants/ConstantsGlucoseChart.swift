@@ -98,8 +98,11 @@ enum ConstantsGlucoseChart {
     /// The spacing in points between axis title labels and axis labels
     static let axisTitleLabelsToLabelsSpacing: CGFloat = 0
     
-    /// diameter of the circle for blood glucose readings
-    static let glucoseCircleDiameter: CGFloat = 6
+    /// diameter of the circle for blood glucose readings. The more hours on the chart, the smaller the circles should be
+    static let glucoseCircleDiameter3h: CGFloat = 7
+    static let glucoseCircleDiameter6h: CGFloat = 6
+    static let glucoseCircleDiameter12h: CGFloat = 5
+    static let glucoseCircleDiameter24h: CGFloat = 4
     
     /// when user pans the chart, when ending the gesture, deceleration is done. At regular intervals the chart needs to be redrawn. This is the interval in seconds
     static let decelerationTimerValueInSeconds = 0.030

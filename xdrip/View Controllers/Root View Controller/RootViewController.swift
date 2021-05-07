@@ -56,9 +56,58 @@ final class RootViewController: UIViewController {
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
     
+    /// outlets for chart time period selector
+    @IBOutlet weak var segmentedControlChartHours: UISegmentedControl!
+    
+    @IBAction func chartHoursChanged(_ sender: Any) {
+        
+        // update the chart period in hours
+        switch segmentedControlChartHours.selectedSegmentIndex
+            {
+            case 0:
+                UserDefaults.standard.chartWidthInHours = 3
+            case 1:
+                UserDefaults.standard.chartWidthInHours = 5
+            case 2:
+                UserDefaults.standard.chartWidthInHours = 12
+            case 3:
+                UserDefaults.standard.chartWidthInHours = 24
+            default:
+                break
+            }
+        
+    }
+    
+    // create a view outlet (with the statistics day control inside) so that we can show/hide it as necessary
+    @IBOutlet weak var segmentedControlStatisticsDaysView: UIView!
+    
+    @IBOutlet weak var segmentedControlStatisticsDays: UISegmentedControl!
+    
+    @IBAction func statisticsDaysChanged(_ sender: Any) {
+        
+        // update the days to use for statistics calculations
+        switch segmentedControlStatisticsDays.selectedSegmentIndex
+            {
+            case 0:
+                UserDefaults.standard.daysToUseStatistics = 0
+            case 1:
+                UserDefaults.standard.daysToUseStatistics = 1
+            case 2:
+                UserDefaults.standard.daysToUseStatistics = 7
+            case 3:
+                UserDefaults.standard.daysToUseStatistics = 30
+            case 4:
+                UserDefaults.standard.daysToUseStatistics = 90
+            default:
+                break
+            }
+        
+    }
+    
+    @IBOutlet weak var optionalSpacerView: UIView!
+    
     /// outlets for statistics view
     @IBOutlet weak var statisticsView: UIView!
-    @IBOutlet weak var spacerView: UIView!
     @IBOutlet weak var pieChartOutlet: PieChart!
     @IBOutlet weak var lowStatisticLabelOutlet: UILabel!
     @IBOutlet weak var inRangeStatisticLabelOutlet: UILabel!
@@ -76,6 +125,7 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var highLabelOutlet: UILabel!
     @IBOutlet weak var pieChartLabelOutlet: UILabel!
     @IBOutlet weak var timePeriodLabelOutlet: UILabel!
+    @IBOutlet weak var activityMonitorOutlet: UIActivityIndicatorView!
     
     /// user long pressed the value label
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
@@ -277,12 +327,15 @@ final class RootViewController: UIViewController {
         
         super.viewWillAppear(animated)
         
+        
+        
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
         
-        // show the statistics view as required. If not, hide it and show the small spacer view to maintain the chart seperated from the tab bar
+        // show the statistics view as required. If not, hide it and show the spacer view to keep segmentedControlChartHours separated a bit more away from the main Tab bar
         statisticsView.isHidden = !UserDefaults.standard.showStatistics
-        spacerView.isHidden = UserDefaults.standard.showStatistics
+        segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
+        optionalSpacerView.isHidden = UserDefaults.standard.showStatistics
         
         // update statistics related outlets
         updateStatistics(animatePieChart: true, overrideApplicationState: true)
@@ -309,6 +362,93 @@ final class RootViewController: UIViewController {
         UserDefaults.standard.highMarkValueInUserChosenUnit = UserDefaults.standard.highMarkValueInUserChosenUnit
         UserDefaults.standard.bloodGlucoseUnitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
+        
+        // set the localized text of the segmented controls
+        segmentedControlChartHours.setTitle("3" + Texts_Common.hourshort, forSegmentAt: 0)
+        segmentedControlChartHours.setTitle("6" + Texts_Common.hourshort, forSegmentAt: 1)
+        segmentedControlChartHours.setTitle("12" + Texts_Common.hourshort, forSegmentAt: 2)
+        segmentedControlChartHours.setTitle("24" + Texts_Common.hourshort, forSegmentAt:3)
+        
+        segmentedControlStatisticsDays.setTitle(Texts_Common.todayshort, forSegmentAt: 0)
+        segmentedControlStatisticsDays.setTitle("24" + Texts_Common.hourshort, forSegmentAt: 1)
+        segmentedControlStatisticsDays.setTitle("7" + Texts_Common.dayshort, forSegmentAt: 2)
+        segmentedControlStatisticsDays.setTitle("30" + Texts_Common.dayshort, forSegmentAt:3)
+        segmentedControlStatisticsDays.setTitle("90" + Texts_Common.dayshort, forSegmentAt:4)
+               
+        // update the segmented control of the chart hours
+        switch UserDefaults.standard.chartWidthInHours
+            {
+            case 3:
+                segmentedControlChartHours.selectedSegmentIndex = 0
+            case 6:
+                segmentedControlChartHours.selectedSegmentIndex = 1
+            case 12:
+                segmentedControlChartHours.selectedSegmentIndex = 2
+            case 24:
+                segmentedControlChartHours.selectedSegmentIndex = 3
+            default:
+                break
+            }
+        
+        
+        // update the segmented control of the statistics days
+         switch UserDefaults.standard.daysToUseStatistics
+             {
+             case 0:
+                segmentedControlStatisticsDays.selectedSegmentIndex = 0
+             case 1:
+                segmentedControlStatisticsDays.selectedSegmentIndex = 1
+             case 7:
+                segmentedControlStatisticsDays.selectedSegmentIndex = 2
+             case 30:
+                segmentedControlStatisticsDays.selectedSegmentIndex = 3
+             case 90:
+                segmentedControlStatisticsDays.selectedSegmentIndex = 4
+             default:
+                 break
+             }
+        
+                
+        // format the segmented control of the chart hours if possible (should normally be ok)
+        if #available(iOS 13.0, *) {
+            
+            // set the basic formatting. We basically want it to dissapear into the background
+            segmentedControlChartHours.backgroundColor = ConstantsUI.segmentedControlBackgroundColor
+            segmentedControlChartHours.tintColor = ConstantsUI.segmentedControlBackgroundColor
+            segmentedControlChartHours.layer.borderWidth = ConstantsUI.segmentedControlBorderWidth
+
+            
+            // format the unselected segments
+            segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlNormalTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.normal)
+            
+            // format the selected segment
+            segmentedControlChartHours.selectedSegmentTintColor = ConstantsUI.segmentedControlSelectedTintColor
+            
+            segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlSelectedTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.selected)
+        
+        }
+        
+        
+        // format the segmented control of the chart hours if possible (should normally be ok)
+        if #available(iOS 13.0, *) {
+            
+            // set the basic formatting. We basically want it to dissapear into the background
+            segmentedControlStatisticsDays.backgroundColor = ConstantsUI.segmentedControlBackgroundColor
+            
+            segmentedControlStatisticsDays.tintColor = ConstantsUI.segmentedControlBackgroundColor
+            
+            segmentedControlStatisticsDays.layer.borderWidth = ConstantsUI.segmentedControlBorderWidth
+
+            
+            // format the unselected segments
+            segmentedControlStatisticsDays.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlNormalTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.normal)
+            
+            // format the selected segment
+            segmentedControlStatisticsDays.selectedSegmentTintColor = ConstantsUI.segmentedControlSelectedTintColor
+            
+            segmentedControlStatisticsDays.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlSelectedTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.selected)
+            
+        }
         
         // enable or disable the buttons 'sensor' and 'calibrate' on top, depending on master or follower
         changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
@@ -357,8 +497,13 @@ final class RootViewController: UIViewController {
         
         // observe setting changes
         // changing from follower to master or vice versa
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new
-                                          , context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
+
+        // see if the user has changed the chart x axis timescale
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.KeysCharts.chartWidthInHours.rawValue, options: .new, context: nil)
+        
+        // see if the user has changed the statistic days to use
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.daysToUseStatistics.rawValue, options: .new, context: nil)
         
         // bg reading notification and badge, and multiplication factor
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showReadingInNotification.rawValue, options: .new, context: nil)
@@ -862,18 +1007,45 @@ final class RootViewController: UIViewController {
         
     }
     
-    // MARK:- observe function
+    /// used by observevalue for UserDefaults.KeysCharts
+    private func evaluateUserDefaultsChange(keyPathEnumCharts: UserDefaults.KeysCharts) {
+        
+        // first check keyValueObserverTimeKeeper
+        switch keyPathEnumCharts {
+        
+        case UserDefaults.KeysCharts.chartWidthInHours, UserDefaults.KeysCharts.chartTimeAxisLabelFormat :
+            
+            if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnumCharts.rawValue, withMinimumDelayMilliSeconds: 200) {
+                return
+            }
+            
+        }
+        
+        switch keyPathEnumCharts {
+        
+        case UserDefaults.KeysCharts.chartWidthInHours:
+            
+            // redraw chart is necessary
+            if let glucoseChartManager = glucoseChartManager {
+                
+                glucoseChartManager.updateGlucoseChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, completionHandler: nil)
+
+            }
+            
+        default:
+            break
+            
+        }
+        
+    }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
-        guard let keyPath = keyPath else {return}
-        
-        guard let keyPathEnum = UserDefaults.Key(rawValue: keyPath) else {return}
+    /// used by observevalue for UserDefaults.Key
+    private func evaluateUserDefaultsChange(keyPathEnum: UserDefaults.Key) {
         
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
         
-        case UserDefaults.Key.isMaster, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl :
+        case UserDefaults.Key.isMaster, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.daysToUseStatistics :
             
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -893,7 +1065,7 @@ final class RootViewController: UIViewController {
             
             // no sensor needed in follower mode, stop it
             stopSensor()
-
+            
         case UserDefaults.Key.showReadingInNotification:
             if !UserDefaults.standard.showReadingInNotification {
                 // remove existing notification if any
@@ -918,9 +1090,32 @@ final class RootViewController: UIViewController {
             
             // redraw chart is necessary
             updateChartWithResetEndDate()
+
+        case UserDefaults.Key.daysToUseStatistics:
             
+            // refresh statistics calculations/view is necessary
+            updateStatistics(animatePieChart: true, overrideApplicationState: false)
+
         default:
             break
+            
+        }
+    }
+    
+    // MARK:- observe function
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        guard let keyPath = keyPath else {return}
+        
+        if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
+            
+            evaluateUserDefaultsChange(keyPathEnum: keyPathEnum)
+            
+        } else if let keyPathEnumCharts = UserDefaults.KeysCharts(rawValue: keyPath) {
+            
+            evaluateUserDefaultsChange(keyPathEnumCharts: keyPathEnumCharts)
+            
         }
         
     }
@@ -1698,6 +1893,23 @@ final class RootViewController: UIViewController {
             fromDate = Date(timeIntervalSinceNow: -3600.0 * 24.0 * Double(daysToUseStatistics))
         }
         
+        
+        // let's clean up statistics UI before calling the Statistics Manager
+        // we'll also show the activity monitor and change the statistics label colors to gray
+        self.pieChartOutlet.clear()
+        self.activityMonitorOutlet.isHidden = false
+        self.lowStatisticLabelOutlet.textColor = UIColor.lightGray
+        self.lowStatisticLabelOutlet.text = "-"
+        self.inRangeStatisticLabelOutlet.textColor = UIColor.lightGray
+        self.inRangeStatisticLabelOutlet.text = "-"
+        self.highStatisticLabelOutlet.textColor = UIColor.lightGray
+        self.highStatisticLabelOutlet.text = "-"
+        self.averageStatisticLabelOutlet.text = "-"
+        self.a1CStatisticLabelOutlet.text = "-"
+        self.cVStatisticLabelOutlet.text = "-"
+        self.timePeriodLabelOutlet.text = "---"
+        
+        
         // statisticsManager will calculate the statistics in background thread and call the callback function in the main thread
         statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil, callback: { statistics in
             
@@ -1716,10 +1928,13 @@ final class RootViewController: UIViewController {
             
             
             // set all label outlets with the correctly formatted calculated values
+            self.lowStatisticLabelOutlet.textColor = ConstantsStatistics.labelLowColor
             self.lowStatisticLabelOutlet.text = Int(statistics.lowStatisticValue.round(toDecimalPlaces: 0)).description + "%"
             
+            self.inRangeStatisticLabelOutlet.textColor = ConstantsStatistics.labelInRangeColor
             self.inRangeStatisticLabelOutlet.text = Int(statistics.inRangeStatisticValue.round(toDecimalPlaces: 0)).description + "%"
             
+            self.highStatisticLabelOutlet.textColor = ConstantsStatistics.labelHighColor
             self.highStatisticLabelOutlet.text = Int(statistics.highStatisticValue.round(toDecimalPlaces: 0)).description + "%"
             
             self.averageStatisticLabelOutlet.text = (isMgDl ? Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics.averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
@@ -1744,8 +1959,6 @@ final class RootViewController: UIViewController {
                 self.timePeriodLabelOutlet.text = statistics.numberOfDaysUsed.description + " " + Texts_Common.days
             }
             
-            // let's remove the old pie chart
-            self.pieChartOutlet.clear()
             
             // disable the chart animation if it's just a normal update, enable it if the call comes from didAppear()
             if animatePieChart {
@@ -1756,6 +1969,9 @@ final class RootViewController: UIViewController {
             
             // we want to calculate how many hours have passed since midnight so that we can decide if we should show the easter egg. The user will almost always be in range at 01hrs in the morning so we don't want to show it until mid-morning or midday so that there is some sense of achievement
             let currentHoursSinceMidnight = Calendar.current.dateComponents([.hour], from: Calendar(identifier: .gregorian).startOfDay(for: Date()), to: Date()).hour!
+            
+            
+            self.activityMonitorOutlet.isHidden = true
             
             // if the user is 100% in range, show the easter egg and make them smile
             if statistics.inRangeStatisticValue < 100 {
