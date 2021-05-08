@@ -13,7 +13,12 @@
 "common_minutes" = "mins";
 "common_minute" = "min";
 "common_day" = "jour";
+"common_days" = "jours";
+"common_today" = "Aujourd'hui";
 "common_week" = "sem";
+"common_hourshort" = "h";
+"common_dayshort" = "j";
+"common_todayshort" = "Auj.";
 "warning" ="Attention !";
 "update" = "Editer";
 "add" = "Ajouter";
@@ -42,3 +47,10 @@
 
 /// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
 "invalidAccountOrPassword" = "Invalid account or password";
+
+"common_statistics_low" = "Basse";
+"common_statistics_inRange" = "En gamme";
+"common_statistics_high" = "Haute";
+"common_statistics_average" = "Moyenne";
+"common_statistics_a1c" = "HbA1c";
+"common_statistics_cv" = "CV";

@@ -13,7 +13,12 @@
 "common_minutes" = "mins";
 "common_minute" = "min";
 "common_day" = "day";
+"common_days" = "days";
+"common_today" = "Today";
 "common_week" = "week";
+"common_hourshort" = "h";
+"common_dayshort" = "d";
+"common_todayshort" = "Today";
 "warning" ="Warning!";
 "update" = "Edit";
 "add" = "Add";
@@ -34,3 +39,9 @@
 "unknown" = "Unknown";
 "sensorStatus" = "Sensor status:";
 "invalidAccountOrPassword" = "Invalid account or password";
+"common_statistics_low" = "Low";
+"common_statistics_inRange" = "In Range";
+"common_statistics_high" = "High";
+"common_statistics_average" = "Average";
+"common_statistics_a1c" = "HbA1c";
+"common_statistics_cv" = "CV";

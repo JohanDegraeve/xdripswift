@@ -305,3 +305,25 @@
 
 /// transmitter settings, this is for the button, when clicked then user will be requested to give transmitter id. The only difference with settingsviews_transmitterid is that ':' is not added
 "settingsviews_transmitterid_text_for_button" = "Transmitter ID";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// statistics settings, how many days to use for calculations
+"settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
+
+/// statistics settings, section title
+"settingsviews_sectiontitlestatistics" = "Statistics";
+
+/// statistics settings, use standard range?
+"settingsviews_useStandardStatisticsRange" = "Use Standard Range?";
+
+/// statistics settings, use IFCC method for HbA1c?
+"settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol?";
+
+/// statistics settings, show statistics on home screen
+"settingsviews_showStatistics" = "Show Statistics?";
+
+/// statistics settings, how many days to use for calculations
+"settingsviews_daysToUseStatisticsTitle" = "Days to Calculate?";

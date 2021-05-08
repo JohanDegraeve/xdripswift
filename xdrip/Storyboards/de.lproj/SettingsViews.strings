@@ -289,3 +289,11 @@
 
 /// transmitter settings, this is for the button, when clicked then user will be requested to give transmitter id. The only difference with settingsviews_transmitterid is that ':' is not added
 "settingsviews_transmitterid_text_for_button" = "Transmitter ID";
+
+
+"settingsviews_sectiontitlestatistics" = "Statistik";
+"settingsviews_showStatistics" = "Zeige Verlauf?";
+"settingsviews_daysToUseStatisticsTitle" = "Tage zum berechnen?";
+"settingsviews_daysToUseStatisticsMessage" = "Maximale Tage anhand dessen versucht wird den Verlauf zu berechnen?\n\n(Bei 0 wird heute ab Mitternacht berechnet)";
+"settingsviews_useStandardStatisticsRange" = "Standardbereich verwenden?";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol anzeigen?";

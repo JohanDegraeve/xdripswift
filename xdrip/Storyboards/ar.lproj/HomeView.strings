@@ -11,7 +11,7 @@
 "bluetoothisnoton" = "البلوتوث غير مفعل قم بتشغيل البلوتوث أولاً ثم حاول مرة أخرى.";
 "bluetoothIsNotAuthorized" = "لم تمنح إذن البلوتوث لـ %@. انتقل إلى الإعدادات ، وابحث عن تطبيق %@ ، وقم بتمكين البلوتوث.";
 "startScanningInfo" = "بدأ البحث..\n\nاترك %@ مفتوحًا في المقدمة حتى يتم إجراء الاتصال.\n\n(ليست هناك حاجة لإيقاف القفل التلقائي. فقط لا تضغط على زر الصفحة الرئيسية ولا تقفل الجوال)";
-"sensorstart" = "بدء الحساس";
+"sensorstart" = "تم بدء الحساس";
 "notstarted" = "لم يبدأ";
 "notknown" = "غير معروف";
 "lastconnection" = "آخر اتصال";
@@ -30,11 +30,5 @@
 "transmitterpairingattempttimeout" = "لم يستجيب جهاز الإرسال على طلب الاقتران.";
 "success" = "نجاح";
 "failed" = "فشل";
+"calibrationNotNecessary" = "عند استخدام خوارزمية الليبري, لا يلزم ولايمكن معايرة الحساس.";
 "dexcomBatteryTooLow" = "بطارية جهاز الإرسال منخفضة جدًا!";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible
-"calibrationNotNecessary" = "When using the Libre algoritm, it is not necessary to calibrate the sensor.";

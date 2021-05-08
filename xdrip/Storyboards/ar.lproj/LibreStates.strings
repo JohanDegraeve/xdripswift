@@ -1,27 +1,21 @@
 
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+/// Possible Libre Sensor states
+"ready" = "جاهز";
 
 /// Possible Libre Sensor states
-"ready" = "ready";
-
-/// Possible Libre Sensor states
-"expired" = "expired";
+"expired" = "منتهي الصلاحية";
 
 /// general usage
-"unknown" = "unknown";
+"unknown" = "غير معروف";
 
 /// Possible Libre Sensor states
-"starting" = "starting";
+"starting" = "بداية";
 
 /// Possible Libre Sensor states
-"notYetStarted" = "not yet started";
+"notYetStarted" = "لم يتم البدء";
 
 /// Possible Libre Sensor states
-"shutdown" = "shut down";
+"shutdown" = "إيقاف";
 
 /// Possible Libre Sensor states
-"failure" = "failed";
+"failure" = "خطأ";
