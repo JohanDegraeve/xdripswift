@@ -337,6 +337,12 @@ final class RootViewController: UIViewController {
         segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
         optionalSpacerView.isHidden = UserDefaults.standard.showStatistics
         
+        if inRangeStatisticLabelOutlet.text == "-" {
+            activityMonitorOutlet.isHidden = true
+        } else {
+            activityMonitorOutlet.isHidden = false
+        }
+        
         // update statistics related outlets
         updateStatistics(animatePieChart: true, overrideApplicationState: true)
         
@@ -1896,8 +1902,13 @@ final class RootViewController: UIViewController {
         
         // let's clean up statistics UI before calling the Statistics Manager
         // we'll also show the activity monitor and change the statistics label colors to gray
+        if self.averageStatisticLabelOutlet.text == "-" {
+            self.activityMonitorOutlet.isHidden = true
+        } else {
+            self.activityMonitorOutlet.isHidden = false
+        }
+        
         self.pieChartOutlet.clear()
-        self.activityMonitorOutlet.isHidden = false
         self.lowStatisticLabelOutlet.textColor = UIColor.lightGray
         self.lowStatisticLabelOutlet.text = "-"
         self.inRangeStatisticLabelOutlet.textColor = UIColor.lightGray
@@ -1907,7 +1918,7 @@ final class RootViewController: UIViewController {
         self.averageStatisticLabelOutlet.text = "-"
         self.a1CStatisticLabelOutlet.text = "-"
         self.cVStatisticLabelOutlet.text = "-"
-        self.timePeriodLabelOutlet.text = "---"
+        self.timePeriodLabelOutlet.text = "- - -"
         
         
         // statisticsManager will calculate the statistics in background thread and call the callback function in the main thread
