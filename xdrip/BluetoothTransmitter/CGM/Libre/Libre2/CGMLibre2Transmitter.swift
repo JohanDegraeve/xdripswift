@@ -182,6 +182,17 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
             return
             
         }
+            
+        // logging libreSensorUID and libre1DerivedAlgorithmParameters just in case it's needed for debugging purposes
+        var libre1DerivedAlgorithmParametersAsString: String!
+        if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters {
+            libre1DerivedAlgorithmParametersAsString = libre1DerivedAlgorithmParameters.description
+        } else {
+            libre1DerivedAlgorithmParametersAsString = "unknown"
+        }
+        
+        trace("in peripheral didUpdateValueFor libreSensorUID = %{public}@, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.toHexString(), libre1DerivedAlgorithmParametersAsString)
+
         
         if let value = characteristic.value {
             
