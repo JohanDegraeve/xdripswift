@@ -456,6 +456,20 @@ final class RootViewController: UIViewController {
             
         }
         
+        // if a RTL localization is in use (such as arabic), then correctly align the low (<x) and high (>x) label outlets towards the centre of the (now reversed) horizontal stack views
+        if UIView.userInterfaceLayoutDirection(for: view.semanticContentAttribute) == UIUserInterfaceLayoutDirection.rightToLeft {
+            lowLabelOutlet.textAlignment = .right
+            lowTitleLabelOutlet.textAlignment = .left
+            highLabelOutlet.textAlignment = .right
+            highTitleLabelOutlet.textAlignment = .left
+        } else {
+            lowLabelOutlet.textAlignment = .left
+            lowTitleLabelOutlet.textAlignment = .right
+            highLabelOutlet.textAlignment = .left
+            highTitleLabelOutlet.textAlignment = .right
+        }
+        
+        
         // enable or disable the buttons 'sensor' and 'calibrate' on top, depending on master or follower
         changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
         
