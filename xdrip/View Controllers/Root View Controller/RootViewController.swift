@@ -1923,6 +1923,8 @@ final class RootViewController: UIViewController {
         }
         
         self.pieChartOutlet.clear()
+        self.pieChartLabelOutlet.text = ""
+        
         self.lowStatisticLabelOutlet.textColor = UIColor.lightGray
         self.lowStatisticLabelOutlet.text = "-"
         self.inRangeStatisticLabelOutlet.textColor = UIColor.lightGray
