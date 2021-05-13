@@ -337,6 +337,12 @@ final class RootViewController: UIViewController {
         segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
         optionalSpacerView.isHidden = UserDefaults.standard.showStatistics
         
+        if inRangeStatisticLabelOutlet.text == "-" {
+            activityMonitorOutlet.isHidden = true
+        } else {
+            activityMonitorOutlet.isHidden = false
+        }
+        
         // update statistics related outlets
         updateStatistics(animatePieChart: true, overrideApplicationState: true)
         
@@ -449,6 +455,20 @@ final class RootViewController: UIViewController {
             segmentedControlStatisticsDays.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlSelectedTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.selected)
             
         }
+        
+        // if a RTL localization is in use (such as arabic), then correctly align the low (<x) and high (>x) label outlets towards the centre of the (now reversed) horizontal stack views
+        if UIView.userInterfaceLayoutDirection(for: view.semanticContentAttribute) == UIUserInterfaceLayoutDirection.rightToLeft {
+            lowLabelOutlet.textAlignment = .right
+            lowTitleLabelOutlet.textAlignment = .left
+            highLabelOutlet.textAlignment = .right
+            highTitleLabelOutlet.textAlignment = .left
+        } else {
+            lowLabelOutlet.textAlignment = .left
+            lowTitleLabelOutlet.textAlignment = .right
+            highLabelOutlet.textAlignment = .left
+            highTitleLabelOutlet.textAlignment = .right
+        }
+        
         
         // enable or disable the buttons 'sensor' and 'calibrate' on top, depending on master or follower
         changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
@@ -1896,8 +1916,15 @@ final class RootViewController: UIViewController {
         
         // let's clean up statistics UI before calling the Statistics Manager
         // we'll also show the activity monitor and change the statistics label colors to gray
+        if self.averageStatisticLabelOutlet.text == "-" {
+            self.activityMonitorOutlet.isHidden = true
+        } else {
+            self.activityMonitorOutlet.isHidden = false
+        }
+        
         self.pieChartOutlet.clear()
-        self.activityMonitorOutlet.isHidden = false
+        self.pieChartLabelOutlet.text = ""
+        
         self.lowStatisticLabelOutlet.textColor = UIColor.lightGray
         self.lowStatisticLabelOutlet.text = "-"
         self.inRangeStatisticLabelOutlet.textColor = UIColor.lightGray
@@ -1907,7 +1934,7 @@ final class RootViewController: UIViewController {
         self.averageStatisticLabelOutlet.text = "-"
         self.a1CStatisticLabelOutlet.text = "-"
         self.cVStatisticLabelOutlet.text = "-"
-        self.timePeriodLabelOutlet.text = "---"
+        self.timePeriodLabelOutlet.text = "- - -"
         
         
         // statisticsManager will calculate the statistics in background thread and call the callback function in the main thread
