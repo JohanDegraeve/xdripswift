@@ -5,6 +5,7 @@ final class SnoozeViewController: UIViewController {
     // MARK: - Properties
     
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var titleLabel: UILabel!
     
     // reference to alertManager
     private var alertManager:AlertManager?
@@ -20,7 +21,7 @@ final class SnoozeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = Texts_Alerts.alertsScreenTitle
+        titleLabel.text = Texts_HomeView.snoozeButton
         setupView()
     }
     

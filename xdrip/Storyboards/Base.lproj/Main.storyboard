@@ -472,7 +472,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="g4X-8R-g01">
-                                <rect key="frame" x="0.0" y="0.0" width="390" height="707"/>
+                                <rect key="frame" x="0.0" y="70" width="390" height="637"/>
                                 <color key="backgroundColor" white="0.10000000000000001" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="blue" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SettingsCell" textLabel="tIz-Hj-yxH" detailTextLabel="Tpl-mr-dqb" style="IBUITableViewCellStyleValue1" id="zQ9-Zy-4Lu" customClass="SettingsTableViewCell" customModule="xdrip" customModuleProvider="target">
@@ -502,14 +502,22 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Snooze Alarms" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LzM-bz-Cnv">
+                                <rect key="frame" x="15" y="14.999999999999996" width="217.33333333333334" height="40.666666666666657"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="34"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="jyR-1Z-GU2"/>
-                        <color key="backgroundColor" systemColor="tableCellGroupedBackgroundColor"/>
+                        <color key="backgroundColor" white="0.050000000000000003" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="jyR-1Z-GU2" firstAttribute="trailing" secondItem="g4X-8R-g01" secondAttribute="trailing" id="BSU-E5-nT5"/>
-                            <constraint firstItem="g4X-8R-g01" firstAttribute="top" secondItem="jyR-1Z-GU2" secondAttribute="top" id="C0Q-s9-2rw"/>
+                            <constraint firstItem="LzM-bz-Cnv" firstAttribute="leading" secondItem="jyR-1Z-GU2" secondAttribute="leading" constant="15" id="FUW-ER-kcd"/>
+                            <constraint firstItem="g4X-8R-g01" firstAttribute="top" secondItem="jyR-1Z-GU2" secondAttribute="top" constant="70" id="RBK-KA-edD"/>
                             <constraint firstItem="jyR-1Z-GU2" firstAttribute="bottom" secondItem="g4X-8R-g01" secondAttribute="bottom" id="dcu-Aj-zv6"/>
                             <constraint firstItem="g4X-8R-g01" firstAttribute="leading" secondItem="jyR-1Z-GU2" secondAttribute="leading" id="vn7-la-bii"/>
+                            <constraint firstItem="LzM-bz-Cnv" firstAttribute="top" secondItem="jyR-1Z-GU2" secondAttribute="top" constant="15" id="yoB-DB-PUa"/>
                         </constraints>
                     </view>
                     <toolbarItems/>
@@ -517,11 +525,12 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="tableView" destination="g4X-8R-g01" id="Nx5-hX-n9H"/>
+                        <outlet property="titleLabel" destination="LzM-bz-Cnv" id="AeW-CB-eha"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lDU-f7-mwF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1755" y="-887"/>
+            <point key="canvasLocation" x="1753.8461538461538" y="-887.20379146919424"/>
         </scene>
         <!--Picker View Controller-->
         <scene sceneID="6RW-Ef-2Hm">
@@ -1526,9 +1535,6 @@
         </systemColor>
         <systemColor name="systemYellowColor">
             <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>
