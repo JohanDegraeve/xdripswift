@@ -13,7 +13,7 @@ final class RootViewController: UIViewController {
     
     // MARK: - Properties - Outlets and Actions for buttons and labels in home screen
     
-    @IBOutlet weak var calibrateButtonOutlet: UIButton!
+ /*   @IBOutlet weak var calibrateButtonOutlet: UIButton!
     
     @IBAction func calibrateButtonAction(_ sender: UIButton) {
         
@@ -43,6 +43,39 @@ final class RootViewController: UIViewController {
     @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
         // opens the SnoozeViewController, see storyboard
     }
+ */
+    
+    @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
+    
+    @IBAction func preSnoozeToolbarButtonAction(_ sender: UIBarButtonItem) {
+        //        // opens the SnoozeViewController, see storyboard
+    }
+    
+    @IBOutlet weak var sensorToolbarButtonOutlet: UIBarButtonItem!
+    
+    @IBAction func sensorToolbarButtonAction(_ sender: UIBarButtonItem) {
+        createAndPresentSensorButtonActionSheet()
+    }
+    
+    @IBOutlet weak var calibrateToolbarButtonOutlet: UIBarButtonItem!
+    
+    @IBAction func calibrateToolbarButtonAction(_ sender: UIBarButtonItem) {
+        
+        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled() {
+            
+            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
+            
+        } else {
+            
+            trace("calibration : user clicks calibrate button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            
+            requestCalibration(userRequested: true)
+        }
+        
+    }
+    
     
     /// outlet for label that shows how many minutes ago and so on
     @IBOutlet weak var minutesLabelOutlet: UILabel!
@@ -1147,11 +1180,14 @@ final class RootViewController: UIViewController {
         
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
-        
+        	
         // set texts for buttons on top
-        calibrateButtonOutlet.setTitle(Texts_HomeView.calibrationButton, for: .normal)
-        preSnoozeButtonOutlet.setTitle(Texts_HomeView.snoozeButton, for: .normal)
-        sensorButtonOutlet.setTitle(Texts_HomeView.sensor, for: .normal)
+//        calibrateToolbarButtonOutlet.setTitle(Texts_HomeView.calibrationButton, for: .normal)
+//        preSnoozeToolbarButtonOutlet.setTitle(Texts_HomeView.snoozeButton, for: .normal)
+//        sensorToolbarButtonOutlet.setTitle(Texts_HomeView.sensor, for: .normal)
+        preSnoozeToolbarButtonOutlet.title = Texts_HomeView.snoozeButton
+        sensorToolbarButtonOutlet.title = Texts_HomeView.sensor
+        calibrateToolbarButtonOutlet.title = Texts_HomeView.calibrationButton
         
         chartLongPressGestureRecognizerOutlet.delegate = self
         chartPanGestureRecognizerOutlet.delegate = self
@@ -1838,11 +1874,11 @@ final class RootViewController: UIViewController {
     private func changeButtonsStatusTo(enabled: Bool) {
         
         if enabled {
-            sensorButtonOutlet.enable()
-            calibrateButtonOutlet.enable()
+            sensorToolbarButtonOutlet.enable()
+            calibrateToolbarButtonOutlet.enable()
         } else {
-            sensorButtonOutlet.disable()
-            calibrateButtonOutlet.disable()
+            sensorToolbarButtonOutlet.disable()
+            calibrateToolbarButtonOutlet.disable()
         }
         
     }
