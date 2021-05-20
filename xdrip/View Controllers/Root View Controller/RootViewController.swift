@@ -13,38 +13,6 @@ final class RootViewController: UIViewController {
     
     // MARK: - Properties - Outlets and Actions for buttons and labels in home screen
     
- /*   @IBOutlet weak var calibrateButtonOutlet: UIButton!
-    
-    @IBAction func calibrateButtonAction(_ sender: UIButton) {
-        
-        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), cgmTransmitter.isWebOOPEnabled() {
-            
-            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil)
-            
-            self.present(alert, animated: true, completion: nil)
-            
-        } else {
-            
-            trace("calibration : user clicks calibrate button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-            
-            requestCalibration(userRequested: true)
-        }
-        
-    }
-    
-    @IBOutlet weak var sensorButtonOutlet: UIButton!
-    
-    @IBAction func sensorButtonAction(_ sender: UIButton) {
-        createAndPresentSensorButtonActionSheet()
-    }
-    
-    @IBOutlet weak var preSnoozeButtonOutlet: UIButton!
-    
-    @IBAction func preSnoozeButtonAction(_ sender: UIButton) {
-        // opens the SnoozeViewController, see storyboard
-    }
- */
-    
     @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
     
     @IBAction func preSnoozeToolbarButtonAction(_ sender: UIBarButtonItem) {
@@ -1182,9 +1150,6 @@ final class RootViewController: UIViewController {
         self.tabBarController?.cleanTitles()
         	
         // set texts for buttons on top
-//        calibrateToolbarButtonOutlet.setTitle(Texts_HomeView.calibrationButton, for: .normal)
-//        preSnoozeToolbarButtonOutlet.setTitle(Texts_HomeView.snoozeButton, for: .normal)
-//        sensorToolbarButtonOutlet.setTitle(Texts_HomeView.sensor, for: .normal)
         preSnoozeToolbarButtonOutlet.title = Texts_HomeView.snoozeButton
         sensorToolbarButtonOutlet.title = Texts_HomeView.sensor
         calibrateToolbarButtonOutlet.title = Texts_HomeView.calibrationButton
