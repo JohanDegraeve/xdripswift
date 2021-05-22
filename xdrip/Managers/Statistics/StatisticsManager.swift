@@ -76,17 +76,15 @@ public final class StatisticsManager {
             // initialize bgReadingsAccessor
             let bgReadingsAccessor = BgReadingsAccessor(coreDataManager: self.coreDataManager)
             
-            // lets get the readings from the bgReadingsAccessor
-            let readings = bgReadingsAccessor.getBgReadings(from: fromDate, to: toDate, on: managedObjectContext)
-            
-            //if there are no available readings, return without doing anything
-            if readings.count == 0 {
-                return
-            }
-            
-            // bgReadings array has been fetched from coredata using a private mangedObjectContext
-            // we need to use the same context to perform next piece of code which will use those bgReadings, in order to stay thread-safe
             managedObjectContext.performAndWait {
+                
+                // lets get the readings from the bgReadingsAccessor
+                let readings = bgReadingsAccessor.getBgReadings(from: fromDate, to: toDate, on: managedObjectContext)
+                
+                //if there are no available readings, return without doing anything
+                if readings.count == 0 {
+                    return
+                }
                 
                 // let's calculate the actual first day of readings in bgReadings. Although the user wants to use 60 days to calculate, maybe we only have 4 days of data. This will be returned from the method and used in the UI. To ensure we calculate the whole days used, we should subtract 5 minutes from the fromDate
                 numberOfDaysUsed = Calendar.current.dateComponents([.day], from: readings.first!.timeStamp - 5 * 60, to: Date()).day!
