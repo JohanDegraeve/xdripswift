@@ -14,7 +14,7 @@ public final class StatisticsManager {
     // MARK: - private properties
     
     /// BgReadingsAccessor instance
-    private var bgReadingsAccessor:BgReadingsAccessor?
+    private var bgReadingsAccessor:BgReadingsAccessor
     
     /// used for calculating statistics on a background thread
     private let operationQueue: OperationQueue
@@ -29,7 +29,7 @@ public final class StatisticsManager {
         // set coreDataManager and bgReadingsAccessor
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
-        
+
         // initialize operationQueue
         operationQueue = OperationQueue()
         
@@ -53,11 +53,6 @@ public final class StatisticsManager {
                 return
             }
             
-            // intialize private managed object context
-            let managedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-            
-            managedObjectContext.parent = self.coreDataManager.mainManagedObjectContext
-            
             // declare variables/constants
             let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
             var glucoseValues: [Double] = []
@@ -73,13 +68,10 @@ public final class StatisticsManager {
             var highLimitForTIR: Double = 0
             var numberOfDaysUsed: Int = 0
             
-            // initialize bgReadingsAccessor
-            let bgReadingsAccessor = BgReadingsAccessor(coreDataManager: self.coreDataManager)
-            
-            managedObjectContext.performAndWait {
-                
+            self.coreDataManager.privateManagedObjectContext.performAndWait {
+
                 // lets get the readings from the bgReadingsAccessor
-                let readings = bgReadingsAccessor.getBgReadings(from: fromDate, to: toDate, on: managedObjectContext)
+                let readings = self.bgReadingsAccessor.getBgReadings(from: fromDate, to: toDate, on: self.coreDataManager.privateManagedObjectContext)
                 
                 //if there are no available readings, return without doing anything
                 if readings.count == 0 {
@@ -216,6 +208,6 @@ public final class StatisticsManager {
         var numberOfDaysUsed: Int
         
     }
-    
+     
 }
 
