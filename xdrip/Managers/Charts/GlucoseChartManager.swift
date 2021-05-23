@@ -151,11 +151,6 @@ public final class GlucoseChartManager {
                 return
             }
             
-            // intialize private managed object context
-            let managedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-            
-            managedObjectContext.parent = self.coreDataManager.mainManagedObjectContext
-            
             // startDateToUse is either parameter value or (if nil), endDate minutes current chartwidth
             let startDateToUse = startDate != nil ? startDate! : Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: endDate)
             
@@ -185,7 +180,7 @@ public final class GlucoseChartManager {
                     reUseExistingChartPointList = false
                     
                     // use newGlucoseChartPointsToAppend and assign it to new list of chartpoints startDate to endDate
-                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor, on: managedObjectContext)
+                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
                     
                     // lastChartPointEarlierThanEndDate is the last chartPoint int he array to append
                     self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
@@ -206,7 +201,7 @@ public final class GlucoseChartManager {
                 } else {
                     
                     // append glucseChartpoints with date > x.date up to endDate
-                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: lastGlucoseTimeStamp, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor, on: managedObjectContext)
+                    newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: lastGlucoseTimeStamp, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
                     
                     // lastChartPointEarlierThanEndDate is the last chartPoint int he array to append
                     self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
@@ -222,7 +217,7 @@ public final class GlucoseChartManager {
                     
                     if let firstGlucoseChartPoint = self.glucoseChartPoints.firstGlucoseChartPoint, let firstGlucoseChartPointX = firstGlucoseChartPoint.x as? ChartAxisValueDate, startDateToUse < firstGlucoseChartPointX.date {
                         
-                        newGlucoseChartPointsToPrepend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: firstGlucoseChartPointX.date, bgReadingsAccessor: self.data().bgReadingsAccessor, on: managedObjectContext)
+                        newGlucoseChartPointsToPrepend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: firstGlucoseChartPointX.date, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
                         
                         // maybe there's a higher value now for maximumValueInGlucoseChartPoints
                         self.maximumValueInGlucoseChartPointsInMgDl = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPointsInMgDl, glucoseChartPoints: newGlucoseChartPointsToPrepend)
@@ -236,7 +231,7 @@ public final class GlucoseChartManager {
                 // this should be a case where there's no glucoseChartPoints stored yet, we just create a new array to append
                 
                 // get glucosePoints from coredata
-                newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor, on: managedObjectContext)
+                newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
                 
                 // lastChartPointEarlierThanEndDate is the last chartPoint int he array to append
                 self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
