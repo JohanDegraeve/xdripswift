@@ -14,7 +14,7 @@ public final class StatisticsManager {
     // MARK: - private properties
     
     /// BgReadingsAccessor instance
-    private var bgReadingsAccessor:BgReadingsAccessor?
+    private var bgReadingsAccessor:BgReadingsAccessor
     
     /// used for calculating statistics on a background thread
     private let operationQueue: OperationQueue
@@ -29,7 +29,7 @@ public final class StatisticsManager {
         // set coreDataManager and bgReadingsAccessor
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
-        
+
         // initialize operationQueue
         operationQueue = OperationQueue()
         
@@ -53,11 +53,6 @@ public final class StatisticsManager {
                 return
             }
             
-            // intialize private managed object context
-            let managedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-            
-            managedObjectContext.parent = self.coreDataManager.mainManagedObjectContext
-            
             // declare variables/constants
             let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
             var glucoseValues: [Double] = []
@@ -73,20 +68,15 @@ public final class StatisticsManager {
             var highLimitForTIR: Double = 0
             var numberOfDaysUsed: Int = 0
             
-            // initialize bgReadingsAccessor
-            let bgReadingsAccessor = BgReadingsAccessor(coreDataManager: self.coreDataManager)
-            
-            // lets get the readings from the bgReadingsAccessor
-            let readings = bgReadingsAccessor.getBgReadings(from: fromDate, to: toDate, on: managedObjectContext)
-            
-            //if there are no available readings, return without doing anything
-            if readings.count == 0 {
-                return
-            }
-            
-            // bgReadings array has been fetched from coredata using a private mangedObjectContext
-            // we need to use the same context to perform next piece of code which will use those bgReadings, in order to stay thread-safe
-            managedObjectContext.performAndWait {
+            self.coreDataManager.privateManagedObjectContext.performAndWait {
+
+                // lets get the readings from the bgReadingsAccessor
+                let readings = self.bgReadingsAccessor.getBgReadings(from: fromDate, to: toDate, on: self.coreDataManager.privateManagedObjectContext)
+                
+                //if there are no available readings, return without doing anything
+                if readings.count == 0 {
+                    return
+                }
                 
                 // let's calculate the actual first day of readings in bgReadings. Although the user wants to use 60 days to calculate, maybe we only have 4 days of data. This will be returned from the method and used in the UI. To ensure we calculate the whole days used, we should subtract 5 minutes from the fromDate
                 numberOfDaysUsed = Calendar.current.dateComponents([.day], from: readings.first!.timeStamp - 5 * 60, to: Date()).day!
@@ -218,6 +208,6 @@ public final class StatisticsManager {
         var numberOfDaysUsed: Int
         
     }
-    
+     
 }
 
