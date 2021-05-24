@@ -16,6 +16,22 @@ enum Texts_HomeView {
         return NSLocalizedString("calibrate", tableName: filename, bundle: Bundle.main, value: "Calibrate", comment: "Text in button on home screen")
     }()
     
+    static let lockButton:String = {
+        return NSLocalizedString("lock", tableName: filename, bundle: Bundle.main, value: "Lock", comment: "Text in button on home screen")
+    }()
+    
+    static let unlockButton:String = {
+        return NSLocalizedString("unlock", tableName: filename, bundle: Bundle.main, value: "Unlock", comment: "Text in button on home screen")
+    }()
+    
+    static let screenLockTitle:String = {
+        return NSLocalizedString("screenlocktitle", tableName: filename, bundle: Bundle.main, value: "Enable Screen Lock?", comment: "Screen Lock Title")
+    }()
+    
+    static let screenLockInfo:String = {
+        return NSLocalizedString("screenlockinfo", tableName: filename, bundle: Bundle.main, value: "Click OK to enable the screen lock function. This will keep the screen awake until you move to another screen or click Unlock.\r\n\nIt is recommended that you keep the phone plugged into a charger to prevent battery drain.", comment: "Info message to explain screen lock function")
+    }()
+    
     static let statusActionTitle:String = {
         return NSLocalizedString("statusactiontitle", tableName: filename, bundle: Bundle.main, value: "Status", comment: "when user clicks transmitterButton, this is the first action, to show the status")
     }()

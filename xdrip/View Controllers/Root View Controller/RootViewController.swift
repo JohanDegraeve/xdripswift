@@ -37,9 +37,43 @@ final class RootViewController: UIViewController {
             
         } else {
             
-            trace("calibration : user clicks calibrate button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            trace("calibration : user clicked the calibrate button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
             requestCalibration(userRequested: true)
+        }
+        
+    }
+    
+    
+    @IBOutlet weak var screenLockToolbarButtonOutlet: UIBarButtonItem!
+    
+    @IBAction func screenLockToolbarButtonAction(_ sender: UIBarButtonItem) {
+
+        if !screenIsLocked {
+            
+            trace("screen lock : user clicked the lock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            
+            let alertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
+
+            // create buttons
+            let OKAction = UIAlertAction(title: Texts_Common.Ok, style: .default) { (action:UIAlertAction!) in self.screenLockUpdate(enabled: true) }
+
+            let cancelAction = UIAlertAction(title: Texts_Common.Cancel, style: .cancel) { (action:UIAlertAction!) in self.screenLockUpdate(enabled: false) }
+
+            // add buttons to the alert
+            alertController.addAction(OKAction)
+            alertController.addAction(cancelAction)
+
+            // show alert
+            self.present(alertController, animated: true, completion:nil)
+            
+        } else {
+            
+            trace("screen lock : user clicked the unlock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            
+            // this means the user has clicked the button whilst the screen look in already in place so let's turn the function off
+            self.screenLockUpdate(enabled: false)
+            
         }
         
     }
@@ -51,11 +85,16 @@ final class RootViewController: UIViewController {
     /// outlet for label that shows difference with previous reading
     @IBOutlet weak var diffLabelOutlet: UILabel!
     
+    /// outlet for the image of the screen lock symbol
+    @IBOutlet weak var screenLockImageOutlet: UIImageView!
+    
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
     
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
+    
+    @IBOutlet weak var segmentedControlsView: UIView!
     
     /// outlets for chart time period selector
     @IBOutlet weak var segmentedControlChartHours: UISegmentedControl!
@@ -105,6 +144,7 @@ final class RootViewController: UIViewController {
         
     }
     
+    /// an optional spacer view that we use to separate the segmented controls from the nav bar if the statistics are not shown
     @IBOutlet weak var optionalSpacerView: UIView!
     
     /// outlets for statistics view
@@ -128,10 +168,11 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var timePeriodLabelOutlet: UILabel!
     @IBOutlet weak var activityMonitorOutlet: UIActivityIndicatorView!
     
-    /// user long pressed the value label
-    @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
-        valueLabelLongPressed(sender)
-    }
+    
+    /// clock view
+    @IBOutlet weak var clockView: UIView!
+    @IBOutlet weak var clockLabelOutlet: UILabel!
+        
     
     @IBAction func chartPanGestureRecognizerAction(_ sender: UIPanGestureRecognizer) {
         
@@ -310,6 +351,16 @@ final class RootViewController: UIViewController {
     /// when was the last notification created with bgreading, setting to 1 1 1970 initially to avoid having to unwrap it
     private var timeStampLastBGNotification = Date(timeIntervalSince1970: 0)
     
+    /// to hold the current state of the screen keep-alive
+    private var screenIsLocked: Bool = false
+    
+    /// date formatter for the clock view
+    private var clockDateFormatter = DateFormatter()
+    
+    /// initiate a Timer object that we will use later to keep the clock view updated if the user activates the screen lock
+    private var clockTimer: Timer?
+    
+    
     // MARK: - overriden functions
     
     // set the status bar content colour to light to match new darker theme
@@ -324,11 +375,13 @@ final class RootViewController: UIViewController {
         
     }
     
+    
     override func viewWillAppear(_ animated: Bool) {
         
         super.viewWillAppear(animated)
         
-        
+        // update the screen lock status
+        screenLockUpdate(enabled: false)
         
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
@@ -347,8 +400,6 @@ final class RootViewController: UIViewController {
         // update statistics related outlets
         updateStatistics(animatePieChart: true, overrideApplicationState: true)
         
-
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -356,10 +407,26 @@ final class RootViewController: UIViewController {
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
         
+        // update the screen lock status
+        //screenLockUpdate(enabled: false)
+        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // set up the clock view
+        clockDateFormatter.dateStyle = .none
+        clockDateFormatter.timeStyle = .short
+        clockDateFormatter.dateFormat = "HH:mm"
+        clockLabelOutlet.font = ConstantsUI.clockLabelFontSize
+        clockLabelOutlet.textColor = ConstantsUI.clockLabelColor
+        
+        
+        // ensure the screen lock icon color as per constants file and also the screen layout
+        screenLockImageOutlet.tintColor = ConstantsUI.screenLockIconColor
+        screenLockUpdate(enabled: false)
+        
         
         // this is to force update of userdefaults that are also stored in the shared user defaults
         // these are used by the today widget. After a year or so (september 2021) this can all be deleted
@@ -556,7 +623,7 @@ final class RootViewController: UIViewController {
             }
         }
         
-        // setup self as delegate for tabbarcontrolelr
+        // setup self as delegate for tabbarcontroller
         self.tabBarController?.delegate = self
         
         // setup the timer logic for updating the view regularly
@@ -565,9 +632,10 @@ final class RootViewController: UIViewController {
         // setup AVAudioSession
         setupAVAudioSession()
         
-        // user may have long pressed the value label, so the screen will not lock, when going back to background, set isIdleTimerDisabled back to false
+        // user may have activated the screen lock function so that the screen stays open, when going back to background, set isIdleTimerDisabled back to false and update the UI so that it's ready to come to foreground when required.
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyIsIdleTimerDisabled, closure: {
             UIApplication.shared.isIdleTimerDisabled = false
+            self.screenLockUpdate(enabled: false)
         })
         
         // add tracing when app goes from foreground to background
@@ -1813,18 +1881,7 @@ final class RootViewController: UIViewController {
         
     }
     
-    private func valueLabelLongPressed(_ sender: UILongPressGestureRecognizer) {
-        if sender.state == .began {
-            
-            // vibrate so that user knows the long press is detected
-            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-            
-            // prevent screen lock
-            UIApplication.shared.isIdleTimerDisabled = true
-            
-        }
-    }
-    
+
     private func getCGMTransmitterDeviceName(for cgmTransmitter: CGMTransmitter) -> String? {
         
         if let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter {
@@ -2045,8 +2102,77 @@ final class RootViewController: UIViewController {
             }
             
         })
+    }
+    
+    
+    //
+    @objc private func updateClockView() {
+        self.clockLabelOutlet.text = clockDateFormatter.string(from: Date())
+    }
+    
+    
+    // MARK: - public helper functions
+    
+    // this function will run when the user wants the screen to lock, or whenever the view appears and it will set up the screen correctly for each mode. This must be kept public so that the App Delegate can access it when the app comes to foreground
+    func screenLockUpdate(enabled: Bool = true) {
 
-        
+        if enabled {
+            
+            // vibrate so that user knows that the keep awake has been activated
+            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+            
+            // set screen lock icon color to value defined in constants file
+            screenLockImageOutlet.isHidden = false
+            valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
+            
+            // set the toolbar button text to "Unlock"
+            screenLockToolbarButtonOutlet.title = Texts_HomeView.unlockButton
+            
+            // de-clutter the screen. Hide the statistics view, controls and show the clock view
+            statisticsView.isHidden = true
+            segmentedControlsView.isHidden = true
+            optionalSpacerView.isHidden = true
+            clockView.isHidden = false
+            
+            // set the format for the clock view, update it once and then and update the label every second after that
+            updateClockView()
+            
+            clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateClockView), userInfo: nil, repeats:true)
+
+            // prevent screen lock
+            UIApplication.shared.isIdleTimerDisabled = true
+            
+            // set the private var so that we can track the screen lock activation within the RootViewController
+            screenIsLocked = true
+            
+            trace("screen lock : screen lock / keep-awake enabled", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            
+        } else {
+
+            // hide the lock image, but the value font size back to normal
+            screenLockImageOutlet.isHidden = true
+            valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
+            
+            // set the toolbar button text to "Lock"
+            screenLockToolbarButtonOutlet.title = Texts_HomeView.lockButton
+
+            // hide
+            statisticsView.isHidden = !UserDefaults.standard.showStatistics
+            segmentedControlsView.isHidden = false
+            optionalSpacerView.isHidden = UserDefaults.standard.showStatistics
+            clockView.isHidden = true
+            
+            // destroy the timer instance so that it doesn't keep using resources and keeping the screen on
+            clockTimer?.invalidate()
+            
+            // make sure that the screen lock is deactivated
+            UIApplication.shared.isIdleTimerDisabled = false
+            
+            trace("screen lock / keep-awake disabled", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+
+            screenIsLocked = false
+            
+        }
     }
 
 }

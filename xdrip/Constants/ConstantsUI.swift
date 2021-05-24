@@ -20,4 +20,15 @@ enum ConstantsUI {
     static let segmentedControlSelectedTextColor = UIColor.black
     static let segmentedControlSelectedTintColor = UIColor.lightGray
     
+    /// colors for lock screen button in toolbar
+    static let screenLockIconColor = UIColor.gray
+    
+    /// value label font sizes
+    static let valueLabelFontSizeNormal = UIFont.systemFont(ofSize: 90)
+    static let valueLabelFontSizeScreenLock = UIFont.systemFont(ofSize: 120)
+    
+    /// clock label color and font size
+    static let clockLabelColor = UIColor.lightGray
+    static let clockLabelFontSize = UIFont.systemFont(ofSize: 120)
+    
 }
