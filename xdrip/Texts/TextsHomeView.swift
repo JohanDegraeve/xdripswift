@@ -25,7 +25,7 @@ enum Texts_HomeView {
     }()
     
     static let screenLockTitle:String = {
-        return NSLocalizedString("screenlocktitle", tableName: filename, bundle: Bundle.main, value: "Enable Screen Lock?", comment: "Screen Lock Title")
+        return NSLocalizedString("screenlocktitle", tableName: filename, bundle: Bundle.main, value: "Screen Lock Enabled", comment: "Screen Lock Title")
     }()
     
     static let screenLockInfo:String = {

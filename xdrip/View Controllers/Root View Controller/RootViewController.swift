@@ -16,7 +16,7 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
     
     @IBAction func preSnoozeToolbarButtonAction(_ sender: UIBarButtonItem) {
-        //        // opens the SnoozeViewController, see storyboard
+        // opens the SnoozeViewController, see storyboard
     }
     
     @IBOutlet weak var sensorToolbarButtonOutlet: UIBarButtonItem!
@@ -48,34 +48,7 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var screenLockToolbarButtonOutlet: UIBarButtonItem!
     
     @IBAction func screenLockToolbarButtonAction(_ sender: UIBarButtonItem) {
-
-        if !screenIsLocked {
-            
-            trace("screen lock : user clicked the lock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-            
-            let alertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
-
-            // create buttons
-            let OKAction = UIAlertAction(title: Texts_Common.Ok, style: .default) { (action:UIAlertAction!) in self.screenLockUpdate(enabled: true) }
-
-            let cancelAction = UIAlertAction(title: Texts_Common.Cancel, style: .cancel) { (action:UIAlertAction!) in self.screenLockUpdate(enabled: false) }
-
-            // add buttons to the alert
-            alertController.addAction(OKAction)
-            alertController.addAction(cancelAction)
-
-            // show alert
-            self.present(alertController, animated: true, completion:nil)
-            
-        } else {
-            
-            trace("screen lock : user clicked the unlock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-            
-            // this means the user has clicked the button whilst the screen look in already in place so let's turn the function off
-            self.screenLockUpdate(enabled: false)
-            
-        }
-        
+        screenLockAlert()
     }
     
     
@@ -90,6 +63,11 @@ final class RootViewController: UIViewController {
     
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
+    
+    @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
+        screenLockAlert()
+    }
+    
     
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
@@ -380,9 +358,6 @@ final class RootViewController: UIViewController {
         
         super.viewWillAppear(animated)
         
-        // update the screen lock status
-        screenLockUpdate(enabled: false)
-        
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
         
@@ -406,9 +381,6 @@ final class RootViewController: UIViewController {
         
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
-        
-        // update the screen lock status
-        //screenLockUpdate(enabled: false)
         
     }
     
@@ -1880,7 +1852,6 @@ final class RootViewController: UIViewController {
         }
         
     }
-    
 
     private func getCGMTransmitterDeviceName(for cgmTransmitter: CGMTransmitter) -> String? {
         
@@ -2104,17 +2075,37 @@ final class RootViewController: UIViewController {
         })
     }
     
-    
-    //
-    @objc private func updateClockView() {
-        self.clockLabelOutlet.text = clockDateFormatter.string(from: Date())
+    private func screenLockAlert() {
+        
+        if !screenIsLocked {
+            
+            trace("screen lock : user clicked the lock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            
+            let alertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
+
+            // create buttons
+            let OKAction = UIAlertAction(title: Texts_Common.Ok, style: .default) { (action:UIAlertAction!) in self.screenLockUpdate(enabled: true) }
+
+            // add buttons to the alert
+            alertController.addAction(OKAction)
+
+            // show alert
+            self.present(alertController, animated: true, completion:nil)
+            
+        } else {
+            
+            trace("screen lock : user clicked the unlock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            
+            // this means the user has clicked the button whilst the screen look in already in place so let's turn the function off
+            self.screenLockUpdate(enabled: false)
+            
+        }
+        
     }
     
     
-    // MARK: - public helper functions
-    
-    // this function will run when the user wants the screen to lock, or whenever the view appears and it will set up the screen correctly for each mode. This must be kept public so that the App Delegate can access it when the app comes to foreground
-    func screenLockUpdate(enabled: Bool = true) {
+    // this function will run when the user wants the screen to lock, or whenever the view appears and it will set up the screen correctly for each mode
+    private func screenLockUpdate(enabled: Bool = true) {
 
         if enabled {
             
@@ -2173,6 +2164,12 @@ final class RootViewController: UIViewController {
             screenIsLocked = false
             
         }
+    }
+    
+    
+    // update the label in the clock view every time this function is called
+    @objc private func updateClockView() {
+        self.clockLabelOutlet.text = clockDateFormatter.string(from: Date())
     }
 
 }

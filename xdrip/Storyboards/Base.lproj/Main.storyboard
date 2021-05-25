@@ -73,6 +73,9 @@
                                                 <fontDescription key="fontDescription" type="system" pointSize="90"/>
                                                 <color key="textColor" systemColor="systemGreenColor"/>
                                                 <nil key="highlightedColor"/>
+                                                <connections>
+                                                    <outletCollection property="gestureRecognizers" destination="tYH-fG-Lky" appends="YES" id="8Ie-iQ-LNP"/>
+                                                </connections>
                                             </label>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0nE-AX-r0w" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
                                                 <rect key="frame" x="10" y="132.66666666666666" width="380" height="258.33333333333337"/>
@@ -476,7 +479,11 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
-                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.90000000000000002" id="tYH-fG-Lky"/>
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.90000000000000002" id="tYH-fG-Lky">
+                    <connections>
+                        <action selector="valueLabelLongPressGestureRecognizerAction:" destination="9pv-A4-QxB" id="6V0-gW-Q4f"/>
+                    </connections>
+                </pongPressGestureRecognizer>
                 <panGestureRecognizer minimumNumberOfTouches="1" id="Fi5-iu-Usk">
                     <connections>
                         <action selector="chartPanGestureRecognizerAction:" destination="9pv-A4-QxB" id="NUY-gV-rdx"/>
