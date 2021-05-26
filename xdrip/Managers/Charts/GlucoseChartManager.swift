@@ -650,6 +650,10 @@ public final class GlucoseChartManager {
                 glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter6h
         }
         
+        // calibration points circle layers - we'll create two circles, one on top of the other to give a white border as per Nightscout calibrations. We'll make the inner circle UIColor.red to make it slightly different to the UIColor.systemRed used by the glucoseChartPoints
+        let calibrationCirclesOuter = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: calibrationChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * 1.5, height: glucoseCircleDiameter * 1.5), itemFillColor: UIColor.red, optimized: true)
+        let calibrationCirclesInner = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: calibrationChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * 1.2, height: glucoseCircleDiameter * 1.2), itemFillColor: UIColor.white, optimized: true)
+        
         // in Range circle layers
         let inRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: inRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseInRangeColor, optimized: true)
 
@@ -658,9 +662,6 @@ public final class GlucoseChartManager {
 
         // above target circle layers
         let notUrgentRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: notUrgentRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseNotUrgentRangeColor, optimized: true)
-        
-        // calibration points circle layers
-        let calibrationCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: calibrationChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * 1.5, height: glucoseCircleDiameter * 1.5), itemFillColor: UIColor.systemOrange, optimized: true)
 
         let layers: [ChartLayer?] = [
             gridLayer,
@@ -672,8 +673,9 @@ public final class GlucoseChartManager {
             targetLineLayer,
             lowLineLayer,
             urgentLowLineLayer,
-            // calibration point layer
-            calibrationCircles,
+            // calibration point layers
+            calibrationCirclesOuter,
+            calibrationCirclesInner,
             // glucosePoint layers
             inRangeGlucoseCircles,
             notUrgentRangeGlucoseCircles,
