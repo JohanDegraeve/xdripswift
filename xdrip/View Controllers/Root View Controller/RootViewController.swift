@@ -2101,9 +2101,6 @@ final class RootViewController: UIViewController {
             
             trace("screen lock : user clicked the unlock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
-            // vibrate so that user knows that the keep awake has been deactivated
-            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-            
             // this means the user has clicked the button whilst the screen look in already in place so let's turn the function off
             self.screenLockUpdate(enabled: false)
             
