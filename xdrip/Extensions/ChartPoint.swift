@@ -11,6 +11,15 @@ extension ChartPoint {
             )
 
     }
+    
+    convenience init(calibration: Calibration, formatter: DateFormatter, unitIsMgDl: Bool) {
+        
+            self.init(
+                x: ChartAxisValueDate(date: calibration.timeStamp, formatter: formatter),
+                y: ChartAxisValueDouble(calibration.bg.mgdlToMmol(mgdl: unitIsMgDl))
+            )
+
+    }
 }
 
 extension ChartPoint: Comparable {

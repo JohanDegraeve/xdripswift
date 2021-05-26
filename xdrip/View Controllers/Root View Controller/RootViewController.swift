@@ -1049,7 +1049,7 @@ final class RootViewController: UIViewController {
             // redraw chart is necessary
             if let glucoseChartManager = glucoseChartManager {
                 
-                glucoseChartManager.updateGlucoseChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, completionHandler: nil)
+                glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, completionHandler: nil)
 
             }
             
@@ -1200,7 +1200,7 @@ final class RootViewController: UIViewController {
     /// will update the chart with endDate = currentDate
     private func updateChartWithResetEndDate() {
         
-        glucoseChartManager?.updateGlucoseChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, completionHandler: nil)
+        glucoseChartManager?.updateChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, completionHandler: nil)
         
     }
     
@@ -1310,6 +1310,9 @@ final class RootViewController: UIViewController {
                 self.present(UIAlertController(title: Texts_Common.warning, message: Texts_Common.invalidValue, actionHandler: nil), animated: true, completion: nil)
                 return
             }
+            
+            // store the calibration value entered by the user into the log
+            trace("calibration : value %{public}@ entered by user", log: self.log, category: ConstantsLog.categoryRootView, type: .info, text.description)
             
             let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
