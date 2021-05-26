@@ -65,7 +65,9 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var valueLabelOutlet: UILabel!
     
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
-        screenLockAlert()
+        
+        valueLabelLongPressed(sender)
+        
     }
     
     
@@ -242,6 +244,9 @@ final class RootViewController: UIViewController {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to initialize the glucoseChartManager and update labels and chart
     private let applicationManagerKeyUpdateLabelsAndChart = "applicationManagerKeyUpdateLabelsAndChart"
     
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to dismiss screenLockAlertController
+    private let applicationManagerKeyDismissScreenLockAlertController = "applicationManagerKeyDismissScreenLockAlertController"
+    
     // MARK: - Properties - other private properties
     
     /// for logging
@@ -338,6 +343,8 @@ final class RootViewController: UIViewController {
     /// initiate a Timer object that we will use later to keep the clock view updated if the user activates the screen lock
     private var clockTimer: Timer?
     
+    /// UIAlertController to use when user chooses to lock the screen. Defined here so we can dismiss it when app goes to the background
+    private var screenLockAlertController: UIAlertController?
     
     // MARK: - overriden functions
     
@@ -608,8 +615,11 @@ final class RootViewController: UIViewController {
         
         // user may have activated the screen lock function so that the screen stays open, when going back to background, set isIdleTimerDisabled back to false and update the UI so that it's ready to come to foreground when required.
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyIsIdleTimerDisabled, closure: {
+            
             UIApplication.shared.isIdleTimerDisabled = false
+            
             self.screenLockUpdate(enabled: false)
+            
         })
         
         // add tracing when app goes from foreground to background
@@ -634,6 +644,13 @@ final class RootViewController: UIViewController {
             
             // update statistics related outlets
             self.updateStatistics(animatePieChart: false)
+            
+        })
+        
+        
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyDismissScreenLockAlertController, closure: {
+
+            self.dismissScreenLockAlertController()
             
         })
         
@@ -1855,6 +1872,17 @@ final class RootViewController: UIViewController {
         
     }
 
+    private func valueLabelLongPressed(_ sender: UILongPressGestureRecognizer) {
+        if sender.state == .began {
+            
+            // vibrate so that user knows the long press is detected
+            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+            
+            screenLockAlert(overrideScreenIsLocked: true)
+            
+        }
+    }
+    
     private func getCGMTransmitterDeviceName(for cgmTransmitter: CGMTransmitter) -> String? {
         
         if let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter {
@@ -2077,25 +2105,38 @@ final class RootViewController: UIViewController {
         })
     }
     
-    private func screenLockAlert() {
+    /// swaps status from locked to unlocked or vice versa, and creates alert to inform user
+    /// - parameters:
+    ///     - overrideScreenIsLocked : if true, then screen will be locked even if it's already locked. If false, then status swaps from locked to unlocked or unlocked to locked
+    private func screenLockAlert(overrideScreenIsLocked: Bool = false) {
         
-        if !screenIsLocked {
+        if !screenIsLocked || overrideScreenIsLocked {
             
-            trace("screen lock : user clicked the lock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-            
-            // vibrate so that user knows that the keep awake has been activated
-            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-            
-            let alertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
+            trace("screen lock : user clicked the lock button or long pressed the value", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
 
-            // create buttons
-            let OKAction = UIAlertAction(title: Texts_Common.Ok, style: .default) { (action:UIAlertAction!) in self.screenLockUpdate(enabled: true) }
+            // lock and update the screen
+            self.screenLockUpdate(enabled: true)
+            
+            // create uialertcontroller to inform user
+            screenLockAlertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
+
+            // create buttons for uialertcontroller
+            let OKAction = UIAlertAction(title: Texts_Common.Ok, style: .default) {
+                (action:UIAlertAction!) in
+                
+                // set screenLockAlertController to nil because this variable is used when app comes to foreground, to check if alert is still presented
+                self.screenLockAlertController = nil
+                
+            }
 
             // add buttons to the alert
-            alertController.addAction(OKAction)
+            screenLockAlertController!.addAction(OKAction)
 
             // show alert
-            self.present(alertController, animated: true, completion:nil)
+            self.present(screenLockAlertController!, animated: true, completion:nil)
+            
+            // schedule timer to dismiss the uialert controller after some time, in case user doesn't click ok
+            Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(dismissScreenLockAlertController), userInfo: nil, repeats:false)
             
         } else {
             
@@ -2109,7 +2150,7 @@ final class RootViewController: UIViewController {
     }
     
     
-    // this function will run when the user wants the screen to lock, or whenever the view appears and it will set up the screen correctly for each mode
+    /// this function will run when the user wants the screen to lock, or whenever the view appears and it will set up the screen correctly for each mode
     private func screenLockUpdate(enabled: Bool = true) {
 
         if enabled {
@@ -2164,7 +2205,7 @@ final class RootViewController: UIViewController {
             optionalSpacerView.isHidden = UserDefaults.standard.showStatistics
             clockView.isHidden = true
             
-            // destroy the timer instance so that it doesn't keep using resources and keeping the screen on
+            // destroy the timer instance so that it doesn't keep using resources
             clockTimer?.invalidate()
             
             // make sure that the screen lock is deactivated
@@ -2178,11 +2219,25 @@ final class RootViewController: UIViewController {
     }
     
     
-    // update the label in the clock view every time this function is called
+    /// update the label in the clock view every time this function is called
     @objc private func updateClockView() {
         self.clockLabelOutlet.text = clockDateFormatter.string(from: Date())
     }
 
+    /// checks if screenLockAlertController is not nil and if not dismisses the presentedViewController
+    @objc private func dismissScreenLockAlertController() {
+        
+        // possibly screenLockAlertController is still on the screen which would happen if user chooses to lock the screen but brings the app to the background before clicking ok
+        if self.screenLockAlertController != nil {
+            
+            self.presentedViewController?.dismiss(animated: false, completion: nil)
+            
+            self.screenLockAlertController = nil
+            
+        }
+
+    }
+    
 }
 
 
