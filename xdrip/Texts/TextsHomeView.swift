@@ -29,7 +29,7 @@ enum Texts_HomeView {
     }()
     
     static let screenLockInfo:String = {
-        return NSLocalizedString("screenlockinfo", tableName: filename, bundle: Bundle.main, value: "Click OK to enable the screen lock function. This will keep the screen awake until you move to another screen or click Unlock.\r\n\nIt is recommended that you keep the phone plugged into a charger to prevent battery drain.", comment: "Info message to explain screen lock function")
+        return NSLocalizedString("screenlockinfo", tableName: filename, bundle: Bundle.main, value: "This will keep the screen awake until you move to another app or click Unlock.\r\n\nIt is recommended that you keep the phone plugged into a charger to prevent battery drain.", comment: "Info message to explain screen lock function")
     }()
     
     static let statusActionTitle:String = {

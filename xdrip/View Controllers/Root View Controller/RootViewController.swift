@@ -362,7 +362,9 @@ final class RootViewController: UIViewController {
         updateLabelsAndChart(overrideApplicationState: true)
         
         // show the statistics view as required. If not, hide it and show the spacer view to keep segmentedControlChartHours separated a bit more away from the main Tab bar
-        statisticsView.isHidden = !UserDefaults.standard.showStatistics
+        if !screenIsLocked {
+            statisticsView.isHidden = !UserDefaults.standard.showStatistics
+        }
         segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
         optionalSpacerView.isHidden = UserDefaults.standard.showStatistics
         
@@ -2081,6 +2083,9 @@ final class RootViewController: UIViewController {
             
             trace("screen lock : user clicked the lock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
+            // vibrate so that user knows that the keep awake has been activated
+            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+            
             let alertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
 
             // create buttons
@@ -2096,6 +2101,9 @@ final class RootViewController: UIViewController {
             
             trace("screen lock : user clicked the unlock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
+            // vibrate so that user knows that the keep awake has been deactivated
+            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+            
             // this means the user has clicked the button whilst the screen look in already in place so let's turn the function off
             self.screenLockUpdate(enabled: false)
             
@@ -2109,12 +2117,17 @@ final class RootViewController: UIViewController {
 
         if enabled {
             
-            // vibrate so that user knows that the keep awake has been activated
-            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-            
             // set screen lock icon color to value defined in constants file
             screenLockImageOutlet.isHidden = false
+            
+            // set the value label font size to big
             valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
+            
+            // set the clock label font size to big (force ConstantsUI implementation)
+            clockLabelOutlet.font = ConstantsUI.clockLabelFontSize
+            
+            // set clock label color
+            clockLabelOutlet.textColor = ConstantsUI.clockLabelColor
             
             // set the toolbar button text to "Unlock"
             screenLockToolbarButtonOutlet.title = Texts_HomeView.unlockButton
@@ -2125,12 +2138,13 @@ final class RootViewController: UIViewController {
             optionalSpacerView.isHidden = true
             clockView.isHidden = false
             
-            // set the format for the clock view, update it once and then and update the label every second after that
+            // set the format for the clock view and update it to show the current time
             updateClockView()
             
+            // set a timer instance to update the clock view label every second
             clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateClockView), userInfo: nil, repeats:true)
 
-            // prevent screen lock
+            // prevent screen dim/lock
             UIApplication.shared.isIdleTimerDisabled = true
             
             // set the private var so that we can track the screen lock activation within the RootViewController
