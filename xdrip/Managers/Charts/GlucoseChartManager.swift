@@ -164,11 +164,9 @@ public final class GlucoseChartManager {
             
             // initialize new list of chartPoints to prepend with empty arrays
             var newGlucoseChartPointsToPrepend: GlucoseChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
-            var newCalibrationChartPointsToPrepend = [ChartPoint]()
             
             // initialize new list of chartPoints to append with empty arrays
             var newGlucoseChartPointsToAppend: GlucoseChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
-            var newCalibrationChartPointsToAppend = [ChartPoint]()
             
             // do we reuse the existing list ? for instance if new startDate > date of currently stored last chartpoint, then we don't reuse the existing list, probably better to reinitialize from scratch to avoid ending up with too long lists
             // and if there's more than a predefined amount of elements already in the array then we restart from scratch because (on an iPhone SE with iOS 13), the panning is getting slowed down when there's more than 1000 elements in the array
@@ -187,9 +185,8 @@ public final class GlucoseChartManager {
                     // startDate is bigger than the the date of the last currently stored ChartPoint, let's reinitialize the glucosechartpoints
                     reUseExistingChartPointList = false
                     
-                    // use newxxxxxxChartPointsToAppend and assign it to new list of chartpoints startDate to endDate
+                    // use newGlucoseChartPointsToAppend and assign it to new list of chartpoints startDate to endDate
                     newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
-                    newCalibrationChartPointsToAppend = self.getCalibrationChartPoints(startDate: startDateToUse, endDate: endDate, calibrationsAccessor: self.data().calibrationsAccessor, on: self.coreDataManager.privateManagedObjectContext)
                     
                     // lastChartPointEarlierThanEndDate is the last chartPoint in the array to append
                     self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
@@ -210,9 +207,8 @@ public final class GlucoseChartManager {
 
                 } else {
                     
-                    // append xxxxxxChartpoints with date > x.date up to endDate
+                    // append glucseChartpoints with date > x.date up to endDate
                     newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: lastGlucoseTimeStamp, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
-                    newCalibrationChartPointsToAppend = self.getCalibrationChartPoints(startDate: lastGlucoseTimeStamp, endDate: endDate, calibrationsAccessor: self.data().calibrationsAccessor, on: self.coreDataManager.privateManagedObjectContext)
                     
                     // lastChartPointEarlierThanEndDate is the last chartPoint int he array to append
                     self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
@@ -235,13 +231,6 @@ public final class GlucoseChartManager {
 
                     }
                     
-                    // repeat for the Calibration Chart Points
-                    if let firstCalibrationChartPoint = self.calibrationChartPoints.first, let firstCalibrationChartPointX = firstCalibrationChartPoint.x as? ChartAxisValueDate, startDateToUse < firstCalibrationChartPointX.date {
-                        
-                        newCalibrationChartPointsToPrepend = self.getCalibrationChartPoints(startDate: startDateToUse, endDate: firstCalibrationChartPointX.date, calibrationsAccessor: self.data().calibrationsAccessor, on: self.coreDataManager.privateManagedObjectContext)
-
-                    }
-                    
                 }
                 
             } else {
@@ -250,7 +239,6 @@ public final class GlucoseChartManager {
                 
                 // get glucosePoints from coredata
                 newGlucoseChartPointsToAppend = self.getGlucoseChartPoints(startDate: startDateToUse, endDate: endDate, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
-                newCalibrationChartPointsToAppend = self.getCalibrationChartPoints(startDate: startDateToUse, endDate: endDate, calibrationsAccessor: self.data().calibrationsAccessor, on: self.coreDataManager.privateManagedObjectContext)
                 
                 // lastChartPointEarlierThanEndDate is the last chartPoint in the array to append
                 self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
@@ -266,6 +254,10 @@ public final class GlucoseChartManager {
             self.glucoseChartPoints.inRange = newGlucoseChartPointsToPrepend.inRange + (reUseExistingChartPointList ? self.glucoseChartPoints.inRange : [ChartPoint]()) + newGlucoseChartPointsToAppend.inRange
             self.glucoseChartPoints.notUrgentRange = newGlucoseChartPointsToPrepend.notUrgentRange + (reUseExistingChartPointList ? self.glucoseChartPoints.notUrgentRange : [ChartPoint]()) + newGlucoseChartPointsToAppend.notUrgentRange
             
+
+            // get calibrations from coredata
+            let newCalibrationChartPoints = self.getCalibrationChartPoints(startDate: startDateToUse, endDate: endDate, calibrationsAccessor: self.data().calibrationsAccessor, on: self.coreDataManager.privateManagedObjectContext)
+
             DispatchQueue.main.async {
                 
                 // so we're in the main thread, now endDate and startDate and glucoseChartPoints can be safely assigned to value that was passed in the call to updateChartPoints
@@ -276,6 +268,9 @@ public final class GlucoseChartManager {
                 self.urgentRangeGlucoseChartPoints = self.glucoseChartPoints.urgentRange
                 self.inRangeGlucoseChartPoints = self.glucoseChartPoints.inRange
                 self.notUrgentRangeGlucoseChartPoints = self.glucoseChartPoints.notUrgentRange
+                
+                // assign calibrationChartPoints to newCalibrationChartPoints
+                self.calibrationChartPoints = newCalibrationChartPoints
                 
                 // update the chart outlet
                 chartOutlet.reloadChart()
