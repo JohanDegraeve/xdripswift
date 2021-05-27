@@ -646,8 +646,8 @@ public final class GlucoseChartManager {
         }
         
         // calibration points circle layers - we'll create two circles, one on top of the other to give a white border as per Nightscout calibrations. We'll make the inner circle UIColor.red to make it slightly different to the UIColor.systemRed used by the glucoseChartPoints
-        let calibrationCirclesOuter = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: calibrationChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * 1.5, height: glucoseCircleDiameter * 1.5), itemFillColor: UIColor.red, optimized: true)
-        let calibrationCirclesInner = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: calibrationChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * 1.2, height: glucoseCircleDiameter * 1.2), itemFillColor: UIColor.white, optimized: true)
+        let calibrationCirclesOuter = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: calibrationChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * 1.6, height: glucoseCircleDiameter * 1.5), itemFillColor: UIColor.white, optimized: true)
+        let calibrationCirclesInner = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: calibrationChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * 1.3, height: glucoseCircleDiameter * 1.2), itemFillColor: UIColor.red, optimized: true)
         
         // in Range circle layers
         let inRangeGlucoseCircles = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: inRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseInRangeColor, optimized: true)
@@ -668,13 +668,13 @@ public final class GlucoseChartManager {
             targetLineLayer,
             lowLineLayer,
             urgentLowLineLayer,
-            // calibration point layers
-            calibrationCirclesOuter,
-            calibrationCirclesInner,
             // glucosePoint layers
             inRangeGlucoseCircles,
             notUrgentRangeGlucoseCircles,
-            urgentRangeGlucoseCircles
+            urgentRangeGlucoseCircles,
+            // calibration point layers
+            calibrationCirclesOuter,
+            calibrationCirclesInner
         ]
         
         return Chart(
