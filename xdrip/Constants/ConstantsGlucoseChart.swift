@@ -111,7 +111,7 @@ enum ConstantsGlucoseChart {
     static let glucoseCircleDiameter24h: CGFloat = 4
     
     /// diameter of the circle for calibration chart points (outer circle)
-    static let calibrationCircleScaleOuter: CGFloat = 1.7
+    static let calibrationCircleScaleOuter: CGFloat = 1.8
     
     /// diameter of the circle for calibration chart points (inner circle)
     static let calibrationCircleScaleInner: CGFloat = 1.3
