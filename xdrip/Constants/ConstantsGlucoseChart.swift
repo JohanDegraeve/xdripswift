@@ -76,6 +76,12 @@ enum ConstantsGlucoseChart {
 
     /// glucose colors - for values between highMarkValue and urgentHighMarkValue or between urgentLowMarkValue and lowMarkValue
     static let glucoseNotUrgentRangeColor = UIColor.yellow
+    
+    /// calibration circle color (inside circle)
+    static let calibrationInsideColor = UIColor.red
+    
+    /// calibration circle border color (outside circle)
+    static let calibrationOutsideColor = UIColor.white
 
     /// labels width for vertical axis
     static let yAxisLabelsWidth: CGFloat = 30
@@ -103,6 +109,10 @@ enum ConstantsGlucoseChart {
     static let glucoseCircleDiameter6h: CGFloat = 6
     static let glucoseCircleDiameter12h: CGFloat = 5
     static let glucoseCircleDiameter24h: CGFloat = 4
+    
+    /// diameter of the circle for blood glucose readings. The more hours on the chart, the smaller the circles should be
+    static let calibrationCircleScaleInner: CGFloat = 1.5
+    static let calibrationCircleScaleOuter: CGFloat = 2.0
     
     /// when user pans the chart, when ending the gesture, deceleration is done. At regular intervals the chart needs to be redrawn. This is the interval in seconds
     static let decelerationTimerValueInSeconds = 0.030
