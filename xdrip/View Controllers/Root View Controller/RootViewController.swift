@@ -374,6 +374,9 @@ final class RootViewController: UIViewController {
         }
         segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
         optionalSpacerView.isHidden = UserDefaults.standard.showStatistics
+        if screenIsLocked {
+            optionalSpacerView.isHidden = UserDefaults.standard.showClockWhenScreenIsLocked
+        }
         
         if inRangeStatisticLabelOutlet.text == "-" {
             activityMonitorOutlet.isHidden = true
@@ -580,6 +583,9 @@ final class RootViewController: UIViewController {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.multipleAppBadgeValueWith10.rawValue, options: .new, context: nil)
         // also update of unit requires update of badge
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
+        // update show clock value for the screen lock function
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showClockWhenScreenIsLocked.rawValue, options: .new, context: nil)
+        
         
         // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of graph
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentLowMarkValue.rawValue, options: .new, context: nil)
@@ -1175,6 +1181,13 @@ final class RootViewController: UIViewController {
             
             // refresh statistics calculations/view is necessary
             updateStatistics(animatePieChart: true, overrideApplicationState: false)
+            
+        case UserDefaults.Key.showClockWhenScreenIsLocked:
+            
+            // refresh screenLock function if it is currently activated in order to show/hide the clock as requested
+            if screenIsLocked {
+                screenLockUpdate(enabled: true)
+            }
 
         default:
             break
@@ -1212,6 +1225,7 @@ final class RootViewController: UIViewController {
         preSnoozeToolbarButtonOutlet.title = Texts_HomeView.snoozeButton
         sensorToolbarButtonOutlet.title = Texts_HomeView.sensor
         calibrateToolbarButtonOutlet.title = Texts_HomeView.calibrationButton
+        screenLockToolbarButtonOutlet.title = screenIsLocked ? Texts_HomeView.unlockButton : Texts_HomeView.lockButton
         
         chartLongPressGestureRecognizerOutlet.delegate = self
         chartPanGestureRecognizerOutlet.delegate = self
@@ -2161,26 +2175,38 @@ final class RootViewController: UIViewController {
             // set the value label font size to big
             valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
             
-            // set the clock label font size to big (force ConstantsUI implementation)
-            clockLabelOutlet.font = ConstantsUI.clockLabelFontSize
-            
-            // set clock label color
-            clockLabelOutlet.textColor = ConstantsUI.clockLabelColor
-            
             // set the toolbar button text to "Unlock"
             screenLockToolbarButtonOutlet.title = Texts_HomeView.unlockButton
             
             // de-clutter the screen. Hide the statistics view, controls and show the clock view
             statisticsView.isHidden = true
             segmentedControlsView.isHidden = true
-            optionalSpacerView.isHidden = true
-            clockView.isHidden = false
             
-            // set the format for the clock view and update it to show the current time
-            updateClockView()
-            
-            // set a timer instance to update the clock view label every second
-            clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateClockView), userInfo: nil, repeats:true)
+            if UserDefaults.standard.showClockWhenScreenIsLocked {
+                
+                // set the clock label font size to big (force ConstantsUI implementation)
+                clockLabelOutlet.font = ConstantsUI.clockLabelFontSize
+                
+                // set clock label color
+                clockLabelOutlet.textColor = ConstantsUI.clockLabelColor
+                
+                optionalSpacerView.isHidden = true
+                
+                clockView.isHidden = false
+                
+                // set the format for the clock view and update it to show the current time
+                updateClockView()
+                
+                // set a timer instance to update the clock view label every second
+                clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateClockView), userInfo: nil, repeats:true)
+                
+            } else {
+                
+                optionalSpacerView.isHidden = false
+                
+                clockView.isHidden = true
+                
+            }
 
             // prevent screen dim/lock
             UIApplication.shared.isIdleTimerDisabled = true
