@@ -110,9 +110,11 @@ enum ConstantsGlucoseChart {
     static let glucoseCircleDiameter12h: CGFloat = 5
     static let glucoseCircleDiameter24h: CGFloat = 4
     
-    /// diameter of the circle for blood glucose readings. The more hours on the chart, the smaller the circles should be
-    static let calibrationCircleScaleInner: CGFloat = 1.5
-    static let calibrationCircleScaleOuter: CGFloat = 2.0
+    /// diameter of the circle for calibration chart points (outer circle)
+    static let calibrationCircleScaleOuter: CGFloat = 1.7
+    
+    /// diameter of the circle for calibration chart points (inner circle)
+    static let calibrationCircleScaleInner: CGFloat = 1.3
     
     /// when user pans the chart, when ending the gesture, deceleration is done. At regular intervals the chart needs to be redrawn. This is the interval in seconds
     static let decelerationTimerValueInSeconds = 0.030
