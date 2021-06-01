@@ -297,3 +297,5 @@
 "settingsviews_daysToUseStatisticsMessage" = "Maximale Tage anhand dessen versucht wird den Verlauf zu berechnen?\n\n(Bei 0 wird heute ab Mitternacht berechnet)";
 "settingsviews_useStandardStatisticsRange" = "Standardbereich verwenden?";
 "settingsviews_useIFCCA1C" = "HbA1c in mmols/mol anzeigen?";
+
+"showClockWhenScreenIsLocked" = "Uhr anzeigen wenn gesperrt?";

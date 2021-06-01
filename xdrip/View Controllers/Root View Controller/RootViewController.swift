@@ -44,11 +44,12 @@ final class RootViewController: UIViewController {
         
     }
     
-    
+    /// outlet for the lock button - it will change text based upon whether they screen is locked or not
     @IBOutlet weak var screenLockToolbarButtonOutlet: UIBarButtonItem!
     
+    /// call the screen lock alert when the button is pressed
     @IBAction func screenLockToolbarButtonAction(_ sender: UIBarButtonItem) {
-        screenLockAlert()
+        screenLockAlert(showClock: true)
     }
     
     
@@ -1890,7 +1891,8 @@ final class RootViewController: UIViewController {
         
         if sender.state == .began && !screenIsLocked {
             
-            screenLockAlert(overrideScreenIsLocked: true)
+            // call the UIAlert but assume that the user wants a simple screen lock, not the full lock mode
+            screenLockAlert(overrideScreenIsLocked: true, showClock: false)
             
         }
         
@@ -2121,7 +2123,8 @@ final class RootViewController: UIViewController {
     /// swaps status from locked to unlocked or vice versa, and creates alert to inform user
     /// - parameters:
     ///     - overrideScreenIsLocked : if true, then screen will be locked even if it's already locked. If false, then status swaps from locked to unlocked or unlocked to locked
-    private func screenLockAlert(overrideScreenIsLocked: Bool = false) {
+    ///     - showClock : when true this parameter will be passed to the screeLockUpdate function and this will lock the screen in the full lock mode adjusting font sizes and showing the clock as required.
+    private func screenLockAlert(overrideScreenIsLocked: Bool = false, showClock: Bool = true) {
         
         if !screenIsLocked || overrideScreenIsLocked {
             
@@ -2131,7 +2134,7 @@ final class RootViewController: UIViewController {
             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
             
             // lock and update the screen
-            self.screenLockUpdate(enabled: true)
+            self.screenLockUpdate(enabled: true, showClock: showClock)
             
             // create uialertcontroller to inform user
             screenLockAlertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
@@ -2159,7 +2162,7 @@ final class RootViewController: UIViewController {
             trace("screen lock : user clicked the unlock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
             // this means the user has clicked the button whilst the screen look in already in place so let's turn the function off
-            self.screenLockUpdate(enabled: false)
+            self.screenLockUpdate(enabled: false, showClock: showClock)
             
         }
         
@@ -2167,47 +2170,54 @@ final class RootViewController: UIViewController {
     
     
     /// this function will run when the user wants the screen to lock, or whenever the view appears and it will set up the screen correctly for each mode
-    private func screenLockUpdate(enabled: Bool = true) {
+    /// - parameters :
+    ///     - enabled : when true this will force the screen to lock
+    ///     - showClock : when false, this will enable a simple screen lock without changing the UI - useful for keeping the screen open on your desk
+    private func screenLockUpdate(enabled: Bool = true, showClock: Bool = true) {
 
         if enabled {
             
             // set screen lock icon color to value defined in constants file
             screenLockImageOutlet.isHidden = false
             
-            // set the value label font size to big
-            valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
-            
             // set the toolbar button text to "Unlock"
             screenLockToolbarButtonOutlet.title = Texts_HomeView.unlockButton
             
-            // de-clutter the screen. Hide the statistics view, controls and show the clock view
-            statisticsView.isHidden = true
-            segmentedControlsView.isHidden = true
+            if showClock {
+                
+                // set the value label font size to big
+                valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
+                
+                // de-clutter the screen. Hide the statistics view, controls and show the clock view
+                statisticsView.isHidden = true
+                segmentedControlsView.isHidden = true
+                
+                if UserDefaults.standard.showClockWhenScreenIsLocked {
+                    
+                    // set the clock label font size to big (force ConstantsUI implementation)
+                    clockLabelOutlet.font = ConstantsUI.clockLabelFontSize
+                    
+                    // set clock label color
+                    clockLabelOutlet.textColor = ConstantsUI.clockLabelColor
+                    
+                    optionalSpacerView.isHidden = true
+                    
+                    clockView.isHidden = false
+                    
+                    // set the format for the clock view and update it to show the current time
+                    updateClockView()
+                    
+                    // set a timer instance to update the clock view label every second
+                    clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateClockView), userInfo: nil, repeats:true)
+                    
+                } else {
+                    
+                    optionalSpacerView.isHidden = false
+                    
+                    clockView.isHidden = true
+                    
+                }
             
-            if UserDefaults.standard.showClockWhenScreenIsLocked {
-                
-                // set the clock label font size to big (force ConstantsUI implementation)
-                clockLabelOutlet.font = ConstantsUI.clockLabelFontSize
-                
-                // set clock label color
-                clockLabelOutlet.textColor = ConstantsUI.clockLabelColor
-                
-                optionalSpacerView.isHidden = true
-                
-                clockView.isHidden = false
-                
-                // set the format for the clock view and update it to show the current time
-                updateClockView()
-                
-                // set a timer instance to update the clock view label every second
-                clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateClockView), userInfo: nil, repeats:true)
-                
-            } else {
-                
-                optionalSpacerView.isHidden = false
-                
-                clockView.isHidden = true
-                
             }
 
             // prevent screen dim/lock
@@ -2220,21 +2230,27 @@ final class RootViewController: UIViewController {
             
         } else {
 
-            // hide the lock image, but the value font size back to normal
+            // hide the lock image
             screenLockImageOutlet.isHidden = true
-            valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
             
             // set the toolbar button text to "Lock"
             screenLockToolbarButtonOutlet.title = Texts_HomeView.lockButton
 
+            valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
+            
             // hide
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
             segmentedControlsView.isHidden = false
             optionalSpacerView.isHidden = UserDefaults.standard.showStatistics
+            
             clockView.isHidden = true
             
-            // destroy the timer instance so that it doesn't keep using resources
-            clockTimer?.invalidate()
+            if showClock {
+                
+                // destroy the timer instance so that it doesn't keep using resources
+                clockTimer?.invalidate()
+                
+            }
             
             // make sure that the screen lock is deactivated
             UIApplication.shared.isIdleTimerDisabled = false
@@ -2244,6 +2260,7 @@ final class RootViewController: UIViewController {
             screenIsLocked = false
             
         }
+        
     }
     
     

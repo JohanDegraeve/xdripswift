@@ -99,3 +99,8 @@
 
 /// for home view, license info
 "licenseinfo" = "This program is free software distributed under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\r\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.\r\n\nSee http://www.gnu.org/licenses/gpl.txt for more details.\r\n\r\nInfo: ";
+
+"lock" = "Sperren";
+"unlock" = "Entsperren";
+"screenlocktitle" = "Bildschirmsperre aktiviert";
+"screenlockinfo" = "Dadurch bleibt der Bildschirm aktiviert, bis zu einer anderen App gewechselt wird oder entsperren geklickt wird.\r\n\nWir empfehlen, dass Handy mit dem Ladekabel zu verbinden, um ein Entladen des Akkus zu verhindern.";

@@ -11,6 +11,7 @@
 "showReadingInNotification" = "Toon BG in Notificaties?";
 "labelShowReadingInAppBadge" = "Toon BG in de App Badge?";
 "multipleAppBadgeValueWith10" = "Vermenigvuldig App Badge Meting met 10?";
+"showClockWhenScreenIsLocked" = "Toon klok indien gelockt?";
 "settingsviews_urgentHighValue" = "Urgent Hoge Waarde:";
 "settingsviews_highValue" = "Hoge Waarde:";
 "settingsviews_targetValue" = "Doel Waarde:";
