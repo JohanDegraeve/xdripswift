@@ -1892,8 +1892,11 @@ final class RootViewController: UIViewController {
 
     private func valueLabelLongPressed(_ sender: UILongPressGestureRecognizer) {
         
-        if sender.state == .began && !screenIsLocked {
+        if sender.state == .began {
             
+            // vibrate so that user knows the long press is detected
+            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+
             // call the UIAlert but assume that the user wants a simple screen lock, not the full lock mode
             screenLockAlert(overrideScreenIsLocked: true, showClock: false)
             
@@ -2132,9 +2135,6 @@ final class RootViewController: UIViewController {
         if !screenIsLocked || overrideScreenIsLocked {
             
             trace("screen lock : user clicked the lock button or long pressed the value", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-            
-            // vibrate so that user knows the long press is detected
-            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
             
             // lock and update the screen
             self.screenLockUpdate(enabled: true, showClock: showClock)
