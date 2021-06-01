@@ -8,18 +8,21 @@ fileprivate enum Setting:Int, CaseIterable {
     /// choose between master and follower
     case masterFollower = 1
     
+    /// if reading is shown in app badge, should value be multiplied with 10 yes or no
+    case showClockWhenScreenIsLocked = 2
+    
     /// should reading be shown in notification
-    case showReadingInNotification = 2
+    case showReadingInNotification = 3
     
     /// - minimum time between two readings, for which notification should be created (in minutes)
     /// - except if there's been a disconnect, in that case this value is not taken into account
-    case notificationInterval = 3
+    case notificationInterval = 4
     
     /// show reading in app badge
-    case showReadingInAppBadge = 4
+    case showReadingInAppBadge = 5
     
     /// if reading is shown in app badge, should value be multiplied with 10 yes or no
-    case multipleAppBadgeValueWith10 = 5
+    case multipleAppBadgeValueWith10 = 6
     
 }
 
@@ -112,7 +115,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
             }
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .showClockWhenScreenIsLocked:
             return SettingsSelectedRowAction.nothing
             
         case .notificationInterval:
@@ -158,6 +161,9 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .multipleAppBadgeValueWith10:
             return Texts_SettingsView.multipleAppBadgeValueWith10
             
+        case .showClockWhenScreenIsLocked:
+            return Texts_SettingsView.showClockWhenScreenIsLocked
+            
         case .notificationInterval:
             return Texts_SettingsView.settingsviews_IntervalTitle
             
@@ -175,7 +181,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .masterFollower:
             return UITableViewCell.AccessoryType.none
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .showClockWhenScreenIsLocked:
             return UITableViewCell.AccessoryType.none
             
         case .notificationInterval:
@@ -195,7 +201,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .masterFollower:
             return UserDefaults.standard.isMaster ? Texts_SettingsView.master:Texts_SettingsView.follower
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .showClockWhenScreenIsLocked:
             return nil
             
         case .notificationInterval:
@@ -220,6 +226,10 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .multipleAppBadgeValueWith10:
 
             return UISwitch(isOn: UserDefaults.standard.multipleAppBadgeValueWith10, action: {(isOn:Bool) in UserDefaults.standard.multipleAppBadgeValueWith10 = isOn})
+            
+        case .showClockWhenScreenIsLocked:
+
+            return UISwitch(isOn: UserDefaults.standard.showClockWhenScreenIsLocked, action: {(isOn:Bool) in UserDefaults.standard.showClockWhenScreenIsLocked = isOn})
 
         case .bloodGlucoseUnit, .masterFollower:
             return nil

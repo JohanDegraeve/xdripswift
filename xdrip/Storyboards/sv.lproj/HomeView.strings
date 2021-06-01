@@ -1,6 +1,10 @@
 "presnooze" = "Snooza";
 "sensor" = "Sensor";
 "calibrate" = "Kalibrera";
+"lock" = "Lås";
+"unlock" = "Lås upp";
+"screenlocktitle" = "Skärmlås på";
+"screenlockinfo" = "Håller skärmen öppen tills du byter app eller klickar 'Lås upp'.\r\n\nDet rekommenderas att du har laddkabeln i för att förhindra urladdning av batteriet.";
 "statusactiontitle" = "Status";
 "scanbluetoothdeviceactiontitle" = "Scanna efter sändare";
 "forgetbluetoothdeviceactiontitle" = "Glöm sändare";

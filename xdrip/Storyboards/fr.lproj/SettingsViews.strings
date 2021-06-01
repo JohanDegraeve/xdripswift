@@ -9,6 +9,7 @@
 "showReadingInNotification" = "Afficher Glyc dans notification?";
 "labelShowReadingInAppBadge" = "Afficher Glyc dans le badge?";
 "multipleAppBadgeValueWith10" = "Multiplier par 10 dans le badge?";
+"showClockWhenScreenIsLocked" = "Visualiser l'heure sur écran verrouillé?";
 "settingsviews_sectiontitlestatistics" = "Statistiques";
 "settingsviews_showStatistics" = "Visualiser les statistiques?";
 "settingsviews_daysToUseStatisticsTitle" = "Nombre de jours?";

@@ -7,6 +7,7 @@
 "showReadingInNotification" = "Mostrar en Notificaciones?";
 "labelShowReadingInAppBadge" = "Mostrar en el icono de la app?";
 "multipleAppBadgeValueWith10" = "Multiplicar valor por 10 en el icono de la app?";
+"showClockWhenScreenIsLocked" = "Mostrar reloj al bloquear?";
 "settingsviews_urgentHighValue" = "Valor de Glucemia Alta (Urgente):";
 "settingsviews_highValue" = "Valor de Glucemia Alta:";
 "settingsviews_targetValue" = "Valor Objectivo:";
