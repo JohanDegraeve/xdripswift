@@ -2,7 +2,7 @@
 "common_cancel" = "Cancelar";
 "common_mgdl" = "mg/dl";
 "common_mmol" = "mmol/l";
-"common_bloodglucoseunit" = "Unidades de Glucemia:";
+"common_bloodglucoseunit" = "Unidades de Glucemia";
 "common_bloodglucoseunit_short" = "Unidad";
 "common_password" = "Contraseña:";
 "common_default" = "Por Defecto";
@@ -33,7 +33,7 @@
 "on" = "On";
 "off" = "Off";
 "delete" = "Borrar";
-"invalidValue" = "Valor Erroneo Value";
+"invalidValue" = "Valor Erróneo";
 "firmware" = "Firmware";
 "hardware" = "Hardware";
 "unknown" = "Desconocido";

@@ -2,7 +2,7 @@
 "settingsviews_sectiontitlegeneral" = "General";
 "settingsviews_selectbgunit" = "Seleccionar Unidades:";
 "settingsviews_masterorfollower" = "Master o Seguidor?";
-"settingsviews_master" = "Master";
+"settingsviews_master" = "Máster";
 "settingsviews_follower" = "Seguidor";
 "showReadingInNotification" = "Mostrar en Notificaciones?";
 "labelShowReadingInAppBadge" = "Mostrar en el icono de la app?";
@@ -35,7 +35,7 @@
 "settingsviews_sectiontitlealerting" = "Alarma";
 "settingsviews_row_alert_types" = "Tipos de Alarmas";
 "settingsviews_row_alerts" = "Alarmas";
-"settingsviews_sectiontitlehealthkit" = "Apple Health";
+"settingsviews_sectiontitlehealthkit" = "Salud (Apple Health)";
 "settingsviews_healthkit" = "Grabar Datos en Apple Health?";
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
 "settingsviews_uploadReadingstoDexcomShare" = "Subir Datos a Dexcom Share?";
@@ -45,7 +45,7 @@
 "settingsviews_giveDexcomShareAccountName" = "Entrar el Nombre de tu Cuenta Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Entrar la  Contraseña para tu Cuenta Dexcom Share";
 "settingsviews_giveDexcomShareSerialNumber" = "Entrar el número de serie del receptor Dexcom:";
-"settingsviews_sectiontitlenightscout" = "NightScout";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightScoutEnabled" = "Habilitar Nightscout?";
 "settingsviews_nightScoutUrl" = "URL:";
 "settingsviews_useSchedule" = "Fijar Horario de Subida de Datos?";
@@ -87,7 +87,7 @@
 "sendTraceFile" = "Enviar Archivo de Rastreo";
 "describeProblem" = "Explicar en detalle porqué es necesario enviar este archivo de rastreo. Si ya has reportando previamente este problema en el grupo de Facebook '%@', confirmar tu Nombre en Facebook dentro del cuerpo del correo";
 "emailNotConfigured" = "Deberías tener configurado una cuenta de correo antes de enviar el archivo.";
-"emailbodyText" = "Problem Description: ";
+"emailbodyText" = "Descripción del problema: ";
 "failedToSendEmail" = "Error al Enviar Correo";
 "volumeTestSoundPlayerExplanation" = "Se está reproduciendo una alamra con el mismo volumen que usar un Tipo de Alarma con la opción de 'Ignorar Mode Silencio?' habilitado\n\nCambiar el volume con los botones del iPhone y apretar OK para confirmar";
 "volumeTestiOSSoundExplanation" = "Se está reproduciendo una alamra con el mismo volumen que usar un Tipo de Alarma con la opción de 'Ignorar Mode Silencio?' deshabilitado\n\nCambiar el volume con los botones del iPhone y apretar OK para confirmar";
