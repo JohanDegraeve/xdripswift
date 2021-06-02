@@ -8,6 +8,7 @@
 "confirmDeletionPeripheral" = "Confirmar que quieres borrar el dispositivo bluetooth: ";
 "bluetoothPeripheralAlias" = "Alias:";
 "SensorSerialNumber" = "Número de Serie:";
+"sensorType" = "Tipo de Sensor:";
 "serialNumber" = "Número de Serie:";
 "battery" = "Batería:";
 "needsTransmitterId" = "Falta la ID del Transmisor";
@@ -26,4 +27,3 @@
 "transmitterResultResult" = "Resultado del reseteo del Transmisor";
 "bootLoader" = "Bootloader";
 "cannotActiveCGMInFollowerMode" = "No puedes añadir un transmisor MGC estando en modo Follower/Seguidor";
-"sensorType" = "Tipo de Sensor:";

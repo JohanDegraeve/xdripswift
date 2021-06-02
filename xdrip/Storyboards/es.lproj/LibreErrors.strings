@@ -1,4 +1,4 @@
-"receivedDataIsNil" = "No data received from oop web server"; // obsolete - no need to translate
+"receivedDataIsNil" = "No data received from oop web server";
+"oOPWebServerError" = "OOP Web Server error: ";
 "libreUSNotSupported" = "El sensor Libre US no es compatible";
-"oOPWebServerError" = "OOP Web Server error: "; // obsolete - no need to translate
 "libreSensorNotReady" = "El sensor Libre no se encuentro activo";

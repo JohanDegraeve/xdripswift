@@ -1,5 +1,5 @@
 "presnooze" = "Snooze";
-"transmitter" = "Transmisor";
+"sensor" = "Sensor";
 "calibrate" = "Calibrar";
 "statusactiontitle" = "Estado";
 "scanbluetoothdeviceactiontitle" = "Buscar Transmisor";
@@ -32,4 +32,3 @@
 "failed" = "Error";
 "calibrationNotNecessary" = "Habilitando el uso del algoritmo Libre, no será necesario calibrar el sensor";
 "dexcomBatteryTooLow" = "El nivel de batería del Transmisor es demasiado bajo!";
-"sensor" = "Sensor";

@@ -1,122 +1,47 @@
-
-/// blood glucose unit in short, for text field title
-"common_bloodglucoseunit_short" = "BZ Einheit";
-
-/// literal translation needed
-"common_hour" = "Stunde";
-
-/// for settings row, literally hardware
-"hardware" = "Hardware";
-
-/// 
-"delete" = "Löschen";
-
-/// to show the sensor status
-"sensorStatus" = "Sensor Status:";
-
-/// yellow
-"yellow" = "gelb";
-
-/// literal translation needed
-"common_minute" = "min";
-
-/// literally yes, without capital
-"yes" = "ja";
-
-/// literal translation needed
-"common_minutes" = "min";
-
-/// green
-"green" = "grün";
-
-/// general usage
-"unknown" = "Unbekannt";
-
-/// red
-"red" = "rot";
-
-/// literally no, without capital
-"no" = "nein";
-
-/// literally add
-"add" = "Hinzufügen";
-
-/// can be used in several screens, just the words Bloodglucose unit
-"common_bloodglucoseunit" = "Blutzucker Einheit";
-
-/// literally update
-"update" = "Bearbeiten";
-
-/// literally password
-"common_password" = "Passwort:";
-
-/// literal translation needed
-"common_hours" = "Stunden";
-
-/// the word LOW, in capitals
-"common_low" = "NIEDRIG";
-
-/// whenever invalid value is given by user somewhere in a field
-"invalidValue" = "Ungültiger Wert";
-
-/// for settings row, literally firmware
-"firmware" = "Firmware";
-
-/// literally 'OK'
 "common_Ok" = "OK";
-
-/// literal translation needed
-"common_day" = "Tag";
-
-/// WiFi
-"WiFi" = "WiFi";
-
-/// on
-"on" = "An";
-
-/// white
-"white" = "weiß";
-
-/// name
-"name" = "Name:";
-
-/// mmol/l
-"common_mmol" = "mmol/l";
-
-/// 
-"off" = "Aus";
-
-/// literally 'Cancel'
 "common_cancel" = "Abbrechen";
-
-/// literally default, will be the name of default alerttypes that will be created during initial app launch
-"common_default" = "Standard";
-
-/// literally warning
-"warning" = "Warnung!";
-
-/// mg/dl
 "common_mgdl" = "mg/dl";
-
-/// literal translation needed
-"common_week" = "Woche";
-
-/// the word HIGH, in capitals
+"common_mmol" = "mmol/l";
+"common_bloodglucoseunit" = "Blutzucker Einheit";
+"common_bloodglucoseunit_short" = "BZ Einheit";
+"common_password" = "Passwort:";
+"common_default" = "Standard";
 "common_high" = "HOCH";
-
-/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
-"invalidAccountOrPassword" = "Konto oder Passwort ungültig";
-
+"common_low" = "NIEDRIG";
+"common_hour" = "Stunde";
+"common_hours" = "Stunden";
+"common_minutes" = "min";
+"common_minute" = "min";
+"common_day" = "Tag";
 "common_days" = "Tage";
 "common_today" = "Heute";
-
+"common_week" = "Woche";
+"common_hourshort" = "h";
+"common_dayshort" = "d";
+"common_todayshort" = "Heute";
+"warning" = "Warnung!";
+"update" = "Bearbeiten";
+"add" = "Hinzufügen";
+"yes" = "ja";
+"no" = "nein";
+"red" = "rot";
+"green" = "grün";
+"white" = "weiß";
+"yellow" = "gelb";
+"name" = "Name:";
+"WiFi" = "WiFi";
+"on" = "An";
+"off" = "Aus";
+"delete" = "Löschen";
+"invalidValue" = "Ungültiger Wert";
+"firmware" = "Firmware";
+"hardware" = "Hardware";
+"unknown" = "Unbekannt";
+"sensorStatus" = "Sensor Status:";
+"invalidAccountOrPassword" = "Konto oder Passwort ungültig";
 "common_statistics_low" = "Niedrig";
 "common_statistics_inRange" = "im Zielbereich";
 "common_statistics_high" = "Hoch";
 "common_statistics_average" = "Durchschnitt";
 "common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
-
-"common_hourshort" = "h";
-"common_dayshort" = "d";
-"common_todayshort" = "Heute";

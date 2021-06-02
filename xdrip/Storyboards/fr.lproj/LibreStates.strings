@@ -1,20 +1,7 @@
-/// Possible Libre Sensor states
-"failure" = "échec";
-
-/// Possible Libre Sensor states
-"shutdown" = "fermeture";
-
-/// Possible Libre Sensor states
-"starting" = "démarrage";
-
-/// Possible Libre Sensor states
-"expired" = "Expiré";
-
-/// general usage
-"unknown" = "Inconnu";
-
-/// Possible Libre Sensor states
-"ready" = "prêt";
-
-/// Possible Libre Sensor states
 "notYetStarted" = "Pas encore démarré";
+"starting" = "démarrage";
+"ready" = "prêt";
+"expired" = "Expiré";
+"shutdown" = "fermeture";
+"failure" = "échec";
+"unknown" = "Inconnu";

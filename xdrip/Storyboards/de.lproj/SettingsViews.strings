@@ -1,299 +1,103 @@
-
-/// default text in email body, when user wants to send trace file.
-"emailbodyText" = "Problem Beschreibung: ";
-
-/// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
-"settingsviews_uploadReadingstoDexcomShare" = "Upload zu Dexcom Share?";
-
-/// for text in pop up where user can select bg unit
-"settingsviews_selectbgunit" = "Blutzucker Einheit:";
-
-/// transmitter settings, just the words that explain that the settings is about transmitter type
-"settingsviews_transmittertype" = "Transmitter Typ:";
-
-/// Apple Watch Settings - text in row where create event is enabled or disabled 
-"createCalendarEvent" = "Kalendereinträge anlegen?";
-
-/// dexcom share settings, section title
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
-
-/// in Settings, section title for Trace
-"sectionTitleTrace" = "Fehlerbericht";
-
-/// used in settings, section Info, title of the build setting
-"settingsviews_build" = "Build:";
-
-/// general settings, literally master
-"settingsviews_master" = "Master";
-
-/// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
-"volumeTestiOSSound" = "Lautstärke Test";
-
-/// transmitter settings, just the words that explain that the settings is about transmitter id
-"settingsviews_transmitterid" = "Transmitter ID:";
-
-/// nightscout settings, title of row
-"uploadSensorStartTime" = "Sensor Startzeit hochladen?";
-
-/// dexcom share settings, pop up that asks user to enter dexcom share account name
-"settingsviews_giveDexcomShareAccountName" = "Eingabe Dexcom Share Account Name";
-
-/// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
-"volumeTestSoundPlayer" = "Lautstärke Test (im Stummmodus)";
-
-/// healthkit settings, section title
-"settingsviews_sectiontitlehealthkit" = "Apple Health";
-
-/// If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown
-"infoCalendarAccessDeniedByUser" = "Keine Freigabe für Kalender.\n\nZum Freigeben: Einstellungen, Datenschutz, Kalender und aktivieren.";
-
-/// 
-"settingsviews_urgentLowValue" = "Niedriger Wert dringend:";
-
-/// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Einstellungen";
-
-/// used in settings, section Info, title of the version setting
-"settingsviews_Version" = "Version:";
-
-/// nightscout settings, where user can set the nightscout url
-"settingsviews_nightScoutUrl" = "URL:";
-
-/// name of setting for back ground color
-"m5stack_settingsviews_backGroundColor" = "Hintergrund Farbe";
-
-/// weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section
-"settingsviews_labelWebOOP" = "xDrip oder Libre Algorithmus";
-
-/// nightscout settings, section title
-"settingsviews_sectiontitlenightscout" = "NightScout";
-
-/// Apple Watch Settings - text in row where user needs to say if delta should be displayed or not
-"displayDeltaInCalendarEvent" = "Delta anzeigen?";
-
-/// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
-"volumeTestiOSSoundExplanation" = "Ein Alarm mit eingestellter Systemlautstärke wird gespielt (nicht im Stummmodus).\n\n(gilt auch bei verpasster Datenübertragung.)\n\nLautstärketaste drücken um Test abzubrechen, danach können Sie die Lautstärke wie gewünscht einstellen und noch einmal testen.";
-
-/// home screen settings, high value
-"settingsviews_highValue" = "Hoher Wert:";
-
-/// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
-"settingsviews_nonfixedtransmitter" = "Aktiviere Mehrpunkt-Kalibrierung?";
-
-/// transmitter settings, to explain that settings is about resetting the transmitter
-"settingsviews_resettransmitter" = "Transmitter zurücksetzten";
-
-/// used in settings, section Info, title of the license setting
-"settingsviews_license" = "Lizenz";
-
-/// general settings, should reading be multiplied with 10 yes or no
-"multipleAppBadgeValueWith10" = "mit 10 multiplizieren?";
-
-/// nightscout settings, pop up that asks user to enter nightscout api key
-"settingsviews_giveNightScoutAPIKey" = "API_SECRET Eingabe";
-
-/// non fixed settings, title of the section
-"settingsviews_labelNonFixed" = "Mehrpunkt-Kalibrierung";
-
-/// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "Apple Health nutzen?";
-
-/// speak settings, section title
-"settingsviews_sectiontitlespeak" = "Vorlesen";
-
-/// used for editing schedule for NightScout upload and Dexcom Share upload
-"editScheduleTimePickerSubtitle" = "Ändern: ";
-
-/// alerting settings, row alert types
-"settingsviews_row_alert_types" = "Eigene Alarme";
-
-/// general settings, section title
 "settingsviews_sectiontitlegeneral" = "Haupteinstellungen";
-
-/// speak settings, where enable or disable speak trend
-"settingsviews_speakTrend" = "Trend vorlesen?";
-
-/// Apple Watch Settings - text in row where user needs to say if trend should be displayed or not
-"displayTrendInCalendarEvent" = "Trend anzeigen?";
-
-/// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
-"infoCalendarAccessRestricted" = "Richtlinien auf ihrem Gerät verhindern das Sie %@ Zugang zu ihrem Kalender geben.";
-
-/// in Settings, to enable debug level in trace file
-"debugLevel" = "Debug Level hinzufügen";
-
-/// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
-"warningChangeFromMasterToFollower" = " Der wechsel von Master zu Follower beendet die aktuelle Verbindung zu ihrem Sensor.Möchten Sie dennoch wechseln?";
-
-/// nightscout or dexcom share settings, where user can select to edit the schedule
-"schedule" = "Upload Plan:";
-
-/// nightscout settings, port to use
-"nightScoutPort" = "Port (Optional):";
-
-/// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
-"settingsviews_IntervalTitle" = "Intervall:";
-
-/// general settings, literally follower
-"settingsviews_follower" = "Follower";
-
-/// home screen settings, target value
-"settingsviews_targetValue" = "Zielwert:";
-
-/// home screen settings, show target line
-"settingsviews_showtarget" = "Zielwert Linie anzeigen?";
-
-/// 
-"settingsviews_showcoloredobjectives" = "Farbige Linien anzeigen?";
-
-/// M5 stack bluetooth  settings, pop up that asks user to enter the password
-"m5stack_settingsviews_giveBluetoothPassword" = "Eingabe Bluetooth Passwort";
-
-/// Apple Watch Settings - text in row where user needs to say if unit should be displayed or not
-"displayUnitInCalendarEvent" = "Einheiten anzeigen?";
-
-/// Text in pop up shown when user wants to send the trace file
-"describeProblem" = "Helfen Sie uns in dem sie uns so viele Innformationen als möglich mitteilen. Sollten Sie das Problem schon in unsere Facebook Gruppe gemeldet haben, teilen Sie uns bitte ihren Facebook Namen per Email mit.";
-
-/// dexcom share settings, pop up that asks user to enter dexcom share password
-"settingsviews_giveDexcomSharePassword" = "Eingabe Dexcom Share Passwort";
-
-/// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Libre Algorithmus benutzen?";
-
-/// When creating schedule for Nightscout or Dexcom Share upload, this is the top label text
-"timeScheduleViewTitle" = "An/Aus für geplanten upload ";
-
-/// nightscout settings, where user can enable or disable nightscout
-"settingsviews_nightScoutEnabled" = "Nightscout aktivieren?";
-
-/// alerting settings, section title
-"settingsviews_sectiontitlealerting" = "Alarm";
-
-/// speak settings, where user can enable or disable speak readings
-"settingsviews_speakBgReadings" = "BZ Werte vorlesen?";
-
-/// home screen settings, urgent high value
-"settingsviews_urgentHighValue" = "Hohe Werte dringend:";
-
-/// name of setting for text color
-"m5stack_settingsviews_textColor" = "Text Color";
-
-/// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Objekte im Diagram anzeigen?";
-
-/// nightscout settings, where user can set the nightscout api key
-"settingsviews_nightScoutAPIKey" = "API_SECRET:";
-
-/// user tries to send trace file but there's no native email account configured
-"emailNotConfigured" = "Sie müßen einen E-mail Konto auf ihrem Gerät aktiviert haben.";
-
-/// transmitter settings, section title
-"settingsviews_sectiontitletransmitter" = "Transmitter";
-
-/// nightscout  settings, pop up that asks user to enter nightscout url
-"settingsviews_giveNightScoutUrl" = "Eingabe NightScout URL";
-
-/// transmitter settings, pop up that asks user to inter transmitter id
-"settingsviews_givetransmitterid" = "Eingabe Transmitter ID";
-
-/// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test
-"volumeTestSoundPlayerExplanation" = "Ein Alarm mit eingestellter Systemlautstärke wird gespielt (auch im Stummmodus).\n\n(Dieser Alarm gilt für alle Alarme mit Ausnahme von verpasster Datenübertragung.)\n\nMit Ok können sie den Test beenden, danach können Sie die Lautstärke wie gewünscht einstellen und noch einmal testen..";
-
-/// speak settings, where user can enable or disable speak delta
-"settingsviews_speakDelta" = "Delta vorlesen?";
-
-/// User sets a transmitter id with id 8G or higher. This is not supported
-"transmitterId8OrHigherNotSupported" = "Transmitter mit der ID 8Gxxxx oder neuer werden zur Zeit nicht unterstützt!";
-
-/// M5 stack setting, brightness
-"m5stack_settingsviews_brightness" = "Bildschirm Helligkeit";
-
-/// dexcom share settings, where user can set the dexcom share account name
-"settingsviews_dexcomShareAccountName" = "Benutzer Name:";
-
-/// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
-"settingsviews_IntervalMessage" = "Mindestabstand zwischen zwei Werten in Minuten";
-
-/// shown on top of the first settings screen
-"m5stack_settingsviews_settingstitle" = "M5 Stack Einstellungen";
-
-/// In case user tries to send trace file via email but error occurs.
-"failedToSendEmail" = "Email senden fehlgeschlagen";
-
-/// alerting settings, row alerts (thresholds)
-"settingsviews_row_alerts" = "Schwellwerte";
-
-/// general settings, should reading be shown in app badge yes or no
-"labelShowReadingInAppBadge" = "BZ Werte auf der App-Kachel anzeigen?";
-
-/// home screen settings, low value
-"settingsviews_lowValue" = "Niedriger Wert:";
-
-/// dexcom share settings, pop up that asks user to enter dexcom share serial number
-"settingsviews_giveDexcomShareSerialNumber" = "Eingabe der Dexcom Receiver Seriennummer";
-
-/// Apple Watch Settings - text in row where user needs to select a calendar
-"calenderId" = "Kalender auswählen?";
-
-/// in Settings, row title to send settings
-"sendTraceFile" = "Fehlerbericht senden";
-
-/// speak settings, where user can select the language
-"settingsviews_speakBgReadingslanguage" = "Sprache:";
-
-/// nightscout settings, where user can select to use schedule or not
-"settingsviews_useSchedule" = "Upload Planer nutzen?";
-
-/// about settings, section title
-"settingsviews_sectiontitleAbout" = "Über %@";
-
-/// Apple Watch Settings - section title
-"appleWatchSectionTitle" = "Apple Watch";
-
-/// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
-"m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
-
-/// nightscout settings, when clicking the cell, test the url and api key
-"testUrlAndAPIKey" = "Verbindung testen?";
-
-/// speak reading settings, text in pop up where user can select the language
-"settingsviews_speakreadingslanguageselection" = "Sprache wählen";
-
-/// general settings, should reading be shown in notification yes or no
-"showReadingInNotification" = "BZ in Mitteilungszentrale?";
-
-/// dexcom share settings, where user can choose to use US url or not
-"settingsviews_useUSDexcomShareurl" = "Benutzung von Dexcom US Server?";
-
-/// general settings, master or follower
+"settingsviews_selectbgunit" = "Blutzucker Einheit:";
 "settingsviews_masterorfollower" = "Master or Follower?";
-
-/// dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload
-"settingsviews_dexcomShareSerialNumber" = "Empfänger Seriennummer:";
-
-/// deloper settings, row title for 'Smooth Libre Values?'
-"smoothLibreValues" = "Libre Werte glätten?";
-
-/// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
-"oslog" = "OSLog";
-
-/// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
-"nslog" = "NSLog";
-
-/// Developer Settings, section title
-"developerSettings" = "Entwickler Einstellungen";
-
-/// home screen settings, section title
-"settingsviews_sectiontitlehomescreen" = "Home Screen";
-
-/// transmitter settings, this is for the button, when clicked then user will be requested to give transmitter id. The only difference with settingsviews_transmitterid is that ':' is not added
-"settingsviews_transmitterid_text_for_button" = "Transmitter ID";
-
-
+"settingsviews_master" = "Master";
+"settingsviews_follower" = "Follower";
+"showReadingInNotification" = "BZ in Mitteilungszentrale?";
+"labelShowReadingInAppBadge" = "BZ Werte auf der App-Kachel anzeigen?";
+"multipleAppBadgeValueWith10" = "mit 10 multiplizieren?";
+"settingsviews_urgentHighValue" = "Hohe Werte dringend:";
+"settingsviews_highValue" = "Hoher Wert:";
+"settingsviews_targetValue" = "Zielwert:";
+"settingsviews_lowValue" = "Niedriger Wert:";
+"settingsviews_urgentLowValue" = "Niedriger Wert dringend:";
+"settingsviews_useobjectives" = "Objekte im Diagram anzeigen?";
+"settingsviews_showcoloredobjectives" = "Farbige Linien anzeigen?";
+"settingsviews_showtarget" = "Zielwert Linie anzeigen?";
 "settingsviews_sectiontitlestatistics" = "Statistik";
 "settingsviews_showStatistics" = "Zeige Verlauf?";
 "settingsviews_daysToUseStatisticsTitle" = "Tage zum berechnen?";
 "settingsviews_daysToUseStatisticsMessage" = "Maximale Tage anhand dessen versucht wird den Verlauf zu berechnen?\n\n(Bei 0 wird heute ab Mitternacht berechnet)";
 "settingsviews_useStandardStatisticsRange" = "Standardbereich verwenden?";
 "settingsviews_useIFCCA1C" = "HbA1c in mmols/mol anzeigen?";
+"settingsviews_sectiontitletransmitter" = "Transmitter";
+"settingsviews_transmittertype" = "Transmitter Typ:";
+"settingsviews_transmitterid" = "Transmitter ID:";
+"settingsviews_transmitterid_text_for_button" = "Transmitter ID";
+"settingsviews_givetransmitterid" = "Eingabe Transmitter ID";
+"settingsviews_resettransmitter" = "Transmitter zurücksetzten";
+"settingsviews_webooptransmitter" = "Libre Algorithmus benutzen?";
+"settingsviews_nonfixedtransmitter" = "Aktiviere Mehrpunkt-Kalibrierung?";
+"settingsviews_labelNonFixed" = "Mehrpunkt-Kalibrierung";
+"settingsviews_labelWebOOP" = "xDrip oder Libre Algorithmus";
+"transmitterId8OrHigherNotSupported" = "Transmitter mit der ID 8Gxxxx oder neuer werden zur Zeit nicht unterstützt!";
+"settingsviews_sectiontitlealerting" = "Alarm";
+"settingsviews_row_alert_types" = "Eigene Alarme";
+"settingsviews_row_alerts" = "Schwellwerte";
+"settingsviews_sectiontitlehealthkit" = "Apple Health";
+"settingsviews_healthkit" = "Apple Health nutzen?";
+"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Upload zu Dexcom Share?";
+"settingsviews_dexcomShareSerialNumber" = "Empfänger Seriennummer:";
+"settingsviews_useUSDexcomShareurl" = "Benutzung von Dexcom US Server?";
+"settingsviews_dexcomShareAccountName" = "Benutzer Name:";
+"settingsviews_giveDexcomShareAccountName" = "Eingabe Dexcom Share Account Name";
+"settingsviews_giveDexcomSharePassword" = "Eingabe Dexcom Share Passwort";
+"settingsviews_giveDexcomShareSerialNumber" = "Eingabe der Dexcom Receiver Seriennummer";
+"settingsviews_sectiontitlenightscout" = "NightScout";
+"settingsviews_nightScoutEnabled" = "Nightscout aktivieren?";
+"settingsviews_nightScoutUrl" = "URL:";
+"settingsviews_useSchedule" = "Upload Planer nutzen?";
+"schedule" = "Upload Plan:";
+"settingsviews_giveNightScoutUrl" = "Eingabe NightScout URL";
+"settingsviews_nightScoutAPIKey" = "API_SECRET:";
+"settingsviews_giveNightScoutAPIKey" = "API_SECRET Eingabe";
+"editScheduleTimePickerSubtitle" = "Ändern: ";
+"timeScheduleViewTitle" = "An/Aus für geplanten upload ";
+"uploadSensorStartTime" = "Sensor Startzeit hochladen?";
+"testUrlAndAPIKey" = "Verbindung testen?";
+"settingsviews_sectiontitlespeak" = "Vorlesen";
+"settingsviews_speakBgReadings" = "BZ Werte vorlesen?";
+"settingsviews_speakBgReadingslanguage" = "Sprache:";
+"settingsviews_speakreadingslanguageselection" = "Sprache wählen";
+"settingsviews_speakTrend" = "Trend vorlesen?";
+"settingsviews_speakDelta" = "Delta vorlesen?";
+"settingsviews_IntervalTitle" = "Intervall:";
+"settingsviews_IntervalMessage" = "Mindestabstand zwischen zwei Werten in Minuten";
+"settingsviews_sectiontitleAbout" = "Über %@";
+"settingsviews_Version" = "Version:";
+"settingsviews_license" = "Lizenz";
+"settingsviews_build" = "Build:";
+"m5stack_settingsviews_settingstitle" = "M5 Stack Einstellungen";
+"m5stack_settingsviews_textColor" = "Text Color";
+"m5stack_settingsviews_backGroundColor" = "Hintergrund Farbe";
+"m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
+"m5stack_settingsviews_giveBluetoothPassword" = "Eingabe Bluetooth Passwort";
+"m5stack_settingsviews_brightness" = "Bildschirm Helligkeit";
+"appleWatchSectionTitle" = "Apple Watch";
+"createCalendarEvent" = "Kalendereinträge anlegen?";
+"calenderId" = "Kalender auswählen?";
+"displayTrendInCalendarEvent" = "Trend anzeigen?";
+"displayUnitInCalendarEvent" = "Einheiten anzeigen?";
+"displayDeltaInCalendarEvent" = "Delta anzeigen?";
+"infoCalendarAccessDeniedByUser" = "Keine Freigabe für Kalender.\n\nZum Freigeben: Einstellungen, Datenschutz, Kalender und aktivieren.";
+"infoCalendarAccessRestricted" = "Richtlinien auf ihrem Gerät verhindern das Sie %@ Zugang zu ihrem Kalender geben.";
+"sectionTitleTrace" = "Fehlerbericht";
+"sendTraceFile" = "Fehlerbericht senden";
+"describeProblem" = "Helfen Sie uns in dem sie uns so viele Innformationen als möglich mitteilen. Sollten Sie das Problem schon in unsere Facebook Gruppe gemeldet haben, teilen Sie uns bitte ihren Facebook Namen per Email mit.";
+"emailNotConfigured" = "Sie müßen einen E-mail Konto auf ihrem Gerät aktiviert haben.";
+"emailbodyText" = "Problem Beschreibung: ";
+"failedToSendEmail" = "Email senden fehlgeschlagen";
+"volumeTestSoundPlayerExplanation" = "Ein Alarm mit eingestellter Systemlautstärke wird gespielt (auch im Stummmodus).\n\n(Dieser Alarm gilt für alle Alarme mit Ausnahme von verpasster Datenübertragung.)\n\nMit Ok können sie den Test beenden, danach können Sie die Lautstärke wie gewünscht einstellen und noch einmal testen..";
+"volumeTestiOSSoundExplanation" = "Ein Alarm mit eingestellter Systemlautstärke wird gespielt (nicht im Stummmodus).\n\n(gilt auch bei verpasster Datenübertragung.)\n\nLautstärketaste drücken um Test abzubrechen, danach können Sie die Lautstärke wie gewünscht einstellen und noch einmal testen.";
+"volumeTestSoundPlayer" = "Lautstärke Test (im Stummmodus)";
+"volumeTestiOSSound" = "Lautstärke Test";
+"debugLevel" = "Debug Level hinzufügen";
+"warningChangeFromMasterToFollower" = " Der wechsel von Master zu Follower beendet die aktuelle Verbindung zu ihrem Sensor.Möchten Sie dennoch wechseln?";
+"nightScoutPort" = "Port (Optional):";
+"developerSettings" = "Entwickler Einstellungen";
+"smoothLibreValues" = "Libre Werte glätten?";
+"nslog" = "NSLog";
+"oslog" = "OSLog";
+"settingsviews_sectiontitlehomescreen" = "Home Screen";

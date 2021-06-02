@@ -1,38 +1,13 @@
-/// In m5StickC view, one line allows to show info where to find M5Stack software, this is the text in the cell
-"m5StickCSoftWhereHelpCellText" = "Wo finde ich die M5StickC Software?";
-
-/// in case M5Stack authentication failed, and M5Stack is generating a random password
-"m5StackResetRequiredWarning" = "Um ein neues Passwort zu erstellen muss M5Stack neu gestartet werden. Klick wenn erledigt ";
-
-/// in case user tires to power off the M5Stack via xdrip but it's not connected
-"deviceMustBeConnectedToPowerOff" = "M5Stack muss verbunden sein um ihn aus zu schalten";
-
-/// in case M5Stack authentication failed
-"authenticationFailureWarning" = "Authentifizierung auf M5Stack ist fehlgeschlagen, entweder benutzen Sie das vorkonfigurierte Passwort, oder sollte der M5Stack kein vorkonfiguriertes Passwort haben, setzten Sie den M5Stack bitte zurück. M5Stack wird jetzt getrennt. Neuer Versuch starten, klicken. ";
-
-/// user clicks power off in M5Stack view, confirmation is needed
-"powerOffConfirm" = "Sind Sie sicher das sie M5Stack herunterfahren wollen?";
-
-/// in case M5Stack authentication failed, and M5Stack is expecting user configured password
-"blePasswordMissingWarning" = "Bitte setzten Sie ein Passwort";
-
-/// text for cell in settings view, connect to wifi yes or no
-"connectToWiFi" = "Verbinden mit WiFi";
-
-/// when Bluetooth Peripheral list is shown, title of the view
 "screenTitle" = "M5Stack";
-
-/// this is the text shown when clicking the cell 'where to find M5Stack software'
-"m5StackSoftWareHelpText" = "Gehe zu";
-
-/// when M5Stack list is shown, title of the view
-"m5StackViewscreenTitle" = "M5Stack";
-
-/// when M5Stick list is shown, title of the view
-"m5StickCViewscreenTitle" = "M5Stick";
-
-/// In m5Stack view, one line allows to show info where to find M5Stack software, this is the text in the cell
+"authenticationFailureWarning" = "Authentifizierung auf M5Stack ist fehlgeschlagen, entweder benutzen Sie das vorkonfigurierte Passwort, oder sollte der M5Stack kein vorkonfiguriertes Passwort haben, setzten Sie den M5Stack bitte zurück. M5Stack wird jetzt getrennt. Neuer Versuch starten, klicken. ";
+"blePasswordMissingWarning" = "Bitte setzten Sie ein Passwort";
+"m5StackResetRequiredWarning" = "Um ein neues Passwort zu erstellen muss M5Stack neu gestartet werden. Klick wenn erledigt ";
 "m5StackSoftWhereHelpCellText" = "Wo finde ich die M5Stack Software?";
-
-/// cell text, to power off
+"m5StickCSoftWhereHelpCellText" = "Wo finde ich die M5StickC Software?";
+"m5StackSoftWareHelpText" = "Gehe zu";
+"m5StackViewscreenTitle" = "M5Stack";
+"m5StickCViewscreenTitle" = "M5Stick";
+"deviceMustBeConnectedToPowerOff" = "M5Stack muss verbunden sein um ihn aus zu schalten";
+"powerOffConfirm" = "Sind Sie sicher das sie M5Stack herunterfahren wollen?";
 "powerOff" = "Ausschalten";
+"connectToWiFi" = "Verbinden mit WiFi";

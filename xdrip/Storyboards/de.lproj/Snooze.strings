@@ -1,6 +1,2 @@
-
-/// row text for overview snooze. Not snoozed alarm
 "not_snoozed" = "Nicht schlummern";
-
-/// row text for overview snooze. Snoozed alarm, until .. followed by timestamp
 "snoozed_until" = "Schlummern bis";

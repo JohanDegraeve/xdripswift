@@ -1,6 +1,6 @@
+"high" = "hoog";
+"low" = "laag";
 "currentglucose" = "Huidige bloedglucose is";
-"currenttrend" = "Het beweegt";
-"currentdelta" = "Verschil met laatste meting is";
 "trendnoncomputable" = "niet berekenbaar";
 "trenddoubledown" = "drastisch naar beneden";
 "trendsingledown" = "aanzienlijk naar beneden";
@@ -9,6 +9,6 @@
 "trendfortyfiveup" = "omhoog";
 "trendsingleup" = "aanzienlijk omhoog";
 "trenddoubleup" = "dramatisch omhoog";
+"currenttrend" = "Het beweegt";
 "deltanoncomputable" = "niet berekenbaar";
-"high" = "hoog";
-"low" = "laag";
+"currentdelta" = "Verschil met laatste meting is";

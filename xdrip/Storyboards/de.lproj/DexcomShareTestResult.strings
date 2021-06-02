@@ -1,28 +1,9 @@
-
-
-/// If dexcom share upload fails because serial number does not match for the account
-"dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Die Dexcom Share Seriennummer stimmt nicht mit der Seriennummer des Kontos überein. Überprüfen sie die Seriennummer unter Einstellungen.";
-
-/// If dexcom share upload fails, and info is giving to user, this is the title of the pop up
-"dexcomsharetestresult_uploadErrorWarning" = "Dexcom Share Upload Fehler";
-
-/// If serial number is not assigned to the account, this is the 2nd part in a series of 3 to form a complete sentence
-"dexcomsharetestresult_monitored_receiver_not_assigned_2" = "ist nicht zugewiesen";
-
-/// POP up after verifying DexcomShare credentials, to say that verification of url and password was not successful - this is the title
-"dexcomsharetestresult_verificationerroralerttitle" = "Fehler während der Prüfung";
-
-/// If serial number is not assigned to the account, this is the 3rd part in a series of 3 to form a complete sentence
-"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Benutzen Sie die offizielle Dexcom App um den Transmitter zu registrieren (G5) oder zu teilen (G4)\r\n\r\neventuell benutzen Sie die flasche URL, US anstelle EU";
-
-/// POP up after verifying DexcomShare credentials, to say that verification of url and password key were successful - this is the title
 "dexcomsharetestresult_verificationsuccessfulalerttitle" = "Prüfung erfolgreich";
-
-/// If serial number is not assigned to the account, this is the 1st part in a series of 3 to form a complete sentence
-"dexcomsharetestresult_monitored_receiver_not_assigned_1" = "Es scheint die Transmitter ID oder Seriennummer";
-
-/// if dexcom share login fails , too many attempts
-"dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Zu viele Fehlversuche. Warten Sie 10 Minuten und versuchen es dann erneut.";
-
-/// POP up after verifying DexcomShare credentials, to say that verification of url and password were successful - this is the body
 "dexcomsharetestresult_verificationsuccessfulalertbody" = "Ihr Dexcom Share Konto wurde erfolgreich verbunden";
+"dexcomsharetestresult_verificationerroralerttitle" = "Fehler während der Prüfung";
+"dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Zu viele Fehlversuche. Warten Sie 10 Minuten und versuchen es dann erneut.";
+"dexcomsharetestresult_uploadErrorWarning" = "Dexcom Share Upload Fehler";
+"dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Die Dexcom Share Seriennummer stimmt nicht mit der Seriennummer des Kontos überein. Überprüfen sie die Seriennummer unter Einstellungen.";
+"dexcomsharetestresult_monitored_receiver_not_assigned_1" = "Es scheint die Transmitter ID oder Seriennummer";
+"dexcomsharetestresult_monitored_receiver_not_assigned_2" = "ist nicht zugewiesen";
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Benutzen Sie die offizielle Dexcom App um den Transmitter zu registrieren (G5) oder zu teilen (G4)\r\n\r\neventuell benutzen Sie die flasche URL, US anstelle EU";
