@@ -85,3 +85,6 @@
 
 /// when M5Stack is shown, title of the cell with the address
 "address" = "Adresse:";
+
+"confirmDisconnectTitle" = "Verbindung trennen";
+"confirmDisconnectMessage" = "Klicke 'Verbindung trennen' um zu bestätigen, dass du die Verbindung zum Transmitter wirklich beenden möchtest.";
