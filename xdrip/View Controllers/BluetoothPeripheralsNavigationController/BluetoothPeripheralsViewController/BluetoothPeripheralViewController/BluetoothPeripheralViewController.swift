@@ -219,10 +219,10 @@ class BluetoothPeripheralViewController: UIViewController {
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
         
         // create uialertcontroller to ask the user if they really want to disconnect
-        confirmDisconnectAlertController = UIAlertController(title: "Confirm Disconnect", message: "Click OK to confirm that you really want to disconnect from the transmitter", preferredStyle: .alert)
+        confirmDisconnectAlertController = UIAlertController(title: Texts_BluetoothPeripheralView.confirmDisconnectTitle , message: Texts_BluetoothPeripheralView.confirmDisconnectMessage, preferredStyle: .alert)
 
         // create buttons for uialertcontroller
-        let OKAction = UIAlertAction(title: Texts_Common.Ok, style: .default) {
+        let OKAction = UIAlertAction(title: Texts_BluetoothPeripheralView.disconnect, style: .default) {
             (action:UIAlertAction!) in
             
             // device should not automaticaly connect in future, which means, each time the app restarts, it will not try to connect to this bluetoothPeripheral
