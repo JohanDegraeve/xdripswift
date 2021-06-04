@@ -111,9 +111,6 @@ class BluetoothPeripheralViewController: UIViewController {
     /// when user starts scanning, info will be shown in UIAlertController. This will be
     private var infoAlertWhenScanningStarts: UIAlertController?
     
-    /// when clicks the disconnect button, info will be shown in UIAlertController asking for confirmation.
-    private var confirmDisconnectAlertController: UIAlertController?
-    
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBluetoothPeripheralViewController)
 
@@ -219,7 +216,7 @@ class BluetoothPeripheralViewController: UIViewController {
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
         
         // create uialertcontroller to ask the user if they really want to disconnect
-        confirmDisconnectAlertController = UIAlertController(title: Texts_BluetoothPeripheralView.confirmDisconnectTitle , message: Texts_BluetoothPeripheralView.confirmDisconnectMessage, preferredStyle: .alert)
+        let confirmDisconnectAlertController = UIAlertController(title: Texts_BluetoothPeripheralView.confirmDisconnectTitle , message: Texts_BluetoothPeripheralView.confirmDisconnectMessage, preferredStyle: .alert)
 
         // create buttons for uialertcontroller
         let OKAction = UIAlertAction(title: Texts_BluetoothPeripheralView.disconnect, style: .default) {
@@ -251,11 +248,11 @@ class BluetoothPeripheralViewController: UIViewController {
         }
 
         // add buttons to the alert
-        confirmDisconnectAlertController!.addAction(OKAction)
-        confirmDisconnectAlertController!.addAction(cancelAction)
+        confirmDisconnectAlertController.addAction(OKAction)
+        confirmDisconnectAlertController.addAction(cancelAction)
 
         // show alert
-        present(confirmDisconnectAlertController!, animated: true, completion:nil)
+        present(confirmDisconnectAlertController, animated: true, completion:nil)
         
     }
     
