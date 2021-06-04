@@ -251,3 +251,10 @@
 
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate?";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// general settings, should the clock also be displayed when the screen is locked?
+"showClockWhenScreenIsLocked" = "Show Clock when Locked?";

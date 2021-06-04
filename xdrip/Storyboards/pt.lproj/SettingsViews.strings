@@ -101,3 +101,10 @@
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Ecrã Inicial";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// general settings, should the clock also be displayed when the screen is locked?
+"showClockWhenScreenIsLocked" = "Show Clock when Locked?";

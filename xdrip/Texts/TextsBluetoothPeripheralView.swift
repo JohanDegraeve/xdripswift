@@ -116,4 +116,12 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("cannotActiveCGMInFollowerMode", tableName: filename, bundle: Bundle.main, value: "You can not activate a CGM in follower mode", comment: "User tries to add a CGM or connect an already existing CGM, while in follower mode.")
     }()
     
+    static let confirmDisconnectTitle: String = {
+        return NSLocalizedString("confirmDisconnectTitle", tableName: filename, bundle: Bundle.main, value: "Confirm Disconnect", comment: "Disconnect transmitter, title")
+    }()
+    
+    static let confirmDisconnectMessage: String = {
+        return NSLocalizedString("confirmDisconnectMessage", tableName: filename, bundle: Bundle.main, value: "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.", comment: "Confirm that the user wants to really disconnect the transmitter, title")
+    }()
+    
 }

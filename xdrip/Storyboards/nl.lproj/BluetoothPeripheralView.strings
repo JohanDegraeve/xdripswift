@@ -26,4 +26,6 @@
 "lastResetNotKnown" = "Laatste Reset Tijdstip onbekend";
 "transmitterResultResult" = "Transmitter Reset Resultaat";
 "bootLoader" = "Bootloader";
+"confirmDisconnectTitle" = "Bevestig Loskoppelen";
+"confirmDisconnectMessage" = "Klik 'Loskoppelen' om te bevestigen dat je de zender wil loskoppelen.";
 "cannotActiveCGMInFollowerMode" = "Je kunt een CGM in Volg Modus niet activeren";

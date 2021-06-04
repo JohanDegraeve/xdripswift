@@ -32,3 +32,19 @@
 "failed" = "Falhou";
 "calibrationNotNecessary" = "Quando se usa Algoritmo do Libre, não é necessário calibrar o sensor.";
 "dexcomBatteryTooLow" = "O Nível de Bateria do Transmissor está muito baixo!";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Text in button on home screen
+"unlock" = "Unlock";
+
+/// Text in button on home screen
+"lock" = "Lock";
+
+/// Screen Lock Title
+"screenlocktitle" = "Screen Lock Enabled";
+
+/// Info message to explain screen lock function
+"screenlockinfo" = "This will keep the screen awake until you move to another app or click Unlock.\r\n\nIt is recommended that you keep the phone plugged into a charger to prevent battery drain.";

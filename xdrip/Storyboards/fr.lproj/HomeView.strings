@@ -1,6 +1,10 @@
 "presnooze" = "Snooze";
 "sensor" = "Capteur";
 "calibrate" = "Calibrer";
+"lock" = "Verrouillé";
+"unlock" = "Déverrouillé";
+"screenlocktitle" = "Verrouillage d'écran activé";
+"screenlockinfo" = "Cette option maintiendra votre écran éveillé jusqu'à ce que vous changiez d'application ou sélectionniez déverrouillé.\r\n\nIl est conseillé de laisser le téléphone sur son chargeur pour éviter que la batterie ne se décharge.";
 "statusactiontitle" = "Statut";
 "scanbluetoothdeviceactiontitle" = "Scanner le transmetteur";
 "forgetbluetoothdeviceactiontitle" = "Oublier le transmetteur";

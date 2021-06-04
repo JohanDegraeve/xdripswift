@@ -21,7 +21,7 @@ extension UserDefaults {
         
         // General
         
-        /// bloodglucose  unit
+        /// bloodglucose unit
         case bloodGlucoseUnitIsMgDl = "bloodGlucoseUnit"
         /// urgent high value
         case isMaster = "isMaster"
@@ -31,6 +31,8 @@ extension UserDefaults {
         case showReadingInAppBadge = "showReadingInAppBadge"
         /// should reading by multiplied by 10
         case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
+        /// should the clock view be shown when the screen is locked?
+        case showClockWhenScreenIsLocked = "showClockWhenScreenIsLocked"
         
         /// minimum time between two notifications, set by user
         case notificationInterval = "notificationInterval"
@@ -349,6 +351,17 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.multipleAppBadgeValueWith10.rawValue)
+        }
+    }
+    
+    /// should the clock view be shown when the screen is locked?
+    @objc dynamic var showClockWhenScreenIsLocked: Bool {
+        // default value for bool in userdefaults is false, as default we want the clock to show when the screen is locked
+        get {
+            return !bool(forKey: Key.showClockWhenScreenIsLocked.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showClockWhenScreenIsLocked.rawValue)
         }
     }
     

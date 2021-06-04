@@ -1,6 +1,10 @@
 "presnooze" = "Snooze";
 "sensor" = "Sensor";
 "calibrate" = "Calibrar";
+"lock" = "Bloquear";
+"unlock" = "Desbloquear";
+"screenlocktitle" = "Bloqueo de Pantalla Habilitado";
+"screenlockinfo" = "Este mode mantendré la pantalla activada hasta que hagas click en 'Desbloquear' o que vuelves a la pantalla de inicio del iPhone.\r\n\nRecomendamos mantener el iPhone conectado a un cargador para evitar la descarga de la batería.";
 "statusactiontitle" = "Estado";
 "scanbluetoothdeviceactiontitle" = "Buscar Transmisor";
 "forgetbluetoothdeviceactiontitle" = "Olvidar Transmisor";

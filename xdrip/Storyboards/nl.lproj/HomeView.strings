@@ -1,6 +1,10 @@
 "presnooze" = "Sluimer";
 "sensor" = "Sensor";
 "calibrate" = "Kalibreer";
+"lock" = "Lock";
+"unlock" = "Unlock";
+"screenlocktitle" = "Scherm Vergrendeld";
+"screenlockinfo" = "Deze optie houdt de app op de voorgrond tot je een andere app opent, of tot je je toestel lockt.\r\n\nHet is aan te raden je toestel aan de oplader te houden om de batterij opgeladen te houden.";
 "statusactiontitle" = "Status";
 "scanbluetoothdeviceactiontitle" = "Scan voor Transmitter";
 "forgetbluetoothdeviceactiontitle" = "Vergeet Transmitter";
