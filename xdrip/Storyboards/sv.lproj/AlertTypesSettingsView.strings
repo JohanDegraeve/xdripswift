@@ -14,4 +14,3 @@
 "alertTypeNoSound" = "Inget ljud";
 "alerttypenamealreadyexistsmessages" = "En larmtyp med detta namn finns redan. Använd ett annat namn.";
 "confirmdeletionalerttype" = "Ta bort larmtyp: ";
-

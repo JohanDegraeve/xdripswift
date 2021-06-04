@@ -1,0 +1,3 @@
+files:
+  - source: /xdrip/Storyboards/en.lproj/*.strings
+    translation: /xdrip/Storyboards/%osx_locale%.lproj/%original_file_name%

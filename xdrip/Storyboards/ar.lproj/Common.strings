@@ -16,10 +16,10 @@
 "common_days" = "أيام";
 "common_today" = "اليوم";
 "common_week" = "أسبوع";
-"common_todayshort" = "اليوم";
-"common_dayshort" = "ي";
 "common_hourshort" = "س";
-"warning" ="تحذير!";
+"common_dayshort" = "ي";
+"common_todayshort" = "اليوم";
+"warning" = "تحذير!";
 "update" = "تعديل";
 "add" = "إضافة";
 "yes" = "نعم";
@@ -45,4 +45,3 @@
 "common_statistics_average" = "المتوسط";
 "common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
-

@@ -25,7 +25,7 @@
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_transmittertype" = "Transmitter Type:";
 "settingsviews_transmitterid" = "Transmitter ID:";
-"settingsviews_transmitterid_text_for_button"  = "Transmitter ID";
+"settingsviews_transmitterid_text_for_button" = "Transmitter ID";
 "settingsviews_givetransmitterid" = "Enter Transmitter ID";
 "settingsviews_resettransmitter" = "Reset Transmitter";
 "settingsviews_webooptransmitter" = "Use Libre Algorithm?";
@@ -102,4 +102,3 @@
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
- 

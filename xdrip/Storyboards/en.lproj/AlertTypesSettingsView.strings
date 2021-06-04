@@ -14,4 +14,3 @@
 "alertTypeNoSound" = "No Sound";
 "alerttypenamealreadyexistsmessages" = "An Alarm Type with this name already exists. Use a different name";
 "confirmdeletionalerttype" = "Delete Alarm Type: ";
-

@@ -1,7 +1,3 @@
-"settingsviews_transmittertype" = "Zender Type";
-"settingsviews_transmitterid" = "Zender-ID";
-"settingsviews_transmitterid_text_for_button" = "Zender-ID";
-
 "settingsviews_settingstitle" = "Instellingen";
 "settingsviews_sectiontitlegeneral" = "Algemeen";
 "settingsviews_selectbgunit" = "Bloedglucose Eenheden:";
@@ -27,6 +23,9 @@
 "settingsviews_useStandardStatisticsRange" = "Standaard Range gebruiken?";
 "settingsviews_useIFCCA1C" = "Toon HbA1c in mmols/mol?";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
+"settingsviews_transmittertype" = "Zender Type";
+"settingsviews_transmitterid" = "Zender-ID";
+"settingsviews_transmitterid_text_for_button" = "Zender-ID";
 "settingsviews_givetransmitterid" = "Voer Transmitter ID In";
 "settingsviews_resettransmitter" = "Reset Transmitter";
 "settingsviews_webooptransmitter" = "Gebruik Libre Algoritme?";
@@ -98,26 +97,8 @@
 "debugLevel" = "Inclusief Debug Niveau";
 "warningChangeFromMasterToFollower" = "Wisselen van Master naar Volger stopt de huidige sensor. Wil je doorgaan ?";
 "nightScoutPort" = "Port (Optioneel):";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// deloper settings, row title for 'Smooth Libre Values?'
-"smoothLibreValues" = "Smooth Libre Values?";
-
-/// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
-"oslog" = "OSLog";
-
-/// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
-"nslog" = "NSLog";
-
-/// Developer Settings, section title
 "developerSettings" = "Developer Settings";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// home screen settings, section title
+"smoothLibreValues" = "Smooth Libre Values?";
+"nslog" = "NSLog";
+"oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Home Screen";

@@ -19,7 +19,7 @@
 "common_hourshort" = "u";
 "common_dayshort" = "d";
 "common_todayshort" = "Vandaag";
-"warning" ="Waarschuwing!";
+"warning" = "Waarschuwing!";
 "update" = "Bewerk";
 "add" = "Voeg toe";
 "yes" = "Ja";
@@ -38,7 +38,6 @@
 "hardware" = "Hardware";
 "unknown" = "Onbekend";
 "sensorStatus" = "Sensor status:";
-/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
 "invalidAccountOrPassword" = "Verkeerde account en/of paswoord";
 "common_statistics_low" = "Laag";
 "common_statistics_inRange" = "In Bereik";

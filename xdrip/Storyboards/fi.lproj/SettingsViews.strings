@@ -1,17 +1,26 @@
 "settingsviews_settingstitle" = "Asetukset";
 "settingsviews_sectiontitlegeneral" = "Yleinen";
-"settingsviews_sectiontitlehomescreen" = "Kotinäyttö";
 "settingsviews_selectbgunit" = "Verensokeriyksikkö:";
-"settingsviews_urgentLowValue" = "Erittäin matala lukema:";
-"settingsviews_lowValue" = "Matala lukema:";
-"settingsviews_highValue" = "Korkea lukema:";
-"settingsviews_urgentHighValue" = "Erittäin korkea lukema:";
 "settingsviews_masterorfollower" = "Isäntä vai seuraaja?";
 "settingsviews_master" = "Isäntä";
 "settingsviews_follower" = "Seuraaja";
 "showReadingInNotification" = "Näytä lukema ilmoituksissa?";
 "labelShowReadingInAppBadge" = "Näytä lukema kuvakkeessa?";
 "multipleAppBadgeValueWith10" = "Kerrotaanko kuvake lukemat 10:llä?";
+"settingsviews_urgentHighValue" = "Erittäin korkea lukema:";
+"settingsviews_highValue" = "Korkea lukema:";
+"settingsviews_targetValue" = "Tavoitearvo";
+"settingsviews_lowValue" = "Matala lukema:";
+"settingsviews_urgentLowValue" = "Erittäin matala lukema:";
+"settingsviews_useobjectives" = "Käytä tavoitteita kaaviossa";
+"settingsviews_showcoloredobjectives" = "Näytä värilliset tavoiteviivat ";
+"settingsviews_showtarget" = "Näytä kohdeviiva";
+"settingsviews_sectiontitlestatistics" = "Statistics";
+"settingsviews_showStatistics" = "Show Statistics?";
+"settingsviews_daysToUseStatisticsTitle" = "Days to Calculate?";
+"settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
+"settingsviews_useStandardStatisticsRange" = "Use Standard Range?";
+"settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol?";
 "settingsviews_sectiontitletransmitter" = "Lähetin";
 "settingsviews_transmittertype" = "Lähettimen tyyppi:";
 "settingsviews_transmitterid" = "Lähettimen ID:";
@@ -87,22 +96,8 @@
 "debugLevel" = "Sisällytä debug taso";
 "warningChangeFromMasterToFollower" = "Vaihtaminen masterista seuraajaan pysäyttää nykyisen anturin. Haluatko jatkaa?";
 "nightScoutPort" = "Portti:";
-"settingsviews_useobjectives" = "Käytä tavoitteita kaaviossa";
-"settingsviews_showcoloredobjectives" = "Näytä värilliset tavoiteviivat ";
-"settingsviews_showtarget" = "Näytä kohdeviiva";
-"settingsviews_targetValue" = "Tavoitearvo";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// deloper settings, row title for 'Smooth Libre Values?'
+"developerSettings" = "Developer Settings";
 "smoothLibreValues" = "Smooth Libre Values?";
-
-/// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
-"oslog" = "OSLog";
-
-/// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
 "nslog" = "NSLog";
 
 /// Developer Settings, section title
@@ -136,3 +131,5 @@
 
 /// general settings, should the clock also be displayed when the screen is locked?
 "showClockWhenScreenIsLocked" = "Show Clock when Locked?";
+"oslog" = "OSLog";
+"settingsviews_sectiontitlehomescreen" = "Kotinäyttö";

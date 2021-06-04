@@ -1,94 +1,36 @@
-/// status info : literally 'not started', used if sensor is not started
-"notstarted" = "Nicht gestartet";
-
-/// when user starts scanning but bluetooth is not on
-"bluetoothisnoton" = "Bluetooth ist aus. Bitte Bluetooth starten und erneut versuchen.";
-
-/// After clicking scan button, this message will appear
-"startScanningInfo" = "Scannen gestartet.\n\n%@ im Vordergrund lassen bis die Verbindung erstellt wurde.\n\n Automatisches Sperren kann, aktiviert bleiben. Einfach nur nicht die App schließen oder das iPhone manuell sperren)";
-
-/// when user clicks transmitterButton, this is the action to forget the device, so that user can scan for a new device, in case user switches device
-"forgetbluetoothdeviceactiontitle" = "Transmitter löschen";
-
-/// If transmitter needs pairing, user needs to click the notification
-"transmitternotpaired" = "Der Transmitter ist noch nicht mit diesem Gerät verbunden. Program öffnen.";
-
-/// If transmitter needs pairing, a notification was fired, user clicked it more than 60 seconds later, which is too late
-"transmitterpairingtoolate" = "Zu spät! Der Transmitter wurde getrennt. Ein neuer Verbindungsversuch erfolgt in Kürze.";
-
-/// status info : literally 'not known', used if transmitter name is not known
-"notknown" = "Unbekannt";
-
-/// status info : literally 'Sensor Start'
-"sensorstart" = "Sensor gestartet";
-
-/// for home view, miaomiao doesn't detect a sensor
-"sensornotdetected" = "Der Sensor wurde nicht gefunden. Prüfen Sie den korrekten sitz des Transmitters im Sensor.";
-
-/// for home view, title of pop up that gives info about how to select the transmitter. Simply the word Info
-"info" = "Info";
-
-/// for home view, user clicks calibrate but there's no sensor started yet
-"startsensorbeforecalibration" = "Die Kalibrierung ist erst nach dem Start eines Sensors möglich.";
-
-/// when user clicks transmitterButton, this is the action to start the sensor
-"startsensor" = "Sensor starten";
-
-/// Text in button on home screen
-"calibrate" = "Kalibrieren";
-
-/// when user clicks transmitterButton, this is the action to start scanning
-"scanbluetoothdeviceactiontitle" = "Transmitter scannen";
-
-/// for home view, Info how to start : set transmitter and id, then go back to home screen, start scanning
-"transmitterinfo" = "Bitte zuerst via Bluettoh einen Sensor bzw. Transmitter verbinden.\r\n\nDanach können Sie den Sensor hier starten.";
-
-/// when user manually starts scanning, this is the message that scanning is ongoing
-"scanbluetoothdeviceongoing" = "Suche nach Transmitter...";
-
-/// for home view, user clicks calibrate but there's no reading yet
-"theremustbeareadingbeforecalibration" = "Es müssen mindestens 2 Werte ausgelesen werden bevor die Kalibrierung durchgeführt werden kann. Sie werden automatisch nach dem 3 ausgelesenen Wert benachrichtigt.";
-
-/// To give info to user that the transmitter is successfully paired
-"transmitterpairingsuccessful" = "Der Transmitter wurde efolgreich verbunden.";
-
-/// To give result about transitter result in notification body, failed
-"failed" = "Fehlgeschlagen";
-
-/// when user manually starts sensor, this is the message that explains that time should be correct
-"startsensortimeinfo" = "Auf der nächsten Seite müßen Sie Zeit und Datum eingeben zu der der Sensor gestartet wurde. Es ist wichtig Zeit und Datum so genau wie möglich ein zu geben.";
-
-/// for home view, where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'
-"ago" = "her";
-
-/// if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible
-"calibrationNotNecessary" = "Bei Verwendung des Libre Algorithmus, muss der Sensor nicht kalibriert werden!";
-
-/// When user has no CGM transmitter created with 'Always connect', and tries to calibrate, then this message is shown
-"theresNoCGMTransmitterActive" = "Kalibrierung kann nur bei verbundenem Transmitter erfolgen.";
-
-/// Literally 'Sensor', used as name in the button in the home screen, but also in text in pop ups
-"sensor" = "Sensor";
-
-/// when user clicks transmitterButton, this is the first action, to show the status
-"statusactiontitle" = "Status";
-
-/// when user starts scanning for bluetooth device, but bluetooth is not authorized
-"bluetoothIsNotAuthorized" = "%@ hat keine Bluetooth Berechtigung. Gehe über Einstellung, %@ App, Bluetooth aktivieren.";
-
-/// Text in button on home screen
 "presnooze" = "Schlummern";
-
-/// when user clicks transmitterButton, this is the action to stop the sensor
+"sensor" = "Sensor";
+"calibrate" = "Kalibrieren";
+"statusactiontitle" = "Status";
+"scanbluetoothdeviceactiontitle" = "Transmitter scannen";
+"forgetbluetoothdeviceactiontitle" = "Transmitter löschen";
+"startsensor" = "Sensor starten";
 "stopsensor" = "Sensor Stoppen";
-
-/// To give info to user that the transmitter pairing requeset timed out
+"startsensortimeinfo" = "Auf der nächsten Seite müßen Sie Zeit und Datum eingeben zu der der Sensor gestartet wurde. Es ist wichtig Zeit und Datum so genau wie möglich ein zu geben.";
+"scanbluetoothdeviceongoing" = "Suche nach Transmitter...";
+"bluetoothisnoton" = "Bluetooth ist aus. Bitte Bluetooth starten und erneut versuchen.";
+"bluetoothIsNotAuthorized" = "%@ hat keine Bluetooth Berechtigung. Gehe über Einstellung, %@ App, Bluetooth aktivieren.";
+"startScanningInfo" = "Scannen gestartet.\n\n%@ im Vordergrund lassen bis die Verbindung erstellt wurde.\n\n Automatisches Sperren kann, aktiviert bleiben. Einfach nur nicht die App schließen oder das iPhone manuell sperren)";
+"sensorstart" = "Sensor gestartet";
+"notstarted" = "Nicht gestartet";
+"notknown" = "Unbekannt";
+"lastconnection" = "Letzte Verbindung";
+"transmitterbatterylevel" = "Transmitter Batteriestand";
+"ago" = "her";
+"licenseinfo" = "This program is free software distributed under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\r\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.\r\n\nSee http://www.gnu.org/licenses/gpl.txt for more details.\r\n\r\nInfo: ";
+"info" = "Info";
+"transmitterinfo" = "Bitte zuerst via Bluettoh einen Sensor bzw. Transmitter verbinden.\r\n\nDanach können Sie den Sensor hier starten.";
+"startsensorbeforecalibration" = "Die Kalibrierung ist erst nach dem Start eines Sensors möglich.";
+"theresNoCGMTransmitterActive" = "Kalibrierung kann nur bei verbundenem Transmitter erfolgen.";
+"theremustbeareadingbeforecalibration" = "Es müssen mindestens 2 Werte ausgelesen werden bevor die Kalibrierung durchgeführt werden kann. Sie werden automatisch nach dem 3 ausgelesenen Wert benachrichtigt.";
+"sensornotdetected" = "Der Sensor wurde nicht gefunden. Prüfen Sie den korrekten sitz des Transmitters im Sensor.";
+"transmitternotpaired" = "Der Transmitter ist noch nicht mit diesem Gerät verbunden. Program öffnen.";
+"transmitterpairingtoolate" = "Zu spät! Der Transmitter wurde getrennt. Ein neuer Verbindungsversuch erfolgt in Kürze.";
+"transmitterpairingsuccessful" = "Der Transmitter wurde efolgreich verbunden.";
 "transmitterpairingattempttimeout" = "Transmitter Verbindung wurde nicht hergestellt.";
-
-/// To give result about transitter result in notification body, successful
 "success" = "Erfolgreich";
-
-/// Error message in case Dexcom G5 (and G6?) battery is too low. This is deteced by wrong G5 values 2096896
+"failed" = "Fehlgeschlagen";
+"calibrationNotNecessary" = "Bei Verwendung des Libre Algorithmus, muss der Sensor nicht kalibriert werden!";
 "dexcomBatteryTooLow" = "Die Transmitter Batterie ist fast leer!";
 
 /// status info : literally 'Transmitter Battery Level', shows the battery level
