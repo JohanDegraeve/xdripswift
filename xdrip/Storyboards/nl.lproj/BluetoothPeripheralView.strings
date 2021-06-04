@@ -30,3 +30,5 @@
 /// The English word Bootloader does not have a sufficient Dutch translation.
 /// [Wikipedia (Bootloader)](https://nl.wikipedia.org/wiki/Bootloader)
 "bootLoader" = "Bootloader";
+"confirmDisconnectTitle" = "Bevestig Loskoppelen";
+"confirmDisconnectMessage" = "Klik 'Loskoppelen' om te bevestigen dat je de zender wil loskoppelen.";

@@ -215,24 +215,45 @@ class BluetoothPeripheralViewController: UIViewController {
         
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
         
-        // device should not automaticaly connect in future, which means, each time the app restarts, it will not try to connect to this bluetoothPeripheral
-        bluetoothPeripheral.blePeripheral.shouldconnect = false
-        
-        // save in coredata
-        coreDataManager?.saveChanges()
-        
-        // connect button label text needs to change because shouldconnect value has changed
-        _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: isScanning, connectButtonOutlet: connectButtonOutlet, expectedBluetoothPeripheralType: expectedBluetoothPeripheralType, transmitterId: transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
-        
-        // this will set bluetoothTransmitter to nil which will result in disconnecting also
-        bluetoothPeripheralManager.setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheral)
-        
-        // as transmitter is now set to nil, call again configure. Maybe not necessary, but it can't hurt
-        bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self)
-        
-        // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
-        tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+        // create uialertcontroller to ask the user if they really want to disconnect
+        let confirmDisconnectAlertController = UIAlertController(title: Texts_BluetoothPeripheralView.confirmDisconnectTitle , message: Texts_BluetoothPeripheralView.confirmDisconnectMessage, preferredStyle: .alert)
 
+        // create buttons for uialertcontroller
+        let OKAction = UIAlertAction(title: Texts_BluetoothPeripheralView.disconnect, style: .default) {
+            (action:UIAlertAction!) in
+            
+            // device should not automaticaly connect in future, which means, each time the app restarts, it will not try to connect to this bluetoothPeripheral
+            bluetoothPeripheral.blePeripheral.shouldconnect = false
+            
+            // save in coredata
+            self.coreDataManager?.saveChanges()
+            
+            // connect button label text needs to change because shouldconnect value has changed
+            _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: self.isScanning, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: self.transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
+            
+            // this will set bluetoothTransmitter to nil which will result in disconnecting also
+            bluetoothPeripheralManager.setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheral)
+            
+            // as transmitter is now set to nil, call again configure. Maybe not necessary, but it can't hurt
+            self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView, bluetoothPeripheralViewController: self)
+            
+            // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
+            self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+            
+        }
+        
+        // create a cancel button. If the user clicks it then we will just return directly
+        let cancelAction = UIAlertAction(title: Texts_Common.Cancel, style: .cancel) {
+            (action:UIAlertAction!) in
+        }
+
+        // add buttons to the alert
+        confirmDisconnectAlertController.addAction(OKAction)
+        confirmDisconnectAlertController.addAction(cancelAction)
+
+        // show alert
+        present(confirmDisconnectAlertController, animated: true, completion:nil)
+        
     }
     
     /// the BluetoothPeripheralViewController has already a few sections defined (eg bluetooth, weboop). This is the amount of sections defined in BluetoothPeripheralViewController.
