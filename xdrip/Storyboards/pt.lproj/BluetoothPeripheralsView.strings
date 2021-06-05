@@ -2,4 +2,4 @@
 "selectCategory" = "Escolher Tipo de Dispositivo";
 "selectType" = "Escolher Tipo de Transmissor";
 "batteryLevel" = "Nível de Bateria:";
-"noMultipleActiveCGMsAllowed" = "Não pode adicionar mais do que um Transmissor CGM o qual está ligado a ser pesquisado.\nVerifique outros Transmissores CGM e pressione em 'Parar a Pesquisa', 'Desligar' or apenas elimine-os";
+"noMultipleActiveCGMsAllowed" = "Não pode ter mais do que um Transmissor CGM o qual está conectado ou a ser pesquisado.\nVerifique outros Transmissores CGM e pressione em 'Parar a Pesquisa', 'Desconectar' or apenas elimine-os";
