@@ -1,7 +1,7 @@
 "address" = "Endereço:";
 "status" = "Estado:";
-"connected" = "Ligado";
-"notConnected" = "Desligado";
+"connected" = "Conectado";
+"notConnected" = "Desconectado";
 "donotconnect" = "Parar a Procura";
 "selectAliasText" = "Escolha um pseudónimo para este dispositivo bluetooth, o nome será mostrado na app e será mais fácil de o reconhecer";
 "aliasAlreadyExists" = "Já existe um dispositivo bluetooth com este pseudónimo";
@@ -15,12 +15,12 @@
 "scan" = "Pesquisar";
 "readyToScan" = "Pronto a Pesquisar";
 "scanning" = "A Pesquisar";
-"disconnect" = "Desligar";
+"disconnect" = "Desconectar";
 "tryingToConnect" = "A Pesquisar";
 "notTryingToConnect" = "Não está a Pesquisar";
-"connect" = "Ligar";
-"connectedAt" = "Ligado a:";
-"disConnectedAt" = "Desligado a:";
+"connect" = "Conectar";
+"connectedAt" = "Conectado a:";
+"disConnectedAt" = "Desconectado a:";
 "resetRequired" = "Reiniciar Transmissor?";
 "lastReset" = "Último Reinício:";
 "lastResetNotKnown" = "Registo Desconhecido do Último Reinício";
