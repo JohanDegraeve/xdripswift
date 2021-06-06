@@ -1,7 +1,21 @@
-"notYetStarted" = "لم يتم البدء";
-"starting" = "بداية";
+
+/// Possible Libre Sensor states
 "ready" = "جاهز";
+
+/// Possible Libre Sensor states
 "expired" = "منتهي الصلاحية";
-"shutdown" = "إيقاف";
-"failure" = "خطأ";
+
+/// general usage
 "unknown" = "غير معروف";
+
+/// Possible Libre Sensor states
+"starting" = "بداية";
+
+/// Possible Libre Sensor states
+"notYetStarted" = "لم يتم البدء";
+
+/// Possible Libre Sensor states
+"shutdown" = "إيقاف";
+
+/// Possible Libre Sensor states
+"failure" = "خطأ";

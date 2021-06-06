@@ -1,7 +1,7 @@
-"notYetStarted" = "ei aloitettu";
-"starting" = "aloittamassa";
-"ready" = "valmis";
-"expired" = "vanhentunut";
-"shutdown" = "sammuttaa";
 "failure" = "epäonnistui";
+"shutdown" = "sammuttaa";
+"starting" = "aloittamassa";
+"expired" = "vanhentunut";
 "unknown" = "tuntematon";
+"ready" = "valmis";
+"notYetStarted" = "ei aloitettu";

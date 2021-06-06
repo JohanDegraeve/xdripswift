@@ -27,3 +27,5 @@
 "transmitterResultResult" = "Resultado do Reinício do Transmissor";
 "bootLoader" = "Bootloader";
 "cannotActiveCGMInFollowerMode" = "Não pode activar um CGM em Modo de Seguidor";
+"confirmDisconnectTitle" = "Confirmar Desconectar";
+"confirmDisconnectMessage" = "Pressione 'Desconectar' para confirmar que realmente quer desconectar o transmissor.";

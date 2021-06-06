@@ -6,7 +6,7 @@
 "alerttypesettingsview_snoozevianotification" = "Snooze via Notification";
 "alerttypesettingsview_defaultsnoozeperiod" = "Durée Snooze (mins)";
 "alerttypesettingsview_overridemute" = "Outrepasser le mode Silence";
-"alerttypesettingsview_sound" = "Son";
+"alerttypesettingsview_soundname" = "Son";
 "alerttypesettingsview_defaultiossound" = "Son iOS";
 "alerttypesettingsview_givename" = "Nom de l'alerte";
 "alerttypesettingsview_givesnoozeperiod" = "Durée Snooze en Minutes";
@@ -14,3 +14,6 @@
 "alertTypeNoSound" = "Pas de son";
 "alerttypenamealreadyexistsmessages" = "Une alerte avec le même nom existe. Utilisez un libellé différent";
 "confirmdeletionalerttype" = "Supprimer le type d'alerte: ";
+
+/// when editing an alert type, field title for Sound
+"alerttypesettingsview_sound" = "Son";

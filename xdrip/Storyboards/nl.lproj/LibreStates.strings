@@ -1,7 +1,7 @@
-"notYetStarted" = "nog niet gestart";
 "starting" = "starten...";
-"ready" = "gereed";
-"expired" = "verlopen";
+"notYetStarted" = "nog niet gestart";
 "shutdown" = "uitschakelen";
+"expired" = "verlopen";
 "failure" = "mislukt";
 "unknown" = "onbekend";
+"ready" = "gereed";

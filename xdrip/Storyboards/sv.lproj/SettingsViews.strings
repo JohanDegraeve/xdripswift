@@ -25,7 +25,7 @@
 "settingsviews_sectiontitletransmitter" = "Sändare";
 "settingsviews_transmittertype" = "Typ av sändare:";
 "settingsviews_transmitterid" = "Sändar-ID:";
-"settingsviews_transmitterid_text_for_button" = "Sändar-ID";
+"settingsviews_transmitterid_text_for_button"  = "Sändar-ID";
 "settingsviews_givetransmitterid" = "Ange sändar-ID";
 "settingsviews_resettransmitter" = "Återställ sändare";
 "settingsviews_webooptransmitter" = "Använd Libre-algoritm?";
@@ -102,3 +102,4 @@
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Hemskärm";
+ 

@@ -1,6 +1,6 @@
-"high" = "élevée";
-"low" = "basse";
 "currentglucose" = "La glycémie actuelle est de";
+"currenttrend" = "La tendance est";
+"currentdelta" = "La variation par rapport à la mesure précédente est";
 "trendnoncomputable" = "non calculable";
 "trenddoubledown" = "très fortement à la baisse";
 "trendsingledown" = "sensiblement à la baisse";
@@ -9,6 +9,6 @@
 "trendfortyfiveup" = "à la hausse";
 "trendsingleup" = "sensiblement à la hausse";
 "trenddoubleup" = "très fortement à la hausse";
-"currenttrend" = "La tendance est";
 "deltanoncomputable" = "non calculable";
-"currentdelta" = "La variation par rapport à la mesure précédente est";
+"high" = "élevée";
+"low" = "basse";

@@ -8,7 +8,6 @@
 "confirmDeletionPeripheral" = "Voulez-vous supprimer ce périphérique: ";
 "bluetoothPeripheralAlias" = "Alias";
 "SensorSerialNumber" = "Numéro de série";
-"sensorType" = "Type de capteur:";
 "serialNumber" = "Numéro de série";
 "battery" = "Batterie";
 "needsTransmitterId" = "ID du transmetteur manquant";

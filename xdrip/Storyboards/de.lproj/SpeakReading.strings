@@ -1,14 +1,43 @@
-"high" = "Hoch";
-"low" = "Niedrig";
-"currentglucose" = "Ihr Blutzucker ist";
-"trendnoncomputable" = "Nicht zu ermitteln";
-"trenddoubledown" = "Dramatisch Niedrig";
-"trendsingledown" = "Signifikant nach unten";
-"trendfortyfivedown" = "Niedrig";
-"trendflat" = "Flach";
-"trendfortyfiveup" = "Hoch";
-"trendsingleup" = "Signifikant nach oben";
+
+
+/// For speak reading functionality
 "trenddoubleup" = "Dramatisch Hoch";
+
+/// For speak reading functionality
+"trendflat" = "Flach";
+
+/// For speak reading functionality
+"currentglucose" = "Ihr Blutzucker ist";
+
+/// For speak reading functionality
+"trendnoncomputable" = "Nicht zu ermitteln";
+
+/// For speak reading functionality
+"trendfortyfivedown" = "Niedrig";
+
+/// For speak reading functionality
 "currenttrend" = "Bewegt sich ";
+
+/// For speak reading functionality
+"trendsingledown" = "Signifikant nach unten";
+
+/// the word low
+"low" = "Niedrig";
+
+/// For speak reading functionality
+"trenddoubledown" = "Dramatisch Niedrig";
+
+/// For speak reading functionality
 "deltanoncomputable" = "Nicht zu ermitteln";
+
+/// For speak reading functionality
+"trendsingleup" = "Signifikant nach oben";
+
+/// 
+"trendfortyfiveup" = "Hoch";
+
+/// For speak reading functionality
 "currentdelta" = "Die Differenz zum letzten Wert beträgt";
+
+/// the word high
+"high" = "Hoch";
