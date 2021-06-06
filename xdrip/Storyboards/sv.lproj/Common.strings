@@ -19,7 +19,7 @@
 "common_hourshort" = "h";
 "common_dayshort" = "d";
 "common_todayshort" = "Idag";
-"warning" = "Varning!";
+"warning" ="Varning!";
 "update" = "Ändra";
 "add" = "Lägg till";
 "yes" = "Ja";
@@ -45,3 +45,4 @@
 "common_statistics_average" = "Medel";
 "common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
+

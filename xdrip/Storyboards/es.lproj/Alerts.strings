@@ -14,5 +14,5 @@
 "alerttype" = "Tipo de Alarma";
 "changealertvalue" = "Cambiar Valor de Alarma";
 "confirmdeletionalert" = "Borrar la Alarma?";
-"alerts_fastdrop" = "Alarma Bajada Rápida";
 "alerts_fastrise" = "Alarma Subida Rápida";
+"alerts_fastdrop" = "Alarma Bajada Rápida";

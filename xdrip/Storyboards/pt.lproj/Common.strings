@@ -19,7 +19,7 @@
 "common_hourshort" = "h";
 "common_dayshort" = "d";
 "common_todayshort" = "Hoje";
-"warning" = "Aviso!";
+"warning" ="Aviso!";
 "update" = "Editar";
 "add" = "Adicionar";
 "yes" = "Sim";

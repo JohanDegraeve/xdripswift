@@ -6,4 +6,4 @@
 "dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "الرقم التسلسلي لديكسكوم شير لا يتطابق مع الرقم التسلسلي لهذا الحساب. تأكد من الرقم التسلسلي في الإعدادات.";
 "dexcomsharetestresult_monitored_receiver_not_assigned_1" = "يبدو أنه معرف حهاز الإرسال أو الرقم التسلسلي";
 "dexcomsharetestresult_monitored_receiver_not_assigned_2" = "لم يتم تعيينه لـ";
-"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "استخدم تطبيق ديكسكوم الرسمي لتسجيل جهاز الإرسال (G5) أو مشاركة جهاز الاستقبال (G4) \\ r \\ n \\ r \\ n ربما فقط أنك تستخدم  عنوان URL خاطئ ، تحقق من الإعدادات (استخدام عنوان URL للولايات المتحدة)";
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "استخدم تطبيق ديكسكوم الرسمي لتسجيل جهاز الإرسال (G5) أو مشاركة جهاز الاستقبال (G4) \ r \ n \ r \ n ربما فقط أنك تستخدم  عنوان URL خاطئ ، تحقق من الإعدادات (استخدام عنوان URL للولايات المتحدة)";
