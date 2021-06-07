@@ -12,7 +12,7 @@ target 'xdrip' do
   pod 'SwiftCharts', '~> 0.6.5'
   
   use_frameworks!
-  pod 'CryptoSwift', '~> 1.0'
+  pod 'CryptoSwift', '~> 1.4.0'
   
   use_frameworks!
   pod 'PieCharts'
