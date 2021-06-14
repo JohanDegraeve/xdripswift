@@ -124,10 +124,7 @@ final class RootViewController: UIViewController {
             }
         
     }
-    
-    /// an optional spacer view that we use to separate the segmented controls from the nav bar if the statistics are not shown
-    @IBOutlet weak var optionalSpacerView: UIView!
-    
+        
     /// outlets for statistics view
     @IBOutlet weak var statisticsView: UIView!
     @IBOutlet weak var pieChartOutlet: PieChart!
@@ -154,6 +151,8 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var clockView: UIView!
     @IBOutlet weak var clockLabelOutlet: UILabel!
         
+    @IBOutlet weak var sensorCountdownOutlet: UIImageView!
+    
     
     @IBAction func chartPanGestureRecognizerAction(_ sender: UIPanGestureRecognizer) {
         
@@ -374,10 +373,6 @@ final class RootViewController: UIViewController {
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
         }
         segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
-        optionalSpacerView.isHidden = UserDefaults.standard.showStatistics
-        if screenIsLocked {
-            optionalSpacerView.isHidden = UserDefaults.standard.showClockWhenScreenIsLocked
-        }
         
         if inRangeStatisticLabelOutlet.text == "-" {
             activityMonitorOutlet.isHidden = true
@@ -387,6 +382,9 @@ final class RootViewController: UIViewController {
         
         // update statistics related outlets
         updateStatistics(animatePieChart: true, overrideApplicationState: true)
+        
+        // display the sensor countdown graphics if applicable
+        updateSensorCountdown()
         
     }
     
@@ -412,6 +410,7 @@ final class RootViewController: UIViewController {
         screenLockImageOutlet.tintColor = ConstantsUI.screenLockIconColor
         screenLockUpdate(enabled: false)
         
+        updateSensorCountdown()
         
         // this is to force update of userdefaults that are also stored in the shared user defaults
         // these are used by the today widget. After a year or so (september 2021) this can all be deleted
@@ -2212,8 +2211,6 @@ final class RootViewController: UIViewController {
                     // set clock label color
                     clockLabelOutlet.textColor = ConstantsUI.clockLabelColor
                     
-                    optionalSpacerView.isHidden = true
-                    
                     clockView.isHidden = false
                     
                     // set the format for the clock view and update it to show the current time
@@ -2223,8 +2220,6 @@ final class RootViewController: UIViewController {
                     clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateClockView), userInfo: nil, repeats:true)
                     
                 } else {
-                    
-                    optionalSpacerView.isHidden = false
                     
                     clockView.isHidden = true
                     
@@ -2253,7 +2248,6 @@ final class RootViewController: UIViewController {
             // hide
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
             segmentedControlsView.isHidden = false
-            optionalSpacerView.isHidden = UserDefaults.standard.showStatistics
             
             clockView.isHidden = true
             
@@ -2295,6 +2289,86 @@ final class RootViewController: UIViewController {
 
     }
     
+    
+    /// this function will check if the user is using a time-sensitive sensor (such as a 14 day Libre, calculate the days remaining and then update the imageUI with the relevant svg image from the project assets.
+    private func updateSensorCountdown() {
+        
+        guard activeSensor != nil else {
+            return
+        }
+        
+        guard let cgmTransmitter = bluetoothPeripheralManager?.getCGMTransmitter() else {
+            return
+        }
+        
+        // only update and show the countdown graphic if we're using a Libre sensor
+        if !cgmTransmitter.isWebOOPEnabled() {
+            return
+        }
+        
+        // test data
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+//        let sensorStartDate: Date? = dateFormatter.date(from: "2021-06-13 14:22:22 +0000")
+        
+        // check that the sensor start date is not nil before we unwrap it
+        guard activeSensor?.startDate != nil else {
+            return
+        }
+        
+        // test data
+        //let sensorAgeInHours: Int = Calendar.current.dateComponents([.hour], from: sensorStartDate! - 5 * 60, to: Date()).hour!
+        
+        let sensorAgeInHours: Int = Calendar.current.dateComponents([.hour], from: activeSensor!.startDate - 5 * 60, to: Date()).hour!
+        
+//        print(sensorAgeInHours)
+        
+        var sensorCountdownGraphic: UIImage = UIImage(named: "sensor14_14")!
+        
+        switch sensorAgeInHours {
+            
+            case 0..<24:
+                sensorCountdownGraphic = UIImage(named: "sensor14_14")!
+            case 24..<48:
+                sensorCountdownGraphic = UIImage(named: "sensor14_13")!
+            case 48..<72:
+                sensorCountdownGraphic = UIImage(named: "sensor14_12")!
+            case 72..<96:
+                sensorCountdownGraphic = UIImage(named: "sensor14_11")!
+            case 96..<120:
+                sensorCountdownGraphic = UIImage(named: "sensor14_10")!
+            case 120..<144:
+                sensorCountdownGraphic = UIImage(named: "sensor14_09")!
+            case 144..<168:
+                sensorCountdownGraphic = UIImage(named: "sensor14_08")!
+            case 168..<192:
+                sensorCountdownGraphic = UIImage(named: "sensor14_07")!
+            case 192..<216:
+                sensorCountdownGraphic = UIImage(named: "sensor14_06")!
+            case 216..<240:
+                sensorCountdownGraphic = UIImage(named: "sensor14_05")!
+            case 240..<264:
+                sensorCountdownGraphic = UIImage(named: "sensor14_04")!
+            case 264..<288:
+                sensorCountdownGraphic = UIImage(named: "sensor14_03")!
+            case 288..<312:
+                sensorCountdownGraphic = UIImage(named: "sensor14_02")!
+            case 312..<324:
+                sensorCountdownGraphic = UIImage(named: "sensor14_01")!
+            case 324..<330:
+                sensorCountdownGraphic = UIImage(named: "sensor14_01_warning")!
+            case 330...1000:
+                sensorCountdownGraphic = UIImage(named: "sensor14_01_urgent")!
+            default:
+                sensorCountdownGraphic = UIImage(named: "sensor14_14")!
+            
+        }
+        
+        sensorCountdownOutlet.image = sensorCountdownGraphic
+        
+        sensorCountdownOutlet.isHidden = false
+        
+    }
 }
 
 
