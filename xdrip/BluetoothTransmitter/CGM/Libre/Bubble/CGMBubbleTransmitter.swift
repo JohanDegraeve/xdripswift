@@ -59,6 +59,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// instance of libreDataParser
     private let libreDataParser: LibreDataParser
     
+    /// sensor type
+    private var libreSensorType: LibreSensorType?
+
     // MARK: - Initialization
     
     /// - parameters:
@@ -204,6 +207,8 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                             // for libre2 and libreUS we will do decryption
                             if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
 
+                                self.libreSensorType = libreSensorType
+                                
                                 // if firmware < 2.6, libre2 and libreUS will decrypt fram local
                                 // after decryptFRAM, the libre2 and libreUS 344 will be libre1 344 data format
                                 // firmware >= 2.6, then bubble already decrypted the data, no need for decryption we already have the 344 bytes
@@ -339,6 +344,12 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     func requestNewReading() {
         
         _ = sendStartReadingCommmand()
+        
+    }
+    
+    func maxSensorAgeInMinutes() -> Int? {
+        
+        return libreSensorType?.maxSensorAgeInMinutes()
         
     }
 

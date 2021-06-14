@@ -58,6 +58,9 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     // it will be casted to LibreNFC when needed
     private var libreNFC: NSObject?
     
+    /// sensor type
+    private var libreSensorType: LibreSensorType?
+    
     // MARK: - Initialization
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
@@ -346,6 +349,12 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         // not supported for Libre 2
     }
     
+    func maxSensorAgeInMinutes() -> Int? {
+        
+        return libreSensorType?.maxSensorAgeInMinutes()
+        
+    }
+    
 }
 
 #else
@@ -368,6 +377,8 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         // if we already know the patchinfo (which we should because normally received(sensorUID: Data, patchInfo: Data) gets called before received(fram: Data), then patchInfo should not be nil
         // same for sensorUID
         if let patchInfo =  UserDefaults.standard.librePatchInfo, let sensorUID = UserDefaults.standard.libreSensorUID, let libreSensorType = LibreSensorType.type(patchInfo: patchInfo.hexEncodedString().uppercased()), let serialNumber = self.sensorSerialNumber {
+            
+            self.libreSensorType = libreSensorType
             
             var framCopy = fram
             

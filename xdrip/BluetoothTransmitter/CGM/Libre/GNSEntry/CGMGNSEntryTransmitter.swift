@@ -262,6 +262,13 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
         // not supported for GNSEntry
     }
     
+    func maxSensorAgeInMinutes() -> Int? {
+        
+        // not supported for gnsentry
+        return nil
+        
+    }
+
     // MARK: CBCentralManager overriden functions
     
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
