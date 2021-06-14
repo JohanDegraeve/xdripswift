@@ -58,6 +58,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// instance of libreDataParser
     private let libreDataParser: LibreDataParser
 
+    /// sensor type
+    private var libreSensorType: LibreSensorType?
+
     // MARK: - Initialization
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
@@ -169,6 +172,8 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
 
                             if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
                                 // note that we should always have a libreSensorType
+                                
+                                self.libreSensorType = libreSensorType
                                 
                                 cGMMiaoMiaoTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
 
@@ -320,6 +325,12 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         return .miaomiao
     }
     
+    func maxSensorAgeInMinutes() -> Int? {
+        
+        return libreSensorType?.maxSensorAgeInMinutes()
+        
+    }
+
     // MARK: - helpers
     
     /// reset rxBuffer, reset startDate, set resendPacketCounter to 0

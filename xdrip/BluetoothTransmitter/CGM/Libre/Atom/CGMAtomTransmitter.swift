@@ -65,6 +65,9 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// current sensor serial number, if nil then it's not known yet
     private var sensorSerialNumber:String?
     
+    /// sensor type
+    private var libreSensorType: LibreSensorType?
+    
     // MARK: - Initialization
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
@@ -198,6 +201,8 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                             
                             if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
                                 // note that we should always have a libreSensorType
+                                
+                                self.libreSensorType = libreSensorType
                                 
                                 // decrypt of libre2 or libreUS
                                 dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer[0..<344], headerLength: 0, log: log, patchInfo: patchInfo, uid: rxBuffer[5..<13].bytes)
@@ -439,6 +444,12 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
     
+    func maxSensorAgeInMinutes() -> Int? {
+        
+        return libreSensorType?.maxSensorAgeInMinutes()
+        
+    }
+
 }
 
 

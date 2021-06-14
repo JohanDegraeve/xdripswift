@@ -36,4 +36,11 @@ extension WatlaaBluetoothTransmitter: CGMTransmitter {
         _ = sendStartReadingCommand()
     }
     
+    func maxSensorAgeInMinutes() -> Int? {
+        
+        // no max sensor age for Watlaa
+        return nil
+        
+    }
+
 }
