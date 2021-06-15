@@ -33,7 +33,8 @@ extension UserDefaults {
         case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
         /// should the clock view be shown when the screen is locked?
         case showClockWhenScreenIsLocked = "showClockWhenScreenIsLocked"
-        
+        /// should the countdown graphic be shown in the applicable for the sensor type being used?
+        case showSensorCountdown = "showSensorCountdown"
         /// minimum time between two notifications, set by user
         case notificationInterval = "notificationInterval"
         
@@ -362,6 +363,17 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showClockWhenScreenIsLocked.rawValue)
+        }
+    }
+    
+    /// should the countdown graphic be shown in the applicable for the sensor type being used?
+    @objc dynamic var showSensorCountdown: Bool {
+        // default value for bool in userdefaults is false, as default we want the clock to show when the screen is locked
+        get {
+            return !bool(forKey: Key.showSensorCountdown.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showSensorCountdown.rawValue)
         }
     }
     
