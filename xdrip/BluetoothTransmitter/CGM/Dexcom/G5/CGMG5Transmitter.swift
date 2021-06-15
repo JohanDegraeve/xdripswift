@@ -547,7 +547,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // not supported for Dexcom G5
     }
     
-    func maxSensorAgeInMinutes() -> Int? {
+    func maxSensorAgeInDays() -> Int? {
         
         // no max sensor age for Dexcom
         return nil

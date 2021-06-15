@@ -29,7 +29,7 @@ protocol CGMTransmitter:AnyObject {
     func requestNewReading()
     
     /// maximum sensor age in minutes, nil if no maximum
-    func maxSensorAgeInMinutes() -> Int?
+    func maxSensorAgeInDays() -> Int?
     
 }
 

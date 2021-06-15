@@ -384,6 +384,7 @@ final class RootViewController: UIViewController {
         updateStatistics(animatePieChart: true, overrideApplicationState: true)
                 
         // display the sensor countdown graphics if applicable
+        sensorCountdownOutlet.isHidden = true
         updateSensorCountdown()
         
     }
@@ -409,9 +410,7 @@ final class RootViewController: UIViewController {
         // ensure the screen lock icon color as per constants file and also the screen layout
         screenLockImageOutlet.tintColor = ConstantsUI.screenLockIconColor
         screenLockUpdate(enabled: false)
-        
-        updateSensorCountdown()
-        
+                
         // this is to force update of userdefaults that are also stored in the shared user defaults
         // these are used by the today widget. After a year or so (september 2021) this can all be deleted
         UserDefaults.standard.urgentLowMarkValueInUserChosenUnit = UserDefaults.standard.urgentLowMarkValueInUserChosenUnit
@@ -2292,7 +2291,8 @@ final class RootViewController: UIViewController {
     
     /// this function will check if the user is using a time-sensitive sensor (such as a 14 day Libre, calculate the days remaining and then update the imageUI with the relevant svg image from the project assets.
     private func updateSensorCountdown() {
-            
+       
+        // if there's no active sensor, there's nothing to do or show
         guard activeSensor != nil else {
             return
         }
@@ -2302,23 +2302,16 @@ final class RootViewController: UIViewController {
             return
         }
         
-        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let maxSensorAgeInMinutes = cgmTransmitter.maxSensorAgeInMinutes() {
+        // if there is a transmitter/sensor, get the maximum number of days for the sensor type (even if this is considered nil in the case of Dexcom etc)
+        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let maxSensorAgeInDays = cgmTransmitter.maxSensorAgeInDays() {
             
-            // test data
-    //        let dateFormatter = DateFormatter()
-    //        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
-    //        let sensorStartDate: Date? = dateFormatter.date(from: "2021-06-13 14:22:22 +0000")
-            
-            // test data
-            //let sensorAgeInHours: Int = Calendar.current.dateComponents([.hour], from: sensorStartDate! - 5 * 60, to: Date()).hour!
-            
+            // calculate how many hours the sensor has been used for since starting. We need to use hours instead of days because during the last day we need to see how many hours are left so that we can display the warning and urgent status graphics.
             let currentSensorAgeInHours: Int = Calendar.current.dateComponents([.hour], from: activeSensor!.startDate - 5 * 60, to: Date()).hour!
             
-    //        print(sensorAgeInHours)
-            
-            var sensorCountdownGraphic: UIImage
-            
-            if maxSensorAgeInMinutes/60 == 14 {
+            // if this is considered to be a 14 day sensor, run the 14 day sensor graphics
+            if maxSensorAgeInDays == 14 {
+                
+                var sensorCountdownGraphic: UIImage
                 
                 switch currentSensorAgeInHours {
                     
@@ -2349,23 +2342,29 @@ final class RootViewController: UIViewController {
                     case 288..<312:
                         sensorCountdownGraphic = UIImage(named: "sensor14_02")!
                     case 312..<324:
+                        // still between 12 and 24 hours left
                         sensorCountdownGraphic = UIImage(named: "sensor14_01")!
                     case 324..<330:
+                        // just between 6 and 12 hours left, show the warning image
                         sensorCountdownGraphic = UIImage(named: "sensor14_01_warning")!
                     case 330...1000:
+                        // less than 6 hours left, show the urgent image
                         sensorCountdownGraphic = UIImage(named: "sensor14_01_urgent")!
                     default:
                         sensorCountdownGraphic = UIImage(named: "sensor14_14")!
                     
                 }
                 
+                // update the UIImage
                 sensorCountdownOutlet.image = sensorCountdownGraphic
                 
+                // show the sensor countdown image
                 sensorCountdownOutlet.isHidden = false
             }
             
         } else {
             
+            // this must be a sensor without a maxSensorAge set, so just hide the sensor countdown image and do nothing
             sensorCountdownOutlet.isHidden = true
             
         }
