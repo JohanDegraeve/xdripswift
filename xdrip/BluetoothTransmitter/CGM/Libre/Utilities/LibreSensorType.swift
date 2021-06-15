@@ -158,10 +158,10 @@ public enum LibreSensorType: String {
             return 14*60*24
 
         case .libreUS:
-            return 14*60*24
+            return nil
 
         case .libreProH:
-            return 14*60*24
+            return nil
 
         }
         
