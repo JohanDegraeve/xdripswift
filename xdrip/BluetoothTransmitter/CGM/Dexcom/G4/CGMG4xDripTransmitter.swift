@@ -185,7 +185,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
         // not supported for Dexcom G4
     }
     
-    func maxSensorAgeInMinutes() -> Int? {
+    func maxSensorAgeInDays() -> Int? {
         
         // no max sensor age for Dexcom
         return nil

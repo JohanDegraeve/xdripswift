@@ -262,7 +262,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
         // not supported for GNSEntry
     }
     
-    func maxSensorAgeInMinutes() -> Int? {
+    func maxSensorAgeInDays() -> Int? {
         
         // not supported for gnsentry
         return nil
