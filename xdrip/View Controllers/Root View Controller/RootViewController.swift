@@ -2292,6 +2292,11 @@ final class RootViewController: UIViewController {
     /// this function will check if the user is using a time-sensitive sensor (such as a 14 day Libre, calculate the days remaining and then update the imageUI with the relevant svg image from the project assets.
     private func updateSensorCountdown() {
        
+        // if the user has chosen not to display the countdown graphic, then just return back without doing anything
+        if !UserDefaults.standard.showSensorCountdown {
+            return
+        }
+        
         // if there's no active sensor, there's nothing to do or show
         guard activeSensor != nil else {
             return

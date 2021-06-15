@@ -48,6 +48,10 @@ class Texts_SettingsView {
         return NSLocalizedString("showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Show Clock when Locked?", comment: "general settings, should the clock also be displayed when the screen is locked?")
     }()
     
+    static let showSensorCountdown: String = {
+        return NSLocalizedString("showSensorCountdown", tableName: filename, bundle: Bundle.main, value: "Show Sensor Countdown?", comment: "general settings, should the app show a sensor countdown graphic if applicable for the sensor type?")
+    }()
+    
     static let warningChangeFromMasterToFollower: String = {
         return NSLocalizedString("warningChangeFromMasterToFollower", tableName: filename, bundle: Bundle.main, value: "Switch from master to follower will stop your current sensor. Do you want to continue ?", comment: "general settings, when switching from master to follower, if confirmation is asked, this message will be shown.")
     }()

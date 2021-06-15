@@ -8,21 +8,24 @@ fileprivate enum Setting:Int, CaseIterable {
     /// choose between master and follower
     case masterFollower = 1
     
-    /// if reading is shown in app badge, should value be multiplied with 10 yes or no
+    /// show a clock at the bottom of the home screen when the screen lock is activated?
     case showClockWhenScreenIsLocked = 2
     
+    /// show a countdown graphic for the sensor days if available?
+    case showSensorCountdown = 3
+    
     /// should reading be shown in notification
-    case showReadingInNotification = 3
+    case showReadingInNotification = 4
     
     /// - minimum time between two readings, for which notification should be created (in minutes)
     /// - except if there's been a disconnect, in that case this value is not taken into account
-    case notificationInterval = 4
+    case notificationInterval = 5
     
     /// show reading in app badge
-    case showReadingInAppBadge = 5
+    case showReadingInAppBadge = 6
     
     /// if reading is shown in app badge, should value be multiplied with 10 yes or no
-    case multipleAppBadgeValueWith10 = 6
+    case multipleAppBadgeValueWith10 = 7
     
 }
 
@@ -115,7 +118,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
             }
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .showClockWhenScreenIsLocked:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .showClockWhenScreenIsLocked, .showSensorCountdown:
             return SettingsSelectedRowAction.nothing
             
         case .notificationInterval:
@@ -152,20 +155,23 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .masterFollower:
             return Texts_SettingsView.labelMasterOrFollower
             
+        case .showClockWhenScreenIsLocked:
+            return Texts_SettingsView.showClockWhenScreenIsLocked
+            
+        case .showSensorCountdown:
+            return Texts_SettingsView.showSensorCountdown
+            
         case .showReadingInNotification:
             return Texts_SettingsView.showReadingInNotification
+            
+        case .notificationInterval:
+            return Texts_SettingsView.settingsviews_IntervalTitle
             
         case .showReadingInAppBadge:
             return Texts_SettingsView.labelShowReadingInAppBadge
             
         case .multipleAppBadgeValueWith10:
             return Texts_SettingsView.multipleAppBadgeValueWith10
-            
-        case .showClockWhenScreenIsLocked:
-            return Texts_SettingsView.showClockWhenScreenIsLocked
-            
-        case .notificationInterval:
-            return Texts_SettingsView.settingsviews_IntervalTitle
             
         }
     }
@@ -181,7 +187,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .masterFollower:
             return UITableViewCell.AccessoryType.none
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .showClockWhenScreenIsLocked:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .showClockWhenScreenIsLocked, .showSensorCountdown:
             return UITableViewCell.AccessoryType.none
             
         case .notificationInterval:
@@ -201,7 +207,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .masterFollower:
             return UserDefaults.standard.isMaster ? Texts_SettingsView.master:Texts_SettingsView.follower
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .showClockWhenScreenIsLocked:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .showClockWhenScreenIsLocked, .showSensorCountdown:
             return nil
             
         case .notificationInterval:
@@ -230,6 +236,10 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .showClockWhenScreenIsLocked:
 
             return UISwitch(isOn: UserDefaults.standard.showClockWhenScreenIsLocked, action: {(isOn:Bool) in UserDefaults.standard.showClockWhenScreenIsLocked = isOn})
+            
+        case .showSensorCountdown:
+
+            return UISwitch(isOn: UserDefaults.standard.showSensorCountdown, action: {(isOn:Bool) in UserDefaults.standard.showSensorCountdown = isOn})
 
         case .bloodGlucoseUnit, .masterFollower:
             return nil
