@@ -280,6 +280,8 @@ extension UserDefaults {
         /// - stored as data as read from transmitter
         case librePatchInfo = "librePatchInfo"
         
+        case maxSensorAgeInDays = "maxSensorAgeInDays"
+        
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -1219,6 +1221,17 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.timeStampLatestDexcomShareUploadedBgReading.rawValue)
+        }
+    }
+    
+    
+    /// store the maximum sensor life if applicable
+    var maxSensorAgeInDays: Int {
+        get {
+            return integer(forKey: Key.maxSensorAgeInDays.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.maxSensorAgeInDays.rawValue)
         }
     }
     

@@ -380,12 +380,11 @@ final class RootViewController: UIViewController {
             activityMonitorOutlet.isHidden = false
         }
         
+        // display the sensor countdown graphics if applicable
+        updateSensorCountdown()
+        
         // update statistics related outlets
         updateStatistics(animatePieChart: true, overrideApplicationState: true)
-                
-        // display the sensor countdown graphics if applicable
-        sensorCountdownOutlet.isHidden = true
-        updateSensorCountdown()
         
     }
     
@@ -536,6 +535,9 @@ final class RootViewController: UIViewController {
             // update label texts, minutes ago, diff and value
             self.updateLabelsAndChart(overrideApplicationState: true)
             
+            // update sensor countdown
+            self.updateSensorCountdown()
+            
             // update statistics related outlets
             self.updateStatistics(animatePieChart: true, overrideApplicationState: true)
             
@@ -646,6 +648,9 @@ final class RootViewController: UIViewController {
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             
             self.updateLabelsAndChart(overrideApplicationState: true)
+            
+            
+            self.updateSensorCountdown()
             
             // update statistics related outlets
             self.updateStatistics(animatePieChart: false)
@@ -1056,6 +1061,9 @@ final class RootViewController: UIViewController {
                     
                     // update statistics related outlets
                     updateStatistics(animatePieChart: false)
+                    
+                    // update sensor countdown graphic
+                    updateSensorCountdown()
                     
                 }
                 
@@ -2292,24 +2300,35 @@ final class RootViewController: UIViewController {
     /// this function will check if the user is using a time-sensitive sensor (such as a 14 day Libre, calculate the days remaining and then update the imageUI with the relevant svg image from the project assets.
     private func updateSensorCountdown() {
        
-        // if the user has chosen not to display the countdown graphic, then just return back without doing anything
+        // if the user has chosen not to display the countdown graphic, then make sure the graphic is hidden and just return back without doing anything
         if !UserDefaults.standard.showSensorCountdown {
+            sensorCountdownOutlet.isHidden = true
             return
         }
         
         // if there's no active sensor, there's nothing to do or show
         guard activeSensor != nil else {
+            sensorCountdownOutlet.isHidden = true
             return
         }
         
-        // check that the sensor start date is not nil before we unwrap it
+        // check that the sensor start date is not nil before unwrapping it
         guard activeSensor?.startDate != nil else {
             return
         }
         
-        // if there is a transmitter/sensor, get the maximum number of days for the sensor type (even if this is considered nil in the case of Dexcom etc)
-        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let maxSensorAgeInDays = cgmTransmitter.maxSensorAgeInDays() {
-            
+        // check if there is a transmitter connected (needed as Dexcom will only connect briefly every 5 minutes)
+        // if there is a transmitter connected, pull the current maxSensorAgeInDays and store in in UserDefaults
+        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let maxDays = cgmTransmitter.maxSensorAgeInDays() {
+            UserDefaults.standard.maxSensorAgeInDays = maxDays
+        }
+        
+        // pull the integer from UserDefaults (if no transmitter is connected, this will just use the previous value stored there)
+        let maxSensorAgeInDays = UserDefaults.standard.maxSensorAgeInDays
+
+        // check if the sensor type has a hard coded maximum sensor life (when using the app, so not applicable to Dexcom)
+        if maxSensorAgeInDays > 0 {
+        
             // calculate how many hours the sensor has been used for since starting. We need to use hours instead of days because during the last day we need to see how many hours are left so that we can display the warning and urgent status graphics.
             let currentSensorAgeInHours: Int = Calendar.current.dateComponents([.hour], from: activeSensor!.startDate - 5 * 60, to: Date()).hour!
             
@@ -2368,10 +2387,10 @@ final class RootViewController: UIViewController {
             }
             
         } else {
-            
-            // this must be a sensor without a maxSensorAge set, so just hide the sensor countdown image and do nothing
+
+            // this must be a sensor without a maxSensorAge , so just hide the sensor countdown image and do nothing
             sensorCountdownOutlet.isHidden = true
-            
+
         }
         
     }
@@ -2582,6 +2601,9 @@ extension RootViewController:NightScoutFollowerDelegate {
                 
                 // update statistics related outlets
                 updateStatistics(animatePieChart: false)
+                
+                // update sensor countdown
+                updateSensorCountdown()
                 
                 // check alerts, create notification, set app badge
                 checkAlertsCreateNotificationAndSetAppBadge()
