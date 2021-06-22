@@ -2044,15 +2044,24 @@ final class RootViewController: UIViewController {
             self.highStatisticLabelOutlet.textColor = ConstantsStatistics.labelHighColor
             self.highStatisticLabelOutlet.text = Int(statistics.highStatisticValue.round(toDecimalPlaces: 0)).description + "%"
             
-            self.averageStatisticLabelOutlet.text = (isMgDl ? Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics.averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
-            
-            if UserDefaults.standard.useIFCCA1C {
-                self.a1CStatisticLabelOutlet.text = Int(statistics.a1CStatisticValue.round(toDecimalPlaces: 0)).description + " mmol"
-            } else {
-                self.a1CStatisticLabelOutlet.text = statistics.a1CStatisticValue.round(toDecimalPlaces: 1).description + "%"
+            // if there are no values returned (new sensor?) then just leave the default "-" showing
+            if statistics.averageStatisticValue.value > 0 {
+                self.averageStatisticLabelOutlet.text = (isMgDl ? Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics.averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
             }
             
-            self.cVStatisticLabelOutlet.text = Int(statistics.cVStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+            // if there are no values returned (new sensor?) then just leave the default "-" showing
+            if statistics.a1CStatisticValue.value > 0 {
+                if UserDefaults.standard.useIFCCA1C {
+                    self.a1CStatisticLabelOutlet.text = Int(statistics.a1CStatisticValue.round(toDecimalPlaces: 0)).description + " mmol"
+                } else {
+                    self.a1CStatisticLabelOutlet.text = statistics.a1CStatisticValue.round(toDecimalPlaces: 1).description + "%"
+                }
+            }
+            
+            // if there are no values returned (new sensor?) then just leave the default "-" showing
+            if statistics.cVStatisticValue.value > 0 {
+                self.cVStatisticLabelOutlet.text = Int(statistics.cVStatisticValue.round(toDecimalPlaces: 0)).description + "%"
+            }
             
             // show number of days calculated under the pie chart
             switch daysToUseStatistics {
