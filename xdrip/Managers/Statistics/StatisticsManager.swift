@@ -136,42 +136,56 @@ public final class StatisticsManager {
                     highLimitForTIR = UserDefaults.standard.highMarkValueInUserChosenUnit
                 }
                 
-                
-                // calculate low %
-                lowStatisticValue = Double((glucoseValues.lazy.filter { $0 < lowLimitForTIR }.count * 200) / (glucoseValues.count * 2))
-                
-                
-                // calculate high %
-                highStatisticValue = Double((glucoseValues.lazy.filter { $0 > highLimitForTIR }.count * 200) / (glucoseValues.count * 2))
+                // make sure that there exist elements in the glucoseValue array before trying to process statistics calculations or we could get a fatal divide by zero error/crash
+                if glucoseValues.count > 0 {
+                    
+                    // calculate low %
+                    lowStatisticValue = Double((glucoseValues.lazy.filter { $0 < lowLimitForTIR }.count * 200) / (glucoseValues.count * 2))
                 
                 
-                // calculate TIR % (let's be lazy and just subtract the other two values from 100)
-                inRangeStatisticValue = 100 - lowStatisticValue - highStatisticValue
+                    // calculate high %
+                    highStatisticValue = Double((glucoseValues.lazy.filter { $0 > highLimitForTIR }.count * 200) / (glucoseValues.count * 2))
+                    
+                    
+                    // calculate TIR % (let's be lazy and just subtract the other two values from 100)
+                    inRangeStatisticValue = 100 - lowStatisticValue - highStatisticValue
+                    
+                    
+                    // calculate average glucose value
+                    averageStatisticValue = Double(glucoseValues.reduce(0, +)) / Double(glucoseValues.count)
                 
+                    
+                    // calculate an estimated HbA1C value using either IFCC (e.g 49 mmol/mol) or NGSP (e.g 5.8%) methods: http://www.ngsp.org/ifccngsp.asp
+                    if UserDefaults.standard.useIFCCA1C {
+                        a1CStatisticValue = (((46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7) - 2.152) / 0.09148
+                    } else {
+                        a1CStatisticValue = (46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7
+                    }
+                    
+                    
+                    // calculate standard deviation (we won't show this but we need it to calculate CV)
+                    var sum: Double = 0;
+                    
+                    for glucoseValue in glucoseValues {
+                        sum += (Double(glucoseValue.value) - averageStatisticValue) * (Double(glucoseValue.value) - averageStatisticValue)
+                    }
+                    
+                    let stdDeviationStatisticValue: Double = sqrt(sum / Double(glucoseValues.count))
+                    
+                    
+                    // calculate Coeffecient of Variation
+                    cVStatisticValue = ((stdDeviationStatisticValue) / averageStatisticValue) * 100
                 
-                // calculate average glucose value
-                averageStatisticValue = Double(glucoseValues.reduce(0, +)) / Double(glucoseValues.count)
-                
-                
-                // calculate standard deviation (we won't show this but we need it to calculate CV)
-                var sum: Double = 0;
-                
-                for glucoseValue in glucoseValues {
-                    sum += (Double(glucoseValue.value) - averageStatisticValue) * (Double(glucoseValue.value) - averageStatisticValue)
-                }
-                
-                let stdDeviationStatisticValue: Double = sqrt(sum / Double(glucoseValues.count))
-                
-                
-                // calculate Coeffecient of Variation
-                cVStatisticValue = ((stdDeviationStatisticValue) / averageStatisticValue) * 100
-                
-                
-                // calculate an estimated HbA1C value using either IFCC (e.g 49 mmol/mol) or NGSP (e.g 5.8%) methods: http://www.ngsp.org/ifccngsp.asp
-                if UserDefaults.standard.useIFCCA1C {
-                    a1CStatisticValue = (((46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7) - 2.152) / 0.09148
                 } else {
-                    a1CStatisticValue = (46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7
+                
+                    // just assign a zero value to all statistics variables
+                    lowStatisticValue = 0
+                    highStatisticValue = 0
+                    inRangeStatisticValue = 0
+                    averageStatisticValue = 0
+                    cVStatisticValue = 0
+                    a1CStatisticValue = 0
+                
                 }
 
             }
