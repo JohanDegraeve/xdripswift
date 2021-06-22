@@ -2314,7 +2314,7 @@ final class RootViewController: UIViewController {
             UserDefaults.standard.maxSensorAgeInDays = maxDays
         }
         
-        // pull the integer from UserDefaults (if no transmitter is connected, this will just use the previous value stored there)
+        // pull the integer from UserDefaults (if no transmitter/sensor is connected, this will just use the previous value stored there)
         let maxSensorAgeInDays = UserDefaults.standard.maxSensorAgeInDays
 
         // check if the sensor type has a hard coded maximum sensor life (when using the app, so not applicable to Dexcom)

@@ -87,7 +87,7 @@
 "settingsviews_license" = "Lizenz";
 
 /// general settings, should reading be multiplied with 10 yes or no
-"multipleAppBadgeValueWith10" = "mit 10 multiplizieren?";
+"settingsviews_multipleAppBadgeValueWith10" = "mit 10 multiplizieren?";
 
 /// nightscout settings, pop up that asks user to enter nightscout api key
 "settingsviews_giveNightScoutAPIKey" = "API_SECRET Eingabe";
@@ -114,7 +114,7 @@
 "settingsviews_speakTrend" = "Trend vorlesen?";
 
 /// Apple Watch Settings - text in row where user needs to say if trend should be displayed or not
-"displayTrendInCalendarEvent" = "Trend anzeigen?";
+"settingsviews_displayTrendInCalendarEvent" = "Trend anzeigen?";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
 "infoCalendarAccessRestricted" = "Richtlinien auf ihrem Gerät verhindern das Sie %@ Zugang zu ihrem Kalender geben.";
@@ -225,7 +225,7 @@
 "settingsviews_row_alerts" = "Schwellwerte";
 
 /// general settings, should reading be shown in app badge yes or no
-"labelShowReadingInAppBadge" = "BZ Werte auf der App-Kachel anzeigen?";
+"settingsviews_labelShowReadingInAppBadge" = "BZ Werte auf der App-Kachel anzeigen?";
 
 /// home screen settings, low value
 "settingsviews_lowValue" = "Niedriger Wert:";
@@ -261,7 +261,7 @@
 "settingsviews_speakreadingslanguageselection" = "Sprache wählen";
 
 /// general settings, should reading be shown in notification yes or no
-"showReadingInNotification" = "BZ in Mitteilungszentrale?";
+"settingsviews_showReadingInNotification" = "BZ in Mitteilungszentrale?";
 
 /// dexcom share settings, where user can choose to use US url or not
 "settingsviews_useUSDexcomShareurl" = "Benutzung von Dexcom US Server?";
@@ -298,4 +298,6 @@
 "settingsviews_useStandardStatisticsRange" = "Standardbereich verwenden?";
 "settingsviews_useIFCCA1C" = "HbA1c in mmols/mol anzeigen?";
 
-"showClockWhenScreenIsLocked" = "Uhr anzeigen wenn gesperrt?";
+"settingsviews_showClockWhenScreenIsLocked" = "Uhr anzeigen wenn gesperrt?";
+
+"settingsviews_showSensorCountdown" = "Zeit bis Sensorende anzeigen?";

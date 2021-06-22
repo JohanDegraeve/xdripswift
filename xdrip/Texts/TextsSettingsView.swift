@@ -33,23 +33,19 @@ class Texts_SettingsView {
     }()
     
     static let showReadingInNotification: String = {
-        return NSLocalizedString("showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Show BG in Notifications?", comment: "general settings, should reading be shown in notification yes or no")
+        return NSLocalizedString("settingsviews_showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Show BG in Notifications?", comment: "general settings, should reading be shown in notification yes or no")
     }()
     
     static let labelShowReadingInAppBadge: String = {
-        return NSLocalizedString("labelShowReadingInAppBadge", tableName: filename, bundle: Bundle.main, value: "Show BG in the App Badge?", comment: "general settings, should reading be shown in app badge yes or no")
+        return NSLocalizedString("settingsviews_labelShowReadingInAppBadge", tableName: filename, bundle: Bundle.main, value: "Show BG in the App Badge?", comment: "general settings, should reading be shown in app badge yes or no")
     }()
     
     static let multipleAppBadgeValueWith10: String = {
-        return NSLocalizedString("multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10?", comment: "general settings, should reading be multiplied with 10 yes or no")
+        return NSLocalizedString("settingsviews_multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10?", comment: "general settings, should reading be multiplied with 10 yes or no")
     }()
     
     static let showClockWhenScreenIsLocked: String = {
-        return NSLocalizedString("showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Show Clock when Locked?", comment: "general settings, should the clock also be displayed when the screen is locked?")
-    }()
-    
-    static let showSensorCountdown: String = {
-        return NSLocalizedString("showSensorCountdown", tableName: filename, bundle: Bundle.main, value: "Show Sensor Countdown?", comment: "general settings, should the app show a sensor countdown graphic if applicable for the sensor type?")
+        return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Show Clock when Locked?", comment: "general settings, should the clock also be displayed when the screen is locked?")
     }()
     
     static let warningChangeFromMasterToFollower: String = {
@@ -114,6 +110,10 @@ class Texts_SettingsView {
     
     static let labelUseIFFCA1C: String = {
         return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "Show HbA1c in mmols/mol?", comment: "statistics settings, use IFCC method for HbA1c?")
+    }()
+    
+    static let showSensorCountdown: String = {
+        return NSLocalizedString("settingsviews_showSensorCountdown", tableName: filename, bundle: Bundle.main, value: "Show Sensor Countdown?", comment: "statistics settings, should the app show a sensor countdown graphic if applicable for the sensor type?")
     }()
     
     
@@ -372,7 +372,7 @@ class Texts_SettingsView {
     }()
 
     static let displayTrendInCalendarEvent: String = {
-        return NSLocalizedString("displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Trend?", comment: "Apple Watch Settings - text in row where user needs to say if trend should be displayed or not")
+        return NSLocalizedString("settingsviews_displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Trend?", comment: "Apple Watch Settings - text in row where user needs to say if trend should be displayed or not")
     }()
     
     static let displayUnitInCalendarEvent: String = {

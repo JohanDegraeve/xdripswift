@@ -4,9 +4,9 @@
 "settingsviews_masterorfollower" = "الاستخدام كتطبيق رئيسي أو للمتابعة؟";
 "settingsviews_master" = "رئيسي";
 "settingsviews_follower" = "متابعة";
-"showReadingInNotification" = "عرض قراءات السكر في الإشعارات؟";
-"labelShowReadingInAppBadge" = "عرض قراءة السكر على أيقونة التطبيق؟";
-"multipleAppBadgeValueWith10" = "مضاعفة قراءة أيقونة التطبيق في 10؟";
+"settingsviews_showReadingInNotification" = "عرض قراءات السكر في الإشعارات؟";
+"settingsviews_labelShowReadingInAppBadge" = "عرض قراءة السكر على أيقونة التطبيق؟";
+"settingsviews_multipleAppBadgeValueWith10" = "مضاعفة قراءة أيقونة التطبيق في 10؟";
 "settingsviews_urgentHighValue" = "قيمة الحد الأعلى الخطر:";
 "settingsviews_highValue" = "القيمة العليا:";
 "settingsviews_targetValue" = "قيمة الهدف:";
@@ -78,7 +78,7 @@
 "appleWatchSectionTitle" = "ساعة أبل";
 "createCalendarEvent" = "إنشاء أحداث التقويم؟";
 "calenderId" = "التقويم للاستخدام؟";
-"displayTrendInCalendarEvent" = "عرض الإتجاه؟";
+"settingsviews_displayTrendInCalendarEvent" = "عرض الإتجاه؟";
 "displayUnitInCalendarEvent" = "عرض الوحدة؟";
 "displayDeltaInCalendarEvent" = "عرض الفرق؟";
 "infoCalendarAccessDeniedByUser" = "لقد رفضت الوصول إلى التقويم الخاص بك مسبقًا.\n\nلتمكينه ، انتقل إلى إعدادات جهازك ثم الخصوصية ثم التقويم ثم قم بتمكينه.";
@@ -108,4 +108,4 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"showClockWhenScreenIsLocked" = "Show Clock when Locked?";
+"settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";
