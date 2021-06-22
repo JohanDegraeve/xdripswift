@@ -8,10 +8,10 @@
 "settingsviews_masterorfollower" = "Master of Volger?";
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Volger";
-"showReadingInNotification" = "Toon BG in Notificaties?";
-"labelShowReadingInAppBadge" = "Toon BG in de App Badge?";
-"multipleAppBadgeValueWith10" = "Vermenigvuldig App Badge Meting met 10?";
-"showClockWhenScreenIsLocked" = "Toon klok indien gelockt?";
+"settingsviews_showReadingInNotification" = "Toon BG in Notificaties?";
+"settingsviews_labelShowReadingInAppBadge" = "Toon BG in de App Badge?";
+"settingsviews_multipleAppBadgeValueWith10" = "Vermenigvuldig App Badge Meting met 10?";
+"settingsviews_showClockWhenScreenIsLocked" = "Toon klok indien gelockt?";
 "settingsviews_urgentHighValue" = "Urgent Hoge Waarde:";
 "settingsviews_highValue" = "Hoge Waarde:";
 "settingsviews_targetValue" = "Doel Waarde:";
@@ -26,6 +26,7 @@
 "settingsviews_daysToUseStatisticsMessage" = "Maximum aantal dagen te gebruiken om de statistieken te berekenen?\n\n(0 betekent vanaf vandaag 00:00)";
 "settingsviews_useStandardStatisticsRange" = "Standaard Range gebruiken?";
 "settingsviews_useIFCCA1C" = "Toon HbA1c in mmols/mol?";
+"settingsviews_showSensorCountdown" = "Toon sensor aftellen";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_givetransmitterid" = "Voer Transmitter ID In";
 "settingsviews_resettransmitter" = "Reset Transmitter";
@@ -80,7 +81,7 @@
 "appleWatchSectionTitle" = "Apple Watch";
 "createCalendarEvent" = "Creëer Agenda Activiteit?";
 "calenderId" = "Te Gebruiken Agenda?";
-"displayTrendInCalendarEvent" = "Toon Trend?";
+"settingsviews_displayTrendInCalendarEvent" = "Toon Trend?";
 "displayUnitInCalendarEvent" = "Toon Eenheid?";
 "displayDeltaInCalendarEvent" = "Toon Delta?";
 "infoCalendarAccessDeniedByUser" = "In het verleden heb je toegang geweigerd tot je Agenda.\n\nOm toestemming te geven, ga naar iPhone Instellingen, Privacy, Agenda's en schakel in.";

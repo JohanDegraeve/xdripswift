@@ -4,9 +4,9 @@
 "settingsviews_masterorfollower" = "Mestre ou Seguidor?";
 "settingsviews_master" = "Mestre";
 "settingsviews_follower" = "Seguidor";
-"showReadingInNotification" = "Mostrar Glicose nas Notificações?";
-"labelShowReadingInAppBadge" = "Mostrar Glicose no Distintivo da App?";
-"multipleAppBadgeValueWith10" = "Multiplicar Distintivo da App por 10?";
+"settingsviews_showReadingInNotification" = "Mostrar Glicose nas Notificações?";
+"settingsviews_labelShowReadingInAppBadge" = "Mostrar Glicose no Distintivo da App?";
+"settingsviews_multipleAppBadgeValueWith10" = "Multiplicar Distintivo da App por 10?";
 "settingsviews_urgentHighValue" = "Valor Hiper Urgente:";
 "settingsviews_highValue" = "Valor Hiper:";
 "settingsviews_targetValue" = "Valor Alvo:";
@@ -21,6 +21,7 @@
 "settingsviews_daysToUseStatisticsMessage" = "Máximo de dias que devemos tentar usar para calcular as estatísticas?\n\n(Introduza 0 para calcular desde a meia-noite de hoje)";
 "settingsviews_useStandardStatisticsRange" = "Usar Intervalo Padrão?";
 "settingsviews_useIFCCA1C" = "Mostar A1C em mmols/mol";
+"settingsviews_showSensorCountdown" = "Dias Restantes do Sensor?";
 "settingsviews_sectiontitletransmitter" = "Transmissor";
 "settingsviews_transmittertype" = "Tipo de Transmissor:";
 "settingsviews_transmitterid" = "ID de Transmissor:";
@@ -78,7 +79,7 @@
 "appleWatchSectionTitle" = "Apple Watch";
 "createCalendarEvent" = "Criar Eventos de Calendário?";
 "calenderId" = "Calendário a Utilizar?";
-"displayTrendInCalendarEvent" = "Mostrar Tendência?";
+"settingsviews_displayTrendInCalendarEvent" = "Mostrar Tendência?";
 "displayUnitInCalendarEvent" = "Mostrar Unidade?";
 "displayDeltaInCalendarEvent" = "Mostrar Delta?";
 "infoCalendarAccessDeniedByUser" = "Anteriormente negou accesso ao Calendário.\n\nPara activá-lo vá às definições do seu dispositivo, privacidade, calendários e active-o.";
@@ -101,4 +102,4 @@
 "nslog" = "NSLog";
 "developerSettings" = "Definições de Programador";
 "settingsviews_sectiontitlehomescreen" = "Ecrã Inicial";
-"showClockWhenScreenIsLocked" = "Mostrar Relógio quando Bloqueado?";
+"settingsviews_showClockWhenScreenIsLocked" = "Mostrar Relógio quando Bloqueado?";

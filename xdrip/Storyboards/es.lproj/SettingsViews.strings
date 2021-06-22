@@ -4,10 +4,10 @@
 "settingsviews_masterorfollower" = "Master o Seguidor?";
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Seguidor";
-"showReadingInNotification" = "Mostrar en Notificaciones?";
-"labelShowReadingInAppBadge" = "Mostrar en el icono de la app?";
-"multipleAppBadgeValueWith10" = "Multiplicar valor por 10 en el icono de la app?";
-"showClockWhenScreenIsLocked" = "Mostrar reloj al bloquear?";
+"settingsviews_showReadingInNotification" = "Mostrar en Notificaciones?";
+"settingsviews_labelShowReadingInAppBadge" = "Mostrar en el icono de la app?";
+"settingsviews_multipleAppBadgeValueWith10" = "Multiplicar valor por 10 en el icono de la app?";
+"settingsviews_showClockWhenScreenIsLocked" = "Mostrar reloj al bloquear?";
 "settingsviews_urgentHighValue" = "Valor de Glucemia Alta (Urgente):";
 "settingsviews_highValue" = "Valor de Glucemia Alta:";
 "settingsviews_targetValue" = "Valor Objectivo:";
@@ -22,6 +22,7 @@
 "settingsviews_daysToUseStatisticsMessage" = "Máximos días a intentar usar para calcular las estadísticas?\n\n(Entrar 0 para calcular el día de hoy desde las 00:00hrs)";
 "settingsviews_useStandardStatisticsRange" = "Usar Rango Estándar?";
 "settingsviews_useIFCCA1C" = "Ver HbA1c en mmols/mol?";
+"settingsviews_showSensorCountdown" = "Días Restantes del Sensor?";
 "settingsviews_sectiontitletransmitter" = "Transmisor";
 "settingsviews_transmittertype" = "Tipo de Transmisor:";
 "settingsviews_transmitterid" = "ID del Transmisor:";
@@ -76,7 +77,7 @@
 "appleWatchSectionTitle" = "Apple Watch";
 "createCalendarEvent" = "Crear Eventos en el Calendario?";
 "calenderId" = "Qué calendario se debe usar?";
-"displayTrendInCalendarEvent" = "Mostrar Tendencia?";
+"settingsviews_displayTrendInCalendarEvent" = "Mostrar Tendencia?";
 "displayUnitInCalendarEvent" = "Mostrar Unidad?";
 "displayDeltaInCalendarEvent" = "Mostrar Delta?";
 "infoCalendarAccessDeniedByUser" = "Has denegado previamente permiso para acceder al calendario.\n\nPara habilitarlo de nuevo, ir a Configuración en tu iPhone, Privacidad, Calendarios y habilitarlo.";
