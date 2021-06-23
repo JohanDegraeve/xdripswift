@@ -26,7 +26,7 @@
 "settingsviews_daysToUseStatisticsMessage" = "Maximum aantal dagen te gebruiken om de statistieken te berekenen?\n\n(0 betekent vanaf vandaag 00:00)";
 "settingsviews_useStandardStatisticsRange" = "Standaard Range gebruiken?";
 "settingsviews_useIFCCA1C" = "Toon HbA1c in mmols/mol?";
-"settingsviews_showSensorCountdown" = "Toon sensor aftellen";
+"settingsviews_showSensorCountdown" = "Toon Sensor ouderdom?";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_givetransmitterid" = "Voer Transmitter ID In";
 "settingsviews_resettransmitter" = "Reset Transmitter";
