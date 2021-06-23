@@ -1856,6 +1856,9 @@ final class RootViewController: UIViewController {
         
         activeSensor = nil
         
+        // now that the activeSensor object has been destroyed, update (hide) the sensor countdown graphic
+        updateSensorCountdown()
+        
     }
     
     /// start a new sensor, ask user for starttime
