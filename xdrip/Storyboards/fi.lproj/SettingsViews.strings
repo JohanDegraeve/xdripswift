@@ -9,9 +9,9 @@
 "settingsviews_masterorfollower" = "Isäntä vai seuraaja?";
 "settingsviews_master" = "Isäntä";
 "settingsviews_follower" = "Seuraaja";
-"showReadingInNotification" = "Näytä lukema ilmoituksissa?";
-"labelShowReadingInAppBadge" = "Näytä lukema kuvakkeessa?";
-"multipleAppBadgeValueWith10" = "Kerrotaanko kuvake lukemat 10:llä?";
+"settingsviews_showReadingInNotification" = "Näytä lukema ilmoituksissa?";
+"settingsviews_labelShowReadingInAppBadge" = "Näytä lukema kuvakkeessa?";
+"settingsviews_multipleAppBadgeValueWith10" = "Kerrotaanko kuvake lukemat 10:llä?";
 "settingsviews_sectiontitletransmitter" = "Lähetin";
 "settingsviews_transmittertype" = "Lähettimen tyyppi:";
 "settingsviews_transmitterid" = "Lähettimen ID:";
@@ -69,7 +69,7 @@
 "appleWatchSectionTitle" = "Apple Watch";
 "createCalendarEvent" = "Luo kalenteritapahtumat?";
 "calenderId" = "Käytettävä kalenteri?";
-"displayTrendInCalendarEvent" = "Näytä suunta?";
+"settingsviews_displayTrendInCalendarEvent" = "Näytä suunta?";
 "displayUnitInCalendarEvent" = "Näytä yksikkö?";
 "displayDeltaInCalendarEvent" = "Näytä erotus?";
 "infoCalendarAccessDeniedByUser" = "Olet aiemmin kieltänyt pääsyn kalenteriin.\n\nOttaaksesi sen käyttöön, siirry laitteen asetuksiin, tietosuojaan, kalentereihin ja ota käyttöön.";
@@ -135,4 +135,4 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"showClockWhenScreenIsLocked" = "Show Clock when Locked?";
+"settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";

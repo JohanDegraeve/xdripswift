@@ -8,7 +8,7 @@ fileprivate enum Setting:Int, CaseIterable {
     /// choose between master and follower
     case masterFollower = 1
     
-    /// if reading is shown in app badge, should value be multiplied with 10 yes or no
+    /// show a clock at the bottom of the home screen when the screen lock is activated?
     case showClockWhenScreenIsLocked = 2
     
     /// should reading be shown in notification
@@ -152,20 +152,20 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .masterFollower:
             return Texts_SettingsView.labelMasterOrFollower
             
+        case .showClockWhenScreenIsLocked:
+            return Texts_SettingsView.showClockWhenScreenIsLocked
+            
         case .showReadingInNotification:
             return Texts_SettingsView.showReadingInNotification
+            
+        case .notificationInterval:
+            return Texts_SettingsView.settingsviews_IntervalTitle
             
         case .showReadingInAppBadge:
             return Texts_SettingsView.labelShowReadingInAppBadge
             
         case .multipleAppBadgeValueWith10:
             return Texts_SettingsView.multipleAppBadgeValueWith10
-            
-        case .showClockWhenScreenIsLocked:
-            return Texts_SettingsView.showClockWhenScreenIsLocked
-            
-        case .notificationInterval:
-            return Texts_SettingsView.settingsviews_IntervalTitle
             
         }
     }

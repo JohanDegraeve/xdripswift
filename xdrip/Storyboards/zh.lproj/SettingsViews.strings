@@ -85,7 +85,7 @@
 "settingsviews_sectiontitleAbout" = "About %@";
 
 /// general settings, should reading be shown in notification yes or no
-"showReadingInNotification" = "Show BG in Notifications?";
+"settingsviews_showReadingInNotification" = "Show BG in Notifications?";
 
 /// 
 "settingsviews_urgentLowValue" = "Urgent Low Value:";
@@ -139,7 +139,7 @@
 "settingsviews_resettransmitter" = "Reset Transmitter";
 
 /// general settings, should reading be multiplied with 10 yes or no
-"multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";
+"settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";
 
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
@@ -160,7 +160,7 @@
 "settingsviews_speakreadingslanguageselection" = "Select Language";
 
 /// general settings, should reading be shown in app badge yes or no
-"labelShowReadingInAppBadge" = "Show BG in the App Badge?";
+"settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge?";
 
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
 "volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
@@ -199,7 +199,7 @@
 "settingsviews_useobjectives" = "Show Objectives in Graph?";
 
 /// Apple Watch Settings - text in row where user needs to say if trend should be displayed or not
-"displayTrendInCalendarEvent" = "Display Trend?";
+"settingsviews_displayTrendInCalendarEvent" = "Display Trend?";
 
 /// 
 "settingsviews_showcoloredobjectives" = "Show Colored Lines?";
@@ -257,4 +257,4 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"showClockWhenScreenIsLocked" = "Show Clock when Locked?";
+"settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";

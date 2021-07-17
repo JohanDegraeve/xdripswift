@@ -4,10 +4,10 @@
 "settingsviews_masterorfollower" = "Master or Follower?";
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Follower";
-"showReadingInNotification" = "Show BG in Notifications?";
-"labelShowReadingInAppBadge" = "Show BG in the App Badge?";
-"multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";
-"showClockWhenScreenIsLocked" = "Show Clock when Locked?";
+"settingsviews_showReadingInNotification" = "Show BG in Notifications?";
+"settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge?";
+"settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";
+"settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";
 "settingsviews_urgentHighValue" = "Urgent High Value:";
 "settingsviews_highValue" = "High Value:";
 "settingsviews_targetValue" = "Target Value:";
@@ -22,6 +22,7 @@
 "settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
 "settingsviews_useStandardStatisticsRange" = "Use Standard Range?";
 "settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol?";
+"settingsviews_showSensorCountdown" = "Show Sensor Countdown?";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_transmittertype" = "Transmitter Type:";
 "settingsviews_transmitterid" = "Transmitter ID:";
@@ -79,7 +80,7 @@
 "appleWatchSectionTitle" = "Apple Watch";
 "createCalendarEvent" = "Create Calendar Events?";
 "calenderId" = "Calendar To Use?";
-"displayTrendInCalendarEvent" = "Display Trend?";
+"settingsviews_displayTrendInCalendarEvent" = "Display Trend?";
 "displayUnitInCalendarEvent" = "Display Unit?";
 "displayDeltaInCalendarEvent" = "Display Delta?";
 "infoCalendarAccessDeniedByUser" = "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it.";
