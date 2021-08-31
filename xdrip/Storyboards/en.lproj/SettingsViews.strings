@@ -22,7 +22,9 @@
 "settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
 "settingsviews_useStandardStatisticsRange" = "Use Standard Range?";
 "settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol?";
+"settingsviews_sectiontitlesensorcountdown" = "Sensor Countdown";
 "settingsviews_showSensorCountdown" = "Show Sensor Countdown?";
+"settingsviews_showSensorCountdownAlternativeGraphics" = "Use Alternative Graphics?";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_transmittertype" = "Transmitter Type:";
 "settingsviews_transmitterid" = "Transmitter ID:";

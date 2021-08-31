@@ -75,7 +75,7 @@
 "infoCalendarAccessDeniedByUser" = "Olet aiemmin kieltänyt pääsyn kalenteriin.\n\nOttaaksesi sen käyttöön, siirry laitteen asetuksiin, tietosuojaan, kalentereihin ja ota käyttöön.";
 "infoCalendarAccessRestricted" = "Et voi antaa %@:lle valtuutusta käyttää kalenteriasi. Tämä johtuu mahdollisesti aktiivisista rajoituksista, kuten vanhempien valvonnasta";
 "sectionTitleTrace" = "Ongelmien raportointi";
-"sendTraceFile" = "Lähetä ongelmaraportti";
+"sendTraceFile" = "Lähetä ongelmaraportti";	
 "describeProblem" = "Selitä mahdollisimman yksityiskohtaisesti, miksi sinun on lähetettävä jäljitystiedosto. Jos olet jo ilmoittanut ongelmastasi Facebook-tukiryhmässä '%@', mainitse facebook-nimesi sähköpostissa";
 "emailNotConfigured" = "Sinun on määritettävä sähköpostitili iOS-laitteellasi.";
 "emailbodyText" = "Ongelman kuvaus: ";

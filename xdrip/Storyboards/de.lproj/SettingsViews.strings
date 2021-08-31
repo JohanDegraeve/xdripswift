@@ -300,4 +300,6 @@
 
 "settingsviews_showClockWhenScreenIsLocked" = "Uhr anzeigen wenn gesperrt?";
 
+"settingsviews_sectiontitlesensorcountdown" = "Sensor Countdown";
 "settingsviews_showSensorCountdown" = "Zeit bis Sensorende anzeigen?";
+"settingsviews_showSensorCountdownAlternativeGraphics" = "Verwenden Sie alternative Grafiken?";
