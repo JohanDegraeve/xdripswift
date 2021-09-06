@@ -2302,7 +2302,7 @@ final class RootViewController: UIViewController {
     
     /// this function will check if the user is using a time-sensitive sensor (such as a 14 day Libre, calculate the days remaining and then update the imageUI with the relevant svg image from the project assets.
     private func updateSensorCountdown() {
-       
+        
         // if the user has chosen not to display the countdown graphic, then make sure the graphic is hidden and just return back without doing anything
         if !UserDefaults.standard.showSensorCountdown {
             sensorCountdownOutlet.isHidden = true
@@ -2339,34 +2339,34 @@ final class RootViewController: UIViewController {
             let sensorCountdownHoursRemaining: Int = (maxSensorAgeInDays * 24) - currentSensorAgeInHours
             
             // start programatically creating the asset name that we will loaded. This is based upon the max sensor days and the days "remaining". To get the full days, we need to round up the currentSensorAgeInHours to the nearest 24 hour block
-            var sensorCountdownAssetName: String = "sensor" + String(maxSensorAgeInDays) + "_"
+            var sensorCountdownAssetName: String = "sensor" +  String(maxSensorAgeInDays) + "_"
 
-            // if the sensor hours remaining is 0 or less, then the sensor is either expired or in the last 12 hours of "overtime" (e.g Libre sensors have an extra 12 hours before the stop working). If this happens, then instead of appending the days left, always show the "00" graphic.
+            // find the amount of days remaining and add it to the asset name string. If there is less than 12 hours, add the corresponding warning/urgent label. If the sensor hours remaining is 0 or less, then the sensor is either expired or in the last 12 hours of "overtime" (e.g Libre sensors have an extra 12 hours before the stop working). If this happens, then instead of appending the days left, always show the "00" graphic.
             if sensorCountdownHoursRemaining > 0 {
                 
-                sensorCountdownAssetName += String(Int(round(Double(currentSensorAgeInHours / 24)) * 24) / 24)
+                sensorCountdownAssetName += String(format: "%02d", maxSensorAgeInDays - Int(round(Double(currentSensorAgeInHours / 24)) * 24) / 24)
+                
+                switch sensorCountdownHoursRemaining {
+
+                    case 7...12:
+                        sensorCountdownAssetName += "_warning"
+                    case 1...6:
+                        sensorCountdownAssetName += "_urgent"
+                    default: break
+
+                }
                 
             } else {
                 
                 sensorCountdownAssetName += "00"
                 
             }
-
-            switch sensorCountdownHoursRemaining {
-
-                case 7...12:
-                    sensorCountdownAssetName += "_warning"
-                case 0...6:
-                    sensorCountdownAssetName += "_urgent"
-                default: break
-
-            }
             
-            // if the user prefers the alternative graphics (count-up), then append this to the string
+            // if the user prefers the alternative graphics (count-up), then append this to the end of the string
             if showSensorCountdownAlternativeGraphics {
                 sensorCountdownAssetName += "_alt"
             }
-                        
+            
             // update the UIImage
             sensorCountdownOutlet.image = UIImage(named: sensorCountdownAssetName)
             
@@ -2375,7 +2375,7 @@ final class RootViewController: UIViewController {
             
         } else {
 
-            // this must be a sensor without a maxSensorAge , so just hide the sensor countdown image and do nothing
+            // this must be a sensor without a maxSensorAge , so just make sure to hide the sensor countdown image and do nothing
             sensorCountdownOutlet.isHidden = true
 
         }
