@@ -21,9 +21,6 @@ fileprivate enum Setting:Int, CaseIterable {
     //urgent low value
     case useIFCCA1C = 2
     
-    /// show a countdown graphic for the sensor days if available?
-    case showSensorCountdown = 3
-    
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
@@ -43,9 +40,6 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
             
         case .useIFCCA1C :
             return UISwitch(isOn: UserDefaults.standard.useIFCCA1C, action: {(isOn:Bool) in UserDefaults.standard.useIFCCA1C = isOn})
-            
-        case .showSensorCountdown :
-            return UISwitch(isOn: UserDefaults.standard.showSensorCountdown, action: {(isOn:Bool) in UserDefaults.standard.showSensorCountdown = isOn})
             
         }
     }
@@ -99,15 +93,6 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
                     }
                 })
                 
-        case  .showSensorCountdown:
-            return SettingsSelectedRowAction.callFunction(function: {
-                if UserDefaults.standard.showSensorCountdown {
-                    UserDefaults.standard.showSensorCountdown = false
-                } else {
-                    UserDefaults.standard.showSensorCountdown = true
-                }
-            })
-                
         }
     }
     
@@ -139,9 +124,6 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
             case .useIFCCA1C:
                 return Texts_SettingsView.labelUseIFFCA1C
                 
-            case .showSensorCountdown:
-                return Texts_SettingsView.showSensorCountdown
-                
         }
     }
     
@@ -150,7 +132,7 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showStatistics, .useStandardStatisticsRange, .useIFCCA1C, .showSensorCountdown:
+        case .showStatistics, .useStandardStatisticsRange, .useIFCCA1C:
             return UITableViewCell.AccessoryType.none
             
         }
@@ -161,7 +143,7 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
 
         switch setting {
             
-        case .showStatistics, .useStandardStatisticsRange, .useIFCCA1C, .showSensorCountdown:
+        case .showStatistics, .useStandardStatisticsRange, .useIFCCA1C:
             return nil
             
         }

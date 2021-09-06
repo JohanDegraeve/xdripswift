@@ -2302,7 +2302,7 @@ final class RootViewController: UIViewController {
     
     /// this function will check if the user is using a time-sensitive sensor (such as a 14 day Libre, calculate the days remaining and then update the imageUI with the relevant svg image from the project assets.
     private func updateSensorCountdown() {
-       
+        
         // if the user has chosen not to display the countdown graphic, then make sure the graphic is hidden and just return back without doing anything
         if !UserDefaults.standard.showSensorCountdown {
             sensorCountdownOutlet.isHidden = true
@@ -2326,72 +2326,56 @@ final class RootViewController: UIViewController {
             UserDefaults.standard.maxSensorAgeInDays = maxDays
         }
         
-        // pull the integer from UserDefaults (if no transmitter/sensor is connected, this will just use the previous value stored there)
-        let maxSensorAgeInDays = UserDefaults.standard.maxSensorAgeInDays
+        // pull the boolean value from UserDefaults to see if you user prefers the alternative graphics (count-up instead of count-down)
+        let showSensorCountdownAlternativeGraphics = UserDefaults.standard.showSensorCountdownAlternativeGraphics
 
-        // check if the sensor type has a hard coded maximum sensor life (when using the app, so not applicable to Dexcom)
-        if maxSensorAgeInDays > 0 {
+        // check if the sensor type has a hard coded maximum sensor life previously stored.
+        if let maxSensorAgeInDays = UserDefaults.standard.maxSensorAgeInDays as Int?, maxSensorAgeInDays > 0 {
         
             // calculate how many hours the sensor has been used for since starting. We need to use hours instead of days because during the last day we need to see how many hours are left so that we can display the warning and urgent status graphics.
             let currentSensorAgeInHours: Int = Calendar.current.dateComponents([.hour], from: activeSensor!.startDate - 5 * 60, to: Date()).hour!
             
-            // if this is considered to be a 14 day sensor, run the 14 day sensor graphics
-            if maxSensorAgeInDays == 14 {
+            // we need to calculate the hours so that we can see if we need to show the yellow (<12hrs remaining) or red (<6hrs remaining) graphics
+            let sensorCountdownHoursRemaining: Int = (maxSensorAgeInDays * 24) - currentSensorAgeInHours
+            
+            // start programatically creating the asset name that we will loaded. This is based upon the max sensor days and the days "remaining". To get the full days, we need to round up the currentSensorAgeInHours to the nearest 24 hour block
+            var sensorCountdownAssetName: String = "sensor" +  String(maxSensorAgeInDays) + "_"
+
+            // find the amount of days remaining and add it to the asset name string. If there is less than 12 hours, add the corresponding warning/urgent label. If the sensor hours remaining is 0 or less, then the sensor is either expired or in the last 12 hours of "overtime" (e.g Libre sensors have an extra 12 hours before the stop working). If this happens, then instead of appending the days left, always show the "00" graphic.
+            if sensorCountdownHoursRemaining > 0 {
                 
-                var sensorCountdownGraphic: UIImage
+                sensorCountdownAssetName += String(format: "%02d", maxSensorAgeInDays - Int(round(Double(currentSensorAgeInHours / 24)) * 24) / 24)
                 
-                switch currentSensorAgeInHours {
-                    
-                    case 0..<24:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_14")!
-                    case 24..<48:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_13")!
-                    case 48..<72:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_12")!
-                    case 72..<96:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_11")!
-                    case 96..<120:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_10")!
-                    case 120..<144:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_09")!
-                    case 144..<168:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_08")!
-                    case 168..<192:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_07")!
-                    case 192..<216:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_06")!
-                    case 216..<240:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_05")!
-                    case 240..<264:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_04")!
-                    case 264..<288:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_03")!
-                    case 288..<312:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_02")!
-                    case 312..<324:
-                        // still between 12 and 24 hours left
-                        sensorCountdownGraphic = UIImage(named: "sensor14_01")!
-                    case 324..<330:
-                        // just between 6 and 12 hours left, show the warning image
-                        sensorCountdownGraphic = UIImage(named: "sensor14_01_warning")!
-                    case 330...1000:
-                        // less than 6 hours left, show the urgent image
-                        sensorCountdownGraphic = UIImage(named: "sensor14_01_urgent")!
-                    default:
-                        sensorCountdownGraphic = UIImage(named: "sensor14_14")!
-                    
+                switch sensorCountdownHoursRemaining {
+
+                    case 7...12:
+                        sensorCountdownAssetName += "_warning"
+                    case 1...6:
+                        sensorCountdownAssetName += "_urgent"
+                    default: break
+
                 }
                 
-                // update the UIImage
-                sensorCountdownOutlet.image = sensorCountdownGraphic
+            } else {
                 
-                // show the sensor countdown image
-                sensorCountdownOutlet.isHidden = false
+                sensorCountdownAssetName += "00"
+                
             }
+            
+            // if the user prefers the alternative graphics (count-up), then append this to the end of the string
+            if showSensorCountdownAlternativeGraphics {
+                sensorCountdownAssetName += "_alt"
+            }
+            
+            // update the UIImage
+            sensorCountdownOutlet.image = UIImage(named: sensorCountdownAssetName)
+            
+            // show the sensor countdown image
+            sensorCountdownOutlet.isHidden = false
             
         } else {
 
-            // this must be a sensor without a maxSensorAge , so just hide the sensor countdown image and do nothing
+            // this must be a sensor without a maxSensorAge , so just make sure to hide the sensor countdown image and do nothing
             sensorCountdownOutlet.isHidden = true
 
         }

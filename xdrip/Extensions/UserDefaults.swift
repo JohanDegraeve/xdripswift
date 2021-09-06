@@ -33,8 +33,6 @@ extension UserDefaults {
         case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
         /// should the clock view be shown when the screen is locked?
         case showClockWhenScreenIsLocked = "showClockWhenScreenIsLocked"
-        /// should the countdown graphic be shown in the applicable for the sensor type being used?
-        case showSensorCountdown = "showSensorCountdown"
         /// minimum time between two notifications, set by user
         case notificationInterval = "notificationInterval"
         
@@ -65,6 +63,16 @@ extension UserDefaults {
         case useIFCCA1C = "useIFCCA1C"
         /// use the "standard" range of 70-180mg/dl to calculate the statistics?
         case useStandardStatisticsRange = "useStandardStatisticsRange"
+        
+        // Sensor Countdown settings
+        
+        /// show the sensor countdown graphic where applicable?
+        case showSensorCountdown = "showSensorCountdown"
+        /// does the user prefer the alternative "count up" graphics?
+        case showSensorCountdownAlternativeGraphics = "showSensorCountdownAlternativeGraphics"
+        /// store the max sensor age in days if applicable to the active sensor type
+        case maxSensorAgeInDays = "maxSensorAgeInDays"
+        
         
         // Transmitter
         
@@ -280,8 +288,6 @@ extension UserDefaults {
         /// - stored as data as read from transmitter
         case librePatchInfo = "librePatchInfo"
         
-        case maxSensorAgeInDays = "maxSensorAgeInDays"
-        
     }
     
     // MARK: - =====  User Configurable Settings ======
@@ -365,17 +371,6 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showClockWhenScreenIsLocked.rawValue)
-        }
-    }
-    
-    /// should the countdown graphic be shown in the applicable for the sensor type being used?
-    @objc dynamic var showSensorCountdown: Bool {
-        // default value for bool in userdefaults is false, as default we want the clock to show when the screen is locked
-        get {
-            return !bool(forKey: Key.showSensorCountdown.rawValue)
-        }
-        set {
-            set(!newValue, forKey: Key.showSensorCountdown.rawValue)
         }
     }
     
@@ -701,6 +696,31 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.useStandardStatisticsRange.rawValue)
+        }
+    }
+    
+    
+    // MARK: Sensor Countdown Settings
+    
+    /// should the countdown graphic be shown in the applicable for the sensor type being used?
+    @objc dynamic var showSensorCountdown: Bool {
+        // default value for bool in userdefaults is false, as default we want the sensor countdown to show when a compatible sensor is started
+        get {
+            return !bool(forKey: Key.showSensorCountdown.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showSensorCountdown.rawValue)
+        }
+    }
+    
+    /// does the user prefer to use the alternative countdown graphic? This would show a "count-up" and not the standard "count-down"
+    @objc dynamic var showSensorCountdownAlternativeGraphics: Bool {
+        // default value for bool in userdefaults is false, as default we want the show the normal countdown graphics so leave as false
+        get {
+            return bool(forKey: Key.showSensorCountdownAlternativeGraphics.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.showSensorCountdownAlternativeGraphics.rawValue)
         }
     }
     

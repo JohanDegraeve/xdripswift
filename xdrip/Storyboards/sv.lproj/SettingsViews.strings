@@ -22,7 +22,9 @@
 "settingsviews_daysToUseStatisticsMessage" = "Maximalt antal dagar för beräkning av statistik?\n\n(ange 0 för beräkning sedan midnatt)";
 "settingsviews_useStandardStatisticsRange" = "Använd standardintervall?";
 "settingsviews_useIFCCA1C" = "Visa HbA1c som mmol/mol (IFCC)";
-"settingsviews_showSensorCountdown" = "Visa sensordagar kvar?";
+"settingsviews_sectiontitlesensorcountdown" = "Nedräkning sensortid";
+"settingsviews_showSensorCountdown" = "Visa sensordagar?";
+"settingsviews_showSensorCountdownAlternativeGraphics" = "Visa använda dagar istället?";
 "settingsviews_sectiontitletransmitter" = "Sändare";
 "settingsviews_transmittertype" = "Typ av sändare:";
 "settingsviews_transmitterid" = "Sändar-ID:";
