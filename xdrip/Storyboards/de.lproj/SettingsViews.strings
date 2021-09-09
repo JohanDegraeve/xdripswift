@@ -153,7 +153,7 @@
 "displayUnitInCalendarEvent" = "Einheiten anzeigen?";
 
 /// Text in pop up shown when user wants to send the trace file
-"describeProblem" = "Helfen Sie uns in dem sie uns so viele Innformationen als möglich mitteilen. Sollten Sie das Problem schon in unsere Facebook Gruppe gemeldet haben, teilen Sie uns bitte ihren Facebook Namen per Email mit.";
+"describeProblem" = "Helfen Sie uns in dem sie uns so viele Innformationen als möglich mitteilen. Sollten Sie das Problem schon in unsere Facebook Gruppe gemeldet haben, teilen Sie uns bitte ihren Facebook Namen per E-Mail mit.";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share password
 "settingsviews_giveDexcomSharePassword" = "Eingabe Dexcom Share Passwort";
@@ -219,7 +219,7 @@
 "m5stack_settingsviews_settingstitle" = "M5 Stack Einstellungen";
 
 /// In case user tries to send trace file via email but error occurs.
-"failedToSendEmail" = "Email senden fehlgeschlagen";
+"failedToSendEmail" = "E-Mail senden fehlgeschlagen";
 
 /// alerting settings, row alerts (thresholds)
 "settingsviews_row_alerts" = "Schwellwerte";
