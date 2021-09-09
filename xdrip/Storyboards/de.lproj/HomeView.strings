@@ -56,7 +56,7 @@
 "failed" = "Fehlgeschlagen";
 
 /// when user manually starts sensor, this is the message that explains that time should be correct
-"startsensortimeinfo" = "Auf der nächsten Seite müßen Sie Zeit und Datum eingeben zu der der Sensor gestartet wurde. Es ist wichtig Zeit und Datum so genau wie möglich ein zu geben.";
+"startsensortimeinfo" = "Auf der nächsten Seite müssen Sie Zeit und Datum eingeben zu der der Sensor gestartet wurde. Es ist wichtig Zeit und Datum so genau wie möglich einzugeben.";
 
 /// for home view, where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'
 "ago" = "her";

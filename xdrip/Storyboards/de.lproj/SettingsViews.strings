@@ -186,7 +186,7 @@
 "settingsviews_nightScoutAPIKey" = "API_SECRET:";
 
 /// user tries to send trace file but there's no native email account configured
-"emailNotConfigured" = "Sie müßen einen E-mail Konto auf ihrem Gerät aktiviert haben.";
+"emailNotConfigured" = "Sie müssen einen E-Mail Konto auf ihrem Gerät aktiviert haben.";
 
 /// transmitter settings, section title
 "settingsviews_sectiontitletransmitter" = "Transmitter";
