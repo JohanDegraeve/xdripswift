@@ -23,7 +23,7 @@
 "sensorstart" = "Sensor gestartet";
 
 /// for home view, miaomiao doesn't detect a sensor
-"sensornotdetected" = "Der Sensor wurde nicht gefunden. Prüfen Sie den korrekten sitz des Transmitters im Sensor.";
+"sensornotdetected" = "Der Sensor wurde nicht gefunden. Prüfen Sie den korrekten Sitz des Transmitters im Sensor.";
 
 /// for home view, title of pop up that gives info about how to select the transmitter. Simply the word Info
 "info" = "Info";
@@ -41,7 +41,7 @@
 "scanbluetoothdeviceactiontitle" = "Transmitter scannen";
 
 /// for home view, Info how to start : set transmitter and id, then go back to home screen, start scanning
-"transmitterinfo" = "Bitte zuerst via Bluettoh einen Sensor bzw. Transmitter verbinden.\r\n\nDanach können Sie den Sensor hier starten.";
+"transmitterinfo" = "Bitte zuerst via Bluetooth einen Sensor bzw. Transmitter verbinden.\r\n\nDanach können Sie den Sensor hier starten.";
 
 /// when user manually starts scanning, this is the message that scanning is ongoing
 "scanbluetoothdeviceongoing" = "Suche nach Transmitter...";
@@ -56,7 +56,7 @@
 "failed" = "Fehlgeschlagen";
 
 /// when user manually starts sensor, this is the message that explains that time should be correct
-"startsensortimeinfo" = "Auf der nächsten Seite müßen Sie Zeit und Datum eingeben zu der der Sensor gestartet wurde. Es ist wichtig Zeit und Datum so genau wie möglich ein zu geben.";
+"startsensortimeinfo" = "Auf der nächsten Seite müssen Sie Zeit und Datum eingeben zu der der Sensor gestartet wurde. Es ist wichtig Zeit und Datum so genau wie möglich einzugeben.";
 
 /// for home view, where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'
 "ago" = "her";

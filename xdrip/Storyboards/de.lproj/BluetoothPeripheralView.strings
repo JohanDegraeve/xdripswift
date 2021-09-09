@@ -12,7 +12,7 @@
 "scan" = "Scannen";
 
 /// cell text, where user can select to reset a transmitter at next connect. Only for Dexcom
-"resetRequired" = "Transmitter zurücksetzten?";
+"resetRequired" = "Transmitter zurücksetzen?";
 
 /// text in status row, when not connected and app is not scanning
 "notTryingToConnect" = "Es wird nicht gescannt";

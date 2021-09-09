@@ -5,7 +5,7 @@
 "m5StackResetRequiredWarning" = "Um ein neues Passwort zu erstellen muss M5Stack neu gestartet werden. Klick wenn erledigt ";
 
 /// in case user tires to power off the M5Stack via xdrip but it's not connected
-"deviceMustBeConnectedToPowerOff" = "M5Stack muss verbunden sein um ihn aus zu schalten";
+"deviceMustBeConnectedToPowerOff" = "M5Stack muss verbunden sein um ihn auszuschalten";
 
 /// in case M5Stack authentication failed
 "authenticationFailureWarning" = "Authentifizierung auf M5Stack ist fehlgeschlagen, entweder benutzen Sie das vorkonfigurierte Passwort, oder sollte der M5Stack kein vorkonfiguriertes Passwort haben, setzten Sie den M5Stack bitte zurück. M5Stack wird jetzt getrennt. Neuer Versuch starten, klicken. ";

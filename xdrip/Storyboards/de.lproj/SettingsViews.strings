@@ -123,7 +123,7 @@
 "debugLevel" = "Debug Level hinzufügen";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
-"warningChangeFromMasterToFollower" = " Der wechsel von Master zu Follower beendet die aktuelle Verbindung zu ihrem Sensor.Möchten Sie dennoch wechseln?";
+"warningChangeFromMasterToFollower" = " Der Wechsel von Master zu Follower beendet die aktuelle Verbindung zu ihrem Sensor. Möchten Sie dennoch wechseln?";
 
 /// nightscout or dexcom share settings, where user can select to edit the schedule
 "schedule" = "Upload Plan:";
@@ -153,7 +153,7 @@
 "displayUnitInCalendarEvent" = "Einheiten anzeigen?";
 
 /// Text in pop up shown when user wants to send the trace file
-"describeProblem" = "Helfen Sie uns in dem sie uns so viele Innformationen als möglich mitteilen. Sollten Sie das Problem schon in unsere Facebook Gruppe gemeldet haben, teilen Sie uns bitte ihren Facebook Namen per Email mit.";
+"describeProblem" = "Helfen Sie uns in dem sie uns so viele Innformationen als möglich mitteilen. Sollten Sie das Problem schon in unsere Facebook Gruppe gemeldet haben, teilen Sie uns bitte ihren Facebook Namen per E-Mail mit.";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share password
 "settingsviews_giveDexcomSharePassword" = "Eingabe Dexcom Share Passwort";
@@ -186,7 +186,7 @@
 "settingsviews_nightScoutAPIKey" = "API_SECRET:";
 
 /// user tries to send trace file but there's no native email account configured
-"emailNotConfigured" = "Sie müßen einen E-mail Konto auf ihrem Gerät aktiviert haben.";
+"emailNotConfigured" = "Sie müssen einen E-Mail Konto auf ihrem Gerät aktiviert haben.";
 
 /// transmitter settings, section title
 "settingsviews_sectiontitletransmitter" = "Transmitter";
@@ -207,10 +207,10 @@
 "transmitterId8OrHigherNotSupported" = "Transmitter mit der ID 8Gxxxx oder neuer werden zur Zeit nicht unterstützt!";
 
 /// M5 stack setting, brightness
-"m5stack_settingsviews_brightness" = "Bildschirm Helligkeit";
+"m5stack_settingsviews_brightness" = "Bildschirmhelligkeit";
 
 /// dexcom share settings, where user can set the dexcom share account name
-"settingsviews_dexcomShareAccountName" = "Benutzer Name:";
+"settingsviews_dexcomShareAccountName" = "Benutzername:";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
 "settingsviews_IntervalMessage" = "Mindestabstand zwischen zwei Werten in Minuten";
@@ -219,7 +219,7 @@
 "m5stack_settingsviews_settingstitle" = "M5 Stack Einstellungen";
 
 /// In case user tries to send trace file via email but error occurs.
-"failedToSendEmail" = "Email senden fehlgeschlagen";
+"failedToSendEmail" = "E-Mail senden fehlgeschlagen";
 
 /// alerting settings, row alerts (thresholds)
 "settingsviews_row_alerts" = "Schwellwerte";
