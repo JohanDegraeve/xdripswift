@@ -197,4 +197,8 @@ class Texts_Common {
     static let cvStatistics = {
         return NSLocalizedString("common_statistics_cv", tableName: filename, bundle: Bundle.main, value: "CV", comment: "coefficient of variation")
     }()
+    
+    static let dontShowAgain = {
+        return NSLocalizedString("common_dontshowagain", tableName: filename, bundle: Bundle.main, value: "Don't Show Again", comment: "don't show again")
+    }()
 }

@@ -120,3 +120,5 @@
 "common_hourshort" = "h";
 "common_dayshort" = "d";
 "common_todayshort" = "Heute";
+
+"common_dontshowagain" = "Nicht wieder anzeigen";
