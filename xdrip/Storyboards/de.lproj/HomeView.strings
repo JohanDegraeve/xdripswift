@@ -41,7 +41,7 @@
 "scanbluetoothdeviceactiontitle" = "Transmitter scannen";
 
 /// for home view, Info how to start : set transmitter and id, then go back to home screen, start scanning
-"transmitterinfo" = "Bitte zuerst via Bluettoh einen Sensor bzw. Transmitter verbinden.\r\n\nDanach können Sie den Sensor hier starten.";
+"transmitterinfo" = "Bitte zuerst via Bluetooth einen Sensor bzw. Transmitter verbinden.\r\n\nDanach können Sie den Sensor hier starten.";
 
 /// when user manually starts scanning, this is the message that scanning is ongoing
 "scanbluetoothdeviceongoing" = "Suche nach Transmitter...";
