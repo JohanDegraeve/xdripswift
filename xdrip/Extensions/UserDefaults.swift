@@ -141,6 +141,9 @@ extension UserDefaults {
         /// license info accepted by user yes or no
         case licenseInfoAccepted = "licenseInfoAccepted"
         
+        /// used to allow the user to dismiss the lock screen warning forever
+        case lockScreenDontShowAgain = "lockScreenDontShowAgain"
+        
         // M5Stack
         
         /// M5Stack blepassword, needed for authenticating App to M5Stack
@@ -986,6 +989,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.licenseInfoAccepted.rawValue)
+        }
+    }
+    
+    /// did the user ask to not show the lock screen warning dialog again?
+    var lockScreenDontShowAgain:Bool {
+        get {
+            return bool(forKey: Key.lockScreenDontShowAgain.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.lockScreenDontShowAgain.rawValue)
         }
     }
     

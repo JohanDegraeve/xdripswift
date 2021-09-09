@@ -59,9 +59,6 @@ final class RootViewController: UIViewController {
     /// outlet for label that shows difference with previous reading
     @IBOutlet weak var diffLabelOutlet: UILabel!
     
-    /// outlet for the image of the screen lock symbol
-    @IBOutlet weak var screenLockImageOutlet: UIImageView!
-    
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
     
@@ -406,8 +403,7 @@ final class RootViewController: UIViewController {
         clockLabelOutlet.textColor = ConstantsUI.clockLabelColor
         
         
-        // ensure the screen lock icon color as per constants file and also the screen layout
-        screenLockImageOutlet.tintColor = ConstantsUI.screenLockIconColor
+        // ensure the screen layout
         screenLockUpdate(enabled: false)
                 
         // this is to force update of userdefaults that are also stored in the shared user defaults
@@ -2157,23 +2153,39 @@ final class RootViewController: UIViewController {
             // lock and update the screen
             self.screenLockUpdate(enabled: true, showClock: showClock)
             
-            // create uialertcontroller to inform user
-            screenLockAlertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
-
-            // create buttons for uialertcontroller
-            let OKAction = UIAlertAction(title: Texts_Common.Ok, style: .default) {
-                (action:UIAlertAction!) in
+            // only trigger the UIAlert if the user hasn't previously asked to not show it again
+            if !UserDefaults.standard.lockScreenDontShowAgain {
                 
-                // set screenLockAlertController to nil because this variable is used when app comes to foreground, to check if alert is still presented
-                self.screenLockAlertController = nil
+                // create uialertcontroller to inform user
+                screenLockAlertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
+
+                // create "don't show again" button for uialertcontroller
+                let dontShowAgainAction = UIAlertAction(title: Texts_Common.dontShowAgain, style: .destructive) {
+                    (action:UIAlertAction!) in
+                    
+                    // if clicked set the user default key to false so that the next time the user locks the screen, the UIAlert isn't triggered
+                    UserDefaults.standard.lockScreenDontShowAgain = true
+                    
+                }
+                
+                // create OK button for uialertcontroller
+                let OKAction = UIAlertAction(title: Texts_Common.Ok, style: .default) {
+                    (action:UIAlertAction!) in
+                    
+                    // set screenLockAlertController to nil because this variable is used when app comes to foreground, to check if alert is still presented
+                    self.screenLockAlertController = nil
+                    
+                }
+
+                // add buttons to the alert
+                screenLockAlertController!.addAction(dontShowAgainAction)
+                screenLockAlertController!.addAction(OKAction)
+
+                // show alert
+                self.present(screenLockAlertController!, animated: true, completion:nil)
                 
             }
-
-            // add buttons to the alert
-            screenLockAlertController!.addAction(OKAction)
-
-            // show alert
-            self.present(screenLockAlertController!, animated: true, completion:nil)
+            
             
             // schedule timer to dismiss the uialert controller after some time, in case user doesn't click ok
             Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(dismissScreenLockAlertController), userInfo: nil, repeats:false)
@@ -2198,11 +2210,17 @@ final class RootViewController: UIViewController {
 
         if enabled {
             
-            // set screen lock icon color to value defined in constants file
-            screenLockImageOutlet.isHidden = false
-            
             // set the toolbar button text to "Unlock"
             screenLockToolbarButtonOutlet.title = Texts_HomeView.unlockButton
+            
+            screenLockToolbarButtonOutlet.tintColor = UIColor.red
+            
+            // check if iOS13 or newer is being used. If it is, then take advantage of SF Symbols to fill in the lock icon to make it stand out more
+            if #available(iOS 13.0, *) {
+
+                screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock.fill")
+            
+            }
             
             if showClock {
                 
@@ -2246,12 +2264,18 @@ final class RootViewController: UIViewController {
             trace("screen lock : screen lock / keep-awake enabled", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
         } else {
-
-            // hide the lock image
-            screenLockImageOutlet.isHidden = true
             
             // set the toolbar button text to "Lock"
             screenLockToolbarButtonOutlet.title = Texts_HomeView.lockButton
+            
+            screenLockToolbarButtonOutlet.tintColor = nil
+            
+            // check if iOS13 or newer is being used. If it is, then set the lock icon back to the standard SF Symbol
+            if #available(iOS 13.0, *) {
+                
+                screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock")
+            
+            }
 
             valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
             
