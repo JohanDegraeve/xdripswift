@@ -23,7 +23,7 @@
 "sensorstart" = "Sensor gestartet";
 
 /// for home view, miaomiao doesn't detect a sensor
-"sensornotdetected" = "Der Sensor wurde nicht gefunden. Prüfen Sie den korrekten sitz des Transmitters im Sensor.";
+"sensornotdetected" = "Der Sensor wurde nicht gefunden. Prüfen Sie den korrekten Sitz des Transmitters im Sensor.";
 
 /// for home view, title of pop up that gives info about how to select the transmitter. Simply the word Info
 "info" = "Info";

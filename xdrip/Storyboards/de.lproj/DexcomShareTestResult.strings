@@ -13,7 +13,7 @@
 "dexcomsharetestresult_verificationerroralerttitle" = "Fehler während der Prüfung";
 
 /// If serial number is not assigned to the account, this is the 3rd part in a series of 3 to form a complete sentence
-"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Benutzen Sie die offizielle Dexcom App um den Transmitter zu registrieren (G5) oder zu teilen (G4)\r\n\r\neventuell benutzen Sie die flasche URL, US anstelle EU";
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Benutzen Sie die offizielle Dexcom App um den Transmitter zu registrieren (G5) oder zu teilen (G4)\r\n\r\neventuell benutzen Sie die falsche URL(US anstelle EU)";
 
 /// POP up after verifying DexcomShare credentials, to say that verification of url and password key were successful - this is the title
 "dexcomsharetestresult_verificationsuccessfulalerttitle" = "Prüfung erfolgreich";
