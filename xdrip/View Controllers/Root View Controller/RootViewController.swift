@@ -2153,23 +2153,39 @@ final class RootViewController: UIViewController {
             // lock and update the screen
             self.screenLockUpdate(enabled: true, showClock: showClock)
             
-            // create uialertcontroller to inform user
-            screenLockAlertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
-
-            // create buttons for uialertcontroller
-            let OKAction = UIAlertAction(title: Texts_Common.Ok, style: .default) {
-                (action:UIAlertAction!) in
+            // only trigger the UIAlert if the user hasn't previously asked to not show it again
+            if !UserDefaults.standard.lockScreenDontShowAgain {
                 
-                // set screenLockAlertController to nil because this variable is used when app comes to foreground, to check if alert is still presented
-                self.screenLockAlertController = nil
+                // create uialertcontroller to inform user
+                screenLockAlertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
+
+                // create "don't show again" button for uialertcontroller
+                let dontShowAgainAction = UIAlertAction(title: Texts_Common.dontShowAgain, style: .destructive) {
+                    (action:UIAlertAction!) in
+                    
+                    // if clicked set the user default key to false so that the next time the user locks the screen, the UIAlert isn't triggered
+                    UserDefaults.standard.lockScreenDontShowAgain = true
+                    
+                }
+                
+                // create OK button for uialertcontroller
+                let OKAction = UIAlertAction(title: Texts_Common.Ok, style: .default) {
+                    (action:UIAlertAction!) in
+                    
+                    // set screenLockAlertController to nil because this variable is used when app comes to foreground, to check if alert is still presented
+                    self.screenLockAlertController = nil
+                    
+                }
+
+                // add buttons to the alert
+                screenLockAlertController!.addAction(dontShowAgainAction)
+                screenLockAlertController!.addAction(OKAction)
+
+                // show alert
+                self.present(screenLockAlertController!, animated: true, completion:nil)
                 
             }
-
-            // add buttons to the alert
-            screenLockAlertController!.addAction(OKAction)
-
-            // show alert
-            self.present(screenLockAlertController!, animated: true, completion:nil)
+            
             
             // schedule timer to dismiss the uialert controller after some time, in case user doesn't click ok
             Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(dismissScreenLockAlertController), userInfo: nil, repeats:false)

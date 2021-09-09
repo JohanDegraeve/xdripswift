@@ -54,3 +54,5 @@
 "common_statistics_average" = "Moyenne";
 "common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
+
+"common_dontshowagain" = "Ne plus visualiser";
