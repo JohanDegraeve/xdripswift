@@ -177,9 +177,23 @@ class Libre2BLEUtilities {
 
         }
         
+        trace("in parseBLEData, bleGlucose before filling gaps", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug)
+        for value in bleGlucose {
+
+            trace("    timestamp = %{public}@, glucoseLevelRaw = %{public}@, value to be smoothed = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, value.timeStamp.toString(timeStyle: .full, dateStyle: .none), value.glucoseLevelRaw.description, value.value.description)
+            
+        }
+        
         // sensor gives values only every 1 minute but it gives only 4 readings for the last 8 minutes, ie with a gap of 1 minute, we try to fill those gaps using previous sessions, but this may not always be successful, (eg if there's been a disconnection of 2 minutes). So let's fill missing gaps of maximum 1 value
         bleGlucose.fill0Gaps(maxGapWidth: 1)
 
+        trace("in parseBLEData, bleGlucose after filling gaps", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug)
+        for value in bleGlucose {
+            
+            trace("    timestamp = %{public}@, glucoseLevelRaw = %{public}@, value to be smoothed = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, value.timeStamp.toString(timeStyle: .full, dateStyle: .none), value.glucoseLevelRaw.description, value.value.description)
+
+        }
+        
         // if first (most recent) value has rawGlucose 0.0 then return empty array
         if let first = bleGlucose.first {
             if first.glucoseLevelRaw == 0.0 {
@@ -195,10 +209,28 @@ class Libre2BLEUtilities {
             
         }
         
+        trace("in parseBLEData, after smoothing", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug)
+        for value in bleGlucose {
+            
+            trace("    timestamp = %{public}@, glucoseLevelRaw = %{public}@, value to be smoothed = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, value.timeStamp.toString(timeStyle: .full, dateStyle: .none), value.glucoseLevelRaw.description, value.value.description)
+
+        }
+        
+
+        
         // there's still possibly 0 values, eg first or last
         // filter out readings with glucoseLevelRaw = 0, if any
         bleGlucose = bleGlucose.filter({return $0.glucoseLevelRaw > 0.0})
 
+        trace("in parseBLEData, after filtering out 0 values", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug)
+        for value in bleGlucose {
+            
+            trace("    timestamp = %{public}@, glucoseLevelRaw = %{public}@, value to be smoothed = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, value.timeStamp.toString(timeStyle: .full, dateStyle: .none), value.glucoseLevelRaw.description, value.value.description)
+
+        }
+        
+
+        
         return (bleGlucose, wearTimeMinutes)
         
     }
