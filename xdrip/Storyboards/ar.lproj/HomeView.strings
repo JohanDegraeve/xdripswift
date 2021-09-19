@@ -32,19 +32,7 @@
 "failed" = "فشل";
 "calibrationNotNecessary" = "عند استخدام خوارزمية الليبري, لا يلزم ولايمكن معايرة الحساس.";
 "dexcomBatteryTooLow" = "بطارية جهاز الإرسال منخفضة جدًا!";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Text in button on home screen
-"unlock" = "Unlock";
-
-/// Text in button on home screen
-"lock" = "Lock";
-
-/// Screen Lock Title
-"screenlocktitle" = "Screen Lock Enabled";
-
-/// Info message to explain screen lock function
-"screenlockinfo" = "This will keep the screen awake until you move to another app or click Unlock.\r\n\nIt is recommended that you keep the phone plugged into a charger to prevent battery drain.";
+"unlock" = "فتح القفل";
+"lock" = "قفل";
+"screenlocktitle" = "تم تفعيل قفل الشاشة";
+"screenlockinfo" = "سيؤدي هذا إلى إبقاء الشاشة في حالة نشاط حتى تنتقل إلى تطبيق آخر أو تنقر فوق إلغاء القفل.\r\n\nيوصى بإبقاء الهاتف متصلاً بالشاحن لمنع استنزاف البطارية.";
