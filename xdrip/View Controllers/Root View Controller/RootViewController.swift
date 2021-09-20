@@ -1904,9 +1904,6 @@ final class RootViewController: UIViewController {
     private func valueLabelLongPressed(_ sender: UILongPressGestureRecognizer) {
         
         if sender.state == .began {
-            
-            // vibrate so that user knows the long press is detected
-            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
 
             // call the UIAlert but assume that the user wants a simple screen lock, not the full lock mode
             screenLockAlert(overrideScreenIsLocked: true, showClock: false)
@@ -2220,6 +2217,9 @@ final class RootViewController: UIViewController {
             screenLockToolbarButtonOutlet.title = Texts_HomeView.unlockButton
             
             screenLockToolbarButtonOutlet.tintColor = UIColor.red
+            
+            // vibrate so that user knows that the screen lock has been activated
+            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
             
             // check if iOS13 or newer is being used. If it is, then take advantage of SF Symbols to fill in the lock icon to make it stand out more
             if #available(iOS 13.0, *) {
