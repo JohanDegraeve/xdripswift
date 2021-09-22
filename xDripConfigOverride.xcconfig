@@ -1,9 +1,0 @@
-// Customize this to change the app name displayed
-MAIN_APP_DISPLAY_NAME = xDrip4iO5
-
-// Put your team id here for signing
-// XDRIP_DEVELOPMENT_TEAM =
-
-// Change to support running multiple apps simultaneously.
-// MAIN_APP_BUNDLE_IDENTIFIER = com.$(DEVELOPMENT_TEAM).xdripswift
-
