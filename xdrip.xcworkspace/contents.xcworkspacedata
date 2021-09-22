@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:xDripConfigOverride.xcconfig">
+   </FileRef>
+   <FileRef
       location = "group:xdrip.xcodeproj">
    </FileRef>
    <FileRef
