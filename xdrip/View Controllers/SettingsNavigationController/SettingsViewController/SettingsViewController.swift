@@ -59,6 +59,9 @@ final class SettingsViewController: UIViewController {
         /// Apple Watch settings
         case AppleWatch
         
+        /// export settings
+        case export
+
         /// tracing
         case trace
         
@@ -99,6 +102,8 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewAppleWatchSettingsViewModel()
             case .trace:
                 return SettingsViewTraceSettingsViewModel()
+            case .export:
+                return SettingsExportSettingsViewModel()
                 
             }
         }

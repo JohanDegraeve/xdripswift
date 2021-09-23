@@ -1503,6 +1503,68 @@ final class RootViewController: UIViewController {
         }
         
     }
+
+    /// export all bg readings
+    public func exportAllReadings () -> URL? {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "YYYYMMdd-HHmm"
+        let datestring = dateFormatter.string(from: Date())
+
+        let exportFileName = "xDripExport_\(datestring)"
+        let dir = FileManager.default.urls(for: .documentDirectory , in: .userDomainMask).first!.appendingPathComponent("export")
+
+        if !FileManager.default.fileExists(atPath: dir.absoluteString) {
+            try! FileManager.default.createDirectory(atPath: dir.path, withIntermediateDirectories: true, attributes: nil)
+        }
+        do {
+            let fileName = try FileManager.default.contentsOfDirectory(atPath: dir.path)
+
+            for file in fileName {
+                // For each file in the directory, create full path and delete the file
+                let filePath = dir.appendingPathComponent(file).absoluteURL
+                try FileManager.default.removeItem(at: filePath)
+            }
+        } catch let error {
+            print(error.localizedDescription)
+        }
+
+        let fileURL = dir.appendingPathComponent(exportFileName).appendingPathExtension("json")
+
+        // create data export file
+        try! "".write(to: fileURL, atomically: true, encoding: String.Encoding.utf8)
+
+        if let bgReadingsAccessor = bgReadingsAccessor {
+            let readings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: true)
+            
+            let size = readings.count
+            
+            let fileHandle = try! FileHandle(forWritingTo: fileURL)
+            fileHandle.seekToEndOfFile()
+
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+            
+            for (index,reading) in readings.enumerated() {
+                var dict: [String: Any] = [:]
+                
+                dict["ts"]  = Int(reading.timeStamp.timeIntervalSince1970)
+                dict["date"]  = formatter.string(from: reading.timeStamp)
+                dict["bg"]  = Int(reading.calculatedValue)
+                dict["sid"] = reading.deviceName
+                
+                let json = try! JSONSerialization.data(withJSONObject: dict, options: [])
+                if index == 0 { fileHandle.write("[".data(using: .utf8)!) }
+                fileHandle.write(json)
+                if index < size { fileHandle.write(", ".data(using: .utf8)!) }
+                else  { fileHandle.write("]".data(using: .utf8)!) }
+
+            }
+        }
+        
+        return fileURL
+
+    }
     
     /// for debug purposes
     private func logAllBgReadings() {

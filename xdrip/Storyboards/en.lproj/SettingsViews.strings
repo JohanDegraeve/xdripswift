@@ -105,4 +105,7 @@
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
- 
+
+"settingsviews_settingsexport" = "Data Export";
+"settingsviews_settingsexportbtn" = "Export data to JSON";
+

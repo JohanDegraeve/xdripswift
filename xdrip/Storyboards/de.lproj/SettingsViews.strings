@@ -303,3 +303,6 @@
 "settingsviews_sectiontitlesensorcountdown" = "Zeit bis Sensorende";
 "settingsviews_showSensorCountdown" = "Zeit bis Sensorende anzeigen?";
 "settingsviews_showSensorCountdownAlternativeGraphics" = "Alternative Symbole verwenden?";
+
+"settingsviews_settingsexport" = "Datenexport";
+"settingsviews_settingsexportbtn" = "Daten als JSON exportieren";
