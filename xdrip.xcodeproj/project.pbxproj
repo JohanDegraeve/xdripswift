@@ -251,7 +251,7 @@
 		F870D3D325126A49008967B0 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F870D3D225126A49008967B0 /* NotificationCenter.framework */; };
 		F870D3D625126A49008967B0 /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3D525126A49008967B0 /* TodayViewController.swift */; };
 		F870D3D925126A49008967B0 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F870D3D725126A49008967B0 /* MainInterface.storyboard */; };
-		F870D3DD25126A49008967B0 /* xDrip4iOS.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = F870D3D125126A49008967B0 /* xDrip4iOS.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F870D3DD25126A49008967B0 /* xDrip4iOS Widget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = F870D3D125126A49008967B0 /* xDrip4iOS Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F870D3EA25129C43008967B0 /* Glucose+GlucoseKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3E925129C43008967B0 /* Glucose+GlucoseKit.swift */; };
 		F870D3EC25129FC2008967B0 /* XDripClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3EB25129FC2008967B0 /* XDripClient.swift */; };
 		F870D3EE2513B786008967B0 /* Trace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3ED2513B786008967B0 /* Trace.swift */; };
@@ -522,7 +522,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				F870D3DD25126A49008967B0 /* xDrip4iOS.appex in Embed App Extensions */,
+				F870D3DD25126A49008967B0 /* xDrip4iOS Widget.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1005,7 +1005,7 @@
 		F86A3C78247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F86A3C79247718C800EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F86A3C7A247718C800EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Main.strings; sourceTree = "<group>"; };
-		F870D3D125126A49008967B0 /* xDrip4iOS.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = xDrip4iOS.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F870D3D125126A49008967B0 /* xDrip4iOS Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "xDrip4iOS Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F870D3D225126A49008967B0 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
 		F870D3D525126A49008967B0 /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
 		F870D3D825126A49008967B0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
@@ -1953,7 +1953,7 @@
 			isa = PBXGroup;
 			children = (
 				F8AC425A21ADEBD60078C348 /* xdrip.app */,
-				F870D3D125126A49008967B0 /* xDrip4iOS.appex */,
+				F870D3D125126A49008967B0 /* xDrip4iOS Widget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";

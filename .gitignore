@@ -1,6 +1,7 @@
 #######
 # config files, to be edited by developer 
 xDripConfigOverride.xcconfig
+xdrip/VersionOverride.xcconfig
 
 .DS_Store
 UserInterfaceState.xcuserstate
