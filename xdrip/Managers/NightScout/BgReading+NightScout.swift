@@ -13,8 +13,8 @@ extension BgReading {
             "type": "sgv",
             "sgv": Int(calculatedValue.round(toDecimalPlaces: 0)),
             "direction": slopeName,
-            "filtered": round(ageAdjustedRawValue * 1000),
-            "unfiltered": round(ageAdjustedRawValue * 1000),
+            "filtered": (ageAdjustedRawValue > 0.0 ? round(ageAdjustedRawValue * 1000) : Int(calculatedValue.round(toDecimalPlaces: 0))*1000),
+            "unfiltered": (ageAdjustedRawValue > 0.0 ? round(ageAdjustedRawValue * 1000) : Int(calculatedValue.round(toDecimalPlaces: 0))*1000),
             "noise": 1,
             "sysTime": timeStamp.ISOStringFromDate()
         ]
