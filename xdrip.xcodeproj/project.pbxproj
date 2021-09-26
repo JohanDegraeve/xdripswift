@@ -16,7 +16,6 @@
 		47FB28082636B04200042FFB /* StatisticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FB28072636B04200042FFB /* StatisticsManager.swift */; };
 		533272967B05B378D81F6529 /* Pods_xdrip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DB0736D7B1553FC8350324C /* Pods_xdrip.framework */; };
 		666E283A26F7E54C00ACE4DF /* xDrip.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 666E283826F7E54C00ACE4DF /* xDrip.xcconfig */; };
-		666E283B26F7E54C00ACE4DF /* Version.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 666E283926F7E54C00ACE4DF /* Version.xcconfig */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
 		CE1B2FE125D0264B00F642F5 /* Main.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD425D0264900F642F5 /* Main.strings */; };
 		F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */; };
@@ -584,7 +583,6 @@
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
 		4DB0736D7B1553FC8350324C /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xdrip/xDrip.xcconfig; sourceTree = "<group>"; };
-		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xdrip/Version.xcconfig; sourceTree = "<group>"; };
 		CE1B2FC825D0261500F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Alerts.strings; sourceTree = "<group>"; };
 		CE1B2FCD25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
 		CE1B2FCE25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/WatlaaView.strings; sourceTree = "<group>"; };
@@ -1944,7 +1942,6 @@
 				F85DC29B21CFCEB800B9F74A /* Recovered References */,
 				6933F5E98A8280DB39890854 /* Pods */,
 				48C0E851274A3BB6D42C6F20 /* Frameworks */,
-				666E283926F7E54C00ACE4DF /* Version.xcconfig */,
 				666E283826F7E54C00ACE4DF /* xDrip.xcconfig */,
 			);
 			sourceTree = "<group>";
@@ -3075,7 +3072,6 @@
 				F824377A24CB7A9800BED341 /* Sci-Fi_Spaceship_Message.caf in Resources */,
 				F824377124CB7A9800BED341 /* Indeed.caf in Resources */,
 				F8B3A7CE226CC0B7004BA588 /* shorthigh2.mp3 in Resources */,
-				666E283B26F7E54C00ACE4DF /* Version.xcconfig in Resources */,
 				F82437D224CB7A9900BED341 /* Remembers_Me_Of_Asia.caf in Resources */,
 				F824378F24CB7A9900BED341 /* Siri_Alert_Glucose_Rising_Fast.caf in Resources */,
 				F824378A24CB7A9900BED341 /* Two_Turtle_Doves.caf in Resources */,
