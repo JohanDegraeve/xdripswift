@@ -63,7 +63,7 @@ class Texts_SettingsView {
     }()
     
     static let allowScreenRotation: String = {
-        return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Screen Rotation?", comment: "home screen settings, should the main glucose chart screen be allowed?")
+        return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Chart Rotation?", comment: "home screen settings, should the main glucose chart screen be allowed?")
     }()
 
     static let labelUseObjectives: String = {
