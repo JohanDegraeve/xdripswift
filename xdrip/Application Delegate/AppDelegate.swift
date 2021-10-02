@@ -9,6 +9,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     
+    /// allow the orientation to be changed as per the settings for each individual view controller
     var restrictRotation:UIInterfaceOrientationMask = .all
     
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryAppDelegate)
@@ -23,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
     }
 
-    // used to allow/prevent the specific views from changing orientation when rotating the device
+    /// used to allow/prevent the specific views from changing orientation when rotating the device
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask
     {
         return self.restrictRotation

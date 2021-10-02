@@ -38,7 +38,7 @@ extension UserDefaults {
         
         // Home Screen and main chart settings
         
-        /// should the screen be allowed to rotate?
+        /// should the screen/chart be allowed to rotate?
         case allowScreenRotation = "allowScreenRotation"
         /// should the clock view be shown when the screen is locked?
         case showClockWhenScreenIsLocked = "showClockWhenScreenIsLocked"
@@ -661,7 +661,7 @@ extension UserDefaults {
     
     /// should the home screen be allowed to rotate to show a landscape glucose chart?
     @objc dynamic var allowScreenRotation: Bool {
-        // default value for bool in userdefaults is false, as default we want the clock to show when the screen is locked
+        // default value for bool in userdefaults is false, as default we want the chart to be able to rotate and show the 24hr view
         get {
             return !bool(forKey: Key.allowScreenRotation.rawValue)
         }
