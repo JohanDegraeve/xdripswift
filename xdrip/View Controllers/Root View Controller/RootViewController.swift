@@ -343,6 +343,10 @@ final class RootViewController: UIViewController {
     /// UIAlertController to use when user chooses to lock the screen. Defined here so we can dismiss it when app goes to the background
     private var screenLockAlertController: UIAlertController?
     
+    /// create the landscape view
+    private var landscapeChartViewController: LandscapeChartViewController?
+
+    
     // MARK: - overriden functions
     
     // set the status bar content colour to light to match new darker theme
@@ -361,6 +365,17 @@ final class RootViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         
         super.viewWillAppear(animated)
+        
+        // if allowed, then permit the Root View Controller which is the main screen, to rotate left/right to show the landscape view
+        if UserDefaults.standard.allowScreenRotation {
+            
+            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
+            
+        } else {
+            
+            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+            
+        }
         
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
@@ -1203,6 +1218,22 @@ final class RootViewController: UIViewController {
             
         }
     }
+    
+    override func willTransition(
+        to newCollection: UITraitCollection,
+        with coordinator: UIViewControllerTransitionCoordinator) {
+      super.willTransition(to: newCollection, with: coordinator)
+      
+      switch newCollection.verticalSizeClass {
+      case .compact:
+        showLandscape(with: coordinator)
+      case .regular, .unspecified:
+        hideLandscape(with: coordinator)
+      @unknown default:
+        fatalError()
+      }
+    }
+
     
     // MARK:- observe function
     
@@ -2411,6 +2442,45 @@ final class RootViewController: UIViewController {
         }
         
     }
+    
+    func showLandscape(with coordinator:
+                       UIViewControllerTransitionCoordinator) {
+      // 1
+      guard landscapeChartViewController == nil else { return }
+      // 2
+        landscapeChartViewController = storyboard!.instantiateViewController(
+                    withIdentifier: "LandscapeChartViewController")
+                    as? LandscapeChartViewController
+      if let controller = landscapeChartViewController {
+        // 3
+        controller.view.frame = view.bounds
+        controller.view.alpha = 0
+        // 4
+        view.addSubview(controller.view)
+        addChild(controller)
+        coordinator.animate(alongsideTransition: { _ in
+            controller.view.alpha = 1
+          }, completion: { _ in
+            controller.didMove(toParent: self)
+          })
+      }
+    }
+    
+    func hideLandscape(with coordinator:
+                       UIViewControllerTransitionCoordinator) {
+      if let controller = landscapeChartViewController {
+        controller.willMove(toParent: nil)
+        coordinator.animate(alongsideTransition: { _ in
+            controller.view.alpha = 0
+          }, completion: { _ in
+            controller.view.removeFromSuperview()
+            controller.removeFromParent()
+            self.landscapeChartViewController = nil
+          })
+      }
+    }
+
+
 }
 
 

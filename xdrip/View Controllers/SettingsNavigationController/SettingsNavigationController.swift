@@ -41,6 +41,12 @@ final class SettingsNavigationController: UINavigationController {
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+    
+        // restrict rotation of this Navigation Controller to just portrait
+        (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+        
+    }
 
 }
 

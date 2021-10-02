@@ -27,6 +27,12 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
     }
     
     // MARK: - overrides
+//
+//    override var supportedInterfaceOrientations: UIInterfaceOrientationMask{
+//        get{
+//            return .portrait
+//        }
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,6 +45,13 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
         
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+    
+        // restrict rotation of this Navigation Controller to just portrait
+        (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
         
     }
     

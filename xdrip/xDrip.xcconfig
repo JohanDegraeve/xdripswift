@@ -22,6 +22,8 @@ XDRIP_CODE_SIGN_IDENTITY_RELEASE = Apple Development
 XDRIP_CODE_SIGN_STYLE = Automatic
 XDRIP_DEVELOPMENT_TEAM = RNX44PP998
 
+// Version [DEFAULT]
+#include? "Version.xcconfig"
 
 // Optional overrides
 #include? "xDripOverride.xcconfig"

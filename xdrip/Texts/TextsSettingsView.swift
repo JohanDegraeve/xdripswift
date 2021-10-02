@@ -44,10 +44,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10?", comment: "general settings, should reading be multiplied with 10 yes or no")
     }()
     
-    static let showClockWhenScreenIsLocked: String = {
-        return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Show Clock when Locked?", comment: "general settings, should the clock also be displayed when the screen is locked?")
-    }()
-    
     static let warningChangeFromMasterToFollower: String = {
         return NSLocalizedString("warningChangeFromMasterToFollower", tableName: filename, bundle: Bundle.main, value: "Switch from master to follower will stop your current sensor. Do you want to continue ?", comment: "general settings, when switching from master to follower, if confirmation is asked, this message will be shown.")
     }()
@@ -56,6 +52,14 @@ class Texts_SettingsView {
     
     static let sectionTitleHomeScreen: String = {
         return NSLocalizedString("settingsviews_sectiontitlehomescreen", tableName: filename, bundle: Bundle.main, value: "Home Screen", comment: "home screen settings, section title")
+    }()
+    
+    static let showClockWhenScreenIsLocked: String = {
+        return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Show Clock when Locked?", comment: "home screen settings, should the clock also be displayed when the screen is locked?")
+    }()
+    
+    static let allowScreenRotation: String = {
+        return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Screen Rotation?", comment: "home screen settings, should the main glucose chart screen be allowed?")
     }()
 
     static let labelUseObjectives: String = {

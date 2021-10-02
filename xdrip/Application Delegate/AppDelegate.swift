@@ -9,6 +9,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     
+    var restrictRotation:UIInterfaceOrientationMask = .all
+    
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryAppDelegate)
     
     // MARK: - Application Life Cycle
@@ -19,6 +21,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
         
+    }
+
+    // used to allow/prevent the specific views from changing orientation when rotating the device
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask
+    {
+        return self.restrictRotation
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
