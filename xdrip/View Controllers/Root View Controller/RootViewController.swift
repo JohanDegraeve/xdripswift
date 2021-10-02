@@ -53,7 +53,7 @@ final class RootViewController: UIViewController {
         let languageCode = NSLocale.current.languageCode
             
         // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
-        if languageCode != "en" && UserDefaults.standard.translateOnlineHelp {
+        if languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
             
             let onlineHelpViewController = SFSafariViewController(url: URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode! + ConstantsHomeView.onlineHelpURLTranslated2)!)
             
