@@ -27,12 +27,6 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
     }
     
     // MARK: - overrides
-//
-//    override var supportedInterfaceOrientations: UIInterfaceOrientationMask{
-//        get{
-//            return .portrait
-//        }
-//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
