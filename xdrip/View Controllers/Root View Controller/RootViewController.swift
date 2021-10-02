@@ -7,6 +7,7 @@ import SwiftCharts
 import HealthKitUI
 import AVFoundation
 import PieCharts
+import SafariServices
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController {
@@ -40,6 +41,31 @@ final class RootViewController: UIViewController {
             trace("calibration : user clicked the calibrate button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
             requestCalibration(userRequested: true)
+        }
+        
+    }
+    
+    @IBOutlet weak var helpToolbarButtonOutlet: UIBarButtonItem!
+    
+    @IBAction func helpToolbarButtonAction(_ sender: UIBarButtonItem) {
+        
+        // get the 2 character language code for the App Locale (i.e. "en", "es", "nl", "fr")
+        let languageCode = Locale.preferredLanguages[0]
+            
+        // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
+        if languageCode != "en" && UserDefaults.standard.translateOnlineHelp {
+            
+            let onlineHelpViewController = SFSafariViewController(url: URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2)!)
+            
+            self.present(onlineHelpViewController, animated: true)
+            
+        } else {
+            
+            // so the user is running the app in English or they don't want to translate so let's just load it directly
+            let onlineHelpViewController = SFSafariViewController(url: URL(string: ConstantsHomeView.onlineHelpURL)!)
+            
+            self.present(onlineHelpViewController, animated: true)
+        
         }
         
     }
@@ -1962,6 +1988,12 @@ final class RootViewController: UIViewController {
         } else {
             sensorToolbarButtonOutlet.disable()
             calibrateToolbarButtonOutlet.disable()
+        }
+        
+        if ConstantsHomeView.onlineHelpURL == "" {
+            helpToolbarButtonOutlet.disable()
+        } else {
+            helpToolbarButtonOutlet.enable()
         }
         
     }

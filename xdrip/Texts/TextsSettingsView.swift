@@ -32,6 +32,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_follower", tableName: filename, bundle: Bundle.main, value: "Follower", comment: "general settings, literally follower")
     }()
     
+    static let translateOnlineHelp: String = {
+        return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Documentation?", comment: "general settings, should the online help be translated automatically if needed")
+    }()
+    
     static let showReadingInNotification: String = {
         return NSLocalizedString("settingsviews_showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Show BG in Notifications?", comment: "general settings, should reading be shown in notification yes or no")
     }()

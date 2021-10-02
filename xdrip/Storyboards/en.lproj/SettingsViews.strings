@@ -4,6 +4,7 @@
 "settingsviews_masterorfollower" = "Master or Follower?";
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Follower";
+"settingsviews_translateOnlineHelp" = "Translate Documentation?";
 "settingsviews_showReadingInNotification" = "Show BG in Notifications?";
 "settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge?";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";

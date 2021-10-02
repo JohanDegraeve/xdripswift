@@ -4,6 +4,7 @@
 "settingsviews_masterorfollower" = "Master o Seguidor?";
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Seguidor";
+"settingsviews_translateOnlineHelp" = "Traducir Documentación?";
 "settingsviews_showReadingInNotification" = "Mostrar en Notificaciones?";
 "settingsviews_labelShowReadingInAppBadge" = "Mostrar en el icono de la app?";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiplicar valor por 10 en el icono de la app?";
