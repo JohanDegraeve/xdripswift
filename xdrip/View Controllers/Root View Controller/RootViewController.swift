@@ -50,12 +50,12 @@ final class RootViewController: UIViewController {
     @IBAction func helpToolbarButtonAction(_ sender: UIBarButtonItem) {
         
         // get the 2 character language code for the App Locale (i.e. "en", "es", "nl", "fr")
-        let languageCode = Locale.preferredLanguages[0]
+        let languageCode = NSLocale.current.languageCode
             
         // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
         if languageCode != "en" && UserDefaults.standard.translateOnlineHelp {
             
-            let onlineHelpViewController = SFSafariViewController(url: URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2)!)
+            let onlineHelpViewController = SFSafariViewController(url: URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode! + ConstantsHomeView.onlineHelpURLTranslated2)!)
             
             self.present(onlineHelpViewController, animated: true)
             
