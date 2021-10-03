@@ -21,14 +21,13 @@ class LandscapeChartViewController: UIViewController {
     @IBOutlet weak var cvTitleLabelOutlet: UILabel!
     @IBOutlet weak var cvLabelOutlet: UILabel!
     
-    @IBOutlet weak var noDataLabelOutlet: UILabel!
-    
     @IBOutlet weak var dateLabelOutlet: UILabel!
     
     @IBOutlet weak var backButtonOutlet: UIButton!
     
     @IBOutlet weak var forwardButtonOutlet: UIButton!
     
+    /// when the back button is pressed we'll subtract a day from the currently selected date and refresh the view
     @IBAction func backButtonPressed(_ sender: Any) {
         
         // subtract a day from the selected date
@@ -38,9 +37,10 @@ class LandscapeChartViewController: UIViewController {
         
     }
     
+    /// when the forward button is pressed we'll add a day from to currently selected date and refresh the view
     @IBAction func forwardButtonPressed(_ sender: Any) {
         
-        // add a day from the selected date
+        // add a day to the selected date
         selectedDate = selectedDate.addingTimeInterval(24 * 60 * 60).toMidnight()
         
         updateView()
@@ -124,15 +124,15 @@ class LandscapeChartViewController: UIViewController {
     
     // MARK: private helper functions
     
-    // this function should do the following:
-    // - show the currently selected date
-    // - update the chart points
-    // - update the statistics values
-    // - update the button status
+    /// this function should do the following:
+    /// - show the currently selected date
+    /// - update the chart points
+    /// - update the statistics values
+    /// - update the button status
     private func updateView() {
         
         // set the selected date outlet
-        dateLabelOutlet.text = dateFormatter.string(from: selectedDate)
+        dateLabelOutlet.text = dateFormatter.string(from: selectedDate) + "  "
         
         // we need to define the start and end times of the day that has been selected
         let startOfDay = Calendar(identifier: .gregorian).startOfDay(for: selectedDate)
@@ -150,7 +150,7 @@ class LandscapeChartViewController: UIViewController {
     }
 
     
-    // helper function to calculate the statistics and update the pie chart and label outlets
+    /// helper function to calculate the statistics and update the pie chart and label outlets
     private func updateStatistics(startOfDay: Date, endOfDay: Date) {
         
         // just to make things easier to read
@@ -176,7 +176,6 @@ class LandscapeChartViewController: UIViewController {
                 self.inRangeLabelOutlet.textColor = UIColor.lightGray
                 self.averageLabelOutlet.textColor = UIColor.lightGray
                 self.cvLabelOutlet.textColor = UIColor.lightGray
-                self.noDataLabelOutlet.isHidden = true
                 self.dateLabelOutlet.textColor = UIColor.lightGray
                 
             } else {
@@ -190,16 +189,15 @@ class LandscapeChartViewController: UIViewController {
                 self.inRangeLabelOutlet.textColor = UIColor.darkGray
                 self.averageLabelOutlet.textColor = UIColor.darkGray
                 self.cvLabelOutlet.textColor = UIColor.darkGray
-                self.noDataLabelOutlet.isHidden = false
-                self.dateLabelOutlet.textColor = UIColor.darkGray
+                self.dateLabelOutlet.textColor = UIColor.red
                 
             }
             
         })
     }
     
-    // This will disable the forward button if we're already at "today"
-    // Keep this as a function just in case we decide to add further validations at some point
+    /// This will disable the forward button if we're already at "today"
+    /// Keep this as a function just in case we decide to add further validations at some point
     private func updateButtons() {
         
         forwardButtonOutlet.isEnabled = !Calendar.current.isDateInToday(selectedDate)

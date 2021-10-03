@@ -2475,41 +2475,50 @@ final class RootViewController: UIViewController {
         
     }
     
-    func showLandscape(with coordinator:
-                       UIViewControllerTransitionCoordinator) {
-      // 1
-      guard landscapeChartViewController == nil else { return }
-      // 2
+    func showLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+        
+        guard landscapeChartViewController == nil else { return }
+        
         landscapeChartViewController = storyboard!.instantiateViewController(
-                    withIdentifier: "LandscapeChartViewController")
-                    as? LandscapeChartViewController
-      if let controller = landscapeChartViewController {
-        // 3
-        controller.view.frame = view.bounds
-        controller.view.alpha = 0
-        // 4
-        view.addSubview(controller.view)
-        addChild(controller)
-        coordinator.animate(alongsideTransition: { _ in
-            controller.view.alpha = 1
-          }, completion: { _ in
-            controller.didMove(toParent: self)
-          })
-      }
+            withIdentifier: "LandscapeChartViewController")
+        as? LandscapeChartViewController
+        
+        if let controller = landscapeChartViewController {
+            controller.view.frame = view.bounds
+            controller.view.alpha = 0
+            view.addSubview(controller.view)
+            addChild(controller)
+            coordinator.animate(alongsideTransition: { _ in
+                controller.view.alpha = 1
+            }, completion: { _ in
+                controller.didMove(toParent: self)
+            })
+        }
     }
     
-    func hideLandscape(with coordinator:
-                       UIViewControllerTransitionCoordinator) {
-      if let controller = landscapeChartViewController {
-        controller.willMove(toParent: nil)
-        coordinator.animate(alongsideTransition: { _ in
-            controller.view.alpha = 0
-          }, completion: { _ in
-            controller.view.removeFromSuperview()
-            controller.removeFromParent()
-            self.landscapeChartViewController = nil
-          })
-      }
+    func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+        
+        if let controller = landscapeChartViewController {
+            controller.willMove(toParent: nil)
+            coordinator.animate(alongsideTransition: { _ in
+                controller.view.alpha = 0
+            }, completion: { _ in
+                controller.view.removeFromSuperview()
+                controller.removeFromParent()
+                self.landscapeChartViewController = nil
+            })
+            
+            if let controller = landscapeChartViewController {
+                controller.willMove(toParent: nil)
+                coordinator.animate(alongsideTransition: { _ in
+                    controller.view.alpha = 0
+                }, completion: { _ in
+                    controller.view.removeFromSuperview()
+                    controller.removeFromParent()
+                    self.landscapeChartViewController = nil
+                })
+            }
+        }
     }
 
 
