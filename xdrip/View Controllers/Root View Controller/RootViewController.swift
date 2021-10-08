@@ -1965,12 +1965,6 @@ final class RootViewController: UIViewController {
             calibrateToolbarButtonOutlet.disable()
         }
         
-        if ConstantsHomeView.onlineHelpURL == "" {
-            helpToolbarButtonOutlet.disable()
-        } else {
-            helpToolbarButtonOutlet.enable()
-        }
-        
     }
     
     /// call alertManager.checkAlerts, and calls createBgReadingNotificationAndSetAppBadge with overrideShowReadingInNotification true or false, depending if immediate notification was created or not
