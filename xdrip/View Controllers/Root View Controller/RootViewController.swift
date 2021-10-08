@@ -45,31 +45,6 @@ final class RootViewController: UIViewController {
         
     }
     
-    @IBOutlet weak var helpToolbarButtonOutlet: UIBarButtonItem!
-    
-    @IBAction func helpToolbarButtonAction(_ sender: UIBarButtonItem) {
-        
-        // get the 2 character language code for the App Locale (i.e. "en", "es", "nl", "fr")
-        let languageCode = NSLocale.current.languageCode
-            
-        // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
-        if languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
-            
-            let onlineHelpViewController = SFSafariViewController(url: URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode! + ConstantsHomeView.onlineHelpURLTranslated2)!)
-            
-            self.present(onlineHelpViewController, animated: true)
-            
-        } else {
-            
-            // so the user is running the app in English or they don't want to translate so let's just load it directly
-            let onlineHelpViewController = SFSafariViewController(url: URL(string: ConstantsHomeView.onlineHelpURL)!)
-            
-            self.present(onlineHelpViewController, animated: true)
-        
-        }
-        
-    }
-    
     /// outlet for the lock button - it will change text based upon whether they screen is locked or not
     @IBOutlet weak var screenLockToolbarButtonOutlet: UIBarButtonItem!
     

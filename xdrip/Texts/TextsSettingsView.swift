@@ -9,7 +9,21 @@ class Texts_SettingsView {
     static let screenTitle: String = {
         return NSLocalizedString("settingsviews_settingstitle", tableName: filename, bundle: Bundle.main, value: "Settings", comment: "shown on top of the first settings screen, literally 'Settings'")
     }()
-
+    
+    // MARK: - Section Help
+    
+    static let sectionTitleHelp: String = {
+        return NSLocalizedString("settingsviews_sectiontitlehelp", tableName: filename, bundle: Bundle.main, value: "Help & Documentation", comment: "help settings, section title")
+    }()
+    
+    static let showOnlineHelp: String = {
+        return NSLocalizedString("settingsviews_showOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Open Online Help?", comment: "help settings, open the online help")
+    }()
+    
+    static let translateOnlineHelp: String = {
+        return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Automatically?", comment: "general settings, should the online help be translated automatically if needed")
+    }()
+    
     // MARK: - Section General
     
     static let sectionTitleGeneral: String = {
@@ -30,10 +44,6 @@ class Texts_SettingsView {
     
     static let follower: String = {
         return NSLocalizedString("settingsviews_follower", tableName: filename, bundle: Bundle.main, value: "Follower", comment: "general settings, literally follower")
-    }()
-    
-    static let translateOnlineHelp: String = {
-        return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Documentation?", comment: "general settings, should the online help be translated automatically if needed")
     }()
     
     static let showReadingInNotification: String = {

@@ -8,21 +8,18 @@ fileprivate enum Setting:Int, CaseIterable {
     /// choose between master and follower
     case masterFollower = 1
     
-    /// should the app automatically translate the help files?
-    case translateOnlineHelp = 2
-    
     /// should reading be shown in notification
-    case showReadingInNotification = 3
+    case showReadingInNotification = 2
     
     /// - minimum time between two readings, for which notification should be created (in minutes)
     /// - except if there's been a disconnect, in that case this value is not taken into account
-    case notificationInterval = 4
+    case notificationInterval = 3
     
     /// show reading in app badge
-    case showReadingInAppBadge = 5
+    case showReadingInAppBadge = 4
     
     /// if reading is shown in app badge, should value be multiplied with 10 yes or no
-    case multipleAppBadgeValueWith10 = 6
+    case multipleAppBadgeValueWith10 = 5
     
 }
 
@@ -115,7 +112,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
             }
             
-        case .translateOnlineHelp, .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return SettingsSelectedRowAction.nothing
             
         case .notificationInterval:
@@ -152,9 +149,6 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .masterFollower:
             return Texts_SettingsView.labelMasterOrFollower
             
-        case .translateOnlineHelp:
-            return Texts_SettingsView.translateOnlineHelp
-            
         case .showReadingInNotification:
             return Texts_SettingsView.showReadingInNotification
             
@@ -181,7 +175,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .masterFollower:
             return UITableViewCell.AccessoryType.none
             
-        case .translateOnlineHelp, .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return UITableViewCell.AccessoryType.none
             
         case .notificationInterval:
@@ -201,7 +195,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .masterFollower:
             return UserDefaults.standard.isMaster ? Texts_SettingsView.master:Texts_SettingsView.follower
             
-        case .translateOnlineHelp, .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return nil
             
         case .notificationInterval:
@@ -214,10 +208,6 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
-        case .translateOnlineHelp:
-            
-            return UISwitch(isOn: UserDefaults.standard.translateOnlineHelp, action: {(isOn:Bool) in UserDefaults.standard.translateOnlineHelp = isOn})
             
         case .showReadingInNotification:
             
