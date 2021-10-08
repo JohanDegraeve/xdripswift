@@ -194,7 +194,7 @@ class Texts_SettingsView {
     // MARK: - Section Alerts
     
     static let sectionTitleAlerting: String = {
-        return NSLocalizedString("settingsviews_sectiontitlealerting", tableName: filename, bundle: Bundle.main, value: "Alarm", comment: "alerting settings, section title")
+        return NSLocalizedString("settingsviews_sectiontitlealerting", tableName: filename, bundle: Bundle.main, value: "Alarms", comment: "alerting settings, section title")
     }()
     
     static let labelAlertTypes: String = {

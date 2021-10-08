@@ -103,7 +103,7 @@
 "m5stack_settingsviews_settingstitle" = "M5 Stack Settings";
 
 /// alerting settings, section title
-"settingsviews_sectiontitlealerting" = "Alarm";
+"settingsviews_sectiontitlealerting" = "Alarms";
 
 /// used in settings, section Info, title of the version setting
 "settingsviews_Version" = "Version:";

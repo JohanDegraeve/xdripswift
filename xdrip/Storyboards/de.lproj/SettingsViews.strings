@@ -168,7 +168,7 @@
 "settingsviews_nightScoutEnabled" = "Nightscout aktivieren?";
 
 /// alerting settings, section title
-"settingsviews_sectiontitlealerting" = "Alarm";
+"settingsviews_sectiontitlealerting" = "Alarms";
 
 /// speak settings, where user can enable or disable speak readings
 "settingsviews_speakBgReadings" = "BZ Werte vorlesen?";
