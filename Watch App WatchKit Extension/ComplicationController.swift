@@ -53,8 +53,49 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 
     // MARK: - Sample Templates
     
+//    func getLocalizableSampleTemplate(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTemplate?) -> Void) {
+//        // This method will be called once per supported complication, and the results will be cached
+//        handler(nil)
+//    }
+    
+    
     func getLocalizableSampleTemplate(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTemplate?) -> Void) {
-        // This method will be called once per supported complication, and the results will be cached
-        handler(nil)
+        let template = getLocalizableSampleTemplate(for: complication.family)
+        handler(template)
     }
+
+    // basic templates copied from LoopKit and updated for WatchOS 7.0
+    func getLocalizableSampleTemplate(for family: CLKComplicationFamily) -> CLKComplicationTemplate? {
+        let valueText = CLKSimpleTextProvider.localizableTextProvider(withStringsFileTextKey: "120↘︎")
+//        let glucoseText = CLKSimpleTextProvider.localizableTextProvider(withStringsFileTextKey: "120")
+        let minsAgoText = CLKSimpleTextProvider.localizableTextProvider(withStringsFileTextKey: "3MIN")
+
+        switch family {
+        case .modularSmall:
+            let template = CLKComplicationTemplateModularSmallStackText.init(line1TextProvider: valueText, line2TextProvider: minsAgoText)
+            return template
+        case .modularLarge:
+            let template = CLKComplicationTemplateModularLargeTallBody.init(headerTextProvider: minsAgoText, bodyTextProvider: valueText)
+            return template
+        case .circularSmall:
+            let template = CLKComplicationTemplateCircularSmallSimpleText.init(textProvider: valueText)
+            return template
+        case .extraLarge:
+            let template = CLKComplicationTemplateExtraLargeStackText.init(line1TextProvider: valueText, line2TextProvider: minsAgoText)
+            return template
+        case .utilitarianSmall, .utilitarianSmallFlat:
+            let template = CLKComplicationTemplateUtilitarianSmallFlat.init(textProvider: valueText)
+            return template
+        case .utilitarianLarge:
+            let eventualGlucoseText = CLKSimpleTextProvider.localizableTextProvider(withStringsFileTextKey: "75")
+            let template = CLKComplicationTemplateUtilitarianLargeFlat.init(textProvider: CLKSimpleTextProvider.localizableTextProvider(withStringsFileFormatKey: "UtilitarianLargeFlat", textProviders: [valueText, eventualGlucoseText, CLKTimeTextProvider(date: Date())]))
+            return template
+        case .graphicCorner, .graphicCircular, .graphicBezel, .graphicRectangular, .graphicExtraLarge:
+            return nil
+            
+        @unknown default:
+            return nil
+        }
+    }
+    
 }

@@ -2459,14 +2459,10 @@ final class RootViewController: UIViewController {
             
             let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
             
-            var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-            
-            var calculatedValueAsString = ""
-            
             // make sure that the necessary objects are initialised and readings are available.
             if let bgReadingsAccessor = bgReadingsAccessor, let lastReading = bgReadingsAccessor.last(forSensor: nil) {
                 
-                calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: mgdl)
+                var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: mgdl)
                 
                 if !lastReading.hideSlope {
                     calculatedValueAsString = calculatedValueAsString + " " + lastReading.slopeArrow()
@@ -2492,8 +2488,7 @@ final class RootViewController: UIViewController {
                 
                 validSession.sendMessage(["currentBGValue" : lastReading.unitizedString(unitIsMgDl: mgdl).description], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["currentBGTimeStamp" : ISO8601DateFormatter().string(from: lastReading.timeStamp)
-                                         ], replyHandler: nil, errorHandler: nil)
+                validSession.sendMessage(["currentBGTimeStamp" : ISO8601DateFormatter().string(from: lastReading.timeStamp)], replyHandler: nil, errorHandler: nil)
                 
                 validSession.sendMessage(["minutesAgoTextLocalized" : minutesAgoTextLocalized], replyHandler: nil, errorHandler: nil)
                 
