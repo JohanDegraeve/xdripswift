@@ -14,7 +14,7 @@
 		470B6199270C448100561E56 /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470B6198270C448100561E56 /* ExtensionDelegate.swift */; };
 		470B619B270C448100561E56 /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470B619A270C448100561E56 /* ComplicationController.swift */; };
 		470B619D270C448200561E56 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B619C270C448200561E56 /* Assets.xcassets */; };
-		470B61A1270C448200561E56 /* xDrip4iOS.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 470B6186270C448000561E56 /* xDrip4iOS.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		470B61A1270C448200561E56 /* xDrip4iO5.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 470B6186270C448000561E56 /* xDrip4iO5.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		470CE1FC246802EB00D5CB74 /* BluetoothPeripheralsView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 470CE1FE246802EB00D5CB74 /* BluetoothPeripheralsView.strings */; };
 		470F021326DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470F021226DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift */; };
 		4749EB9B25B36E010072DF8B /* LibreNFC.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4749EB9D25B36E010072DF8B /* LibreNFC.strings */; };
@@ -547,7 +547,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				470B61A1270C448200561E56 /* xDrip4iOS.app in Embed Watch Content */,
+				470B61A1270C448200561E56 /* xDrip4iO5.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -621,7 +621,7 @@
 		2867F5D925BC209B00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LibreErrors.strings; sourceTree = "<group>"; };
 		2867F5DA25BC209C00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Snooze.strings; sourceTree = "<group>"; };
 		2867F5DB25BC209C00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LibreNFC.strings; sourceTree = "<group>"; };
-		470B6186270C448000561E56 /* xDrip4iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xDrip4iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		470B6186270C448000561E56 /* xDrip4iO5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xDrip4iO5.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		470B6189270C448000561E56 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		470B618B270C448100561E56 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		470B6191270C448100561E56 /* Watch App WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Watch App WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2045,7 +2045,7 @@
 			children = (
 				F8AC425A21ADEBD60078C348 /* xdrip.app */,
 				F870D3D125126A49008967B0 /* xDrip4iOS Widget.appex */,
-				470B6186270C448000561E56 /* xDrip4iOS.app */,
+				470B6186270C448000561E56 /* xDrip4iO5.app */,
 				470B6191270C448100561E56 /* Watch App WatchKit Extension.appex */,
 			);
 			name = Products;
@@ -2947,7 +2947,7 @@
 			);
 			name = "Watch App";
 			productName = "Watch App";
-			productReference = 470B6186270C448000561E56 /* xDrip4iOS.app */;
+			productReference = 470B6186270C448000561E56 /* xDrip4iO5.app */;
 			productType = "com.apple.product-type.application.watchapp2";
 		};
 		470B6190270C448100561E56 /* Watch App WatchKit Extension */ = {
@@ -4205,9 +4205,10 @@
 				IBSC_MODULE = Watch_App_WatchKit_Extension;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
-				MARKETING_VERSION = 4.7.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.92C77A2942.xdripswift.watchkitapp;
-				PRODUCT_NAME = xDrip4iOS;
+				MAIN_APP_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp";
+				PRODUCT_NAME = "$(MAIN_APP_DISPLAY_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4232,9 +4233,10 @@
 				IBSC_MODULE = Watch_App_WatchKit_Extension;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
-				MARKETING_VERSION = 4.7.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.92C77A2942.xdripswift.watchkitapp;
-				PRODUCT_NAME = xDrip4iOS;
+				MAIN_APP_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp";
+				PRODUCT_NAME = "$(MAIN_APP_DISPLAY_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4251,10 +4253,10 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4167;
-				DEVELOPMENT_TEAM = 92C77A2942;
+				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Watch App WatchKit Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iOS;
+				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
 				INFOPLIST_KEY_CLKComplicationPrincipalClass = Watch_App_WatchKit_Extension.ComplicationController;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2021 Johan Degraeve. All rights reserved.";
 				INFOPLIST_KEY_WKExtensionDelegateClassName = Watch_App_WatchKit_Extension.ExtensionDelegate;
@@ -4263,9 +4265,10 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.7.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.92C77A2942.xdripswift.watchkitapp.watchkitextension;
-				PRODUCT_NAME = "${TARGET_NAME}";
+				MAIN_APP_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp.watchkitextension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4282,10 +4285,10 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4167;
-				DEVELOPMENT_TEAM = 92C77A2942;
+				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Watch App WatchKit Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iOS;
+				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
 				INFOPLIST_KEY_CLKComplicationPrincipalClass = Watch_App_WatchKit_Extension.ComplicationController;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2021 Johan Degraeve. All rights reserved.";
 				INFOPLIST_KEY_WKExtensionDelegateClassName = Watch_App_WatchKit_Extension.ExtensionDelegate;
@@ -4294,9 +4297,10 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.7.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.92C77A2942.xdripswift.watchkitapp.watchkitextension;
-				PRODUCT_NAME = "${TARGET_NAME}";
+				MAIN_APP_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp.watchkitextension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4486,7 +4490,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_ENTITLEMENTS_DEBUG)";
 				CODE_SIGN_IDENTITY = "$(XDRIP_CODE_SIGN_IDENTITY_DEBUG)";
-				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -4515,7 +4519,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_ENTITLEMENTS_RELEASE)";
 				CODE_SIGN_IDENTITY = "$(XDRIP_CODE_SIGN_IDENTITY_RELEASE)";
-				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
