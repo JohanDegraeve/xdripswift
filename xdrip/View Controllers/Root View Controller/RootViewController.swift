@@ -2548,7 +2548,7 @@ final class RootViewController: UIViewController {
                 
                 let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
                 
-                let minutesAgoTextLocalized = (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) + " " + Texts_HomeView.ago
+                let minutesAgoTextLocalized = (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) // + " " + Texts_HomeView.ago
                 
                 let latestReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
                 

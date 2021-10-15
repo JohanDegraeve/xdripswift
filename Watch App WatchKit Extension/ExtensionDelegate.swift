@@ -10,6 +10,9 @@ import WatchKit
 
 class ExtensionDelegate: NSObject, WKExtensionDelegate {
 
+    var currentBGValueText: String = "124↘︎"
+    var minsAgoText: String = "3 mins"
+    
     func applicationDidFinishLaunching() {
         // Perform any final initialization of your application.
     }

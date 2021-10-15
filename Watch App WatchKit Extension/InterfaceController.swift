@@ -23,11 +23,11 @@ class InterfaceController: WKInterfaceController {
     /// we can attach this action to the value label (or whatever) and use it to force refresh the data if it is needed for some reason. We'll set it to require a 2 second push so it should not be triggered accidentally
     @IBAction func longPressToRefresh(_ sender: Any) {
         
-        // set all label outlets to deactivated and show a message to the user to acknowledge that a refresh has been requested
-        minutesAgoLabelOutlet.setText("Refreshing...")
+//        // set all label outlets to deactivated and show a message to the user to acknowledge that a refresh has been requested
+//        minutesAgoLabelOutlet.setText("Refreshing...")
         minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
         
-        deltaLabelOutlet.setText("---")
+        deltaLabelOutlet.setText("Refreshing...")
         deltaLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
         
         valueLabelOutlet.setText("---")
@@ -37,21 +37,26 @@ class InterfaceController: WKInterfaceController {
         
     }
     
+    // Here is an example of accessing the Float variable
+//    let accessVar = myDelegate.dataVar1
+//    let myDict = myDelegate.myDictionary
+    
     // MARK: - Properties - other private properties
     
     // WatchConnectivity session needed for messaging with the companion app
     private let session = WCSession.default
     
+    
     // declare and initialise app-wide variables
-    private var currentBGValue: Double = 0
-    private var currentBGValueText: String = ""
-    private var currentBGTimestamp: Date = Date()
-    private var deltaTextLocalized: String = "---"
-    private var minutesAgoTextLocalized: String = "---"
-    private var urgentLowMarkValueInUserChosenUnit: Double = 0
-    private var lowMarkValueInUserChosenUnit: Double = 0
-    private var highMarkValueInUserChosenUnit: Double = 0
-    private var urgentHighMarkValueInUserChosenUnit: Double = 0
+    var currentBGValue: Double = 0
+    var currentBGValueText: String = ""
+    var currentBGTimestamp: Date = Date()
+    var deltaTextLocalized: String = "---"
+    var minutesAgoTextLocalized: String = "---"
+    var urgentLowMarkValueInUserChosenUnit: Double = 0
+    var lowMarkValueInUserChosenUnit: Double = 0
+    var highMarkValueInUserChosenUnit: Double = 0
+    var urgentHighMarkValueInUserChosenUnit: Double = 0
     
     
     // MARK: - overriden functions
@@ -69,6 +74,9 @@ class InterfaceController: WKInterfaceController {
     override func willActivate() {
         // This method is called when watch view controller is about to be visible to user
         super.willActivate()
+        
+        // change some of the UI text so that the user sees that something is happening whilst we request new data
+        deltaLabelOutlet.setText("Refreshing...")
         
         // pull new BG data from xDrip4iOS
         requestBGData()
@@ -104,6 +112,10 @@ class InterfaceController: WKInterfaceController {
             minutesAgoLabelOutlet.setText(minutesAgoText)
             minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.minsAgoLabelColor)
             
+            let myDelegate = WKExtension.shared().delegate as! ExtensionDelegate
+            
+            myDelegate.minsAgoText = minutesAgoText
+            
             // let's see how long the "mins ago" string is. Some localizations produce a really long string (Dutch, Swedish) that isn't easily abbreviated without losing context. In this case, let's just hide the icon to allow the text to fit without issues
             iconImageOutlet.setHidden(minutesAgoText.count > 13 ? true : false)
             
@@ -111,6 +123,8 @@ class InterfaceController: WKInterfaceController {
             deltaLabelOutlet.setTextColor(ConstantsWatchApp.deltaLabelColor)
             
             valueLabelOutlet.setText(currentBGValueText.description)
+            
+            myDelegate.currentBGValueText = currentBGValueText
             
             // make a simple check to ensure that there is no incoherency between the BG and objective values (i.e. some values in mg/dl whilst others are still in mmol/l). This can happen as the message sending from the iOS session is asynchronous. When one value is updated before the others, then it can cause the wrong colour text to be displayed until the next messages arrive 0.5 seconds later and the view is corrected.
             let coherencyCheck = (currentBGValue < 30 && urgentLowMarkValueInUserChosenUnit < 10 && lowMarkValueInUserChosenUnit < 10 && highMarkValueInUserChosenUnit < 30 && urgentHighMarkValueInUserChosenUnit < 30) || (currentBGValue > 20 && urgentLowMarkValueInUserChosenUnit > 20 && lowMarkValueInUserChosenUnit > 20 && highMarkValueInUserChosenUnit > 80 && urgentHighMarkValueInUserChosenUnit > 80)
