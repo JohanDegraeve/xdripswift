@@ -101,7 +101,7 @@ enum TransmitterBatteryInfo: Equatable {
                 voltageA = Int(data.uint64(position: 1))
                 voltageB = Int(data.uint64(position: 1 + 8))
                 resist = Int(data.uint64(position: 1 + 16))
-                runtime = Int(data.uint64(position: 1 + 24))
+                runtime = Int(data.uint64(position: 1 + 32))
                 temperature = Int(data.uint64(position: 1 + 32))
             default:
                 break
