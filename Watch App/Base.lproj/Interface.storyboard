@@ -52,7 +52,7 @@
                                 </separator>
                                 <label width="1" alignment="center" text="Waiting for data..." textAlignment="center" minimumScaleFactor="0.0" id="ies-y9-I8N">
                                     <gestureRecognizers>
-                                        <longPressGestureRecognizer minimumPressDuration="1.8999999999999999" id="WxN-fs-nqg">
+                                        <longPressGestureRecognizer minimumPressDuration="1" id="WxN-fs-nqg">
                                             <connections>
                                                 <action selector="longPressToRefresh:" destination="AgC-eL-Hgc" id="cET-Bm-UeH"/>
                                             </connections>

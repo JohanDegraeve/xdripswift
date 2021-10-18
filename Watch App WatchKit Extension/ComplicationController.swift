@@ -72,7 +72,6 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             entry = CLKComplicationTimelineEntry(date: Date(), complicationTemplate: template)
         case .modularLarge:
             let template = CLKComplicationTemplateModularLargeTallBody.init(headerTextProvider: minsAgoText, bodyTextProvider: valueTextFull)
-            template.bodyTextProvider.tintColor = statusColor
             entry = CLKComplicationTimelineEntry(date: Date(), complicationTemplate: template)
          default:
             break
