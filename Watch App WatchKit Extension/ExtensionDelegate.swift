@@ -7,14 +7,23 @@
 //
 
 import WatchKit
+import ClockKit
 
 class ExtensionDelegate: NSObject, WKExtensionDelegate {
 
-    var currentBGValueText: String = "124↘︎"
-    var minsAgoText: String = "3 mins"
+    static func shared() -> ExtensionDelegate {
+        return WKExtension.shared().extensionDelegate
+    }
+    
+    var currentBGValueTextFull: String = "-- →"
+    var currentBGValueText: String = "--"
+    var currentBGValueTrend: String = "→"
+    var currentBGValueStatus: UIColor = UIColor.gray
+    var minsAgoText: String = "- mins"
     
     func applicationDidFinishLaunching() {
         // Perform any final initialization of your application.
+        scheduleNextReload()
     }
 
     func applicationDidBecomeActive() {
@@ -24,6 +33,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate {
     func applicationWillResignActive() {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, etc.
+        reloadActiveComplications()
     }
 
     func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
@@ -37,6 +47,8 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate {
             case let snapshotTask as WKSnapshotRefreshBackgroundTask:
                 // Snapshot tasks have a unique completion call, make sure to set your expiration date
                 snapshotTask.setTaskCompleted(restoredDefaultState: true, estimatedSnapshotExpiration: Date.distantFuture, userInfo: nil)
+                scheduleNextReload()
+                reloadActiveComplications()
             case let connectivityTask as WKWatchConnectivityRefreshBackgroundTask:
                 // Be sure to complete the connectivity task once you’re done.
                 connectivityTask.setTaskCompletedWithSnapshot(false)
@@ -55,5 +67,29 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate {
             }
         }
     }
+    
+    func scheduleNextReload() {
+//        let refreshTime = Date().advanced(by: Constants.backgroundRefreshInterval)
+        let refreshTime = Date().advanced(by: 60)
+        WKExtension.shared().scheduleBackgroundRefresh(
+            withPreferredDate: refreshTime,
+            userInfo: nil,
+            scheduledCompletion: { _ in }
+        )
+    }
+    
+    func reloadActiveComplications() {
+        let server = CLKComplicationServer.sharedInstance()
 
+        for complication in server.activeComplications ?? [] {
+            server.reloadTimeline(for: complication)
+        }
+    }
+
+}
+
+fileprivate extension WKExtension {
+    var extensionDelegate: ExtensionDelegate! {
+        return delegate as? ExtensionDelegate
+    }
 }

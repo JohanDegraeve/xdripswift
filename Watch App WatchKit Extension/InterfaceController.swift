@@ -50,6 +50,8 @@ class InterfaceController: WKInterfaceController {
     // declare and initialise app-wide variables
     var currentBGValue: Double = 0
     var currentBGValueText: String = ""
+    var currentBGValueTextFull: String = ""
+    var currentBGValueTrend: String = ""
     var currentBGTimestamp: Date = Date()
     var deltaTextLocalized: String = "---"
     var minutesAgoTextLocalized: String = "---"
@@ -122,9 +124,11 @@ class InterfaceController: WKInterfaceController {
             deltaLabelOutlet.setText(deltaTextLocalized)
             deltaLabelOutlet.setTextColor(ConstantsWatchApp.deltaLabelColor)
             
-            valueLabelOutlet.setText(currentBGValueText.description)
+            valueLabelOutlet.setText(currentBGValueTextFull.description)
             
+            myDelegate.currentBGValueTextFull = currentBGValueTextFull
             myDelegate.currentBGValueText = currentBGValueText
+            myDelegate.currentBGValueTrend = currentBGValueTrend
             
             // make a simple check to ensure that there is no incoherency between the BG and objective values (i.e. some values in mg/dl whilst others are still in mmol/l). This can happen as the message sending from the iOS session is asynchronous. When one value is updated before the others, then it can cause the wrong colour text to be displayed until the next messages arrive 0.5 seconds later and the view is corrected.
             let coherencyCheck = (currentBGValue < 30 && urgentLowMarkValueInUserChosenUnit < 10 && lowMarkValueInUserChosenUnit < 10 && highMarkValueInUserChosenUnit < 30 && urgentHighMarkValueInUserChosenUnit < 30) || (currentBGValue > 20 && urgentLowMarkValueInUserChosenUnit > 20 && lowMarkValueInUserChosenUnit > 20 && highMarkValueInUserChosenUnit > 80 && urgentHighMarkValueInUserChosenUnit > 80)
@@ -134,8 +138,10 @@ class InterfaceController: WKInterfaceController {
                 // if there's a clear problem and iOS hasn't sent any new data in 20-30 minutes
                 minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.minsAgoLabelColorUrgent)
                 deltaLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
-                valueLabelOutlet.setText("Waiting for xDrip4iOS...")
+                valueLabelOutlet.setText("Waiting for data...")
                 valueLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
+                
+                myDelegate.currentBGValueStatus = ConstantsWatchApp.labelColorDeactivated
                 
             } else if minutesAgo > ConstantsWatchApp.minutesAgoWarningMinutes {
                 
@@ -144,20 +150,28 @@ class InterfaceController: WKInterfaceController {
                 deltaLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
                 valueLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
                 
+                myDelegate.currentBGValueStatus = ConstantsWatchApp.labelColorDeactivated
+                
             } else if (currentBGValue >= urgentHighMarkValueInUserChosenUnit || currentBGValue <= urgentLowMarkValueInUserChosenUnit) && coherencyCheck {
                 
                 // BG is higher than urgentHigh or lower than urgentLow objectives
                 valueLabelOutlet.setTextColor(ConstantsWatchApp.glucoseUrgentRangeColor)
+                
+                myDelegate.currentBGValueStatus = ConstantsWatchApp.glucoseUrgentRangeColor
                 
             } else if (currentBGValue >= highMarkValueInUserChosenUnit || currentBGValue <= lowMarkValueInUserChosenUnit) && coherencyCheck {
                 
                 // BG is between urgentHigh/high and low/urgentLow objectives
                 valueLabelOutlet.setTextColor(ConstantsWatchApp.glucoseNotUrgentRangeColor)
                 
+                myDelegate.currentBGValueStatus = ConstantsWatchApp.glucoseNotUrgentRangeColor
+                
             } else if coherencyCheck {
                 
                 // BG is between high and low objectives so considered "in range"
                 valueLabelOutlet.setTextColor(ConstantsWatchApp.glucoseInRangeColor)
+                
+                myDelegate.currentBGValueStatus = ConstantsWatchApp.glucoseInRangeColor
             }
             
         }
@@ -190,18 +204,26 @@ extension InterfaceController: WCSessionDelegate {
         // uncomment the following for debug console use
         // print("received message from iOS App: \(message)")
         
-        if let data = message["currentBGValue"] as? String, let doubleValue = Double(data) {
-                currentBGValue = doubleValue
-        }
-        
         if let data = message["currentBGTimeStamp"] as? String, let date = ISO8601DateFormatter().date(from: data) {
             if date != currentBGTimestamp {
                 currentBGTimestamp = date
             }
         }
         
+        if let data = message["currentBGValue"] as? String, let doubleValue = Double(data) {
+            currentBGValue = doubleValue
+        }
+        
+        if let data = message["currentBGValueTextFull"] as? String {
+            currentBGValueTextFull = data
+        }
+        
         if let data = message["currentBGValueText"] as? String {
             currentBGValueText = data
+        }
+        
+        if let data = message["currentBGValueTrend"] as? String {
+            currentBGValueTrend = data
         }
         
         if let data = message["deltaTextLocalized"] as? String {

@@ -10,7 +10,7 @@
         <!--Interface Controller-->
         <scene sceneID="aou-V4-d1y">
             <objects>
-                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="xDrip4iOS" customModuleProvider="target">
+                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="xDrip4iO5" customModuleProvider="target">
                     <items>
                         <group width="1" alignment="left" verticalAlignment="center" layout="vertical" spacing="10" id="Wqm-hO-ln6">
                             <items>
@@ -27,7 +27,7 @@
                                                 </label>
                                                 <label alignment="right" text="---" textAlignment="right" minimumScaleFactor="0.0" id="RJK-M1-Bu5">
                                                     <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    <fontDescription key="font" style="UICTFontTextStyleHeadline"/>
+                                                    <fontDescription key="font" style="UICTFontTextStyleBody"/>
                                                 </label>
                                             </items>
                                             <edgeInsets key="margins" left="0.0" right="0.0" top="5" bottom="5"/>
@@ -50,7 +50,7 @@
                                 <separator alignment="center" id="Y5j-Vc-Vi6">
                                     <color key="color" white="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </separator>
-                                <label width="1" alignment="center" text="Waiting for xDrip4iOS..." textAlignment="center" minimumScaleFactor="0.0" id="ies-y9-I8N">
+                                <label width="1" alignment="center" text="Waiting for data..." textAlignment="center" minimumScaleFactor="0.0" id="ies-y9-I8N">
                                     <gestureRecognizers>
                                         <longPressGestureRecognizer minimumPressDuration="1.8999999999999999" id="WxN-fs-nqg">
                                             <connections>

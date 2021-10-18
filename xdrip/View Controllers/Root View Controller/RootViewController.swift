@@ -2540,10 +2540,14 @@ final class RootViewController: UIViewController {
             // make sure that the necessary objects are initialised and readings are available.
             if let bgReadingsAccessor = bgReadingsAccessor, let lastReading = bgReadingsAccessor.last(forSensor: nil) {
                 
-                var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: mgdl)
+                let calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: mgdl)
+                
+                var calculatedValueFullAsString: String = ""
+                var calculatedValueTrendAsString: String = ""
                 
                 if !lastReading.hideSlope {
-                    calculatedValueAsString = calculatedValueAsString + " " + lastReading.slopeArrow()
+                    calculatedValueTrendAsString = lastReading.slopeArrow()
+                    calculatedValueFullAsString = calculatedValueAsString + " " + calculatedValueTrendAsString
                 }
                 
                 let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
@@ -2563,6 +2567,10 @@ final class RootViewController: UIViewController {
                 
                 // create the WKSession messages in String format and send them. Although they are all sent almost immediately, they will be queued and sent in a background thread by the handler
                 validSession.sendMessage(["currentBGValueText" : calculatedValueAsString], replyHandler: nil, errorHandler: nil)
+                
+                validSession.sendMessage(["currentBGValueTextFull" : calculatedValueFullAsString], replyHandler: nil, errorHandler: nil)
+                
+                validSession.sendMessage(["currentBGValueTrend" : calculatedValueTrendAsString], replyHandler: nil, errorHandler: nil)
                 
                 validSession.sendMessage(["currentBGValue" : lastReading.unitizedString(unitIsMgDl: mgdl).description], replyHandler: nil, errorHandler: nil)
                 
