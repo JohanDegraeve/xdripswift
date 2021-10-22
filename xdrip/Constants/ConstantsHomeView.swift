@@ -8,5 +8,14 @@ enum ConstantsHomeView {
     static let infoEmailAddress = "xdrip@proximus.be"
     
     /// application name, appears in licenseInfo as title
-    static let applicationName = "xDrip4iO5"
+    static let applicationName: String = {
+
+        guard let dictionary = Bundle.main.infoDictionary else {return "unknown"}
+        
+        guard let version = dictionary["CFBundleDisplayName"] as? String else {return "unknown"}
+        
+        return version
+        
+    }()
+    
 }
