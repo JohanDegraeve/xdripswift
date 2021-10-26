@@ -108,7 +108,6 @@ enum TransmitterBatteryInfo: Equatable {
                 temperature = Int(data.uint32(position: 1 + 16))
                 
             case 41:// if values are stored with 8 bytes per int
-                debuglogging("data = " + data.hexEncodedString())
                 voltageA = Int(data.uint64(position: 1))
                 voltageB = Int(data.uint64(position: 1 + 8))
                 resist = Int(data.uint64(position: 1 + 16))

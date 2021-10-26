@@ -1,3 +1,3 @@
-#import "BluetoothTransmitter/CGM/Dexcom/G5/G5Messages/AESCrypt.h"
+#import "BluetoothTransmitter/CGM/Dexcom/Generic/AESCrypt.h"
 #import "Utilities/CustomColoredDisclosureIndicator/DTCustomColoredAccessory.h"
 

@@ -4,7 +4,7 @@ import CoreBluetooth
 /// to be implemented for anyone who needs to receive information from a specific type of cgm transmitter
 protocol CGMTransmitterDelegate:AnyObject {
      
-    /// only for transmitters that can detect new sensor id
+    /// only for transmitters that can detect new sensor
     func newSensorDetected()
     
     /// only for transmitters that can detect missing sensor

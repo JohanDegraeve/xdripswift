@@ -1519,29 +1519,36 @@ final class RootViewController: UIViewController {
         
         let cgmTransmitterType = cgmTransmitter.cgmTransmitterType()
         
+        // initialize return value
+        var calibrator: Calibrator = NoCalibrator()
+        
         switch cgmTransmitterType {
         
-        case .dexcomG4, .dexcomG5, .dexcomG6:
+        case .dexcomG4, .dexcomG5 :
             
-            trace("in getCalibrator, calibrator = DexcomCalibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
+            calibrator = DexcomCalibrator()
             
-            return DexcomCalibrator()
+        case .dexcomG6:
+            
+            if (cgmTransmitter as! CGMG6Transmitter).isFireFly() {
+                
+                calibrator = NoCalibrator()
+                
+            } else {
+                
+                calibrator = DexcomCalibrator()
+            }
             
         case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa, .Libre2, .Atom:
             
             if cgmTransmitter.isWebOOPEnabled() {
                 
                 // received values are already calibrated
-                
-                trace("in getCalibrator, calibrator = NoCalibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
-                
-                return NoCalibrator()
+                calibrator = NoCalibrator()
                 
             } else if cgmTransmitter.isNonFixedSlopeEnabled() {
                 
                 // no oop web, non-fixed slope
-                
-                trace("in getCalibrator, calibrator = Libre1NonFixedSlopeCalibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
                 
                 return Libre1NonFixedSlopeCalibrator()
                 
@@ -1549,13 +1556,15 @@ final class RootViewController: UIViewController {
                 
                 // no oop web, fixed slope
                 
-                trace("in getCalibrator, calibrator = Libre1Calibrator", log: log, category: ConstantsLog.categoryRootView, type: .info)
-                
-                return Libre1Calibrator()
+                calibrator = Libre1Calibrator()
                 
             }
             
         }
+        
+        trace("in getCalibrator, calibrator = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, calibrator.description())
+        
+        return calibrator
         
     }
     
@@ -2661,11 +2670,18 @@ extension RootViewController: CGMTransmitterDelegate {
         
         trace("transmitterBatteryInfo %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, transmitterBatteryInfo?.description ?? "not received")
         trace("sensor time in minutes %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, sensorTimeInMinutes?.description ?? "not received")
-        trace("glucoseData size = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, glucoseData.count.description)
+        trace("glucoseData size = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, glucoseData.count.description)
         
         // if received transmitterBatteryInfo not nil, then store it
         if let transmitterBatteryInfo = transmitterBatteryInfo {
             UserDefaults.standard.transmitterBatteryInfo = transmitterBatteryInfo
+        }
+        
+        // list readings
+        for (index, glucose) in glucoseData.enumerated() {
+            
+            trace("glucoseData %{public}@, value = %{public}@, timestamp = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, index.description, glucose.glucoseLevelRaw.description, glucose.timeStamp.toString(timeStyle: .long, dateStyle: .none))
+            
         }
         
         // process new readings

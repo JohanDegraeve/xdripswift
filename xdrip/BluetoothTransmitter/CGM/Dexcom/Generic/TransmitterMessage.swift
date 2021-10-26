@@ -26,7 +26,6 @@ protocol RespondableMessage: TransmitterTxMessage {
 /// A data sequence received by the transmitter
 protocol TransmitterRxMessage {
 
-
     init?(data: Data)
 
 }

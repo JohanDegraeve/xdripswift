@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20C69" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19206" systemVersion="20G95" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="AlertEntry" representedClassName=".AlertEntry" syncable="YES">
         <attribute name="alertkind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="start" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -104,6 +104,8 @@
         <attribute name="firmwareVersion" optional="YES" attributeType="String"/>
         <attribute name="isDexcomG6" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="lastResetTimeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="sensorStartDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="transmitterStartDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="voltageA" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="voltageB" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="dexcomG5" inverseEntity="BLEPeripheral"/>
@@ -156,6 +158,7 @@
     <elements>
         <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="28"/>
         <element name="AlertType" positionX="-657" positionY="180" width="128" height="28"/>
+        <element name="Atom" positionX="-657" positionY="189" width="128" height="74"/>
         <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="298"/>
         <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="359"/>
         <element name="Blucon" positionX="-657" positionY="189" width="128" height="58"/>
@@ -163,7 +166,7 @@
         <element name="Bubble" positionX="-657" positionY="189" width="128" height="88"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="285"/>
         <element name="DexcomG4" positionX="-621" positionY="225" width="128" height="58"/>
-        <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="193"/>
+        <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="209"/>
         <element name="Droplet" positionX="-630" positionY="216" width="128" height="58"/>
         <element name="GNSEntry" positionX="-648" positionY="198" width="128" height="103"/>
         <element name="Libre2" positionX="-648" positionY="198" width="128" height="58"/>
@@ -172,6 +175,5 @@
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="133"/>
         <element name="SnoozeParameters" positionX="-648" positionY="198" width="128" height="28"/>
         <element name="Watlaa" positionX="-639" positionY="207" width="128" height="88"/>
-        <element name="Atom" positionX="-657" positionY="189" width="128" height="74"/>
     </elements>
 </model>

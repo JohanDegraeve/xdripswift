@@ -245,13 +245,21 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// will write to characteristicToWriteTo
     /// - returns: true if writeValue was successfully called, doesn't necessarily mean data is successvully written to peripheral
     func writeDataToPeripheral(data:Data, characteristicToWriteTo:CBCharacteristic, type:CBCharacteristicWriteType)  -> Bool {
+        
         if let peripheral = peripheral, getConnectionStatus() == CBPeripheralState.connected {
+            
             trace("in writeDataToPeripheral, for peripheral with name %{public}@, for characteristic %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", characteristicToWriteTo.uuid.description)
+            
             peripheral.writeValue(data, for: characteristicToWriteTo, type: type)
+            
             return true
+            
         } else {
+            
             trace("in writeDataToPeripheral, for peripheral with name %{public}@, failed because either peripheral or characteristicToWriteTo is nil or not connected", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, deviceName ?? "'unknown'")
+            
             return false
+            
         }
     }
     
@@ -482,9 +490,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         timeStampLastStatusUpdate = Date()
         
         if let error = error {
-            trace("didWriteValueFor characteristic %{public}@, characteristic description %{public}@, error =  %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, String(describing: characteristic.uuid), String(characteristic.debugDescription), error.localizedDescription)
+            trace("in didWriteValueFor. Characteristic %{public}@, error =  %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, String(describing: characteristic.uuid), error.localizedDescription)
         } else {
-            trace("didWriteValueFor characteristic %{public}@, characteristic description %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, String(describing: characteristic.uuid), String(characteristic.debugDescription))
+            trace("in didWriteValueFor. Characteristic %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, String(describing: characteristic.uuid))
         }
     }
     
@@ -493,7 +501,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         timeStampLastStatusUpdate = Date()
         
         if let error = error {
-            trace("didUpdateNotificationStateFor for peripheral with name %{public}@, characteristic %{public}@, characteristic description %{public}@, error =  %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, deviceName ?? "'unkonwn'", String(describing: characteristic.uuid), String(characteristic.debugDescription), error.localizedDescription)
+            trace("didUpdateNotificationStateFor for peripheral with name %{public}@, characteristic %{public}@, error =  %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, deviceName ?? "'unkonwn'", String(describing: characteristic.uuid), error.localizedDescription)
         }
         
     }
@@ -502,7 +510,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
 
         // trace the received value
         if let value = characteristic.value {
-            trace("in peripheral didUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, value.hexEncodedString())
+            trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, value.hexEncodedString())
         }
         
         timeStampLastStatusUpdate = Date()

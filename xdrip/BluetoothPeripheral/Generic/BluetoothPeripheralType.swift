@@ -222,13 +222,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
                 return Texts_ErrorMessages.DexcomTransmitterIDInvalidCharacters
             }
             
-            // reject transmitters with id in range 8G or higher. These are Firefly's
-            // convert to upper
-            let transmitterIdUpper = transmitterId.uppercased()
-            if transmitterIdUpper.compare("8G") == .orderedDescending {
-                return Texts_SettingsView.transmitterId8OrHigherNotSupported
-            }
-
             // validation successful
             return nil
             

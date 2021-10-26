@@ -22,7 +22,6 @@
 "settingsviews_nonfixedtransmitter" = "Käytä monipistekalibrointia?";
 "settingsviews_labelNonFixed" = "Monipistekalibrointi";
 "settingsviews_labelWebOOP" = "xDrip vai Libre algorithmi";
-"transmitterId8OrHigherNotSupported" = "Lähettimet ID:llä 8Gxxxx tai uudemmat eivät ole tuettu!";
 "settingsviews_sectiontitlealerting" = "Hälytys";
 "settingsviews_row_alert_types" = "Hälytystyypit";
 "settingsviews_row_alerts" = "Hälytykset";

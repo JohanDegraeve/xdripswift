@@ -187,10 +187,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_labelNonFixed", tableName: filename, bundle: Bundle.main, value: "Multi-point Calibration", comment: "non fixed settings, title of the section")
     }()
     
-    static let transmitterId8OrHigherNotSupported: String = {
-        return NSLocalizedString("transmitterId8OrHigherNotSupported", tableName: filename, bundle: Bundle.main, value: "Transmitters with ID 8Gxxxx or newer are not currently supported!", comment: "User sets a transmitter id with id 8G or higher. This is not supported")
-    }()
-    
     // MARK: - Section Alerts
     
     static let sectionTitleAlerting: String = {

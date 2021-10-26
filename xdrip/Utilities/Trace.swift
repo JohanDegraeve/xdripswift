@@ -178,7 +178,7 @@ func trace(_ message: StaticString, log:OSLog, category: String, type: OSLogType
     // nslog if enabled and if type = debug, then check also if debug logging is required
     if UserDefaults.standard.NSLogEnabled && (type != .debug || (type == .debug && UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog)) {
         
-        NSLog("%@", ConstantsLog.tracePrefix + " " + timeStamp + " " + applicationVersion + " " + buildNumber + " " + category + " " + actualMessage)
+        NSLog("%@", ConstantsLog.tracePrefix + " " + timeStamp + " " + applicationVersion + " " + buildNumber + " " + category + " " + Date().toString(timeStyle: .medium, dateStyle: .none) + " " + actualMessage)
         
     }
     

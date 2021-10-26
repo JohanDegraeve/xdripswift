@@ -203,9 +203,6 @@
 /// speak settings, where user can enable or disable speak delta
 "settingsviews_speakDelta" = "Delta vorlesen?";
 
-/// User sets a transmitter id with id 8G or higher. This is not supported
-"transmitterId8OrHigherNotSupported" = "Transmitter mit der ID 8Gxxxx oder neuer werden zur Zeit nicht unterstützt!";
-
 /// M5 stack setting, brightness
 "m5stack_settingsviews_brightness" = "Bildschirmhelligkeit";
 

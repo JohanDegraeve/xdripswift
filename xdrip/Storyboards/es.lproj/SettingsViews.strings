@@ -36,7 +36,6 @@
 "settingsviews_nonfixedtransmitter" = "Habilitar Calibración Multi-punto?";
 "settingsviews_labelNonFixed" = "Calibración Multi-punto";
 "settingsviews_labelWebOOP" = "Algoritmo xDrip o Libre";
-"transmitterId8OrHigherNotSupported" = "Los transmisores con ID 8Gxxxx o más nuevos no son compatibles de momento!";
 "settingsviews_sectiontitlealerting" = "Alarmas";
 "settingsviews_row_alert_types" = "Tipos de Alarmas";
 "settingsviews_row_alerts" = "Alarmas";

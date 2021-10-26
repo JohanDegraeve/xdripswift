@@ -35,7 +35,6 @@
 "settingsviews_nonfixedtransmitter" = "Använd flerpunktskalibrering?";
 "settingsviews_labelNonFixed" = "Flerpunktskalibrering";
 "settingsviews_labelWebOOP" = "xDrip- eller Libre-algoritm";
-"transmitterId8OrHigherNotSupported" = "Sändare med ID 8Gxxxx eller nyare stöds för tillfället inte";
 "settingsviews_sectiontitlealerting" = "Larm";
 "settingsviews_row_alert_types" = "Typ av larm";
 "settingsviews_row_alerts" = "Larm";

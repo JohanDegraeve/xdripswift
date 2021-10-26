@@ -31,7 +31,6 @@
 "settingsviews_nonfixedtransmitter" = "تفعيل المعايرة متعددة النقاط ?";
 "settingsviews_labelNonFixed" = "المعايرة متعددة النقاط";
 "settingsviews_labelWebOOP" = "خوارزمية xDrip أو Libre";
-"transmitterId8OrHigherNotSupported" = "جهاز الإرسال برمز الهوية 8Gxxxx أو الأحدث غير مدعوم!";
 "settingsviews_sectiontitlealerting" = "التنبيهات";
 "settingsviews_row_alert_types" = "أنواع التنبيهات";
 "settingsviews_row_alerts" = "التنبيهات";

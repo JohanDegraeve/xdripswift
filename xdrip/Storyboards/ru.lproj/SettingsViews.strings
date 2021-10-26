@@ -273,9 +273,6 @@
 /// 
 "settingsviews_showcoloredobjectives" = "Show Colored Lines?";
 
-/// User sets a transmitter id with id 8G or higher. This is not supported
-"transmitterId8OrHigherNotSupported" = "Transmitters with ID 8Gxxxx or newer are not currently supported!";
-
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////

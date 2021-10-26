@@ -11,8 +11,8 @@ import Foundation
 
 struct TransmitterVersionRxMessage: TransmitterRxMessage {
     let status: UInt8
-    let firmwareVersion: Data
-
+    let firmwareVersionAsData: Data
+    
     init?(data: Data) {
         guard data.count == 19 && data.isCRCValid else {
             return nil
@@ -23,7 +23,13 @@ struct TransmitterVersionRxMessage: TransmitterRxMessage {
         }
 
         status = data[1]
-        firmwareVersion = data[2..<6]
+        firmwareVersionAsData = data[2..<6]
+
+    }
+
+    /// firmware version in readable format
+    func firmwareVersionFormatted() -> String  {
+        return firmwareVersionAsData.map { "\(Int($0))" }.joined(separator: ".")
     }
 
 }
