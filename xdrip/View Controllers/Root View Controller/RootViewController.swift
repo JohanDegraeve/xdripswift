@@ -810,6 +810,13 @@ final class RootViewController: UIViewController {
                     
                 }
                 
+                // check if cgmTransmitterType has changed, if yes reset transmitterBatteryInfo
+                if let currentTransmitterType = UserDefaults.standard.cgmTransmitterType, currentTransmitterType != cgmTransmitter.cgmTransmitterType() {
+                    
+                    UserDefaults.standard.transmitterBatteryInfo = nil
+                    
+                }
+                
                 // check if the type of sensor supported by the cgmTransmitterType  has changed, if yes stop the sensor
                 if let currentTransmitterType = UserDefaults.standard.cgmTransmitterType, currentTransmitterType.sensorType() != cgmTransmitter.cgmTransmitterType().sensorType() {
                     

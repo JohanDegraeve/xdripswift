@@ -8,6 +8,16 @@ enum ConstantsHomeView {
     static let infoEmailAddress = "xdrip@proximus.be"
     
     /// application name, appears in licenseInfo as title
+    static let applicationName: String = {
+
+        guard let dictionary = Bundle.main.infoDictionary else {return "unknown"}
+        
+        guard let version = dictionary["CFBundleDisplayName"] as? String else {return "unknown"}
+        
+        return version
+        
+    }()
+  
     static let applicationName = "xDrip4iO5"
     
     /// URL where the online help should be loaded from
@@ -21,4 +31,5 @@ enum ConstantsHomeView {
     /// we'll use this to spilt into two separate strings
     static let onlineHelpURLTranslated1 = "https://xdrip4ios-readthedocs-io.translate.goog/en/latest/?_x_tr_sl=auto&_x_tr_tl="
     static let onlineHelpURLTranslated2 = "&_x_tr_hl=es&_x_tr_pto=nui"
+
 }
