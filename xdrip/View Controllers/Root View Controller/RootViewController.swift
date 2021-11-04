@@ -408,6 +408,8 @@ final class RootViewController: UIViewController {
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
         
+        updateWatchApp()
+        
     }
     
     override func viewDidLoad() {
@@ -1086,8 +1088,6 @@ final class RootViewController: UIViewController {
                     // update sensor countdown graphic
                     updateSensorCountdown()
                     
-                    updateWatchApp()
-                    
                 }
                 
                 nightScoutUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
@@ -1103,6 +1103,8 @@ final class RootViewController: UIViewController {
                 watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 loopManager?.share()
+                
+                updateWatchApp()
                 
             }
         }
@@ -2556,6 +2558,12 @@ final class RootViewController: UIViewController {
                 
                 let latestReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
                 
+                // check that there actually exists some readings. If not then return without doing anything (if we don't trap this it could sometimes cause a crash if the app hasn't had time to collect recent readings)
+                guard latestReadings.count > 0 else {
+                    
+                    return
+                }
+                
                 // assign last reading
                 let lastReading = latestReadings[0]
                 
@@ -2574,8 +2582,6 @@ final class RootViewController: UIViewController {
                 
                 validSession.sendMessage(["currentBGValue" : lastReading.unitizedString(unitIsMgDl: mgdl).description], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["currentBGTimeStamp" : ISO8601DateFormatter().string(from: lastReading.timeStamp)], replyHandler: nil, errorHandler: nil)
-                
                 validSession.sendMessage(["minutesAgoTextLocalized" : minutesAgoTextLocalized], replyHandler: nil, errorHandler: nil)
                 
                 validSession.sendMessage(["deltaTextLocalized" : deltaText], replyHandler: nil, errorHandler: nil)
@@ -2588,10 +2594,12 @@ final class RootViewController: UIViewController {
                 
                 validSession.sendMessage(["urgentHighMarkValueInUserChosenUnit" : UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
                 
+                // send the timestamp last as this is what will eventually trigger the view refresh on the watch
+                validSession.sendMessage(["currentBGTimeStamp" : ISO8601DateFormatter().string(from: lastReading.timeStamp)], replyHandler: nil, errorHandler: nil)
+                
             }
             
         }
-        
         
     }
     
@@ -2866,7 +2874,7 @@ extension RootViewController: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         
         // uncomment the following for debug console use
-        // print("received message from Watch App: \(message)")
+        print("received message from Watch App: \(message)")
         
         DispatchQueue.main.async {
             

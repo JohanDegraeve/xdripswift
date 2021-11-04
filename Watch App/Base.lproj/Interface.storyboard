@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="19162" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="19455" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
     <device id="watch45"/>
     <dependencies>
         <deployment identifier="watchOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="19044"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="19454"/>
     </dependencies>
     <scenes>
         <!--Interface Controller-->
@@ -12,7 +12,7 @@
             <objects>
                 <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="xDrip4iO5" customModuleProvider="target">
                     <items>
-                        <group width="1" alignment="left" verticalAlignment="center" layout="vertical" spacing="10" id="Wqm-hO-ln6">
+                        <group width="1" alignment="center" verticalAlignment="center" layout="vertical" spacing="5" id="Wqm-hO-ln6">
                             <items>
                                 <group width="1" alignment="left" id="QuI-vf-khn">
                                     <items>

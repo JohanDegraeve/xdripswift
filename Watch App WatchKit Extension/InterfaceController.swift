@@ -23,23 +23,18 @@ class InterfaceController: WKInterfaceController {
     /// we can attach this action to the value label (or whatever) and use it to force refresh the data if it is needed for some reason. We'll set it to require a 2 second push so it should not be triggered accidentally
     @IBAction func longPressToRefresh(_ sender: Any) {
         
-//        // set all label outlets to deactivated and show a message to the user to acknowledge that a refresh has been requested
-//        minutesAgoLabelOutlet.setText("Refreshing...")
-        minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
+        // set all label outlets to deactivated and show a message to the user to acknowledge that a refresh has been requested
+        minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.minsAgoLabelColorDeactivated)
         
         deltaLabelOutlet.setText("Refreshing...")
-        deltaLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
+        deltaLabelOutlet.setTextColor(ConstantsWatchApp.deltaLabelColorDeactivated)
         
         valueLabelOutlet.setText("---")
-        valueLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
+        valueLabelOutlet.setTextColor(ConstantsWatchApp.valueLabelColorDeactivated)
         
         requestBGData()
         
     }
-    
-    // Here is an example of accessing the Float variable
-//    let accessVar = myDelegate.dataVar1
-//    let myDict = myDelegate.myDictionary
     
     // MARK: - Properties - other private properties
     
@@ -53,12 +48,14 @@ class InterfaceController: WKInterfaceController {
     var currentBGValueTextFull: String = ""
     var currentBGValueTrend: String = ""
     var currentBGTimestamp: Date = Date()
-    var deltaTextLocalized: String = "---"
-    var minutesAgoTextLocalized: String = "---"
+    var deltaTextLocalized: String = ""
+    var minutesAgoText: String = ""
+    var minutesAgoTextLocalized: String = ""
     var urgentLowMarkValueInUserChosenUnit: Double = 0
     var lowMarkValueInUserChosenUnit: Double = 0
     var highMarkValueInUserChosenUnit: Double = 0
     var urgentHighMarkValueInUserChosenUnit: Double = 0
+    
     
     
     // MARK: - overriden functions
@@ -77,8 +74,8 @@ class InterfaceController: WKInterfaceController {
         // This method is called when watch view controller is about to be visible to user
         super.willActivate()
         
-        // change some of the UI text so that the user sees that something is happening whilst we request new data
-        deltaLabelOutlet.setText("Refreshing...")
+        // change some of the UI text so that the user sees that something is happening when they raise their write and we request new data
+        minutesAgoLabelOutlet.setText("Refreshing...")
         
         // pull new BG data from xDrip4iOS
         requestBGData()
@@ -89,11 +86,19 @@ class InterfaceController: WKInterfaceController {
         // This method is called when watch view controller is no longer visible
         super.didDeactivate()
         
-        // when the app is deactivated or pushed to the background and then we'll change the text colours to gray to indicate (in case the user sees the screen without taking it) that the app is currently not being updated. As soon as the app is activated, fresh data will be requested and the label colours updated again.
-        minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
-        deltaLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
-        valueLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
+        // when the app is deactivated or pushed to the background and then we'll change the text colours to gray to indicate (in case the user sees the screen without waking it up) that the app is currently not being updated. As soon as the app is activated, fresh data will be requested and the label colours and values updated accordingly
+        deltaLabelOutlet.setTextColor(ConstantsWatchApp.deltaLabelColorDeactivated)
         
+        // as the minutesAgo label will get "frozen" when the watch app deactivates, let's change it to show the actual time of the last reading. At least it will correctly show the context until the app reactivates.
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.current
+        dateFormatter.dateStyle = .none
+        dateFormatter.timeStyle = .short
+        
+        minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.minsAgoLabelColorDeactivated)
+        minutesAgoLabelOutlet.setText(dateFormatter.string(from: currentBGTimestamp))
+        
+        valueLabelOutlet.setTextColor(ConstantsWatchApp.valueLabelColorDeactivated)
     }
     
     
@@ -109,26 +114,18 @@ class InterfaceController: WKInterfaceController {
             let minutesAgo = -(Int(currentBGTimestamp.timeIntervalSinceNow) / 60)
             
             // build a locale-friendly text string using the freshly calculated value and the localized text sent by iOS
-            let minutesAgoText = minutesAgo.description + " " + minutesAgoTextLocalized
+            //let minutesAgoText = minutesAgo.description + " " + minutesAgoTextLocalized
             
             minutesAgoLabelOutlet.setText(minutesAgoText)
             minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.minsAgoLabelColor)
             
-            let myDelegate = WKExtension.shared().delegate as! ExtensionDelegate
-            
-            myDelegate.minsAgoText = minutesAgoText
-            
-            // let's see how long the "mins ago" string is. Some localizations produce a really long string (Dutch, Swedish) that isn't easily abbreviated without losing context. In this case, let's just hide the icon to allow the text to fit without issues
+            // let's see how long the "mins ago" string is. Some localizations produce a really long string (Dutch, Swedish) that isn't easily abbreviated without losing context. Althouhg unlikely, if this is the case, let's just hide the icon to allow the text to fit without issues
             iconImageOutlet.setHidden(minutesAgoText.count > 13 ? true : false)
             
             deltaLabelOutlet.setText(deltaTextLocalized)
             deltaLabelOutlet.setTextColor(ConstantsWatchApp.deltaLabelColor)
             
             valueLabelOutlet.setText(currentBGValueTextFull.description)
-            
-            myDelegate.currentBGValueTextFull = currentBGValueTextFull
-            myDelegate.currentBGValueText = currentBGValueText
-            myDelegate.currentBGValueTrend = currentBGValueTrend
             
             // make a simple check to ensure that there is no incoherency between the BG and objective values (i.e. some values in mg/dl whilst others are still in mmol/l). This can happen as the message sending from the iOS session is asynchronous. When one value is updated before the others, then it can cause the wrong colour text to be displayed until the next messages arrive 0.5 seconds later and the view is corrected.
             let coherencyCheck = (currentBGValue < 30 && urgentLowMarkValueInUserChosenUnit < 10 && lowMarkValueInUserChosenUnit < 10 && highMarkValueInUserChosenUnit < 30 && urgentHighMarkValueInUserChosenUnit < 30) || (currentBGValue > 20 && urgentLowMarkValueInUserChosenUnit > 20 && lowMarkValueInUserChosenUnit > 20 && highMarkValueInUserChosenUnit > 80 && urgentHighMarkValueInUserChosenUnit > 80)
@@ -137,43 +134,36 @@ class InterfaceController: WKInterfaceController {
                 
                 // if there's a clear problem and iOS hasn't sent any new data in 20-30 minutes
                 minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.minsAgoLabelColorUrgent)
-                deltaLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
-                valueLabelOutlet.setText("Waiting for data...")
-                valueLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
                 
-                myDelegate.currentBGValueStatus = ConstantsWatchApp.labelColorDeactivated
+                deltaLabelOutlet.setTextColor(ConstantsWatchApp.deltaLabelColorDeactivated)
+                
+                valueLabelOutlet.setText("Waiting for data...")
+                valueLabelOutlet.setTextColor(ConstantsWatchApp.valueLabelColorDeactivated)
                 
             } else if minutesAgo > ConstantsWatchApp.minutesAgoWarningMinutes {
                 
                 // if there's a potential problem and iOS hasn't sent any new data in 10-15 minutes
                 minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.minsAgoLabelColorWarning)
-                deltaLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
-                valueLabelOutlet.setTextColor(ConstantsWatchApp.labelColorDeactivated)
                 
-                myDelegate.currentBGValueStatus = ConstantsWatchApp.labelColorDeactivated
+                deltaLabelOutlet.setTextColor(ConstantsWatchApp.deltaLabelColorDeactivated)
+                
+                valueLabelOutlet.setTextColor(ConstantsWatchApp.valueLabelColorDeactivated)
                 
             } else if (currentBGValue >= urgentHighMarkValueInUserChosenUnit || currentBGValue <= urgentLowMarkValueInUserChosenUnit) && coherencyCheck {
                 
                 // BG is higher than urgentHigh or lower than urgentLow objectives
                 valueLabelOutlet.setTextColor(ConstantsWatchApp.glucoseUrgentRangeColor)
                 
-                myDelegate.currentBGValueStatus = ConstantsWatchApp.glucoseUrgentRangeColor
-                
             } else if (currentBGValue >= highMarkValueInUserChosenUnit || currentBGValue <= lowMarkValueInUserChosenUnit) && coherencyCheck {
                 
                 // BG is between urgentHigh/high and low/urgentLow objectives
                 valueLabelOutlet.setTextColor(ConstantsWatchApp.glucoseNotUrgentRangeColor)
                 
-                myDelegate.currentBGValueStatus = ConstantsWatchApp.glucoseNotUrgentRangeColor
-                
             } else if coherencyCheck {
                 
                 // BG is between high and low objectives so considered "in range"
                 valueLabelOutlet.setTextColor(ConstantsWatchApp.glucoseInRangeColor)
-                
-                myDelegate.currentBGValueStatus = ConstantsWatchApp.glucoseInRangeColor
             }
-            
         }
     }
     
@@ -250,6 +240,14 @@ extension InterfaceController: WCSessionDelegate {
                 urgentHighMarkValueInUserChosenUnit = doubleValue
         }
         
+        if let data = message["currentBGTimeStamp"] as? String, let date = ISO8601DateFormatter().date(from: data) {
+            if date != currentBGTimestamp {
+                currentBGTimestamp = date
+            }
+            let minutesAgo = -(Int(currentBGTimestamp.timeIntervalSinceNow) / 60)
+            minutesAgoText = minutesAgo.description + " " + minutesAgoTextLocalized
+        }
+
         // when we've finished, update the view
         updateWatchView()
         
