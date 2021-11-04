@@ -18,8 +18,6 @@ enum ConstantsHomeView {
         
     }()
   
-    static let applicationName = "xDrip4iO5"
-    
     /// URL where the online help should be loaded from
     static let onlineHelpURL = "https://xdrip4ios.readthedocs.io"
     
