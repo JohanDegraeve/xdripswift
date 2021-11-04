@@ -4,6 +4,7 @@
 "settingsviews_masterorfollower" = "Master o Seguidor?";
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Seguidor";
+"settingsviews_translateOnlineHelp" = "Traducir Documentación?";
 "settingsviews_showReadingInNotification" = "Mostrar en Notificaciones?";
 "settingsviews_labelShowReadingInAppBadge" = "Mostrar en el icono de la app?";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiplicar valor por 10 en el icono de la app?";
@@ -36,7 +37,7 @@
 "settingsviews_labelNonFixed" = "Calibración Multi-punto";
 "settingsviews_labelWebOOP" = "Algoritmo xDrip o Libre";
 "transmitterId8OrHigherNotSupported" = "Los transmisores con ID 8Gxxxx o más nuevos no son compatibles de momento!";
-"settingsviews_sectiontitlealerting" = "Alarma";
+"settingsviews_sectiontitlealerting" = "Alarmas";
 "settingsviews_row_alert_types" = "Tipos de Alarmas";
 "settingsviews_row_alerts" = "Alarmas";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";

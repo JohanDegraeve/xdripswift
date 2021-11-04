@@ -10,26 +10,32 @@ import UIKit
 
 fileprivate enum Setting:Int, CaseIterable {
     
+    // allow the homescreen to be show a landscape chart when rotated?
+    case allowScreenRotation = 0
+    
+    // show a clock at the bottom of the home screen when the screen lock is activated?
+    case showClockWhenScreenIsLocked = 1
+    
     //urgent high value
-    case urgentHighMarkValue = 0
+    case urgentHighMarkValue = 2
     
     //high value
-    case highMarkValue = 1
+    case highMarkValue = 3
     
     //low value
-    case lowMarkValue = 2
+    case lowMarkValue = 4
     
     //urgent low value
-    case urgentLowMarkValue = 3
+    case urgentLowMarkValue = 5
     
     //use objectives in graph?
-    case useObjectives = 4
+    case useObjectives = 6
     
     //show target line?
-    case showTarget = 5
+    case showTarget = 7
     
     //target value
-    case targetMarkValue = 6
+    case targetMarkValue = 8
     
 }
 
@@ -41,6 +47,12 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
+        
+        case .allowScreenRotation:
+            return UISwitch(isOn: UserDefaults.standard.allowScreenRotation, action: {(isOn:Bool) in UserDefaults.standard.allowScreenRotation = isOn})
+            
+        case .showClockWhenScreenIsLocked:
+            return UISwitch(isOn: UserDefaults.standard.showClockWhenScreenIsLocked, action: {(isOn:Bool) in UserDefaults.standard.showClockWhenScreenIsLocked = isOn})
 
         case .useObjectives:
             return UISwitch(isOn: UserDefaults.standard.useObjectives, action: {(isOn:Bool) in UserDefaults.standard.useObjectives = isOn})
@@ -87,6 +99,24 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
 
             case .urgentLowMarkValue:
                 return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelUrgentLowValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(urgentLowMarkValue:String) in UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded = urgentLowMarkValue}, cancelHandler: nil, inputValidator: nil)
+                
+            case .allowScreenRotation:
+                    return SettingsSelectedRowAction.callFunction(function: {
+                        if UserDefaults.standard.allowScreenRotation {
+                            UserDefaults.standard.allowScreenRotation = false
+                        } else {
+                            UserDefaults.standard.allowScreenRotation = true
+                        }
+                    })
+                    
+            case .showClockWhenScreenIsLocked:
+                    return SettingsSelectedRowAction.callFunction(function: {
+                        if UserDefaults.standard.showClockWhenScreenIsLocked {
+                            UserDefaults.standard.showClockWhenScreenIsLocked = false
+                        } else {
+                            UserDefaults.standard.showClockWhenScreenIsLocked = true
+                        }
+                    })
 
             case .useObjectives:
                 return SettingsSelectedRowAction.callFunction(function: {
@@ -144,6 +174,12 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             case .urgentLowMarkValue:
                 return Texts_SettingsView.labelUrgentLowValue
                 
+            case .allowScreenRotation:
+                return Texts_SettingsView.allowScreenRotation
+                
+            case .showClockWhenScreenIsLocked:
+                return Texts_SettingsView.showClockWhenScreenIsLocked
+                
             case .useObjectives:
                 return Texts_SettingsView.labelUseObjectives
             
@@ -171,6 +207,12 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         
         case .urgentLowMarkValue:
             return UITableViewCell.AccessoryType.disclosureIndicator
+            
+        case .allowScreenRotation:
+            return UITableViewCell.AccessoryType.none
+            
+        case .showClockWhenScreenIsLocked:
+            return UITableViewCell.AccessoryType.none
 
         case .useObjectives:
             return UITableViewCell.AccessoryType.none
@@ -204,7 +246,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .targetMarkValue:
             return UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
-        case .useObjectives, .showTarget:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .useObjectives, .showTarget:
             return nil
             
         }

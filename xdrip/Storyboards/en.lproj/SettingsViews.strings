@@ -1,4 +1,7 @@
 "settingsviews_settingstitle" = "Settings";
+"settingsviews_sectiontitlehelp" = "Help & Documentation";
+"settingsviews_showOnlineHelp" = "Open Online Help?";
+"settingsviews_translateOnlineHelp" = "Translate Automatically?";
 "settingsviews_sectiontitlegeneral" = "General";
 "settingsviews_selectbgunit" = "Blood Glucose Units:";
 "settingsviews_masterorfollower" = "Master or Follower?";
@@ -7,6 +10,7 @@
 "settingsviews_showReadingInNotification" = "Show BG in Notifications?";
 "settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge?";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";
+"settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
 "settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";
 "settingsviews_urgentHighValue" = "Urgent High Value:";
 "settingsviews_highValue" = "High Value:";
@@ -36,7 +40,7 @@
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
 "settingsviews_labelWebOOP" = "xDrip or Libre Algorithm";
 "transmitterId8OrHigherNotSupported" = "Transmitters with ID 8Gxxxx or newer are not currently supported!";
-"settingsviews_sectiontitlealerting" = "Alarm";
+"settingsviews_sectiontitlealerting" = "Alarms";
 "settingsviews_row_alert_types" = "Alarm Types";
 "settingsviews_row_alerts" = "Alarms";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
@@ -80,6 +84,7 @@
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth Password";
 "m5stack_settingsviews_brightness" = "Screen Brightness";
 "appleWatchSectionTitle" = "Apple Watch";
+"calendarEventsSectionTitle" = "Calendar Events";
 "createCalendarEvent" = "Create Calendar Events?";
 "calenderId" = "Calendar To Use?";
 "settingsviews_displayTrendInCalendarEvent" = "Display Trend?";
