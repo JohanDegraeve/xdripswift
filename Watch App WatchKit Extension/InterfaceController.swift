@@ -24,12 +24,11 @@ class InterfaceController: WKInterfaceController {
     @IBAction func longPressToRefresh(_ sender: Any) {
         
         // set all label outlets to deactivated and show a message to the user to acknowledge that a refresh has been requested
-        minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.minsAgoLabelColorDeactivated)
-        
-        deltaLabelOutlet.setText("Refreshing...")
         deltaLabelOutlet.setTextColor(ConstantsWatchApp.deltaLabelColorDeactivated)
         
-        valueLabelOutlet.setText("---")
+        minutesAgoLabelOutlet.setText("Refreshing...")
+        minutesAgoLabelOutlet.setTextColor(ConstantsWatchApp.minsAgoLabelColorDeactivated)
+        
         valueLabelOutlet.setTextColor(ConstantsWatchApp.valueLabelColorDeactivated)
         
         requestBGData()
