@@ -5,7 +5,7 @@ import os.log
 import UIKit
 import CoreData
 
-public final class GlucoseChartManager {
+public class GlucoseChartManager {
     
     /// to hold range of glucose chartpoints
     /// - urgentRange = above urgentHighMarkValue or below urgentLowMarkValue
@@ -106,7 +106,10 @@ public final class GlucoseChartManager {
     /// - the maximum value in glucoseChartPoints array between start and endPoint
     /// - the value will never get smaller during the run time of the app
     /// - in mgdl
-     private var maximumValueInGlucoseChartPointsInMgDl: Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
+    private var maximumValueInGlucoseChartPointsInMgDl: Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
+    
+    /// if the class is iniatated by the view controller without specifying a Gesture Recogniser, then we are not displaying the main chart, but the static 24 hour chart from the landscape view controller
+    private var isStatic24hrChart: Bool = false
     
     /// - if glucoseChartPoints.count > 0, then this is the latest one that has timestamp less than endDate.
     private(set) var lastChartPointEarlierThanEndDate: ChartPoint?
@@ -118,13 +121,23 @@ public final class GlucoseChartManager {
     
     /// - parameters:
     ///     - chartLongPressGestureRecognizer : defined here as parameter so that this class can handle the config of the recognizer
-    init(chartLongPressGestureRecognizer: UILongPressGestureRecognizer, coreDataManager: CoreDataManager) {
+    ///     - chartLongPressGestureRecognizer has been made optional (initialized to nil) as it doesn't need to be used for the static landscape chart
+    init(chartLongPressGestureRecognizer: UILongPressGestureRecognizer? = nil, coreDataManager: CoreDataManager) {
         
         // set coreDataManager and bgReadingsAccessor
         self.coreDataManager = coreDataManager
         
-        // for tapping the chart, we're using UILongPressGestureRecognizer because UITapGestureRecognizer doesn't react on touch down. With UILongPressGestureRecognizer and minimumPressDuration set to 0, we get a trigger as soon as the chart is touched
-        chartLongPressGestureRecognizer.minimumPressDuration = 0
+        // if the call included the optional gesture recogniser, then for tapping the chart, we're using UILongPressGestureRecognizer because UITapGestureRecognizer doesn't react on touch down. With UILongPressGestureRecognizer and minimumPressDuration set to 0, we get a trigger as soon as the chart is touched
+        if let chartLongPressGestureRecognizer = chartLongPressGestureRecognizer {
+            
+            chartLongPressGestureRecognizer.minimumPressDuration = 0
+        
+        } else {
+            
+            // as the call didn't pass a gesture recogniser, we must be initiating from the landscape view controller
+            isStatic24hrChart = true
+            
+        }
         
         // initialize enddate
         endDate = Date()
@@ -645,6 +658,13 @@ public final class GlucoseChartManager {
                 glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter6h
         }
         
+        // check if we're using the static 24hr chart and then just override the above if necessary
+        if isStatic24hrChart {
+            
+            glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter24h
+            
+        }
+        
         // calibration points circle layers - we'll create two circles, one on top of the other to give a white border as per Nightscout calibrations. We'll make the inner circle UIColor.red to make it slightly different to the UIColor.systemRed used by the glucoseChartPoints. Both circles will be scaled as per the current glucoseCircleDiameter but bigger so that they stand out
         let calibrationCirclesOuter = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: calibrationChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.calibrationCircleScaleOuter, height: glucoseCircleDiameter * ConstantsGlucoseChart.calibrationCircleScaleOuter), itemFillColor: ConstantsGlucoseChart.calibrationOutsideColor, optimized: true)
         
@@ -688,41 +708,56 @@ public final class GlucoseChartManager {
     
     private func generateXAxisValues() -> [ChartAxisValue] {
         
-        // in the comments, assume it is now 13:26 and width is 6 hours, that means startDate = 07:26, endDate = 13:26
         
-        /// how many full hours between startdate and enddate
-        let amountOfFullHours = Int(ceil(endDate.timeIntervalSince(startDate).hours))
-        
-        /// create array that goes from 1 to number of full hours, as helper to map to array of ChartAxisValueDate - array will go from 1 to 6
-        let mappingArray = Array(1...amountOfFullHours)
-        
-        /// set the stride count interval to make sure we don't add too many labels to the x-axis if the user wants to view >6 hours
-        var intervalBetweenAxisValues: Int = 1
+        if !isStatic24hrChart {
             
-        switch UserDefaults.standard.chartWidthInHours {
-            case 12.0:
-                intervalBetweenAxisValues = 2
-            case 24.0:
-                intervalBetweenAxisValues = 4
-            default:
-                break
+            // in the comments, assume it is now 13:26 and width is 6 hours, that means startDate = 07:26, endDate = 13:26
+            
+            /// how many full hours between startdate and enddate
+            let amountOfFullHours = Int(ceil(endDate.timeIntervalSince(startDate).hours))
+            
+            /// create array that goes from 1 to number of full hours, as helper to map to array of ChartAxisValueDate - array will go from 1 to 6
+            let mappingArray = Array(1...amountOfFullHours)
+            
+            /// set the stride count interval to make sure we don't add too many labels to the x-axis if the user wants to view >6 hours
+            var intervalBetweenAxisValues: Int = 1
+                
+            switch UserDefaults.standard.chartWidthInHours {
+                case 12.0:
+                    intervalBetweenAxisValues = 2
+                case 24.0:
+                    intervalBetweenAxisValues = 4
+                default:
+                    break
+            }
+            
+            /// first, for each int in mappingArray, we create a ChartAxisValueDate, which will have as date one of the hours, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
+            let startDateLower = startDate.toLowerHour()
+            var xAxisValues: [ChartAxisValue] = stride(from: 1, to: mappingArray.count + 1, by: intervalBetweenAxisValues).map { ChartAxisValueDate(date: Date(timeInterval: Double($0)*3600, since: startDateLower), formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings) }
+            
+            /// insert the start Date as first element, in this example 07:26
+            xAxisValues.insert(ChartAxisValueDate(date: startDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings), at: 0)
+            
+            /// now append the endDate as last element, in this example 13:26
+            xAxisValues.append(ChartAxisValueDate(date: endDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings))
+            
+            /// don't show the first and last hour, because this is usually not something like 13 but rather 13:26
+            xAxisValues.first?.hidden = true
+            xAxisValues.last?.hidden = true
+            
+            return xAxisValues
+            
+        } else {
+            
+            let xAxisValues: [ChartAxisValue] = stride(from: 0, to: 26, by: 2).map { ChartAxisValueDate(date: Date(timeInterval: Double($0)*3600, since: startDate), formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings) }
+            
+            /// don't show the first and last hour, because this is usually not something like 13 but rather 13:26
+            xAxisValues.first?.hidden = true
+            xAxisValues.last?.hidden = false
+            
+            return xAxisValues
+            
         }
-        
-        /// first, for each int in mappingArray, we create a ChartAxisValueDate, which will have as date one of the hours, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
-        let startDateLower = startDate.toLowerHour()
-        var xAxisValues: [ChartAxisValue] = stride(from: 1, to: mappingArray.count + 1, by: intervalBetweenAxisValues).map { ChartAxisValueDate(date: Date(timeInterval: Double($0)*3600, since: startDateLower), formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings) }
-        
-        /// insert the start Date as first element, in this example 07:26
-        xAxisValues.insert(ChartAxisValueDate(date: startDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings), at: 0)
-        
-        /// now append the endDate as last element, in this example 13:26
-        xAxisValues.append(ChartAxisValueDate(date: endDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings))
-        
-        /// don't show the first and last hour, because this is usually not something like 13 but rather 13:26
-        xAxisValues.first?.hidden = true
-        xAxisValues.last?.hidden = true
-        
-        return xAxisValues
         
     }
     

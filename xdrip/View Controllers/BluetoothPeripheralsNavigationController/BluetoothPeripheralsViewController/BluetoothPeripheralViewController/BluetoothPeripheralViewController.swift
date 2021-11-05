@@ -422,6 +422,8 @@ class BluetoothPeripheralViewController: UIViewController {
         
         bluetoothPeripheralManager.startScanningForNewDevice(type: type, transmitterId: transmitterIdTempValue, bluetoothTransmitterDelegate: self, callBackForScanningResult: handleScanningResult(startScanningResult:), callback: { (bluetoothPeripheral) in
 
+            trace("in BluetoothPeripheralViewController, callback. bluetoothPeripheral address = %{public}@, name = %{public}@", log: self.log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info, bluetoothPeripheral.blePeripheral.address, bluetoothPeripheral.blePeripheral.name)
+
             // remove info alert screen which may still be there
             self.dismissInfoAlertWhenScanningStarts()
 
@@ -453,7 +455,22 @@ class BluetoothPeripheralViewController: UIViewController {
             if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) {
                 
                 bluetoothTransmitter.bluetoothTransmitterDelegate = self
+                
+                // tracing added to analyse issue 221
+                if let connectionStatus = bluetoothTransmitter.getConnectionStatus() {
+                    
+                    trace("in BluetoothPeripheralViewController, callback. bluetoothPeripheral connection status = %{public}@", log: self.log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info, connectionStatus.description())
 
+                } else {
+                    
+                    trace("in BluetoothPeripheralViewController, callback. bluetoothPeripheral connection status is nil", log: self.log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info)
+                    
+                }
+
+            } else {
+                
+                trace("in BluetoothPeripheralViewController, callback. no transmitter found for bluetoothperipheral", log: self.log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info)
+                
             }
 
             // reload the full screen , all rows in all sections in the tableView

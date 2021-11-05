@@ -9,7 +9,21 @@ class Texts_SettingsView {
     static let screenTitle: String = {
         return NSLocalizedString("settingsviews_settingstitle", tableName: filename, bundle: Bundle.main, value: "Settings", comment: "shown on top of the first settings screen, literally 'Settings'")
     }()
-
+    
+    // MARK: - Section Help
+    
+    static let sectionTitleHelp: String = {
+        return NSLocalizedString("settingsviews_sectiontitlehelp", tableName: filename, bundle: Bundle.main, value: "Help & Documentation", comment: "help settings, section title")
+    }()
+    
+    static let showOnlineHelp: String = {
+        return NSLocalizedString("settingsviews_showOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Open Online Help?", comment: "help settings, open the online help")
+    }()
+    
+    static let translateOnlineHelp: String = {
+        return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Automatically?", comment: "general settings, should the online help be translated automatically if needed")
+    }()
+    
     // MARK: - Section General
     
     static let sectionTitleGeneral: String = {
@@ -44,10 +58,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10?", comment: "general settings, should reading be multiplied with 10 yes or no")
     }()
     
-    static let showClockWhenScreenIsLocked: String = {
-        return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Show Clock when Locked?", comment: "general settings, should the clock also be displayed when the screen is locked?")
-    }()
-    
     static let warningChangeFromMasterToFollower: String = {
         return NSLocalizedString("warningChangeFromMasterToFollower", tableName: filename, bundle: Bundle.main, value: "Switch from master to follower will stop your current sensor. Do you want to continue ?", comment: "general settings, when switching from master to follower, if confirmation is asked, this message will be shown.")
     }()
@@ -56,6 +66,14 @@ class Texts_SettingsView {
     
     static let sectionTitleHomeScreen: String = {
         return NSLocalizedString("settingsviews_sectiontitlehomescreen", tableName: filename, bundle: Bundle.main, value: "Home Screen", comment: "home screen settings, section title")
+    }()
+    
+    static let showClockWhenScreenIsLocked: String = {
+        return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Show Clock when Locked?", comment: "home screen settings, should the clock also be displayed when the screen is locked?")
+    }()
+    
+    static let allowScreenRotation: String = {
+        return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Chart Rotation?", comment: "home screen settings, should the main glucose chart screen be allowed?")
     }()
 
     static let labelUseObjectives: String = {
@@ -176,7 +194,7 @@ class Texts_SettingsView {
     // MARK: - Section Alerts
     
     static let sectionTitleAlerting: String = {
-        return NSLocalizedString("settingsviews_sectiontitlealerting", tableName: filename, bundle: Bundle.main, value: "Alarm", comment: "alerting settings, section title")
+        return NSLocalizedString("settingsviews_sectiontitlealerting", tableName: filename, bundle: Bundle.main, value: "Alarms", comment: "alerting settings, section title")
     }()
     
     static let labelAlertTypes: String = {
@@ -373,24 +391,30 @@ class Texts_SettingsView {
         return NSLocalizedString("appleWatchSectionTitle", tableName: filename, bundle: Bundle.main, value: "Apple Watch", comment: "Apple Watch Settings - section title")
     }()
     
+    // MARK: - Calendar Events
+    
+    static let calendarEventsSectionTitle: String = {
+        return NSLocalizedString("calendarEventsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Calendar Events", comment: "Calendar Events Settings - section title")
+    }()
+    
     static let createCalendarEvent: String = {
-        return NSLocalizedString("createCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Create Calendar Events?", comment: "Apple Watch Settings - text in row where create event is enabled or disabled ")
+        return NSLocalizedString("createCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Create Calendar Events?", comment: "Calendar Events Settings - text in row where create event is enabled or disabled ")
     }()
 
     static let calenderId: String = {
-        return NSLocalizedString("calenderId", tableName: filename, bundle: Bundle.main, value: "Calendar To Use?", comment: "Apple Watch Settings - text in row where user needs to select a calendar")
+        return NSLocalizedString("calenderId", tableName: filename, bundle: Bundle.main, value: "Calendar To Use?", comment: "Calendar Events Settings - text in row where user needs to select a calendar")
     }()
 
     static let displayTrendInCalendarEvent: String = {
-        return NSLocalizedString("settingsviews_displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Trend?", comment: "Apple Watch Settings - text in row where user needs to say if trend should be displayed or not")
+        return NSLocalizedString("settingsviews_displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Trend?", comment: "Calendar Events Settings - text in row where user needs to say if trend should be displayed or not")
     }()
     
     static let displayUnitInCalendarEvent: String = {
-        return NSLocalizedString("displayUnitInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Dispaly Unit?", comment: "Apple Watch Settings - text in row where user needs to say if unit should be displayed or not")
+        return NSLocalizedString("displayUnitInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Unit?", comment: "Calendar Events Settings - text in row where user needs to say if unit should be displayed or not")
     }()
     
     static let displayDeltaInCalendarEvent: String = {
-        return NSLocalizedString("displayDeltaInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Dispaly Delta?", comment: "Apple Watch Settings - text in row where user needs to say if delta should be displayed or not")
+        return NSLocalizedString("displayDeltaInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Delta?", comment: "Calendar Events Settings - text in row where user needs to say if delta should be displayed or not")
     }()
     
     static let infoCalendarAccessDeniedByUser: String = {
@@ -400,6 +424,8 @@ class Texts_SettingsView {
     static let infoCalendarAccessRestricted: String = {
         return String(format: NSLocalizedString("infoCalendarAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
     }()
+    
+    // MARK: - Issue Reporting
     
     static let sectionTitleTrace: String = {
         return NSLocalizedString("sectionTitleTrace", tableName: filename, bundle: Bundle.main, value: "Issue Reporting", comment: "in Settings, section title for Trace")

@@ -7,11 +7,14 @@ import SwiftCharts
 import HealthKitUI
 import AVFoundation
 import PieCharts
+import WatchConnectivity
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController {
     
     // MARK: - Properties - Outlets and Actions for buttons and labels in home screen
+    
+    private var session: WCSession?
     
     @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
     
@@ -343,6 +346,10 @@ final class RootViewController: UIViewController {
     /// UIAlertController to use when user chooses to lock the screen. Defined here so we can dismiss it when app goes to the background
     private var screenLockAlertController: UIAlertController?
     
+    /// create the landscape view
+    private var landscapeChartViewController: LandscapeChartViewController?
+
+    
     // MARK: - overriden functions
     
     // set the status bar content colour to light to match new darker theme
@@ -361,6 +368,17 @@ final class RootViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         
         super.viewWillAppear(animated)
+        
+        // if allowed, then permit the Root View Controller which is the main screen, to rotate left/right to show the landscape view
+        if UserDefaults.standard.allowScreenRotation {
+            
+            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
+            
+        } else {
+            
+            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+            
+        }
         
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
@@ -390,10 +408,13 @@ final class RootViewController: UIViewController {
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
         
+        updateWatchApp()
+        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.configureWatchKitSession()
         
         // set up the clock view
         clockDateFormatter.dateStyle = .none
@@ -789,6 +810,13 @@ final class RootViewController: UIViewController {
                     
                 }
                 
+                // check if cgmTransmitterType has changed, if yes reset transmitterBatteryInfo
+                if let currentTransmitterType = UserDefaults.standard.cgmTransmitterType, currentTransmitterType != cgmTransmitter.cgmTransmitterType() {
+                    
+                    UserDefaults.standard.transmitterBatteryInfo = nil
+                    
+                }
+                
                 // check if the type of sensor supported by the cgmTransmitterType  has changed, if yes stop the sensor
                 if let currentTransmitterType = UserDefaults.standard.cgmTransmitterType, currentTransmitterType.sensorType() != cgmTransmitter.cgmTransmitterType().sensorType() {
                     
@@ -1083,6 +1111,8 @@ final class RootViewController: UIViewController {
                 
                 loopManager?.share()
                 
+                updateWatchApp()
+                
             }
         }
         
@@ -1178,6 +1208,9 @@ final class RootViewController: UIViewController {
                 
             }
             
+            // also update Watch App with the new values. (Only really needed for unit change between mg/dl and mmol/l)
+            updateWatchApp()
+            
             // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
             createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
             
@@ -1185,6 +1218,9 @@ final class RootViewController: UIViewController {
             
             // redraw chart is necessary
             updateChartWithResetEndDate()
+            
+            // update Watch App with the new objective values
+            updateWatchApp()
 
         case UserDefaults.Key.daysToUseStatistics:
             
@@ -1203,6 +1239,22 @@ final class RootViewController: UIViewController {
             
         }
     }
+    
+    override func willTransition(
+        to newCollection: UITraitCollection,
+        with coordinator: UIViewControllerTransitionCoordinator) {
+      super.willTransition(to: newCollection, with: coordinator)
+      
+      switch newCollection.verticalSizeClass {
+      case .compact:
+        showLandscape(with: coordinator)
+      case .regular, .unspecified:
+        hideLandscape(with: coordinator)
+      @unknown default:
+        fatalError()
+      }
+    }
+
     
     // MARK:- observe function
     
@@ -1245,6 +1297,18 @@ final class RootViewController: UIViewController {
     }
     
     // MARK: - private helper functions
+    
+    /// configures the WKSession used for communication between the app and the watch app if available
+    private func configureWatchKitSession() {
+        
+        if WCSession.isSupported() {
+            
+            session = WCSession.default
+            session?.delegate = self
+            session?.activate()
+            
+        }
+    }
     
     /// creates notification
     private func createNotification(title: String?, body: String?, identifier: String, sound: UNNotificationSound?) {
@@ -1738,14 +1802,21 @@ final class RootViewController: UIViewController {
         // if not, then set color, depending on value lower than low mark or higher than high mark
         // set both HIGH and LOW BG values to red as previous yellow for hig is now not so obvious due to in-range colour of green.
         if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
+            
             valueLabelOutlet.textColor = UIColor.lightGray
+            
         } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
+            
             // BG is higher than urgentHigh or lower than urgentLow objectives
             valueLabelOutlet.textColor = UIColor.red
+            
         } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
+            
             // BG is between urgentHigh/high and low/urgentLow objectives
             valueLabelOutlet.textColor = UIColor.yellow
+            
         } else {
+            
             // BG is between high and low objectives so considered "in range"
             valueLabelOutlet.textColor = UIColor.green
         }
@@ -1757,10 +1828,18 @@ final class RootViewController: UIViewController {
         minutesLabelOutlet.text = minutesAgoText
         
         // create delta text
-        diffLabelOutlet.text = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        
+        diffLabelOutlet.text = diffLabelText
         
         // update the chart up to now
         updateChartWithResetEndDate()
+//
+//        let minutesAgoTextLabel = (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) + " " + Texts_HomeView.ago
+                
+//        updateWatchApp(currentBGValueText: calculatedValueAsString, currentBGValue: lastReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), currentBGTimeStamp: ISO8601DateFormatter().string(from: lastReading.timeStamp), minutesAgoTextLocalized: minutesAgoTextLabel, deltaTextLocalized: diffLabelText)
+//
+//        updateWatchApp(urgentLowMarkValueInUserChosenUnit: UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded.description, lowMarkValueInUserChosenUnit: UserDefaults.standard.lowMarkValueInUserChosenUnitRounded.description, highMarkValueInUserChosenUnit: UserDefaults.standard.highMarkValueInUserChosenUnitRounded.description, urgentHighMarkValueInUserChosenUnit: UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded.description)
         
     }
     
@@ -2411,6 +2490,126 @@ final class RootViewController: UIViewController {
         }
         
     }
+    
+    func showLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+        
+        guard landscapeChartViewController == nil else { return }
+        
+        landscapeChartViewController = storyboard!.instantiateViewController(
+            withIdentifier: "LandscapeChartViewController")
+        as? LandscapeChartViewController
+        
+        if let controller = landscapeChartViewController {
+            controller.view.frame = view.bounds
+            controller.view.alpha = 0
+            view.addSubview(controller.view)
+            addChild(controller)
+            coordinator.animate(alongsideTransition: { _ in
+                controller.view.alpha = 1
+            }, completion: { _ in
+                controller.didMove(toParent: self)
+            })
+        }
+    }
+    
+    func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+        
+        if let controller = landscapeChartViewController {
+            controller.willMove(toParent: nil)
+            coordinator.animate(alongsideTransition: { _ in
+                controller.view.alpha = 0
+            }, completion: { _ in
+                controller.view.removeFromSuperview()
+                controller.removeFromParent()
+                self.landscapeChartViewController = nil
+            })
+            
+            if let controller = landscapeChartViewController {
+                controller.willMove(toParent: nil)
+                coordinator.animate(alongsideTransition: { _ in
+                    controller.view.alpha = 0
+                }, completion: { _ in
+                    controller.view.removeFromSuperview()
+                    controller.removeFromParent()
+                    self.landscapeChartViewController = nil
+                })
+            }
+        }
+    }
+
+
+    /// if there is an active WCSession open between the app and the watch app, then process the current data and send it via the messaging service to the watch app.
+    private func updateWatchApp() {
+        
+        // if there is no active WCSession open (i.e. if there is no paired Apple Watch with the watch app installed and running), then do nothing and just return
+        if let validSession = self.session, validSession.isReachable {
+            
+            let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+            
+            // make sure that the necessary objects are initialised and readings are available.
+            if let bgReadingsAccessor = bgReadingsAccessor, let lastReading = bgReadingsAccessor.last(forSensor: nil) {
+                
+                let calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: mgdl)
+                
+                var calculatedValueFullAsString: String = ""
+                var calculatedValueTrendAsString: String = ""
+                
+                if !lastReading.hideSlope {
+                    calculatedValueTrendAsString = lastReading.slopeArrow()
+                    calculatedValueFullAsString = calculatedValueAsString + " " + calculatedValueTrendAsString
+                }
+                
+                let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
+                
+                let minutesAgoTextLocalized = (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) // + " " + Texts_HomeView.ago
+                
+                let latestReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
+                
+                // check that there actually exists some readings. If not then return without doing anything (if we don't trap this it could sometimes cause a crash if the app hasn't had time to collect recent readings)
+                guard latestReadings.count > 0 else {
+                    
+                    return
+                }
+                
+                // assign last reading
+                let lastReading = latestReadings[0]
+                
+                // assign last but one reading
+                let lastButOneReading = latestReadings.count > 1 ? latestReadings[1]:nil
+                
+                // create delta text from the last two readings
+                let deltaText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: mgdl)
+                
+                // create the WKSession messages in String format and send them. Although they are all sent almost immediately, they will be queued and sent in a background thread by the handler
+                validSession.sendMessage(["currentBGValueText" : calculatedValueAsString], replyHandler: nil, errorHandler: nil)
+                
+                validSession.sendMessage(["currentBGValueTextFull" : calculatedValueFullAsString], replyHandler: nil, errorHandler: nil)
+                
+                validSession.sendMessage(["currentBGValueTrend" : calculatedValueTrendAsString], replyHandler: nil, errorHandler: nil)
+                
+                validSession.sendMessage(["currentBGValue" : lastReading.unitizedString(unitIsMgDl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                
+                validSession.sendMessage(["minutesAgoTextLocalized" : minutesAgoTextLocalized], replyHandler: nil, errorHandler: nil)
+                
+                validSession.sendMessage(["deltaTextLocalized" : deltaText], replyHandler: nil, errorHandler: nil)
+                
+                validSession.sendMessage(["urgentLowMarkValueInUserChosenUnit" : UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                
+                validSession.sendMessage(["lowMarkValueInUserChosenUnit" : UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                
+                validSession.sendMessage(["highMarkValueInUserChosenUnit" : UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                
+                validSession.sendMessage(["urgentHighMarkValueInUserChosenUnit" : UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                
+                // send the timestamp last as this is what will eventually trigger the view refresh on the watch
+                validSession.sendMessage(["currentBGTimeStamp" : ISO8601DateFormatter().string(from: lastReading.timeStamp)], replyHandler: nil, errorHandler: nil)
+                
+            }
+            
+        }
+        
+    }
+    
 }
 
 
@@ -2640,6 +2839,8 @@ extension RootViewController:NightScoutFollowerDelegate {
                 
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
                 self.loopManager?.share()
+                                
+                updateWatchApp()
                 
             }
         }
@@ -2662,4 +2863,38 @@ extension RootViewController: UIGestureRecognizerDelegate {
         
     }
     
+}
+
+// WCSession delegate functions
+extension RootViewController: WCSessionDelegate {
+    
+    func sessionDidBecomeInactive(_ session: WCSession) {
+    }
+    
+    func sessionDidDeactivate(_ session: WCSession) {
+    }
+    
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+    }
+    
+    // process any received messages from the watch app
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        
+        // uncomment the following for debug console use
+        print("received message from Watch App: \(message)")
+        
+        DispatchQueue.main.async {
+            
+            // if the action: refreshBGData message is received, then force the app to send new data to the Watch App
+            if let action = message["action"] as? String {
+                
+                if action == "refreshBGData" {
+                    
+                    self.updateWatchApp()
+                    
+                }
+            }
+            
+        }
+    }
 }

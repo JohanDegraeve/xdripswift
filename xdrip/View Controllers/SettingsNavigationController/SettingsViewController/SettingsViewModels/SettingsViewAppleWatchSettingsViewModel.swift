@@ -42,7 +42,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.appleWatchSectionTitle
+        return Texts_SettingsView.calendarEventsSectionTitle
     }
     
     func settingsRowText(index: Int) -> String {

@@ -128,4 +128,7 @@ enum ConstantsGlucoseChart {
     /// dateformat for minutesAgo label when user is panning the chart back in time. The label will show the timestamp of the latest shown value in the chart
     static let dateFormatLatestChartPointWhenPanning = "E d MMM HH:mm"
     
+    /// dateformat for the date label in the 24 hours static landscape chart
+    static let dateFormatLandscapeChart = "EEEE dd/MM/yyyy"
+    
 }
