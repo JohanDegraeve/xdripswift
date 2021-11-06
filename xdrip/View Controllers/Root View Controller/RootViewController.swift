@@ -2673,6 +2673,11 @@ extension RootViewController: UITabBarControllerDelegate {
             
             navigationController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
             
+        } else {
+            
+            // Resets chart to the latest reading
+            self.updateChartWithResetEndDate()
+            
         }
     }
     
