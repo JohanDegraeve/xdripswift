@@ -1,4 +1,7 @@
 "settingsviews_settingstitle" = "Definições";
+"settingsviews_sectiontitlehelp" = "Ajuda & Documentação";
+"settingsviews_showOnlineHelp" = "Abrir Ajuda Online?";
+"settingsviews_translateOnlineHelp" = "Traduzir Automaticamente?";
 "settingsviews_sectiontitlegeneral" = "Geral";
 "settingsviews_selectbgunit" = "Unidades de Glicose:";
 "settingsviews_masterorfollower" = "Mestre ou Seguidor?";
@@ -7,6 +10,7 @@
 "settingsviews_showReadingInNotification" = "Mostrar Glicose nas Notificações?";
 "settingsviews_labelShowReadingInAppBadge" = "Mostrar Glicose no Distintivo da App?";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiplicar Distintivo da App por 10?";
+"settingsviews_allowScreenRotation" = "Permitir Rotação do Gráfico?";
 "settingsviews_urgentHighValue" = "Valor Hiper Urgente:";
 "settingsviews_highValue" = "Valor Hiper:";
 "settingsviews_targetValue" = "Valor Alvo:";
