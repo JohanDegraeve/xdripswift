@@ -75,6 +75,10 @@ enum Texts_HomeView {
     static let sensorStart:String = {
         return NSLocalizedString("sensorstart", tableName: filename, bundle: Bundle.main, value: "Sensor Start", comment: "status info : literally 'Sensor Start'")
     }()
+
+    static let sensorEnd:String = {
+        return NSLocalizedString("sensorend", tableName: filename, bundle: Bundle.main, value: "Sensor End", comment: "status info : literally 'Sensor End'")
+    }()
     
     static let notStarted:String = {
         return NSLocalizedString("notstarted", tableName: filename, bundle: Bundle.main, value: "Not Started", comment: "status info : literally 'not started', used if sensor is not started")

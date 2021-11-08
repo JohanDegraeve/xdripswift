@@ -1897,6 +1897,21 @@ final class RootViewController: UIViewController {
         self.present(actionSheet, animated: true)
     }
     
+    private func appendEndDateInformation(_ activeSensor: Sensor, _ textToShow: String) -> String {
+        var result = "\r\n\r\n" + Texts_HomeView.sensorEnd + " : "
+        if activeSensor.endDate != nil {
+            result += (activeSensor.endDate?.description(with: .current))!
+        }
+        else if UserDefaults.standard.maxSensorAgeInDays > 0 {
+            result += activeSensor.startDate.addingTimeInterval(TimeInterval(hours: Double(UserDefaults.standard.maxSensorAgeInDays * 24))).description(with: .current)
+        }
+        else { //No end date information could be retrieved, return nothing
+            return ""
+        }
+            
+        return result
+    }
+    
     /// will show the status
     private func showStatus() {
         
@@ -1904,6 +1919,7 @@ final class RootViewController: UIViewController {
         var textToShow = Texts_HomeView.sensorStart + " : "
         if let activeSensor = activeSensor {
             textToShow += activeSensor.startDate.description(with: .current)
+            textToShow += appendEndDateInformation(activeSensor, textToShow)
         } else {
             textToShow += Texts_HomeView.notStarted
         }
