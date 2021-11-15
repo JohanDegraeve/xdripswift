@@ -14,7 +14,7 @@ protocol CGMG5TransmitterDelegate: AnyObject {
     /// transmitter reset result
     func reset(for cGMG5Transmitter: CGMG5Transmitter, successful: Bool)
     
-    /// received sensor start time from transmitter
+    /// sensor start time as received from transmitter
     func received(sensorStartDate: Date, cGMG5Transmitter: CGMG5Transmitter)
     
 }

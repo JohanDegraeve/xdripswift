@@ -5,7 +5,9 @@ import CoreBluetooth
 protocol CGMTransmitterDelegate:AnyObject {
      
     /// only for transmitters that can detect new sensor
-    func newSensorDetected()
+    /// - parameters:
+    ///     - detected sensor start time, optional, default nil
+    func newSensorDetected(sensorStartDate: Date?)
     
     /// only for transmitters that can detect missing sensor
     func sensorNotDetected()
@@ -14,8 +16,8 @@ protocol CGMTransmitterDelegate:AnyObject {
     /// - parameters:
     ///     - glucoseData : array of RawGlucoseData, can be empty array, first entry is the youngest
     ///     - transmitterBatteryInfo : needed for battery level alarm
-    ///     - sensorTimeInMinutes : sensor age in minutes, only if transmitter can give that info, eg MiaoMiao, otherwise nil
-    func cgmTransmitterInfoReceived(glucoseData:inout [GlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorTimeInMinutes:Int?)
+    ///     - sensorAge : only if transmitter can give that info, eg MiaoMiao, otherwise nil
+    func cgmTransmitterInfoReceived(glucoseData:inout [GlucoseData], transmitterBatteryInfo:TransmitterBatteryInfo?, sensorAge: TimeInterval?)
     
     /// to pass some text error message, delegate can decide to show to user, log, ...
     func errorOccurred(xDripError: XdripError)

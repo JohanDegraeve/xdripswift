@@ -12,9 +12,13 @@ import Foundation
 struct DexcomSessionStopRxMessage {
     
     let status: UInt8
-    let received: UInt8
+    
+    let sessionStopResponse: DexcomSessionStopResponse
+    
     let sessionStopTime: Double
+    
     let sessionStartTime: Double
+    
     let transmitterTime: Double
     
     init?(data: Data) {
@@ -24,9 +28,15 @@ struct DexcomSessionStopRxMessage {
         guard data.starts(with: .sessionStopRx) else {return nil}
         
         status = data[1]
-        received = data[2]
+        
+        guard let sessionStoptResponseReceived = DexcomSessionStopResponse(rawValue: data[2]) else {return nil}
+
+        sessionStopResponse = sessionStoptResponseReceived
+        
         sessionStopTime = Double(Data(data[3..<7]).to(UInt32.self))
+        
         sessionStartTime = Double(Data(data[7..<11]).to(UInt32.self))
+        
         transmitterTime = Double(Data(data[11..<15]).to(UInt32.self))
         
     }
@@ -34,4 +44,5 @@ struct DexcomSessionStopRxMessage {
     var isOkay: Bool {
         return status == 0
     }
+    
 }

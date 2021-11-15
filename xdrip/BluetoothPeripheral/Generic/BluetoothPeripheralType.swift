@@ -25,6 +25,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// DexcomG6
     case DexcomG6Type = "Dexcom G6"
     
+    /// Dexcom G6 firefly
+    case DexcomG6FireflyType = "Dexcom G6 Firefly"
+    
     /// DexcomG5
     case DexcomG5Type = "Dexcom G5"
     
@@ -90,6 +93,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .DexcomG6Type:
             return DexcomG6BluetoothPeripheralViewModel()
             
+        case .DexcomG6FireflyType:
+            return DexcomG6FireflyBluetoothPeripheralViewModel()
+            
         case .Libre2Type:
             return Libre2BluetoothPeripheralViewModel()
             
@@ -128,8 +134,26 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .DexcomG6Type:
             
             // DexcomG6 is a DexcomG5 with isDexcomG6 set to true
+            
+            // the cgm transmitter itself will use the transmitter id to determine that firefly logic needs to be used
+            // which means, a user could add a Dexcom G6 Firefly as a Dexcom G6 or even a Dexcom G5, the class CGMG5Transmitter will find out it's a firefly, based on transmitter id and handle it as a firefly
+            // It plays only a role in the RootViewController that a G6 Firefly is selected, because then also the user needs to add a code
+
             let dexcomG6 = DexcomG5(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             dexcomG6.isDexcomG6 = true
+
+            return dexcomG6
+            
+        case .DexcomG6FireflyType:
+            
+            // DexcomG6 Firefly is a DexcomG5 with isFirefly set to true
+            
+            // the cgm transmitter itself will use the transmitter id to determine that firefly logic needs to be used
+            // which means, a user could add a Dexcom G6 Firefly as a Dexcom G6 or even a Dexcom G5, the class CGMG5Transmitter will find out it's a firefly, based on transmitter id and handle it as a firefly
+            // It plays only a role in the RootViewController that a G6 Firefly is selected, because then also the user needs to add a code
+            
+            let dexcomG6 = DexcomG5(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            dexcomG6.isFirefly = true
             
             return dexcomG6
             
@@ -181,7 +205,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StackType, .M5StickCType:
             return .M5Stack
             
-        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .WatlaaType, .Libre2Type, .AtomType:
+        case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .WatlaaType, .Libre2Type, .AtomType, .DexcomG6FireflyType:
             return .CGM
             
         }
@@ -196,7 +220,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StackType, .M5StickCType, .WatlaaType, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType, .Libre2Type, .AtomType:
             return false
             
-        case .DexcomG5Type, .BluconType, .DexcomG4Type, .DexcomG6Type:
+        case .DexcomG5Type, .BluconType, .DexcomG4Type, .DexcomG6Type, .DexcomG6FireflyType:
             return true
 
         }
@@ -209,7 +233,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .DexcomG5Type, .DexcomG6Type:
+        case .DexcomG5Type, .DexcomG6Type, .DexcomG6FireflyType:
             
             // length for G5 and G6 is 6
             if transmitterId.count != 6 {
@@ -261,7 +285,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .WatlaaType, .DexcomG4Type, .DexcomG5Type, .DexcomG6Type, .BluconType, .BlueReaderType, .DropletType , .GNSentryType:
+        case .M5StackType, .M5StickCType, .WatlaaType, .DexcomG4Type, .DexcomG5Type, .DexcomG6Type, .BluconType, .BlueReaderType, .DropletType , .GNSentryType, .DexcomG6FireflyType:
             return false
             
         case .BubbleType, .MiaoMiaoType, .AtomType:
@@ -280,7 +304,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
        
        switch self {
            
-       case .M5StackType, .M5StickCType, .DexcomG4Type, .DexcomG5Type, .DexcomG6Type:
+       case .M5StackType, .M5StickCType, .DexcomG4Type, .DexcomG5Type, .DexcomG6Type, .DexcomG6FireflyType:
            return false
            
        case .BubbleType, .MiaoMiaoType, .WatlaaType, .BluconType, .BlueReaderType, .DropletType , .GNSentryType, .AtomType:

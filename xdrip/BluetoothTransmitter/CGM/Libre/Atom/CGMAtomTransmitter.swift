@@ -262,7 +262,7 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                         let transmitterBatteryPercentage = Int(value[4])
                         
                         // send transmitterBatteryInfo to cgmTransmitterDelegate
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: transmitterBatteryPercentage), sensorTimeInMinutes: nil)
+                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: transmitterBatteryPercentage), sensorAge: nil)
                         
                         // send transmitter battery percentage to cGMAtomTransmitterDelegate
                         cGMAtomTransmitterDelegate?.received(batteryLevel: transmitterBatteryPercentage, from: self)
@@ -354,8 +354,9 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 self.sensorSerialNumber = libreSensorSerialNumber.serialNumber
                                 
                                 // call delegate, to inform that a new sensor is detected
-                                cgmTransmitterDelegate?.newSensorDetected()
-                                
+                                // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
+                                cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+
                             }
 
                         } else {

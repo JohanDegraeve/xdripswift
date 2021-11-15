@@ -344,10 +344,16 @@ class LibreDataParser {
             cgmTransmitterDelegate?.errorOccurred(xDripError: xDripError)
             
         }
-        
+
+        // variable to  be used in last call to cgmTransmitterDelegate
+        var sensorTimeInResult: TimeInterval?
+
         // if sensor time < 60, return an empty glucose data array
         // should probably not happen because we only get here if status = .ready or .expired ?
         if let sensorTimeInMinutes = result.sensorTimeInMinutes {
+            
+            // assign sensorTimeInResult, will be used later
+            sensorTimeInResult = TimeInterval(minutes: Double(sensorTimeInMinutes))
             
             guard sensorTimeInMinutes >= 60 else {
                 
@@ -355,7 +361,7 @@ class LibreDataParser {
                 
                 var emptyArray = [GlucoseData]()
                 
-                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorAge: TimeInterval(minutes: Double(sensorTimeInMinutes)))
                 
                 // call completion handler to make sure the sensor state is handled, set state to .starting, because result.sensorState has value .ready here which is not correct
                 completionHandler(.starting, result.xDripError)
@@ -367,8 +373,9 @@ class LibreDataParser {
         }
         
         var result = result
+
         // call delegate with result
-        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorTimeInMinutes: result.sensorTimeInMinutes)
+        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &result.glucoseData, transmitterBatteryInfo: nil, sensorAge: sensorTimeInResult)
         
         completionHandler(result.sensorState, result.xDripError)
         

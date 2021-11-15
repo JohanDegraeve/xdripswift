@@ -108,14 +108,14 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
             }
             
             // fourth field is sensor time in minutes, stop if convert to Int fails
-            guard let sensorTimeInMinutes = Int(String(valueAsString[valueAsString.index(after: indexesOfSplitter[2])..<valueAsString.endIndex])) else {
-                trace("    failed to convert sensorTimeInMinutes field  to Int", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)
+            guard let sensorAgeInMinutes = Int(String(valueAsString[valueAsString.index(after: indexesOfSplitter[2])..<valueAsString.endIndex])) else {
+                trace("    failed to convert sensorAge field  to Int", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)
                 return
             }
             
-            // send glucoseDataArray, transmitterBatteryInfo and sensorTimeInMinutes to cgmTransmitterDelegate
+            // send glucoseDataArray, transmitterBatteryInfo and sensorAge to cgmTransmitterDelegate
             var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawValueAsDouble)]
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: sensorTimeInMinutes * 10)
+            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: TimeInterval(minutes: Double(sensorAgeInMinutes * 10) ))
             
             // send transmitterBatteryInfo to delegate
             cGMDropletTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
@@ -132,31 +132,12 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
         nonFixedSlopeEnabled = enabled
     }
 
-    /// this transmitter does not support oopWeb
-    func setWebOOPEnabled(enabled: Bool) {
-    }
-
     func cgmTransmitterType() -> CGMTransmitterType {
         return .Droplet1
     }
     
-    func isWebOOPEnabled() -> Bool {
-        return false
-    }
-
     func isNonFixedSlopeEnabled() -> Bool {
         return nonFixedSlopeEnabled
-    }
-
-    func requestNewReading() {
-        // not supported for droplet
-    }
-    
-    func maxSensorAgeInDays() -> Int? {
-        
-        // no supported for droplet
-        return nil
-        
     }
 
 }

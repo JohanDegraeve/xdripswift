@@ -43,6 +43,8 @@ public class Calibration: NSManagedObject {
         
         possibleBad = false
         id = UniqueId.createEventId()
+        sentToTransmitter = false
+            
     }
     
     var sensorAgeAtTimeOfEstimation:Double {
@@ -75,6 +77,7 @@ public class Calibration: NSManagedObject {
         r += "\n" + indentation + "slope = " + slope.description
         r += "\n" + indentation + "slopeConfidence = " + slopeConfidence.description
         r += "\n" + indentation + "timestamp = " + timeStamp.description + "\n"
+        r += "\n" + indentation + "sentToTransmitter = " + sentToTransmitter.description + "\n"
         return r
     }
 }

@@ -19,7 +19,7 @@ class DexcomG5BluetoothPeripheralViewModel {
         case firmWareVersion = 2
         
     }
-    
+     
     private enum ResetSettings:Int, CaseIterable {
         
         /// should reset be done yes or no

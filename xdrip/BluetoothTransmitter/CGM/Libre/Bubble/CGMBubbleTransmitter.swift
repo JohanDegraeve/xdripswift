@@ -158,7 +158,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         cGMBubbleTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
                         
                         // send batteryPercentage to delegate
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorTimeInMinutes: nil)
+                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: nil)
                         
                         // store received firmware local
                         self.firmware = firmware
@@ -248,8 +248,9 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                     trace("    new sensor detected :  %{public}@", log: log, category: ConstantsLog.categoryCGMBubble, type: .info, libreSensorSerialNumber.serialNumber)
                                     
                                     // inform cgmTransmitterDelegate about new sensor detected
-                                    cgmTransmitterDelegate?.newSensorDetected()
-                                    
+                                    // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
+                                    cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+
                                     // inform cGMBubbleTransmitterDelegate about new sensor detected
                                     cGMBubbleTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
                                     

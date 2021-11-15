@@ -110,7 +110,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
                     
                 }
                 
-                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorTimeInMinutes: nil)
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorAge: nil)
                 
             }
             
@@ -149,7 +149,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
                     cGMDexcomG4TransmitterDelegate?.received(batteryLevel: level, from: self)
                     
                 }
-                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorTimeInMinutes: nil)
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorAge: nil)
             }
         }
         
@@ -157,41 +157,10 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK:- CGMTransmitter protocol functions
     
-    // this transmitter does not support Libre non fixed slopes
-    func setNonFixedSlopeEnabled(enabled: Bool) {   
-    }
-    
-    /// this transmitter does not support oopWeb
-    func setWebOOPEnabled(enabled: Bool) {
-    }
-    
-    func setWebOOPSite(oopWebSite: String) {}
-    
-    func setWebOOPToken(oopWebToken: String) {}
-
     func cgmTransmitterType() -> CGMTransmitterType {
         return .dexcomG4
     }
 
-    func isNonFixedSlopeEnabled() -> Bool {
-        return false
-    }
-    
-    func isWebOOPEnabled() -> Bool {
-        return false
-    }
-    
-    func requestNewReading() {
-        // not supported for Dexcom G4
-    }
-    
-    func maxSensorAgeInDays() -> Int? {
-        
-        // no max sensor age for Dexcom
-        return nil
-        
-    }
-    
     // MARK:- helper functions
     
     private func processxBridgeDataPacket(value:Data) -> (glucoseData:GlucoseData?, batteryLevel:Int?, transmitterID:String?) {

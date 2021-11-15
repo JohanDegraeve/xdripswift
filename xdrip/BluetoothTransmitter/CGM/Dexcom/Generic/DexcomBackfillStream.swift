@@ -74,7 +74,7 @@ final class DexcomBackfillStream {
             trend = data[idx]
             idx += 1
             
-            if let state = DexcomCalibrationState(rawValue: type) {
+            if let state = DexcomAlgorithmState(rawValue: type) {
                 switch state {
                 case .okay, .needsCalibration:
                     if dexTime != 0 {

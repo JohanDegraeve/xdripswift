@@ -20,4 +20,7 @@ enum ConstantsDexcomG5 {
     /// if there's a new connect within this period, but latest reading was less than this interval ago, then no need to request new reading
     static let minimumTimeBetweenTwoReadings = TimeInterval(minutes: 2.0)
     
+    /// specifically for firefly. If calibration was created more than this period ago, but not yet sent to the transmitter, then it will not be sent anymore
+    static let maxUnSentCalibrationAge = TimeInterval(hours: 1)
+    
 }

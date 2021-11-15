@@ -37,3 +37,4 @@
 "failed" = "Failed";
 "calibrationNotNecessary" = "When using the Libre algoritm, it is not necessary to calibrate the sensor.";
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
+"enterSensorCode" = "Enter Sensor Code";

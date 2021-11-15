@@ -293,10 +293,10 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
                 // if oop web not enabled, then don't pass libre1DerivedAlgorithmParameters
                 var parsedBLEData = Libre2BLEUtilities.parseBLEData(Data(try Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: rxBuffer)), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ? UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
                 
-                // send glucoseData and sensorTimeInMinutes to cgmTransmitterDelegate
-                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &parsedBLEData.bleGlucose, transmitterBatteryInfo: nil, sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes))
+                // send glucoseData and sensorAge to cgmTransmitterDelegate
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &parsedBLEData.bleGlucose, transmitterBatteryInfo: nil, sensorAge: TimeInterval(minutes: Double(parsedBLEData.sensorTimeInMinutes)))
                 
-                // send sensorTimeInMinutes also to cGMLibre2TransmitterDelegate
+                // send sensorAge also to cGMLibre2TransmitterDelegate
                 cGMLibre2TransmitterDelegate?.received(sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes), from: self)
                 
             } catch {
@@ -343,10 +343,6 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     func isNonFixedSlopeEnabled() -> Bool {
         return nonFixedSlopeEnabled
-    }
-    
-    func requestNewReading() {
-        // not supported for Libre 2
     }
     
     func maxSensorAgeInDays() -> Int? {
@@ -416,8 +412,9 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
                 
                 self.sensorSerialNumber = receivedSensorSerialNumberAsString
                 
-                cgmTransmitterDelegate?.newSensorDetected()
-                
+                // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
+                cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+
                 cGMLibre2TransmitterDelegate?.received(serialNumber: receivedSensorSerialNumberAsString, from: self)
 
             }

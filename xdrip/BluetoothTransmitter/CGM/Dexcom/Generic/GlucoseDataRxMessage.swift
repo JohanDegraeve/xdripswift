@@ -2,11 +2,11 @@ import Foundation
 
 struct GlucoseDataRxMessage {
     
-    let status: UInt8
+    let transmitterStatus: UInt8
     
     let calculatedValue: Double
     
-    let state: DexcomCalibrationState
+    let algorithmStatus: DexcomAlgorithmState
 
     init?(data: Data) {
 
@@ -14,17 +14,17 @@ struct GlucoseDataRxMessage {
         
         guard data.starts(with: .glucoseRx) else { return nil }
         
-        status = data[1]
+        transmitterStatus = data[1]
         
         calculatedValue = Double(Data(data[10..<12]).to(UInt16.self) & 0xfff)
         
-        if let receivedState = DexcomCalibrationState(rawValue: data[12]) {
+        if let receivedState = DexcomAlgorithmState(rawValue: data[12]) {
             
-            state = receivedState
+            algorithmStatus = receivedState
             
         } else {
             
-            state = DexcomCalibrationState.unknown
+            algorithmStatus = DexcomAlgorithmState.None
             
         }
         

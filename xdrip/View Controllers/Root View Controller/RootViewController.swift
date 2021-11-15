@@ -788,7 +788,7 @@ final class RootViewController: UIViewController {
                     
                     trace("in cgmTransmitterInfoChanged, webOOPEnabled value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.isWebOOPEnabled().description)
                     
-                    self.stopSensor()
+                    self.stopSensor(cGMTransmitter: cgmTransmitter)
                     
                 }
                 
@@ -797,7 +797,7 @@ final class RootViewController: UIViewController {
                     
                     trace("in cgmTransmitterInfoChanged, nonFixedSlopeEnabled value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.isNonFixedSlopeEnabled().description)
                     
-                    self.stopSensor()
+                    self.stopSensor(cGMTransmitter: cgmTransmitter)
                     
                 }
                 
@@ -813,7 +813,7 @@ final class RootViewController: UIViewController {
                     
                     trace("in cgmTransmitterInfoChanged, sensorType value changed to %{public}@, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, cgmTransmitter.cgmTransmitterType().sensorType().rawValue)
                     
-                    self.stopSensor()
+                    self.stopSensor(cGMTransmitter: cgmTransmitter)
                     
                 }
                 
@@ -862,8 +862,8 @@ final class RootViewController: UIViewController {
     /// process new glucose data received from transmitter.
     /// - parameters:
     ///     - glucoseData : array with new readings
-    ///     - sensorTimeInMinutes : should be present only if it's the first reading(s) being processed for a specific sensor and is needed if it's a transmitterType that returns true to the function canDetectNewSensor
-    private func processNewGlucoseData(glucoseData: inout [GlucoseData], sensorTimeInMinutes: Int?) {
+    ///     - sensorAge : should be present only if it's the first reading(s) being processed for a specific sensor and is needed if it's a transmitterType that returns true to the function canDetectNewSensor
+    private func processNewGlucoseData(glucoseData: inout [GlucoseData], sensorAge: TimeInterval?) {
         
         // unwrap calibrationsAccessor and coreDataManager and cgmTransmitter
         guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager, let cgmTransmitter = bluetoothPeripheralManager?.getCGMTransmitter() else {
@@ -876,17 +876,10 @@ final class RootViewController: UIViewController {
         
         if activeSensor == nil {
             
-            if let sensorTimeInMinutes = sensorTimeInMinutes, cgmTransmitter.cgmTransmitterType().canDetectNewSensor() {
+            if let sensorAge = sensorAge, cgmTransmitter.cgmTransmitterType().canDetectNewSensor() {
+
+                self.startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: Date(timeIntervalSinceNow: -sensorAge), sensorCode: nil, coreDataManager: coreDataManager)
                 
-                activeSensor = Sensor(startDate: Date(timeInterval: -Double(sensorTimeInMinutes * 60), since: Date()),nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                if let activeSensor = activeSensor {
-                    trace("created sensor with id : %{public}@ and startdate  %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, activeSensor.id, activeSensor.startDate.description)
-                } else {
-                    trace("creation active sensor failed", log: log, category: ConstantsLog.categoryRootView, type: .info)
-                }
-                
-                // save the newly created Sensor permenantly in coredata
-                coreDataManager.saveChanges()
             }
             
         }
@@ -1179,8 +1172,10 @@ final class RootViewController: UIViewController {
             
             changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
             
+            guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else {break}
+            
             // no sensor needed in follower mode, stop it
-            stopSensor()
+            stopSensor(cGMTransmitter: cgmTransmitter)
             
         case UserDefaults.Key.showReadingInNotification:
             if !UserDefaults.standard.showReadingInNotification {
@@ -1439,7 +1434,6 @@ final class RootViewController: UIViewController {
         // assign deviceName, needed in the closure when creating alert. As closures can create strong references (to bluetoothTransmitter in this case), I'm fetching the deviceName here
         let deviceName = bluetoothTransmitter.deviceName
         
-        // let alert = UIAlertController(title: "test title", message: "test message", keyboardType: .numberPad, text: nil, placeHolder: "...", actionTitle: nil, cancelTitle: nil, actionHandler: {_ in }, cancelHandler: nil)
         let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: nil, placeHolder: "...", actionTitle: nil, cancelTitle: nil, actionHandler: {
             (text:String) in
             
@@ -1464,7 +1458,13 @@ final class RootViewController: UIViewController {
                     trace("calibration : initial calibration, creating two calibrations", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                     
                     // calling initialCalibration will create two calibrations, they are returned also but we don't need them
-                    _ = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDoubleConvertedToMgDl, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDoubleConvertedToMgDl, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    let (_, calibration) = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDoubleConvertedToMgDl, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDoubleConvertedToMgDl, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    
+                    // send calibration to transmitter (only used for Dexcom, if firefly flow is used)
+                    if let calibration = calibration {
+                        cgmTransmitter.calibrate(calibration: calibration)
+                    }
+                    
                     
                 } else {
                     
@@ -1473,8 +1473,11 @@ final class RootViewController: UIViewController {
 
                         trace("calibration : creating calibrations", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                         
-                        // calling createNewCalibration will create a new  calibration, it is returned but we don't need it
-                        _ = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        // create new calibration
+                        let calibration = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        
+                        // send calibration to transmitter (only used for Dexcom, if firefly flow is used)
+                        cgmTransmitter.calibrate(calibration: calibration)
                         
                     }
                     
@@ -1524,20 +1527,13 @@ final class RootViewController: UIViewController {
         
         switch cgmTransmitterType {
         
-        case .dexcomG4, .dexcomG5 :
+        case .dexcomG4, .dexcomG5, .dexcomG6 :
             
             calibrator = DexcomCalibrator()
             
-        case .dexcomG6:
+        case .dexcomG6Firefly:
             
-            if (cgmTransmitter as! CGMG6Transmitter).isFireFly() {
-                
-                calibrator = NoCalibrator()
-                
-            } else {
-                
-                calibrator = DexcomCalibrator()
-            }
+            calibrator = NoCalibrator()
             
         case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa, .Libre2, .Atom:
             
@@ -1846,6 +1842,10 @@ final class RootViewController: UIViewController {
     /// when user clicks transmitter button, this will create and present the actionsheet, contents depend on type of transmitter and sensor status
     private func createAndPresentSensorButtonActionSheet() {
         
+        // unwrap coredatamanager
+        guard let coreDataManager = coreDataManager else {return}
+
+        
         // initialize list of actions
         var listOfActions = [UIAlertAction]()
         
@@ -1858,18 +1858,35 @@ final class RootViewController: UIViewController {
         // next action is to start or stop the sensor, can also be omitted depending on type of device - also not applicable for follower mode
         if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
             if cgmTransmitter.cgmTransmitterType().allowManualSensorStart() && UserDefaults.standard.isMaster {
-                // user needs to start and stop the sensor manually
+                
+                // user can (or needs to) start and stop the sensor
                 var startStopAction: UIAlertAction
                 
                 if activeSensor != nil {
                     startStopAction = UIAlertAction(title: Texts_HomeView.stopSensorActionTitle, style: .default) { (UIAlertAction) in
                         trace("in createAndPresentSensorButtonActionSheet, user clicked stop sensor, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                         
-                        self.stopSensor()
+                        self.stopSensor(cGMTransmitter: cgmTransmitter)
                     }
                 } else {
                     startStopAction = UIAlertAction(title: Texts_HomeView.startSensorActionTitle, style: .default) { (UIAlertAction) in
-                        self.startSensorAskUserForStarttime()
+
+                        // either sensor needs a sensor start time, or a sensor code .. or none
+                        if cgmTransmitter.cgmTransmitterType().needsSensorStartTime() {
+
+                            self.startSensorAskUserForStarttime(cGMTransmitter: cgmTransmitter)
+
+                        } else if cgmTransmitter.cgmTransmitterType().needsSensorStartCode() {
+                            
+                            self.startSensorAskUserForSensorCode(cGMTransmitter: cgmTransmitter)
+                            
+                        } else {
+                            
+                            self.startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: Date(), sensorCode: nil, coreDataManager: coreDataManager)
+                            
+                        }
+                        
+                        
                     }
                 }
                 
@@ -1941,36 +1958,17 @@ final class RootViewController: UIViewController {
         
     }
     
-    /// stops the active sensor and sets sensorSerialNumber in UserDefaults to nil
-    private func stopSensor() {
-        
-        if let activeSensor = activeSensor, let coreDataManager = coreDataManager {
-            activeSensor.endDate = Date()
-            coreDataManager.saveChanges()
-        }
-        // save the changes
-        coreDataManager?.saveChanges()
-        
-        activeSensor = nil
-        
-        // now that the activeSensor object has been destroyed, update (hide) the sensor countdown graphic
-        updateSensorCountdown()
-        
-    }
-    
     /// start a new sensor, ask user for starttime
-    private func startSensorAskUserForStarttime() {
+    /// - parameters:
+    ///     - cGMTransmitter is required because startSensor command will be sent also to the transmitter
+    private func startSensorAskUserForStarttime(cGMTransmitter: CGMTransmitter) {
         
         // craete datePickerViewData
         let datePickerViewData = DatePickerViewData(withMainTitle: Texts_HomeView.startSensorActionTitle, withSubTitle: nil, datePickerMode: .dateAndTime, date: Date(), minimumDate: nil, maximumDate: Date(), okButtonText: Texts_Common.Ok, cancelButtonText: Texts_Common.Cancel, onOkClick: {(date) in
-            if let coreDataManager = self.coreDataManager {
+            if let coreDataManager = self.coreDataManager, let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
                 
-                // set sensorStartTime
-                let sensorStartTime = date
-                self.activeSensor = Sensor(startDate: sensorStartTime, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                
-                // save the newly created Sensor permenantly in coredata
-                coreDataManager.saveChanges()
+                // start sensor with date chosen by user, sensorCode nil
+                self.startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: date, sensorCode: nil, coreDataManager: coreDataManager)
                 
             }
         }, onCancelClick: nil)
@@ -1996,6 +1994,27 @@ final class RootViewController: UIViewController {
         
     }
 
+    /// start a new sensor, ask user for sensor code
+    /// - parameters:
+    ///     - cGMTransmitter is required because startSensor command will be sent also to the transmitter
+    private func startSensorAskUserForSensorCode(cGMTransmitter: CGMTransmitter) {
+        
+        let alert = UIAlertController(title: Texts_HomeView.enterSensorCode, message: nil, keyboardType:.numberPad, text: nil, placeHolder: "0000", actionTitle: nil, cancelTitle: nil, actionHandler: {
+            (text:String) in
+            
+            if let coreDataManager = self.coreDataManager, let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
+                
+                // start sensor with date chosen by user, sensorCode nil
+                self.startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: Date(), sensorCode: text, coreDataManager: coreDataManager)
+                
+            }
+            
+        }, cancelHandler: nil)
+
+        self.present(alert, animated: true, completion: nil)
+        
+    }
+    
     private func valueLabelLongPressed(_ sender: UILongPressGestureRecognizer) {
         
         if sender.state == .began {
@@ -2646,6 +2665,52 @@ final class RootViewController: UIViewController {
         }
     }
     
+    /// - creates a new sensor and assigns it to activeSensor
+    /// - sends startSensor command to transmitter (ony useful for Firefly)
+    /// - saves to coredata
+    private func startSensor(cGMTransmitter: CGMTransmitter, sensorStarDate: Date, sensorCode: String?, coreDataManager: CoreDataManager) {
+        
+        // create active sensor
+        let newSensor = Sensor(startDate: sensorStarDate, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        
+        // save the newly created Sensor permenantly in coredata
+        coreDataManager.saveChanges()
+        
+        // send to transmitter
+        cGMTransmitter.startSensor(sensorCode: sensorCode, startDate: sensorStarDate)
+
+        // assign activeSensor to newSensor
+        activeSensor = newSensor
+        
+    }
+    
+    private func stopSensor(cGMTransmitter: CGMTransmitter) {
+    
+        // create stopDate
+        let stopDate = Date()
+        
+        // send stop sensor command to transmitter, don't check if there's an activeSensor in coredata or not, never know that there's a desync between coredata and transmitter
+        cGMTransmitter.stopSensor(stopDate: stopDate)
+
+        // no need to further continue if activeSensor = nil, and at the same time, unwrap coredataManager
+        guard let activeSensor = activeSensor, let coreDataManager = coreDataManager else {
+            return
+        }
+
+        // set endDate of activeSensor to stopDate
+        activeSensor.endDate = stopDate
+        
+        // save changes to coreData
+        coreDataManager.saveChanges()
+        
+        // asign nil to activeSensor
+        self.activeSensor = nil
+        
+        // now that the activeSensor object has been destroyed, update (hide) the sensor countdown graphic
+        updateSensorCountdown()
+
+    }
+    
 }
 
 
@@ -2653,10 +2718,23 @@ final class RootViewController: UIViewController {
 
 /// conform to CGMTransmitterDelegate
 extension RootViewController: CGMTransmitterDelegate {
-    
-    func newSensorDetected() {
+
+    func newSensorDetected(sensorStartDate: Date?) {
         trace("new sensor detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
-        stopSensor()
+        
+        // unwrap cgmTransmitter
+        guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else {return}
+        
+        stopSensor(cGMTransmitter: cgmTransmitter)
+
+        // if sensorStartDate is given, then unwrap coreDataManager and startSensor
+        if let sensorStartDate = sensorStartDate, let coreDataManager = coreDataManager {
+            
+            // use sensorCode nil, in the end there will be no start sensor command sent to the transmitter because we just received the sensorStartTime from the transmitter, so it's already started
+            startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: sensorStartDate, sensorCode: nil, coreDataManager: coreDataManager)
+            
+        }
+        
     }
     
     func sensorNotDetected() {
@@ -2666,10 +2744,10 @@ extension RootViewController: CGMTransmitterDelegate {
         
     }
     
-    func cgmTransmitterInfoReceived(glucoseData: inout [GlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorTimeInMinutes: Int?) {
+    func cgmTransmitterInfoReceived(glucoseData: inout [GlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorAge: TimeInterval?) {
         
         trace("transmitterBatteryInfo %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, transmitterBatteryInfo?.description ?? "not received")
-        trace("sensor time in minutes %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, sensorTimeInMinutes?.description ?? "not received")
+        trace("sensor time in days %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, sensorAge?.days.round(toDecimalPlaces: 1).description ?? "not received")
         trace("glucoseData size = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, glucoseData.count.description)
         
         // if received transmitterBatteryInfo not nil, then store it
@@ -2685,7 +2763,7 @@ extension RootViewController: CGMTransmitterDelegate {
         }
         
         // process new readings
-        processNewGlucoseData(glucoseData: &glucoseData, sensorTimeInMinutes: sensorTimeInMinutes)
+        processNewGlucoseData(glucoseData: &glucoseData, sensorAge: sensorAge)
         
     }
     

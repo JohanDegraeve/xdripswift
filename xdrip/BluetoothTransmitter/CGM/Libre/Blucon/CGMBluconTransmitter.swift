@@ -312,7 +312,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     sendCommandToBlucon(opcode: BluconTransmitterOpCode.getPatchInfoRequest)
                     
                     // by default set battery level to 100
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 100), sensorTimeInMinutes: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 100), sensorAge: nil)
                     
                     cGMBluconTransmitterDelegate?.received(batteryLevel: 100, from: self)
 
@@ -345,8 +345,9 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                         sensorSerialNumber = newSerialNumber
                         
                         // inform cGMTransmitterDelegate about new sensor detected
-                        cgmTransmitterDelegate?.newSensorDetected()
-                        
+                        // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
+                        cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+
                         cGMBluconTransmitterDelegate?.received(serialNumber: sensorSerialNumber, from: self)
 
                         
@@ -372,7 +373,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     }
                     
                     // inform cGMTransmitterDelegate about sensorSerialNumber and sensorState
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorTimeInMinutes: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorAge: nil)
                     
                     return
                     
@@ -407,7 +408,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     if valueAsString.startsWith(unknownCommand2BatteryLowIndicator) {
                         
                         // this is considered as battery level 5%
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 5),  sensorTimeInMinutes: nil)
+                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 5),  sensorAge: nil)
                         
                         cGMBluconTransmitterDelegate?.received(batteryLevel: 5, from: self)
 
@@ -493,7 +494,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                         
                         let glucoseData = GlucoseData(timeStamp: Date(), glucoseLevelRaw: glucoseValue)
                         var glucoseDataArray = [glucoseData]
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil,  sensorTimeInMinutes: nil)
+                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil,  sensorAge: nil)
 
                         sendCommandToBlucon(opcode: .sleep)
                         
@@ -502,14 +503,14 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                 case .bluconBatteryLowIndication1:
                     
                     // this is considered as battery level 3%
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 3), sensorTimeInMinutes: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 3), sensorAge: nil)
                     
                     cGMBluconTransmitterDelegate?.received(batteryLevel: 3, from: self)
 
                 case .bluconBatteryLowIndication2:
                     
                     // this is considered as battery level 2%
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 2), sensorTimeInMinutes: nil)
+                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 2), sensorAge: nil)
                     
                     cGMBluconTransmitterDelegate?.received(batteryLevel: 2, from: self)
                     
@@ -535,14 +536,6 @@ extension CGMBluconTransmitter: CGMTransmitter {
         nonFixedSlopeEnabled = enabled
     }
     
-    /// this transmitter does not support oopWeb
-    func setWebOOPEnabled(enabled: Bool) {
-    }
-
-    func setWebOOPSite(oopWebSite: String) {}
-    
-    func setWebOOPToken(oopWebToken: String) {}
-    
     func cgmTransmitterType() -> CGMTransmitterType {
         return .Blucon
     }
@@ -551,16 +544,5 @@ extension CGMBluconTransmitter: CGMTransmitter {
         return nonFixedSlopeEnabled
     }
     
-    func isWebOOPEnabled() -> Bool {
-        return false
-    }
-
-    func maxSensorAgeInDays() -> Int? {
-        
-        // not supported for blucon
-        return nil
-        
-    }
-
 }
 

@@ -363,25 +363,14 @@ class Trace {
                             
                         }
                         
-                    case .DexcomG5Type:
-                        if let dexcomG5 = blePeripheral.dexcomG5, !dexcomG5.isDexcomG6 {
+                    case .DexcomG5Type, .DexcomG6Type, .DexcomG6FireflyType:
+                        if let dexcomG5 = blePeripheral.dexcomG5 {
                             
                             traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
                             
                             // if needed additional specific info can be added
                             traceInfo.appendStringAndNewLine("    voltageA : " + dexcomG5.voltageA.description)
                             traceInfo.appendStringAndNewLine("    voltageB : " + dexcomG5.voltageB.description)
-                            
-                        }
-                        
-                    case .DexcomG6Type:
-                        if let dexcomG6 = blePeripheral.dexcomG5, dexcomG6.isDexcomG6 {
-                            
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
-                            
-                            // if needed additional specific info can be added
-                            traceInfo.appendStringAndNewLine("    voltageA : " + dexcomG6.voltageA.description)
-                            traceInfo.appendStringAndNewLine("    voltageB : " + dexcomG6.voltageB.description)
                             
                         }
                         

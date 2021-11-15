@@ -33,11 +33,15 @@ class CalibrationsAccessor {
 
     /// get last calibration (ie youngest) for currently active sensor and with sensorconfidence and slopeconfidence != 0
     /// - parameters:
-    ///     - withActivesensor : should be currently active sensor
+    ///     - withActivesensor : should be currently active sensor - if nil then returnvalue is also nil
     /// - returns:
     ///     - the last calibration, can be nil
-    func lastCalibrationForActiveSensor(withActivesensor sensor:Sensor) -> Calibration? {
+    func lastCalibrationForActiveSensor(withActivesensor sensor:Sensor?) -> Calibration? {
+        
+        guard let sensor = sensor else {return nil}
+        
         return getFirstOrLastCalibration(withActivesensor: sensor, first: false)
+        
     }
     
     /// Returns last calibrations, possibly zero
