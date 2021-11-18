@@ -9,23 +9,26 @@ fileprivate enum Setting:Int, CaseIterable {
     ///nightscout url
     case nightScoutUrl = 1
     
+    /// nightscout api key
+    case nightScoutAPIKey = 2
+    
     /// port
-    case port = 2
+    case port = 3
     
     /// nightscout api key
-    case nightScoutAPIKey = 3
+    case token = 4
     
     /// to allow testing explicitly
-    case testUrlAndAPIKey = 4
+    case testUrlAndAPIKey = 5
     
     /// should sensor start time be uploaded to NS yes or no
-    case uploadSensorStartTime = 5
+    case uploadSensorStartTime = 6
     
     /// use nightscout schedule or not
-    case useSchedule = 6
+    case useSchedule = 7
     
     /// open uiviewcontroller to edit schedule
-    case schedule = 7
+    case schedule = 8
     
 }
 
@@ -146,15 +149,72 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightScoutUrl, message: Texts_SettingsView.giveNightScoutUrl, keyboardType: .URL, text: UserDefaults.standard.nightScoutUrl != nil ? UserDefaults.standard.nightScoutUrl : ConstantsNightScout.defaultNightScoutUrl, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(nightscouturl:String) in
                 
                 // if user gave empty string then set to nil
-                // if not nil, and if not starting with http, add https, and remove ending /
-                UserDefaults.standard.nightScoutUrl = nightscouturl.toNilIfLength0().addHttpsIfNeeded()
+                // if not nil, and if not starting with http or https, add https, and remove ending /
+                var enteredURL = nightscouturl.toNilIfLength0()
+                
+                // assuming that the enteredURL isn't nil, isn't the default value and hasn't been entered without a valid scheme
+                if enteredURL != nil && enteredURL != ConstantsNightScout.defaultNightScoutUrl  && !enteredURL!.startsWith("https://http") {
+                    
+                    // if self doesn't start with http or https, then add https. This might not make sense, but it will guard against throwing fatal errors when trying to get the scheme of the Endpoint
+                    if !enteredURL!.startsWith("http://") && !enteredURL!.startsWith("https://") {
+                        enteredURL = "https://" + enteredURL!
+                    }
+                    
+                    // if url ends with /, remove it
+                    if enteredURL!.last == "/" {
+                        enteredURL!.removeLast()
+                    }
+                    
+                    // remove the api path if it exists - useful for people pasting in xDrip+ Base URLs
+                    enteredURL = enteredURL!.replacingOccurrences(of: "/api/v1", with: "")
+                    
+                    // if we've got a valid URL, then let's break it down
+                    if let enteredURLComponents = URLComponents(string: enteredURL!) {
+                        
+                        // pull the port info if it exists and set the port
+                        if let port = enteredURLComponents.port {
+                            UserDefaults.standard.nightScoutPort = port
+                        }
+                        
+                        // pull the "user" info if it exists and use it to set the API_SECRET
+                        if let user = enteredURLComponents.user {
+                            UserDefaults.standard.nightScoutAPIKey = user.toNilIfLength0()
+                        }
+                        
+                        // if the user has pasted in a URL with a token, then let's parse it out and use it
+                        if let token = enteredURLComponents.queryItems?.first(where: { $0.name == "token" })?.value {
+                            UserDefaults.standard.nightscoutToken = token.toNilIfLength0()
+                        }
+                        
+                        // finally, let's make a clean with just the scheme and host. We don't need to add anything else as this is basically the only thing we were asking for in the first place.
+                        var nighscoutURLComponents = URLComponents()
+                        nighscoutURLComponents.scheme = "https"
+                        nighscoutURLComponents.host = enteredURLComponents.host?.lowercased()
+                        
+                        UserDefaults.standard.nightScoutUrl = nighscoutURLComponents.string!
+                        
+                    }
+                    
+                } else {
+                    
+                    // there must be something wrong with the URL the user is trying to add, so let's just ignore it
+                    UserDefaults.standard.nightScoutUrl = nil
+                    
+                }
                 
             }, cancelHandler: nil, inputValidator: nil)
 
         case .nightScoutAPIKey:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightScoutAPIKey, message:  Texts_SettingsView.giveNightScoutAPIKey, keyboardType: .default, text: UserDefaults.standard.nightScoutAPIKey, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(apiKey:String) in
                 UserDefaults.standard.nightScoutAPIKey = apiKey.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
-           
+
+        case .port:
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightScoutPort, message: nil, keyboardType: .numberPad, text: UserDefaults.standard.nightScoutPort != 0 ? UserDefaults.standard.nightScoutPort.description : nil, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(port:String) in if let port = port.toNilIfLength0() { UserDefaults.standard.nightScoutPort = Int(port) ?? 0 } else {UserDefaults.standard.nightScoutPort = 0}}, cancelHandler: nil, inputValidator: nil)
+        
+        case .token:
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutToken, message:  nil, keyboardType: .default, text: UserDefaults.standard.nightscoutToken, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(token:String) in
+                UserDefaults.standard.nightscoutToken = token.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
+            
         case .testUrlAndAPIKey:
 
             if UserDefaults.standard.nightScoutAPIKey != nil && UserDefaults.standard.nightScoutUrl != nil {
@@ -182,9 +242,7 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             
         case .uploadSensorStartTime:
             return SettingsSelectedRowAction.nothing
-            
-        case .port:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightScoutPort, message: nil, keyboardType: .numberPad, text: UserDefaults.standard.nightScoutPort != 0 ? UserDefaults.standard.nightScoutPort.description : nil, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(port:String) in if let port = port.toNilIfLength0() { UserDefaults.standard.nightScoutPort = Int(port) ?? 0 } else {UserDefaults.standard.nightScoutPort = 0}}, cancelHandler: nil, inputValidator: nil)}
+        }
     }
     
     func sectionTitle() -> String? {
@@ -196,9 +254,9 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
         // if nightscout upload not enabled then only first row is shown
         if UserDefaults.standard.nightScoutEnabled {
             
-            // in follower mode, only 5 first rows to be shown : nightscout enabled button, url, port number, api key, option to test
+            // in follower mode, only 6 first rows to be shown : nightscout enabled button, url, port number, token, api key, option to test
             if !UserDefaults.standard.isMaster {
-                return 5
+                return 6
             }
             
             // if schedule not enabled then show all rows except the last which is to edit the schedule
@@ -218,12 +276,16 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .nightScoutAPIKey:
-            return Texts_SettingsView.labelNightScoutAPIKey
-        case .nightScoutUrl:
-            return Texts_SettingsView.labelNightScoutUrl
         case .nightScoutEnabled:
             return Texts_SettingsView.labelNightScoutEnabled
+        case .nightScoutUrl:
+            return Texts_SettingsView.labelNightScoutUrl
+        case .nightScoutAPIKey:
+            return Texts_SettingsView.labelNightScoutAPIKey
+        case .port:
+            return Texts_SettingsView.nightScoutPort
+        case .token:
+            return Texts_SettingsView.nightscoutToken
         case .useSchedule:
             return Texts_SettingsView.useSchedule
         case .schedule:
@@ -232,8 +294,6 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return Texts_SettingsView.uploadSensorStartTime
         case .testUrlAndAPIKey:
             return Texts_SettingsView.testUrlAndAPIKey
-        case .port:
-            return Texts_SettingsView.nightScoutPort
         }
     }
     
@@ -247,6 +307,10 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return UITableViewCell.AccessoryType.disclosureIndicator
         case .nightScoutAPIKey:
             return UITableViewCell.AccessoryType.disclosureIndicator
+        case .port:
+            return .disclosureIndicator
+        case .token:
+            return .disclosureIndicator
         case .useSchedule:
             return UITableViewCell.AccessoryType.none
         case .schedule:
@@ -255,8 +319,6 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return UITableViewCell.AccessoryType.none
         case .testUrlAndAPIKey:
             return .none
-        case .port:
-            return .disclosureIndicator
         }
     }
     
@@ -266,10 +328,14 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
         switch setting {
         case .nightScoutEnabled:
             return nil
-        case .nightScoutAPIKey:
-            return UserDefaults.standard.nightScoutAPIKey != nil ? "***********" : nil
         case .nightScoutUrl:
             return UserDefaults.standard.nightScoutUrl
+        case .nightScoutAPIKey:
+            return UserDefaults.standard.nightScoutAPIKey != nil ? "***********" : nil
+        case .port:
+            return UserDefaults.standard.nightScoutPort != 0 ? UserDefaults.standard.nightScoutPort.description : nil
+        case .token:
+            return UserDefaults.standard.nightscoutToken != nil ? UserDefaults.standard.nightscoutToken?.description : nil
         case .useSchedule:
             return nil
         case .schedule:
@@ -278,8 +344,6 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return nil
         case .testUrlAndAPIKey:
             return nil
-        case .port:
-            return UserDefaults.standard.nightScoutPort != 0 ? UserDefaults.standard.nightScoutPort.description : nil
         }
     }
     
@@ -297,6 +361,12 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
         case .nightScoutAPIKey:
             return nil
             
+        case .port:
+            return nil
+            
+        case .token:
+            return nil
+            
         case .useSchedule:
             return UISwitch(isOn: UserDefaults.standard.nightScoutUseSchedule, action: {(isOn:Bool) in UserDefaults.standard.nightScoutUseSchedule = isOn})
             
@@ -307,9 +377,6 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return UISwitch(isOn: UserDefaults.standard.uploadSensorStartTimeToNS, action: {(isOn:Bool) in UserDefaults.standard.uploadSensorStartTimeToNS = isOn})
             
         case .testUrlAndAPIKey:
-            return nil
-            
-        case .port:
             return nil
             
         }

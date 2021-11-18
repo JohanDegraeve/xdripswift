@@ -16,7 +16,11 @@ extension Endpoint {
         let (host, scheme) = EndPointScheme.getHostAndScheme(hostAndScheme: hostAndScheme)
         
         // if scheme nil then looks like a coding error, throw fatal error
-        guard scheme != nil else {fatalError("in getEndpointForLatestNSEntries, hostAndScheme doesn't start with a known scheme name")}
+        // before throwing the error, let's reset the Nightscout URL or it will not be possible to recover without deleting the app to remove coredata and re-installing
+        guard scheme != nil else {
+            UserDefaults.standard.nightScoutUrl = nil
+            fatalError("in getEndpointForLatestNSEntries, hostAndScheme doesn't start with a known scheme name")
+        }
         
         // create quertyItems
         var queryItems = [

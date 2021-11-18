@@ -302,6 +302,10 @@ class Texts_SettingsView {
     static let nightScoutPort: String = {
         return NSLocalizedString("nightScoutPort", tableName: filename, bundle: Bundle.main, value: "Port (optional):", comment: "nightscout settings, port to use")
     }()
+    
+    static let nightscoutToken: String = {
+        return NSLocalizedString("nightscoutToken", tableName: filename, bundle: Bundle.main, value: "Token (optional):", comment: "nightscout settings, token to use")
+    }()
 
     // MARK: - Section Speak
     

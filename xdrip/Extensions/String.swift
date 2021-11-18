@@ -221,12 +221,9 @@ extension Optional where Wrapped == String {
         
         // if self nil, then return nil
         guard var returnValue = self else {return nil}
-        
-        // first convert to lowercase
-        returnValue = returnValue.lowercased()
-        
-        // if self doesn't start with http, then add https
-        if !returnValue.startsWith("http") {
+                
+        // if self doesn't start with http or https, then add https. This might not make sense, but it will guard against throwing fatal errors when trying to get the scheme of the Endpoint
+        if !returnValue.startsWith("http://") && !returnValue.startsWith("https://") {
             returnValue = "https://" + returnValue
         }
         
