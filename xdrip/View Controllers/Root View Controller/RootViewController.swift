@@ -364,21 +364,12 @@ final class RootViewController: UIViewController {
         
     }
     
-    
     override func viewWillAppear(_ animated: Bool) {
         
         super.viewWillAppear(animated)
-        
-        // if allowed, then permit the Root View Controller which is the main screen, to rotate left/right to show the landscape view
-        if UserDefaults.standard.allowScreenRotation {
-            
-            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
-            
-        } else {
-            
-            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
-            
-        }
+
+        // check if allowed to rotate to landscape view
+        updateScreenRotationSettings()
         
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
@@ -2343,9 +2334,12 @@ final class RootViewController: UIViewController {
             // prevent screen dim/lock
             UIApplication.shared.isIdleTimerDisabled = true
             
+            // prevent screen rotation
+            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+            
             // set the private var so that we can track the screen lock activation within the RootViewController
             screenIsLocked = true
-            
+           
             trace("screen lock : screen lock / keep-awake enabled", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
         } else {
@@ -2379,6 +2373,9 @@ final class RootViewController: UIViewController {
             
             // make sure that the screen lock is deactivated
             UIApplication.shared.isIdleTimerDisabled = false
+            
+            // revert screen rotation settings
+            updateScreenRotationSettings()
             
             trace("screen lock / keep-awake disabled", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
 
@@ -2607,7 +2604,21 @@ final class RootViewController: UIViewController {
             }
             
         }
-        
+            
+    }
+    
+    /// if allowed set the main screen rotation settings 
+    fileprivate func updateScreenRotationSettings() {
+        // if allowed, then permit the Root View Controller which is the main screen, to rotate left/right to show the landscape view
+        if UserDefaults.standard.allowScreenRotation {
+            
+            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
+            
+        } else {
+            
+            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+            
+        }
     }
     
 }
