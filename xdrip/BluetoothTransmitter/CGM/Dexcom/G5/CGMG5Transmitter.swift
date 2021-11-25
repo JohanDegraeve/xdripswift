@@ -1043,6 +1043,26 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             trace("in processCalibrateGlucoseRxMessage, received dexcomCalibrationRxMessage, accepted = %{public}@, type = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomCalibrationRxMessage.accepted.description, dexcomCalibrationResponseType.description)
             
+            // if calibrationToSendToTransmitter not nil, then set calibrationToSendToTransmitter.sentToTransmitter to true
+            if let calibrationToSendToTransmitter = calibrationToSendToTransmitter {
+                
+                // assumption is that the stored calibration is the one for which we receive this dexcomCalibrationRxMessage
+                // even if it failed, set sentToTransmitter to true, because we will not resend it
+                calibrationToSendToTransmitter.sentToTransmitter = true
+
+            }
+            
+            switch dexcomCalibrationRxMessage.type {
+                
+            case .secondCalibrationNeeded:
+                
+                trace("in processCalibrateGlucoseRxMessage, transmitter is asking for second calibration, that still needs to be implemented", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                
+            default:
+                break
+                
+            }
+            
             
         } else {
             trace("in processCalibrateGlucoseRxMessage, dexcomCalibrationRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
@@ -1328,9 +1348,19 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 } else
                 
                 // if there's a valid calibrationToSendToTransmitter
-                if let calibrationToSendToTransmitter = calibrationToSendToTransmitter, calibrationIsValid(calibration: calibrationToSendToTransmitter) {
+                if let calibrationToSendToTransmitter = calibrationToSendToTransmitter {
                     
-                    sendCalibrationTxMessage(calibration: calibrationToSendToTransmitter, transmitterStartDate: transmitterStartDate)
+                    if calibrationIsValid(calibration: calibrationToSendToTransmitter) {
+
+                        sendCalibrationTxMessage(calibration: calibrationToSendToTransmitter, transmitterStartDate: transmitterStartDate)
+
+                    } else {
+                        
+                        // calibration  not valid anymore, assign it to nil
+                        self.calibrationToSendToTransmitter = nil
+                        
+                    }
+                    
                     
                 } else
                 
@@ -1484,7 +1514,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             return false
         }
         
-        // if calibrationToSendToTransmitter timestamp older than 1 hour then invalid
+        // if calibrationToSendToTransmitter timestamp older than 5 minutes
         if Date().timeIntervalSince1970 - calibration.timeStamp.timeIntervalSince1970 > ConstantsDexcomG5.maxUnSentCalibrationAge {
             trace("    calibration has timestamp older than %{public}@ hours, not valid", log: log, category: ConstantsLog.categoryCGMG5, type: .info, ConstantsDexcomG5.maxUnSentCalibrationAge.hours.description)
             return false

@@ -21,6 +21,6 @@ enum ConstantsDexcomG5 {
     static let minimumTimeBetweenTwoReadings = TimeInterval(minutes: 2.0)
     
     /// specifically for firefly. If calibration was created more than this period ago, but not yet sent to the transmitter, then it will not be sent anymore
-    static let maxUnSentCalibrationAge = TimeInterval(hours: 1)
+    static let maxUnSentCalibrationAge = TimeInterval(minutes: 5)
     
 }
