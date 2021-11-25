@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19206" systemVersion="20G95" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19461" systemVersion="20G95" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="AlertEntry" representedClassName=".AlertEntry" syncable="YES">
         <attribute name="alertkind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="start" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -87,7 +87,7 @@
         <attribute name="rawTimeStamp" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="rawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="sensorConfidence" attributeType="Double" usesScalarValueType="YES"/>
-        <attribute name="sentToTransmitter" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="sentToTransmitter" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="slope" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="slopeConfidence" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="timeStamp" attributeType="Date" usesScalarValueType="NO"/>
