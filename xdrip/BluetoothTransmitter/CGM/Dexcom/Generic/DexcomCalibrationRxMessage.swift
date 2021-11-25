@@ -14,7 +14,7 @@ struct DexcomCalibrationRxMessage {
     
     init?(data: Data) {
         
-        guard data.count == 5 else { return nil }
+        guard data.count == 3 else { return nil }
         
         guard data.starts(with: .calibrateGlucoseRx) else { return nil }
         

@@ -21,8 +21,13 @@ protocol CGMTransmitter:AnyObject {
     func setWebOOPEnabled(enabled:Bool)
     
     /// - is the CGMTransmitter web oop enabled or not
+    /// - webOOPEnabled means actually the transmitter sends calibrated data (which is the case also for Dexcom G6 firefly for example, and Libre 2 using Libre algorithm)
     /// - default implementation returns false
     func isWebOOPEnabled() -> Bool
+    
+    /// - if true then the calibration is possible, even though the transmitter sends calibrated values (which is the case for Dexcom G6 firefly)
+    /// - default false
+    func overruleIsWebOOPEnabled() -> Bool
     
     /// get cgmTransmitterType
     func cgmTransmitterType() -> CGMTransmitterType
@@ -298,6 +303,9 @@ extension CGMTransmitter {
     
     // default implementation, false
     func isWebOOPEnabled() -> Bool {return false}
+    
+    // default implementation, false
+    func overruleIsWebOOPEnabled() -> Bool {return false}
     
     // empty implementation for transmitter types that don't need this
     func requestNewReading() {}

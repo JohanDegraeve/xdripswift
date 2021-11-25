@@ -723,6 +723,13 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         return .dexcomG5
     }
     
+    func overruleIsWebOOPEnabled() -> Bool {
+        
+        // only firefly allow calibration
+        return useFireflyFlow()
+        
+    }
+
     func startSensor(dexcomCalibrationParameters: DexcomCalibrationParameters, startDate: Date) {
         
         // assign sensorStartToSendToTransmitter to nil, because a new sensor start command must be sent
@@ -1026,16 +1033,19 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let dexcomCalibrationRxMessage = DexcomCalibrationRxMessage(data: value) {
             
-            var type = "unknown"
-            
-            if let dexcomCalibrationResponseType = dexcomCalibrationRxMessage.type {
-                type = dexcomCalibrationResponseType.description
+            guard let dexcomCalibrationResponseType = dexcomCalibrationRxMessage.type  else {
+
+                trace("in processCalibrateGlucoseRxMessage, received unknown type", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomCalibrationRxMessage.accepted.description)
+
+                return
+                
             }
             
-            trace("in processCalibrateGlucoseRxMessage, received dexcomCalibrationRxMessage, accepted = %{public}@, type = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomCalibrationRxMessage.accepted.description, type)
+            trace("in processCalibrateGlucoseRxMessage, received dexcomCalibrationRxMessage, accepted = %{public}@, type = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomCalibrationRxMessage.accepted.description, dexcomCalibrationResponseType.description)
+            
             
         } else {
-            trace("dexcomCalibrationRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
+            trace("in processCalibrateGlucoseRxMessage, dexcomCalibrationRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
         }
         
     }
