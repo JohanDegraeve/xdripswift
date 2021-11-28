@@ -15,11 +15,20 @@ struct DexcomSessionStopRxMessage {
     
     let sessionStopResponse: DexcomSessionStopResponse
     
+    /// timeinterval since transmitterStartDate
     let sessionStopTime: Double
     
+    /// timeinterval since transmitterStartDate
     let sessionStartTime: Double
     
+    /// transmitterStartDAte =timeinterval since now, negative
     let transmitterTime: Double
+    
+    /// transmitter Start Date
+    let transmitterStartDate: Date
+    
+    /// session stopDate
+    let sessionStopDate: Date
     
     init?(data: Data) {
         
@@ -38,6 +47,10 @@ struct DexcomSessionStopRxMessage {
         sessionStartTime = Double(Data(data[7..<11]).to(UInt32.self))
         
         transmitterTime = Double(Data(data[11..<15]).to(UInt32.self))
+        
+        transmitterStartDate = Date(timeIntervalSinceNow: -transmitterTime)
+        
+        sessionStopDate = Date(timeInterval: sessionStopTime, since: transmitterStartDate)
         
     }
     

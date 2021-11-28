@@ -16,6 +16,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// created public because inheriting classes need it
     var transmitterStartDate: Date?
     
+    /// if true, then firefly flow will be used, even if the transmitter id < 8G
+    var isFireflyNoMatterTransmitterId: Bool = false
+    
     /// CGMG5TransmitterDelegate
     public weak var cGMG5TransmitterDelegate: CGMG5TransmitterDelegate?
 
@@ -131,12 +134,17 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// if the user starts the sensor via xDrip4iOS, then only after having receivec a confirmation from the transmitter, then sensorStartDate will be assigned to the actual sensor start date
     private var sensorStartDate: Date?
     
+    /// to temporary store the received SensorStartDate. Will be compared to sensorStartDate only after having received a glucoseRx message with a valid algorithm status
+    private var receivedSensorStartDate: Date?
+    
     /// - used to send sensor start done by user via xDrip4iOS to Dexcom transmitter. For example, user may have started a sensor in the app, but it's not yet send to the transmitter.
     /// - tuple consisitng of startDate and dexcomCalibrationParameters. If startDate is nil, then there's no start sensor waiting to be sent to the transmitter.
     private var sensorStartToSendToTransmitter: (startDate: Date, dexcomCalibrationParameters: DexcomCalibrationParameters)?
     
-    /// if true, then firefly flow will be used, even if the transmitter id < 8G
-    private let isFireflyNoMatterTransmitterId: Bool
+    /// used to send stop session to transmitter
+    private var dexcomSessionStopTxMessageToSendToTransmitter: DexcomSessionStopTxMessage?
+    
+    private var timeStampLastConnection = Date(timeIntervalSince1970: 0)
     
     // MARK: - public functions
     
@@ -150,8 +158,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - transmitterStartDate : transmitter start date, optional - actual transmitterStartDate is received from transmitter itself, and stored in coredata. The stored value iss given here as parameter in the initializer. Means  at app start up, it's read from core data and added here as parameter
     ///     - sensorStartDate : should be sensorStartDate of active sensor. If a different sensor start date is received from the transmitter, then we know a new senosr was started
     ///     - calibrationToSendToTransmitter : used to send calibration done by user via xDrip4iOS to Dexcom transmitter. For example, user may have give a calibration in the app, but it's not yet send to the transmitter. This needs to be verified in CGMG5Transmitter, which is why it's given here as parameter - when initializing, assign last known calibration for the active sensor, even if it's already sent.
-    ///     - isFireFly : if true then the transmitter will be treated as a firefly, no matter the transmitter id, no matter if it's a G5, G6 or real Firefly
-    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?, isFireFly: Bool) {
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DEXCOM" + transmitterID[transmitterID.index(transmitterID.startIndex, offsetBy: 4)..<transmitterID.endIndex])
@@ -174,9 +181,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // assign sensorStartDate
         self.sensorStartDate = sensorStartDate
         
-        // assign isFireflyNoMatterTransmitterId
-        self.isFireflyNoMatterTransmitterId = isFireFly
-
         // initialize - CBUUID_Receive_Authentication.rawValue and CBUUID_Write_Control.rawValue will probably not be used in the superclass
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G5, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G5)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
 
@@ -271,7 +275,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // get characteristic description and trace
         var characteristicDescription = characteristic.uuid.uuidString
         if let characteristic = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString) { characteristicDescription = characteristic.description}
-        trace("in peripheralDidUpdateNotificationStateFor. characteristic = ", log: log, category: ConstantsLog.categoryCGMG5, type: .info, characteristicDescription)
+        trace("in peripheralDidUpdateNotificationStateFor. characteristic = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, characteristicDescription)
         
         if let error = error {
             trace("    error: %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .error , error.localizedDescription)
@@ -395,6 +399,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                     // subscribe to writeControlCharacteristic
                                     if let writeControlCharacteristic = writeControlCharacteristic {
                                         
+                                        trace("    will set notifyValue for writeControlCharacteristic to true", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
                                         setNotifyValue(true, for: writeControlCharacteristic)
                                         
                                     } else {
@@ -404,12 +409,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                     // subscribe to backfillCharacteristic
                                     if let backfillCharacteristic = backfillCharacteristic {
                                         
+                                        trace("    will set notifyValue for backfillCharacteristic to true", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
                                         setNotifyValue(true, for: backfillCharacteristic)
                                         
                                     } else {
-                                        
                                         trace("    backfillCharacteristic is nil, can not set notifyValue", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
-                                        
                                     }
                                     
                                 }
@@ -594,6 +598,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         case .sessionStopRx:
                             
                             processSessionStopRxMessage(value: value)
+                            
+                            // if firefly continue with the firefly message flow
+                            if useFireflyFlow() { fireflyMessageFlow() }
 
                         case .sessionStartRx:
 
@@ -637,16 +644,32 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // not calling super.didconnect here
         
-        // if last reading was less than a minute ago, then no need to continue, otherwise continue with process by calling super.centralManager(central, didConnect: peripheral)
-        if Date() < Date(timeInterval: ConstantsDexcomG5.minimumTimeBetweenTwoReadings, since: timeStampOfLastG5Reading) {
-            trace("connected to peripheral with name %{public}@, but last reading was less than %{public}@ minute ago", log: log, category: ConstantsLog.categoryCGMG5, type: .info, (deviceName != nil ? deviceName! : "unknown"), ConstantsDexcomG5.minimumTimeBetweenTwoReadings.minutes.description)
-            // don't disconnect here, keep the connection open, the transmitter will disconnect in a few seconds, assumption is that this will increase battery life
-        } else {
+        // if last reading was less than 2.1 minutes ago, or last connection less than 2.1 minutes ago, then no need to continue, otherwise continue with process by calling super.centralManager(central, didConnect: peripheral)
+        // except if calibrationToSendToTransmitter or sensorStartToSendToTransmitter or dexcomSessionStopTxMessageToSendTransmitter not nil
+        if calibrationToSendToTransmitter == nil && sensorStartToSendToTransmitter == nil && dexcomSessionStopTxMessageToSendToTransmitter == nil {
             
-            super.centralManager(central, didConnect: peripheral)
+            if Date() < Date(timeInterval: ConstantsDexcomG5.minimumTimeBetweenTwoReadings, since: timeStampOfLastG5Reading) {
                 
+                trace("connected to peripheral with name %{public}@, but last reading was less than %{public}@ minute ago, will let the connection timeout", log: log, category: ConstantsLog.categoryCGMG5, type: .info, (deviceName != nil ? deviceName! : "unknown"), ConstantsDexcomG5.minimumTimeBetweenTwoReadings.minutes.description)
+                // don't disconnect here, keep the connection open, the transmitter will disconnect in a few seconds, assumption is that this will increase battery life, because otherwise there's lot of unnecessary data communication
+                
+                return
+                
+            } else if Date() < Date(timeInterval: TimeInterval(minutes: 2.1), since: timeStampLastConnection) {
+                
+                trace("connected to peripheral with name %{public}@, but last connection was less than 2.1 minutes ago, will let the connection timeout", log: log, category: ConstantsLog.categoryCGMG5, type: .info, (deviceName != nil ? deviceName! : "unknown"))
+                // don't disconnect here, keep the connection open, the transmitter will disconnect in a few seconds, assumption is that this will increase battery life, because otherwise there's lot of unnecessary data communication
+                
+                return
+                
+            }
+            
         }
         
+        super.centralManager(central, didConnect: peripheral)
+        
+        timeStampLastConnection = Date()
+
         // to be sure waitingPairingConfirmation is reset to false
         waitingPairingConfirmation = false
         
@@ -729,25 +752,54 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         return useFireflyFlow()
         
     }
-
-    func startSensor(dexcomCalibrationParameters: DexcomCalibrationParameters, startDate: Date) {
+    
+    func startSensor(sensorCode: String?, startDate: Date) {
         
         // assign sensorStartToSendToTransmitter to nil, because a new sensor start command must be sent
         sensorStartToSendToTransmitter = nil
-
+        
         guard startDate != sensorStartDate else {
-
+            
             trace("in startSensor, but startDate is equal to already known sensorStartDate, so it looks as if a startSensor is done for a sensor that is already started. No further processing", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-
+            
             return
             
         }
+        
+        guard let dexcomCalibrationParameters = DexcomCalibrationParameters(sensorCode: sensorCode) else {
+            
+            trace("in startSensor, failed to create dexcomCalibrationParameters for sensorcode %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, (sensorCode == nil ? "nil" : sensorCode!))
+            
+            return
+            
+        }
+        
+        trace("in startSensor, storing sensor start  info, will be sent to transmitter at next connect", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
         
         // assign sensorStartToSendToTransmitter
         sensorStartToSendToTransmitter = (startDate, dexcomCalibrationParameters)
         
     }
-    
+
+    func stopSensor(stopDate: Date) {
+        
+        // if there's no sensorStartDate known, then don't send any stopSensor command to the transmitter
+        if sensorStartDate == nil {
+            
+            trace("in stopSensor, sensorStartDate is nil, no further processing", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+            
+            return
+            
+        }
+        
+        guard let transmitterStartDate = transmitterStartDate else { return }
+
+        trace("in stopsensor, storing sensor stop  info, will be sent to transmitter at next connect", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+        
+        dexcomSessionStopTxMessageToSendToTransmitter = DexcomSessionStopTxMessage(stopDate: stopDate, transmitterStartDate: transmitterStartDate)
+        
+    }
+
     func calibrate(calibration: Calibration?) {
         
         // - if calibration is valid, then it assigns calibrationToSendToTransmitter to calibration, will be picked up when transmitter connects , and if it's within an hour
@@ -869,6 +921,22 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             
         }
 
+    }
+    
+    private func sendSessionStopTxMessage(dexcomSessionStopTxMessage: DexcomSessionStopTxMessage) {
+        
+        if let writeControlCharacteristic = writeControlCharacteristic {
+            
+            trace("sending sendSessionStopTxMessage with stopDate %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomSessionStopTxMessage.stopDate.toString(timeStyle: .long, dateStyle: .long))
+            
+            _ = super.writeDataToPeripheral(data: dexcomSessionStopTxMessage.data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
+            
+        } else {
+            
+            trace("in sendSessionStopTxMessage, writeControlCharacteristic is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
+            
+        }
+        
     }
     
     /// sends startDate and dexcomCalibrationParameters to transmitter. Will use super.writeDataToPeripheral, meaning, even if letDexcomAppDoTheTransmitWork = true, then still it will send the data to the transmitter
@@ -1002,10 +1070,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let dexcomSessionStopRxMessage = DexcomSessionStopRxMessage(data: value) {
             
-            trace("in processSessionStopRxMessage, received dexcomSessionStopRxMessage, isOkay = %{public}@, received = %{public}@, sessionStartTime = %{public}@, sessionStopTime = %{public}@, status = %{public}@, transmitterTime = %{public}@,", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomSessionStopRxMessage.isOkay.description, dexcomSessionStopRxMessage.sessionStopResponse.description, dexcomSessionStopRxMessage.sessionStartTime.description, dexcomSessionStopRxMessage.sessionStopTime.description, dexcomSessionStopRxMessage.status.description, dexcomSessionStopRxMessage.transmitterTime.description)
+            trace("in processSessionStopRxMessage, received dexcomSessionStopRxMessage, isOkay = %{public}@, sessionStopResponse = %{public}@, sessionStartTime = %{public}@, sessionStopTime = %{public}@, status = %{public}@, transmitterTime = %{public}@,", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomSessionStopRxMessage.isOkay.description, dexcomSessionStopRxMessage.sessionStopResponse.description, dexcomSessionStopRxMessage.sessionStopDate.toString(timeStyle: .long, dateStyle: .long), dexcomSessionStopRxMessage.sessionStopTime.description, dexcomSessionStopRxMessage.status.description, dexcomSessionStopRxMessage.transmitterStartDate.toString(timeStyle: .long, dateStyle: .long))
             
         } else {
+            
             trace("dexcomSessionStopRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
+        
         }
         
     }
@@ -1084,8 +1154,37 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             // create glucose data and assign to lastGlucoseInSensorDataRxReading
             lastGlucoseInSensorDataRxReading = GlucoseData(timeStamp: timeStamp, glucoseLevelRaw: calculatedValue)
+
+            // this is a valid sensor state, now it's time to process receivedSensorStartDate if it exists
+            if let receivedSensorStartDate = receivedSensorStartDate {
+                
+                // if current sensorStartDate is < from receivedSensorStartDate then it seems a new sensor
+                if sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate) {
+                    
+                    trace("    Seems a new sensor is detected.", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                    
+                    self.receivedSensorStartDate = receivedSensorStartDate
+                    
+                    cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: receivedSensorStartDate)
+                    
+                }
+                
+                // assign sensorStartDate to receivedSensorStartDate
+                sensorStartDate = receivedSensorStartDate
+                
+                // reset receivedSensorStartDate to nil
+                self.receivedSensorStartDate = nil
+                
+            }
             
             break
+            
+        case .SessionStopped:
+            
+            // session stopped, means sensor stopped?
+            cgmTransmitterDelegate?.sensorStopDetected()
+            
+            sensorStartDate = nil
             
         default:
             
@@ -1156,14 +1255,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 // if current sensorStartDate is < from receivedSensorStartDate then it seems a new sensor
                 if sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate) {
                    
-                    trace("    sensorStartDate == nil or sensorStartDate < receivedSensorStartDate, seems a new sensor is detected.", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                    trace("    current sensorStartDate == nil or current sensorStartDate < received SensorStartDate, seems a new sensor is detected. Temporary storing the received SensorStartDate till a glucoseRx message is received with valid sensor status", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                     
-                    cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: receivedSensorStartDate)
+                    self.receivedSensorStartDate = receivedSensorStartDate
                     
                 }
-                
-                // assign sensorStartDate to receivedSensorStartDate
-                sensorStartDate = receivedSensorStartDate
                 
             } else {
                 trace("    sensorStartDate is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
@@ -1324,6 +1420,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // first of all check that the transmitter is really a firefly, if not stop processing
         if !useFireflyFlow() { return }
         
+        trace("    start of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+        
         // check if firmware is known, if not ask it
         guard firmware != nil else {
             
@@ -1337,13 +1435,33 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // if yes, request battery status (done in function batteryStatusRequested)
         if !batteryStatusRequested() {
             
-            // check if transmitterStartDate is known, and if we've recently requested the sensorStartTime, if not then request transmitterStartDate, response should contain both transmitterStartDate and sensorStartDate
-            if let transmitterStartDate = transmitterStartDate, Date() < Date(timeInterval: ConstantsDexcomG5.sensorStartTimeReadPeriod, since: timeStampLastSensorStartTimeRead) {
+            // check if transmitterStartDate is known
+            // and if sensorStartTime is known:
+            //     - check if we've recently requested the sensorStartTime, less than sensorStartTimeReadPeriod ago
+            // and if sensorStartTime is not known:
+            //     - check if we've recently requested the sensorStartTime, less than 2.1 minutes ago
+            // otherwise get transmitterStartDate and sensorStartTime
+            if let transmitterStartDate = transmitterStartDate,
+                (
+                    (Date() < Date(timeInterval: ConstantsDexcomG5.sensorStartTimeReadPeriod, since: timeStampLastSensorStartTimeRead) && sensorStartDate != nil)
+                    ||
+                    (Date() < Date(timeInterval: TimeInterval(minutes: 2.1), since: timeStampLastSensorStartTimeRead) && sensorStartDate == nil)
+                )  {
 
-                // if there's a sensor start command to send it
+                if let dexcomSessionStopTxMessage = dexcomSessionStopTxMessageToSendToTransmitter {
+                    
+                    sendSessionStopTxMessage(dexcomSessionStopTxMessage: dexcomSessionStopTxMessage)
+                    
+                    self.dexcomSessionStopTxMessageToSendToTransmitter = nil
+                    
+                } else
+                
+                // if there's a sensor start command to send, then send it
                 if let sensorStartToSendToTransmitter = sensorStartToSendToTransmitter {
                     
                     sendSessionStartTxMessage(sensorStartToSendToTransmitter: (startDate: sensorStartToSendToTransmitter.startDate, dexcomCalibrationParameters: sensorStartToSendToTransmitter.dexcomCalibrationParameters), transmitterStartDate: transmitterStartDate)
+                    
+                    self.sensorStartToSendToTransmitter = nil
                     
                 } else
                 
@@ -1364,9 +1482,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     
                 } else
                 
-                // if glucoseTx was not yet sent and minimumTimeBetweenTwoReadings smaller than now - timeStampOfLastG5Reading (for safety)
+                // if glucoseTx was not yet sent and minimumTimeBetweenTwoReadings larger than now - timeStampOfLastG5Reading (for safety)
                 // then send glucoseTx message
-                if !glucoseTxSent || Date() < Date(timeInterval: ConstantsDexcomG5.minimumTimeBetweenTwoReadings, since: timeStampOfLastG5Reading) {
+                // and sensor must be active
+                if !glucoseTxSent && Date() > Date(timeInterval: ConstantsDexcomG5.minimumTimeBetweenTwoReadings, since: timeStampOfLastG5Reading) && sensorStartDate != nil {
 
                     // ask latest glucose value
                     sendGlucoseTxMessage()
@@ -1381,7 +1500,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 
                 // check if backfill needed, and request backfill if needed
                 // if not needed continue with flow
-                if Date().timeIntervalSince(timeStampOfLastG5Reading) > ConstantsDexcomG5.minPeriodOfLatestReadingsToStartBackFill && !backfillTxSent {
+                // sensor must be active
+                if Date().timeIntervalSince(timeStampOfLastG5Reading) > ConstantsDexcomG5.minPeriodOfLatestReadingsToStartBackFill && !backfillTxSent && sensorStartDate != nil {
                         
                     // send backfillTxMessage
                     // start time = timeStampOfLastG5Reading - maximum maxBackfillPeriod
@@ -1396,9 +1516,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     trace("    end of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                     
                     // disconnect
-                    trace("    will disconnect now", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                    
-                    disconnect()
+                    trace("    will not disconnect, let transmitter timeout the connect", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
 
                 }
 

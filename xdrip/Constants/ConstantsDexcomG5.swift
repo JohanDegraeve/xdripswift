@@ -9,7 +9,7 @@ enum ConstantsDexcomG5 {
     static let maxTimeToAcceptPairing = TimeInterval(minutes: 1.0)
     
     /// how often to read sensor start time (only for Firefly)
-    static let sensorStartTimeReadPeriod = TimeInterval(hours: 1.0)
+    static let sensorStartTimeReadPeriod = TimeInterval(hours: 0.5)
     
     /// how far in history to go back for fetching readings
     static let maxBackfillPeriod = TimeInterval(hours: 6.0)
@@ -18,7 +18,7 @@ enum ConstantsDexcomG5 {
     static let minPeriodOfLatestReadingsToStartBackFill = TimeInterval(minutes: 5.30)
     
     /// if there's a new connect within this period, but latest reading was less than this interval ago, then no need to request new reading
-    static let minimumTimeBetweenTwoReadings = TimeInterval(minutes: 2.0)
+    static let minimumTimeBetweenTwoReadings = TimeInterval(minutes: 2.1)
     
     /// specifically for firefly. If calibration was created more than this period ago, but not yet sent to the transmitter, then it will not be sent anymore
     static let maxUnSentCalibrationAge = TimeInterval(minutes: 5)

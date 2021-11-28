@@ -9,6 +9,9 @@ protocol CGMTransmitterDelegate:AnyObject {
     ///     - detected sensor start time, optional, default nil
     func newSensorDetected(sensorStartDate: Date?)
     
+    /// only for transmitters that can detect an expired sensor - only used for Firefly (at the time of writing this), but could probably also be used for Libre
+    func sensorStopDetected()
+    
     /// only for transmitters that can detect missing sensor
     func sensorNotDetected()
     

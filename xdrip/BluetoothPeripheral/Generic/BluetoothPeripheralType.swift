@@ -152,10 +152,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             // which means, a user could add a Dexcom G6 Firefly as a Dexcom G6 or even a Dexcom G5, the class CGMG5Transmitter will find out it's a firefly, based on transmitter id and handle it as a firefly
             // It plays only a role in the RootViewController that a G6 Firefly is selected, because then also the user needs to add a code
             
-            let dexcomG6 = DexcomG5(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
-            dexcomG6.isFirefly = true
+            let dexcomG6Firefly = DexcomG5(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            dexcomG6Firefly.isFirefly = true
             
-            return dexcomG6
+            return dexcomG6Firefly
             
         case .BubbleType:
             

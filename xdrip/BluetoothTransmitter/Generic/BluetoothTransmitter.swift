@@ -248,7 +248,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         if let peripheral = peripheral, getConnectionStatus() == CBPeripheralState.connected {
             
-            trace("in writeDataToPeripheral, for peripheral with name %{public}@, for characteristic %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", characteristicToWriteTo.uuid.description)
+            trace("in writeDataToPeripheral, for peripheral with name %{public}@, for characteristic %{public}@, data = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", characteristicToWriteTo.uuid.description, data.hexEncodedString())
             
             peripheral.writeValue(data, for: characteristicToWriteTo, type: type)
             

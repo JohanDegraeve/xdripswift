@@ -172,7 +172,6 @@ final class BluetoothPeripheralsViewController: UIViewController {
                     
                 }
                 
-                
             }
             
             
