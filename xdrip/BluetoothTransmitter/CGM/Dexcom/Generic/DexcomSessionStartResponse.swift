@@ -18,19 +18,19 @@ enum DexcomSessionStartResponse: UInt8 {
         switch self {
             
         case .manualCalibrationSessionStarted:
-            return "manualCalibrationSessionStarted"
+            return "manual calibration session started"
             
         case .staleStartComand:
-            return "staleStartComand"
+            return "stale start comand"
             
         case .error:
             return "error"
             
         case .transmitterEndOfLife:
-            return "transmitterEndOfLife"
+            return "transmitter end of life"
             
         case .autoCalibrationSessionInProgress:
-            return "autoCalibrationSessionInProgress"
+            return "Auto calibration session in progress"
             
         }
         

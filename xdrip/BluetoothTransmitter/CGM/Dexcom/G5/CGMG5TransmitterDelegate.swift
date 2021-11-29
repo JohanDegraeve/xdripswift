@@ -16,6 +16,9 @@ protocol CGMG5TransmitterDelegate: AnyObject {
     
     /// sensor start time as received from transmitter
     func received(sensorStartDate: Date, cGMG5Transmitter: CGMG5Transmitter)
+   
+    /// sensor status as received from the transmitter
+    func received(sensorStatus: String, cGMG5Transmitter: CGMG5Transmitter)
     
 }
 

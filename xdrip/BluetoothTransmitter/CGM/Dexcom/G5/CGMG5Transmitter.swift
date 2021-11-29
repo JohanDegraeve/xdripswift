@@ -228,6 +228,13 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         G5ResetRequested = requested
     }
     
+    /// verifies if it's a firefly based on transmitterId, if >= 8G then considered to be a Firefly
+    func useFireflyFlow() -> Bool {
+        
+        return transmitterId.uppercased().compare("8G") == .orderedDescending || isFireflyNoMatterTransmitterId
+        
+    }
+
     // MARK: - deinit
 
     deinit {
@@ -1092,6 +1099,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                   dexcomSessionStartRxMessage.status.description,
                   dexcomSessionStartRxMessage.transmitterTime.description)
             
+            // send sensor status to delegate
+            cGMG5TransmitterDelegate?.received(sensorStatus: dexcomSessionStartRxMessage.sessionStartResponse.description, cGMG5Transmitter: self)
+            
         } else {
             trace("in processSessionStartRxMessage, dexcomSessionStartRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
         }
@@ -1208,6 +1218,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             trace("in processGlucoseDataRxMessage, received glucoseDataRxMessage, value = %{public}@, algorithm status = %{public}@, transmitter status = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, glucoseDataRxMessage.calculatedValue.description, glucoseDataRxMessage.algorithmStatus.description, glucoseDataRxMessage.transmitterStatus.description)
             
             processGlucoseG6DataRxMessageOrGlucoseDataRxMessage(calculatedValue: glucoseDataRxMessage.calculatedValue, algorithmStatus: glucoseDataRxMessage.algorithmStatus, timeStamp: Date())
+            
+            cGMG5TransmitterDelegate?.received(sensorStatus: glucoseDataRxMessage.algorithmStatus.description, cGMG5Transmitter: self)
             
         } else {
             
@@ -1645,13 +1657,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         }
         
         return true
-        
-    }
-    
-    /// verifies if it's a firefly based on transmitterId, if >= 8G then considered to be a Firefly
-    private func useFireflyFlow() -> Bool {
-        
-        return transmitterId.uppercased().compare("8G") == .orderedDescending || isFireflyNoMatterTransmitterId
         
     }
     

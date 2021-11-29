@@ -36,4 +36,6 @@ extension DexcomG5 {
     /// - if the user starts the sensor via xDrip4iOS, then only after having receivec a confirmation from the transmitter, then sensorStartDate will be assigned to the actual sensor start date
     @NSManaged public var sensorStartDate: Date?
     
+    @NSManaged public var sensorStatus: String?
+    
 }

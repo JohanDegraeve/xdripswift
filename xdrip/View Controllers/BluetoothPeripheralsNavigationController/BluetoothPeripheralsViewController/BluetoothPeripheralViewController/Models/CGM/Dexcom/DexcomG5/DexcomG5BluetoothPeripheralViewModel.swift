@@ -18,6 +18,11 @@ class DexcomG5BluetoothPeripheralViewModel {
         /// firmware version
         case firmWareVersion = 2
         
+        // next are only for transmitters that use the firefly flow
+        
+        /// case sensorStatus
+        case sensorStatus = 3
+        
     }
      
     private enum ResetSettings:Int, CaseIterable {
@@ -71,7 +76,7 @@ class DexcomG5BluetoothPeripheralViewModel {
     /// temporary reference to bluetoothPerpipheral, will be set in configure function.
     private var bluetoothPeripheral: BluetoothPeripheral?
     
-    /// it's the bluetoothPeripheral as M5Stack
+    /// it's the bluetoothPeripheral as dexcomG6
     private var dexcomG5: DexcomG5? {
         get {
             return bluetoothPeripheral as? DexcomG5
@@ -219,6 +224,12 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 cell.detailTextLabel?.text = dexcomG5.firmwareVersion
                 cell.accessoryType = .none
                 
+            case .sensorStatus:
+                
+                cell.textLabel?.text = "Sensor Status"
+                cell.detailTextLabel?.text = dexcomG5.sensorStatus
+                cell.accessoryType = .none
+                
             }
 
         case .resetSetings:
@@ -315,6 +326,21 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         switch getDexcomSection(forSectionInTable: section) {
             
         case .commonDexcomSettings:
+            
+            /// to know if firefly flow is used.
+            /// Number of rows is longer for firefly transmitters
+            var isFireFly = false
+            
+            if let dexcomG5 = dexcomG5, let cGMG5Transmitter = getTransmitter(for: dexcomG5) {
+                
+                isFireFly = cGMG5Transmitter.useFireflyFlow()
+                
+            }
+            
+            if !isFireFly {
+                return 3
+            }
+            
             return Settings.allCases.count
             
         case .resetSetings:
@@ -412,6 +438,19 @@ extension DexcomG5BluetoothPeripheralViewModel: CGMG5TransmitterDelegate {
         
         if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
             reloadRow(row: Settings.sensorStartDate.rawValue, section: DexcomSection.commonDexcomSettings.rawValue + bluetoothPeripheralViewController.numberOfGeneralSections())
+        }
+        
+    }
+    
+    /// received sensorStatus
+    func received(sensorStatus: String, cGMG5Transmitter: CGMG5Transmitter) {
+        
+        (bluetoothPeripheralManager as? CGMG5TransmitterDelegate)?.received(sensorStatus: sensorStatus, cGMG5Transmitter: cGMG5Transmitter)
+        
+        // sensorStatus should get updated in DexcomG5 object by bluetoothPeripheralManager, here's the trigger to update the table
+        
+        if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
+            reloadRow(row: Settings.sensorStatus.rawValue, section: DexcomSection.commonDexcomSettings.rawValue + bluetoothPeripheralViewController.numberOfGeneralSections())
         }
         
     }
