@@ -18,9 +18,6 @@ struct DexcomSessionStopRxMessage {
     /// timeinterval since transmitterStartDate
     let sessionStopTime: Double
     
-    /// timeinterval since transmitterStartDate
-    let sessionStartTime: Double
-    
     /// transmitterStartDAte =timeinterval since now, negative
     let transmitterTime: Double
     
@@ -38,13 +35,11 @@ struct DexcomSessionStopRxMessage {
         
         status = data[1]
         
-        guard let sessionStoptResponseReceived = DexcomSessionStopResponse(rawValue: data[2]) else {return nil}
+        guard let sessionStopResponseReceived = DexcomSessionStopResponse(rawValue: data[2]) else {return nil}
 
-        sessionStopResponse = sessionStoptResponseReceived
+        sessionStopResponse = sessionStopResponseReceived
         
         sessionStopTime = Double(Data(data[3..<7]).to(UInt32.self))
-        
-        sessionStartTime = Double(Data(data[7..<11]).to(UInt32.self))
         
         transmitterTime = Double(Data(data[11..<15]).to(UInt32.self))
         

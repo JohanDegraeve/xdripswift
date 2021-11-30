@@ -18,7 +18,9 @@ struct DexcomTransmitterTimeRxMessage {
         
         if data.count >= 9 {
             
-            sensorStartDate = transmitterStartDate + TimeInterval(data.subdata(in: 6..<10).to(Int32.self))
+           // sensorStartDate = transmitterStartDate + TimeInterval(data.subdata(in: 6..<10).to(Int32.self))
+            
+            sensorStartDate = Date() - TimeInterval(data.subdata(in: 2..<6).to(Int32.self)) + TimeInterval(data.subdata(in: 6..<10).to(Int32.self))
             
         } else {
             
