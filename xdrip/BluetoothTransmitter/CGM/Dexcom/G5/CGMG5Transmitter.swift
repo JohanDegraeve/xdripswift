@@ -146,7 +146,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     private var timeStampLastConnection = Date(timeIntervalSince1970: 0)
     
-    /// to use in firefly flow, if zzz
+    /// to use in firefly flow, if true, then sensor status is ok, backfill request can be sent
     private var okToRequestBackfill = false
     
     // MARK: - public functions
@@ -1080,7 +1080,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let dexcomSessionStopRxMessage = DexcomSessionStopRxMessage(data: value) {
             
-            trace("in processSessionStopRxMessage, received dexcomSessionStopRxMessage, isOkay = %{public}@, sessionStopResponse = %{public}@, sessionStartTime = %{public}@, sessionStopTime = %{public}@, status = %{public}@, transmitterTime = %{public}@,", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomSessionStopRxMessage.isOkay.description, dexcomSessionStopRxMessage.sessionStopResponse.description, dexcomSessionStopRxMessage.sessionStartDate.toString(timeStyle: .long, dateStyle: .long), dexcomSessionStopRxMessage.sessionStopDate.toString(timeStyle: .long, dateStyle: .long), dexcomSessionStopRxMessage.status.description, dexcomSessionStopRxMessage.transmitterStartDate.toString(timeStyle: .long, dateStyle: .long))
+            trace("in processSessionStopRxMessage, received dexcomSessionStopRxMessage, isOkay = %{public}@, sessionStopResponse = %{public}@, sessionStartTime = %{public}@, sessionStopTime = %{public}@, status = %{public}@, transmitterTime = %{public}@,", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomSessionStopRxMessage.isOkay.description, dexcomSessionStopRxMessage.sessionStopResponse.description, dexcomSessionStopRxMessage.sessionStopDate.toString(timeStyle: .long, dateStyle: .long), dexcomSessionStopRxMessage.status.description, dexcomSessionStopRxMessage.transmitterStartDate.toString(timeStyle: .long, dateStyle: .long))
             
         } else {
             
@@ -1168,6 +1168,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             // create glucose data and assign to lastGlucoseInSensorDataRxReading
             lastGlucoseInSensorDataRxReading = GlucoseData(timeStamp: timeStamp, glucoseLevelRaw: calculatedValue)
 
+            // it's a valid sensor state, so it's ok to send a backfill request after this message is processed
+            okToRequestBackfill = true
+            
             // this is a valid sensor state, now it's time to process receivedSensorStartDate if it exists
             if let receivedSensorStartDate = receivedSensorStartDate {
                 
@@ -1195,9 +1198,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 
                 // reset receivedSensorStartDate to nil
                 self.receivedSensorStartDate = nil
-                
-                // it's a valid sensor state, so it's ok to send a backfill request after this message is processed
-                okToRequestBackfill = true
                 
             }
             
@@ -1537,7 +1537,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 // if not needed continue with flow
                 // sensor must be active
                 if Date().timeIntervalSince(timeStampOfLastG5Reading) > ConstantsDexcomG5.minPeriodOfLatestReadingsToStartBackFill && !backfillTxSent && sensorStartDate != nil && okToRequestBackfill {
-                        
+                      
                     // send backfillTxMessage
                     // start time = timeStampOfLastG5Reading - maximum maxBackfillPeriod
                     // end time = now
@@ -1550,12 +1550,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     
                     trace("    end of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                     
+                    trace("    will disconnect", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                    
                     // disconnect
-                    trace("    will not disconnect, let transmitter timeout the connect", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                    disconnect()
 
                 }
                 
-                // reset okToRequestBackfill to nil
+                // reset okToRequestBackfill to false
                 okToRequestBackfill = false
 
             } else {
