@@ -27,6 +27,9 @@ extension Calibration {
     
     // only used for firefly transmitters, for now
     @NSManaged public var sentToTransmitter: Bool
+    
+    // only used for firefly transmitters, for now
+    @NSManaged public var acceptedByTransmitter: Bool
 
 }
 

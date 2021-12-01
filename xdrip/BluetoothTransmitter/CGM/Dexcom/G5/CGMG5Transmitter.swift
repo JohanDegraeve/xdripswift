@@ -810,21 +810,13 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
 
-    func calibrate(calibration: Calibration?) {
+    func calibrate(calibration: Calibration) {
         
         // - if calibration is valid, then it assigns calibrationToSendToTransmitter to calibration, will be picked up when transmitter connects , and if it's within an hour
         // - the function does not immediately send the calibration to the transmitter, this will happen only if connected, after successful authentication
         
         // set calibrationToSendToTransmitter to nil, because a new calibration needs to be sent
         calibrationToSendToTransmitter = nil
-        
-        guard let calibration = calibration else {
-            
-            trace("in calibrate. assigned calibrationToSendToTransmitter to nil ", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-            
-            return
-            
-        }
         
         if calibrationIsValid(calibration: calibration) {
             
@@ -924,6 +916,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             trace("sending calibrationTxMessage with timestamp %{public}@, value %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, calibration.timeStamp.toString(timeStyle: .long, dateStyle: .long), calibration.bg.description)
             
             _ = super.writeDataToPeripheral(data: calibrationTxMessage.data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
+            
+            // set sentToTransmitter to true
+            calibration.sentToTransmitter = true
             
         } else {
             
@@ -1126,12 +1121,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             trace("in processCalibrateGlucoseRxMessage, received dexcomCalibrationRxMessage, accepted = %{public}@, type = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomCalibrationRxMessage.accepted.description, dexcomCalibrationResponseType.description)
             
-            // if calibrationToSendToTransmitter not nil, then set calibrationToSendToTransmitter.sentToTransmitter to true
+            // if calibrationToSendToTransmitter not nil, then set calibrationToSendToTransmitter.acceptedByTransmitter to value received from transmitter
             if let calibrationToSendToTransmitter = calibrationToSendToTransmitter {
                 
                 // assumption is that the stored calibration is the one for which we receive this dexcomCalibrationRxMessage
-                // even if it failed, set sentToTransmitter to true, because we will not resend it
-                calibrationToSendToTransmitter.sentToTransmitter = true
+                calibrationToSendToTransmitter.acceptedByTransmitter = dexcomCalibrationRxMessage.accepted
+                
+                // set calibrationToSendToTransmitter to nil so it's not processed next run
+                self.calibrationToSendToTransmitter = nil
 
             }
             
@@ -1674,7 +1671,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // if calibrationToSendToTransmitter timestamp older than 5 minutes
         if Date().timeIntervalSince1970 - calibration.timeStamp.timeIntervalSince1970 > ConstantsDexcomG5.maxUnSentCalibrationAge {
-            trace("    calibration has timestamp older than %{public}@ hours, not valid", log: log, category: ConstantsLog.categoryCGMG5, type: .info, ConstantsDexcomG5.maxUnSentCalibrationAge.hours.description)
+            trace("    calibration has timestamp older than %{public}@ hours, not valid", log: log, category: ConstantsLog.categoryCGMG5, type: .info, ConstantsDexcomG5.maxUnSentCalibrationAge.minutes.description)
             return false
         }
         

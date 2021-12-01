@@ -11,10 +11,10 @@ import Foundation
 struct DexcomCalibrationRxMessage {
     
     let type: DexcomCalibrationResponseType?
-    
+    //35 00 00 552e
     init?(data: Data) {
         
-        guard data.count == 3 else { return nil }
+        guard data.count >= 3 else { return nil }
         
         guard data.starts(with: .calibrateGlucoseRx) else { return nil }
         

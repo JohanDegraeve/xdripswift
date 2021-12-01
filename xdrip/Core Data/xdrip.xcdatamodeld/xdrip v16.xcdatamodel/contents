@@ -76,6 +76,7 @@
         <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="bubble" inverseEntity="BLEPeripheral"/>
     </entity>
     <entity name="Calibration" representedClassName=".Calibration" syncable="YES">
+        <attribute name="acceptedByTransmitter" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="adjustedRawValue" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="bg" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="deviceName" optional="YES" attributeType="String"/>
@@ -167,7 +168,7 @@
         <element name="Blucon" positionX="-657" positionY="189" width="128" height="58"/>
         <element name="BlueReader" positionX="-639" positionY="207" width="128" height="58"/>
         <element name="Bubble" positionX="-657" positionY="189" width="128" height="88"/>
-        <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="284"/>
+        <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="299"/>
         <element name="DexcomG4" positionX="-621" positionY="225" width="128" height="58"/>
         <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="239"/>
         <element name="Droplet" positionX="-630" positionY="216" width="128" height="58"/>

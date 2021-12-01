@@ -78,6 +78,7 @@ public class Calibration: NSManagedObject {
         r += "\n" + indentation + "slopeConfidence = " + slopeConfidence.description
         r += "\n" + indentation + "timestamp = " + timeStamp.description + "\n"
         r += "\n" + indentation + "sentToTransmitter = " + sentToTransmitter.description + "\n"
+        r += "\n" + indentation + "acceptedByTransmitter = " + acceptedByTransmitter.description + "\n"
         return r
     }
 }

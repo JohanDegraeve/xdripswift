@@ -34,7 +34,6 @@ struct DexcomG6GlucoseDataRxMessage {
             
             algorithmStatus = DexcomAlgorithmState.None
             
-            
         }
         
     }
