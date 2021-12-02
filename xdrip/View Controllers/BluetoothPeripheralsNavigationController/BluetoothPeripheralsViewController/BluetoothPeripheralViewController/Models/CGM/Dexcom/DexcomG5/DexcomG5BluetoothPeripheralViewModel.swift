@@ -4,10 +4,10 @@ import CoreBluetooth
 
 class DexcomG5BluetoothPeripheralViewModel {
     
-    // MARK: - private properties
+    // MARK: - private and public properties
     
     /// settings specific for Dexcom G5
-    private enum Settings:Int, CaseIterable {
+    public enum Settings:Int, CaseIterable {
         
         /// sensor start time
         case sensorStartDate = 0
@@ -135,6 +135,14 @@ class DexcomG5BluetoothPeripheralViewModel {
     public func numberOfSectionsForThisTransmitter() -> Int {
         
         return DexcomSection.allCases.count
+        
+    }
+    
+    /// number of rows to show from commondexcomsettings
+    public func numberOfCommonDexcomSettings() -> Int {
+        
+        // for non-fireflies, last row not shown
+        return Settings.allCases.count - 1
         
     }
     
@@ -334,28 +342,14 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
         case .commonDexcomSettings:
             
-            /// to know if firefly flow is used.
-            /// Number of rows is longer for firefly transmitters
-            var isFireFly = false
-            
-            if let dexcomG5 = dexcomG5, let cGMG5Transmitter = getTransmitter(for: dexcomG5) {
-                
-                isFireFly = cGMG5Transmitter.useFireflyFlow()
-                
-            }
-            
-            if !isFireFly {
-                return 3
-            }
-            
-            return Settings.allCases.count
-            
-        case .resetSetings:
-            return ResetSettings.allCases.count
+            return numberOfCommonDexcomSettings()
             
         case .batterySettings:
             return TransmitterBatteryInfoSettings.allCases.count
 
+        case .resetSetings:
+            return ResetSettings.allCases.count
+            
         }
 
     }
