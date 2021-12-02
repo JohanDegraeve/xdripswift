@@ -14,7 +14,7 @@ class DexcomG5BluetoothPeripheralViewModel {
         
         /// transmitter start time
         case transmitterStartDate = 1
-        
+
         /// firmware version
         case firmWareVersion = 2
         
@@ -51,16 +51,16 @@ class DexcomG5BluetoothPeripheralViewModel {
     
     /// - list of sections available in Dexcom
     /// - counting starts at 0
-    private enum DexcomSection: Int, CaseIterable {
+    public enum DexcomSection: Int, CaseIterable {
         
         /// helptest, blepassword, rotation, color, ... settings applicable to both M5Stack and M5StickC
         case commonDexcomSettings = 0
 
-        /// reset settings
-        case resetSetings = 1
-        
         /// batterySettings
-        case batterySettings = 2
+        case batterySettings = 1
+        
+        /// reset settings
+        case resetSetings = 2
         
     }
     
@@ -129,6 +129,13 @@ class DexcomG5BluetoothPeripheralViewModel {
     /// screenTitle, can be overriden for G6
     public func dexcomScreenTitle() -> String {
         return BluetoothPeripheralType.DexcomG5Type.rawValue
+    }
+    
+    /// just a helper, can be overloaded, eg for firefly
+    public func numberOfSectionsForThisTransmitter() -> Int {
+        
+        return DexcomSection.allCases.count
+        
     }
     
 }
@@ -355,7 +362,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     
     func numberOfSections() -> Int {
         
-        return DexcomSection.allCases.count
+        return numberOfSectionsForThisTransmitter()
         
     }
     

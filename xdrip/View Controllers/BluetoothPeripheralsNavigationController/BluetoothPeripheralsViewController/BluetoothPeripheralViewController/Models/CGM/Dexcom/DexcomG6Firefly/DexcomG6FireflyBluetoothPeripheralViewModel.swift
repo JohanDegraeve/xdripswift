@@ -9,5 +9,14 @@ class DexcomG6FireflyBluetoothPeripheralViewModel: DexcomG5BluetoothPeripheralVi
     override public func dexcomScreenTitle() -> String {
         return BluetoothPeripheralType.DexcomG6FireflyType.rawValue
     }
-    
+
+    /// just a helper, can be overloaded, eg for firefly
+    public override func numberOfSectionsForThisTransmitter() -> Int {
+        
+        return DexcomSection.allCases.count - 1
+        
+    }
+
 }
+
+

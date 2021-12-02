@@ -1547,11 +1547,19 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     
                     trace("    end of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                     
-                    trace("    will disconnect", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                    
-                    // disconnect
-                    disconnect()
+                    if letDexcomAppDoTheTransmitWork {
 
+                        trace("    letDexcomAppDoTheTransmitWork = true, will not disconnect", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+
+                    } else {
+
+                        trace("    will disconnect", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+
+                        // disconnect
+                        disconnect()
+                        
+                    }
+                    
                 }
                 
                 // reset okToRequestBackfill to false
