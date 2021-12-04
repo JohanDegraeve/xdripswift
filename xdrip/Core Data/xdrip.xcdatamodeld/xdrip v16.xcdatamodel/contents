@@ -110,6 +110,7 @@
         <attribute name="sensorStartDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="sensorStatus" optional="YES" attributeType="String"/>
         <attribute name="transmitterStartDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="useOtherApp" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="voltageA" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="voltageB" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="dexcomG5" inverseEntity="BLEPeripheral"/>
@@ -170,7 +171,7 @@
         <element name="Bubble" positionX="-657" positionY="189" width="128" height="88"/>
         <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="299"/>
         <element name="DexcomG4" positionX="-621" positionY="225" width="128" height="58"/>
-        <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="239"/>
+        <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="254"/>
         <element name="Droplet" positionX="-630" positionY="216" width="128" height="58"/>
         <element name="GNSEntry" positionX="-648" positionY="198" width="128" height="103"/>
         <element name="Libre2" positionX="-648" positionY="198" width="128" height="58"/>

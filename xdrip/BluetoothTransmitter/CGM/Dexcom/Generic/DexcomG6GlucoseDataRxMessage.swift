@@ -24,9 +24,9 @@ struct DexcomG6GlucoseDataRxMessage {
 
         timeStamp = transmitterStartDate + TimeInterval(data.subdata(in: 6..<10).to(Int32.self))
         
-        calculatedValue = Double(data[10]) + Double(data[11]) * 256.0 + Double(data[13]) * 256.0 * 256.0
+        calculatedValue = Double(data[10]) + Double(data[11] & 0x0F) * 256.0
         
-        if let receivedState = DexcomAlgorithmState(rawValue: data[14]) {
+        if let receivedState = DexcomAlgorithmState(rawValue: data[12]) {
             
             algorithmStatus = receivedState
             

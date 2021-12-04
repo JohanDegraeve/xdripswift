@@ -23,6 +23,9 @@ class DexcomG5BluetoothPeripheralViewModel {
         /// case sensorStatus
         case sensorStatus = 3
         
+        /// let other app run in parallel with xDrip4iOS. If true then xDrip4iOS will only listen and never send, except for calibration and sensor start
+        case userOtherApp = 4
+        
     }
      
     private enum ResetSettings:Int, CaseIterable {
@@ -142,7 +145,7 @@ class DexcomG5BluetoothPeripheralViewModel {
     public func numberOfCommonDexcomSettings() -> Int {
         
         // for non-fireflies, last row not shown
-        return Settings.allCases.count - 1
+        return Settings.allCases.count - 2
         
     }
     
@@ -241,9 +244,26 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 
             case .sensorStatus:
                 
-                cell.textLabel?.text = "Sensor Status"
+                cell.textLabel?.text = Texts_Common.sensorStatus
                 cell.detailTextLabel?.text = dexcomG5.sensorStatus
                 cell.accessoryType = .none
+                
+            case .userOtherApp:
+
+                cell.textLabel?.text = Texts_BluetoothPeripheralView.useOtherDexcomApp
+                cell.detailTextLabel?.text = nil // it's a UISwitch,  no detailed text
+                cell.accessoryView = UISwitch(isOn: dexcomG5.useOtherApp, action: { (isOn:Bool) in
+                    
+                    dexcomG5.useOtherApp = isOn
+                    
+                    if let cGMG5Transmitter = self.getTransmitter(for: dexcomG5) {
+                        
+                        // set isOn value to cGMG5Transmitter
+                        cGMG5Transmitter.useOtherApp = isOn
+                        
+                    }
+                    
+                })
                 
             }
 

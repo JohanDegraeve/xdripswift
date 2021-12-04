@@ -73,4 +73,5 @@ extension BLEPeripheral {
 
     /// timestamp when connection changed to connected or not connected
     @NSManaged public var lastConnectionStatusChangeTimeStamp: Date?
+    
 }

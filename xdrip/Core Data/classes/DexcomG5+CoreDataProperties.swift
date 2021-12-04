@@ -38,4 +38,7 @@ extension DexcomG5 {
     
     @NSManaged public var sensorStatus: String?
     
+    /// if true then other app will be used in parallel with the same transmitter (only for firefly)
+    @NSManaged public var useOtherApp: Bool
+    
 }

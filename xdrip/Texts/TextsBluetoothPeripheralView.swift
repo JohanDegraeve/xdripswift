@@ -132,4 +132,7 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("confirmDisconnectMessage", tableName: filename, bundle: Bundle.main, value: "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.", comment: "Confirm that the user wants to really disconnect the transmitter, title")
     }()
     
+    static let useOtherDexcomApp: String = {
+        return NSLocalizedString("useOtherDexcomApp", tableName: filename, bundle: Bundle.main, value: "Use Other App", comment: "Dexcom bluetooth screen. Is another app used in parallel or not")
+    }()
 }
