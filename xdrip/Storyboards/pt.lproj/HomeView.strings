@@ -36,3 +36,13 @@
 "lock" = "Bloquear";
 "screenlocktitle" = "Activado Bloqueio de Ecrã";
 "screenlockinfo" = "Isto irá manter o ecrã ligado até que mude para outra aplicação or pressione Desbloquear.\r\n\nÉ recomendado que deixe o seu telemóvel ligado ao carregado para prevenir descarga da bateria.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// When user clicks stop sensor, ask confirmation
+"stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
+
+/// When user needs to enter sensor code, to start firefly sensor
+"enterSensorCode" = "Enter Sensor Code";

@@ -29,3 +29,16 @@
 "cannotActiveCGMInFollowerMode" = "Du kan inte aktivera en CGM medan du är i följarläge";
 "confirmDisconnectTitle" = "Bekräfta frånkoppling";
 "confirmDisconnectMessage" = "Klicka 'Koppla från' för att bekräfta att du verkligen vill koppla från sändaren.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Dexcom bluetooth screen. Is another app used in parallel or not
+"useOtherDexcomApp" = "Use Other App";
+
+/// cell text, sensor start time
+"sensorStartDate" = "Sensor Start";
+
+/// cell text, transmitter start time
+"transmittterStartDate" = "Transmitter Start";

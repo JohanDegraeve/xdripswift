@@ -36,3 +36,13 @@
 "failed" = "Echec";
 "calibrationNotNecessary" = "Avec l'activation d'OOPWeb, la calibration n'est plus nécessaire pour le capteur Libre.";
 "dexcomBatteryTooLow" = "La batterie du transmetteur est trop faible!";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// When user clicks stop sensor, ask confirmation
+"stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
+
+/// When user needs to enter sensor code, to start firefly sensor
+"enterSensorCode" = "Enter Sensor Code";

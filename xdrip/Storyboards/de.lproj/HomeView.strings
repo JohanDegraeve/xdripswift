@@ -104,3 +104,13 @@
 "unlock" = "Entsperren";
 "screenlocktitle" = "Bildschirmsperre aktiviert";
 "screenlockinfo" = "Dadurch bleibt der Bildschirm aktiviert, bis zu einer anderen App gewechselt wird oder entsperren geklickt wird.\r\n\nWir empfehlen, dass Handy mit dem Ladekabel zu verbinden, um ein Entladen des Akkus zu verhindern.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// When user clicks stop sensor, ask confirmation
+"stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
+
+/// When user needs to enter sensor code, to start firefly sensor
+"enterSensorCode" = "Enter Sensor Code";

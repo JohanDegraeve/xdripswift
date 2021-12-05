@@ -36,3 +36,13 @@
 "failed" = "Mislukt";
 "calibrationNotNecessary" = "Indien het Libre algoritme wordt gebruikt is kalibratie van de sensor niet nodig.";
 "dexcomBatteryTooLow" = "Het Transmitter batterijniveau is te laag!";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// When user clicks stop sensor, ask confirmation
+"stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
+
+/// When user needs to enter sensor code, to start firefly sensor
+"enterSensorCode" = "Enter Sensor Code";

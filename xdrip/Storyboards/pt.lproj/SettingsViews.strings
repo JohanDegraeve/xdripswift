@@ -108,3 +108,10 @@
 "developerSettings" = "Definições de Programador";
 "settingsviews_sectiontitlehomescreen" = "Ecrã Inicial";
 "settingsviews_showClockWhenScreenIsLocked" = "Mostrar Relógio quando Bloqueado?";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Calendar Events Settings - section title
+"calendarEventsSectionTitle" = "Calendar Events";

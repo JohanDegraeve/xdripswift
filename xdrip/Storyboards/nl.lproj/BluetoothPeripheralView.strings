@@ -32,3 +32,16 @@
 "bootLoader" = "Bootloader";
 "confirmDisconnectTitle" = "Bevestig Loskoppelen";
 "confirmDisconnectMessage" = "Klik 'Loskoppelen' om te bevestigen dat je de zender wil loskoppelen.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Dexcom bluetooth screen. Is another app used in parallel or not
+"useOtherDexcomApp" = "Use Other App";
+
+/// cell text, sensor start time
+"sensorStartDate" = "Sensor Start";
+
+/// cell text, transmitter start time
+"transmittterStartDate" = "Transmitter Start";

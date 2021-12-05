@@ -30,3 +30,16 @@
 "sensorType" = "Type de capteur:";
 "confirmDisconnectTitle" = "Confirmer la déconnexion";
 "confirmDisconnectMessage" = "Sélectionner 'Déconnecter' pour confirmer que vous voulez vraiment déconnecter le transmetteur.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Dexcom bluetooth screen. Is another app used in parallel or not
+"useOtherDexcomApp" = "Use Other App";
+
+/// cell text, sensor start time
+"sensorStartDate" = "Sensor Start";
+
+/// cell text, transmitter start time
+"transmittterStartDate" = "Transmitter Start";

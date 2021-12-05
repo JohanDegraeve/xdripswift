@@ -29,3 +29,16 @@
 "cannotActiveCGMInFollowerMode" = "Não pode activar um CGM em Modo de Seguidor";
 "confirmDisconnectTitle" = "Confirmar Desconectar";
 "confirmDisconnectMessage" = "Pressione 'Desconectar' para confirmar que realmente quer desconectar o transmissor.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Dexcom bluetooth screen. Is another app used in parallel or not
+"useOtherDexcomApp" = "Use Other App";
+
+/// cell text, sensor start time
+"sensorStartDate" = "Sensor Start";
+
+/// cell text, transmitter start time
+"transmittterStartDate" = "Transmitter Start";
