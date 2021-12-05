@@ -69,7 +69,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// - sending should be done by other app (eg official Dexcom app)
     /// - exception could be sending calibration request or start sensor request, because if user is calibrating or starting the sensor via xDrip4iOS then it would need to be send to the transmitter by xDrip4iOS
     public var useOtherApp = false
-
+    
     // MARK: - private properties
     
     /// the write and control Characteristic
@@ -1075,7 +1075,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let dexcomSessionStopRxMessage = DexcomSessionStopRxMessage(data: value) {
             
-            trace("in processSessionStopRxMessage, received dexcomSessionStopRxMessage, isOkay = %{public}@, sessionStopResponse = %{public}@, sessionStartTime = %{public}@, sessionStopTime = %{public}@, status = %{public}@, transmitterTime = %{public}@,", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomSessionStopRxMessage.isOkay.description, dexcomSessionStopRxMessage.sessionStopResponse.description, dexcomSessionStopRxMessage.sessionStopDate.toString(timeStyle: .long, dateStyle: .long), dexcomSessionStopRxMessage.status.description, dexcomSessionStopRxMessage.transmitterStartDate.toString(timeStyle: .long, dateStyle: .long))
+            trace("in processSessionStopRxMessage, received dexcomSessionStopRxMessage, isOkay = %{public}@, sessionStopResponse = %{public}@, sessionStopDate = %{public}@, status = %{public}@, transmitterStartDate = %{public}@,", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomSessionStopRxMessage.isOkay.description, dexcomSessionStopRxMessage.sessionStopResponse.description, dexcomSessionStopRxMessage.sessionStopDate.toString(timeStyle: .long, dateStyle: .long), dexcomSessionStopRxMessage.status.description, dexcomSessionStopRxMessage.transmitterStartDate.toString(timeStyle: .long, dateStyle: .long))
             
         } else {
             
@@ -1158,6 +1158,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - timeStamp : timestamp in the reading
     private func processGlucoseG6DataRxMessageOrGlucoseDataRxMessage(calculatedValue: Double, algorithmStatus: DexcomAlgorithmState, timeStamp: Date) {
         
+        // send algorithm status to delegate
+        cGMG5TransmitterDelegate?.received(sensorStatus: algorithmStatus.description, cGMG5Transmitter: self)
+
         switch algorithmStatus {
             
         case .okay, .needsCalibration:
@@ -1233,8 +1236,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             trace("in processGlucoseDataRxMessage, received glucoseDataRxMessage, value = %{public}@, algorithm status = %{public}@, transmitter status = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, glucoseDataRxMessage.calculatedValue.description, glucoseDataRxMessage.algorithmStatus.description, glucoseDataRxMessage.transmitterStatus.description)
             
             processGlucoseG6DataRxMessageOrGlucoseDataRxMessage(calculatedValue: glucoseDataRxMessage.calculatedValue, algorithmStatus: glucoseDataRxMessage.algorithmStatus, timeStamp: Date())
-            
-            cGMG5TransmitterDelegate?.received(sensorStatus: glucoseDataRxMessage.algorithmStatus.description, cGMG5Transmitter: self)
             
         } else {
             
