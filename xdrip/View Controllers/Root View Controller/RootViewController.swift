@@ -1867,9 +1867,18 @@ final class RootViewController: UIViewController {
                 
                 if activeSensor != nil {
                     startStopAction = UIAlertAction(title: Texts_HomeView.stopSensorActionTitle, style: .default) { (UIAlertAction) in
-                        trace("in createAndPresentSensorButtonActionSheet, user clicked stop sensor, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                         
-                        self.stopSensor(cGMTransmitter: cgmTransmitter, sendToTransmitter: true)
+                        // first ask user confirmation
+                        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.stopSensorConfirmation, actionHandler: {
+                            
+                            trace("in createAndPresentSensorButtonActionSheet, user clicked stop sensor, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                            
+                            self.stopSensor(cGMTransmitter: cgmTransmitter, sendToTransmitter: true)
+                            
+                        }, cancelHandler: nil)
+                        
+                        self.present(alert, animated: true, completion: nil)
+                        
                     }
                 } else {
                     startStopAction = UIAlertAction(title: Texts_HomeView.startSensorActionTitle, style: .default) { (UIAlertAction) in

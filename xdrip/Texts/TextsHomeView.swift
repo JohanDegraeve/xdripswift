@@ -164,4 +164,8 @@ enum Texts_HomeView {
         return NSLocalizedString("enterSensorCode", tableName: filename, bundle: Bundle.main, value: "Enter Sensor Code", comment: "When user needs to enter sensor code, to start firefly sensor")
     }()
     
+    static let stopSensorConfirmation: String = {
+        return NSLocalizedString("stopSensorConfirmation", tableName: filename, bundle: Bundle.main, value: "Are you sure you want to stop the sensor?", comment: "When user clicks stop sensor, ask confirmation")
+    }()
+    
 }
