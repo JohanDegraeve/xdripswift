@@ -605,6 +605,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             
                             processCalibrateGlucoseRxMessage(value: value)
                             
+                            // if firefly continue with the firefly message flow
+                            if useFireflyFlow() { fireflyMessageFlow() }
+                            
                         case .sessionStopRx:
                             
                             processSessionStopRxMessage(value: value)
@@ -615,6 +618,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         case .sessionStartRx:
 
                             processSessionStartRxMessage(value: value)
+                            
+                            // if firefly continue with the firefly message flow
+                            if useFireflyFlow() { fireflyMessageFlow() }
                             
                         default:
                             trace("    unknown opcode received ", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
