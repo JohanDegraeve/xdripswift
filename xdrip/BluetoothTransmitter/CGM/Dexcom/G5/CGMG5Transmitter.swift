@@ -1047,11 +1047,16 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
             trace("in processBatteryStatusRxMessage, voltageA = %{public}@, voltageB = %{public}@, resist = %{public}@, runtime = %{public}@, temperature = %{public}@, status = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, batteryStatusRxMessage.voltageA.description, batteryStatusRxMessage.voltageB.description, batteryStatusRxMessage.resist.description, batteryStatusRxMessage.runtime.description, batteryStatusRxMessage.temperature.description, batteryStatusRxMessage.status.description)
 
-            // cGMG5TransmitterDelegate for showing info on bluetoothviewcontroller and store in coredata
-            cGMG5TransmitterDelegate?.received(transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), cGMG5Transmitter: self)
-            
-            // cgmTransmitterDelegate , because rootviewcontroller also shows battery info in home screen
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), sensorAge: nil)
+            // possibly other app is running in parallel and also requested battery info, in that case don't store it again
+            if Date() > Date(timeInterval: ConstantsDexcomG5.batteryReadPeriod, since: UserDefaults.standard.timeStampOfLastBatteryReading != nil ? UserDefaults.standard.timeStampOfLastBatteryReading! : Date(timeIntervalSince1970: 0)) {
+
+                // cGMG5TransmitterDelegate for showing info on bluetoothviewcontroller and store in coredata
+                cGMG5TransmitterDelegate?.received(transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), cGMG5Transmitter: self)
+                
+                // cgmTransmitterDelegate , because rootviewcontroller also shows battery info in home screen
+                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), sensorAge: nil)
+
+            }
             
         } else {
             
