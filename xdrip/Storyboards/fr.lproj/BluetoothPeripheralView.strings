@@ -36,7 +36,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Use Other App";
+"useOtherDexcomApp" = "Follow Dexcom-app";
 
 /// cell text, sensor start time
 "sensorStartDate" = "Sensor Start";

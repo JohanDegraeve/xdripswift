@@ -31,4 +31,4 @@
 "confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
 "transmittterStartDate" = "Transmitter Start";
 "sensorStartDate" = "Sensor Start";
-"useOtherDexcomApp" = "Use Other App";
+"useOtherDexcomApp" = "Follow Dexcom-app";
