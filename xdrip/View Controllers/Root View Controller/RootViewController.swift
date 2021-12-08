@@ -1465,7 +1465,14 @@ final class RootViewController: UIViewController {
                     
                     // send calibration to transmitter (only used for Dexcom, if firefly flow is used)
                     if let calibration = calibration {
+                        
                         cgmTransmitter.calibrate(calibration: calibration)
+                        
+                        // presnooze fastrise and fastdrop alert
+                        self.alertManager?.snooze(alertKind: .fastdrop, snoozePeriodInMinutes: 9, response: nil)
+                        
+                        self.alertManager?.snooze(alertKind: .fastrise, snoozePeriodInMinutes: 9, response: nil)
+
                     }
                     
                     
@@ -1482,6 +1489,11 @@ final class RootViewController: UIViewController {
                         // send calibration to transmitter (only used for Dexcom, if firefly flow is used)
                         cgmTransmitter.calibrate(calibration: calibration)
                         
+                        // presnooze fastrise and fastdrop alert
+                        self.alertManager?.snooze(alertKind: .fastdrop, snoozePeriodInMinutes: 9, response: nil)
+
+                        self.alertManager?.snooze(alertKind: .fastrise, snoozePeriodInMinutes: 9, response: nil)
+
                     }
                     
                 }
