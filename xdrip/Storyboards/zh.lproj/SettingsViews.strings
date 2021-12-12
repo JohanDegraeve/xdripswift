@@ -57,9 +57,6 @@
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
 "settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration?";
 
-/// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Libre Algorithm?";
-
 /// Apple Watch Settings - text in row where user needs to say if unit should be displayed or not
 "displayUnitInCalendarEvent" = "Display Unit?";
 
@@ -89,9 +86,6 @@
 
 /// 
 "settingsviews_urgentLowValue" = "Urgent Low Value:";
-
-/// weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section
-"settingsviews_labelWebOOP" = "xDrip or Libre Algorithm";
 
 /// nightscout or dexcom share settings, where user can select to edit the schedule
 "schedule" = "Schedule:";

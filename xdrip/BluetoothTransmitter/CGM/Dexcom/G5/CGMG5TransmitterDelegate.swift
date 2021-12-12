@@ -15,10 +15,12 @@ protocol CGMG5TransmitterDelegate: AnyObject {
     func reset(for cGMG5Transmitter: CGMG5Transmitter, successful: Bool)
     
     /// sensor start time as received from transmitter
-    func received(sensorStartDate: Date, cGMG5Transmitter: CGMG5Transmitter)
+    /// - sensorStartDate = nil for sensorStop
+    func received(sensorStartDate: Date?, cGMG5Transmitter: CGMG5Transmitter)
    
     /// sensor status as received from the transmitter
-    func received(sensorStatus: String, cGMG5Transmitter: CGMG5Transmitter)
+    /// - sensorStatus if not known
+    func received(sensorStatus: String?, cGMG5Transmitter: CGMG5Transmitter)
     
 }
 

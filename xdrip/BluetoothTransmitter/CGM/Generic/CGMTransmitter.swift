@@ -20,12 +20,12 @@ protocol CGMTransmitter:AnyObject {
     /// ---  for transmitters who support webOOP (Bubble, MiaoMiao, ..) this should be implemented
     func setWebOOPEnabled(enabled:Bool)
     
-    /// - is the CGMTransmitter web oop enabled or not
+    /// is the CGMTransmitter web oop enabled or not
     /// - webOOPEnabled means actually the transmitter sends calibrated data (which is the case also for Dexcom G6 firefly for example, and Libre 2 using Libre algorithm)
     /// - default implementation returns false
     func isWebOOPEnabled() -> Bool
     
-    /// - if true then the calibration is possible, even though the transmitter sends calibrated values (which is the case for Dexcom G6 firefly)
+    /// if true then the calibration is possible, even though the transmitter sends calibrated values (which is the case for Dexcom G6 firefly)
     /// - default false
     func overruleIsWebOOPEnabled() -> Bool
     
@@ -35,24 +35,32 @@ protocol CGMTransmitter:AnyObject {
     /// only applicable for Libre transmitters. To request a new reading.
     func requestNewReading()
     
-    /// - maximum sensor age in days, nil if no maximum
+    /// maximum sensor age in days, nil if no maximum
     /// - default implementation returns nil
     func maxSensorAgeInDays() -> Int?
     
-    /// - to send a start sensor command to the transmitter
+    /// to send a start sensor command to the transmitter
     /// - only useful for Dexcom - firefly type of transmitters, other transmitter types will have an empty implementation
     /// - parameters:
     ///     - sensorCode : only to be filled in if code known, only applicable for Dexcom firefly
     ///     - startDate : sensor start timeStamp
     func startSensor(sensorCode: String?, startDate: Date)
     
-    /// - to send a stop sensor command to the transmitter
+    /// to send a stop sensor command to the transmitter
     /// - only useful for Dexcom type of transmitters, other transmitter types will have an empty implementation
     func stopSensor(stopDate: Date)
     
     /// - to send a calibration toe the transmitter
     /// - only useful for Dexcom type of transmitters, other transmitter types will have an empty implementation
     func calibrate(calibration: Calibration)
+    
+    /// - should user give sensor start time when starting a sensor
+    /// - default true
+    func needsSensorStartTime() -> Bool
+    
+    /// - should user give sensor start code when starting a sensor
+    /// - default false
+    func needsSensorStartCode() -> Bool
     
 }
 
@@ -62,15 +70,8 @@ enum CGMTransmitterType:String, CaseIterable {
     /// dexcom G4 using xdrip, xbridge, ...
     case dexcomG4 = "Dexcom G4"
     
-    /// dexcom G5
-    case dexcomG5 = "Dexcom G5"
-    
-    /// - dexcom G6 - for non Firefly - although it can also be used for firefly
-    /// - only difference with firefly, is that sensorCode will not be asked (which is needed for firefly), and user will be asked to set a sensor start time (in case of firefly it's always the actual time that is used as start time)
-    case dexcomG6 = "Dexcom G6"
-    
-    /// dexcom G6 firefly
-    case dexcomG6Firefly = "Dexcom G6 Firefly"
+    /// dexcom G5, G6
+    case dexcom = "Dexcom"
     
     /// miaomiao
     case miaomiao = "MiaoMiao"
@@ -104,7 +105,7 @@ enum CGMTransmitterType:String, CaseIterable {
         
         switch self {
             
-        case .dexcomG4, .dexcomG5, .dexcomG6, .dexcomG6Firefly :
+        case .dexcomG4, .dexcom:
             return .Dexcom
             
         case .miaomiao, .Bubble, .GNSentry, .Droplet1, .blueReader, .watlaa, .Blucon, .Libre2, .Atom:
@@ -126,11 +127,9 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG4:
             return false
             
-        case .dexcomG5, .dexcomG6:
-            return false
-            
-        case .dexcomG6Firefly:
-            // for firefly, we receive the sensorStart time from the transmitter, this will be used to determine if a new sensor is received
+        case .dexcom:
+            // for dexcom in native algorithm mode, we receive the sensorStart time from the transmitter, this will be used to determine if a new sensor is received
+            // the others will not send sensorStart and will also not send sensorAge
             return true
             
         case .miaomiao, .Bubble:
@@ -167,10 +166,7 @@ enum CGMTransmitterType:String, CaseIterable {
         
         switch self {
             
-        case .dexcomG4, .dexcomG5, .dexcomG6, .GNSentry, .Droplet1, .blueReader, .watlaa:
-            return true
-            
-        case .dexcomG6Firefly:
+        case .dexcomG4, .dexcom, .GNSentry, .Droplet1, .blueReader, .watlaa:
             return true
             
         case .miaomiao, .Bubble, .Blucon, .Libre2, .Atom:
@@ -187,7 +183,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG4:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG4
             
-        case .dexcomG5, .dexcomG6, .dexcomG6Firefly:
+        case .dexcom:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
             
         case .miaomiao:
@@ -230,7 +226,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG4:
             return ""
             
-        case .dexcomG5, .dexcomG6, .dexcomG6Firefly:
+        case .dexcom:
             return "voltA"
             
         case .miaomiao, .Bubble, .Droplet1:
@@ -255,37 +251,6 @@ enum CGMTransmitterType:String, CaseIterable {
             return "%"
             
         }
-    }
-    
-    /// - if user starts, sensor, does it require a code?
-    /// - only true for Dexcom G6  firefly type of transmitters
-    func needsSensorStartCode() -> Bool {
-        
-        switch self {
-           
-        case .dexcomG6Firefly:
-            return true
-            
-        default:
-            return false
-        }
-        
-    }
-
-    /// - if user starts, sensor, does it require to give the start time?
-    /// - only false for Dexcom G6 type of transmitters - all other true
-    func needsSensorStartTime() -> Bool {
-        
-        switch self {
-            
-        case .dexcomG6Firefly:
-            return false
-            
-        default:
-            return true
-            
-        }
-        
     }
     
 }
@@ -321,5 +286,11 @@ extension CGMTransmitter {
     
     // default implementation, does nothing
     func calibrate(calibration: Calibration) {}
+    
+    // default implementation, returns true
+    func needsSensorStartTime() -> Bool {return true}
+    
+    // default implementation, returns false
+    func needsSensorStartCode() -> Bool {return false}
     
 }

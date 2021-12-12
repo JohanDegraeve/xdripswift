@@ -62,9 +62,6 @@
 /// name of setting for back ground color
 "m5stack_settingsviews_backGroundColor" = "Hintergrund Farbe";
 
-/// weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section
-"settingsviews_labelWebOOP" = "xDrip oder Libre Algorithmus";
-
 /// nightscout settings, section title
 "settingsviews_sectiontitlenightscout" = "NightScout";
 
@@ -157,9 +154,6 @@
 
 /// dexcom share settings, pop up that asks user to enter dexcom share password
 "settingsviews_giveDexcomSharePassword" = "Eingabe Dexcom Share Passwort";
-
-/// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Libre Algorithmus benutzen?";
 
 /// When creating schedule for Nightscout or Dexcom Share upload, this is the top label text
 "timeScheduleViewTitle" = "An/Aus für geplanten upload ";

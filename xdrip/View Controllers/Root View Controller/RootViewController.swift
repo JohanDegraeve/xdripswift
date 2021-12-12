@@ -1542,13 +1542,32 @@ final class RootViewController: UIViewController {
         
         switch cgmTransmitterType {
         
-        case .dexcomG4, .dexcomG5, .dexcomG6 :
+        case .dexcomG4:
             
             calibrator = DexcomCalibrator()
             
-        case .dexcomG6Firefly:
+        case .dexcom:
             
-            calibrator = NoCalibrator()
+            if cgmTransmitter.isWebOOPEnabled() {
+                
+                // received values are already calibrated
+                calibrator = NoCalibrator()
+                
+            } else if cgmTransmitter.isNonFixedSlopeEnabled() {
+                
+                // no oop web, fixed slope
+                // should not occur, because Dexcom should have nonFixedSlopeEnabled false
+                //  if true for dexcom, then someone has set this to true but didn't create a non-fixed slope calibrator
+                fatalError("cgmTransmitter.isNonFixedSlopeEnabled returns true for dexcom but there's no NonFixedSlopeCalibrator for Dexcom")
+                
+            } else {
+                
+                // no oop web, no fixed slope
+                
+                calibrator = DexcomCalibrator()
+                
+            }
+
             
         case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa, .Libre2, .Atom:
             
@@ -1896,11 +1915,11 @@ final class RootViewController: UIViewController {
                     startStopAction = UIAlertAction(title: Texts_HomeView.startSensorActionTitle, style: .default) { (UIAlertAction) in
 
                         // either sensor needs a sensor start time, or a sensor code .. or none
-                        if cgmTransmitter.cgmTransmitterType().needsSensorStartTime() {
+                        if cgmTransmitter.needsSensorStartTime() {
 
                             self.startSensorAskUserForStarttime(cGMTransmitter: cgmTransmitter)
 
-                        } else if cgmTransmitter.cgmTransmitterType().needsSensorStartCode() {
+                        } else if cgmTransmitter.needsSensorStartCode() {
                             
                             self.startSensorAskUserForSensorCode(cGMTransmitter: cgmTransmitter)
                             

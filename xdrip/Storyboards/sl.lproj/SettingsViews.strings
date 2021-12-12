@@ -30,9 +30,6 @@
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
 "settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration?";
 
-/// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Libre Algorithm?";
-
 /// speak settings, where enable or disable speak trend
 "settingsviews_speakTrend" = "Speak Trend?";
 
@@ -77,9 +74,6 @@
 
 /// speak settings, where user can enable or disable speak delta
 "settingsviews_speakDelta" = "Speak Delta?";
-
-/// weboop settings, title of the dialogs where site and token are asked - also used when viewing bluetoothperipheral settings, the title of the section
-"settingsviews_labelWebOOP" = "xDrip or Libre Algorithm";
 
 /// nightscout or dexcom share settings, where user can select to edit the schedule
 "schedule" = "Schedule:";

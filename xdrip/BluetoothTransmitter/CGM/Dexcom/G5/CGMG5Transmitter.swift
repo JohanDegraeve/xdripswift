@@ -16,9 +16,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// created public because inheriting classes need it
     var transmitterStartDate: Date?
     
-    /// if true, then firefly flow will be used, even if the transmitter id < 8G
-    var isFireflyNoMatterTransmitterId: Bool = false
-    
     /// CGMG5TransmitterDelegate
     public weak var cGMG5TransmitterDelegate: CGMG5TransmitterDelegate?
 
@@ -132,7 +129,17 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private var calibrationToSendToTransmitter: Calibration?
     
     /// if the user starts the sensor via xDrip4iOS, then only after having receivec a confirmation from the transmitter, then sensorStartDate will be assigned to the actual sensor start date
-    private var sensorStartDate: Date?
+    /// - if set then call cGMG5TransmitterDelegate.received(sensorStartDate
+    private var sensorStartDate: Date? {
+        
+        didSet {
+            
+            cGMG5TransmitterDelegate?.received(sensorStartDate: sensorStartDate, cGMG5Transmitter: self)
+            
+            timeStampLastSensorStartTimeRead = Date(timeIntervalSince1970: 0)
+            
+        }
+    }
     
     /// to temporary store the received SensorStartDate. Will be compared to sensorStartDate only after having received a glucoseRx message with a valid algorithm status
     private var receivedSensorStartDate: Date?
@@ -149,6 +156,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// to use in firefly flow, if true, then sensor status is ok, backfill request can be sent
     private var okToRequestBackfill = false
     
+    /// is the transmitter oop web enabled or not
+    private var webOOPEnabled: Bool
+
     // MARK: - public functions
     
     /// - parameters:
@@ -161,7 +171,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - transmitterStartDate : transmitter start date, optional - actual transmitterStartDate is received from transmitter itself, and stored in coredata. The stored value iss given here as parameter in the initializer. Means  at app start up, it's read from core data and added here as parameter
     ///     - sensorStartDate : should be sensorStartDate of active sensor. If a different sensor start date is received from the transmitter, then we know a new senosr was started
     ///     - calibrationToSendToTransmitter : used to send calibration done by user via xDrip4iOS to Dexcom transmitter. For example, user may have give a calibration in the app, but it's not yet send to the transmitter. This needs to be verified in CGMG5Transmitter, which is why it's given here as parameter - when initializing, assign last known calibration for the active sensor, even if it's already sent.
-    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?) {
+    ///     - webOOPEnabled : enabled or not, if nil then default false
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?, webOOPEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DEXCOM" + transmitterID[transmitterID.index(transmitterID.startIndex, offsetBy: 4)..<transmitterID.endIndex])
@@ -169,6 +180,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
         }
         
+        // initialize webOOPEnabled
+        self.webOOPEnabled = webOOPEnabled ?? false
+
         //assign transmitterId
         self.transmitterId = transmitterID
         
@@ -222,6 +236,25 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // for G5, the scaling is independent of the firmwareVersion
         // and there's no scaling to do
+        if transmitterId.startsWith("4") {
+
+            return rawValue
+
+        }
+        
+        // so it's G6 (non firefly)
+        guard let firmwareVersion = firmwareVersion else { return rawValue }
+        
+        if firmwareVersion.starts(with: "1.") {
+            
+            return rawValue * 34.0
+            
+        } else if firmwareVersion.starts(with: "2.") {
+            
+            return (rawValue - 1151500000.0) / 110.0
+            
+        }
+        
         return rawValue
         
     }
@@ -231,13 +264,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         G5ResetRequested = requested
     }
     
-    /// verifies if it's a firefly based on transmitterId, if >= 8G then considered to be a Firefly
-    func useFireflyFlow() -> Bool {
-        
-        return transmitterId.uppercased().compare("8G") == .orderedDescending || isFireflyNoMatterTransmitterId
-        
-    }
-
     // MARK: - deinit
 
     deinit {
@@ -320,7 +346,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
                     // is it a firefly ?
                     // if no treat it as a G5, with own calibration
-                    if !useFireflyFlow() {
+                    if !webOOPEnabled {
                         
                         // send SensorTxMessage to transmitter
                         getSensorData()
@@ -458,11 +484,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             
                         case .sensorDataRx:
                             
-                            if useOtherApp {
-                                trace("    sensorDataRx, useOtherApp = true, no further processing", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                                return
-                            }
-
                             // if this is the first sensorDataRx after a successful pairing, then inform delegate that pairing is finished
                             if waitingPairingConfirmation {
                                 waitingPairingConfirmation = false
@@ -527,7 +548,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                 }
 
                             } else {
-                                trace("    sensorDataRxMessagee is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
+                                trace("    sensorDataRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
                             }
                             
                         case .resetRx:
@@ -539,14 +560,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             processBatteryStatusRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if useFireflyFlow() { fireflyMessageFlow() }
+                            if webOOPEnabled { fireflyMessageFlow() }
                             
                         case .transmitterVersionRx:
                             
                             processTransmitterVersionRxMessage(value: value)
 
                             // if firefly continue with the firefly message flow
-                            if useFireflyFlow() { fireflyMessageFlow() }
+                            if webOOPEnabled { fireflyMessageFlow() }
 
                         case .keepAliveRx:
                             
@@ -554,11 +575,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             break
                             
                         case .pairRequestRx:
-                            
-                            if useOtherApp {
-                                trace("    pairRequestRx, useOtherApp = true, no further processing", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                                return
-                            }
                             
                             // don't know if the user accepted the pairing request or not, we can only know by trying to subscribe to writeControlCharacteristic - if the device is paired, we'll receive a sensorDataRx message, if not paired, then a disconnect will happen
                             
@@ -577,21 +593,21 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             processTransmitterTimeRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if useFireflyFlow() { fireflyMessageFlow() }
+                            if webOOPEnabled { fireflyMessageFlow() }
                             
                         case .glucoseBackfillRx:
                             
                             processGlucoseBackfillRxMessage(value: value)
 
                             // if firefly continue with the firefly message flow
-                            if useFireflyFlow() { fireflyMessageFlow() }
+                            if webOOPEnabled { fireflyMessageFlow() }
 
                         case .glucoseRx:
                             
                             processGlucoseDataRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if useFireflyFlow() { fireflyMessageFlow() }
+                            if webOOPEnabled { fireflyMessageFlow() }
                             
                         case .glucoseG6Rx:
                             // received when relying on official Dexcom app, ie in mode useOtherApp = true
@@ -599,28 +615,28 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             processGlucoseG6DataRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if useFireflyFlow() { fireflyMessageFlow() }
+                            if webOOPEnabled { fireflyMessageFlow() }
                             
                         case .calibrateGlucoseRx:
                             
                             processCalibrateGlucoseRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if useFireflyFlow() { fireflyMessageFlow() }
+                            if webOOPEnabled { fireflyMessageFlow() }
                             
                         case .sessionStopRx:
                             
                             processSessionStopRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if useFireflyFlow() { fireflyMessageFlow() }
+                            if webOOPEnabled { fireflyMessageFlow() }
 
                         case .sessionStartRx:
 
                             processSessionStartRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if useFireflyFlow() { fireflyMessageFlow() }
+                            if webOOPEnabled { fireflyMessageFlow() }
                             
                         default:
                             trace("    unknown opcode received ", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
@@ -758,14 +774,38 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
     // MARK: - CGMTransmitter protocol functions
     
+    func setWebOOPEnabled(enabled: Bool) {
+        
+        if webOOPEnabled != enabled {
+            
+            trace("in setWebOOPEnabled, new value for webOOPEnabled = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, webOOPEnabled.description)
+            
+            // reset sensor start date, because changing webOOPEnabled value stops the sensor
+            sensorStartDate = nil
+            
+            // as sensor is stopped, also set sensorStatus to nil
+            cGMG5TransmitterDelegate?.received(sensorStatus: nil, cGMG5Transmitter: self)
+            
+        }
+        
+        webOOPEnabled = enabled
+        
+    }
+    
+    func isWebOOPEnabled() -> Bool {
+        
+        return webOOPEnabled
+        
+    }
+    
     func cgmTransmitterType() -> CGMTransmitterType {
-        return .dexcomG5
+        return .dexcom
     }
     
     func overruleIsWebOOPEnabled() -> Bool {
         
-        // only firefly allow calibration
-        return useFireflyFlow()
+        // dexcom transmitters an be calibrated, even if dexcom algorithm is used
+        return true
         
     }
     
@@ -834,7 +874,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
     
-
     // MARK: - private helper functions
     
     /// sends SensorTxMessage to transmitter
@@ -844,7 +883,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let writeControlCharacteristic = writeControlCharacteristic {
             
-            _ = writeDataToPeripheral(data: SensorDataTxMessage().data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
+            _ = super.writeDataToPeripheral(data: SensorDataTxMessage().data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
             
         } else {
             
@@ -1405,8 +1444,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private func batteryStatusRequested() -> Bool {
         
         if Date() > Date(timeInterval: ConstantsDexcomG5.batteryReadPeriod, since: UserDefaults.standard.timeStampOfLastBatteryReading != nil ? UserDefaults.standard.timeStampOfLastBatteryReading! : Date(timeIntervalSince1970: 0)) {
+            
             trace("    last battery reading was long time ago, requesting now", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+            
             if let writeControlCharacteristic = writeControlCharacteristic {
+                
                 _ = super.writeDataToPeripheral(data: BatteryStatusTxMessage().data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
 
                 return true
@@ -1445,7 +1487,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         }
         
         // if firefly, then subscribe to backfillCharacteristic
-        if useFireflyFlow(), let backfillCharacteristic = backfillCharacteristic {
+        if webOOPEnabled, let backfillCharacteristic = backfillCharacteristic {
             
             trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, CBUUID_Characteristic_UUID.CBUUID_Backfill.description)
             
@@ -1464,7 +1506,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private func fireflyMessageFlow() {
         
         // first of all check that the transmitter is really a firefly, if not stop processing
-        if !useFireflyFlow() { return }
+        if !webOOPEnabled { return }
         
         trace("    start of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
         
@@ -1598,7 +1640,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// - reset backFillStream, lastGlucoseInSensorDataRxReading, backfillTxSent, glucoseTxSent
     private func sendGlucoseDataToDelegate() {
         
-        guard useFireflyFlow() else {return}
+        guard webOOPEnabled else {return}
         
         // transmitterDate should be non nil
         guard let transmitterStartDate = transmitterStartDate else {

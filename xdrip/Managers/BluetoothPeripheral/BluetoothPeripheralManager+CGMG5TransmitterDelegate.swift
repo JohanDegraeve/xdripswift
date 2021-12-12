@@ -58,7 +58,7 @@ extension BluetoothPeripheralManager: CGMG5TransmitterDelegate {
         
     }
     
-    func received(sensorStartDate: Date, cGMG5Transmitter: CGMG5Transmitter) {
+    func received(sensorStartDate: Date?, cGMG5Transmitter: CGMG5Transmitter) {
 
         guard let dexcomG5 = getDexcomG5(cGMG5Transmitter: cGMG5Transmitter) else {return}
         
@@ -68,7 +68,7 @@ extension BluetoothPeripheralManager: CGMG5TransmitterDelegate {
 
     }
 
-    func received(sensorStatus: String, cGMG5Transmitter: CGMG5Transmitter) {
+    func received(sensorStatus: String?, cGMG5Transmitter: CGMG5Transmitter) {
         
         guard let dexcomG5 = getDexcomG5(cGMG5Transmitter: cGMG5Transmitter) else {return}
         

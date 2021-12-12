@@ -34,10 +34,8 @@
 "settingsviews_transmitterid_text_for_button" = "ID de Transmissor";
 "settingsviews_givetransmitterid" = "Introduzir ID Transmissor";
 "settingsviews_resettransmitter" = "Repor Transmissor:";
-"settingsviews_webooptransmitter" = "Utilizar Algoritmo do Libre?";
 "settingsviews_nonfixedtransmitter" = "Activar Calibração Multi-ponto?";
 "settingsviews_labelNonFixed" = "Calibração Multi-ponto";
-"settingsviews_labelWebOOP" = "xDrip ou Algoritmo do Libre";
 "settingsviews_sectiontitlealerting" = "Alarme";
 "settingsviews_row_alert_types" = "Tipos de Alarmes";
 "settingsviews_row_alerts" = "Alarmes";

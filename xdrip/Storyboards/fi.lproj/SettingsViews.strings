@@ -18,10 +18,8 @@
 "settingsviews_transmitterid_text_for_button" = "Lähettimen ID";
 "settingsviews_givetransmitterid" = "Anna lähetettimen ID";
 "settingsviews_resettransmitter" = "Nollaa lähetin";
-"settingsviews_webooptransmitter" = "Käytä Libre algorithmiä?";
 "settingsviews_nonfixedtransmitter" = "Käytä monipistekalibrointia?";
 "settingsviews_labelNonFixed" = "Monipistekalibrointi";
-"settingsviews_labelWebOOP" = "xDrip vai Libre algorithmi";
 "settingsviews_sectiontitlealerting" = "Hälytys";
 "settingsviews_row_alert_types" = "Hälytystyypit";
 "settingsviews_row_alerts" = "Hälytykset";

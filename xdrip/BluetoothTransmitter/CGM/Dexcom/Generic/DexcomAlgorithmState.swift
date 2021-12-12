@@ -44,7 +44,7 @@ enum DexcomAlgorithmState: UInt8, CustomStringConvertible {
         case .excessNoise: return "excess Noise"
         case .FirstofTwoBGsNeeded: return "First of Two BGs Needed"
         case .SecondofTwoBGsNeeded: return "Second of Two BGs Needed"
-        case .okay: return "In Calibration"
+        case .okay: return "In Calibration/Okay"
         case .needsCalibration: return "needs Calibration"
         case .CalibrationError1: return "Calibration Error 1"
         case .CalibrationError2: return "Calibration Error "

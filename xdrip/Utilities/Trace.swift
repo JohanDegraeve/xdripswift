@@ -363,7 +363,7 @@ class Trace {
                             
                         }
                         
-                    case .DexcomG5Type, .DexcomG6Type, .DexcomG6FireflyType:
+                    case .DexcomType:
                         if let dexcomG5 = blePeripheral.dexcomG5 {
                             
                             traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)

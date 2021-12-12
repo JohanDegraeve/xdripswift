@@ -26,10 +26,6 @@ extension DexcomG5 {
     
     @NSManaged public var lastResetTimeStamp: Date?
     
-    @NSManaged public var isDexcomG6: Bool
-    
-    @NSManaged public var isFirefly: Bool
-    
     @NSManaged public var transmitterStartDate: Date?
     
     /// - contains sensor start date, received from transmitter

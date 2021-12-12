@@ -157,9 +157,8 @@ class BluetoothPeripheralManager: NSObject {
 
                     }
                     
-                case .DexcomG5Type, .DexcomG6Type, .DexcomG6FireflyType:
+                case .DexcomType:
                 
-                    // both DexcomG5Type and DexcomG6Type are stored in blePeripheral as dexcomG5
                     if let dexcomG5orG6 = blePeripheral.dexcomG5 {
                         
                         // add it to the list of bluetoothPeripherals
@@ -169,22 +168,10 @@ class BluetoothPeripheralManager: NSObject {
                             
                             if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId {
 
-                                // create an instance of CGMG5Transmitter (or CGMG6Transmitter), CGMG5Transmitter (or CGMG6Transmitter) will automatically try to connect to the dexcom with the address that is stored in dexcom
+                                // create an instance of CGMG5Transmitter, will automatically try to connect to the dexcom with the address that is stored in dexcom
                                 // add it to the array of bluetoothTransmitters
-                                if !dexcomG5orG6.isDexcomG6 && !dexcomG5orG6.isFirefly {
-                                    
-                                    bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion), at: index)
-                                 
-                                } else if !dexcomG5orG6.isFirefly {
-                                    
-                                    bluetoothTransmitters.insert(CGMG6Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion), at: index)
+                                bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled), at: index)
 
-                                } else {
-                                    
-                                    bluetoothTransmitters.insert(CGMG6FireflyTransmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion, useOtherApp: dexcomG5orG6.useOtherApp), at: index)
-
-                                }
-                                
                                 // if DexcomG5Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                                 if bluetoothPeripheralType.category() == .CGM {
                                     currentCgmTransmitterAddress = blePeripheral.address
@@ -525,7 +512,7 @@ class BluetoothPeripheralManager: NSObject {
                     // no need to send reading to watlaa in master mode
                     break
                     
-                case .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .Libre2Type, .AtomType, .DexcomG6FireflyType:
+                case .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .Libre2Type, .AtomType:
                     // cgm's don't receive reading, they send it
                     break
                     
@@ -592,25 +579,13 @@ class BluetoothPeripheralManager: NSObject {
                         
                     }
                     
-                case .DexcomG5Type, .DexcomG6Type, .DexcomG6FireflyType:
+                case .DexcomType:
                     
                     if let dexcomG5orG6 = bluetoothPeripheral as? DexcomG5 {
                         
                         if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
                             
-                            if !dexcomG5orG6.isDexcomG6 && !dexcomG5orG6.isFirefly {
-
-                                newTransmitter = CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion)
-
-                            } else if !dexcomG5orG6.isFirefly {
-
-                                newTransmitter = CGMG6Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion)
-
-                            } else {
-                                
-                                newTransmitter = CGMG6FireflyTransmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion, useOtherApp: dexcomG5orG6.useOtherApp)
-                                
-                            }
+                            newTransmitter = CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled)
                             
                             
                         } else {
@@ -789,20 +764,10 @@ class BluetoothPeripheralManager: NSObject {
                     return .WatlaaType
                 }
                 
-            case .DexcomG5Type:
-                // every CGMG6Transmitter and CGMG6FireflyTransmitter is CGMG5Transmitter, check that
-                if bluetoothTransmitter is CGMG5Transmitter && !(bluetoothTransmitter is CGMG6Transmitter) && !(bluetoothTransmitter is CGMG6FireflyTransmitter){
-                    return .DexcomG5Type
-                }
-                
-            case .DexcomG6Type:
-                if bluetoothTransmitter is CGMG6Transmitter {
-                    return .DexcomG6Type
-                }
-                
-            case .DexcomG6FireflyType:
-                if bluetoothTransmitter is CGMG6FireflyTransmitter {
-                    return .DexcomG6FireflyType
+            case .DexcomType:
+
+                if bluetoothTransmitter is CGMG5Transmitter {
+                    return .DexcomType
                 }
                 
             case .BubbleType:
@@ -874,29 +839,13 @@ class BluetoothPeripheralManager: NSObject {
             
             return WatlaaBluetoothTransmitter(address: nil, name: nil, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, watlaaBluetoothTransmitterDelegate: self,  sensorSerialNumber: nil, webOOPEnabled: nil, nonFixedSlopeEnabled: nil)
             
-        case .DexcomG5Type:
+        case .DexcomType:
             
             guard let transmitterId = transmitterId, let cgmTransmitterDelegate =  cgmTransmitterDelegate else {
-                fatalError("in createNewTransmitter, type DexcomG5Type, transmitterId is nil or cgmTransmitterDelegate is nil")
+                fatalError("in createNewTransmitter, type DexcomType, transmitterId is nil or cgmTransmitterDelegate is nil")
             }
             
-            return CGMG5Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: nil, sensorStartDate: nil, calibrationToSendToTransmitter: nil, firmware: nil)
-            
-        case .DexcomG6Type:
-            
-            guard let transmitterId = transmitterId, let cgmTransmitterDelegate =  cgmTransmitterDelegate else {
-                fatalError("in createNewTransmitter, type DexcomG6Type, transmitterId is nil or cgmTransmitterDelegate is nil")
-            }
-            
-            return CGMG6Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: nil, sensorStartDate: nil, calibrationToSendToTransmitter: nil, firmware: nil)
-            
-        case .DexcomG6FireflyType:
-            
-            guard let transmitterId = transmitterId, let cgmTransmitterDelegate =  cgmTransmitterDelegate else {
-                fatalError("in createNewTransmitter, type DexcomG6FireflyType, transmitterId is nil or cgmTransmitterDelegate is nil")
-            }
-            
-            return CGMG6FireflyTransmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG6TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: nil, sensorStartDate: nil, calibrationToSendToTransmitter: nil, firmware: nil, useOtherApp: false)
+            return CGMG5Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: nil, sensorStartDate: nil, calibrationToSendToTransmitter: nil, firmware: nil, webOOPEnabled: nil)
             
         case .BubbleType:
             
@@ -1201,7 +1150,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .WatlaaType, .DexcomG5Type, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .DexcomG6Type, .Libre2Type, .AtomType, .DexcomG6FireflyType:
+            case .WatlaaType, .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .Libre2Type, .AtomType:
                 
                 // nothing to check
                 break

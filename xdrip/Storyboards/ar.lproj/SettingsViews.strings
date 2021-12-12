@@ -27,10 +27,8 @@
 "settingsviews_transmitterid_text_for_button" = "رقم هوية جهاز الإرسال";
 "settingsviews_givetransmitterid" = "أدخل رقم هوية جهاز الإرسال";
 "settingsviews_resettransmitter" = "إعادة تعيين جهاز الإرسال";
-"settingsviews_webooptransmitter" = "استخدم خوارزمية ليبري?";
 "settingsviews_nonfixedtransmitter" = "تفعيل المعايرة متعددة النقاط ?";
 "settingsviews_labelNonFixed" = "المعايرة متعددة النقاط";
-"settingsviews_labelWebOOP" = "خوارزمية xDrip أو Libre";
 "settingsviews_sectiontitlealerting" = "التنبيهات";
 "settingsviews_row_alert_types" = "أنواع التنبيهات";
 "settingsviews_row_alerts" = "التنبيهات";

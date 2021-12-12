@@ -131,22 +131,7 @@ class DexcomG5BluetoothPeripheralViewModel {
     
     /// screenTitle, can be overriden for G6
     public func dexcomScreenTitle() -> String {
-        return BluetoothPeripheralType.DexcomG5Type.rawValue
-    }
-    
-    /// just a helper, can be overloaded, eg for firefly
-    public func numberOfSectionsForThisTransmitter() -> Int {
-        
-        return DexcomSection.allCases.count
-        
-    }
-    
-    /// number of rows to show from commondexcomsettings
-    public func numberOfCommonDexcomSettings() -> Int {
-        
-        // for non-fireflies, last row not shown
-        return Settings.allCases.count - 2
-        
+        return BluetoothPeripheralType.DexcomType.rawValue
     }
     
 }
@@ -362,7 +347,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
         case .commonDexcomSettings:
             
-            return numberOfCommonDexcomSettings()
+            return Settings.allCases.count
             
         case .batterySettings:
             return TransmitterBatteryInfoSettings.allCases.count
@@ -376,7 +361,21 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     
     func numberOfSections() -> Int {
         
-        return numberOfSectionsForThisTransmitter()
+        if let bluetoothPeripheral = bluetoothPeripheral, let transmitterId = bluetoothPeripheral.blePeripheral.transmitterId {
+            
+            if transmitterId.compare("8G") == .orderedDescending {
+                
+                return DexcomSection.allCases.count - 1
+                
+            } else {
+                
+                return DexcomSection.allCases.count
+                
+            }
+            
+        }
+        
+        return DexcomSection.allCases.count
         
     }
     
@@ -451,7 +450,7 @@ extension DexcomG5BluetoothPeripheralViewModel: CGMG5TransmitterDelegate {
     }
     
     /// received sensorStartDate
-    func received(sensorStartDate: Date, cGMG5Transmitter: CGMG5Transmitter) {
+    func received(sensorStartDate: Date?, cGMG5Transmitter: CGMG5Transmitter) {
         
         (bluetoothPeripheralManager as? CGMG5TransmitterDelegate)?.received(sensorStartDate: sensorStartDate, cGMG5Transmitter: cGMG5Transmitter)
         
@@ -464,7 +463,7 @@ extension DexcomG5BluetoothPeripheralViewModel: CGMG5TransmitterDelegate {
     }
     
     /// received sensorStatus
-    func received(sensorStatus: String, cGMG5Transmitter: CGMG5Transmitter) {
+    func received(sensorStatus: String?, cGMG5Transmitter: CGMG5Transmitter) {
         
         (bluetoothPeripheralManager as? CGMG5TransmitterDelegate)?.received(sensorStatus: sensorStatus, cGMG5Transmitter: cGMG5Transmitter)
         

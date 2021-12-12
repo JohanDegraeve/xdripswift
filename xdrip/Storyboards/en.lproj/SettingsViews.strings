@@ -35,10 +35,10 @@
 "settingsviews_transmitterid_text_for_button"  = "Transmitter ID";
 "settingsviews_givetransmitterid" = "Enter Transmitter ID";
 "settingsviews_resettransmitter" = "Reset Transmitter";
-"settingsviews_webooptransmitter" = "Use Libre Algorithm?";
+"settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
 "settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration?";
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
-"settingsviews_labelWebOOP" = "xDrip or Libre Algorithm";
+"settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
 "settingsviews_sectiontitlealerting" = "Alarms";
 "settingsviews_row_alert_types" = "Alarm Types";
 "settingsviews_row_alerts" = "Alarms";

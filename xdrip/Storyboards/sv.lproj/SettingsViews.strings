@@ -31,10 +31,8 @@
 "settingsviews_transmitterid_text_for_button"  = "Sändar-ID";
 "settingsviews_givetransmitterid" = "Ange sändar-ID";
 "settingsviews_resettransmitter" = "Återställ sändare";
-"settingsviews_webooptransmitter" = "Använd Libre-algoritm?";
 "settingsviews_nonfixedtransmitter" = "Använd flerpunktskalibrering?";
 "settingsviews_labelNonFixed" = "Flerpunktskalibrering";
-"settingsviews_labelWebOOP" = "xDrip- eller Libre-algoritm";
 "settingsviews_sectiontitlealerting" = "Larm";
 "settingsviews_row_alert_types" = "Typ av larm";
 "settingsviews_row_alerts" = "Larm";
