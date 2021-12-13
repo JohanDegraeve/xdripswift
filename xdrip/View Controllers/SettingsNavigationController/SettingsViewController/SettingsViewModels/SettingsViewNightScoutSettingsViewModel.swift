@@ -1,5 +1,6 @@
 import UIKit
 import os
+import Foundation
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -46,25 +47,28 @@ class SettingsViewNightScoutSettingsViewModel {
     
     /// path to test API Secret
     private let nightScoutAuthTestPath = "/api/v1/experiments/test"
-
+    
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMG5)
-
+    
     // MARK: - private functions
     
     /// test the nightscout url and api key and send result to messageHandler
     private func testNightScoutCredentials() {
         
         // unwrap siteUrl and apiKey
-        guard let siteUrl = UserDefaults.standard.nightScoutUrl, let apiKey = UserDefaults.standard.nightScoutAPIKey else {return}
-        
+        guard let siteUrl = UserDefaults.standard.nightScoutUrl else {return}
+                
         if let url = URL(string: siteUrl) {
             let testURL = url.appendingPathComponent(nightScoutAuthTestPath)
             
             var request = URLRequest(url: testURL)
             request.setValue("application/json", forHTTPHeaderField:"Content-Type")
             request.setValue("application/json", forHTTPHeaderField:"Accept")
-            request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
+            
+            if let apiKey = UserDefaults.standard.nightScoutAPIKey {
+                request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
+            }
             
             let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
                 
@@ -72,30 +76,83 @@ class SettingsViewNightScoutSettingsViewModel {
                 
                 if let error = error {
                     
-                    trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, error.localizedDescription)
+                    if error.localizedDescription.hasPrefix("A server with the specified hostname could not be found") {
                     
-                    self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationErrorAlertTitle, message: error.localizedDescription)
-                    
-                    return
-                    
+                        print("in testNightScoutCredentials, error = Hostname/URL not found!")
+                        
+                        trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, error.localizedDescription)
+                        
+                        self.callMessageHandlerInMainThread(title: "Hostname/URL not found!", message: error.localizedDescription)
+                        
+                        return
+                        
+                    } else {
+                        
+                        trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, error.localizedDescription)
+                        
+                        self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationErrorAlertTitle, message: error.localizedDescription)
+                        
+                        return
+                        
+                    }
                 }
                 
-                if let httpResponse = response as? HTTPURLResponse ,
-                    httpResponse.statusCode != 200, let data = data {
+                if let httpResponse = response as? HTTPURLResponse, let data = data {
                     
                     let errorMessage = String(data: data, encoding: String.Encoding.utf8)!
                     
-                    trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, errorMessage)
+                    switch httpResponse.statusCode {
+                        
+                    case (200...299):
+                        
+                        trace("in testNightScoutCredentials, successful", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
+                        
+                        self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationSuccessFulAlertTitle, message: Texts_NightScoutTestResult.verificationSuccessFulAlertBody)
+                        
+                    case (400):
+                        
+                        trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, errorMessage)
+                        
+                        self.callMessageHandlerInMainThread(title: "400: Bad Request", message: errorMessage)
+                        
+                    case (401):
+                        
+                        if UserDefaults.standard.nightScoutAPIKey != nil {
+                            
+                            trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, errorMessage)
+                            
+                            self.callMessageHandlerInMainThread(title: "API_SECRET incorrect", message: errorMessage)
+                            
+                        } else {
+                            
+                            trace("in testNightScoutCredentials, URL responds OK but API_SECRET is missing", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
+                            
+                            self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationSuccessFulAlertTitle, message: "URL is verified but API_SECRET is missing and cannot be authenticated!")
+                            
+                        }
                     
-                   self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationErrorAlertTitle, message: errorMessage)
-                    
-                } else {
-                    
-                    trace("in testNightScoutCredentials, successful", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
-                    
-                    self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationSuccessFulAlertTitle, message: Texts_NightScoutTestResult.verificationSuccessFulAlertBody)
+                    case (403):
+                        
+                        trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, errorMessage)
+                        
+                        self.callMessageHandlerInMainThread(title: "403: Forbidden Request", message: errorMessage)
+                        
+                    case (404):
+                        
+                        trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, errorMessage)
+                        
+                        self.callMessageHandlerInMainThread(title: "404: Page Not Found", message: errorMessage)
+                        
+                    default:
+                        
+                        trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, errorMessage)
+                        
+                        self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationErrorAlertTitle, message: errorMessage)
+                        
+                    }
                     
                 }
+                
             })
             
             trace("in testNightScoutCredentials, calling task.resume", log: log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
@@ -114,7 +171,7 @@ class SettingsViewNightScoutSettingsViewModel {
         }
         
     }
-
+    
 }
 
 /// conforms to SettingsViewModelProtocol for all nightscout settings in the first sections screen
@@ -217,7 +274,7 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             
         case .testUrlAndAPIKey:
 
-            if UserDefaults.standard.nightScoutAPIKey != nil && UserDefaults.standard.nightScoutUrl != nil {
+            //if UserDefaults.standard.nightScoutAPIKey != nil && UserDefaults.standard.nightScoutUrl != nil {
 
                 // show info that test is started, through the messageHandler
                 if let messageHandler = messageHandler {
@@ -228,11 +285,11 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
                 
                 return .nothing
 
-            } else {
-                
-                return .showInfoText(title: Texts_Common.warning, message: Texts_NightScoutTestResult.warningAPIKeyOrURLIsnil)
-                
-            }
+//            } else {
+//
+//                return .showInfoText(title: Texts_Common.warning, message: Texts_NightScoutTestResult.warningAPIKeyOrURLIsnil)
+//
+//            }
 
         case .useSchedule:
             return .nothing
