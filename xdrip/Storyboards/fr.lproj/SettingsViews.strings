@@ -167,3 +167,13 @@
 
 /// help settings, open the online help
 "settingsviews_showOnlineHelp" = "Open Online Help?";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// web oop settings in bluetooth peripheral view : enabled or not
+"settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
+
+/// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
+"settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";

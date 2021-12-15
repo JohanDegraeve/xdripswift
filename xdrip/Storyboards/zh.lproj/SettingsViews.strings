@@ -277,3 +277,13 @@
 
 /// sensor countdown settings, show sensor countdown graphic on home screen
 "settingsviews_showSensorCountdown" = "Show Sensor Countdown?";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// web oop settings in bluetooth peripheral view : enabled or not
+"settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
+
+/// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
+"settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
