@@ -53,7 +53,10 @@ public class LoopManager:NSObject {
         // convert to json Dexcom Share format
         var dictionary = [Dictionary<String, Any>]()
         for reading in lastReadings {
-            dictionary.append(reading.dictionaryRepresentationForDexcomShareUpload)
+            var representation = reading.dictionaryRepresentationForDexcomShareUpload
+            // Adding "from" field to be able to use multiple BG sources with the same shared group in FreeAPS X
+            representation["from"] = "xDrip"
+            dictionary.append(representation)
         }
 
         // get Dictionary stored in UserDefaults from previous session
