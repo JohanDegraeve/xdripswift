@@ -879,7 +879,13 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
     
-    func needsSensorStartCode() -> Bool {return transmitterId.isFireFly()}
+    func needsSensorStartCode() -> Bool {
+        return transmitterId.isFireFly()
+    }
+    
+    func needsSensorStartTime() -> Bool {
+        return !transmitterId.isFireFly()
+    }
     
     // MARK: - private helper functions
     
