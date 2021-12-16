@@ -879,6 +879,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
     
+    func needsSensorStartCode() -> Bool {return transmitterId.isFireFly()}
+    
     // MARK: - private helper functions
     
     /// sends SensorTxMessage to transmitter

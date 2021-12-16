@@ -4,13 +4,23 @@ extension String {
     
     func isFireFly() -> Bool {
         
-        if self.compare("8G") == .orderedDescending {
+        if self.startsWith("4") {
+            
+            return false
+            
+        }
+        
+        if self >= "8G" {
             
             return true
             
-        } else {
+        } else if self >= "8" {
             
             return false
+            
+        } else {
+            
+            return true
             
         }
         
