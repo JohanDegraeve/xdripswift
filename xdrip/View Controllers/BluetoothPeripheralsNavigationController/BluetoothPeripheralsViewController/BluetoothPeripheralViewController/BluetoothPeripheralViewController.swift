@@ -260,13 +260,29 @@ class BluetoothPeripheralViewController: UIViewController {
     public func numberOfGeneralSections() -> Int {
         
         // first check if bluetoothPeripheral already known
-        if bluetoothPeripheral != nil {
+        if let bluetoothPeripheral = bluetoothPeripheral {
 
             // bluetoothPeripheral already known
             
             // unwrap expectedBluetoothPeripheralType
             if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType {
-                // zzz : hier op basis van cgmtransmitter eventueel canweboop op false zetten
+                
+                // get cgmTransmitter, if not nonWebOOPAllowed, then it means this is a transmitter that can not give rawdata
+                // in that case disable both weboopenabled and nonfixedslope setting
+                if let bluetoothPeripheralManager = bluetoothPeripheralManager, let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), let cgmTransmitter = bluetoothTransmitter as? CGMTransmitter {
+
+                    if !cgmTransmitter.nonWebOOPAllowed() {
+                        
+                        // mark web oop and non fixed slope settings sections as shown
+                        webOOPSettingsSectionIsShown = true
+                        nonFixedSettingsSectionIsShown = true
+                        
+                        return 1
+                        
+                    }
+                    
+                }
+                
                 if expectedBluetoothPeripheralType.canWebOOP(), expectedBluetoothPeripheralType.canUseNonFixedSlope() {
                     
                     // mark web oop and non fixed slope settings sections as shown

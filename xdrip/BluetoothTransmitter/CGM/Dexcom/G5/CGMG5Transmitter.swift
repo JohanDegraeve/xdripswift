@@ -344,7 +344,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     
                 } else {
 
-                    // is it a firefly ?
+                    // is webOOPEnabled ?
                     // if no treat it as a G5, with own calibration
                     if !webOOPEnabled {
                         
@@ -355,8 +355,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         
                     }
                     
-                    // it a transmitter with transmitterid >= 8G
-                    // continue with the firefly message flow
+                    // webOOPEnabled, continue with the firefly message flow
                     fireflyMessageFlow()
                     
                 }
@@ -804,8 +803,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     func overruleIsWebOOPEnabled() -> Bool {
         
-        // dexcom transmitters an be calibrated, even if dexcom algorithm is used
+        // dexcom transmitters can be calibrated, even if dexcom algorithm is used
         return true
+        
+    }
+    
+    func nonWebOOPAllowed() -> Bool {
+        
+        return !transmitterId.isFireFly()
         
     }
     

@@ -126,6 +126,20 @@ class DexcomG5BluetoothPeripheralViewModel {
         return nil
         
     }
+    
+    /// is the selected dexcom a firefly or not?
+    /// - if not known yet (because transmitter id not yet set, then returns false)
+    private func isFireFly() -> Bool {
+        
+        if let bluetoothPeripheral = bluetoothPeripheral, let transmitterId = bluetoothPeripheral.blePeripheral.transmitterId {
+            
+            return transmitterId.isFireFly()
+            
+        }
+
+        return false
+        
+    }
 
     // MARK: - public functions
     
@@ -361,21 +375,15 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     
     func numberOfSections() -> Int {
         
-        if let bluetoothPeripheral = bluetoothPeripheral, let transmitterId = bluetoothPeripheral.blePeripheral.transmitterId {
+        if isFireFly() {
             
-            if transmitterId.compare("8G") == .orderedDescending {
-                
-                return DexcomSection.allCases.count - 1
-                
-            } else {
-                
-                return DexcomSection.allCases.count
-                
-            }
+            return DexcomSection.allCases.count - 1
+            
+        } else {
+            
+            return DexcomSection.allCases.count
             
         }
-        
-        return DexcomSection.allCases.count
         
     }
     

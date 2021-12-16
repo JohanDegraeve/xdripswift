@@ -29,6 +29,11 @@ protocol CGMTransmitter:AnyObject {
     /// - default false
     func overruleIsWebOOPEnabled() -> Bool
     
+    /// is it allowed to set webOOPenabled to false
+    /// - typicall for firefly, where webOOPEnabled false is not possible
+    /// - default true
+    func nonWebOOPAllowed() -> Bool
+    
     /// get cgmTransmitterType
     func cgmTransmitterType() -> CGMTransmitterType
     
@@ -292,5 +297,8 @@ extension CGMTransmitter {
     
     // default implementation, returns false
     func needsSensorStartCode() -> Bool {return false}
+    
+    // default implementation, returns true
+    func nonWebOOPAllowed() -> Bool {return true}
     
 }
