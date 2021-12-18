@@ -777,6 +777,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if webOOPEnabled != enabled {
             
+            webOOPEnabled = enabled
+            
             trace("in setWebOOPEnabled, new value for webOOPEnabled = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, webOOPEnabled.description)
             
             // reset sensor start date, because changing webOOPEnabled value stops the sensor
@@ -786,8 +788,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             cGMG5TransmitterDelegate?.received(sensorStatus: nil, cGMG5Transmitter: self)
             
         }
-        
-        webOOPEnabled = enabled
         
     }
     
@@ -1521,7 +1521,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // first of all check that the transmitter is really a firefly, if not stop processing
         if !webOOPEnabled { return }
         
-        trace("    start of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+        trace("start of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
         
         // check if firmware is known, if not ask it
         guard firmware != nil else {
@@ -1529,6 +1529,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             sendTransmitterVersionTxMessage()
             
             return
+            
+        }
+        
+        // calibrationToSendToTransmitter is not nil but not valid anymore, then set already to nil here
+        // to have a correct flow in the next steps
+        if let calibrationToSendToTransmitter = calibrationToSendToTransmitter,         !calibrationIsValid(calibration: calibrationToSendToTransmitter) {
+            
+            self.calibrationToSendToTransmitter =  nil
             
         }
         
@@ -1568,21 +1576,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     
                 } else
                 
-                // if there's a valid calibrationToSendToTransmitter
-                if let calibrationToSendToTransmitter = calibrationToSendToTransmitter {
+                // if there's a valid calibrationToSendToTransmitter (should be valid because it was just checked but let's do the check anyway
+                if let calibrationToSendToTransmitter = calibrationToSendToTransmitter, calibrationIsValid(calibration: calibrationToSendToTransmitter) {
                     
-                    if calibrationIsValid(calibration: calibrationToSendToTransmitter) {
-
                         sendCalibrationTxMessage(calibration: calibrationToSendToTransmitter, transmitterStartDate: transmitterStartDate)
 
-                    } else {
-                        
-                        // calibration  not valid anymore, assign it to nil
-                        self.calibrationToSendToTransmitter = nil
-                        
-                    }
-                    
-                    
                 } else
                 
                 // if glucoseTx was not yet sent and minimumTimeBetweenTwoReadings larger than now - timeStampOfLastG5Reading (for safety)
