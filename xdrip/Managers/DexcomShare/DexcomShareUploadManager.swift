@@ -666,7 +666,7 @@ class DexcomShareUploadManager:NSObject {
     /// calls messageHandler with title and errorMessage. Title text will depend on success.
     private func callMessageHandler(withCredentialVerificationResult success:Bool, errorMessage:String?) {
         // define the title text
-        var title = Texts_DexcomShareTestResult.verificationSuccessFulAlertTitle
+        var title = Texts_DexcomShareTestResult.verificationSuccessfulAlertTitle
         if !success {
             title = Texts_DexcomShareTestResult.verificationErrorAlertTitle
         }
@@ -675,7 +675,7 @@ class DexcomShareUploadManager:NSObject {
         
         
         // define the message text
-        var message = Texts_DexcomShareTestResult.verificationSuccessFulAlertBody
+        var message = Texts_DexcomShareTestResult.verificationSuccessfulAlertBody
         if !success {
             if let errorMessage = errorMessage {
                 message = errorMessage

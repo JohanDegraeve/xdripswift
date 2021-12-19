@@ -4,11 +4,11 @@ import Foundation
 class Texts_DexcomShareTestResult {
     static private let filename = "DexcomShareTestResult"
     
-    static let verificationSuccessFulAlertTitle: String = {
+    static let verificationSuccessfulAlertTitle: String = {
         return NSLocalizedString("dexcomsharetestresult_verificationsuccessfulalerttitle", tableName: filename, bundle: Bundle.main, value: "Verification Successful", comment: "POP up after verifying DexcomShare credentials, to say that verification of url and password key were successful - this is the title")
     }()
     
-    static let verificationSuccessFulAlertBody: String = {
+    static let verificationSuccessfulAlertBody: String = {
         return NSLocalizedString("dexcomsharetestresult_verificationsuccessfulalertbody", tableName: filename, bundle: Bundle.main, value: "Your Dexcom Share account was verified successfully", comment: "POP up after verifying DexcomShare credentials, to say that verification of url and password were successful - this is the body")
     }()
     

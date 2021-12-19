@@ -46,7 +46,7 @@
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port (optional):";
+"nightScoutPort" = "Port:";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Urgent High Value:";

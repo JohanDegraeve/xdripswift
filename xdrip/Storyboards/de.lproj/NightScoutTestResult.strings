@@ -3,7 +3,7 @@
 "nightscouttestresult_verificationsuccessfulalertbody" = "Ihre Nightscout Anmeldung war erfolgreich";
 
 /// in settings screen, user clicked test button for nightscout url and apikey
-"nightScoutAPIKeyAndURLStarted" = "Verbindung testen";
+"nightScoutAPIKeyAndURLStartedBody" = "Verbindung testen";
 
 /// POP up after verifying nightscout credentials, to say that verification of url and api key were successful - this is the title
 "nightscouttestresult_verificationsuccessfulalerttitle" = "Überprüfung erfolgreich";

@@ -13,11 +13,11 @@ fileprivate enum Setting:Int, CaseIterable {
     /// nightscout api key
     case nightScoutAPIKey = 2
     
-    /// port
-    case port = 3
-    
     /// nightscout api key
-    case token = 4
+    case token = 3
+    
+    /// port
+    case port = 4
     
     /// to allow testing explicitly
     case testUrlAndAPIKey = 5
@@ -60,14 +60,22 @@ class SettingsViewNightScoutSettingsViewModel {
         guard let siteUrl = UserDefaults.standard.nightScoutUrl else {return}
                 
         if let url = URL(string: siteUrl) {
+            
             let testURL = url.appendingPathComponent(nightScoutAuthTestPath)
             
             var request = URLRequest(url: testURL)
             request.setValue("application/json", forHTTPHeaderField:"Content-Type")
             request.setValue("application/json", forHTTPHeaderField:"Accept")
             
+            // if the API_SECRET is present, then hash it and pass it via http header. If it's missing but there is a token, then send this as plain text to allow the authentication check.
             if let apiKey = UserDefaults.standard.nightScoutAPIKey {
+                
                 request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
+                
+            } else if let token = UserDefaults.standard.nightscoutToken {
+                
+                request.setValue(token, forHTTPHeaderField:"api-secret")
+                
             }
             
             let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
@@ -78,11 +86,11 @@ class SettingsViewNightScoutSettingsViewModel {
                     
                     if error.localizedDescription.hasPrefix("A server with the specified hostname could not be found") {
                     
-                        print("in testNightScoutCredentials, error = Hostname/URL not found!")
+                        print("in testNightScoutCredentials, error = URL/Hostname not found!")
                         
                         trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, error.localizedDescription)
                         
-                        self.callMessageHandlerInMainThread(title: "Hostname/URL not found!", message: error.localizedDescription)
+                        self.callMessageHandlerInMainThread(title: "URL/Hostname not found!", message: error.localizedDescription)
                         
                         return
                         
@@ -107,7 +115,9 @@ class SettingsViewNightScoutSettingsViewModel {
                         
                         trace("in testNightScoutCredentials, successful", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
                         
-                        self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationSuccessFulAlertTitle, message: Texts_NightScoutTestResult.verificationSuccessFulAlertBody)
+                        self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationSuccessfulAlertTitle, message: Texts_NightScoutTestResult.verificationSuccessfulAlertBody)
+                        
+                        
                         
                     case (400):
                         
@@ -119,15 +129,21 @@ class SettingsViewNightScoutSettingsViewModel {
                         
                         if UserDefaults.standard.nightScoutAPIKey != nil {
                             
-                            trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, errorMessage)
+                            trace("in testNightScoutCredentials, API_SECRET is not valid, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, errorMessage)
                             
-                            self.callMessageHandlerInMainThread(title: "API_SECRET incorrect", message: errorMessage)
+                            self.callMessageHandlerInMainThread(title: "API_SECRET is not valid", message: errorMessage)
+                            
+                        } else if UserDefaults.standard.nightScoutAPIKey == nil && UserDefaults.standard.nightscoutToken != nil {
+                            
+                            trace("in testNightScoutCredentials, Token is not valid, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, errorMessage)
+                            
+                            self.callMessageHandlerInMainThread(title: "Token is not valid", message: errorMessage)
                             
                         } else {
                             
-                            trace("in testNightScoutCredentials, URL responds OK but API_SECRET is missing", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
+                            trace("in testNightScoutCredentials, URL responds OK but authentication method is missing and cannot be checked", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
                             
-                            self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationSuccessFulAlertTitle, message: "URL is verified but API_SECRET is missing and cannot be authenticated!")
+                            self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationSuccessfulAlertTitle, message: "URL responds OK but authentication method is missing and cannot be checked!")
                             
                         }
                     
@@ -243,7 +259,7 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
                             UserDefaults.standard.nightscoutToken = token.toNilIfLength0()
                         }
                         
-                        // finally, let's make a clean with just the scheme and host. We don't need to add anything else as this is basically the only thing we were asking for in the first place.
+                        // finally, let's make a clean URL with just the scheme and host. We don't need to add anything else as this is basically the only thing we were asking for in the first place.
                         var nighscoutURLComponents = URLComponents()
                         nighscoutURLComponents.scheme = "https"
                         nighscoutURLComponents.host = enteredURLComponents.host?.lowercased()
@@ -274,22 +290,14 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             
         case .testUrlAndAPIKey:
 
-            //if UserDefaults.standard.nightScoutAPIKey != nil && UserDefaults.standard.nightScoutUrl != nil {
-
                 // show info that test is started, through the messageHandler
                 if let messageHandler = messageHandler {
-                    messageHandler(Texts_HomeView.info, Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStarted)
+                    messageHandler(Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedTitle, Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedBody)
                 }
                 
                 self.testNightScoutCredentials()
                 
                 return .nothing
-
-//            } else {
-//
-//                return .showInfoText(title: Texts_Common.warning, message: Texts_NightScoutTestResult.warningAPIKeyOrURLIsnil)
-//
-//            }
 
         case .useSchedule:
             return .nothing
@@ -388,11 +396,11 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
         case .nightScoutUrl:
             return UserDefaults.standard.nightScoutUrl
         case .nightScoutAPIKey:
-            return UserDefaults.standard.nightScoutAPIKey != nil ? "***********" : nil
+            return UserDefaults.standard.nightScoutAPIKey != nil ? obscureString(stringToObscure: UserDefaults.standard.nightScoutAPIKey) : nil
         case .port:
             return UserDefaults.standard.nightScoutPort != 0 ? UserDefaults.standard.nightScoutPort.description : nil
         case .token:
-            return UserDefaults.standard.nightscoutToken != nil ? UserDefaults.standard.nightscoutToken?.description : nil
+            return UserDefaults.standard.nightscoutToken != nil ? obscureString(stringToObscure: UserDefaults.standard.nightscoutToken) : nil
         case .useSchedule:
             return nil
         case .schedule:
@@ -437,6 +445,48 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return nil
             
         }
+    }
+    
+    /// use this to partially obscure the API-SECRET and Token values. We want the user to see that "something" is there that makes sense to them, but it won't reveal any private information if they screenshot it
+    func obscureString(stringToObscure: String?) -> String {
+        
+        // make sure that something useful has been passed to the function
+        guard var obscuredString = stringToObscure else { return "" }
+        
+        let stringLength: Int = obscuredString.count
+        
+        // in order to avoid strange layouts if somebody uses a really long API_SECRET, then let's limit the displayed string size to something more manageable
+        let maxStringSizeToShow: Int = 12
+        
+        // the characters we will use to obscure the sensitive data
+        let maskingCharacter: String = "*"
+        
+        // based upon the length of the string, we will show more, or less, of the original characters at the beginning. This gives more context whilst maintaining privacy
+        var startCharsNotToObscure: Int = 0
+        
+        switch stringLength {
+        case 0...3:
+            startCharsNotToObscure = 0
+        case 4...5:
+            startCharsNotToObscure = 1
+        case 6...7:
+            startCharsNotToObscure = 2
+        case 8...10:
+            startCharsNotToObscure = 3
+        case 11...50:
+            startCharsNotToObscure = 4
+        default:
+            startCharsNotToObscure = 0
+        }
+        
+        // remove the characters that we want to obscure
+        obscuredString.removeLast(stringLength - startCharsNotToObscure)
+        
+        // now "fill up" the string with the masking character up to the original string size. If it is longer than the maxStingSizeToShow then trim it down to make everything fit in a clean way
+        obscuredString += String(repeating: maskingCharacter, count: stringLength > maxStringSizeToShow ? maxStringSizeToShow - obscuredString.count : stringLength - obscuredString.count)
+        
+        return obscuredString
+        
     }
     
 }

@@ -100,7 +100,7 @@
 "volumeTestiOSSound" = "Test Volume (Huidig iPhone Volume)";
 "debugLevel" = "Inclusief Debug Niveau";
 "warningChangeFromMasterToFollower" = "Wisselen van Master naar Volger stopt de huidige sensor. Wil je doorgaan ?";
-"nightScoutPort" = "Port (Optioneel):";
+"nightScoutPort" = "Port:";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
