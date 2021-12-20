@@ -104,7 +104,7 @@
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 "debugLevel" = "Include Debug Level";
 "warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
-"nightScoutPort" = "Port (optional):";
+"nightScoutPort" = "Port:";
 "developerSettings" = "Developer Settings";
 "smoothLibreValues" = "Smooth Libre Values?";
 "nslog" = "NSLog";

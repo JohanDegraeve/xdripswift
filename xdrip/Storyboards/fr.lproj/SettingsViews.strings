@@ -86,7 +86,7 @@
 "failedToSendEmail" = "Echec d'envoi du Email";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port (Optionnel):";
+"nightScoutPort" = "Port:";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Urgent Valeur Haute";

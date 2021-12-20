@@ -99,7 +99,7 @@
 "volumeTestiOSSound" = "Testa volym (nuvarande iPhone-volym)";
 "debugLevel" = "Inkludera felsökningsnivå";
 "warningChangeFromMasterToFollower" = "Byte från användare till följare kommer att stoppa nuvarande sensor. Vill du fortsätta?";
-"nightScoutPort" = "Port (inte obligatorisk):";
+"nightScoutPort" = "Port:";
 "developerSettings" = "Inställningar för utvecklare";
 "smoothLibreValues" = "Utjämna Libre-värden?";
 "nslog" = "NSLog";

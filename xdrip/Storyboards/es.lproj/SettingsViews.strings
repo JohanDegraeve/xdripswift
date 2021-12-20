@@ -95,7 +95,7 @@
 "volumeTestiOSSound" = "Comprobar Volumen (volumen actual del iPhone)";
 "debugLevel" = "Incluir Datos Nivel Debug";
 "warningChangeFromMasterToFollower" = "Si cambias el modo de Master a Seguidor se parará la sesión del sensor actual. Quieres continuar?";
-"nightScoutPort" = "Puerto (opcional):";
+"nightScoutPort" = "Puerto:";
 "volumeTestSoundPlayerExplanation" = "Se está reproduciendo una alamra con el mismo volumen que usar un Tipo de Alarma con la opción de 'Ignorar Mode Silencio?' habilitado\n\nCambiar el volume con los botones del iPhone y apretar OK para confirmar";
 "settingsviews_nightScoutAPIKey" = "API_SECRET:";
 "settingsviews_nightScoutUrl" = "URL:";
