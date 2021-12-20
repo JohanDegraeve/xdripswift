@@ -1,5 +1,7 @@
 Project in development.
 
+Documentation available on https://xdrip4ios.readthedocs.io/en/latest/
+
 for info, send an email to xdrip@proximus.be
 
 Current Status :
