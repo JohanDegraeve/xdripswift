@@ -79,32 +79,19 @@ public class NightScoutUploadManager:NSObject {
     /// - parameters:
     ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect
     public func upload(lastConnectionStatusChangeTimeStamp: Date?) {
-        
-        var apiKey: String = ""
-        var token: String = ""
-        
+                
         // check that NightScout is enabled
         guard UserDefaults.standard.nightScoutEnabled else {return}
         
         // check that master is enabled
         guard UserDefaults.standard.isMaster else {return}
         
-        // check that either the API_SECRET or Token exists
+        // check that the URL exists
+        guard let _ = UserDefaults.standard.nightScoutUrl else {return}
+        
+        // check that either the API_SECRET or Token exists, if both are nil then return
         if UserDefaults.standard.nightScoutAPIKey == nil && UserDefaults.standard.nightscoutToken == nil {
             return
-        }
-        
-        // check that siteUrl exists and if so, assign it
-        guard let siteURL = UserDefaults.standard.nightScoutUrl else {return}
-        
-        // assign apiKey if it isn't nil
-        if let string = UserDefaults.standard.nightScoutAPIKey {
-            apiKey = string
-        }
-        
-        // assign token if it isn't nil
-        if let string = UserDefaults.standard.nightscoutToken {
-            token = string
         }
         
         // if schedule is on, check if upload is needed according to schedule
