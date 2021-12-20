@@ -102,6 +102,10 @@ class BluetoothPeripheralViewController: UIViewController {
     /// is the webOOPSettingsSection currently shown or not
     private var webOOPSettingsSectionIsShown = false
     
+    /// if true, webOOPSettingsSectionIsShown and nonFixedSettingsSectionIsShown was already calculated once.
+    /// - this is to avoid that it jumps from true to false or vice versa when the user clicks disconnect or stops scanning, which deletes the transmitter, and then calculation of webOOPSettingsSectionIsShown and nonFixedSettingsSectionIsShown gets different values
+    private var webOOpSettingsAndNonFixedSlopeSectionIsShownIsKnown = false
+    
     /// in which section do we find the non fixed calibration slopes setting, if enabled
     private let nonFixedSettingsSectionNumber = 1
     
@@ -256,8 +260,27 @@ class BluetoothPeripheralViewController: UIViewController {
         
     }
     
-    /// the BluetoothPeripheralViewController has already a few sections defined (eg bluetooth, weboop). This is the amount of sections defined in BluetoothPeripheralViewController.
+    /// The BluetoothPeripheralViewController has already a few sections defined (bluetooth, weboop, nonfixedslopeenabled). This function gives the amount of general sections to be shown. This depends on the availability of weboop and nonfixedslopeenabled for the transmitter
     public func numberOfGeneralSections() -> Int {
+        
+        if webOOpSettingsAndNonFixedSlopeSectionIsShownIsKnown {
+            
+            // means we already calculated numberOfGeneralSections while bluetoothTransmitter was not nil
+            
+            // start with one general section, which is Setting
+            var numberOfGeneralSections = 1
+            
+            if webOOPSettingsSectionIsShown {
+                numberOfGeneralSections = numberOfGeneralSections + 1
+            }
+            
+            if nonFixedSettingsSectionIsShown {
+                numberOfGeneralSections = numberOfGeneralSections + 1
+            }
+            
+            return numberOfGeneralSections
+            
+        }
         
         // first check if bluetoothPeripheral already known
         if let bluetoothPeripheral = bluetoothPeripheral {
@@ -267,18 +290,28 @@ class BluetoothPeripheralViewController: UIViewController {
             // unwrap expectedBluetoothPeripheralType
             if let expectedBluetoothPeripheralType = expectedBluetoothPeripheralType {
                 
-                // get cgmTransmitter, if not nonWebOOPAllowed, then it means this is a transmitter that can not give rawdata
-                // in that case disable both weboopenabled and nonfixedslope setting
-                if let bluetoothPeripheralManager = bluetoothPeripheralManager, let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), let cgmTransmitter = bluetoothTransmitter as? CGMTransmitter {
+                // if transmitter is cgmTransmitter, if not nonWebOOPAllowed, then it means this is a transmitter that can not give rawdata
+                // in that case don't show the sections  weboopenabled and nonfixedslope
+                if let bluetoothPeripheralManager = bluetoothPeripheralManager, let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) {
 
-                    if !cgmTransmitter.nonWebOOPAllowed() {
+                    // no need to recalculate webOOPSettingsSectionIsShown and nonFixedSettingsSectionIsShown later
+                    webOOpSettingsAndNonFixedSlopeSectionIsShownIsKnown = true
+                    
+                    if let cgmTransmitter = bluetoothTransmitter as? CGMTransmitter {
                         
-                        // mark web oop and non fixed slope settings sections as shown
-                        webOOPSettingsSectionIsShown = true
-                        nonFixedSettingsSectionIsShown = true
-                        
-                        return 1
-                        
+                        // is it allowed for this transmitter to work with rawdata?
+                        // if not then don't show weboopsettings and nonfixedslopesettings
+                        // there's only one section (the first) in this case
+                        if !cgmTransmitter.nonWebOOPAllowed() {
+                            
+                            // mark web oop and non fixed slope settings sections as not shown
+                            webOOPSettingsSectionIsShown = false
+                            nonFixedSettingsSectionIsShown = false
+                            
+                            return 1
+                            
+                        }
+
                     }
                     
                 }
@@ -333,7 +366,7 @@ class BluetoothPeripheralViewController: UIViewController {
         }
         
         // here the tableView is not nil, we can safely call bluetoothPeripheralViewModel.configure, this one requires a non-nil tableView
-        
+
         // get a viewModel instance for the expectedBluetoothPeripheralType
         bluetoothPeripheralViewModel = expectedBluetoothPeripheralType?.viewModel()
 
