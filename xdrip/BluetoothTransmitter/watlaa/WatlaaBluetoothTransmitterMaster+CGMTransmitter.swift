@@ -28,7 +28,7 @@ extension WatlaaBluetoothTransmitter: CGMTransmitter {
         return webOOPEnabled
     }
 
-        func isNonFixedSlopeEnabled() -> Bool {
+    func isNonFixedSlopeEnabled() -> Bool {
         return nonFixedSlopeEnabled
     }
 

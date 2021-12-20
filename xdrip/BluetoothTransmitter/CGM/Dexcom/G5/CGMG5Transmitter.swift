@@ -346,7 +346,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
                     // is webOOPEnabled ?
                     // if no treat it as a G5, with own calibration
-                    if !webOOPEnabled {
+                    if !useFireFlyFlow() {
                         
                         // send SensorTxMessage to transmitter
                         getSensorData()
@@ -559,14 +559,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             processBatteryStatusRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if webOOPEnabled { fireflyMessageFlow() }
+                            if useFireFlyFlow() { fireflyMessageFlow() }
                             
                         case .transmitterVersionRx:
                             
                             processTransmitterVersionRxMessage(value: value)
 
                             // if firefly continue with the firefly message flow
-                            if webOOPEnabled { fireflyMessageFlow() }
+                            if useFireFlyFlow() { fireflyMessageFlow() }
 
                         case .keepAliveRx:
                             
@@ -592,21 +592,21 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             processTransmitterTimeRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if webOOPEnabled { fireflyMessageFlow() }
+                            if useFireFlyFlow() { fireflyMessageFlow() }
                             
                         case .glucoseBackfillRx:
                             
                             processGlucoseBackfillRxMessage(value: value)
 
                             // if firefly continue with the firefly message flow
-                            if webOOPEnabled { fireflyMessageFlow() }
+                            if useFireFlyFlow() { fireflyMessageFlow() }
 
                         case .glucoseRx:
                             
                             processGlucoseDataRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if webOOPEnabled { fireflyMessageFlow() }
+                            if useFireFlyFlow() { fireflyMessageFlow() }
                             
                         case .glucoseG6Rx:
                             // received when relying on official Dexcom app, ie in mode useOtherApp = true
@@ -614,28 +614,28 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             processGlucoseG6DataRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if webOOPEnabled { fireflyMessageFlow() }
+                            if useFireFlyFlow() { fireflyMessageFlow() }
                             
                         case .calibrateGlucoseRx:
                             
                             processCalibrateGlucoseRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if webOOPEnabled { fireflyMessageFlow() }
+                            if useFireFlyFlow() { fireflyMessageFlow() }
                             
                         case .sessionStopRx:
                             
                             processSessionStopRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if webOOPEnabled { fireflyMessageFlow() }
+                            if useFireFlyFlow() { fireflyMessageFlow() }
 
                         case .sessionStartRx:
 
                             processSessionStartRxMessage(value: value)
                             
                             // if firefly continue with the firefly message flow
-                            if webOOPEnabled { fireflyMessageFlow() }
+                            if useFireFlyFlow() { fireflyMessageFlow() }
                             
                         default:
                             trace("    unknown opcode received ", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
@@ -1500,7 +1500,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         }
         
         // if firefly, then subscribe to backfillCharacteristic
-        if webOOPEnabled, let backfillCharacteristic = backfillCharacteristic {
+        if useFireFlyFlow(), let backfillCharacteristic = backfillCharacteristic {
             
             trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, CBUUID_Characteristic_UUID.CBUUID_Backfill.description)
             
@@ -1519,7 +1519,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private func fireflyMessageFlow() {
         
         // first of all check that the transmitter is really a firefly, if not stop processing
-        if !webOOPEnabled { return }
+        if !useFireFlyFlow() { return }
         
         trace("start of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
         
@@ -1651,7 +1651,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// - reset backFillStream, lastGlucoseInSensorDataRxReading, backfillTxSent, glucoseTxSent
     private func sendGlucoseDataToDelegate() {
         
-        guard webOOPEnabled else {return}
+        guard useFireFlyFlow() else {return}
         
         // transmitterDate should be non nil
         guard let transmitterStartDate = transmitterStartDate else {
@@ -1759,6 +1759,15 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         }
         
         return true
+        
+    }
+    
+    /// Possibly webOOPEnabled might be set to false, even though it's a transmitter that can only use with webOOPEnabled true. This can happen if transmitter is known but disconnected, app is launched, user goes to bluetooth settings. At that time, view will show the option to disable weboopenabled, then user disables oopweb, then clicks 'connect'. App will crash, and then user relaunches. At that time, webOOPEnabled will not be shown (transmitter is known, it returns false to nonWebOOPAllowed), but it's actually enabled. To avoid that transmitter starts using raw, this function here i sused
+    private func useFireFlyFlow() -> Bool {
+        
+        if !nonWebOOPAllowed() {return true}
+        
+        return webOOPEnabled
         
     }
     
