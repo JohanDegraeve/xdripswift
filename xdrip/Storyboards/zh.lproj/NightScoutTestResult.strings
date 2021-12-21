@@ -11,3 +11,10 @@
 
 /// in settings screen, user clicked test button for nightscout url and apikey
 "nightScoutAPIKeyAndURLStartedBody" = "Nightscout Verification Test Started\n\nThis message should automatically disappear shortly";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// in settings screen, user clicked test button for nightscout url and apikey - this is the title
+"nightScoutAPIKeyAndURLStartedTitle" = "Verifying...";

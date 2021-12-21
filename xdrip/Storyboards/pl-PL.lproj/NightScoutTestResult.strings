@@ -17,3 +17,10 @@
 
 /// POP up after verifying nightscout credentials, to say that verification of url and api key were successful - this is the body
 "nightscouttestresult_verificationsuccessfulalertbody" = "Your Nightscout site was verified successfully";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// in settings screen, user clicked test button for nightscout url and apikey - this is the title
+"nightScoutAPIKeyAndURLStartedTitle" = "Verifying...";

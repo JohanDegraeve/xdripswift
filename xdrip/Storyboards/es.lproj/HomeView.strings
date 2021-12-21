@@ -47,3 +47,10 @@
 
 /// When user needs to enter sensor code, to start firefly sensor
 "enterSensorCode" = "Enter Sensor Code";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// status info : literally 'Sensor End'
+"sensorend" = "Sensor Ends";
