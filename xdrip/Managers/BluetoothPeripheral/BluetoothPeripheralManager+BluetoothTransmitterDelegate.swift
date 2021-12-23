@@ -224,9 +224,21 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
 
         // bluetoothTransmitter has initially been created with webOOPEnabled = false (possibily it's not even a CGM transmitter
         // if it's a CGM transmitter being created here, then we need to reassign webOOPEnabled to the value in the blePeripheral
+        // possibly webOOPEnabled is false, because user sees the option to enable/disable weboop if the transmitter is not connected. So user might have disabled weboop. So as soon as connected, check if nonweboop is allowed
+        //  if not, then set weboopenabled to true
         if let bluetoothTransmitterAsCGM = bluetoothTransmitter as? CGMTransmitter {
             
-            bluetoothTransmitterAsCGM.setWebOOPEnabled(enabled: newBluetoothPeripheral.blePeripheral.webOOPEnabled)
+            if !bluetoothTransmitterAsCGM.nonWebOOPAllowed() {
+                
+                newBluetoothPeripheral.blePeripheral.webOOPEnabled = true
+                
+                bluetoothTransmitterAsCGM.setWebOOPEnabled(enabled: true)
+                
+            } else {
+
+                bluetoothTransmitterAsCGM.setWebOOPEnabled(enabled: newBluetoothPeripheral.blePeripheral.webOOPEnabled)
+
+            }
             
         }
         
@@ -245,28 +257,10 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         checkCurrentCGMTransmitterHelper()
         
         // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
-        if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
-            bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
-        }
+        newBluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
         
-        // assign tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral to nil here
-        self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
-        
-        // possibly webOOPEnabled is false, because user sees the option to enable/disable weboop if the transmitter is not connected. So user might have disabled weboop. So as soon as connected, check if nonweboop is allowed
-        //  if not, then set weboopenabled to true
-        if let cgmTransmitter = bluetoothTransmitter as? CGMTransmitter {
-            
-            if !cgmTransmitter.nonWebOOPAllowed() {
-
-                newBluetoothPeripheral.blePeripheral.webOOPEnabled = true
-                
-                cgmTransmitter.setWebOOPEnabled(enabled: true)
-
-                coreDataManager.saveChanges()
-                
-            }
-            
-        }
+        // call sendSettings function
+        newBluetoothPeripheral.sendSettings(to: bluetoothTransmitter)
         
     }
     
