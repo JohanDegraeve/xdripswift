@@ -216,6 +216,16 @@ final class RootViewController: UIViewController {
     
     @IBOutlet var chartLongPressGestureRecognizerOutlet: UILongPressGestureRecognizer!
     
+    @IBAction func chartDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
+        
+        // if the main chart is double-tapped then force a reset to return to the current date/time, refresh the chart and also all labels
+        updateLabelsAndChart(forceReset: true)
+        
+    }
+    
+    @IBOutlet var chartDoubleTapGestureRecognizerOutlet: UITapGestureRecognizer!
+    
+    
     // MARK: - Constants for ApplicationManager usage
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updateLabelsAndChartTimer
@@ -1759,13 +1769,16 @@ final class RootViewController: UIViewController {
     /// - and if overrideApplicationState = false
     /// - parameters:
     ///     - overrideApplicationState : if true, then update will be done even if state is not .active
-    @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false) {
+    ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
+    @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
         if let glucoseChartManager = glucoseChartManager  {
             // check that app is in foreground, but only if overrideApplicationState = false
-            // check if chart is currently panned back in time, in that case we don't update the labels
-            guard !glucoseChartManager.chartIsPannedBackward else {return}
+            // if we are not forcing to reset even if the chart is currently panned back in time (such as by double-tapping the main chart, then check if it is panned back in that case we don't update the labels
+            if !forceReset {
+                guard !glucoseChartManager.chartIsPannedBackward else {return}
+            }
         }
         
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
