@@ -2283,8 +2283,24 @@ final class RootViewController: UIViewController {
                 ]
                 
                 self.pieChartLabelOutlet.font = UIFont.boldSystemFont(ofSize: 26)
-                self.pieChartLabelOutlet.text = "😎"
                 
+                let components = Calendar.current.dateComponents([.month, .day], from: Date())
+                
+                if components.day != nil {
+                    
+                    // let's add a Christmas holiday easter egg. Because... why not?
+                    if components.month == 12 && (components.day! >= 23 && components.day! <= 31) {
+                        
+                        self.pieChartLabelOutlet.text = "🎁"
+                        
+                    } else {
+                        
+                        // ok, so it's not Chistmas, but we can still be happy about a 100% TIR
+                        self.pieChartLabelOutlet.text = "😎"
+                        
+                    }
+                }
+
             } else {
                 
                 // the easter egg isn't wanted so just show a green circle at 100%
