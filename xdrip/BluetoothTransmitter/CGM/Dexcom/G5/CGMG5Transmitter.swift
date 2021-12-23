@@ -804,7 +804,17 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     func overruleIsWebOOPEnabled() -> Bool {
         
         // dexcom transmitters can be calibrated, even if dexcom algorithm is used
-        return true
+        // that only applies if webOOPEnabled
+        // if not webOOPEnabled, then this transmitter is working in raw mode, no overrule required
+        if webOOPEnabled {
+
+            return true
+
+        } else {
+            
+            return false
+            
+        }
         
     }
     
