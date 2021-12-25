@@ -7,9 +7,9 @@ for info, send an email to xdrip@proximus.be
 Current Status :
 
 - Supported transmitters :
-    - G5
+    - Dexcom G4 with xBridge       
+    - Dexcom G5 and G6
     - MiaoMiao 1 and 2
-    - G4 with xBridge
     - Blucon
     - Bubble
     - Droplet 1
