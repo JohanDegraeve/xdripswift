@@ -27,5 +27,13 @@ enum Texts_TreatmentsView {
 	static let exerciseWithUnit:String = {
 		return NSLocalizedString("treatments_exercise_with_unit", tableName: filename, bundle: Bundle.main, value: "Exercise (min):", comment: "Exercise with unit.")
 	}()
+
+	static let success:String = {
+		return NSLocalizedString("treatments_success", tableName: filename, bundle: Bundle.main, value: "Success", comment: "Success.")
+	}()
+
+	static let uploadCompleted:String = {
+		return NSLocalizedString("treatments_upload_complete", tableName: filename, bundle: Bundle.main, value: "Upload completed.", comment: "Upload completed.")
+	}()
 	
 }

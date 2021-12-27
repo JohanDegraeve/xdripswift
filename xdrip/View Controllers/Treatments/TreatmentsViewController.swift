@@ -35,10 +35,14 @@ class TreatmentsViewController : UIViewController {
 	}
 	
 	@IBAction func uploadButtonTapped(_ sender: UIButton) {
-		nightScoutUploadManager?.uploadTreatmentsToNightScout()
-		let alert = UIAlertController(title: Texts_Common.Ok, message: Texts_Common.Ok, actionHandler: nil)
-						
-		self.present(alert, animated: true, completion: nil)
+		nightScoutUploadManager?.uploadTreatmentsToNightScout(sucessHandler: {
+			// Make sure to run alert in the correct thread.
+			DispatchQueue.main.async {
+				let alert = UIAlertController(title: Texts_TreatmentsView.success, message: Texts_TreatmentsView.uploadCompleted, actionHandler: nil)
+
+				self.present(alert, animated: true, completion: nil)
+			}
+		})
 	}
 	
 	
