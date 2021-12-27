@@ -267,6 +267,9 @@ final class RootViewController: UIViewController {
     
     /// CalibrationsAccessor instance
     private var calibrationsAccessor:CalibrationsAccessor?
+	
+	/// TreatmentEntryAccessor instance
+	private var treatmentEntryAccessor:TreatmentEntryAccessor?
     
     /// NightScoutUploadManager instance
     private var nightScoutUploadManager:NightScoutUploadManager?
@@ -731,6 +734,8 @@ final class RootViewController: UIViewController {
         guard let bgReadingsAccessor = bgReadingsAccessor else {
             fatalError("In setupApplicationData, failed to initialize bgReadings")
         }
+		
+		treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
         
         // instantiate calibrations
         calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
@@ -2852,7 +2857,9 @@ extension RootViewController: UITabBarControllerDelegate {
             
             navigationController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
             
-        }
+        } else if let navigationController = viewController as? TreatmentsNavigationController, let coreDataManager = coreDataManager, let nightScoutUploadManager = nightScoutUploadManager, let treatmentEntryAccessor = treatmentEntryAccessor {
+			navigationController.configure(coreDataManager: coreDataManager, nightScoutUploadManager: nightScoutUploadManager, treatmentEntryAccessor: treatmentEntryAccessor)
+		}
     }
     
 }
