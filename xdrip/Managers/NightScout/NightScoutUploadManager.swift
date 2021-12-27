@@ -29,6 +29,9 @@ public class NightScoutUploadManager:NSObject {
     
     /// CalibrationsAccessor instance
     private let calibrationsAccessor: CalibrationsAccessor
+	
+	/// TreatmentEntryAccessor
+	private let treatmentEntryAccessor: TreatmentEntryAccessor
     
     /// reference to coreDataManager
     private let coreDataManager: CoreDataManager
@@ -60,6 +63,7 @@ public class NightScoutUploadManager:NSObject {
         self.calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         self.messageHandler = messageHandler
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
+		self.treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
         
         super.init()
         
@@ -108,6 +112,9 @@ public class NightScoutUploadManager:NSObject {
         
         // upload calibrations
         uploadCalibrationsToNightScout()
+
+        // upload treatments
+        uploadTreatmentsToNightScout()
         
         // upload activeSensor if needed
         if UserDefaults.standard.uploadSensorStartTimeToNS, let activeSensor = sensorsAccessor.fetchActiveSensor() {
@@ -347,6 +354,40 @@ public class NightScoutUploadManager:NSObject {
             trace("    no readings to upload", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
         }
         
+    }
+
+    /// upload treatments to nightscout
+    /// Only checks recents ones
+    public func uploadTreatmentsToNightScout() {
+		trace("in uploadTreatmentsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+		
+		// get the latest treatments from the last maxDaysToUpload days
+		// filter by those that have not been uploaded
+		let treatments = treatmentEntryAccessor.getRequireUploadTreatments()
+		
+		guard treatments.count > 0 else {
+			trace("    no treatments to upload", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+			return
+		}
+	
+		trace("    number of treatments to upload : %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, treatments.count.description)
+		
+		// map treatments to dictionaryRepresentation
+		let treatmentsDictionaryRepresentation = treatments.map({$0.dictionaryRepresentationForNightScoutUpload()})
+		
+		uploadData(dataToUpload: treatmentsDictionaryRepresentation, traceString: "uploadTreatmentsToNightScout", path: nightScoutTreatmentPath, completionHandler: {
+			
+			// Be sure to use the correct thread.
+			// Running in the completionHandler thread will
+			// result in issues.
+			self.coreDataManager.mainManagedObjectContext.performAndWait {
+				for treatment in treatments {
+					treatment.uploaded = true
+				}
+				
+				self.coreDataManager.saveChanges()
+			}
+		})
     }
     
     /// upload latest calibrations to nightscout
