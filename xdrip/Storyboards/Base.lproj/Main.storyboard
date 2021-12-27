@@ -291,7 +291,7 @@
         <scene sceneID="WDM-MY-6pS">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="IdU-mY-C1M" customClass="TreatmentsNavigationController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Treatments" image="Home" id="Jgh-Nb-wg6"/>
+                    <tabBarItem key="tabBarItem" title="Treatments" image="pencil" catalog="system" id="Jgh-Nb-wg6"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Z4f-sX-pvq">
                         <rect key="frame" x="0.0" y="44" width="390" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -2009,6 +2009,7 @@
         <image name="icloud.and.arrow.up" catalog="system" width="128" height="106"/>
         <image name="lock" catalog="system" width="128" height="128"/>
         <image name="moon.zzz" catalog="system" width="115" height="128"/>
+        <image name="pencil" catalog="system" width="128" height="113"/>
         <image name="scope" catalog="system" width="128" height="122"/>
         <image name="sensor14_14_alt" width="390" height="14"/>
         <systemColor name="systemGrayColor">

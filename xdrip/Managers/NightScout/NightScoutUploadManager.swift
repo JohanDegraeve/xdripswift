@@ -112,9 +112,6 @@ public class NightScoutUploadManager:NSObject {
         
         // upload calibrations
         uploadCalibrationsToNightScout()
-
-        // upload treatments
-        uploadTreatmentsToNightScout()
         
         // upload activeSensor if needed
         if UserDefaults.standard.uploadSensorStartTimeToNS, let activeSensor = sensorsAccessor.fetchActiveSensor() {
@@ -364,7 +361,7 @@ public class NightScoutUploadManager:NSObject {
 
     /// upload treatments to nightscout
     /// Only checks recents ones
-    public func uploadTreatmentsToNightScout() {
+	public func uploadTreatmentsToNightScout(sucessHandler: (() -> Void)?) {
 		trace("in uploadTreatmentsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
 		
 		// get the latest treatments from the last maxDaysToUpload days
@@ -392,6 +389,10 @@ public class NightScoutUploadManager:NSObject {
 				}
 				
 				self.coreDataManager.saveChanges()
+			}
+			
+			if let sucessHandler = sucessHandler {
+				sucessHandler()
 			}
 		})
     }
