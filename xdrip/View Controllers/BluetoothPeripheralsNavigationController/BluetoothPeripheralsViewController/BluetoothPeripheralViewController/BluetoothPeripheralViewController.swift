@@ -1102,7 +1102,10 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                             bluetoothPeripheralManager.receivedNewValue(nonFixedSlopeEnabled: false, for: bluetoothPeripheral)
                             
                         }
-                        
+
+                        // make sure that new value is stored in coredata, because a crash may happen here
+                        self.coreDataManager?.saveChanges()
+
                         // reload the section for nonFixedSettingsSectionNumber, even though the value may not have changed, because possibly isUserInteractionEnabled needs to be set to false for the nonFixedSettingsSectionNumber UISwitch
                         // also reload webOOPSettingsSectionNumber
                         tableView.reloadSections(IndexSet(arrayLiteral: self.nonFixedSettingsSectionNumber, self.webOOPSettingsSectionNumber), with: .none)

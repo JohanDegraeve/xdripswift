@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
     <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
-        <capability name="Image references" minToolsVersion="12.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -384,6 +383,7 @@
                                                 <connections>
                                                     <outletCollection property="gestureRecognizers" destination="Fi5-iu-Usk" appends="YES" id="Rkv-hK-sLH"/>
                                                     <outletCollection property="gestureRecognizers" destination="axt-dD-sCA" appends="YES" id="Bxm-Qp-L3P"/>
+                                                    <outletCollection property="gestureRecognizers" destination="KGx-wX-6Ap" appends="YES" id="VDW-BI-6so"/>
                                                 </connections>
                                             </view>
                                         </subviews>
@@ -740,6 +740,7 @@
                         <outlet property="averageTitleLabelOutlet" destination="na4-pU-1Ik" id="Ieo-0G-9qU"/>
                         <outlet property="cVStatisticLabelOutlet" destination="Vdh-xP-Z0Y" id="wT9-MZ-QcV"/>
                         <outlet property="calibrateToolbarButtonOutlet" destination="u4d-bZ-Kw8" id="lSA-06-2bO"/>
+                        <outlet property="chartDoubleTapGestureRecognizerOutlet" destination="KGx-wX-6Ap" id="zYr-Hc-SGZ"/>
                         <outlet property="chartLongPressGestureRecognizerOutlet" destination="axt-dD-sCA" id="mUZ-cu-720"/>
                         <outlet property="chartOutlet" destination="0nE-AX-r0w" id="ivs-se-S3b"/>
                         <outlet property="chartPanGestureRecognizerOutlet" destination="Fi5-iu-Usk" id="zn5-wp-DKt"/>
@@ -787,6 +788,11 @@
                         <action selector="chartLongPressGestureRecognizerAction:" destination="9pv-A4-QxB" id="6qG-44-Nd4"/>
                     </connections>
                 </pongPressGestureRecognizer>
+                <tapGestureRecognizer numberOfTapsRequired="2" id="KGx-wX-6Ap">
+                    <connections>
+                        <action selector="chartDoubleTapGestureRecognizer:" destination="9pv-A4-QxB" id="KJ1-MA-2o8"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="744.61538461538464" y="-890.75829383886253"/>
         </scene>
