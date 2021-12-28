@@ -18,7 +18,7 @@ class TreatmentTableViewCell: UITableViewCell {
 		self.valueLabel.text = treatment.displayValue()
 		
 		let formatter = DateFormatter()
-		formatter.dateFormat = "dd/MM HH:mm"
+		formatter.dateFormat = "HH:mm"
 
 		self.dateLabel.text = formatter.string(from: treatment.date)
 	}
