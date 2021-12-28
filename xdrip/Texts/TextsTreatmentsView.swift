@@ -28,6 +28,34 @@ enum Texts_TreatmentsView {
 		return NSLocalizedString("treatments_exercise_with_unit", tableName: filename, bundle: Bundle.main, value: "Exercise (min):", comment: "Exercise with unit.")
 	}()
 
+	static let carbsUnit:String = {
+		return NSLocalizedString("treatments_carbs_unit", tableName: filename, bundle: Bundle.main, value: "g", comment: "Carbs unit.")
+	}()
+	
+	static let insulinUnit:String = {
+		return NSLocalizedString("treatments_insulin_unit", tableName: filename, bundle: Bundle.main, value: "U:", comment: "Insulin unit.")
+	}()
+	
+	static let exerciseUnit:String = {
+		return NSLocalizedString("treatments_exercise_unit", tableName: filename, bundle: Bundle.main, value: "min", comment: "Exercise unit.")
+	}()
+
+	static let carbs:String = {
+		return NSLocalizedString("treatments_carbs", tableName: filename, bundle: Bundle.main, value: "Carbs", comment: "Carbs.")
+	}()
+	
+	static let insulin:String = {
+		return NSLocalizedString("treatments_insulin", tableName: filename, bundle: Bundle.main, value: "Insulin", comment: "Insulin.")
+	}()
+	
+	static let exercise:String = {
+		return NSLocalizedString("treatments_exercise", tableName: filename, bundle: Bundle.main, value: "Exercise", comment: "Exercise.")
+	}()
+
+	static let questionMark:String = {
+		return NSLocalizedString("treatments_question_mark", tableName: filename, bundle: Bundle.main, value: "?", comment: "Literally a question mark, used as unknown abbreviation.")
+	}()
+
 	static let success:String = {
 		return NSLocalizedString("treatments_success", tableName: filename, bundle: Bundle.main, value: "Success", comment: "Success.")
 	}()
