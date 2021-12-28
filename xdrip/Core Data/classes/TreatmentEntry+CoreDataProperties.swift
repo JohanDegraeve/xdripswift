@@ -12,21 +12,21 @@ import CoreData
 
 extension TreatmentEntry {
 
-	// Used to load entries from CoreData.
+	/// Used to load entries from CoreData.
 	@nonobjc public class func fetchRequest() -> NSFetchRequest<TreatmentEntry> {
 		return NSFetchRequest<TreatmentEntry>(entityName: "TreatmentEntry")
 	}
 
-	// Date represents the date of the treatment, not the date of creation.
+	/// Date represents the date of the treatment, not the date of creation.
 	@NSManaged public var date: Date
 
-	// Value represents the amount (e.g. insulin units or carbs grams).
+	/// Value represents the amount (e.g. insulin units or carbs grams).
 	@NSManaged public var value: Double
 
-	// Enum TreatmentType defines which treatment this instance is.
+	/// Enum TreatmentType defines which treatment this instance is.
 	@NSManaged public var treatmentType: TreatmentType
 	
-	// Tells if this instance has been uploaded to Nightscout.
+	/// Tells if this instance has been uploaded to Nightscout.
 	@NSManaged public var uploaded: Bool
 	
 }

@@ -86,15 +86,8 @@ class TreatmentEntryAccessor {
 	///     Order by timestamp, descending meaning the treatment at index 0 is the youngest
    func getLatestTreatments(limit:Int?, fromDate:Date?) -> [TreatmentEntry] {
 		
-		var returnValue:[TreatmentEntry] = []
-				
-		let treatments = fetchTreatments(limit: limit, fromDate: fromDate)
+		return fetchTreatments(limit: limit, fromDate: fromDate)
 		
-		loop: for (_, treatment) in treatments.enumerated() {
-			returnValue.append(treatment)
-		}
-		
-		return returnValue
 	}
 	
 	/// gets last treatment

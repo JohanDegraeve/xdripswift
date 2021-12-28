@@ -354,6 +354,7 @@ public class NightScoutUploadManager:NSObject {
     }
 
     /// upload treatments to nightscout
+    ///
     /// Only checks recents ones
 	public func uploadTreatmentsToNightScout(sucessHandler: (() -> Void)?) {
 		trace("in uploadTreatmentsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
