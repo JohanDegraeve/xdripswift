@@ -50,13 +50,13 @@ import CoreData
 }
 
 
-// Representation of a Treatment
-// Stored at CoreData.
-// .date represents the date of the treatment, not the date of creation.
-// .value represents the amount (e.g. insulin units or carbs grams)
-// the value unit is defined by the treatmentType.
-// .treatmentType see TreatmentType
-// .uploaded tells if entry has been uploaded for Nighscout or not.
+/// Representation of a Treatment
+/// Stored at CoreData.
+/// .date represents the date of the treatment, not the date of creation.
+/// .value represents the amount (e.g. insulin units or carbs grams)
+/// the value unit is defined by the treatmentType.
+/// .treatmentType see TreatmentType
+/// .uploaded tells if entry has been uploaded for Nighscout or not.
 public class TreatmentEntry: NSManagedObject {
 
 	init(date: Date, value: Double, treatmentType: TreatmentType, nsManagedObjectContext:NSManagedObjectContext) {
@@ -74,7 +74,7 @@ public class TreatmentEntry: NSManagedObject {
 		super.init(entity: entity, insertInto: context)
 	}
 	
-	// Returns the displayValue: the .value with the proper unit.
+	/// Returns the displayValue: the .value with the proper unit.
 	public func displayValue() -> String {
 		var string = String(self.value)
 		// Checks prevents .0 from being displayed
@@ -84,7 +84,7 @@ public class TreatmentEntry: NSManagedObject {
 		return string + " " + self.treatmentType.unit()
 	}
 	
-	// Returns the dictionary representation required for nighscout post request.
+	/// Returns the dictionary representation required for nighscout post request.
 	public func dictionaryRepresentationForNightScoutUpload() -> [String: Any] {
 		// Universal fields.
 		var dict: [String: Any] = [
