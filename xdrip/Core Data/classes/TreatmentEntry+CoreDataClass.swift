@@ -24,13 +24,13 @@ import CoreData
 	public func asString() -> String {
 		switch self {
 		case .Insulin:
-			return "Insulin"
+			return Texts_TreatmentsView.insulin
 		case .Carbs:
-			return "Carbs"
+			return Texts_TreatmentsView.carbs
 		case .Exercise:
-			return "Exercise"
+			return Texts_TreatmentsView.exercise
 		default:
-			return "Unknown"
+			return Texts_TreatmentsView.questionMark
 		}
 	}
 	
@@ -38,13 +38,13 @@ import CoreData
 	public func unit() -> String {
 		switch self {
 		case .Insulin:
-			return "u"
+			return Texts_TreatmentsView.insulinUnit
 		case .Carbs:
-			return "g"
+			return Texts_TreatmentsView.carbsUnit
 		case .Exercise:
-			return "min"
+			return Texts_TreatmentsView.exerciseUnit
 		default:
-			return ""
+			return Texts_TreatmentsView.questionMark
 		}
 	}
 }
