@@ -11,6 +11,10 @@ import CoreData
 
 
 // @objc and Int16 allows enums to work with CoreData
+// WARNING: DO NOT change the order without caution.
+// Changing the order will change the Int16 value
+// and may change all Treatments Type present in CoreData.
+// Add new at the end or specify each value.
 @objc public enum TreatmentType: Int16 {
 	case Insulin
 	case Carbs
