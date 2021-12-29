@@ -38,6 +38,7 @@
 	<key>NFCReaderUsageDescription</key>
 	<string>xDrip4iO5 uses NFC to scan Libre sensors.</string>
 	<key>NSAppTransportSecurity</key>
+	<dict/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Connect to CGM Transmitter and M5Stack</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
