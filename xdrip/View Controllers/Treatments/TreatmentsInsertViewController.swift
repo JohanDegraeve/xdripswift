@@ -67,17 +67,17 @@ class TreatmentsInsertViewController : UIViewController {
 		var treatments: [TreatmentEntry] = []
 		let date = datePicker.date
 		
-		if let carbsText = carbsTextField.text, let carbs = Double(carbsText) {
+		if let carbsText = carbsTextField.text, let carbs = Double(carbsText), carbs > 0 {
 			let treatment = TreatmentEntry(date: date, value: carbs, treatmentType: .Carbs, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 			treatments.append(treatment)
 		}
 		
-		if let insulinText = insulinTextField.text, let insulin = Double(insulinText) {
+		if let insulinText = insulinTextField.text, let insulin = Double(insulinText), insulin > 0 {
 			let treatment = TreatmentEntry(date: date, value: insulin, treatmentType: .Insulin, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 			treatments.append(treatment)
 		}
 		
-		if let exerciseText = exerciseTextField.text, let exercise = Double(exerciseText) {
+		if let exerciseText = exerciseTextField.text, let exercise = Double(exerciseText), exercise > 0 {
 			let treatment = TreatmentEntry(date: date, value: exercise, treatmentType: .Exercise, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 			treatments.append(treatment)
 		}
