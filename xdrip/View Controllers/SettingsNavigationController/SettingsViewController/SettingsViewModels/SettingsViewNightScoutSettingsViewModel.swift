@@ -58,7 +58,11 @@ class SettingsViewNightScoutSettingsViewModel {
         
         // unwrap siteUrl and apiKey
         guard let siteUrl = UserDefaults.standard.nightScoutUrl else {return}
-                
+        
+        if UserDefaults.standard.nightScoutUrl == nil {
+            return
+        }
+        
         if let url = URL(string: siteUrl) {
             
             let testURL = url.appendingPathComponent(nightScoutAuthTestPath)
@@ -289,15 +293,19 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
                 UserDefaults.standard.nightscoutToken = token.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .testUrlAndAPIKey:
-
-                // show info that test is started, through the messageHandler
-                if let messageHandler = messageHandler {
-                    messageHandler(Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedTitle, Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedBody)
-                }
-                
-                self.testNightScoutCredentials()
-                
+            
+            if UserDefaults.standard.nightScoutUrl == nil {
                 return .nothing
+            }
+            
+            // show info that test is started, through the messageHandler
+            if let messageHandler = messageHandler {
+                messageHandler(Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedTitle, Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedBody)
+            }
+            
+            self.testNightScoutCredentials()
+            
+            return .nothing
 
         case .useSchedule:
             return .nothing
