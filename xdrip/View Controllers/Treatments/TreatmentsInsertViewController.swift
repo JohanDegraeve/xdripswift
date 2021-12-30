@@ -23,16 +23,18 @@ class TreatmentsInsertViewController : UIViewController {
 	@IBOutlet weak var exerciseTextField: UITextField!
 	
 	// MARK: - private properties
+    
 	/// reference to coreDataManager
 	private var coreDataManager:CoreDataManager?
 	
-	// handler to executed when user clicks actionButton
+	/// handler to be executed when user clicks okButton
 	private var entryHandler:((_ entries: [TreatmentEntry]) -> Void)?
 	
-	/// handler to execute when user clicks cancelHandler
+	/// handler to be executed when user clicks cancelButton
 	private var cancelHandler:(() -> Void)?
 	
 	// MARK: - overrides
+    
 	// set the status bar content colour to light to match new darker theme
 	override var preferredStatusBarStyle: UIStatusBarStyle {
 		return .lightContent
@@ -43,10 +45,12 @@ class TreatmentsInsertViewController : UIViewController {
 		
 		// Title
 		self.titleLabel.text = Texts_TreatmentsView.newEntryTitle
+        
 		// Labels for each TextField
 		self.carbsLabel.text = Texts_TreatmentsView.carbsWithUnit
 		self.insulinLabel.text = Texts_TreatmentsView.insulinWithUnit
 		self.exerciseLabel.text = Texts_TreatmentsView.exerciseWithUnit
+        
 		// Buttons
 		self.cancelButton.setTitle(Texts_Common.Cancel, for: .normal)
 		self.okButton.setTitle(Texts_Common.Ok, for: .normal)
@@ -54,12 +58,15 @@ class TreatmentsInsertViewController : UIViewController {
 		self.addDoneButtonOnNumpad(textField: self.carbsTextField)
 		self.addDoneButtonOnNumpad(textField: self.insulinTextField)
 		self.addDoneButtonOnNumpad(textField: self.exerciseTextField)
+        
 		self.setDismissKeyboard()
+        
 	}
 
 	// MARK: - buttons actions
 	
 	@IBAction func okButtonTapped(_ sender: UIButton) {
+        
 		guard let coreDataManager = coreDataManager, let entryHandler = entryHandler else {
 			return
 		}
@@ -83,6 +90,7 @@ class TreatmentsInsertViewController : UIViewController {
 		}
 		
 		entryHandler(treatments)
+        
 	}
 	
 	
@@ -96,10 +104,12 @@ class TreatmentsInsertViewController : UIViewController {
 	// MARK: - public functions
 	
 	public func configure(coreDataManager: CoreDataManager?, entryHandler: ((_ entries: [TreatmentEntry]) -> Void)?, cancelHandler:(() -> Void)?) {
+        
 		// initalize private properties
 		self.coreDataManager = coreDataManager
 		self.entryHandler = entryHandler
 		self.cancelHandler = cancelHandler
+        
 	}
 	
 	
@@ -117,7 +127,8 @@ class TreatmentsInsertViewController : UIViewController {
 		keypadToolbar.sizeToFit()
 		// add a toolbar with a done button above the number pad
 		textField.inputAccessoryView = keypadToolbar
-	} //addDoneToKeyPad
+        
+	}
 	
 	func setDismissKeyboard() {
 	   let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action:    #selector(self.dismissKeyboardTouchOutside))
