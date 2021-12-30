@@ -593,7 +593,7 @@ public class NightScoutUploadManager:NSObject {
     
     private func testNightScoutCredentials(_ completion: @escaping (_ success: Bool, _ error: Error?) -> Void) {
         
-        if let url = URL(string: UserDefaults.standard.nightScoutUrl!), var uRLComponents = URLComponents(url: url.appendingPathComponent(nightScoutAuthTestPath), resolvingAgainstBaseURL: false) {
+        if let nightSccoutUrl = UserDefaults.standard.nightScoutUrl, let url = URL(string: nightSccoutUrl), var uRLComponents = URLComponents(url: url.appendingPathComponent(nightScoutAuthTestPath), resolvingAgainstBaseURL: false) {
             
             if UserDefaults.standard.nightScoutPort != 0 {
                 uRLComponents.port = UserDefaults.standard.nightScoutPort
