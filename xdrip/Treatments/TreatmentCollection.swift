@@ -9,56 +9,54 @@
 import Foundation
 
 
-// Data structure used to fetch
-// treatments with TreatmentEntryAccessor
-// and group them by date
-// allowing for easier retrieval.
+/// Data structure used to fetch treatments with TreatmentEntryAccessor and group them by date allowing for easier retrieval.
 public class TreatmentCollection {
 	
 	// MARK: - Properties
 
-	// List that has keeps tracks of all DateOnly
-	// objects sorted from newest to oldest.
-	// Swift has no OrderedSet, so mimic it with an array.
+	/// List that has keeps tracks of all DateOnly objects sorted from newest to oldest.
+    ///
+	/// Swift has no OrderedSet, so mimic it with an array.
 	private var datesOnly: [DateOnly] = []
 	
-	// Dictionary that maps a DateOnly to a list of TreatmentsEntry.
+	/// Dictionary that maps a DateOnly to a list of TreatmentsEntry.
 	private var treatmentsByDate: [DateOnly: [TreatmentEntry]] = [:]
 	
 	
 	// MARK: - Inits
 
-	// Inits from a list of treatments.
+	/// Inits from a list of treatments.
 	init(treatments: [TreatmentEntry]) {
 		self.addTreatments(treatments)
 	}
 	
 	
-	// MARK: - Public methods
+	/// MARK: - Public methods
 	
-	// Getter for datesOnly.
+	/// Getter for datesOnly.
 	public func dateOnlys() -> [DateOnly] {
 		return self.datesOnly
 	}
 
-	// Returns the treatments for a given date.
+	/// Returns the treatments for a given date.
 	public func getTreatmentsFor(date: DateOnly) -> [TreatmentEntry] {
 		return self.treatmentsByDate[date] ?? []
 	}
 	
-	// Returns the DateOnly at a given index.
+	/// Returns the DateOnly at a given index.
 	public func dateOnlyAt(_ index: Int) -> DateOnly {
 		return self.datesOnly[index]
 	}
 	
-	// Returns the treatments for the date at a given index.
+	/// Returns the treatments for the date at a given index.
 	public func treatmentsForDateOnlyAt(_ index: Int) -> [TreatmentEntry] {
 		let date = self.dateOnlyAt(index)
 		return self.getTreatmentsFor(date: date)
 	}
 	
-	// Returns a single treatment at given date index and treatment index.
-	// getTreatment(dateIndex: 0, treatmentIndex: 0) will return the latest treatment.
+	/// Returns a single treatment at given date index and treatment index.
+    ///
+	/// getTreatment(dateIndex: 0, treatmentIndex: 0) will return the latest treatment.
 	public func getTreatment(dateIndex: Int, treatmentIndex: Int) -> TreatmentEntry {
 		return self.treatmentsForDateOnlyAt(dateIndex)[treatmentIndex]
 	}
@@ -66,7 +64,7 @@ public class TreatmentCollection {
 	
 	// MARK: - Private methods
 	
-	// Adds treatments to this collection.
+	/// Adds treatments to this collection.
 	private func addTreatments(_ treatments: [TreatmentEntry]) {
 		// Cannot assume treatments are sorted.
 		for treatment in treatments {
