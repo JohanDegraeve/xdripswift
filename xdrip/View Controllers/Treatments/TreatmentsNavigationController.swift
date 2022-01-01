@@ -29,11 +29,11 @@ final class TreatmentsNavigationController: UINavigationController {
 	// MARK: - public functions
 	
 	/// configure
-	public func configure(coreDataManager: CoreDataManager, nightScoutUploadManager: NightScoutUploadManager, treatmentEntryAccessor: TreatmentEntryAccessor) {
+	public func configure(coreDataManager: CoreDataManager, nightScoutUploadManager: NightScoutUploadManager) {
 		// initalize private properties
 		self.coreDataManager = coreDataManager
 		self.nightScoutUploadManager = nightScoutUploadManager
-		self.treatmentEntryAccessor = treatmentEntryAccessor
+		self.treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
 	}
 	
 	// MARK: - overrides
