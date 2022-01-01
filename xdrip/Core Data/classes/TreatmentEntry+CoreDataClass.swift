@@ -20,7 +20,7 @@ import CoreData
 	case Carbs
 	case Exercise
 	
-	// String representation.
+	/// String representation.
 	public func asString() -> String {
 		switch self {
 		case .Insulin:
@@ -34,7 +34,7 @@ import CoreData
 		}
 	}
 	
-	// The unit used for the type.
+	/// The unit used for the type.
 	public func unit() -> String {
 		switch self {
 		case .Insulin:
