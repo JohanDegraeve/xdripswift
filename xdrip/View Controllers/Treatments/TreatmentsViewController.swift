@@ -14,7 +14,7 @@ class TreatmentsViewController : UIViewController {
 	
 	// MARK: - private properties
 	
-	// TreatmentCollection is used to get and sort data.
+	/// TreatmentCollection is used to get and sort data.
 	private var treatmentCollection: TreatmentCollection?
 	
 	/// reference to coreDataManager
@@ -31,12 +31,12 @@ class TreatmentsViewController : UIViewController {
 	@IBOutlet weak var newButton: UIButton!
 	@IBOutlet weak var tableView: UITableView!
 	
-	// 'New' button action.
+	/// 'New' button action.
 	@IBAction func newButtonTapped(_ sender: UIButton) {
 		self.presentTreatmentsInsert()
 	}
 	
-	// Upload button action.
+	/// Upload button action.
 	@IBAction func uploadButtonTapped(_ sender: UIButton) {
 		// Uploads to nighscout and if sucess display an alert.
 		nightScoutUploadManager?.uploadTreatmentsToNightScout(sucessHandler: {
@@ -49,7 +49,6 @@ class TreatmentsViewController : UIViewController {
 		})
 	}
 	
-	// Overide viewWillAppear and do localization.
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		
@@ -60,7 +59,7 @@ class TreatmentsViewController : UIViewController {
 	
 	// MARK: - public functions
 	
-	// Configure will be called before this view is presented for the user.
+	/// Configure will be called before this view is presented for the user.
 	public func configure(coreDataManager: CoreDataManager, nightScoutUploadManager: NightScoutUploadManager, treatmentEntryAccessor: TreatmentEntryAccessor) {
 		// initalize private properties
 		self.coreDataManager = coreDataManager
@@ -73,7 +72,7 @@ class TreatmentsViewController : UIViewController {
 
 	// MARK: - private functions
 	
-	// Reloads treatmentCollection and calls reloadData on tableView.
+	/// Reloads treatmentCollection and calls reloadData on tableView.
 	private func reload() {
 		guard let treatmentEntryAccessor = treatmentEntryAccessor else { return }
 		let treatments = treatmentEntryAccessor.getLatestTreatments()
@@ -83,7 +82,7 @@ class TreatmentsViewController : UIViewController {
 	}
 	
 
-	// Presents the TreatmentsInsertViewController.
+	/// Presents the TreatmentsInsertViewController.
 	private func presentTreatmentsInsert() {
 		// Controller instance created from storyboard identifier.
 		let insertViewController = UIStoryboard.main.instantiateViewController(withIdentifier: "TreatmentsInsertViewController") as! TreatmentsInsertViewController
@@ -112,17 +111,14 @@ class TreatmentsViewController : UIViewController {
 }
 
 
-// MARK: - UITableView related
+// MARK: - conform to UITableViewDelegate and UITableViewDataSource
 
 extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 	
-	// Number of sections will be the number of days in data.
-	// TreatmentCollection will take care of it for us.
 	func numberOfSections(in tableView: UITableView) -> Int {
 		return self.treatmentCollection?.dateOnlys().count ?? 0
 	}
 	
-	// Number of rows in section will be the number of treatments at a given date
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		guard let treatmentCollection = treatmentCollection else {
 			return 0
@@ -132,9 +128,6 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 		return treatments.count
 	}
 	
-	// Setups and returns a cell for given indexPath.
-	// indexPath.section will be interpreted as the index of the date
-	// indexPath.row will be interpreted as the treatment index for treatments at the date
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		guard let cell = tableView.dequeueReusableCell(withIdentifier: "TreatmentsCell", for: indexPath) as? TreatmentTableViewCell, let treatmentCollection = treatmentCollection else {
 			fatalError("Unexpected Table View Cell")
@@ -146,13 +139,10 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 		return cell
 	}
 	
-	// Enables cell deletion.
 	func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
 		return true
 	}
 	
-	// Called when user edits a cell.
-	// Only used for deletion.
 	func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 		if (editingStyle == .delete) {
 			guard let treatmentCollection = treatmentCollection, let treatmentEntryAccessor = treatmentEntryAccessor, let coreDataManager = coreDataManager else {
@@ -170,15 +160,13 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 		}
 	}
 	
-	
-	// Returns the title for a given table section.
 	func tableView( _ tableView : UITableView,  titleForHeaderInSection section: Int) -> String? {
 		
 		guard let treatmentCollection = treatmentCollection else {
 			return ""
 		}
 		
-		// Title will be the date formated.
+		// Title will be the date formatted.
 		let date = treatmentCollection.dateOnlyAt(section).date
 
 		let formatter = DateFormatter()
@@ -187,8 +175,6 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 		return formatter.string(from: date)
 	}
 	
-	// Called before each section header is displayed.
-	// Can be used to set font, text color, background color and other properties.
 	func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
 		guard let titleView = view as? UITableViewHeaderFooterView else {
 			return
@@ -204,7 +190,6 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 		}
 	}
 
-	// The height for each section header.
 	func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
 		return 40.0
 	}
