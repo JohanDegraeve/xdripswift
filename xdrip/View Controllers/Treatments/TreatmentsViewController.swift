@@ -27,17 +27,11 @@ class TreatmentsViewController : UIViewController {
 	private var treatmentEntryAccessor: TreatmentEntryAccessor?
 	
 	// Outlets
-	@IBOutlet weak var titleLabel: UILabel!
-	@IBOutlet weak var newButton: UIButton!
+	@IBOutlet weak var titleNavigation: UINavigationItem!
 	@IBOutlet weak var tableView: UITableView!
 	
-	/// 'New' button action.
-	@IBAction func newButtonTapped(_ sender: UIButton) {
-		self.presentTreatmentsInsert()
-	}
-	
 	/// Upload button action.
-	@IBAction func uploadButtonTapped(_ sender: UIButton) {
+	@IBAction func uploadButtonTapped(_ sender: UIBarButtonItem) {
 		// Uploads to nighscout and if sucess display an alert.
 		nightScoutUploadManager?.uploadTreatmentsToNightScout(sucessHandler: {
 			// Make sure to run alert in the correct thread.
@@ -52,8 +46,41 @@ class TreatmentsViewController : UIViewController {
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		
-		self.titleLabel.text = Texts_TreatmentsView.treatmentsTitle
-		self.newButton.setTitle(Texts_TreatmentsView.newButton, for: .normal)
+		// Fixes dark mode issues
+		if let navigationBar = navigationController?.navigationBar {
+			navigationBar.barStyle = UIBarStyle.blackTranslucent
+			navigationBar.barTintColor  = UIColor.black
+			navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
+		}
+		
+		self.titleNavigation.title = Texts_TreatmentsView.treatmentsTitle
+	}
+	
+
+	/// Override prepare for segue, we must call configure on the TreatmentsInsertViewController.
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		// Check if is the segueIdentifier to TreatmentsInsert.
+		guard let segueIndentifier = segue.identifier, segueIndentifier == TreatmentsViewController.SegueIdentifiers.TreatmentsToNewTreatmentsSegue.rawValue else {
+			return
+		}
+		
+		// Cast the destination to TreatmentsInsertViewController (if possible).
+		// And assures the destination and coreData are valid.
+		guard let insertViewController = segue.destination as? TreatmentsInsertViewController, let coreDataManager = coreDataManager else {
+
+			fatalError("In TreatmentsInsertViewController, prepare for segue, viewcontroller is not TreatmentsInsertViewController or coreDataManager is nil" )
+		}
+		
+		// Handler that will be called when entries are created.
+		// No need to use the variable, reload will load from CoreData.
+		let entryHandler = { (entries : [TreatmentEntry]) in
+			self.coreDataManager?.saveChanges()
+			insertViewController.dismiss(animated: true, completion: nil)
+			self.reload()
+		}
+		
+		// Configure insertViewController with CoreData instance and complete handler.
+		insertViewController.configure(coreDataManager: coreDataManager, entryHandler: entryHandler)
 	}
 	
 	
@@ -80,34 +107,17 @@ class TreatmentsViewController : UIViewController {
 
 		self.tableView.reloadData()
 	}
+}
+
+
+/// defines perform segue identifiers used within TreatmentsViewController
+extension TreatmentsViewController {
 	
-
-	/// Presents the TreatmentsInsertViewController.
-	private func presentTreatmentsInsert() {
-		// Controller instance created from storyboard identifier.
-		let insertViewController = UIStoryboard.main.instantiateViewController(withIdentifier: "TreatmentsInsertViewController") as! TreatmentsInsertViewController
-		insertViewController.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
-		
-		// Handler that will be called when entries are created.
-		// No need to use the variable, reload will load from CoreData.
-		let entryHandler = { (entries : [TreatmentEntry]) in
-			self.coreDataManager?.saveChanges()
-			insertViewController.dismiss(animated: true, completion: nil)
-			self.reload()
-		}
-		
-		// Handler that will be called when user cancels in TreatmentsInsertViewController.
-		// Just dismiss the view.
-		let cancelHandler = {
-			insertViewController.dismiss(animated: true, completion: nil)
-		}
-		
-		// Configure insertViewController with CoreData instance and handlers.
-		insertViewController.configure(coreDataManager: coreDataManager, entryHandler: entryHandler, cancelHandler: cancelHandler)
-
-		// present it
-		self.present(insertViewController, animated: true)
+	public enum SegueIdentifiers:String {
+		/// to go from TreatmentsViewController to TreatmentsInsertViewController
+		case TreatmentsToNewTreatmentsSegue = "TreatmentsToNewTreatmentsSegue"
 	}
+	
 }
 
 

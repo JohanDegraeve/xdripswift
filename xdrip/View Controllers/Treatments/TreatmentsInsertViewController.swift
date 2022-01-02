@@ -11,12 +11,11 @@ import Foundation
 
 class TreatmentsInsertViewController : UIViewController {
 	
-	@IBOutlet weak var titleLabel: UILabel!
+	@IBOutlet weak var titleNavigation: UINavigationItem!
 	@IBOutlet weak var carbsLabel: UILabel!
 	@IBOutlet weak var insulinLabel: UILabel!
 	@IBOutlet weak var exerciseLabel: UILabel!
-	@IBOutlet weak var cancelButton: UIButton!
-	@IBOutlet weak var okButton: UIButton!
+	@IBOutlet weak var doneButton: UIBarButtonItem!
 	@IBOutlet weak var datePicker: UIDatePicker!
 	@IBOutlet weak var carbsTextField: UITextField!
 	@IBOutlet weak var insulinTextField: UITextField!
@@ -30,9 +29,6 @@ class TreatmentsInsertViewController : UIViewController {
 	/// handler to be executed when user clicks okButton
 	private var entryHandler:((_ entries: [TreatmentEntry]) -> Void)?
 	
-	/// handler to be executed when user clicks cancelButton
-	private var cancelHandler:(() -> Void)?
-	
 	// MARK: - overrides
     
 	// set the status bar content colour to light to match new darker theme
@@ -43,30 +39,34 @@ class TreatmentsInsertViewController : UIViewController {
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		
+		// Fixes dark mode issues
+		if let navigationBar = navigationController?.navigationBar {
+			navigationBar.barStyle = UIBarStyle.blackTranslucent
+			navigationBar.barTintColor  = UIColor.black
+			navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
+		}
+		
 		// Title
-		self.titleLabel.text = Texts_TreatmentsView.newEntryTitle
+		self.titleNavigation.title = Texts_TreatmentsView.newEntryTitle
         
 		// Labels for each TextField
 		self.carbsLabel.text = Texts_TreatmentsView.carbsWithUnit
 		self.insulinLabel.text = Texts_TreatmentsView.insulinWithUnit
 		self.exerciseLabel.text = Texts_TreatmentsView.exerciseWithUnit
-        
-		// Buttons
-		self.cancelButton.setTitle(Texts_Common.Cancel, for: .normal)
-		self.okButton.setTitle(Texts_Common.Ok, for: .normal)
 		
+		// Done button
+//		self.doneButton.title = Texts_Common.
+        
 		self.addDoneButtonOnNumpad(textField: self.carbsTextField)
 		self.addDoneButtonOnNumpad(textField: self.insulinTextField)
 		self.addDoneButtonOnNumpad(textField: self.exerciseTextField)
         
 		self.setDismissKeyboard()
-        
 	}
 
 	// MARK: - buttons actions
 	
-	@IBAction func okButtonTapped(_ sender: UIButton) {
-        
+	@IBAction func doneButtonTapped(_ sender: UIBarButtonItem) {
 		guard let coreDataManager = coreDataManager, let entryHandler = entryHandler else {
 			return
 		}
@@ -90,26 +90,19 @@ class TreatmentsInsertViewController : UIViewController {
 		}
 		
 		entryHandler(treatments)
-        
-	}
-	
-	
-	@IBAction func cancelButtonTapped(_ sender: UIButton) {
-		if let cancelHandler = cancelHandler {
-			cancelHandler()
-		}
+		
+		// Pops the current view (this)
+		self.navigationController?.popViewController(animated: true)
 	}
 	
 	
 	// MARK: - public functions
 	
-	public func configure(coreDataManager: CoreDataManager?, entryHandler: ((_ entries: [TreatmentEntry]) -> Void)?, cancelHandler:(() -> Void)?) {
+	public func configure(coreDataManager: CoreDataManager?, entryHandler: ((_ entries: [TreatmentEntry]) -> Void)?) {
         
 		// initalize private properties
 		self.coreDataManager = coreDataManager
 		self.entryHandler = entryHandler
-		self.cancelHandler = cancelHandler
-        
 	}
 	
 	
