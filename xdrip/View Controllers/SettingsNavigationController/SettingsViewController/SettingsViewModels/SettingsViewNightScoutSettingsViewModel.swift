@@ -56,7 +56,7 @@ class SettingsViewNightScoutSettingsViewModel {
     /// test the nightscout url and api key and send result to messageHandler
     private func testNightScoutCredentials() {
         
-        // unwrap siteUrl and apiKey
+        // check if the Nightscout URL exists. If not, don't test anything
         guard let siteUrl = UserDefaults.standard.nightScoutUrl else {return}
                 
         if let url = URL(string: siteUrl) {
@@ -222,57 +222,58 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightScoutUrl, message: Texts_SettingsView.giveNightScoutUrl, keyboardType: .URL, text: UserDefaults.standard.nightScoutUrl != nil ? UserDefaults.standard.nightScoutUrl : ConstantsNightScout.defaultNightScoutUrl, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(nightscouturl:String) in
                 
                 // if user gave empty string then set to nil
-                // if not nil, and if not starting with http or https, add https, and remove ending /
-                var enteredURL = nightscouturl.toNilIfLength0()
-                
-                // assuming that the enteredURL isn't nil, isn't the default value and hasn't been entered without a valid scheme
-                if enteredURL != nil && enteredURL != ConstantsNightScout.defaultNightScoutUrl  && !enteredURL!.startsWith("https://http") {
+                // if not nil, then process it
+                if var enteredURL = nightscouturl.toNilIfLength0() {
                     
-                    // if self doesn't start with http or https, then add https. This might not make sense, but it will guard against throwing fatal errors when trying to get the scheme of the Endpoint
-                    if !enteredURL!.startsWith("http://") && !enteredURL!.startsWith("https://") {
-                        enteredURL = "https://" + enteredURL!
-                    }
-                    
-                    // if url ends with /, remove it
-                    if enteredURL!.last == "/" {
-                        enteredURL!.removeLast()
-                    }
-                    
-                    // remove the api path if it exists - useful for people pasting in xDrip+ Base URLs
-                    enteredURL = enteredURL!.replacingOccurrences(of: "/api/v1", with: "")
-                    
-                    // if we've got a valid URL, then let's break it down
-                    if let enteredURLComponents = URLComponents(string: enteredURL!) {
+                    // assuming that the enteredURL isn't nil, isn't the default value and hasn't been entered without a valid scheme
+                    if enteredURL != ConstantsNightScout.defaultNightScoutUrl  && !enteredURL.startsWith("https://http") {
                         
-                        // pull the port info if it exists and set the port
-                        if let port = enteredURLComponents.port {
-                            UserDefaults.standard.nightScoutPort = port
+                        // if self doesn't start with http or https, then add https. This might not make sense, but it will guard against throwing fatal errors when trying to get the scheme of the entered URL
+                        if !enteredURL.startsWith("http://") && !enteredURL.startsWith("https://") {
+                            enteredURL = "https://" + enteredURL
                         }
                         
-                        // pull the "user" info if it exists and use it to set the API_SECRET
-                        if let user = enteredURLComponents.user {
-                            UserDefaults.standard.nightScoutAPIKey = user.toNilIfLength0()
+                        // if url ends with /, remove it
+                        if enteredURL.last == "/" {
+                            enteredURL.removeLast()
                         }
                         
-                        // if the user has pasted in a URL with a token, then let's parse it out and use it
-                        if let token = enteredURLComponents.queryItems?.first(where: { $0.name == "token" })?.value {
-                            UserDefaults.standard.nightscoutToken = token.toNilIfLength0()
+                        // remove the api path if it exists - useful for people pasting in xDrip+ Base URLs
+                        enteredURL = enteredURL.replacingOccurrences(of: "/api/v1", with: "")
+                        
+                        // if we've got a valid URL, then let's break it down
+                        if let enteredURLComponents = URLComponents(string: enteredURL) {
+                            
+                            // pull the port info if it exists and set the port
+                            if let port = enteredURLComponents.port {
+                                UserDefaults.standard.nightScoutPort = port
+                            }
+                            
+                            // pull the "user" info if it exists and use it to set the API_SECRET
+                            if let user = enteredURLComponents.user {
+                                UserDefaults.standard.nightScoutAPIKey = user.toNilIfLength0()
+                            }
+                            
+                            // if the user has pasted in a URL with a token, then let's parse it out and use it
+                            if let token = enteredURLComponents.queryItems?.first(where: { $0.name == "token" })?.value {
+                                UserDefaults.standard.nightscoutToken = token.toNilIfLength0()
+                            }
+                            
+                            // finally, let's make a clean URL with just the scheme and host. We don't need to add anything else as this is basically the only thing we were asking for in the first place.
+                            var nighscoutURLComponents = URLComponents()
+                            nighscoutURLComponents.scheme = "https"
+                            nighscoutURLComponents.host = enteredURLComponents.host?.lowercased()
+                            
+                            UserDefaults.standard.nightScoutUrl = nighscoutURLComponents.string!
+                            
                         }
                         
-                        // finally, let's make a clean URL with just the scheme and host. We don't need to add anything else as this is basically the only thing we were asking for in the first place.
-                        var nighscoutURLComponents = URLComponents()
-                        nighscoutURLComponents.scheme = "https"
-                        nighscoutURLComponents.host = enteredURLComponents.host?.lowercased()
+                    } else {
                         
-                        UserDefaults.standard.nightScoutUrl = nighscoutURLComponents.string!
+                        // there must be something wrong with the URL the user is trying to add, so let's just ignore it
+                        UserDefaults.standard.nightScoutUrl = nil
                         
                     }
-                    
-                } else {
-                    
-                    // there must be something wrong with the URL the user is trying to add, so let's just ignore it
-                    UserDefaults.standard.nightScoutUrl = nil
-                    
                 }
                 
             }, cancelHandler: nil, inputValidator: nil)
@@ -290,14 +291,21 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             
         case .testUrlAndAPIKey:
 
-                // show info that test is started, through the messageHandler
-                if let messageHandler = messageHandler {
-                    messageHandler(Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedTitle, Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedBody)
-                }
-                
-                self.testNightScoutCredentials()
+            // if there's no URL then don't even try to test anything
+            if UserDefaults.standard.nightScoutUrl == nil {
                 
                 return .nothing
+                
+            }
+            
+            // show info that test is started, through the messageHandler
+            if let messageHandler = messageHandler {
+                messageHandler(Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedTitle, Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedBody)
+            }
+            
+            self.testNightScoutCredentials()
+            
+            return .nothing
 
         case .useSchedule:
             return .nothing

@@ -202,8 +202,6 @@ public class NightScoutUploadManager:NSObject {
     
     /// upload battery level to nightscout
     /// - parameters:
-    ///     - siteURL : nightscout site url
-    ///     - apiKey : nightscout api key
     ///     - transmitterBatteryInfosensor: setransmitterBatteryInfosensornsor to upload
     private func uploadTransmitterBatteryInfoToNightScout(transmitterBatteryInfo: TransmitterBatteryInfo) {
         
@@ -252,8 +250,6 @@ public class NightScoutUploadManager:NSObject {
 
     /// upload sensor to nightscout
     /// - parameters:
-    ///     - siteURL : nightscout site url
-    ///     - apiKey : nightscout api key
     ///     - sensor: sensor to upload
     private func uploadActiveSensorToNightScout(sensor: Sensor) {
         
@@ -284,8 +280,6 @@ public class NightScoutUploadManager:NSObject {
     
     /// upload latest readings to nightscout
     /// - parameters:
-    ///     - siteURL : nightscout site url
-    ///     - apiKey : nightscout api key
     private func uploadBgReadingsToNightScout(lastConnectionStatusChangeTimeStamp: Date?) {
         
         trace("in uploadBgReadingsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
@@ -357,8 +351,6 @@ public class NightScoutUploadManager:NSObject {
     
     /// upload latest calibrations to nightscout
     /// - parameters:
-    ///     - siteURL : nightscout site url
-    ///     - apiKey : nightscout api key
     private func uploadCalibrationsToNightScout() {
         
         trace("in uploadCalibrationsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
@@ -410,8 +402,6 @@ public class NightScoutUploadManager:NSObject {
     ///     - dataToUpload : data to upload
     ///     - traceString : trace will start with this string, to distinguish between different uploads that may be ongoing simultaneously
     ///     - completionHandler : will be executed if upload was successful
-    ///     - siteURL : nightscout site url
-    ///     - apiKey : nightscout api key
     private func uploadData(dataToUpload: Any, traceString: String, path: String, completionHandler: (() -> ())?) {
         
         trace("in uploadData, %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, traceString)
@@ -423,7 +413,7 @@ public class NightScoutUploadManager:NSObject {
 
             trace("    size of data to upload : %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, dateToUploadAsJSON.count.description)
 
-            if let url = URL(string: UserDefaults.standard.nightScoutUrl!), var uRLComponents = URLComponents(url: url.appendingPathComponent(path), resolvingAgainstBaseURL: false) {
+            if let nightscoutURL = UserDefaults.standard.nightScoutUrl, let url = URL(string: nightscoutURL), var uRLComponents = URLComponents(url: url.appendingPathComponent(path), resolvingAgainstBaseURL: false) {
 
                 if UserDefaults.standard.nightScoutPort != 0 {
                     uRLComponents.port = UserDefaults.standard.nightScoutPort
@@ -550,7 +540,7 @@ public class NightScoutUploadManager:NSObject {
     
     private func testNightScoutCredentials(_ completion: @escaping (_ success: Bool, _ error: Error?) -> Void) {
         
-        if let url = URL(string: UserDefaults.standard.nightScoutUrl!), var uRLComponents = URLComponents(url: url.appendingPathComponent(nightScoutAuthTestPath), resolvingAgainstBaseURL: false) {
+        if let nightscoutURL = UserDefaults.standard.nightScoutUrl, let url = URL(string: nightscoutURL), var uRLComponents = URLComponents(url: url.appendingPathComponent(nightScoutAuthTestPath), resolvingAgainstBaseURL: false) {
             
             if UserDefaults.standard.nightScoutPort != 0 {
                 uRLComponents.port = UserDefaults.standard.nightScoutPort
