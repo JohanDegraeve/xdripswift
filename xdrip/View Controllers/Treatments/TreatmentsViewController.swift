@@ -155,6 +155,7 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 	
 	func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 		if (editingStyle == .delete) {
+            
 			guard let treatmentCollection = treatmentCollection, let treatmentEntryAccessor = treatmentEntryAccessor, let coreDataManager = coreDataManager else {
 				return
 			}
@@ -165,8 +166,11 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 			// Deletes the treatment from CoreData.
 			treatmentEntryAccessor.delete(treatmentEntry: treatment, on: coreDataManager.mainManagedObjectContext)
 			
+            coreDataManager.saveChanges()
+            
 			// Reloads data and table.
 			self.reload()
+            
 		}
 	}
 	
