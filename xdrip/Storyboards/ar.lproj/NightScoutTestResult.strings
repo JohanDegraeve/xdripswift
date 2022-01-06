@@ -3,10 +3,4 @@
 "nightscouttestresult_verificationerroralerttitle" = "خطأ في التحقق";
 "warningAPIKeyOrURLIsnil" = "يجب تعيين عنوان URL الخاص بـمنصة نايتسكاوت و API_SECRET قبل أن تتمكن من عمل الاختبار";
 "nightScoutAPIKeyAndURLStartedBody" = "تم بدأ الاختبار";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// in settings screen, user clicked test button for nightscout url and apikey - this is the title
-"nightScoutAPIKeyAndURLStartedTitle" = "Verifying...";
+"nightScoutAPIKeyAndURLStartedTitle" = "جاري التحقق ...";
