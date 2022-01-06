@@ -150,7 +150,7 @@ public class NightScoutUploadManager:NSObject {
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
                         
                         // if master is set, siteURL exists and either API_SECRET or a token is entered, then test credentials
-                        if UserDefaults.standard.nightScoutUrl != "" && UserDefaults.standard.isMaster && (UserDefaults.standard.nightScoutAPIKey != "" || UserDefaults.standard.nightscoutToken != "") {
+                        if UserDefaults.standard.nightScoutUrl != nil && UserDefaults.standard.isMaster && (UserDefaults.standard.nightScoutAPIKey != nil || UserDefaults.standard.nightscoutToken != nil) {
                             
                             testNightScoutCredentials({ (success, error) in
                                 DispatchQueue.main.async {
@@ -174,7 +174,7 @@ public class NightScoutUploadManager:NSObject {
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
                         
                         // if master is set, siteURL exists and either API_SECRET or a token is entered, then test credentials
-                        if UserDefaults.standard.nightScoutUrl != "" && UserDefaults.standard.isMaster && (UserDefaults.standard.nightScoutAPIKey != "" || UserDefaults.standard.nightscoutToken != "") {
+                        if UserDefaults.standard.nightScoutUrl != nil && UserDefaults.standard.isMaster && (UserDefaults.standard.nightScoutAPIKey != nil || UserDefaults.standard.nightscoutToken != nil) {
                             
                             testNightScoutCredentials({ (success, error) in
                                 DispatchQueue.main.async {
@@ -539,6 +539,11 @@ public class NightScoutUploadManager:NSObject {
     }
     
     private func testNightScoutCredentials(_ completion: @escaping (_ success: Bool, _ error: Error?) -> Void) {
+        
+        // don't run the test if one of the authentication methods is missing. This can happen because the user has input the URL but hasn't added auth yet.
+        if UserDefaults.standard.nightScoutAPIKey == nil && UserDefaults.standard.nightscoutToken == nil {
+            return
+        }
         
         if let nightscoutURL = UserDefaults.standard.nightScoutUrl, let url = URL(string: nightscoutURL), var uRLComponents = URLComponents(url: url.appendingPathComponent(nightScoutAuthTestPath), resolvingAgainstBaseURL: false) {
             
