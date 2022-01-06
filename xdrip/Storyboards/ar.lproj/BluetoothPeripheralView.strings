@@ -27,22 +27,8 @@
 "transmitterResultResult" = "نتيجة إعادة تعيين جهاز الإرسال";
 "bootLoader" = "محمل الإقلاع";
 "cannotActiveCGMInFollowerMode" = "لا يمكنك تفعيل نظام متابعة سكر الدم المستمرة CGM في وضع المتابعة";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Follow Dexcom-app";
-
-/// Disconnect transmitter, title
-"confirmDisconnectTitle" = "Confirm Disconnect";
-
-/// Confirm that the user wants to really disconnect the transmitter, title
-"confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
-
-/// cell text, sensor start time
-"sensorStartDate" = "Sensor Start";
-
-/// cell text, transmitter start time
-"transmittterStartDate" = "Transmitter Start";
+"useOtherDexcomApp" = "قم بمتابعة تطبيق Dexcom";
+"confirmDisconnectTitle" = "تأكيد قطع الاتصال";
+"confirmDisconnectMessage" = "انقر فوق "قطع الاتصال" لتأكيد رغبتك حقًا في قطع الاتصال بجهاز الإرسال.";
+"sensorStartDate" = "بداية الحساس";
+"transmittterStartDate" = "بداية جهاز الإرسال";
