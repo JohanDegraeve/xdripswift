@@ -99,41 +99,13 @@
 "oslog" = "OSتقرير";
 "settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";
 "settingsviews_showClockWhenScreenIsLocked" = "عرض الساعة عند القفل؟";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically?";
-
-/// sensor countdown settings, use alternative sensor countdown graphics on home screen
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Use Alternative Graphics?";
-
-/// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
-
-/// sensor countdown settings, section title
-"settingsviews_sectiontitlesensorcountdown" = "Sensor Countdown";
-
-/// help settings, section title
-"settingsviews_sectiontitlehelp" = "Help & Documentation";
-
-/// Calendar Events Settings - section title
-"calendarEventsSectionTitle" = "Calendar Events";
-
-/// help settings, open the online help
-"settingsviews_showOnlineHelp" = "Open Online Help?";
-
-/// sensor countdown settings, show sensor countdown graphic on home screen
-"settingsviews_showSensorCountdown" = "Show Sensor Countdown?";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
-
-/// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
-"settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
+"settingsviews_translateOnlineHelp" = "هل تريد الترجمة تلقائيًا؟";
+"settingsviews_showSensorCountdownAlternativeGraphics" = "استخدام الرسومات البديلة؟";
+"settingsviews_allowScreenRotation" = "السماح بإلتفاف المخطط؟";
+"settingsviews_sectiontitlesensorcountdown" = "العد التنازلي للحساس";
+"settingsviews_sectiontitlehelp" = "المساعدة والتوثيق";
+"calendarEventsSectionTitle" = "أحداث التقويم";
+"settingsviews_showOnlineHelp" = "فتح المساعدة عبر الإنترنت؟";
+"settingsviews_showSensorCountdown" = "إظهار العد التنازلي للحساس؟";
+"settingsviews_webooptransmitter" = "استخدام خوارزمية جهاز الإرسال؟";
+"settingsviews_labelWebOOP" = "خوارزمية xDrip أو جهاز الإرسال";
