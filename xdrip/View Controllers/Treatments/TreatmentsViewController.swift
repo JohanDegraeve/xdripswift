@@ -43,6 +43,8 @@ class TreatmentsViewController : UIViewController {
 		})
 	}
 	
+    // MARK: - View Life Cycle
+    
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		
@@ -59,6 +61,7 @@ class TreatmentsViewController : UIViewController {
 
 	/// Override prepare for segue, we must call configure on the TreatmentsInsertViewController.
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
 		// Check if is the segueIdentifier to TreatmentsInsert.
 		guard let segueIndentifier = segue.identifier, segueIndentifier == TreatmentsViewController.SegueIdentifiers.TreatmentsToNewTreatmentsSegue.rawValue else {
 			return
@@ -72,15 +75,13 @@ class TreatmentsViewController : UIViewController {
 		}
 		
 		// Handler that will be called when entries are created.
-		// No need to use the variable, reload will load from CoreData.
-		let entryHandler = { (entries : [TreatmentEntry]) in
-			self.coreDataManager?.saveChanges()
-			insertViewController.dismiss(animated: true, completion: nil)
+		let completionHandler = {
 			self.reload()
 		}
 		
 		// Configure insertViewController with CoreData instance and complete handler.
-		insertViewController.configure(coreDataManager: coreDataManager, entryHandler: entryHandler)
+        insertViewController.configure(treatMentEntryToUpdate: sender as? TreatmentEntry, coreDataManager: coreDataManager, completionHandler: completionHandler)
+        
 	}
 	
 	
@@ -88,12 +89,14 @@ class TreatmentsViewController : UIViewController {
 	
 	/// Configure will be called before this view is presented for the user.
 	public func configure(coreDataManager: CoreDataManager, nightScoutUploadManager: NightScoutUploadManager, treatmentEntryAccessor: TreatmentEntryAccessor) {
+        
 		// initalize private properties
 		self.coreDataManager = coreDataManager
 		self.nightScoutUploadManager = nightScoutUploadManager
 		self.treatmentEntryAccessor = treatmentEntryAccessor
 	
 		self.reload()
+        
 	}
 	
 
@@ -101,11 +104,13 @@ class TreatmentsViewController : UIViewController {
 	
 	/// Reloads treatmentCollection and calls reloadData on tableView.
 	private func reload() {
+        
 		guard let treatmentEntryAccessor = treatmentEntryAccessor else { return }
-		let treatments = treatmentEntryAccessor.getLatestTreatments()
-		self.treatmentCollection = TreatmentCollection(treatments: treatments)
+        
+		self.treatmentCollection = TreatmentCollection(treatments: treatmentEntryAccessor.getLatestTreatments())
 
 		self.tableView.reloadData()
+        
 	}
 }
 
@@ -114,12 +119,13 @@ class TreatmentsViewController : UIViewController {
 extension TreatmentsViewController {
 	
 	public enum SegueIdentifiers:String {
+        
 		/// to go from TreatmentsViewController to TreatmentsInsertViewController
 		case TreatmentsToNewTreatmentsSegue = "TreatmentsToNewTreatmentsSegue"
+        
 	}
 	
 }
-
 
 // MARK: - conform to UITableViewDelegate and UITableViewDataSource
 
@@ -207,5 +213,13 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 	func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
 		return 40.0
 	}
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        self.performSegue(withIdentifier: TreatmentsViewController.SegueIdentifiers.TreatmentsToNewTreatmentsSegue.rawValue, sender: treatmentCollection?.getTreatment(dateIndex: indexPath.section, treatmentIndex: indexPath.row))
+        
+    }
+    
 }
-

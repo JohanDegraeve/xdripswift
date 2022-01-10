@@ -57,9 +57,9 @@ import CoreData
 /// the value unit is defined by the treatmentType.
 /// .treatmentType see TreatmentType
 /// .uploaded tells if entry has been uploaded for Nighscout or not.
-public class TreatmentEntry: NSManagedObject {
+public class TreatmentEntry: NSManagedObject, Comparable {
 
-	init(date: Date, value: Double, treatmentType: TreatmentType, nsManagedObjectContext:NSManagedObjectContext) {
+    init(date: Date, value: Double, treatmentType: TreatmentType, nsManagedObjectContext:NSManagedObjectContext) {
 		
 		let entity = NSEntityDescription.entity(forEntityName: "TreatmentEntry", in: nsManagedObjectContext)!
 		super.init(entity: entity, insertInto: nsManagedObjectContext)
@@ -111,3 +111,13 @@ public class TreatmentEntry: NSManagedObject {
 	}
 
 }
+
+// MARK: - conform to Comparable
+
+public func < (lhs: TreatmentEntry, rhs: TreatmentEntry) -> Bool {
+
+    return lhs.date < rhs.date
+    
+}
+
+

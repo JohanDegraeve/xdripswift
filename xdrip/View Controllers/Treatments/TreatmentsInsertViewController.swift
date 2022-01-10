@@ -27,15 +27,30 @@ class TreatmentsInsertViewController : UIViewController {
 	private var coreDataManager:CoreDataManager?
 	
 	/// handler to be executed when user clicks okButton
-	private var entryHandler:((_ entries: [TreatmentEntry]) -> Void)?
+	private var completionHandler:(() -> Void)?
+    
+    /// used if this viewcontroller is used to update an existing entry
+    /// - if nil then viewcontroller is used to add a (or mote) new entry (or entries)
+    private var treatMentEntryToUpdate: TreatmentEntry?
 	
-	// MARK: - overrides
+    // MARK: - View Life Cycle
     
 	// set the status bar content colour to light to match new darker theme
 	override var preferredStatusBarStyle: UIStatusBarStyle {
 		return .lightContent
 	}
 	
+    // will assign datePicker.date to treatMentEntryToUpdate.date
+    override func viewDidLoad() {
+    
+        if let treatMentEntryToUpdate = treatMentEntryToUpdate {
+            
+            datePicker.date = treatMentEntryToUpdate.date
+            
+        }
+        
+    }
+    
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		
@@ -55,54 +70,114 @@ class TreatmentsInsertViewController : UIViewController {
 		self.exerciseLabel.text = Texts_TreatmentsView.exerciseWithUnit
 		
 		// Done button
-//		self.doneButton.title = Texts_Common.
-        
 		self.addDoneButtonOnNumpad(textField: self.carbsTextField)
 		self.addDoneButtonOnNumpad(textField: self.insulinTextField)
 		self.addDoneButtonOnNumpad(textField: self.exerciseTextField)
         
 		self.setDismissKeyboard()
+
+        if let treatMentEntryToUpdate = treatMentEntryToUpdate {
+            
+            switch treatMentEntryToUpdate.treatmentType {
+                
+            case .Carbs:
+                carbsTextField.text = treatMentEntryToUpdate.value.description
+                
+            case .Exercise:
+                exerciseTextField.text = treatMentEntryToUpdate.value.description
+                
+            case .Insulin:
+                insulinTextField.text = treatMentEntryToUpdate.value.description
+                
+            }
+            
+        }
 	}
 
 	// MARK: - buttons actions
 	
 	@IBAction func doneButtonTapped(_ sender: UIBarButtonItem) {
-		guard let coreDataManager = coreDataManager, let entryHandler = entryHandler else {
+        
+		guard let coreDataManager = coreDataManager, let completionHandler = completionHandler else {
 			return
 		}
 		
 		var treatments: [TreatmentEntry] = []
-		let date = datePicker.date
-		
+        
+        // if treatMentEntryToUpdate not nil, then assign new value or delete it
+        // it's either type carbs, insulin or exercise
+        if let treatMentEntryToUpdate = treatMentEntryToUpdate {
+
+            // code reused three times
+            // checks if text in textfield exists, has value > 0.
+            // if yes, assigns value to treatMentEntryToUpdate.value
+            // if no deletes treatMentEntryToUpdate
+            // sets text in textField to "0" to avoid that new treatmentEntry is created
+            let updateFunction = { (textField: UITextField) in
+                
+                if let text = textField.text, let value = Double(text), value > 0 {
+                    treatMentEntryToUpdate.value = value
+                    textField.text = "0"
+                } else {
+                    coreDataManager.mainManagedObjectContext.delete(treatMentEntryToUpdate)
+                    self.treatMentEntryToUpdate = nil
+                }
+            }
+
+            switch treatMentEntryToUpdate.treatmentType {
+               
+            case .Carbs:
+                updateFunction(carbsTextField)
+                    
+            case .Insulin:
+                updateFunction(insulinTextField)
+                
+            case .Exercise:
+                updateFunction(exerciseTextField)
+                
+            }
+            
+        }
+        
 		if let carbsText = carbsTextField.text, let carbs = Double(carbsText), carbs > 0 {
-			let treatment = TreatmentEntry(date: date, value: carbs, treatmentType: .Carbs, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+			let treatment = TreatmentEntry(date: datePicker.date, value: carbs, treatmentType: .Carbs, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 			treatments.append(treatment)
 		}
 		
 		if let insulinText = insulinTextField.text, let insulin = Double(insulinText), insulin > 0 {
-			let treatment = TreatmentEntry(date: date, value: insulin, treatmentType: .Insulin, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+			let treatment = TreatmentEntry(date: datePicker.date, value: insulin, treatmentType: .Insulin, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 			treatments.append(treatment)
 		}
 		
 		if let exerciseText = exerciseTextField.text, let exercise = Double(exerciseText), exercise > 0 {
-			let treatment = TreatmentEntry(date: date, value: exercise, treatmentType: .Exercise, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+			let treatment = TreatmentEntry(date: datePicker.date, value: exercise, treatmentType: .Exercise, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 			treatments.append(treatment)
 		}
 		
-		entryHandler(treatments)
+        // permenant save in coredata
+        coreDataManager.saveChanges()
+        
+        // call
+		completionHandler()
 		
 		// Pops the current view (this)
 		self.navigationController?.popViewController(animated: true)
+        
 	}
 	
 	
 	// MARK: - public functions
 	
-	public func configure(coreDataManager: CoreDataManager?, entryHandler: ((_ entries: [TreatmentEntry]) -> Void)?) {
+    /// - parameters:
+    ///     - treatMentEntryToUpdate
+    public func configure(treatMentEntryToUpdate: TreatmentEntry?, coreDataManager: CoreDataManager?, completionHandler: @escaping (() -> Void)) {
         
 		// initalize private properties
 		self.coreDataManager = coreDataManager
-		self.entryHandler = entryHandler
+		self.completionHandler = completionHandler
+        
+        self.treatMentEntryToUpdate = treatMentEntryToUpdate
+        
 	}
 	
 	
