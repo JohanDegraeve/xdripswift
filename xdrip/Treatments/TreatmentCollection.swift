@@ -9,7 +9,7 @@
 import Foundation
 
 
-/// Data structure used to fetch treatments with TreatmentEntryAccessor and group them by date allowing for easier retrieval.
+/// Data structure to group treatments by DateOnly (ie by day), allows retrieval by DateOnly
 public class TreatmentCollection {
 	
 	// MARK: - Properties
@@ -26,12 +26,15 @@ public class TreatmentCollection {
 	// MARK: - Inits
 
 	/// Inits from a list of treatments.
+    ///  - dateOnly instances are added to hold all TreatmentEntry, sorted by date, most recent  first
+    ///  - treatments in every DateOnly array are sorted by date, most recent  first
 	init(treatments: [TreatmentEntry]) {
+        
 		self.addTreatments(treatments)
+        
 	}
 	
-	
-	/// MARK: - Public methods
+	// MARK: - Public methods
 	
 	/// Getter for datesOnly.
 	public func dateOnlys() -> [DateOnly] {
@@ -56,7 +59,7 @@ public class TreatmentCollection {
 	
 	/// Returns a single treatment at given date index and treatment index.
     ///
-	/// getTreatment(dateIndex: 0, treatmentIndex: 0) will return the latest treatment.
+	/// getTreatment(dateIndex: 0, treatmentIndex: 0) will return the most recent (first) treatment.
 	public func getTreatment(dateIndex: Int, treatmentIndex: Int) -> TreatmentEntry {
 		return self.treatmentsForDateOnlyAt(dateIndex)[treatmentIndex]
 	}
@@ -65,9 +68,13 @@ public class TreatmentCollection {
 	// MARK: - Private methods
 	
 	/// Adds treatments to this collection.
+    ///  - dateOnly instances are added to hold all TreatmentEntry, sorted by date, most recent  first
+    ///  - treatments in every DateOnly array are sorted by date, most recent  first
 	private func addTreatments(_ treatments: [TreatmentEntry]) {
+        
 		// Cannot assume treatments are sorted.
 		for treatment in treatments {
+            
 			// Converts treatment date to a DateOnly.
 			let dateOnly = DateOnly(date: treatment.date)
 			
@@ -80,12 +87,23 @@ public class TreatmentCollection {
 			// Always append the treatment to the list.
 			// treatmentsByDate[dateOnly] is guaranteed to be already defined.
 			self.treatmentsByDate[dateOnly]?.append(treatment)
+            
 		}
 		
 		// We want datesOnly sorted in reverse order
-		// so elem 0 is the newest dateOnly.
+		// so elem 0 is the most recent dateOnly.
 		self.datesOnly.sort()
 		self.datesOnly.reverse()
+        
+        // sort also the treatments in every array by date, reversed
+        for dateOnly in datesOnly {
+            
+            self.treatmentsByDate[dateOnly]?.sort()
+            
+            self.treatmentsByDate[dateOnly]?.reverse()
+            
+        }
+        
 	}
 	
 }

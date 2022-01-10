@@ -10,8 +10,8 @@ import Foundation
 
 
 /// Swift has no class to represent a day
-/// NSDate will always have time information together
-/// DateOnly will act as a wrapper for this purpose.
+/// - NSDate will always have time information together
+/// - DateOnly will act as a wrapper for this purpose.
 public struct DateOnly: Comparable, Equatable, Hashable {
 	
 	// MARK: - Properties.
@@ -19,12 +19,12 @@ public struct DateOnly: Comparable, Equatable, Hashable {
 	/// A Date object, used for comparations.
 	/// Should always have time zeroed.
 	public let date: Date
-	
 
 	// MARK: - Public
 	
 	/// Creates a DateOnly from a Date object.
 	init(date: Date) {
+        
 		let calendar = Calendar.current
 		// Extracts the day, month and year for date
 		let dateComponents = calendar.dateComponents([.day, .month, .year], from: date)
@@ -33,6 +33,7 @@ public struct DateOnly: Comparable, Equatable, Hashable {
 		// we can be sure they are not invalid args
 		// and use Force-unwrap ('!') .
 		self.date = calendar.date(from: dateComponents)!
+        
 	}
 	
 	
