@@ -81,13 +81,13 @@ class TreatmentsInsertViewController : UIViewController {
             switch treatMentEntryToUpdate.treatmentType {
                 
             case .Carbs:
-                carbsTextField.text = treatMentEntryToUpdate.value.description
+                carbsTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
                 
             case .Exercise:
-                exerciseTextField.text = treatMentEntryToUpdate.value.description
+                exerciseTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
                 
             case .Insulin:
-                insulinTextField.text = treatMentEntryToUpdate.value.description
+                insulinTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
                 
             }
             

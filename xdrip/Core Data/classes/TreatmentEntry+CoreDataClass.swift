@@ -76,12 +76,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 	
 	/// Returns the displayValue: the .value with the proper unit.
 	public func displayValue() -> String {
-		var string = String(self.value)
-		// Checks prevents .0 from being displayed
-		if string.suffix(2) == ".0" {
-			string = String(string.dropLast(2))
-		}
-		return string + " " + self.treatmentType.unit()
+		return self.value.stringWithoutTrailingZeroes + " " + self.treatmentType.unit()
 	}
 	
 	/// Returns the dictionary representation required for nighscout post request.
