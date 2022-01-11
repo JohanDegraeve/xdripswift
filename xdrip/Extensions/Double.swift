@@ -15,6 +15,16 @@ extension Double: RawRepresentable {
     }
     
     // MARK: - own code
+	
+	/// Converts to a string and removes trailing .0
+	public var stringWithoutTrailingZeroes: String {
+		var description = String(self.description)
+		// Checks if ends with .0 and removes if so
+		if description.suffix(2) == ".0" {
+			description = String(description.dropLast(2))
+		}
+		return description
+	}
     
     /// converts mgdl to mmol
     func mgdlToMmol() -> Double {
