@@ -116,6 +116,35 @@ class TreatmentEntryAccessor {
 		}
 	}
 	
+	/// Given an Id, returns the TreatmentEntry with that id, if it exists.
+	///     - id : the id string
+	func getTreatmentById(_ id: String) -> TreatmentEntry? {
+		// EmptyId is not a valid id
+		guard id != TreatmentEntry.EmptyId else {
+			return nil
+		}
+		
+		let fetchRequest: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+		// limit to 1, although there shouldn't be more than 1 with the same id.
+		fetchRequest.fetchLimit = 1
+		// Filter by id
+		fetchRequest.predicate = NSPredicate(format: "id == %@", id)
+		
+		var treatment: TreatmentEntry? = nil
+		coreDataManager.mainManagedObjectContext.performAndWait {
+			do {
+				// Execute Fetch Request
+				// Since it returns an array, get the first elem
+				treatment = (try fetchRequest.execute()).first
+			} catch {
+				let fetchError = error as NSError
+				trace("in fetchTreatments, Unable to Execute getTreatmentById Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
+			}
+		}
+
+		return treatment
+	}
+	
 	// MARK: - private helper functions
 	
 	/// returnvalue can be empty array

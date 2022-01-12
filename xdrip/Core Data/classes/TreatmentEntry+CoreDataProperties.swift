@@ -16,6 +16,8 @@ extension TreatmentEntry {
 	@nonobjc public class func fetchRequest() -> NSFetchRequest<TreatmentEntry> {
 		return NSFetchRequest<TreatmentEntry>(entityName: "TreatmentEntry")
 	}
+	
+	public static let EmptyId: String = ""
 
 	/// Date represents the date of the treatment, not the date of creation.
 	@NSManaged public var date: Date

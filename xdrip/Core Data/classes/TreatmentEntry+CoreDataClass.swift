@@ -80,7 +80,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		self.date = date
 		self.value = value
 		self.treatmentType = treatmentType
-		self.id = ""  // defaults to empty
+		self.id = TreatmentEntry.EmptyId  // defaults to empty
 		self.uploaded = false  // tracks upload to nightscout
 	}
 
