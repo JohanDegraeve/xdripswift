@@ -85,9 +85,7 @@ class TreatmentEntryAccessor {
 	/// - returns: an array with treatments, can be empty array.
 	///     Order by timestamp, descending meaning the treatment at index 0 is the youngest
    func getLatestTreatments(limit:Int?, fromDate:Date?) -> [TreatmentEntry] {
-		
 		return fetchTreatments(limit: limit, fromDate: fromDate)
-		
 	}
 	
 	/// gets last treatment
@@ -98,45 +96,6 @@ class TreatmentEntryAccessor {
 		} else {
 			return nil
 		}
-	}
-	
-	/// gets treatments, synchronously, in the managedObjectContext's thread
-	/// - returns:
-	///        treatments sorted by timestamp, ascending (ie first is oldest)
-	/// - parameters:
-	///     - to : if specified, only return treatments with timestamp  smaller than fromDate (not equal to)
-	///     - from : if specified, only return treatments with timestamp greater than fromDate (not equal to)
-	///     - managedObjectContext : the ManagedObjectContext to use
-	func getTreatments(from: Date?, to: Date?, on managedObjectContext: NSManagedObjectContext) -> [TreatmentEntry] {
-		
-		let fetchRequest: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
-		fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(TreatmentEntry.date), ascending: true)]
-		
-		// create predicate
-		if let from = from, to == nil {
-			let predicate = NSPredicate(format: "date > %@", from as NSDate)
-			fetchRequest.predicate = predicate
-		} else if let to = to, from == nil {
-			let predicate = NSPredicate(format: "date < %@", to as NSDate)
-			fetchRequest.predicate = predicate
-		} else if let to = to, let from = from {
-			let predicate = NSPredicate(format: "date < %@ AND date > %@", to as NSDate, from as NSDate)
-			fetchRequest.predicate = predicate
-		}
-		
-		var treatments: [TreatmentEntry] = []
-		
-		managedObjectContext.performAndWait {
-			do {
-				// Execute Fetch Request
-				treatments = try fetchRequest.execute()
-			} catch {
-				let fetchError = error as NSError
-				trace("in getTreatments, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
-			}
-		}
-		
-		return treatments
 	}
 	
 	/// deletes treatmentEntry, synchronously, in the managedObjectContext's thread
