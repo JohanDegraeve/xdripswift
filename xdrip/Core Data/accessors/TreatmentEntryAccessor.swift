@@ -120,7 +120,7 @@ class TreatmentEntryAccessor {
 			let predicate = NSPredicate(format: "date < %@", to as NSDate)
 			fetchRequest.predicate = predicate
 		} else if let to = to, let from = from {
-			let predicate = NSPredicate(format: "date < %@ AND date > %@", to as CVarArg, from as NSDate)
+			let predicate = NSPredicate(format: "date < %@ AND date > %@", to as NSDate, from as NSDate)
 			fetchRequest.predicate = predicate
 		}
 		
