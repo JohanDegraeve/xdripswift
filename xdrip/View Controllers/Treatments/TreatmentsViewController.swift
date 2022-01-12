@@ -30,8 +30,8 @@ class TreatmentsViewController : UIViewController {
 	@IBOutlet weak var titleNavigation: UINavigationItem!
 	@IBOutlet weak var tableView: UITableView!
 	
-	/// Upload button action.
-	@IBAction func uploadButtonTapped(_ sender: UIBarButtonItem) {
+	/// Sync button action.
+	@IBAction func syncButtonTapped(_ sender: UIBarButtonItem) {
 		// Uploads to nighscout and if sucess display an alert.
 		nightScoutUploadManager?.uploadTreatmentsToNightScout(sucessHandler: {
 			// Make sure to run alert in the correct thread.
