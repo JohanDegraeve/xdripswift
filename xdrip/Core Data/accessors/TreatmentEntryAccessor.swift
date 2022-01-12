@@ -111,7 +111,7 @@ class TreatmentEntryAccessor {
 			do {
 				try managedObjectContext.save()
 			} catch {
-				trace("in delete bgReading,  Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, error.localizedDescription)
+				trace("in delete treatmentEntry,  Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, error.localizedDescription)
 			}
 		}
 	}
@@ -147,7 +147,7 @@ class TreatmentEntryAccessor {
 				treatments = try fetchRequest.execute()
 			} catch {
 				let fetchError = error as NSError
-				trace("in fetchTreatments, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
+				trace("in fetchTreatments, Unable to Execute fetchTreatments Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
 			}
 		}
 		
