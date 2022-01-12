@@ -34,6 +34,7 @@
 		D40C3DA62775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */; };
 		D482BD942776153F003C4FB2 /* TreatmentsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D482BD932776153F003C4FB2 /* TreatmentsNavigationController.swift */; };
 		D484BC292774F783008490E9 /* TreatmentsInsertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D484BC282774F783008490E9 /* TreatmentsInsertViewController.swift */; };
+		D48E8F78278E49B300CCEE08 /* TreatmentNSResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48E8F77278E49B300CCEE08 /* TreatmentNSResponse.swift */; };
 		D4AC54502778C82C0097FF10 /* Treatments.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4AC54412778C82B0097FF10 /* Treatments.strings */; };
 		D4BAF37627769B38009D3465 /* TreatmentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BAF37527769B38009D3465 /* TreatmentTableViewCell.swift */; };
 		D4E499AB277B43E3000F8CBA /* TreatmentCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E499AA277B43E3000F8CBA /* TreatmentCollection.swift */; };
@@ -718,6 +719,7 @@
 		D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TreatmentEntry+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		D482BD932776153F003C4FB2 /* TreatmentsNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsNavigationController.swift; sourceTree = "<group>"; };
 		D484BC282774F783008490E9 /* TreatmentsInsertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsInsertViewController.swift; sourceTree = "<group>"; };
+		D48E8F77278E49B300CCEE08 /* TreatmentNSResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentNSResponse.swift; sourceTree = "<group>"; };
 		D4AC54422778C82B0097FF10 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Treatments.strings; sourceTree = "<group>"; };
 		D4AC54432778C82B0097FF10 /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Treatments.strings; sourceTree = "<group>"; };
 		D4AC54442778C82B0097FF10 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Treatments.strings; sourceTree = "<group>"; };
@@ -1582,6 +1584,7 @@
 			children = (
 				D4E499AA277B43E3000F8CBA /* TreatmentCollection.swift */,
 				D4E499AC277B4CE7000F8CBA /* DateOnly.swift */,
+				D48E8F77278E49B300CCEE08 /* TreatmentNSResponse.swift */,
 			);
 			path = Treatments;
 			sourceTree = "<group>";
@@ -3749,6 +3752,7 @@
 				F8A2BC2D25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMG5TransmitterDelegate.swift in Sources */,
 				F8FDFEA9260DE1A70047597D /* DTCustomColoredAccessory.m in Sources */,
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
+				D48E8F78278E49B300CCEE08 /* TreatmentNSResponse.swift in Sources */,
 				F816E12C2439DFBA009EE65B /* DexcomG4+CoreDataProperties.swift in Sources */,
 				F8A2BC3425DB0D6D001D1E78 /* BluetoothPeripheralManager+WatlaaBluetoothTransmitterDelegate.swift in Sources */,
 				F8B3A820227DEC92004BA588 /* AlertTypesAccessor.swift in Sources */,

@@ -47,6 +47,19 @@ import CoreData
 			return Texts_TreatmentsView.questionMark
 		}
 	}
+	
+	public static func fromNightscoutString(_ string: String) -> TreatmentType? {
+		switch string {
+		case "Correction Bolus":
+			return .Insulin
+		case "Meal Bolus":
+			return .Carbs
+		case "Exercise":
+			return .Exercise
+		default:
+			return nil
+		}
+	}
 }
 
 
@@ -67,6 +80,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		self.date = date
 		self.value = value
 		self.treatmentType = treatmentType
+		self.id = ""  // defaults to empty
 		self.uploaded = false  // tracks upload to nightscout
 	}
 
