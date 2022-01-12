@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreData
 
 /// Class that represents the Nightscout response for adding a single new treatment.
 /// NS API docs states:
@@ -69,6 +70,19 @@ public struct TreatmentNSResponse {
 	/// Compares this TreatmentNSResponse to a given TreatmentEntry
 	public func matchesTreatmentEntry(_ entry: TreatmentEntry) -> Bool {
 		return entry.date.ISOStringFromDate() == self.createdAt && entry.treatmentType == self.eventType && entry.value == self.value
+	}
+	
+	// Converts self (TreatmentNSResponse) to TreatmentEntry.
+	// Be extra carefull when creating new TreatmentEntry, will impact core data.
+	public func asNewTreatmentEntry(nsManagedObjectContext: NSManagedObjectContext) -> TreatmentEntry? {
+		guard let date = Date.fromISOString(createdAt) else {
+			return nil
+		}
+		
+		var treatment = TreatmentEntry(date: date, value: value, treatmentType: eventType, nsManagedObjectContext: nsManagedObjectContext)
+		// Since this entry originated at nightscout, set uploaded as true.
+		treatment.uploaded = true
+		return treatment
 	}
 	
 }
