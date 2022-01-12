@@ -116,6 +116,12 @@ class TreatmentEntryAccessor {
 		}
 	}
 	
+	/// Given an Id, returns if exists a treatment with that id.
+	///     - id : the id string
+	func existsTreatmentWithId(_ id: String) -> Bool {
+		return getTreatmentById(id) != nil
+	}
+	
 	/// Given an Id, returns the TreatmentEntry with that id, if it exists.
 	///     - id : the id string
 	func getTreatmentById(_ id: String) -> TreatmentEntry? {
