@@ -359,43 +359,65 @@ public class NightScoutUploadManager:NSObject {
         
     }
 
-    /// upload treatments to nightscout
-    ///
-    /// Only checks recents ones
+    /// Upload treatments to nightscout, receives the JSON response with the asigned IDS and sets the ids in Core Data.
+	/// - parameters:
+	///     - sucessHandler : handler called after upload. Only called if upload was required.
 	public func uploadTreatmentsToNightScout(sucessHandler: (() -> Void)?) {
 		trace("in uploadTreatmentsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
 		
 		// get the latest treatments from the last maxDaysToUpload days
 		// filter by those that have not been uploaded
-		let treatments = treatmentEntryAccessor.getRequireUploadTreatments()
+		var treatmentsToUpload = treatmentEntryAccessor.getRequireUploadTreatments()
 		
-		guard treatments.count > 0 else {
+		guard treatmentsToUpload.count > 0 else {
 			trace("    no treatments to upload", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
 			return
 		}
 	
-		trace("    number of treatments to upload : %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, treatments.count.description)
+		trace("    number of treatments to upload : %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, treatmentsToUpload.count.description)
 		
 		// map treatments to dictionaryRepresentation
-		let treatmentsDictionaryRepresentation = treatments.map({$0.dictionaryRepresentationForNightScoutUpload()})
+		let treatmentsDictionaryRepresentation = treatmentsToUpload.map({$0.dictionaryRepresentationForNightScoutUpload()})
 		
-		uploadData(dataToUpload: treatmentsDictionaryRepresentation, traceString: "uploadTreatmentsToNightScout", path: nightScoutTreatmentPath, completionHandler: {
+		// The responsedata will contain, in serialized json, the treatments ids asigned by the server.
+		uploadDataAndGetResponse(dataToUpload: treatmentsDictionaryRepresentation, traceString: "uploadTreatmentsToNightScout", path: nightScoutTreatmentPath) { (responseData: Data?) in
 			
-			// Be sure to use the correct thread.
-			// Running in the completionHandler thread will
-			// result in issues.
-			self.coreDataManager.mainManagedObjectContext.performAndWait {
-				for treatment in treatments {
-					treatment.uploaded = true
+			do {
+				// Try to serialize the data
+				if let responses = try TreatmentNSResponse.arrayFromData(responseData) {
+					// Be sure to use the correct thread.
+					// Running in the completionHandler thread will
+					// result in issues.
+					self.coreDataManager.mainManagedObjectContext.performAndWait {
+						// Loop over each response and each treatment at treatmentsToUpload
+						// If they match, sets the required fields.
+						// Index used to optimze the loop.
+						for response in responses {
+							for (index_treatment, treatment) in treatmentsToUpload.enumerated() {
+								if response.matchesTreatmentEntry(treatment) {
+									/// Found the treatment
+									treatment.uploaded = true
+									/// Sets the id
+									treatment.id = response.id
+									// Removes from treatmentsToUpload and responses, optimizes the nested loop
+									treatmentsToUpload.remove(at: index_treatment)
+									break
+								}
+							}
+						}
+						
+						self.coreDataManager.saveChanges()
+					}
+					
+					if let sucessHandler = sucessHandler {
+						sucessHandler()
+					}
 				}
-				
-				self.coreDataManager.saveChanges()
+			} catch let error {
+				trace("    uploadTreatmentsToNightScout error at JSONSerialization : %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .error, error.localizedDescription)
 			}
-			
-			if let sucessHandler = sucessHandler {
-				sucessHandler()
-			}
-		})
+		}
+		
     }
     
     /// upload latest calibrations to nightscout
@@ -456,6 +478,21 @@ public class NightScoutUploadManager:NSObject {
     ///     - siteURL : nightscout site url
     ///     - apiKey : nightscout api key
     private func uploadData(dataToUpload: Any, traceString: String, path: String, completionHandler: (() -> ())?) {
+		uploadDataAndGetResponse(dataToUpload: dataToUpload, traceString: traceString, path: path) { _ in
+			if let completionHandler = completionHandler {
+				completionHandler()
+			}
+		}
+    }
+
+	/// common functionality to upload data to nightscout and get response
+	/// - parameters:
+	///     - dataToUpload : data to upload
+	///     - traceString : trace will start with this string, to distinguish between different uploads that may be ongoing simultaneously
+	///     - responseHandler : will be executed with the response Data? if sucessfull
+	///     - siteURL : nightscout site url
+	///     - apiKey : nightscout api key
+	private func uploadDataAndGetResponse(dataToUpload: Any, traceString: String, path: String, responseHandler: ((Data?) -> Void)?) {
         
         trace("in uploadData, %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, traceString)
         
@@ -508,8 +545,8 @@ public class NightScoutUploadManager:NSObject {
                             } else {
                                 
                                 // successful case, call completionhandler
-                                if let completionHandler = completionHandler {
-                                    completionHandler()
+                                if let responseHandler = responseHandler {
+									responseHandler(data)
                                 }
 
                             }
