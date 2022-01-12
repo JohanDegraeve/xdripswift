@@ -151,6 +151,18 @@ class TreatmentEntryAccessor {
 		return treatment
 	}
 	
+	public func newTreatmentsIfRequired(responses: [TreatmentNSResponse]) -> [TreatmentEntry] {
+		var newTreatments: [TreatmentEntry] = []
+		
+		for response in responses {
+			if !self.existsTreatmentWithId(response.id), let treatment = response.asNewTreatmentEntry(nsManagedObjectContext: coreDataManager.mainManagedObjectContext) {
+				newTreatments.append(treatment)
+			}
+		}
+		
+		return newTreatments
+	}
+	
 	// MARK: - private helper functions
 	
 	/// returnvalue can be empty array
