@@ -469,6 +469,81 @@ public class NightScoutUploadManager:NSObject {
         }
         
     }
+	
+	/// Gets the latest treatments from Nightscout
+	/// - parameters:
+	///     - count: the amount of treatments to return
+	///     - completionHandler: handler that will be caled with the result TreatmentNSResponse array
+	public func getLatestTreatmentsNSResponses(count: Int, completionHandler: @escaping (([TreatmentNSResponse]) -> Void)) {
+		let queries = [URLQueryItem(name: "count", value: String(count))]
+		getRequest(path: nightScoutTreatmentPath, queries: queries, traceString: "getLatestTreatmentsNSResponses") { (data: Data?) in
+			
+			guard let data = data else {
+				return
+			}
+			
+			do {
+				// Try to serialize the data
+				if let responses = try TreatmentNSResponse.arrayFromData(data) {
+					completionHandler(responses)
+				}
+			} catch let error {
+				trace("    getLatestTreatmentsNSResponses error at JSONSerialization : %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .error, error.localizedDescription)
+			}
+		}
+	}
+	
+	
+	
+	/// common functionality to do a GET request to Nightscout and get response
+	/// - parameters:
+	///     - path : the query path
+	///     - queries : an array of URLQueryItem (added after the '?' at the URL)
+	 ///     - traceString : trace will start with this string, to distinguish between different GETs that may be ongoing simultaneously
+	///     - responseHandler : will be executed with the response Data? if sucessfull
+	private func getRequest(path: String, queries: [URLQueryItem], traceString: String, responseHandler: ((Data?) -> Void)?) {
+		guard let url = URL(string: UserDefaults.standard.nightScoutUrl!), var uRLComponents = URLComponents(url: url.appendingPathComponent(path), resolvingAgainstBaseURL: false) else {
+			return
+		}
+
+		if UserDefaults.standard.nightScoutPort != 0 {
+			uRLComponents.port = UserDefaults.standard.nightScoutPort
+		}
+			
+		// Mutable copy used to add token if defined.
+		var queryItems = queries
+		// if token not nil, then add also the token
+		if let token = UserDefaults.standard.nightscoutToken {
+			queryItems.append(URLQueryItem(name: "token", value: token))
+		}
+		uRLComponents.queryItems = queryItems
+		
+		if let url = uRLComponents.url {
+			// Create Request
+			var request = URLRequest(url: url)
+			request.httpMethod = "GET"
+			request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+			request.setValue("application/json", forHTTPHeaderField: "Accept")
+			
+			if let apiKey = UserDefaults.standard.nightScoutAPIKey {
+				request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
+			}
+			
+			let task = URLSession.shared.dataTask(with: request) { (data: Data?, urlResponse: URLResponse?, error: Error?) in
+				
+				// error cases
+				if let error = error {
+					trace("    in getRequest, %{public}@, failed to upload, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .error, traceString, error.localizedDescription)
+				} else {
+					// TODO: Check the HTTPURLResponse response code, unsure how to.
+					if let responseHandler = responseHandler {
+						responseHandler(data)
+					}
+				}
+			}
+			task.resume()
+		}
+	}
     
     /// common functionality to upload data to nightscout
     /// - parameters:
