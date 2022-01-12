@@ -29,15 +29,15 @@ class TreatmentEntryAccessor {
 	
 	// MARK: - public functions
 	
-	/// Gives the 50 latest treatments
+	/// Gives the 100 latest treatments
 	///
 	/// - returns: an array with treatments, can be empty array.
 	///     Order by timestamp, descending meaning the treatment at index 0 is the youngest
 	func getLatestTreatments() -> [TreatmentEntry] {
-		return getLatestTreatments(limit:50)
+		return getLatestTreatments(limit:100)
 	}
 	
-	/// Returns the treatments among the 50 latest
+	/// Returns the treatments among the latest
 	/// that have not yet been uploaded
 	///
 	/// - returns: an array with treatments not uploaded, can be empty array.
