@@ -35,6 +35,15 @@ class TreatmentsViewController : UIViewController {
 		guard let nightScoutUploadManager = nightScoutUploadManager else {
 			return
 		}
+		
+		let alertSucessHandler: (() -> Void) = {
+			// Make sure to run alert in the correct thread.
+			DispatchQueue.main.async {
+				let alert = UIAlertController(title: Texts_TreatmentsView.success, message: Texts_TreatmentsView.uploadCompleted, actionHandler: nil)
+
+				self.present(alert, animated: true, completion: nil)
+			}
+		}
 
 		// Fetches new treatments from Nightscout
 		// TODO: for some reason if count > 52 NS only returns 52 entries. Why?
@@ -54,19 +63,12 @@ class TreatmentsViewController : UIViewController {
 				// Update UI, run at main thread
 				DispatchQueue.main.async {
 					self.reload()
+					
+					// Uploads to nighscout and if sucess display an alert.
+					nightScoutUploadManager.uploadTreatmentsToNightScout(sucessHandler:alertSucessHandler)
 				}
 			}
 		}
-
-		// Uploads to nighscout and if sucess display an alert.
-		nightScoutUploadManager.uploadTreatmentsToNightScout(sucessHandler: {
-			// Make sure to run alert in the correct thread.
-			DispatchQueue.main.async {
-				let alert = UIAlertController(title: Texts_TreatmentsView.success, message: Texts_TreatmentsView.uploadCompleted, actionHandler: nil)
-
-				self.present(alert, animated: true, completion: nil)
-			}
-		})
 	}
 	
     // MARK: - View Life Cycle
