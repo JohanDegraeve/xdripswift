@@ -69,10 +69,23 @@ import CoreData
 /// .value represents the amount (e.g. insulin units or carbs grams)
 /// the value unit is defined by the treatmentType.
 /// .treatmentType see TreatmentType
+/// .id is the Nightscout id, defaults to TreatmentEntry.EmptyId.
 /// .uploaded tells if entry has been uploaded for Nighscout or not.
 public class TreatmentEntry: NSManagedObject, Comparable {
 
-    init(date: Date, value: Double, treatmentType: TreatmentType, nsManagedObjectContext:NSManagedObjectContext) {
+    convenience init(date: Date, value: Double, treatmentType: TreatmentType, nsManagedObjectContext:NSManagedObjectContext) {
+		// Id defaults to Empty
+		self.init(id: TreatmentEntry.EmptyId, date: date, value: value, treatmentType: treatmentType, uploaded: false, nsManagedObjectContext: nsManagedObjectContext)
+	}
+	
+	convenience init(id: String, date: Date, value: Double, treatmentType: TreatmentType, nsManagedObjectContext:NSManagedObjectContext) {
+		
+		let uploaded = id != TreatmentEntry.EmptyId
+		
+		self.init(id: id, date: date, value: value, treatmentType: treatmentType, uploaded: uploaded, nsManagedObjectContext: nsManagedObjectContext)
+	}
+	
+	init(id: String, date: Date, value: Double, treatmentType: TreatmentType, uploaded: Bool, nsManagedObjectContext:NSManagedObjectContext) {
 		
 		let entity = NSEntityDescription.entity(forEntityName: "TreatmentEntry", in: nsManagedObjectContext)!
 		super.init(entity: entity, insertInto: nsManagedObjectContext)
@@ -80,8 +93,8 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		self.date = date
 		self.value = value
 		self.treatmentType = treatmentType
-		self.id = TreatmentEntry.EmptyId  // defaults to empty
-		self.uploaded = false  // tracks upload to nightscout
+		self.id = id
+		self.uploaded = uploaded  // tracks upload to nightscout
 	}
 
 	private override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {

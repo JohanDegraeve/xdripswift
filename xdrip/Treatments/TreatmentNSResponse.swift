@@ -79,10 +79,7 @@ public struct TreatmentNSResponse {
 			return nil
 		}
 		
-		var treatment = TreatmentEntry(date: date, value: value, treatmentType: eventType, nsManagedObjectContext: nsManagedObjectContext)
-		// Since this entry originated at nightscout, set uploaded as true.
-		treatment.uploaded = true
-		return treatment
+		return TreatmentEntry(id: id, date: date, value: value, treatmentType: eventType, nsManagedObjectContext: nsManagedObjectContext)
 	}
 	
 }
