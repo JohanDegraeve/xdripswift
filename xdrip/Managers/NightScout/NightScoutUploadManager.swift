@@ -361,8 +361,8 @@ public class NightScoutUploadManager:NSObject {
 
     /// Upload treatments to nightscout, receives the JSON response with the asigned IDS and sets the ids in Core Data.
 	/// - parameters:
-	///     - sucessHandler : handler called after upload. Only called if upload was required.
-	public func uploadTreatmentsToNightScout(sucessHandler: (() -> Void)?) {
+	///     - successHandler : handler called after upload. Only called if upload was required.
+	public func uploadTreatmentsToNightScout(successHandler: (() -> Void)?) {
 		trace("in uploadTreatmentsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
 		
 		// get the latest treatments from the last maxDaysToUpload days
@@ -371,8 +371,8 @@ public class NightScoutUploadManager:NSObject {
 		
 		guard treatmentsToUpload.count > 0 else {
 			trace("    no treatments to upload", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
-			if let sucessHandler = sucessHandler {
-				sucessHandler()
+			if let successHandler = successHandler {
+				successHandler()
 			}
 			return
 		}
@@ -412,8 +412,8 @@ public class NightScoutUploadManager:NSObject {
 						self.coreDataManager.saveChanges()
 					}
 					
-					if let sucessHandler = sucessHandler {
-						sucessHandler()
+					if let successHandler = successHandler {
+						successHandler()
 					}
 				}
 			} catch let error {
@@ -503,7 +503,7 @@ public class NightScoutUploadManager:NSObject {
 	///     - path : the query path
 	///     - queries : an array of URLQueryItem (added after the '?' at the URL)
 	 ///     - traceString : trace will start with this string, to distinguish between different GETs that may be ongoing simultaneously
-	///     - responseHandler : will be executed with the response Data? if sucessfull
+	///     - responseHandler : will be executed with the response Data? if successfull
 	private func getRequest(path: String, queries: [URLQueryItem], traceString: String, responseHandler: ((Data?) -> Void)?) {
 		guard let url = URL(string: UserDefaults.standard.nightScoutUrl!), var uRLComponents = URLComponents(url: url.appendingPathComponent(path), resolvingAgainstBaseURL: false) else {
 			return
@@ -567,7 +567,7 @@ public class NightScoutUploadManager:NSObject {
 	/// - parameters:
 	///     - dataToUpload : data to upload
 	///     - traceString : trace will start with this string, to distinguish between different uploads that may be ongoing simultaneously
-	///     - responseHandler : will be executed with the response Data? if sucessfull
+	///     - responseHandler : will be executed with the response Data? if successfull
 	///     - siteURL : nightscout site url
 	///     - apiKey : nightscout api key
 	private func uploadDataAndGetResponse(dataToUpload: Any, traceString: String, path: String, responseHandler: ((Data?) -> Void)?) {

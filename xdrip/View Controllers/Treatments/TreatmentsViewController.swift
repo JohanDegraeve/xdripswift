@@ -36,7 +36,7 @@ class TreatmentsViewController : UIViewController {
 			return
 		}
 		
-		let alertSucessHandler: (() -> Void) = {
+		let alertsuccessHandler: (() -> Void) = {
 			// Make sure to run alert in the correct thread.
 			DispatchQueue.main.async {
 				let alert = UIAlertController(title: Texts_TreatmentsView.success, message: Texts_TreatmentsView.syncCompleted, actionHandler: nil)
@@ -64,8 +64,8 @@ class TreatmentsViewController : UIViewController {
 				DispatchQueue.main.async {
 					self.reload()
 					
-					// Uploads to nighscout and if sucess display an alert.
-					nightScoutUploadManager.uploadTreatmentsToNightScout(sucessHandler:alertSucessHandler)
+					// Uploads to nighscout and if success display an alert.
+					nightScoutUploadManager.uploadTreatmentsToNightScout(successHandler:alertsuccessHandler)
 				}
 			}
 		}
