@@ -39,7 +39,7 @@ class TreatmentsViewController : UIViewController {
 		let alertSucessHandler: (() -> Void) = {
 			// Make sure to run alert in the correct thread.
 			DispatchQueue.main.async {
-				let alert = UIAlertController(title: Texts_TreatmentsView.success, message: Texts_TreatmentsView.uploadCompleted, actionHandler: nil)
+				let alert = UIAlertController(title: Texts_TreatmentsView.success, message: Texts_TreatmentsView.syncCompleted, actionHandler: nil)
 
 				self.present(alert, animated: true, completion: nil)
 			}
