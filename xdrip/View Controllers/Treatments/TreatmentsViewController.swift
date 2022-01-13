@@ -46,7 +46,7 @@ class TreatmentsViewController : UIViewController {
 		}
 
 		// Fetches new treatments from Nightscout
-		// TODO: for some reason if count > 52 NS only returns 52 entries. Why?
+		// TODO: set optimal value for getLatestTreatmentsNSResponses count.
 		nightScoutUploadManager.getLatestTreatmentsNSResponses(count: 50) { (responses: [TreatmentNSResponse]) in
 
 			guard let treatmentEntryAccessor = self.treatmentEntryAccessor, let coreDataManager = self.coreDataManager else {
