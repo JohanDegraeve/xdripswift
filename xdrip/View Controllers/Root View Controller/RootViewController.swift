@@ -1494,16 +1494,18 @@ final class RootViewController: UIViewController {
                         trace("calibration : creating calibration", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                         
                         // create new calibration
-                        let calibration = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings[0], sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                        
-                        // send calibration to transmitter (only used for Dexcom, if firefly flow is used)
-                        cgmTransmitter.calibrate(calibration: calibration)
-                        
-                        // presnooze fastrise and fastdrop alert
-                        self.alertManager?.snooze(alertKind: .fastdrop, snoozePeriodInMinutes: 9, response: nil)
+                        if let calibration = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings.count > 0 ? latestReadings[0] : nil, sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext) {
 
-                        self.alertManager?.snooze(alertKind: .fastrise, snoozePeriodInMinutes: 9, response: nil)
+                            // send calibration to transmitter (only used for Dexcom, if firefly flow is used)
+                            cgmTransmitter.calibrate(calibration: calibration)
+                            
+                            // presnooze fastrise and fastdrop alert
+                            self.alertManager?.snooze(alertKind: .fastdrop, snoozePeriodInMinutes: 9, response: nil)
+                            
+                            self.alertManager?.snooze(alertKind: .fastrise, snoozePeriodInMinutes: 9, response: nil)
 
+                        }
+                        
                     }
                     
                 }

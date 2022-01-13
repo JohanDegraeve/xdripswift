@@ -867,11 +867,24 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             
         }
         
-        guard let transmitterStartDate = transmitterStartDate else { return }
+        guard let transmitterStartDate = transmitterStartDate else {
+            
+            trace("in stopsensor, but transmitterStartDate is  nil, no further processing", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+            
+            return
+            
+        }
 
         trace("in stopsensor, storing sensor stop  info, will be sent to transmitter at next connect", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
         
         dexcomSessionStopTxMessageToSendToTransmitter = DexcomSessionStopTxMessage(stopDate: stopDate, transmitterStartDate: transmitterStartDate)
+        
+        // if there's still a pending calibration message, set it to nil
+        if let calibrationToSendToTransmitter = calibrationToSendToTransmitter {
+            
+            trace("in stopsensor, setting calibrationToSendToTransmitter to nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+            
+        }
         
     }
 
@@ -1554,6 +1567,30 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             
         }
         
+        // if there's a sessionStopTxMessage to send, then send it
+        if let dexcomSessionStopTxMessage = dexcomSessionStopTxMessageToSendToTransmitter {
+            
+            sendSessionStopTxMessage(dexcomSessionStopTxMessage: dexcomSessionStopTxMessage)
+            
+            self.dexcomSessionStopTxMessageToSendToTransmitter = nil
+            
+            self.sensorStartDate = nil
+            
+            return
+            
+        }
+        
+        // if there's a sensor start command to send, then send it
+        if let sensorStartToSendToTransmitter = sensorStartToSendToTransmitter, let transmitterStartDate = transmitterStartDate {
+            
+            sendSessionStartTxMessage(sensorStartToSendToTransmitter: (startDate: sensorStartToSendToTransmitter.startDate, dexcomCalibrationParameters: sensorStartToSendToTransmitter.dexcomCalibrationParameters), transmitterStartDate: transmitterStartDate)
+            
+            self.sensorStartToSendToTransmitter = nil
+            
+            return
+            
+        }
+        
         // check if battery status update needed, if not proceed with flow
         // if yes, request battery status (done in function batteryStatusRequested)
         if !batteryStatusRequested() {
@@ -1571,25 +1608,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     (Date() < Date(timeInterval: TimeInterval(minutes: 2.1), since: timeStampLastSensorStartTimeRead) && sensorStartDate == nil)
                 )  {
 
-                if let dexcomSessionStopTxMessage = dexcomSessionStopTxMessageToSendToTransmitter {
-                    
-                    sendSessionStopTxMessage(dexcomSessionStopTxMessage: dexcomSessionStopTxMessage)
-                    
-                    self.dexcomSessionStopTxMessageToSendToTransmitter = nil
-                    
-                    self.sensorStartDate = nil
-                    
-                } else
-                
-                // if there's a sensor start command to send, then send it
-                if let sensorStartToSendToTransmitter = sensorStartToSendToTransmitter {
-                    
-                    sendSessionStartTxMessage(sensorStartToSendToTransmitter: (startDate: sensorStartToSendToTransmitter.startDate, dexcomCalibrationParameters: sensorStartToSendToTransmitter.dexcomCalibrationParameters), transmitterStartDate: transmitterStartDate)
-                    
-                    self.sensorStartToSendToTransmitter = nil
-                    
-                } else
-                
                 // if there's a valid calibrationToSendToTransmitter (should be valid because it was just checked but let's do the check anyway
                 if let calibrationToSendToTransmitter = calibrationToSendToTransmitter, calibrationIsValid(calibration: calibrationToSendToTransmitter) {
                     

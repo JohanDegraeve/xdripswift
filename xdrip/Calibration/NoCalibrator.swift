@@ -48,7 +48,7 @@ class NoCalibrator: Calibrator {
         return bgReading
     }
     
-    func createNewCalibration(bgValue:Double, lastBgReading:BgReading, sensor:Sensor, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration, deviceName:String?, nsManagedObjectContext:NSManagedObjectContext) -> Calibration {
+    func createNewCalibration(bgValue:Double, lastBgReading:BgReading?, sensor:Sensor, lastCalibrationsForActiveSensorInLastXDays:inout Array<Calibration>, firstCalibration:Calibration, deviceName:String?, nsManagedObjectContext:NSManagedObjectContext) -> Calibration? {
         
         return Calibration(timeStamp: Date(), sensor: sensor, bg: bgValue, rawValue: bgValue, adjustedRawValue: bgValue, sensorConfidence: 0, rawTimeStamp: Date(), slope: 0.0, intercept: 0.0, distanceFromEstimate: 0, estimateRawAtTimeOfCalibration: 0, slopeConfidence: 0, deviceName:deviceName, nsManagedObjectContext: nsManagedObjectContext)
 
