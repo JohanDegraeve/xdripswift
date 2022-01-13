@@ -60,8 +60,8 @@ enum Texts_TreatmentsView {
 		return NSLocalizedString("treatments_success", tableName: filename, bundle: Bundle.main, value: "Success", comment: "Success.")
 	}()
 
-	static let uploadCompleted:String = {
-		return NSLocalizedString("treatments_upload_complete", tableName: filename, bundle: Bundle.main, value: "Upload completed.", comment: "Upload completed.")
+	static let syncCompleted:String = {
+		return NSLocalizedString("treatments_sync_complete", tableName: filename, bundle: Bundle.main, value: "Sync completed.", comment: "Sync completed.")
 	}()
 	
 }
