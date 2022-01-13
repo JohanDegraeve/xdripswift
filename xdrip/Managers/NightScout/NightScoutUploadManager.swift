@@ -371,6 +371,9 @@ public class NightScoutUploadManager:NSObject {
 		
 		guard treatmentsToUpload.count > 0 else {
 			trace("    no treatments to upload", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+			if let sucessHandler = sucessHandler {
+				sucessHandler()
+			}
 			return
 		}
 	
