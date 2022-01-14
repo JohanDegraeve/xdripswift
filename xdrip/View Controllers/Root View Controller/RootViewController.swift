@@ -62,15 +62,19 @@ final class RootViewController: UIViewController {
             
         // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
         // important to check the the URLs actually exist in ConstansHomeView before trying to open them
-        if languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
+        if let languageCode = languageCode, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
             
-            guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode! + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
+            guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
             
             UIApplication.shared.open(url)
             
         } else {
             
-            // so the user is running the app in English or they don't want to translate so let's just load it directly
+            // so the user is running the app in English
+            // or
+            // NSLocale.current.languageCode returned a nil value
+            // or
+            // they don't want to translate so let's just load it directly
             guard let url = URL(string: ConstantsHomeView.onlineHelpURL) else { return }
             
             UIApplication.shared.open(url)
@@ -450,7 +454,7 @@ final class RootViewController: UIViewController {
         self.configureWatchKitSession()
         
         // if the user requested to hide the help icon on the main screen, then remove it (and the flexible space next to it)
-        // this is why we keep the help icon as the last one in the toolbar item array.
+        // this is because we keep the help icon as the last one in the toolbar item array.
         if !UserDefaults.standard.showHelpIcon {
             
             toolbarOutlet.items!.removeLast(2)
