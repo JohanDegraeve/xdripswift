@@ -16,6 +16,10 @@ final class RootViewController: UIViewController {
     
     private var session: WCSession?
     
+    
+    @IBOutlet weak var toolbarOutlet: UIToolbar!
+    
+    
     @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
     
     @IBAction func preSnoozeToolbarButtonAction(_ sender: UIBarButtonItem) {
@@ -44,6 +48,33 @@ final class RootViewController: UIViewController {
             trace("calibration : user clicked the calibrate button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
             requestCalibration(userRequested: true)
+        }
+        
+    }
+    
+    
+    @IBOutlet weak var helpToolbarButtonOutlet: UIBarButtonItem!
+    
+    @IBAction func helpToolbarButtonAction(_ sender: UIBarButtonItem) {
+        
+        // get the 2 character language code for the App Locale (i.e. "en", "es", "nl", "fr")
+        let languageCode = NSLocale.current.languageCode
+            
+        // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
+        // important to check the the URLs actually exist in ConstansHomeView before trying to open them
+        if languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
+            
+            guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode! + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
+            
+            UIApplication.shared.open(url)
+            
+        } else {
+            
+            // so the user is running the app in English or they don't want to translate so let's just load it directly
+            guard let url = URL(string: ConstantsHomeView.onlineHelpURL) else { return }
+            
+            UIApplication.shared.open(url)
+        
         }
         
     }
@@ -417,6 +448,14 @@ final class RootViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.configureWatchKitSession()
+        
+        // if the user requested to hide the help icon on the main screen, then remove it (and the flexible space next to it)
+        // this is why we keep the help icon as the last one in the toolbar item array.
+        if !UserDefaults.standard.showHelpIcon {
+            
+            toolbarOutlet.items!.removeLast(2)
+            
+        }
         
         // set up the clock view
         clockDateFormatter.dateStyle = .none
