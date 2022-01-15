@@ -3030,12 +3030,18 @@ extension RootViewController:NightScoutFollowerDelegate {
         
         if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor, let nightScoutFollowManager = nightScoutFollowManager {
             
+            trace("nightScoutFollowerInfoReceived", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
 
             // get lastReading, ignore sensor as this should be nil because this is follower mode
             if let lastReading = bgReadingsAccessor.last(forSensor: nil) {
+                
                 timeStampLastBgReading = lastReading.timeStamp
+                
+                trace("    timeStampLastBgReading = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, timeStampLastBgReading.toString(timeStyle: .long, dateStyle: .long))
+
             }
             
             // was a new reading created or not
@@ -3043,8 +3049,12 @@ extension RootViewController:NightScoutFollowerDelegate {
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for (_, followGlucoseData) in followGlucoseDataArray.enumerated().reversed() {
+
+                trace("    followGlucoseData timestamp = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
                 
                 if followGlucoseData.timeStamp > timeStampLastBgReading {
+                    
+                    trace("    creating new bgreading timestamp = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
                     
                     // creata a new reading
                     _ = nightScoutFollowManager.createBgReading(followGlucoseData: followGlucoseData)
@@ -3060,7 +3070,7 @@ extension RootViewController:NightScoutFollowerDelegate {
             
             if newReadingCreated {
                 
-                trace("nightScoutFollowerInfoReceived, new reading(s) received", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                trace("    new reading(s) received", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                 
                 // save in core data
                 coreDataManager.saveChanges()
