@@ -29,6 +29,6 @@
 "cannotActiveCGMInFollowerMode" = "لا يمكنك تفعيل نظام متابعة سكر الدم المستمرة CGM في وضع المتابعة";
 "useOtherDexcomApp" = "قم بمتابعة تطبيق Dexcom";
 "confirmDisconnectTitle" = "تأكيد قطع الاتصال";
-"confirmDisconnectMessage" = "انقر فوق "قطع الاتصال" لتأكيد رغبتك حقًا في قطع الاتصال بجهاز الإرسال.";
+"confirmDisconnectMessage" = "انقر فوق \"قطع الاتصال\" لتأكيد رغبتك حقًا في قطع الاتصال بجهاز الإرسال.";
 "sensorStartDate" = "بداية الحساس";
 "transmittterStartDate" = "بداية جهاز الإرسال";
