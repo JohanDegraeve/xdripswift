@@ -56,12 +56,4 @@ enum Texts_TreatmentsView {
 		return NSLocalizedString("treatments_question_mark", tableName: filename, bundle: Bundle.main, value: "?", comment: "Literally a question mark, used as unknown abbreviation.")
 	}()
 
-	static let success:String = {
-		return NSLocalizedString("treatments_success", tableName: filename, bundle: Bundle.main, value: "Success", comment: "Success.")
-	}()
-
-	static let syncCompleted:String = {
-		return NSLocalizedString("treatments_sync_complete", tableName: filename, bundle: Bundle.main, value: "Sync completed.", comment: "Sync completed.")
-	}()
-	
 }

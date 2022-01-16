@@ -98,7 +98,7 @@ class SettingsViewNightScoutSettingsViewModel {
                         
                         trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, error.localizedDescription)
                         
-                        self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationErrorAlertTitle, message: error.localizedDescription)
+                        self.callMessageHandlerInMainThread(title: TextsNightScout.verificationErrorAlertTitle, message: error.localizedDescription)
                         
                         return
                         
@@ -115,7 +115,7 @@ class SettingsViewNightScoutSettingsViewModel {
                         
                         trace("in testNightScoutCredentials, successful", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
                         
-                        self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationSuccessfulAlertTitle, message: Texts_NightScoutTestResult.verificationSuccessfulAlertBody)
+                        self.callMessageHandlerInMainThread(title: TextsNightScout.verificationSuccessfulAlertTitle, message: TextsNightScout.verificationSuccessfulAlertBody)
                         
                         
                         
@@ -143,7 +143,7 @@ class SettingsViewNightScoutSettingsViewModel {
                             
                             trace("in testNightScoutCredentials, URL responds OK but authentication method is missing and cannot be checked", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
                             
-                            self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationSuccessfulAlertTitle, message: "URL responds OK but authentication method is missing and cannot be checked!")
+                            self.callMessageHandlerInMainThread(title: TextsNightScout.verificationSuccessfulAlertTitle, message: "URL responds OK but authentication method is missing and cannot be checked!")
                             
                         }
                     
@@ -163,7 +163,7 @@ class SettingsViewNightScoutSettingsViewModel {
                         
                         trace("in testNightScoutCredentials, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info, errorMessage)
                         
-                        self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationErrorAlertTitle, message: errorMessage)
+                        self.callMessageHandlerInMainThread(title: TextsNightScout.verificationErrorAlertTitle, message: errorMessage)
                         
                     }
                     
@@ -292,7 +292,7 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
 
                 // show info that test is started, through the messageHandler
                 if let messageHandler = messageHandler {
-                    messageHandler(Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedTitle, Texts_NightScoutTestResult.nightScoutAPIKeyAndURLStartedBody)
+                    messageHandler(TextsNightScout.nightScoutAPIKeyAndURLStartedTitle, TextsNightScout.nightScoutAPIKeyAndURLStartedBody)
                 }
                 
                 self.testNightScoutCredentials()

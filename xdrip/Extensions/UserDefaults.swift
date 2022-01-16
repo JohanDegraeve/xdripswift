@@ -102,7 +102,16 @@ extension UserDefaults {
         case nightScoutPort = "nightScoutPort"
         /// token to use for authentication, 0 means not set
         case nightscoutToken = "nightscoutToken"
+        
+        /// is a  nightscout sync of treatments required
+        ///
+        /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightScoutUploadManager and when set to true, the manager knows a new sync is required
+        case nightScoutSyncTreatmentsRequired = "nightScoutSyncTreatmentsRequired"
 
+        /// used to trigger view controllers that there's a change in TreatmentEntries
+        ///
+        /// value will be increased with 1 each time there's an update
+        case nightScoutTreatmentsUpdateCounter = "nightScoutTreatmentsUpdateCounter"
         
         // Dexcom Share
         
@@ -869,6 +878,30 @@ extension UserDefaults {
         }
     }
     
+    /// is a  nightscout sync of treatments required
+    ///
+    /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightScoutUploadManager and when set to true, the manager knows a new sync is required
+    @objc dynamic var nightScoutSyncTreatmentsRequired: Bool {
+        get {
+            return bool(forKey: Key.nightScoutSyncTreatmentsRequired.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.nightScoutSyncTreatmentsRequired.rawValue)
+        }
+    }
+    
+    /// used to trigger view controllers that there's a change in TreatmentEntries
+    ///
+    /// value will be increased with 1 each time there's an update
+    @objc dynamic var nightScoutTreatmentsUpdateCounter: Int {
+        get {
+            return integer(forKey: Key.nightScoutTreatmentsUpdateCounter.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.nightScoutTreatmentsUpdateCounter.rawValue)
+        }
+    }
+
     // MARK: Dexcom Share Settings
     
     /// should readings be uploaded to Dexcom share server, true or false

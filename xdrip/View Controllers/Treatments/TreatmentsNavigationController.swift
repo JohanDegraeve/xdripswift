@@ -18,21 +18,17 @@ final class TreatmentsNavigationController: UINavigationController {
 	// MARK: - private properties
 	
 	/// reference to coreDataManager
-	private var coreDataManager:CoreDataManager?
-	
-	/// reference to nightScoutUploadManager
-	private var nightScoutUploadManager: NightScoutUploadManager?
+	private var coreDataManager:CoreDataManager!
 	
 	/// reference to treatmentEntryAccessor
-	private var treatmentEntryAccessor: TreatmentEntryAccessor?
+	private var treatmentEntryAccessor: TreatmentEntryAccessor!
 
 	// MARK: - public functions
 	
 	/// configure
-	public func configure(coreDataManager: CoreDataManager, nightScoutUploadManager: NightScoutUploadManager) {
+	public func configure(coreDataManager: CoreDataManager) {
 		// initalize private properties
 		self.coreDataManager = coreDataManager
-		self.nightScoutUploadManager = nightScoutUploadManager
 		self.treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
 	}
 	
@@ -62,12 +58,17 @@ final class TreatmentsNavigationController: UINavigationController {
 }
 
 extension TreatmentsNavigationController: UINavigationControllerDelegate {
+    
 	func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
 		
-		if let coreDataManager = coreDataManager, let nightScoutUploadManager = nightScoutUploadManager, let treatmentEntryAccessor = treatmentEntryAccessor, let treatmentsViewController = viewController as? TreatmentsViewController {
-			treatmentsViewController.configure(coreDataManager: coreDataManager, nightScoutUploadManager: nightScoutUploadManager, treatmentEntryAccessor: treatmentEntryAccessor)
+		if let treatmentsViewController = viewController as? TreatmentsViewController {
+            
+			treatmentsViewController.configure(coreDataManager: coreDataManager)
+            
 		}
+        
 	}
+    
 }
 
 
