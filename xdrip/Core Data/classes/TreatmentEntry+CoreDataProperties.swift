@@ -17,6 +17,7 @@ extension TreatmentEntry {
 		return NSFetchRequest<TreatmentEntry>(entityName: "TreatmentEntry")
 	}
 	
+    /// if TreatmentEntry is not yet uploaded to NS, then the id will get this value
 	public static let EmptyId: String = ""
 
 	/// Date represents the date of the treatment, not the date of creation.
@@ -34,4 +35,7 @@ extension TreatmentEntry {
 	/// Tells if this instance has been uploaded to Nightscout.
 	@NSManaged public var uploaded: Bool
 	
+    /// deleted means not visible anymore for user, not taken into account for IOB etc. Used to figure out if DELETE command needs to be sent to NightScout
+    @NSManaged public var treatmentdeleted: Bool
+    
 }

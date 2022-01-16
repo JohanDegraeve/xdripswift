@@ -18,62 +18,28 @@ class TreatmentsViewController : UIViewController {
 	private var treatmentCollection: TreatmentCollection?
 	
 	/// reference to coreDataManager
-	private var coreDataManager: CoreDataManager?
-	
-	/// reference to nightScoutUploadManager
-	private var nightScoutUploadManager: NightScoutUploadManager?
+	private var coreDataManager: CoreDataManager!
 	
 	/// reference to treatmentEntryAccessor
-	private var treatmentEntryAccessor: TreatmentEntryAccessor?
+	private var treatmentEntryAccessor: TreatmentEntryAccessor!
 	
 	// Outlets
 	@IBOutlet weak var titleNavigation: UINavigationItem!
+    
 	@IBOutlet weak var tableView: UITableView!
 	
 	/// Sync button action.
 	@IBAction func syncButtonTapped(_ sender: UIBarButtonItem) {
-		guard let nightScoutUploadManager = nightScoutUploadManager else {
-			return
-		}
-		
-		let alertsuccessHandler: (() -> Void) = {
-			// Make sure to run alert in the correct thread.
-			DispatchQueue.main.async {
-				let alert = UIAlertController(title: Texts_TreatmentsView.success, message: Texts_TreatmentsView.syncCompleted, actionHandler: nil)
-
-				self.present(alert, animated: true, completion: nil)
-			}
-		}
-
-		// Fetches new treatments from Nightscout
-		// TODO: set optimal value for getLatestTreatmentsNSResponses count.
-		nightScoutUploadManager.getLatestTreatmentsNSResponses(count: 50) { (responses: [TreatmentNSResponse]) in
-
-			guard let treatmentEntryAccessor = self.treatmentEntryAccessor, let coreDataManager = self.coreDataManager else {
-				return
-			}
-
-			// Be sure to use the correct thread.
-			// Running in the completionHandler thread will
-			// result in issues.
-			coreDataManager.mainManagedObjectContext.performAndWait {
-				let _ = treatmentEntryAccessor.newTreatmentsIfRequired(responses: responses)
-				coreDataManager.saveChanges()
-
-				// Update UI, run at main thread
-				DispatchQueue.main.async {
-					self.reload()
-					
-					// Uploads to nighscout and if success display an alert.
-					nightScoutUploadManager.uploadTreatmentsToNightScout(successHandler:alertsuccessHandler)
-				}
-			}
-		}
+        
+        // nightscout upload manager observes this value and will initialize a sync
+        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        
 	}
 	
     // MARK: - View Life Cycle
     
 	override func viewWillAppear(_ animated: Bool) {
+        
 		super.viewWillAppear(animated)
 		
 		// Fixes dark mode issues
@@ -84,6 +50,12 @@ class TreatmentsViewController : UIViewController {
 		}
 		
 		self.titleNavigation.title = Texts_TreatmentsView.treatmentsTitle
+        
+        // add observer for nightScoutTreatmentsUpdateCounter, to reload the screen whenever the value changes
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
+        
+
+        
 	}
 	
 
@@ -97,18 +69,15 @@ class TreatmentsViewController : UIViewController {
 		
 		// Cast the destination to TreatmentsInsertViewController (if possible).
 		// And assures the destination and coreData are valid.
-		guard let insertViewController = segue.destination as? TreatmentsInsertViewController, let coreDataManager = coreDataManager else {
+		guard let insertViewController = segue.destination as? TreatmentsInsertViewController else {
 
-			fatalError("In TreatmentsInsertViewController, prepare for segue, viewcontroller is not TreatmentsInsertViewController or coreDataManager is nil" )
+			fatalError("In TreatmentsInsertViewController, prepare for segue, viewcontroller is not TreatmentsInsertViewController" )
 		}
-		
-		// Handler that will be called when entries are created.
-		let completionHandler = {
-			self.reload()
-		}
-		
+
 		// Configure insertViewController with CoreData instance and complete handler.
-        insertViewController.configure(treatMentEntryToUpdate: sender as? TreatmentEntry, coreDataManager: coreDataManager, completionHandler: completionHandler)
+        insertViewController.configure(treatMentEntryToUpdate: sender as? TreatmentEntry, coreDataManager: coreDataManager, completionHandler: {
+            self.reload()
+        })
         
 	}
 	
@@ -116,12 +85,11 @@ class TreatmentsViewController : UIViewController {
 	// MARK: - public functions
 	
 	/// Configure will be called before this view is presented for the user.
-	public func configure(coreDataManager: CoreDataManager, nightScoutUploadManager: NightScoutUploadManager, treatmentEntryAccessor: TreatmentEntryAccessor) {
+	public func configure(coreDataManager: CoreDataManager) {
         
 		// initalize private properties
 		self.coreDataManager = coreDataManager
-		self.nightScoutUploadManager = nightScoutUploadManager
-		self.treatmentEntryAccessor = treatmentEntryAccessor
+		self.treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
 	
 		self.reload()
         
@@ -133,13 +101,33 @@ class TreatmentsViewController : UIViewController {
 	/// Reloads treatmentCollection and calls reloadData on tableView.
 	private func reload() {
         
-		guard let treatmentEntryAccessor = treatmentEntryAccessor else { return }
-        
-		self.treatmentCollection = TreatmentCollection(treatments: treatmentEntryAccessor.getLatestTreatments())
+        self.treatmentCollection = TreatmentCollection(treatments: treatmentEntryAccessor.getLatestTreatments(howOld: TimeInterval(days: 100)).filter( {!$0.treatmentdeleted} ))
 
 		self.tableView.reloadData()
         
 	}
+    
+    // MARK: - overriden functions
+
+    /// when one of the observed settings get changed, possible actions to take
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if let keyPath = keyPath {
+            if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
+                
+                switch keyPathEnum {
+                    
+                case UserDefaults.Key.nightScoutTreatmentsUpdateCounter :
+                    // Reloads data and table.
+                    self.reload()
+                    
+                default:
+                    break
+                }
+            }
+        }
+    }
+
 }
 
 
@@ -190,17 +178,23 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 	func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 		if (editingStyle == .delete) {
             
-			guard let treatmentCollection = treatmentCollection, let treatmentEntryAccessor = treatmentEntryAccessor, let coreDataManager = coreDataManager else {
+			guard let treatmentCollection = treatmentCollection else {
 				return
 			}
 
 			// Get the treatment the user wants to delete.
 			let treatment = treatmentCollection.getTreatment(dateIndex: indexPath.section, treatmentIndex: indexPath.row)
 			
-			// Deletes the treatment from CoreData.
-			treatmentEntryAccessor.delete(treatmentEntry: treatment, on: coreDataManager.mainManagedObjectContext)
+			// set treatmentDelete to true in coredata.
+            treatment.treatmentdeleted = true
+            
+            // set uploaded to false, so that at next nightscout sync, the treatment will be deleted at NightScout
+            treatment.uploaded = false
 			
             coreDataManager.saveChanges()
+            
+            // trigger nightscoutsync
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
             
 			// Reloads data and table.
 			self.reload()

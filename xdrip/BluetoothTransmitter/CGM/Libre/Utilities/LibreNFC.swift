@@ -68,7 +68,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
             tagSession.alertMessage = TextsLibreNFC.holdTopOfIphoneNearSensor
             
             tagSession.begin()
-
+            
         }
         
     }

@@ -24,7 +24,7 @@ class TreatmentsInsertViewController : UIViewController {
 	// MARK: - private properties
     
 	/// reference to coreDataManager
-	private var coreDataManager:CoreDataManager?
+	private var coreDataManager:CoreDataManager!
 	
 	/// handler to be executed when user clicks okButton
 	private var completionHandler:(() -> Void)?
@@ -98,12 +98,6 @@ class TreatmentsInsertViewController : UIViewController {
 	
 	@IBAction func doneButtonTapped(_ sender: UIBarButtonItem) {
         
-		guard let coreDataManager = coreDataManager, let completionHandler = completionHandler else {
-			return
-		}
-		
-		var treatments: [TreatmentEntry] = []
-        
         // if treatMentEntryToUpdate not nil, then assign new value or delete it
         // it's either type carbs, insulin or exercise
         if let treatMentEntryToUpdate = treatMentEntryToUpdate {
@@ -112,16 +106,43 @@ class TreatmentsInsertViewController : UIViewController {
             // checks if text in textfield exists, has value > 0.
             // if yes, assigns value to treatMentEntryToUpdate.value
             // if no deletes treatMentEntryToUpdate
-            // sets text in textField to "0" to avoid that new treatmentEntry is created
             let updateFunction = { (textField: UITextField) in
                 
                 if let text = textField.text, let value = Double(text), value > 0 {
-                    treatMentEntryToUpdate.value = value
-                    textField.text = "0"
+                    
+                    if treatMentEntryToUpdate.value != value {
+                        
+                        treatMentEntryToUpdate.value = value
+
+                        // sets text in textField to "0" to avoid that new treatmentEntry is created
+                        textField.text = "0"
+
+                        // permenant save in coredata
+                        self.coreDataManager.saveChanges()
+                        
+                        // set uploaded to false so that the entry is synced with NightScout
+                        treatMentEntryToUpdate.uploaded = false
+
+                        // trigger nightscoutsync
+                        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+                        
+                    }
+
                 } else {
-                    coreDataManager.mainManagedObjectContext.delete(treatMentEntryToUpdate)
+                    
+                    // text is nil or "0", set treatmentdeleted to true
+                    treatMentEntryToUpdate.treatmentdeleted = true
+                    
+                    // set uploaded to false so that the entry is synced with NightScout
+                    treatMentEntryToUpdate.uploaded = false
+
+                    // trigger nightscoutsync
+                    UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+                    
                     self.treatMentEntryToUpdate = nil
+
                 }
+                
             }
 
             switch treatMentEntryToUpdate.treatmentType {
@@ -137,28 +158,51 @@ class TreatmentsInsertViewController : UIViewController {
                 
             }
             
+        } else {
+            
+            // viewcontroller is opened to create a new treatmenEntry
+            
+            // if there's more than one new treatmentEntry being created here, then each will be created with a small difference in timestamp, ie 1 millisecond
+            // because, after uploading to NightScout, the timestamp is is used to recognize/find back the actualy event, and so to find the id assigned by NightScout
+            // (probably it's better that xdrip4ioS would assign the id)
+            // dateOffset is used to keep track of the offset to use
+            var dateOffset = TimeInterval(0.0)
+            
+            // code reused three times
+            // checks if text is not nil, has value > 0.
+            // if yes, creates a new TreatmentEntry
+            let createFunction = { [self] (text: String?, treatmentType: TreatmentType) in
+                
+                if let text = text, let value = Double(text), value > 0 {
+
+                    // create the treatment and append to treatments
+                    _ = TreatmentEntry(date: Date(timeInterval: dateOffset, since: datePicker.date), value: value, treatmentType: treatmentType, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
+                    
+                    // trigger nightscoutsync
+                    UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+                    
+                    // save to coredata
+                    coreDataManager.saveChanges()
+
+                    // increase dateOffset in case a next/new treatment will be be created
+                    dateOffset = dateOffset + TimeInterval(0.001)
+                    
+                }
+
+            }
+            
+            // call createFunction for each TextField
+            createFunction(carbsTextField.text, .Carbs)
+            createFunction(insulinTextField.text, .Insulin)
+            createFunction(exerciseTextField.text, .Exercise)
+
         }
         
-		if let carbsText = carbsTextField.text, let carbs = Double(carbsText), carbs > 0 {
-			let treatment = TreatmentEntry(date: datePicker.date, value: carbs, treatmentType: .Carbs, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-			treatments.append(treatment)
-		}
+        // call completionHandler
+        if let completionHandler = completionHandler {
+            completionHandler()
+        }
 		
-		if let insulinText = insulinTextField.text, let insulin = Double(insulinText), insulin > 0 {
-			let treatment = TreatmentEntry(date: datePicker.date, value: insulin, treatmentType: .Insulin, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-			treatments.append(treatment)
-		}
-		
-		if let exerciseText = exerciseTextField.text, let exercise = Double(exerciseText), exercise > 0 {
-			let treatment = TreatmentEntry(date: datePicker.date, value: exercise, treatmentType: .Exercise, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-			treatments.append(treatment)
-		}
-		
-        // permenant save in coredata
-        coreDataManager.saveChanges()
-        
-        // call
-		completionHandler()
 		
 		// Pops the current view (this)
 		self.navigationController?.popViewController(animated: true)
@@ -170,7 +214,7 @@ class TreatmentsInsertViewController : UIViewController {
 	
     /// - parameters:
     ///     - treatMentEntryToUpdate
-    public func configure(treatMentEntryToUpdate: TreatmentEntry?, coreDataManager: CoreDataManager?, completionHandler: @escaping (() -> Void)) {
+    public func configure(treatMentEntryToUpdate: TreatmentEntry?, coreDataManager: CoreDataManager, completionHandler: @escaping (() -> Void)) {
         
 		// initalize private properties
 		self.coreDataManager = coreDataManager
@@ -179,7 +223,6 @@ class TreatmentsInsertViewController : UIViewController {
         self.treatMentEntryToUpdate = treatMentEntryToUpdate
         
 	}
-	
 	
 	// MARK: - private functions
 	

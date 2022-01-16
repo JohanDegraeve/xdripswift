@@ -39,6 +39,7 @@ extension Date {
     }
 	
 	/// Given a date represented as a string, returns a Date object, the reverse of ISOStringFromDate.
+    ///
 	/// Example string: "2022-01-12T23:04:17.190Z"
 	static func fromISOString(_ string: String) -> Date? {
 		let dateFormatter = DateFormatter()
@@ -50,6 +51,7 @@ extension Date {
 	}
     
 	/// Returns the date represented as a ISO string.
+    ///
 	/// Example return: "2022-01-12T23:04:17.190Z"
     func ISOStringFromDate() -> String {
         let dateFormatter = DateFormatter()
