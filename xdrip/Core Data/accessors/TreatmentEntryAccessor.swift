@@ -29,15 +29,15 @@ class TreatmentEntryAccessor {
 	
 	// MARK: - public functions
 	
-	/// Gives the 50 latest treatments
+	/// Gives the 100 latest treatments
 	///
 	/// - returns: an array with treatments, can be empty array.
 	///     Order by timestamp, descending meaning the treatment at index 0 is the youngest
 	func getLatestTreatments() -> [TreatmentEntry] {
-		return getLatestTreatments(limit:50)
+		return getLatestTreatments(limit:100)
 	}
 	
-	/// Returns the treatments among the 50 latest
+	/// Returns the treatments among the latest
 	/// that have not yet been uploaded
 	///
 	/// - returns: an array with treatments not uploaded, can be empty array.
@@ -85,9 +85,7 @@ class TreatmentEntryAccessor {
 	/// - returns: an array with treatments, can be empty array.
 	///     Order by timestamp, descending meaning the treatment at index 0 is the youngest
    func getLatestTreatments(limit:Int?, fromDate:Date?) -> [TreatmentEntry] {
-		
 		return fetchTreatments(limit: limit, fromDate: fromDate)
-		
 	}
 	
 	/// gets last treatment
@@ -98,45 +96,6 @@ class TreatmentEntryAccessor {
 		} else {
 			return nil
 		}
-	}
-	
-	/// gets treatments, synchronously, in the managedObjectContext's thread
-	/// - returns:
-	///        treatments sorted by timestamp, ascending (ie first is oldest)
-	/// - parameters:
-	///     - to : if specified, only return treatments with timestamp  smaller than fromDate (not equal to)
-	///     - from : if specified, only return treatments with timestamp greater than fromDate (not equal to)
-	///     - managedObjectContext : the ManagedObjectContext to use
-	func getTreatments(from: Date?, to: Date?, on managedObjectContext: NSManagedObjectContext) -> [TreatmentEntry] {
-		
-		let fetchRequest: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
-		fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(TreatmentEntry.date), ascending: true)]
-		
-		// create predicate
-		if let from = from, to == nil {
-			let predicate = NSPredicate(format: "date > %@", from as NSDate)
-			fetchRequest.predicate = predicate
-		} else if let to = to, from == nil {
-			let predicate = NSPredicate(format: "date < %@", to as NSDate)
-			fetchRequest.predicate = predicate
-		} else if let to = to, let from = from {
-			let predicate = NSPredicate(format: "date < %@ AND date > %@", to as CVarArg, from as NSDate)
-			fetchRequest.predicate = predicate
-		}
-		
-		var treatments: [TreatmentEntry] = []
-		
-		managedObjectContext.performAndWait {
-			do {
-				// Execute Fetch Request
-				treatments = try fetchRequest.execute()
-			} catch {
-				let fetchError = error as NSError
-				trace("in getTreatments, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
-			}
-		}
-		
-		return treatments
 	}
 	
 	/// deletes treatmentEntry, synchronously, in the managedObjectContext's thread
@@ -152,9 +111,56 @@ class TreatmentEntryAccessor {
 			do {
 				try managedObjectContext.save()
 			} catch {
-				trace("in delete bgReading,  Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, error.localizedDescription)
+				trace("in delete treatmentEntry,  Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, error.localizedDescription)
 			}
 		}
+	}
+	
+	/// Given an Id, returns if exists a treatment with that id.
+	///     - id : the id string
+	func existsTreatmentWithId(_ id: String) -> Bool {
+		return getTreatmentById(id) != nil
+	}
+	
+	/// Given an Id, returns the TreatmentEntry with that id, if it exists.
+	///     - id : the id string
+	func getTreatmentById(_ id: String) -> TreatmentEntry? {
+		// EmptyId is not a valid id
+		guard id != TreatmentEntry.EmptyId else {
+			return nil
+		}
+		
+		let fetchRequest: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+		// limit to 1, although there shouldn't be more than 1 with the same id.
+		fetchRequest.fetchLimit = 1
+		// Filter by id
+		fetchRequest.predicate = NSPredicate(format: "id == %@", id)
+		
+		var treatment: TreatmentEntry? = nil
+		coreDataManager.mainManagedObjectContext.performAndWait {
+			do {
+				// Execute Fetch Request
+				// Since it returns an array, get the first elem
+				treatment = (try fetchRequest.execute()).first
+			} catch {
+				let fetchError = error as NSError
+				trace("in fetchTreatments, Unable to Execute getTreatmentById Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
+			}
+		}
+
+		return treatment
+	}
+	
+	public func newTreatmentsIfRequired(responses: [TreatmentNSResponse]) -> [TreatmentEntry] {
+		var newTreatments: [TreatmentEntry] = []
+		
+		for response in responses {
+			if !self.existsTreatmentWithId(response.id), let treatment = response.asNewTreatmentEntry(nsManagedObjectContext: coreDataManager.mainManagedObjectContext) {
+				newTreatments.append(treatment)
+			}
+		}
+		
+		return newTreatments
 	}
 	
 	// MARK: - private helper functions
@@ -188,7 +194,7 @@ class TreatmentEntryAccessor {
 				treatments = try fetchRequest.execute()
 			} catch {
 				let fetchError = error as NSError
-				trace("in fetchTreatments, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
+				trace("in fetchTreatments, Unable to Execute fetchTreatments Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
 			}
 		}
 		

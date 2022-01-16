@@ -155,6 +155,7 @@
     </entity>
     <entity name="TreatmentEntry" representedClassName=".TreatmentEntry" syncable="YES">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="treatmentType" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="uploaded" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="value" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -183,7 +184,7 @@
         <element name="MiaoMiao" positionX="-657" positionY="189" width="128" height="88"/>
         <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="133"/>
         <element name="SnoozeParameters" positionX="-648" positionY="198" width="128" height="28"/>
-        <element name="TreatmentEntry" positionX="-657" positionY="189" width="128" height="89"/>
+        <element name="TreatmentEntry" positionX="-657" positionY="189" width="128" height="104"/>
         <element name="Watlaa" positionX="-639" positionY="207" width="128" height="88"/>
     </elements>
 </model>

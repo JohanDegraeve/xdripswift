@@ -16,6 +16,8 @@ extension TreatmentEntry {
 	@nonobjc public class func fetchRequest() -> NSFetchRequest<TreatmentEntry> {
 		return NSFetchRequest<TreatmentEntry>(entityName: "TreatmentEntry")
 	}
+	
+	public static let EmptyId: String = ""
 
 	/// Date represents the date of the treatment, not the date of creation.
 	@NSManaged public var date: Date
@@ -25,6 +27,9 @@ extension TreatmentEntry {
 
 	/// Enum TreatmentType defines which treatment this instance is.
 	@NSManaged public var treatmentType: TreatmentType
+	
+	/// Nightscout id, should be always generated at Nighscout and saved to core data when uploaded.
+	@NSManaged public var id: String
 	
 	/// Tells if this instance has been uploaded to Nightscout.
 	@NSManaged public var uploaded: Bool
