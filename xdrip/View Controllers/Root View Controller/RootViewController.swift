@@ -2785,7 +2785,7 @@ final class RootViewController: UIViewController {
     /// - creates a new sensor and assigns it to activeSensor
     /// - if sendToTransmitter is true then sends startSensor command to transmitter (ony useful for Firefly)
     /// - saves to coredata
-    private func startSensor(cGMTransmitter: CGMTransmitter, sensorStarDate: Date, sensorCode: String?, coreDataManager: CoreDataManager, sendToTransmitter: Bool) {
+    private func startSensor(cGMTransmitter: CGMTransmitter?, sensorStarDate: Date, sensorCode: String?, coreDataManager: CoreDataManager, sendToTransmitter: Bool) {
         
         // create active sensor
         let newSensor = Sensor(startDate: sensorStarDate, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
@@ -2794,7 +2794,7 @@ final class RootViewController: UIViewController {
         coreDataManager.saveChanges()
         
         // send to transmitter
-        if sendToTransmitter {
+        if let cGMTransmitter = cGMTransmitter, sendToTransmitter {
             cGMTransmitter.startSensor(sensorCode: sensorCode, startDate: sensorStarDate)
         }
 
@@ -2803,13 +2803,13 @@ final class RootViewController: UIViewController {
         
     }
     
-    private func stopSensor(cGMTransmitter: CGMTransmitter, sendToTransmitter: Bool) {
+    private func stopSensor(cGMTransmitter: CGMTransmitter?, sendToTransmitter: Bool) {
     
         // create stopDate
         let stopDate = Date()
         
         // send stop sensor command to transmitter, don't check if there's an activeSensor in coredata or not, never know that there's a desync between coredata and transmitter
-        if sendToTransmitter {
+        if let cGMTransmitter = cGMTransmitter, sendToTransmitter {
             cGMTransmitter.stopSensor(stopDate: stopDate)
         }
 
@@ -2844,26 +2844,22 @@ extension RootViewController: CGMTransmitterDelegate {
         
         trace("sensor stop detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
 
-        // unwrap cgmTransmitter
-        guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else {return}
-        
-        stopSensor(cGMTransmitter: cgmTransmitter, sendToTransmitter: false)
+        stopSensor(cGMTransmitter: self.bluetoothPeripheralManager?.getCGMTransmitter(), sendToTransmitter: false)
 
     }
     
     func newSensorDetected(sensorStartDate: Date?) {
+        
         trace("new sensor detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
-        
-        // unwrap cgmTransmitter
-        guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else {return}
-        
-        stopSensor(cGMTransmitter: cgmTransmitter, sendToTransmitter: false)
+
+        // stop sensor, self.bluetoothPeripheralManager?.getCGMTransmitter() can be nil in case of Libre2, because new sensor is detected via NFC call which usually happens before the transmitter connection is made (and so before cGMTransmitter is assigned a new value)
+        stopSensor(cGMTransmitter: self.bluetoothPeripheralManager?.getCGMTransmitter(), sendToTransmitter: false)
 
         // if sensorStartDate is given, then unwrap coreDataManager and startSensor
         if let sensorStartDate = sensorStartDate, let coreDataManager = coreDataManager {
             
             // use sensorCode nil, in the end there will be no start sensor command sent to the transmitter because we just received the sensorStartTime from the transmitter, so it's already started
-            startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: sensorStartDate, sensorCode: nil, coreDataManager: coreDataManager, sendToTransmitter: false)
+            startSensor(cGMTransmitter: self.bluetoothPeripheralManager?.getCGMTransmitter(), sensorStarDate: sensorStartDate, sensorCode: nil, coreDataManager: coreDataManager, sendToTransmitter: false)
             
         }
         
