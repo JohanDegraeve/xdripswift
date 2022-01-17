@@ -128,6 +128,8 @@
 
 /// general settings, should the online help be translated automatically if needed
 "settingsviews_translateOnlineHelp" = "Translate Automatically?";
+"settingsviews_showHelpIcon" = "Toon Help Icon?";
+"settingsviews_restartNeeded" = "(Herstarten nodig)";
 
 /// home screen settings, should the main glucose chart screen be allowed?
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation?";

@@ -2,6 +2,8 @@
 "settingsviews_sectiontitlehelp" = "Help & Documentation";
 "settingsviews_showOnlineHelp" = "Open Online Help?";
 "settingsviews_translateOnlineHelp" = "Translate Automatically?";
+"settingsviews_showHelpIcon" = "Show Help Icon?";
+"settingsviews_restartNeeded" = "(Restart required)";
 "settingsviews_sectiontitlegeneral" = "General";
 "settingsviews_selectbgunit" = "Blood Glucose Units:";
 "settingsviews_masterorfollower" = "Master or Follower?";
