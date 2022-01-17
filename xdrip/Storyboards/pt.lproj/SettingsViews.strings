@@ -2,6 +2,8 @@
 "settingsviews_sectiontitlehelp" = "Ajuda & Documentação";
 "settingsviews_showOnlineHelp" = "Abrir Ajuda Online?";
 "settingsviews_translateOnlineHelp" = "Traduzir Automaticamente?";
+"settingsviews_showHelpIcon" = "Mostrar Ícone de Ajuda?";
+"settingsviews_restartNeeded" = "(É necessário reiniciar)";
 "settingsviews_sectiontitlegeneral" = "Geral";
 "settingsviews_selectbgunit" = "Unidades de Glicose:";
 "settingsviews_masterorfollower" = "Mestre ou Seguidor?";

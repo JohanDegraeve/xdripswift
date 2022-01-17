@@ -154,19 +154,21 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically?";
+"settingsviews_translateOnlineHelp" = "Traduire automatiquement?";
+"settingsviews_showHelpIcon" = "Afficher l'icône d'aide?";
+"settingsviews_restartNeeded" = "(Redémarrage requis)";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
+"settingsviews_allowScreenRotation" = "Autoriser la rotation du graphique?";
 
 /// help settings, section title
-"settingsviews_sectiontitlehelp" = "Help & Documentation";
+"settingsviews_sectiontitlehelp" = "Aide et documentation";
 
 /// Calendar Events Settings - section title
 "calendarEventsSectionTitle" = "Calendar Events";
 
 /// help settings, open the online help
-"settingsviews_showOnlineHelp" = "Open Online Help?";
+"settingsviews_showOnlineHelp" = "Ouvrir l'aide en ligne?";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

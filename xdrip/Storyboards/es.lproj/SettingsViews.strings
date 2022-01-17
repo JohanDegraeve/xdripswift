@@ -5,6 +5,8 @@
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Seguidor";
 "settingsviews_translateOnlineHelp" = "Traducir Documentación?";
+"settingsviews_showHelpIcon" = "Mostrar icono?";
+"settingsviews_restartNeeded" = "(Pendiente reiniciar)";
 "settingsviews_showReadingInNotification" = "Mostrar en Notificaciones?";
 "settingsviews_labelShowReadingInAppBadge" = "Mostrar en el icono de la app?";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiplicar valor por 10 en el icono de la app?";
