@@ -143,7 +143,7 @@ class SettingsViewNightScoutSettingsViewModel {
                             
                             trace("in testNightScoutCredentials, URL responds OK but authentication method is missing and cannot be checked", log: self.log, category: ConstantsLog.categoryNightScoutSettingsViewModel, type: .info)
                             
-                            self.callMessageHandlerInMainThread(title: Texts_NightScoutTestResult.verificationSuccessfulAlertTitle, message: "URL responds OK but authentication method is missing and cannot be checked!")
+                            self.callMessageHandlerInMainThread(title: UserDefaults.standard.isMaster ? Texts_NightScoutTestResult.verificationErrorAlertTitle : Texts_NightScoutTestResult.verificationSuccessfulAlertTitle, message:  UserDefaults.standard.isMaster ? "URL responds OK but authentication method is missing\n\nAuthentication by API_SECRET or Token is necessary for Master mode!" : "URL responds OK for Follower mode without needing authentication")
                             
                         }
                     
