@@ -171,3 +171,13 @@
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// help settings, should the help icon be shown on the toolbar
+"settingsviews_showHelpIcon" = "Show Help Icon?";
+
+/// help settings, restart needed
+"settingsviews_restartNeeded" = "(Restart required)";
