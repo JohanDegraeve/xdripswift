@@ -1,6 +1,6 @@
-"nightscouttestresult_verificationsuccessfulalerttitle" = "Verification Successful";
-"nightscouttestresult_verificationsuccessfulalertbody" = "Your Nightscout site was verified successfully";
-"nightscouttestresult_verificationerroralerttitle" = "Verification Error";
-"warningAPIKeyOrURLIsnil" = "Your Nightscout URL (and optionally API_SECRET or Token) must be set before you can run the test";
-"nightScoutAPIKeyAndURLStartedTitle" = "Verifying...";
-"nightScoutAPIKeyAndURLStartedBody" = "Nightscout Verification Test Started\n\nThis message should automatically disappear shortly";
+"nightscouttestresult_verificationsuccessfulalerttitle" = "Doğrulama Başarılı";
+"nightscouttestresult_verificationsuccessfulalertbody" = "Nightscout siteniz başarıyla doğrulandı";
+"nightscouttestresult_verificationerroralerttitle" = "Doğrulama hatası";
+"warningAPIKeyOrURLIsnil" = "Testi çalıştırmadan önce Nightscout URL'niz (ve isteğe bağlı olarak API_SECRET veya Token) ayarlanmalıdır.";
+"nightScoutAPIKeyAndURLStartedTitle" = "Doğrulanıyor...";
+"nightScoutAPIKeyAndURLStartedBody" = "Nightscout Doğrulama Testi Başlatıldı\n\nBu mesaj kısa süre sonra otomatik olarak kaybolacaktır";
