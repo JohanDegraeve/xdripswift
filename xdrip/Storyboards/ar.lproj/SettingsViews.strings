@@ -109,13 +109,5 @@
 "settingsviews_showSensorCountdown" = "إظهار العد التنازلي للحساس؟";
 "settingsviews_webooptransmitter" = "استخدام خوارزمية جهاز الإرسال؟";
 "settingsviews_labelWebOOP" = "خوارزمية xDrip أو جهاز الإرسال";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// help settings, should the help icon be shown on the toolbar
-"settingsviews_showHelpIcon" = "Show Help Icon?";
-
-/// help settings, restart needed
-"settingsviews_restartNeeded" = "(Restart required)";
+"settingsviews_showHelpIcon" = "إظهار رمز المساعدة؟";
+"settingsviews_restartNeeded" = "(مطلوب إعادة التشغيل) ";
