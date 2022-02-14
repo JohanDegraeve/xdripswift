@@ -269,7 +269,39 @@ class Trace {
     /// BluetoothPeripheralManager to use
     private static var bluetoothPeripheralManager: BluetoothPeripheralManager?
     
-    private static let paragraphSeperator = "\n\n===================================================\n\n"
+    private static let paragraphSeperator = "\n===================================================\n"
+    
+    private static var timeStampAppBuild: Date {
+        
+        if let path = Bundle.main.path(forResource: "Info", ofType: "plist") {
+            
+            if let createdDate = try! FileManager.default.attributesOfItem(atPath: path)[.creationDate] as? Date {
+                
+                return createdDate
+                
+            }
+            
+        }
+        
+        return Date() // Should never execute
+        
+    }
+    
+    private static var timeStampAppInstall: Date {
+        
+        if let documentsFolder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last {
+            
+            if let installDate = try! FileManager.default.attributesOfItem(atPath: documentsFolder.path)[.creationDate] as? Date {
+                
+                return installDate
+                
+            }
+            
+        }
+        
+        return Date() // Should never execute
+        
+    }
     
     // MARK: - initializer
     
@@ -286,30 +318,143 @@ class Trace {
         
         var traceInfo = ""
 
-        // app version and build
-        traceInfo.appendStringAndNewLine("Version " + applicationVersion)
-        traceInfo.appendStringAndNewLine("Build number " + buildNumber)
+        // app name, version and build
+        traceInfo.appendStringAndNewLine("App name: " + ConstantsHomeView.applicationName)
+        traceInfo.appendStringAndNewLine("Version: " + applicationVersion)
+        traceInfo.appendStringAndNewLine("Build number: " + buildNumber + " (" + timeStampAppBuild.toString(timeStyle: .none, dateStyle: .long) + ")\n")
         
-        // Info from UserDefaults
-        
-        // timestamp app launch
-        // unwrap timeStampAppLaunch
+        // app install and open timestamps
+        traceInfo.appendStringAndNewLine("App first installed on: " + timeStampAppInstall.toString(timeStyle: .long, dateStyle: .long))
+                
         if let timeStampAppLaunch = UserDefaults.standard.timeStampAppLaunch {
-            traceInfo.appendStringAndNewLine("App launched at " + timeStampAppLaunch.toString(timeStyle: .short, dateStyle: .short) + " local time.")
+            traceInfo.appendStringAndNewLine("App last opened on: " + timeStampAppLaunch.toString(timeStyle: .long, dateStyle: .long))
         }
-
+        
+        traceInfo.appendStringAndNewLine(paragraphSeperator)
+        
+        // nightscout info
+        if UserDefaults.standard.nightScoutEnabled {
+            
+            traceInfo.appendStringAndNewLine("Nightscout: Enabled")
+            
+            if UserDefaults.standard.nightScoutUrl != nil {
+                
+                traceInfo.appendStringAndNewLine("    URL: Present")
+                
+            } else {
+                
+                traceInfo.appendStringAndNewLine("    URL: Missing")
+                
+            }
+            
+            if UserDefaults.standard.nightScoutAPIKey != nil {
+                
+                traceInfo.appendStringAndNewLine("    API_SECRET: Present")
+                
+            } else {
+                
+                traceInfo.appendStringAndNewLine("    API_SECRET: Missing")
+                
+            }
+            
+            if UserDefaults.standard.nightscoutToken != nil {
+                
+                traceInfo.appendStringAndNewLine("    Token: Present")
+                
+            } else {
+                
+                traceInfo.appendStringAndNewLine("    Token: Missing")
+                
+            }
+        
+        } else {
+            
+            traceInfo.appendStringAndNewLine("Nightscout: Disabled")
+            
+        }
+        
+        traceInfo.appendStringAndNewLine("")
+        
         // cgm transmitter type from UserDefaults
         if let cgmTransmitterTypeAsString = UserDefaults.standard.cgmTransmitterTypeAsString {
-            traceInfo.appendStringAndNewLine("Transmitter type = " + cgmTransmitterTypeAsString + "\n")
-            traceInfo.appendStringAndNewLine(paragraphSeperator)
+            traceInfo.appendStringAndNewLine("Transmitter type: " + cgmTransmitterTypeAsString + "\n")
         }
         
+        traceInfo.appendStringAndNewLine("App settings:")
+
+        // master or follower mode?
+        traceInfo.appendStringAndNewLine("    Mode: " + (UserDefaults.standard.isMaster ? "Master" : "Follower"))
+
+        // is help icon hidden on or off
+        traceInfo.appendStringAndNewLine("    Show help icon: " + UserDefaults.standard.showHelpIcon.description)
+
+        // is translate help on or off
+        traceInfo.appendStringAndNewLine("    Translate help: " + UserDefaults.standard.translateOnlineHelp.description)
+
         // is showReadingInNotification on or off
-        traceInfo.appendStringAndNewLine("bgReading in notification is on = " + UserDefaults.standard.showReadingInNotification.description + "\n")
+        traceInfo.appendStringAndNewLine("    Show BG in notification: " + UserDefaults.standard.showReadingInNotification.description)
+
+        // minimum interval between notifications
+        traceInfo.appendStringAndNewLine("    Notification interval: " + UserDefaults.standard.notificationInterval.description + " minutes")
+
+        // show BG in app badge on or off
+        traceInfo.appendStringAndNewLine("    Show BG in app badge: " + UserDefaults.standard.showReadingInAppBadge.description)
+
+        // allow chart rotation
+        traceInfo.appendStringAndNewLine("    Allow chart rotation: " + UserDefaults.standard.allowScreenRotation.description)
+
+        // is use statistics on or off
+        traceInfo.appendStringAndNewLine("    Show statistics: " + UserDefaults.standard.showStatistics.description)
+
+        // is statistics standard range on or off
+        traceInfo.appendStringAndNewLine("    Use standard range: " + UserDefaults.standard.useStandardStatisticsRange.description)
+        
+        // how many days is the user using to calculation the statistics
+        traceInfo.appendStringAndNewLine("    Days to use for statistics calculations: " + UserDefaults.standard.daysToUseStatistics.description)
+        
+        // how many hours are selected for the chart width
+        traceInfo.appendStringAndNewLine("    Selected chart width: " + UserDefaults.standard.chartWidthInHours.description)
+
+        // is sensor countdown on or off
+        traceInfo.appendStringAndNewLine("    Show sensor countdown: " + UserDefaults.standard.showSensorCountdown.description)
+        
+        // is the sensor countdown using the count-up graphics?
+        traceInfo.appendStringAndNewLine("    Use alternative graphics: " + UserDefaults.standard.showSensorCountdownAlternativeGraphics.description)
+  
+        // are calendar events on or off
+        traceInfo.appendStringAndNewLine("    Write calendar events: " + UserDefaults.standard.createCalendarEvent.description)
+        
+        if let calendarId = UserDefaults.standard.calenderId {
+            
+            traceInfo.appendStringAndNewLine("    Calendar to use: " + calendarId)
+        
+        }
+
+        // is Apple Health on or off
+        traceInfo.appendStringAndNewLine("    Write to Apple Health: " + UserDefaults.standard.storeReadingsInHealthkit.description)
+
+        // is speak readings on or off
+        traceInfo.appendStringAndNewLine("    Speak BG readings: " + UserDefaults.standard.speakReadings.description)
+        
+        // developer settings
+        traceInfo.appendStringAndNewLine("    Hide screen lock warning?: " + UserDefaults.standard.lockScreenDontShowAgain.description)
+        traceInfo.appendStringAndNewLine("    NS log enabled: " + UserDefaults.standard.NSLogEnabled.description)
+        traceInfo.appendStringAndNewLine("    OS log enabled: " + UserDefaults.standard.OSLogEnabled.description)
+        traceInfo.appendStringAndNewLine("    Smooth Libre Readings: " + UserDefaults.standard.smoothLibreValues .description + "\n")
+
+        // BG chart threshold values
+        traceInfo.appendStringAndNewLine("Chart threshold values:")
+        traceInfo.appendStringAndNewLine("    Urgent low: " + UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded.description)
+        traceInfo.appendStringAndNewLine("    Low: " + UserDefaults.standard.lowMarkValueInUserChosenUnitRounded.description)
+        traceInfo.appendStringAndNewLine("    Target: " + UserDefaults.standard.targetMarkValueInUserChosenUnitRounded.description)
+        traceInfo.appendStringAndNewLine("    High: " + UserDefaults.standard.highMarkValueInUserChosenUnitRounded.description)
+        traceInfo.appendStringAndNewLine("    Urgent high: " + UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded.description + "\n")
         
         // Info from coredata
         
         if let coreDataManager = coreDataManager {
+            
+            traceInfo.appendStringAndNewLine(paragraphSeperator)
 
             // accessors
             let bLEPeripheralAccessor = BLEPeripheralAccessor(coreDataManager: coreDataManager)
@@ -317,18 +462,18 @@ class Trace {
             let alertTypesAccessor = AlertTypesAccessor(coreDataManager: coreDataManager)
 
             // all bluetooth transmitters
-            traceInfo.appendStringAndNewLine("List of bluetooth peripherals:\n")
+            traceInfo.appendStringAndNewLine("List of Bluetooth Peripherals:\n")
             
             for blePeripheral in bLEPeripheralAccessor.getBLEPeripherals() {
-                traceInfo.appendStringAndNewLine("    Name : " + blePeripheral.name)
-                traceInfo.appendStringAndNewLine("    Address : " + blePeripheral.address)
+                traceInfo.appendStringAndNewLine("    Name: " + blePeripheral.name)
+                traceInfo.appendStringAndNewLine("        Address: " + blePeripheral.address)
                 if let alias = blePeripheral.alias {
-                    traceInfo.appendStringAndNewLine("    Alias : " + alias)
+                    traceInfo.appendStringAndNewLine("        Alias: " + alias)
                 }
-                traceInfo.appendStringAndNewLine("    xDrip will " + (blePeripheral.shouldconnect ? "try ":"not try") + " to connect to this peripheral")
+                traceInfo.appendStringAndNewLine("        " + ConstantsHomeView.applicationName + " will " + (blePeripheral.shouldconnect ? "try":"*not* try") + " to connect to this peripheral")
                 
                 if let libreSensorType = blePeripheral.libreSensorType {
-                    traceInfo.appendStringAndNewLine("last known libreSensorType = " + libreSensorType.description)
+                    traceInfo.appendStringAndNewLine("Last known libreSensorType: " + libreSensorType.description)
                 }
 
                 for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
@@ -338,8 +483,8 @@ class Trace {
                     case .M5StackType:
                         if let m5Stack = blePeripheral.m5Stack, !m5Stack.isM5StickC {
 
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("    battery level = " + m5Stack.batteryLevel.description)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Battery level: " + m5Stack.batteryLevel.description)
                             
                             // if needed additional specific info can be added
       
@@ -348,101 +493,101 @@ class Trace {
                     case .M5StickCType:
                         if let m5Stack = blePeripheral.m5Stack, m5Stack.isM5StickC {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("    battery level = " + m5Stack.batteryLevel.description)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Battery level: " + m5Stack.batteryLevel.description)
                             
                         }
                         
                     case .DexcomG4Type:
                         if let dexcomG4 = blePeripheral.dexcomG4 {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
                             
                             // if needed additional specific info can be added
-                            traceInfo.appendStringAndNewLine("    batterylevel : " + dexcomG4.batteryLevel.description)
+                            traceInfo.appendStringAndNewLine("        Battery level: " + dexcomG4.batteryLevel.description)
                             
                         }
                         
                     case .DexcomType:
                         if let dexcomG5 = blePeripheral.dexcomG5 {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
                             
                             // if needed additional specific info can be added
-                            traceInfo.appendStringAndNewLine("    voltageA : " + dexcomG5.voltageA.description)
-                            traceInfo.appendStringAndNewLine("    voltageB : " + dexcomG5.voltageB.description)
+                            traceInfo.appendStringAndNewLine("        Voltage A: " + dexcomG5.voltageA.description)
+                            traceInfo.appendStringAndNewLine("        Voltage B: " + dexcomG5.voltageB.description)
                             
                         }
                         
                     case .BluconType:
                         if let blucon = blePeripheral.blucon {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
                             
                             // if needed additional specific info can be added
-                            traceInfo.appendStringAndNewLine("    batteryLevel : " + blucon.batteryLevel.description)
+                            traceInfo.appendStringAndNewLine("        Battery level: " + blucon.batteryLevel.description)
                             
                         }
                         
                     case .BlueReaderType:
                         if blePeripheral.blueReader != nil {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
                             
                         }
                         
                     case .BubbleType:
                         if let bubble = blePeripheral.bubble {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("    batteryLevel : " + bubble.batteryLevel.description)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Battery level: " + bubble.batteryLevel.description)
                             
                         }
                         
                     case .DropletType:
                         if let droplet = blePeripheral.droplet {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("    batteryLevel : " + droplet.batteryLevel.description)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Battery level: " + droplet.batteryLevel.description)
                             
                         }
 
                     case .GNSentryType:
                         if let gNSEntry = blePeripheral.gNSEntry {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("    batteryLevel : " + gNSEntry.batteryLevel.description)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Battery level: " + gNSEntry.batteryLevel.description)
                             
                         }
 
                     case .MiaoMiaoType:
                         if let miaoMiao = blePeripheral.miaoMiao {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("    batteryLevel : " + miaoMiao.batteryLevel.description)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Battery level: " + miaoMiao.batteryLevel.description)
                             
                         }
                         
                     case .AtomType:
                         if let miaoMiao = blePeripheral.atom {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("    batteryLevel : " + miaoMiao.batteryLevel.description)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Battery level: " + miaoMiao.batteryLevel.description)
                             
                         }
                         
                     case .WatlaaType:
                         if let watlaa = blePeripheral.watlaa {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("    batteryLevel : " + watlaa.watlaaBatteryLevel.description)
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Battery level: " + watlaa.watlaaBatteryLevel.description)
                             
                         }
                         
                     case .Libre2Type:
-                        if let libre2 = blePeripheral.libre2 {
+                        if blePeripheral.libre2 != nil {
                             
-                            traceInfo.appendStringAndNewLine("    type = " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("        Type3: " + bluetoothPeripheralType.rawValue)
                             
                         }
                         
@@ -453,42 +598,42 @@ class Trace {
                 
             }
             
+            traceInfo.appendStringAndNewLine(paragraphSeperator)
+            
             // all alertentries
-            traceInfo.appendStringAndNewLine("List of alerts:\n")
+            traceInfo.appendStringAndNewLine("List of Alarms:\n")
             
             for alertKind in AlertKind.allCases {
                 
-                traceInfo.appendStringAndNewLine("    alert kind : " + alertKind.descriptionForLogging())
+                traceInfo.appendStringAndNewLine("    Name: " + alertKind.descriptionForLogging())
                 
                 let alertEntries = alertEntriesAccessor.getAllEntries(forAlertKind: alertKind, alertTypesAccessor: alertTypesAccessor)
                 
                 for alertEntry in alertEntries {
-                    traceInfo.appendStringAndNewLine("        start " + alertEntry.start.convertMinutesToTimeAsString() + " - value " + alertEntry.value.description + " - alert type : " + alertEntry.alertType.description)
+                    traceInfo.appendStringAndNewLine("        start: " + alertEntry.start.convertMinutesToTimeAsString() + " / value: " + alertEntry.value.description + " / alarm type: " + alertEntry.alertType.description)
                     
                 }
                 
-                traceInfo.appendStringAndNewLine("")
-                
             }
+            
+            traceInfo.appendStringAndNewLine(paragraphSeperator)
         
             // all alert types
-            traceInfo.appendStringAndNewLine("List of alert types:\n")
+            traceInfo.appendStringAndNewLine("List of Alarm Types:\n")
             
             for alertType in alertTypesAccessor.getAllAlertTypes() {
                 
-                traceInfo.appendStringAndNewLine("    alert type : " + alertType.description)
-                traceInfo.appendStringAndNewLine("        name : " + alertType.name)
-                traceInfo.appendStringAndNewLine("        enabled : " + alertType.enabled.description)
-                traceInfo.appendStringAndNewLine("        overridemute : " + alertType.overridemute.description)
-                traceInfo.appendStringAndNewLine("        snooze via notification : " + alertType.snooze.description)
-                traceInfo.appendStringAndNewLine("        default snooze period : " + alertType.snoozeperiod.description)
+                traceInfo.appendStringAndNewLine("    Name: " + alertType.description)
+                traceInfo.appendStringAndNewLine("        Enabled: " + alertType.enabled.description)
+                traceInfo.appendStringAndNewLine("        Override Mute: " + alertType.overridemute.description)
+                traceInfo.appendStringAndNewLine("        Snooze via notification: " + alertType.snooze.description)
+                traceInfo.appendStringAndNewLine("        Default snooze period: " + alertType.snoozeperiod.description)
                 if let soundname = alertType.soundname {
-                    traceInfo.appendStringAndNewLine("        sound : " + soundname)
+                    traceInfo.appendStringAndNewLine("        Sound: " + soundname)
                 } else {
-                    traceInfo.appendStringAndNewLine("        sound : " + "default iOS sound")
+                    traceInfo.appendStringAndNewLine("        Sound: " + "default iOS sound")
                 }
                 
-
                 traceInfo.appendStringAndNewLine("")
                 
             }
