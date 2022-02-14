@@ -77,6 +77,10 @@ class NightScoutFollowManager:NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
         // setting nightscout url also does require action
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new, context: nil)
+        // setting nightscout API_SECRET also does require action
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutAPIKey.rawValue, options: .new, context: nil)
+        // setting nightscout authentication token also does require action
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutToken.rawValue, options: .new, context: nil)
         // change value of nightscout enabled
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutEnabled.rawValue, options: .new, context: nil)
 
@@ -153,17 +157,23 @@ class NightScoutFollowManager:NSObject {
             timeStampOfFirstBgReadingToDowload = max(latestBgReadings[0].timeStamp, timeStampOfFirstBgReadingToDowload)
         }
         
-        // calculate count, which is a parameter in the nightscout API - divide by 60, worst case NightScout has a reading every minute, this can be the case for MiaoMiao
-        let count = Int(-timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow / 60 + 1)
+        // calculate count, which is a parameter in the nightscout API - divide by 300, we're assuming readings every 5 minutes = 300 seconds
+        let count = Int(-timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow / 300 + 1)
         
         // ceate endpoint to get latest entries
-//        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightScoutUrl, count: count, olderThan: timeStampOfFirstBgReadingToDowload, token: UserDefaults.standard.nightScoutAPIKey)
-        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightScoutUrl, count: count, olderThan: timeStampOfFirstBgReadingToDowload, token: UserDefaults.standard.nightscoutToken)
+        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightScoutUrl, count: count, token: UserDefaults.standard.nightscoutToken)
         
         // create downloadTask and start download
         if let url = latestEntriesEndpoint.url {
             
-            let task = URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+            // Create Request - this way we can add authentication in follower mode in order to pull data from Nightscout sites with AUTH_DEFAULT_ROLES configured to deny read access
+            var request = URLRequest(url: url)
+            
+            if let apiKey = UserDefaults.standard.nightScoutAPIKey {
+                request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
+            }
+            
+            let task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error in
                 
                 trace("in download, finished task", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
                 
@@ -389,7 +399,7 @@ class NightScoutFollowManager:NSObject {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.isMaster, UserDefaults.Key.nightScoutUrl, UserDefaults.Key.nightScoutEnabled :
+                case UserDefaults.Key.isMaster, UserDefaults.Key.nightScoutUrl, UserDefaults.Key.nightScoutEnabled, UserDefaults.Key.nightScoutAPIKey, UserDefaults.Key.nightscoutToken :
                     
                     // change by user, should not be done within 200 ms
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {

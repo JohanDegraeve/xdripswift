@@ -1,0 +1,9 @@
+"dexcomsharetestresult_verificationsuccessfulalerttitle" = "Doğrulama Başarılı";
+"dexcomsharetestresult_verificationsuccessfulalertbody" = "Dexcom Share hesabınız başarıyla doğrulandı";
+"dexcomsharetestresult_verificationerroralerttitle" = "Doğrulama hatası";
+"dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Maksimum oturum açma denemesi aşıldı. 10 dakika bekleyin ve tekrar deneyin.";
+"dexcomsharetestresult_uploadErrorWarning" = "Dexcom Share Yükleme Hatası";
+"dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "Dexcom Share Seri Numarası, bu hesabın seri numarasıyla eşleşmiyor. Ayarlarda Seri Numarasını doğrulayın.";
+"dexcomsharetestresult_monitored_receiver_not_assigned_1" = "Görünüşe göre Verici Kimliği veya seri numarası";
+"dexcomsharetestresult_monitored_receiver_not_assigned_2" = "atanmamış";
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Vericiyi (G5) veya Paylaşım alıcısını (G4) kaydetmek için resmi Dexcom uygulamasını kullanın\r\n\r\nMuhtemelen yanlış URL kullanıyorsunuz, 'ABD URLsini kullan?' ayarını doğrulayın.";

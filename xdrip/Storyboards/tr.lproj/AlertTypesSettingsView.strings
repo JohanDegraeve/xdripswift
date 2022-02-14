@@ -1,0 +1,16 @@
+"alerttypessettingsview_screentitle" = "Uyarı tipi";
+"alerttypesettingsview_screentitle" = "Uyarı tipini düzenle";
+"alerttypesettingsview_name" = "İsim";
+"alerttypesettingsview_enabled" = "Etkin?";
+"alerttypesettingsview_vibrate" = "Titreşim?";
+"alerttypesettingsview_snoozevianotification" = "Bildirim Yoluyla Ertelemeye İzin Verilsin mi?";
+"alerttypesettingsview_defaultsnoozeperiod" = "Varsayılan Erteleme Süresi (dak)";
+"alerttypesettingsview_overridemute" = "Sessiz modunu geçersiz kıl?";
+"alerttypesettingsview_sound" = "Ses";
+"alerttypesettingsview_defaultiossound" = "iOS Ses";
+"alerttypesettingsview_givename" = "Uyarı İsmi";
+"alerttypesettingsview_givesnoozeperiod" = "Dakika Olarak Erteleme Süresi";
+"alerttypesettingsview_picksoundname" = "Ses ismi";
+"alertTypeNoSound" = "Ses yok";
+"alerttypenamealreadyexistsmessages" = "Bu isme sahip bir uyarı tipi zaten mevcut. Farklı bir isim kullanın";
+"confirmdeletionalerttype" = "Uyarı tipini sil: ";

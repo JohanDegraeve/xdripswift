@@ -1,0 +1,13 @@
+"screenTitle" = "M5Stack";
+"authenticationFailureWarning" = "M5Stack için Kimlik Doğrulama Başarısız, ya Ayarlar'da önceden yapılandırılmış parolayı ayarlayın ya da M5Stack'in önceden yapılandırılmış bir parolası yoksa M5Stack'i sıfırlayın. M5Stack şimdi bağlantıyı kesecek. tıklayarak yeni bir deneme yapabilirsiniz. ";
+"blePasswordMissingWarning" = "Ayarlarda şifreyi ayarlamanız gerekiyor";
+"m5StackResetRequiredWarning" = "Yeni bir geçici parola oluşturmak için M5Stack sıfırlanmalıdır. Bittiğinde tıklayın ";
+"m5StackSoftWhereHelpCellText" = "M5Stack yazılımını nerede bulabilirim?";
+"m5StickCSoftWhereHelpCellText" = "M5StickC yazılımını nerede bulabilirim?";
+"m5StackSoftWareHelpText" = "Şuraya git";
+"m5StackViewscreenTitle" = "M5Stack";
+"m5StickCViewscreenTitle" = "M5StickC";
+"deviceMustBeConnectedToPowerOff" = "M5Stack'in kapatılabilmesi için bağlı olması gerekir";
+"powerOffConfirm" = "M5Stack'i kapatmak istediğinizden emin misiniz?";
+"powerOff" = "Kapat";
+"connectToWiFi" = "WiFi'ye bağlan";
