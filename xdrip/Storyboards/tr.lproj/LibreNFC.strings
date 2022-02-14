@@ -1,0 +1,7 @@
+"scanComplete" = "Tarama Tamamlandı";
+"holdTopOfIphoneNearSensor" = "Taramak için iOS cihazınızın üst kısmını sensörün yakınında tutun";
+"deviceMustSupportNFC" = "Bu iPhone NFC'yi desteklemiyor";
+"deviceMustSupportIOS14" = "Libre 2'ye bağlanmak için bu iPhone'un iOS14'e yükseltilmesi gerekiyor";
+"donotusethelibrelinkapp" = "Libre 2'ye bağlı.\r\n\r\nResmi Libre uygulamasıyla bazen Libre sensörünü taramaya devam etmek istiyorsanız, o zaman Libre uygulaması için bluetooth iznine izin vermeyin.\r\n\r\nAksi takdirde, NFC'yi Libre uygulaması ve izin verilen bluetooth izni ile %@ ve Libre 2 arasındaki bağlantıyı kesecektir.";
+"connectedLibre2DoesNotMatchScannedLibre2" = "Yeni bir sensör taramış görünüyorsunuz, ancak %@ eski sensörle Bluetooth bağlantısı kuruyor.\r\n\r\nBunu çözmek için:\r\n- 'bağlantıyı kes' veya 'taramayı durdur'u tıklayın\r\n- Önceki ekrana geri dönün ve Libre 2 türünde yeni bir CGM ekleyin ve tekrar tarayın.\r\n\r\n%@ şimdi yeni sensöre bağlanmalıdır.";
+"nfcErrorRetryScan" = "Sensör taranırken hata oluştu. Sol üstteki 'Tara'ya tıklayın veya 'geri'ye tıklayın ve Libre 2'yi tekrar ekleyin ve tekrar tarayın.";

@@ -15,6 +15,7 @@ enum ConstantsSpeakReadingLanguages: String, CaseIterable {
     case slovenian = "Slovenian/sl"
     case spanish_mexico = "Spanish (Mexico)/es-MX"
     case spanish_spain = "Spanish (Spain)/es-ES"
+    case turkish = "Turkish/tr-TR"
     
     /// gets all language names and language codes in two arrays
     /// - returns:
