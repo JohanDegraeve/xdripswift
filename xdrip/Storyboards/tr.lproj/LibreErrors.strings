@@ -1,0 +1,4 @@
+"receivedDataIsNil" = "oop web sunucusundan veri alınmadı";
+"oOPWebServerError" = "OOP Web Sunucusu hatası: ";
+"libreUSNotSupported" = "Libre ABD desteklenmiyor";
+"libreSensorNotReady" = "Libre sensörü hazır durumda değil";
