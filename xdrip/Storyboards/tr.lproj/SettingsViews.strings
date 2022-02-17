@@ -78,7 +78,7 @@
 "settingsviews_Version" = "Sürüm:";
 "settingsviews_license" = "Lisans";
 "settingsviews_build" = "Yapı ayarı:";
-"m5stack_settingsviews_settingstitle" = "M5 Yığın Ayarları";
+"m5stack_settingsviews_settingstitle" = "M5 Stack Ayarları";
 "m5stack_settingsviews_textColor" = "Metin Rengi";
 "m5stack_settingsviews_backGroundColor" = "Arka plan rengi";
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
