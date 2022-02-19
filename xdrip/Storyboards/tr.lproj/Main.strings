@@ -1,69 +1,69 @@
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "0QS-QO-ffs"; */
-"0QS-QO-ffs.text" = "Title";
+"0QS-QO-ffs.text" = "Başlık";
 
 /* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "0oo-Gz-k2G"; */
-"0oo-Gz-k2G.normalTitle" = "Cancel";
+"0oo-Gz-k2G.normalTitle" = "İptal";
 
 /* Class = "UINavigationItem"; title = "Title"; ObjectID = "1DE-2P-Qfh"; */
-"1DE-2P-Qfh.title" = "Title";
+"1DE-2P-Qfh.title" = "Başlık";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "2fU-HY-PwD"; */
-"2fU-HY-PwD.text" = "Detail";
+"2fU-HY-PwD.text" = "Detay";
 
 /* Class = "UILabel"; text = "-"; ObjectID = "4LK-sw-cBS"; */
 "4LK-sw-cBS.text" = "-";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "5ta-po-Bsd"; */
-"5ta-po-Bsd.text" = "Detail";
+"5ta-po-Bsd.text" = "Detay";
 
 /* Class = "UILabel"; text = "In Range"; ObjectID = "63h-Q9-PbK"; */
-"63h-Q9-PbK.text" = "In Range";
+"63h-Q9-PbK.text" = "Aralık içinde";
 
 /* Class = "UILabel"; text = "-"; ObjectID = "6JK-yH-Ykh"; */
 "6JK-yH-Ykh.text" = "-";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "7NI-o7-nWK"; */
-"7NI-o7-nWK.text" = "Label";
+"7NI-o7-nWK.text" = "Etiket";
 
 /* Class = "UILabel"; text = "delta"; ObjectID = "7Wo-wd-80o"; */
 "7Wo-wd-80o.text" = "delta";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "7vO-nL-nIV"; */
-"7vO-nL-nIV.text" = "Title";
+"7vO-nL-nIV.text" = "Başlık";
 
 /* Class = "UILabel"; text = "92%"; ObjectID = "85k-YD-W2b"; */
 "85k-YD-W2b.text" = "92%";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "8Bd-7p-ZRp"; */
-"8Bd-7p-ZRp.text" = "Label";
+"8Bd-7p-ZRp.text" = "Etiket";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "8jK-jB-QOG"; */
-"8jK-jB-QOG.text" = "Label";
+"8jK-jB-QOG.text" = "Etiket";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[0] = "3h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[0]" = "3h";
+"9LS-Vp-uGd.segmentTitles[0]" = "3sa";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[1] = "6h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[1]" = "6h";
+"9LS-Vp-uGd.segmentTitles[1]" = "6sa";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[2] = "12h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[2]" = "12h";
+"9LS-Vp-uGd.segmentTitles[2]" = "12sa";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[3] = "24h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[3]" = "24h";
+"9LS-Vp-uGd.segmentTitles[3]" = "24sa";
 
 /* Class = "UILabel"; text = "HbA1c"; ObjectID = "9Ud-mR-3u4"; */
 "9Ud-mR-3u4.text" = "HbA1c";
 
 /* Class = "UILabel"; text = "Low "; ObjectID = "B0Q-ux-IHf"; */
-"B0Q-ux-IHf.text" = "Low ";
+"B0Q-ux-IHf.text" = "Düşük ";
 
 /* Class = "UILabel"; text = "113 mg/dl"; ObjectID = "B6N-bY-mFa"; */
 "B6N-bY-mFa.text" = "113 mg/dl";
 
 /* Class = "UIBarButtonItem"; title = "Help"; ObjectID = "DuN-xR-xYB"; */
-"DuN-xR-xYB.title" = "Help";
+"DuN-xR-xYB.title" = "Yardım";
 
 /* Class = "UILabel"; text = "-"; ObjectID = "EbR-T4-LIg"; */
 "EbR-T4-LIg.text" = "-";
@@ -72,25 +72,25 @@
 "Fis-6U-di6.title" = "I";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "Hay-Q1-7fh"; */
-"Hay-Q1-7fh.text" = "Label";
+"Hay-Q1-7fh.text" = "Etiket";
 
 /* Class = "UILabel"; text = "31%"; ObjectID = "I1A-nd-fNX"; */
 "I1A-nd-fNX.text" = "31%";
 
 /* Class = "UILabel"; text = "Subtitle"; ObjectID = "I1p-t1-Yls"; */
-"I1p-t1-Yls.text" = "Subtitle";
+"I1p-t1-Yls.text" = "Alt yazı";
 
 /* Class = "UILabel"; text = "Snooze Alarms"; ObjectID = "LzM-bz-Cnv"; */
-"LzM-bz-Cnv.text" = "Snooze Alarms";
+"LzM-bz-Cnv.text" = "Alarmları Ertele";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "Mfz-72-6g0"; */
-"Mfz-72-6g0.text" = "Detail";
+"Mfz-72-6g0.text" = "Detay";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "N1U-VA-CRw"; */
-"N1U-VA-CRw.text" = "Detail";
+"N1U-VA-CRw.text" = "Detay";
 
 /* Class = "UIButton"; normalTitle = "OK"; ObjectID = "N9b-EE-lZm"; */
-"N9b-EE-lZm.normalTitle" = "OK";
+"N9b-EE-lZm.normalTitle" = "Tamam";
 
 /* Class = "UILabel"; text = "(-)"; ObjectID = "Ncy-6l-nO2"; */
 "Ncy-6l-nO2.text" = "(-)";
@@ -102,160 +102,160 @@
 "PZI-Ln-kfh.text" = "CV";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "Pom-Rr-Zcn"; */
-"Pom-Rr-Zcn.text" = "Title";
+"Pom-Rr-Zcn.text" = "Başlık";
 
 /* Class = "UILabel"; text = "Average:"; ObjectID = "RLk-Au-VSf"; */
-"RLk-Au-VSf.text" = "Average:";
+"RLk-Au-VSf.text" = "Ortalama :";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "S45-Yf-BHe"; */
-"S45-Yf-BHe.text" = "Title";
+"S45-Yf-BHe.text" = "Başlık";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "SQk-hK-fHN"; */
-"SQk-hK-fHN.text" = "Detail";
+"SQk-hK-fHN.text" = "Detay";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "Tpl-mr-dqb"; */
-"Tpl-mr-dqb.text" = "Detail";
+"Tpl-mr-dqb.text" = "Detay";
 
 /* Class = "UILabel"; text = "-%"; ObjectID = "Vdh-xP-Z0Y"; */
 "Vdh-xP-Z0Y.text" = "-%";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "WNo-rU-sXx"; */
-"WNo-rU-sXx.text" = "Title";
+"WNo-rU-sXx.text" = "Başlık";
 
 /* Class = "UILabel"; text = "---"; ObjectID = "We3-bN-ffR"; */
 "We3-bN-ffR.text" = "---";
 
 /* Class = "UIButton"; normalTitle = "Connect"; ObjectID = "WtR-0P-RyL"; */
-"WtR-0P-RyL.normalTitle" = "Connect";
+"WtR-0P-RyL.normalTitle" = "Bağlan";
 
 /* Class = "UILabel"; text = "(-)"; ObjectID = "Xlz-6g-zzD"; */
 "Xlz-6g-zzD.text" = "(-)";
 
 /* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[0] = "Today"; ObjectID = "Xuy-hn-ozf"; */
-"Xuy-hn-ozf.segmentTitles[0]" = "Today";
+"Xuy-hn-ozf.segmentTitles[0]" = "Bugün";
 
 /* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[1] = "24h"; ObjectID = "Xuy-hn-ozf"; */
-"Xuy-hn-ozf.segmentTitles[1]" = "24h";
+"Xuy-hn-ozf.segmentTitles[1]" = "24sa";
 
 /* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[2] = "7d"; ObjectID = "Xuy-hn-ozf"; */
-"Xuy-hn-ozf.segmentTitles[2]" = "7d";
+"Xuy-hn-ozf.segmentTitles[2]" = "7gün";
 
 /* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[3] = "30d"; ObjectID = "Xuy-hn-ozf"; */
-"Xuy-hn-ozf.segmentTitles[3]" = "30d";
+"Xuy-hn-ozf.segmentTitles[3]" = "30gün";
 
 /* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[4] = "90d"; ObjectID = "Xuy-hn-ozf"; */
-"Xuy-hn-ozf.segmentTitles[4]" = "90d";
+"Xuy-hn-ozf.segmentTitles[4]" = "90gün";
 
 /* Class = "UINavigationItem"; title = "Title"; ObjectID = "YQZ-eK-OoJ"; */
-"YQZ-eK-OoJ.title" = "Title";
+"YQZ-eK-OoJ.title" = "Başlık";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "Z96-ov-isg"; */
-"Z96-ov-isg.text" = "Detail";
+"Z96-ov-isg.text" = "Detay";
 
 /* Class = "UIBarButtonItem"; title = "Sensor"; ObjectID = "ZIM-Wf-bUy"; */
-"ZIM-Wf-bUy.title" = "Sensor";
+"ZIM-Wf-bUy.title" = "Sensör";
 
 /* Class = "UILabel"; text = "In Range:"; ObjectID = "aU7-G8-ash"; */
-"aU7-G8-ash.text" = "In Range:";
+"aU7-G8-ash.text" = "Aralık içinde:";
 
 /* Class = "UITabBarItem"; title = "Home"; ObjectID = "acW-dT-cKf"; */
-"acW-dT-cKf.title" = "Home";
+"acW-dT-cKf.title" = "Ana Ekran";
 
 /* Class = "UILabel"; text = "-"; ObjectID = "apa-6w-gic"; */
 "apa-6w-gic.text" = "-";
 
 /* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "b1J-rJ-H3K"; */
-"b1J-rJ-H3K.normalTitle" = "Cancel";
+"b1J-rJ-H3K.normalTitle" = "İptal";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "bT9-HM-Wcp"; */
-"bT9-HM-Wcp.text" = "Label";
+"bT9-HM-Wcp.text" = "Etiket";
 
 /* Class = "UILabel"; text = "High"; ObjectID = "bUK-pC-4bd"; */
-"bUK-pC-4bd.text" = "High";
+"bUK-pC-4bd.text" = "Yüksek";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "c4h-5z-5mU"; */
-"c4h-5z-5mU.text" = "Title";
+"c4h-5z-5mU.text" = "Başlık";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "cFe-Nd-8MW"; */
-"cFe-Nd-8MW.text" = "Label";
+"cFe-Nd-8MW.text" = "Etiket";
 
 /* Class = "UITabBarItem"; title = "Settings"; ObjectID = "cPa-gy-q4n"; */
-"cPa-gy-q4n.title" = "Settings";
+"cPa-gy-q4n.title" = "Ayarlar";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "cVj-Us-dOZ"; */
-"cVj-Us-dOZ.text" = "Detail";
+"cVj-Us-dOZ.text" = "Detay";
 
 /* Class = "UIViewController"; title = "M5 Stack Settings View Controller"; ObjectID = "d2Q-Tq-3zC"; */
-"d2Q-Tq-3zC.title" = "M5 Stack Settings View Controller";
+"d2Q-Tq-3zC.title" = "M5 Stack Ayarları Görünüm Denetleyicisi";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "ekz-vj-3BZ"; */
-"ekz-vj-3BZ.text" = "Title";
+"ekz-vj-3BZ.text" = "Başlık";
 
 /* Class = "UINavigationItem"; title = "Title"; ObjectID = "etA-fM-tGh"; */
-"etA-fM-tGh.title" = "Title";
+"etA-fM-tGh.title" = "Başlık";
 
 /* Class = "UIBarButtonItem"; title = "Snooze"; ObjectID = "f3E-Tt-LBV"; */
-"f3E-Tt-LBV.title" = "Snooze";
+"f3E-Tt-LBV.title" = "Ertele";
 
 /* Class = "UILabel"; text = "Friday 01/10/2021"; ObjectID = "fRg-Sl-fZq"; */
-"fRg-Sl-fZq.text" = "Friday 01/10/2021";
+"fRg-Sl-fZq.text" = "Cuma 01/10/2021";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "goS-0m-pgb"; */
-"goS-0m-pgb.text" = "Title";
+"goS-0m-pgb.text" = "Başlık";
 
 /* Class = "UILabel"; text = "CV:"; ObjectID = "h7N-aV-8eN"; */
 "h7N-aV-8eN.text" = "CV:";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "hfQ-Tt-xNH"; */
-"hfQ-Tt-xNH.text" = "Title";
+"hfQ-Tt-xNH.text" = "Başlık";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "iIy-f4-6Ww"; */
 "iIy-f4-6Ww.text" = "Label";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "jx2-oc-XfQ"; */
-"jx2-oc-XfQ.text" = "Title";
+"jx2-oc-XfQ.text" = "Başlık";
 
 /* Class = "UINavigationItem"; title = "Title"; ObjectID = "lBP-cK-gbT"; */
-"lBP-cK-gbT.title" = "Title";
+"lBP-cK-gbT.title" = "Başlık";
 
 /* Class = "UILabel"; text = "-"; ObjectID = "n2x-3q-js1"; */
 "n2x-3q-js1.text" = "-";
 
 /* Class = "UILabel"; text = "Average"; ObjectID = "na4-pU-1Ik"; */
-"na4-pU-1Ik.text" = "Average";
+"na4-pU-1Ik.text" = "Ortalama";
 
 /* Class = "UILabel"; text = "--:--"; ObjectID = "rSC-H3-vfk"; */
 "rSC-H3-vfk.text" = "--:--";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "raE-D9-ezV"; */
-"raE-D9-ezV.text" = "Detail";
+"raE-D9-ezV.text" = "Detay";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "sBg-yb-0Iy"; */
-"sBg-yb-0Iy.text" = "Detail";
+"sBg-yb-0Iy.text" = "Detay";
 
 /* Class = "UITabBarItem"; title = "Bluetooth"; ObjectID = "sgT-p5-hUt"; */
 "sgT-p5-hUt.title" = "Bluetooth";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "skm-we-lQ3"; */
-"skm-we-lQ3.text" = "Detail";
+"skm-we-lQ3.text" = "Detay";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "tIz-Hj-yxH"; */
-"tIz-Hj-yxH.text" = "Title";
+"tIz-Hj-yxH.text" = "Başlık";
 
 /* Class = "UIBarButtonItem"; title = "Calibrate"; ObjectID = "u4d-bZ-Kw8"; */
-"u4d-bZ-Kw8.title" = "Calibrate";
+"u4d-bZ-Kw8.title" = "Kalibre et";
 
 /* Class = "UIButton"; normalTitle = "OK"; ObjectID = "uqL-UP-KZF"; */
-"uqL-UP-KZF.normalTitle" = "OK";
+"uqL-UP-KZF.normalTitle" = "Tamam";
 
 /* Class = "UILabel"; text = "x mins ago"; ObjectID = "uyn-2k-K74"; */
-"uyn-2k-K74.text" = "x mins ago";
+"uyn-2k-K74.text" = "x dak önce";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "vbi-WE-Mvc"; */
-"vbi-WE-Mvc.text" = "Title";
+"vbi-WE-Mvc.text" = "Başlık";
 
 /* Class = "UIBarButtonItem"; title = "Lock"; ObjectID = "wfX-50-2w6"; */
-"wfX-50-2w6.title" = "Lock";
+"wfX-50-2w6.title" = "Kilitle";
 
 /* Class = "UINavigationItem"; title = "Title"; ObjectID = "wi3-X0-YuZ"; */
-"wi3-X0-YuZ.title" = "Title";
+"wi3-X0-YuZ.title" = "Başlık";
