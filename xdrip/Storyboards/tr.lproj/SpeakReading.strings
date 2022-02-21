@@ -8,6 +8,7 @@
 "trendsingledown" = "önemli ölçüde aşağı";
 /// aşağı
 "trendfortyfivedown" = "azalmakta";
+/// düz
 "trendflat" = "sabit";
 /// yukarı
 "trendfortyfiveup" = "artmakta";
