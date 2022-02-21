@@ -6,7 +6,7 @@
 "m5StickCSoftWhereHelpCellText" = "M5StickC yazılımını nerede bulabilirim?";
 "m5StackSoftWareHelpText" = "Şuraya git";
 "m5StackViewscreenTitle" = "M5Stack";
-"m5StickCViewscreenTitle" = "M5StickC";
+"m5StickCViewscreenTitle" = "M5Stick";
 "deviceMustBeConnectedToPowerOff" = "M5Stack'in kapatılabilmesi için bağlı olması gerekir";
 "powerOffConfirm" = "M5Stack'i kapatmak istediğinizden emin misiniz?";
 "powerOff" = "Kapat";
