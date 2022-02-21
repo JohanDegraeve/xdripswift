@@ -21,7 +21,7 @@
 "notknown" = "Bilinmeyen";
 "lastconnection" = "Son Bağlantı";
 "transmitterbatterylevel" = "Verici Pil Seviyesi";
-"ago" = "dakika önce";
+"ago" = "önce";
 "licenseinfo" = "Bu program Özgür Yazılım Vakfı tarafından yayınlandığı şekliyle, Lisansın 3. sürümü veya sonraki herhangi bir sürümü olan GNU Genel Kamu Lisansı koşulları altında dağıtılan ücretsiz bir yazılımdır.\r\n\nBu programın yararlı olabileceği ümit edilir ancak HİÇBİR GARANTİ YOKTUR.\r\n\nDaha fazla ayrıntı için http://www.gnu.org/licenses/gpl.txt adresine bakın.\r\n\r\nBilgi: ";
 "info" = "Lütfen okuyun";
 "transmitterinfo" = "Önce vericinizi ekleyip tarayabileceğiniz Bluetooth ekranına gidin.\r\n\nArdından Ana ekrana geri dönün ve sensörünüzü başlatın.";
