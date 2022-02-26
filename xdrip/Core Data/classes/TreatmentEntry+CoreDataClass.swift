@@ -47,20 +47,23 @@ import CoreData
 			return Texts_TreatmentsView.questionMark
 		}
 	}
+    
+    /// returns "-insulin", "-carbs", "-exercise", according to treatment type
+    public func idExtension() -> String {
+        
+        switch self {
+            
+        case .Insulin:
+            return "-insulin"
+        case .Carbs:
+            return "-carbs"
+        case .Exercise:
+            return "-exercise"
+            
+        }
+        
+    }
 	
-    /// define TreatmentType based on string received from NightScout
-	public static func fromNightscoutString(_ string: String) -> TreatmentType? {
-		switch string {
-		case "Correction Bolus":
-			return .Insulin
-		case "Meal Bolus":
-			return .Carbs
-		case "Exercise":
-			return .Exercise
-		default:
-			return nil
-		}
-	}
 }
 
 
@@ -75,20 +78,25 @@ import CoreData
 public class TreatmentEntry: NSManagedObject, Comparable {
 
     /// initializer with id default empty, uploaded default false
-    convenience init(date: Date, value: Double, treatmentType: TreatmentType, nsManagedObjectContext:NSManagedObjectContext) {
+    /// - parameters:
+    ///     -     nightscoutEventType : if it's a treatmentEntry that was downloaded from NightScout, then this is the eventType as it was received form NightScout. nil if not known or if it's a treatmentType that was not downloaded from NightScout
+    convenience init(date: Date, value: Double, treatmentType: TreatmentType, nightscoutEventType: String?, nsManagedObjectContext:NSManagedObjectContext) {
+        
 		// Id defaults to Empty
-		self.init(id: TreatmentEntry.EmptyId, date: date, value: value, treatmentType: treatmentType, uploaded: false, nsManagedObjectContext: nsManagedObjectContext)
+        self.init(id: TreatmentEntry.EmptyId, date: date, value: value, treatmentType: treatmentType, uploaded: false, nightscoutEventType: nightscoutEventType, nsManagedObjectContext: nsManagedObjectContext)
+        
 	}
 	
     /// if id = TreatmentEntry.EmptyId then uploaded will get default value false
-	convenience init(id: String, date: Date, value: Double, treatmentType: TreatmentType, nsManagedObjectContext:NSManagedObjectContext) {
+	convenience init(id: String, date: Date, value: Double, treatmentType: TreatmentType, nightscoutEventType: String?, nsManagedObjectContext:NSManagedObjectContext) {
 		
 		let uploaded = id != TreatmentEntry.EmptyId
 		
-		self.init(id: id, date: date, value: value, treatmentType: treatmentType, uploaded: uploaded, nsManagedObjectContext: nsManagedObjectContext)
+        self.init(id: id, date: date, value: value, treatmentType: treatmentType, uploaded: uploaded, nightscoutEventType: nightscoutEventType, nsManagedObjectContext: nsManagedObjectContext)
+        
 	}
 	
-	init(id: String, date: Date, value: Double, treatmentType: TreatmentType, uploaded: Bool, nsManagedObjectContext:NSManagedObjectContext) {
+    init(id: String, date: Date, value: Double, treatmentType: TreatmentType, uploaded: Bool, nightscoutEventType: String?, nsManagedObjectContext:NSManagedObjectContext) {
 		
 		let entity = NSEntityDescription.entity(forEntityName: "TreatmentEntry", in: nsManagedObjectContext)!
 		super.init(entity: entity, insertInto: nsManagedObjectContext)
@@ -98,6 +106,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		self.treatmentType = treatmentType
 		self.id = id
 		self.uploaded = uploaded  // tracks upload to nightscout
+        self.nightscoutEventType = nightscoutEventType
 
     }
 
@@ -110,7 +119,8 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		return self.value.stringWithoutTrailingZeroes + " " + self.treatmentType.unit()
 	}
 	
-	/// Returns the dictionary representation required for creating a new treatment @ NighScout using POST or updating an existing treatment @ NightScout using PUT
+	/// - get the dictionary representation required for creating a new treatment @ NighScout using POST or updating an existing treatment @ NightScout using PUT
+    /// - splits of "-carbs" "-insulin" or "-exercise" from the id
 	public func dictionaryRepresentationForNightScoutUpload() -> [String: Any] {
         
 		// Universal fields.
@@ -120,24 +130,31 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		]
 		
         // if id exists, then add it also
+        // split off the "-carbs", "-insulin" or "-exercise"
         if id != TreatmentEntry.EmptyId {
-            dict["_id"] = id
+            dict["_id"] = id.split(separator: "-")[0]
         }
         
 		// Checks the treatmentType and add specific information.
+        // eventType may be overwritten in next step
 		switch self.treatmentType {
 		case .Insulin:
-			dict["eventType"] = "Correction Bolus"
+			dict["eventType"] = "Bolus" // maybe overwritten in next statement
 			dict["insulin"] = self.value
 		case .Carbs:
-			dict["eventType"] = "Meal Bolus"
+			dict["eventType"] = "Carbs" // maybe overwritten in next statement
 			dict["carbs"] = self.value
 		case .Exercise:
-			dict["eventType"] = "Exercise"
+			dict["eventType"] = "Exercise" // maybe overwritten in next statement
 			dict["duration"] = self.value
 		default:
 			break
 		}
+        
+        // if nightscoutEventType not nil, then this is a treatment that was downloaded form NS, set the eventType as it was set at NS
+        if let nightscoutEventType = nightscoutEventType {
+            dict["eventType"] = nightscoutEventType
+        }
 		
 		return dict
 	}

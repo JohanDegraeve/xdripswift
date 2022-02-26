@@ -20,8 +20,11 @@ class TreatmentsInsertViewController : UIViewController {
 	@IBOutlet weak var carbsTextField: UITextField!
 	@IBOutlet weak var insulinTextField: UITextField!
 	@IBOutlet weak var exerciseTextField: UITextField!
-	
-	// MARK: - private properties
+    @IBOutlet weak var carbsStackView: UIStackView!
+    @IBOutlet weak var insulinStackView: UIStackView!
+    @IBOutlet weak var exerciseStackView: UIStackView!
+    
+    // MARK: - private properties
     
 	/// reference to coreDataManager
 	private var coreDataManager:CoreDataManager!
@@ -81,14 +84,41 @@ class TreatmentsInsertViewController : UIViewController {
             switch treatMentEntryToUpdate.treatmentType {
                 
             case .Carbs:
+                // set text to value of treatMentEntryToUpdate
                 carbsTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
                 
+                // hide the other fields
+                insulinTextField.isHidden = true
+                insulinLabel.isHidden = true
+                insulinStackView.isHidden = true
+                exerciseTextField.isHidden = true
+                exerciseLabel.isHidden = true
+                exerciseStackView.isHidden = true
+
             case .Exercise:
+                // set text to value of treatMentEntryToUpdate
                 exerciseTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
                 
+                // hide the other fields
+                carbsTextField.isHidden = true
+                carbsLabel.isHidden = true
+                carbsStackView.isHidden = true
+                insulinTextField.isHidden = true
+                insulinLabel.isHidden = true
+                insulinStackView.isHidden = true
+
             case .Insulin:
+                // set text to value of treatMentEntryToUpdate
                 insulinTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
                 
+                // hide the other fields
+                carbsTextField.isHidden = true
+                carbsLabel.isHidden = true
+                carbsStackView.isHidden = true
+                exerciseTextField.isHidden = true
+                exerciseLabel.isHidden = true
+                exerciseStackView.isHidden = true
+
             }
             
         }
@@ -176,7 +206,7 @@ class TreatmentsInsertViewController : UIViewController {
                 if let text = text, let value = Double(text), value > 0 {
 
                     // create the treatment and append to treatments
-                    _ = TreatmentEntry(date: Date(timeInterval: dateOffset, since: datePicker.date), value: value, treatmentType: treatmentType, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
+                    _ = TreatmentEntry(date: Date(timeInterval: dateOffset, since: datePicker.date), value: value, treatmentType: treatmentType, nightscoutEventType: nil, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
                     
                     // trigger nightscoutsync
                     UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
