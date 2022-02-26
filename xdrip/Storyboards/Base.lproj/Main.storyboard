@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
     <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -1939,12 +1939,15 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="carbsLabel" destination="fvP-G8-Gxk" id="d2b-CN-IK4"/>
+                        <outlet property="carbsStackView" destination="ZDj-72-yiq" id="HEu-wA-BlI"/>
                         <outlet property="carbsTextField" destination="saY-fP-EEW" id="4DV-cC-8cz"/>
                         <outlet property="datePicker" destination="M5l-qV-xjH" id="itP-VQ-w6m"/>
                         <outlet property="doneButton" destination="6Fh-ms-ugk" id="RiQ-MN-r0W"/>
                         <outlet property="exerciseLabel" destination="9tx-02-GXf" id="GH5-oA-TX3"/>
+                        <outlet property="exerciseStackView" destination="OJv-t7-QLZ" id="kuw-Ef-fXa"/>
                         <outlet property="exerciseTextField" destination="kl9-iM-MlH" id="hcJ-8j-9xT"/>
                         <outlet property="insulinLabel" destination="agq-m8-HZ9" id="rx7-pv-7Yo"/>
+                        <outlet property="insulinStackView" destination="4G8-c0-IhJ" id="tao-kP-Rbv"/>
                         <outlet property="insulinTextField" destination="ggq-1D-Pj6" id="eDP-Dz-C8Z"/>
                         <outlet property="titleNavigation" destination="nDn-qs-kKp" id="OLC-l6-yUz"/>
                     </connections>

@@ -16,33 +16,52 @@ import CoreData
 public struct TreatmentNSResponse {
     
 	public let id: String
+    
 	public let createdAt: Date
+    
+    /// - eventType either insulin, carbs or exercise
+    /// - only used internally in the app
 	public let eventType: TreatmentType
-	public let value: Double
+    
+    /// - eventType received from NightScout (for downloaded treatments) or uploaded to NightScout (for treatments created in xdrip4ios)
+    public let nightscoutEventType: String?
 	
-	/// Takes a NSDictionary from nightscout response and returns a TreatmentNSResponse, if fields are valid.
-	public static func fromNighscout(dictionary: NSDictionary) -> TreatmentNSResponse? {
+    public let value: Double
+    
+	/// Takes a NSDictionary from nightscout response and returns an array TreatmentNSResponse. Can be more than one, eg NightScout treatment of type 'Snack Bolus' could contain an insulin value and a carbs value
+    ///
+    /// id will be the id retrieved from nightscout + "-insulin", "-carbs", "-exercise", according to treatment type
+    public static func fromNighscout(dictionary: NSDictionary) -> [TreatmentNSResponse] {
         
-		if let id = dictionary["_id"] as? String, let createdAt = dictionary["created_at"] as? String, let eventTypeStr = dictionary["eventType"] as? String, let eventType = TreatmentType.fromNightscoutString(eventTypeStr), let date = Date.fromISOString(createdAt) {
+        var treatmentNSResponses: [TreatmentNSResponse] = []
+        
+		if let id = dictionary["_id"] as? String, let createdAt = dictionary["created_at"] as? String, let date = Date.fromISOString(createdAt) {
 			
-			var value: Double?
+            // retrieve nightScoutEventType from the nightscout response
+            // if not present then it's set to nil (it should be present)
+            let nightScoutEventType: String? = dictionary["eventType"] as? String
             
-			switch eventType {
-			case .Insulin:
-				value = dictionary["insulin"] as? Double
-			case .Carbs:
-				value = dictionary["carbs"] as? Double
-			case .Exercise:
-				value = dictionary["duration"] as? Double
-			}
-			
-			if let value = value {
-				return TreatmentNSResponse(id: id, createdAt: date, eventType: eventType, value: value)
-			}
+            if let carbs = dictionary["carbs"] as? Double {
+                
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Carbs, nightscoutEventType: nightScoutEventType, value: carbs))
+                
+            }
+            
+            if let insulin = dictionary["insulin"] as? Double {
+                
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Insulin.idExtension(), createdAt: date, eventType: .Insulin, nightscoutEventType: nightScoutEventType, value: insulin))
+                
+            }
+            
+            if let exercise = dictionary["exercise"] as? Double {
+                
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Exercise, nightscoutEventType: nightScoutEventType, value: exercise))
+                
+            }
             
 		}
         
-		return nil
+		return treatmentNSResponses
         
 	}
 	
@@ -52,8 +71,10 @@ public struct TreatmentNSResponse {
 		var responses: [TreatmentNSResponse] = []
 
 		for element in array {
-			if let dicionary = element as? NSDictionary, let treatmentNSResponse = TreatmentNSResponse.fromNighscout(dictionary: dicionary) {
-				responses.append(treatmentNSResponse)
+			if let dictionary = element as? NSDictionary {
+                
+                responses = responses + TreatmentNSResponse.fromNighscout(dictionary: dictionary)
+                
 			}
 		}
 		
@@ -88,7 +109,7 @@ public struct TreatmentNSResponse {
 	/// Be extra carefull when creating new TreatmentEntry, will create the new entry in CoreData but does not save in CoreData
 	public func asNewTreatmentEntry(nsManagedObjectContext: NSManagedObjectContext) -> TreatmentEntry? {
         
-		return TreatmentEntry(id: id, date: createdAt, value: value, treatmentType: eventType, nsManagedObjectContext: nsManagedObjectContext)
+        return TreatmentEntry(id: id, date: createdAt, value: value, treatmentType: eventType, nightscoutEventType: nightscoutEventType, nsManagedObjectContext: nsManagedObjectContext)
         
 	}
 	

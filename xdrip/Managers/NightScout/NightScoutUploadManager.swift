@@ -565,21 +565,51 @@ public class NightScoutUploadManager: NSObject {
         
         trace("in updateTreatmentsToNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
         
-            uploadDataAndGetResponse(dataToUpload: treatmentToUpdate.dictionaryRepresentationForNightScoutUpload(), httpMethod: "PUT", path: nightScoutTreatmentPath) { (responseData: Data?, nightScoutResult: NightScoutResult) in
-                
-                self.coreDataManager.mainManagedObjectContext.performAndWait {
-
-                    if nightScoutResult.successFull() {
-                        treatmentToUpdate.uploaded = true
-                        self.coreDataManager.saveChanges()
-                    }
-
+        var treatmentToUploadToNightscoutAsDictionary = treatmentToUpdate.dictionaryRepresentationForNightScoutUpload()
+        
+        // check if there's other treatmenentries that have the same id and if yes add them to treatmentToUploadToNightscout
+        let otherTreatmentEntries = treatmentEntryAccessor.getTreatments(containsId: String(treatmentToUpdate.id.split(separator: "-")[0]))
+        
+        for otherTreatmentEntry in otherTreatmentEntries {
+            
+            // no need to add treatmentToUpdate. This is also in the list otherTreatmentEntries
+            if otherTreatmentEntry.id != treatmentToUpdate.id {
+            
+                switch otherTreatmentEntry.treatmentType {
+                    
+                case .Insulin:
+                    treatmentToUploadToNightscoutAsDictionary["insulin"] = otherTreatmentEntry.value
+                    
+                case .Carbs:
+                    treatmentToUploadToNightscoutAsDictionary["carbs"] = otherTreatmentEntry.value
+                    
+                case .Exercise:
+                    treatmentToUploadToNightscoutAsDictionary["duration"] = otherTreatmentEntry.value
+                    
+                default:
+                    break
+                    
                 }
                 
-                completionHandler(nightScoutResult)
-                
             }
+            
+        }
         
+        uploadDataAndGetResponse(dataToUpload: treatmentToUploadToNightscoutAsDictionary, httpMethod: "PUT", path: nightScoutTreatmentPath) { (responseData: Data?, nightScoutResult: NightScoutResult) in
+            
+            self.coreDataManager.mainManagedObjectContext.performAndWait {
+
+                if nightScoutResult.successFull() {
+                    treatmentToUpdate.uploaded = true
+                    self.coreDataManager.saveChanges()
+                }
+
+            }
+            
+            completionHandler(nightScoutResult)
+            
+        }
+
     }
     
     /// delete one single treatment at nightscout
@@ -590,7 +620,7 @@ public class NightScoutUploadManager: NSObject {
 
         trace("in deleteTreatmentAtNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
 
-        getOrDeleteRequest(path: nightScoutTreatmentPath + "/" + treatmentToDelete.id, queries: [], httpMethod: "DELETE", completionHandler: { (data: Data?, nightScoutResult: NightScoutResult)  in
+        getOrDeleteRequest(path: nightScoutTreatmentPath + "/" + treatmentToDelete.id.split(separator: "-")[0], queries: [], httpMethod: "DELETE", completionHandler: { (data: Data?, nightScoutResult: NightScoutResult)  in
 
             // trace data to upload as string in debug  mode
             if let data = data, let dataAsString = String(bytes: data, encoding: .utf8) {
@@ -1264,7 +1294,7 @@ public class NightScoutUploadManager: NSObject {
                         treatmentEntry.uploaded = true
                         
                         // Sets the id
-                        treatmentEntry.id = treatmentNSResponse.id
+                        treatmentEntry.id = treatmentNSResponse.id + treatmentEntry.treatmentType.idExtension()
                         
                         amountOfNewTreatmentEntries = amountOfNewTreatmentEntries + 1
                         
@@ -1303,7 +1333,7 @@ public class NightScoutUploadManager: NSObject {
                     
                     numberOfNewTreatments = numberOfNewTreatments + 1
                     
-                    trace("    new treatmentEntry created with date %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .debug, treatmentNSResponse.createdAt.toString(timeStyle: .long, dateStyle: .long))
+                    trace("    new treatmentEntry created with id %{public}@ and date %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .debug, treatmentNSResponse.id, treatmentNSResponse.createdAt.toString(timeStyle: .long, dateStyle: .long))
                     
                 }
 

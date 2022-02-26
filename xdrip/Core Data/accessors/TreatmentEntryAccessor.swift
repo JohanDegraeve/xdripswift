@@ -116,6 +116,26 @@ class TreatmentEntryAccessor {
 		return getTreatmentById(id) != nil
 	}
 	
+    
+    /// Given an Id, returns the TreatmentEntry's that have an id that contains the given id
+    /// - parameters:
+    ///     - containsId : the id string
+    func getTreatments(containsId id: String) -> [TreatmentEntry] {
+        
+        // EmptyId is not a valid id
+        guard id != TreatmentEntry.EmptyId else {
+            return [TreatmentEntry]()
+        }
+        
+        let fetchRequest: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+        
+        // Filter by treatmententries that contain the id
+        fetchRequest.predicate = NSPredicate(format: "id CONTAINS %@", id)
+        
+        return getTreatments(withFetchRequest: fetchRequest)
+
+    }
+    
 	/// Given an Id, returns the TreatmentEntry with that id, if it exists.
     /// - parameters:
 	///     - id : the id string
@@ -134,24 +154,35 @@ class TreatmentEntryAccessor {
         // Filter by id
 		fetchRequest.predicate = NSPredicate(format: "id == %@", id)
 		
-		var treatment: TreatmentEntry? = nil
-		
-        coreDataManager.mainManagedObjectContext.performAndWait {
-			do {
-				// Execute Fetch Request
-				// Since it returns an array, get the first elem
-				treatment = (try fetchRequest.execute()).first
-			} catch {
-				let fetchError = error as NSError
-				trace("in fetchTreatments, Unable to Execute getTreatmentById Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
-			}
-		}
-
-		return treatment
+        return getTreatments(withFetchRequest: fetchRequest).first
+        
 	}
 	
 	// MARK: - private helper functions
 	
+    /// Given an Id, returns the TreatmentEntry with that id, if it exists.
+    /// - parameters:
+    ///     - id : the id string
+    private func getTreatments(withFetchRequest fetchRequest: NSFetchRequest<TreatmentEntry>) -> [TreatmentEntry] {
+        
+        var treatments = [TreatmentEntry]()
+        
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            do {
+                // Execute Fetch Request
+                // Since it returns an array, get the first elem
+                treatments = (try fetchRequest.execute())
+                
+            } catch {
+                let fetchError = error as NSError
+                trace("in fetchTreatments, Unable to Execute getTreatmentById Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
+            }
+        }
+
+        return treatments
+        
+    }
+
 	/// returnvalue can be empty array
 	/// - parameters:
 	///     - limit: maximum amount of treatments to fetch, if 0 then no limit

@@ -38,4 +38,8 @@ extension TreatmentEntry {
     /// deleted means not visible anymore for user, not taken into account for IOB etc. Used to figure out if DELETE command needs to be sent to NightScout
     @NSManaged public var treatmentdeleted: Bool
     
+    /// - if it's a treatmentEntry that was downloaded from NightScout, then this is the eventType as it was received form NightScout
+    /// - only used when updating an entry @ NS, to make sure the same eventType is used as the original one assigned by NightScout
+    @NSManaged public var nightscoutEventType: String?
+    
 }
