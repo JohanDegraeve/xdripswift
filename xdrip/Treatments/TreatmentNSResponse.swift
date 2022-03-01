@@ -15,6 +15,7 @@ import CoreData
 /// "The client should not create the identifier, the server automatically assigns it when the document is inserted."
 public struct TreatmentNSResponse {
     
+    /// id received from NightScout , incusive the extension "-insulin", "-carbs" or "-exercise"
 	public let id: String
     
 	public let createdAt: Date
@@ -53,7 +54,7 @@ public struct TreatmentNSResponse {
                 
             }
             
-            if let exercise = dictionary["exercise"] as? Double {
+            if let exercise = dictionary["duration"] as? Double {
                 
                 treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Exercise, nightscoutEventType: nightScoutEventType, value: exercise))
                 

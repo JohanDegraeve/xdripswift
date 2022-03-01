@@ -140,6 +140,9 @@ class TreatmentsInsertViewController : UIViewController {
                 
                 if let text = textField.text, let value = Double(text), value > 0 {
                     
+                    // keep track if changed or not
+                    var treatMentEntryToUpdateChanged = false
+                    
                     if treatMentEntryToUpdate.value != value {
                         
                         treatMentEntryToUpdate.value = value
@@ -147,6 +150,20 @@ class TreatmentsInsertViewController : UIViewController {
                         // sets text in textField to "0" to avoid that new treatmentEntry is created
                         textField.text = "0"
 
+                        treatMentEntryToUpdateChanged = true
+                                                
+                    }
+                    
+                    if treatMentEntryToUpdate.date != self.datePicker.date {
+                        
+                        treatMentEntryToUpdate.date = self.datePicker.date
+                        
+                        treatMentEntryToUpdateChanged = true
+                        
+                    }
+                    
+                    if treatMentEntryToUpdateChanged {
+                        
                         // permenant save in coredata
                         self.coreDataManager.saveChanges()
                         
@@ -155,7 +172,7 @@ class TreatmentsInsertViewController : UIViewController {
 
                         // trigger nightscoutsync
                         UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
-                        
+
                     }
 
                 } else {
