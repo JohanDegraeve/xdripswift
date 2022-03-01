@@ -51,14 +51,23 @@ import CoreData
     /// returns "-insulin", "-carbs", "-exercise", according to treatment type
     public func idExtension() -> String {
         
+        return "-" + self.nightScoutFieldname()
+        
+    }
+    
+    /// return the name of the attribute used in NightScout for the TreatmentType
+    public func nightScoutFieldname() -> String {
+        
         switch self {
             
         case .Insulin:
-            return "-insulin"
+            return "insulin"
+            
         case .Carbs:
-            return "-carbs"
+            return "carbs"
+            
         case .Exercise:
-            return "-exercise"
+            return "exericse"
             
         }
         

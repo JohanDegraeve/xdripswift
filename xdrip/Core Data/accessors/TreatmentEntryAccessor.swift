@@ -116,11 +116,10 @@ class TreatmentEntryAccessor {
 		return getTreatmentById(id) != nil
 	}
 	
-    
     /// Given an Id, returns the TreatmentEntry's that have an id that contains the given id
     /// - parameters:
-    ///     - containsId : the id string
-    func getTreatments(containsId id: String) -> [TreatmentEntry] {
+    ///     - thatContainId : the id string
+    func getTreatments(thatContainId id: String) -> [TreatmentEntry] {
         
         // EmptyId is not a valid id
         guard id != TreatmentEntry.EmptyId else {
