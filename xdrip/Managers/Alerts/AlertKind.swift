@@ -359,8 +359,8 @@ public enum AlertKind:Int, CaseIterable {
                 switch transmitterBatteryInfo {
                 case .percentage(let percentage):
                     batteryLevelToCheck = percentage
-                case .DexcomG5(let voltageA, _, _, _, _):
-                    batteryLevelToCheck = voltageA
+                case .DexcomG5(let voltageB, _, _, _, _):
+                    batteryLevelToCheck = voltageB
                 case .DexcomG4(let level):
                     batteryLevelToCheck = level
                 }
