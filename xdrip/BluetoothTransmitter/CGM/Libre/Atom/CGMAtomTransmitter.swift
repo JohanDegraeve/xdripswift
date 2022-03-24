@@ -451,6 +451,14 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
 
+    func getCBUUID_Service() -> String {
+        return CBUUID_Service_Atom
+    }
+    
+    func getCBUUID_Receive() -> String {
+        return CBUUID_ReceiveCharacteristic_Atom
+    }
+
 }
 
 

@@ -67,6 +67,12 @@ protocol CGMTransmitter:AnyObject {
     /// - default false
     func needsSensorStartCode() -> Bool
     
+    /// returns the service CBUUID
+    func getCBUUID_Service() -> String
+    
+    /// returns the receive characteristic CBUUID
+    func getCBUUID_Receive() -> String
+    
 }
 
 /// cgm transmitter types

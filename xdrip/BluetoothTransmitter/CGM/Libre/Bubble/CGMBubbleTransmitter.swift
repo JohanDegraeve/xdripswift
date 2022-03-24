@@ -354,6 +354,15 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
 
+    func getCBUUID_Service() -> String {
+        return CBUUID_Service_Bubble
+    }
+    
+    func getCBUUID_Receive() -> String {
+        return CBUUID_ReceiveCharacteristic_Bubble
+    }
+
+
     // MARK: - helpers
     
     /// reset rxBuffer, reset startDate, stop packetRxMonitorTimer, set resendPacketCounter to 0

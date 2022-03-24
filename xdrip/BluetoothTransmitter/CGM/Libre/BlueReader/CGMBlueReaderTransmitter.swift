@@ -136,4 +136,12 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
         return nonFixedSlopeEnabled
     }
     
+    func getCBUUID_Service() -> String {
+        return CBUUID_Service_BlueReader
+    }
+    
+    func getCBUUID_Receive() -> String {
+        return CBUUID_ReceiveCharacteristic_BlueReader
+    }
+
 }

@@ -237,7 +237,7 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
     
-    // MARK: CGMTransmitter protocol functions
+    // MARK: - CGMTransmitter protocol functions
     
     func setNonFixedSlopeEnabled(enabled: Bool) {
         nonFixedSlopeEnabled = enabled
@@ -251,7 +251,15 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
         return nonFixedSlopeEnabled
     }
     
-    // MARK: CBCentralManager overriden functions
+    func getCBUUID_Service() -> String {
+        return CBUUID_GNWService
+    }
+    
+    func getCBUUID_Receive() -> String {
+        return CBUUID_Characteristic_UUID.CBUUID_GNW_Notify.rawValue
+    }
+
+    // MARK: - CBCentralManager overriden functions
     
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         trace("didDiscoverCharacteristicsFor", log: log, category: ConstantsLog.categoryCGMGNSEntry, type: .info)

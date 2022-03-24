@@ -43,11 +43,19 @@ class BluetoothPeripheralManager: NSObject {
     ///
     /// this is to keep track of changes in cgmTransmitter (ie if switching from transmitter A to B)
     public var currentCgmTransmitterAddress: String? {
+        
         didSet(newValue) {
+            
             if newValue != currentCgmTransmitterAddress {
+                
                 cgmTransmitterInfoChanged()
+                
+                setCGMTransmitterInSharedUserDefaults()
+                
             }
+            
         }
+        
     }
     
     // MARK: - private properties
@@ -92,378 +100,14 @@ class BluetoothPeripheralManager: NSObject {
         
         super.init()
         
-        // loop through blePeripherals
-        for blePeripheral in bLEPeripheralAccessor.getBLEPeripherals() {
-
-            // each time the app launches, we will send the parameters to all BluetoothPeripherals (only used for M5Stack for now)
-            blePeripheral.parameterUpdateNeededAtNextConnect = true
-
-            // need to initialize all types of bluetoothperipheral
-            // using enum here to make sure future types are not forgotten
-            bluetoothPeripheralTypeLoop: for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
-
-                switch bluetoothPeripheralType {
-                    
-                case .M5StackType:
-                    // no seperate handling needed for M5StickC because M5StickC is stored in coredata as M5Stack objecct, so it will be handled when going through case M5StackType
-                    // in other words this case will never be applicable
-                    break
-                    
-                case .M5StickCType:
-                    if let m5Stack = blePeripheral.m5Stack {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: m5Stack)
-                        
-                        if m5Stack.blePeripheral.shouldconnect {
-                            
-                            // create an instance of M5StackBluetoothTransmitter, M5StackBluetoothTransmitter will automatically try to connect to the M5Stack with the address that is stored in m5Stack
-                            // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(M5StackBluetoothTransmitter(address: m5Stack.blePeripheral.address, name: m5Stack.blePeripheral.name, bluetoothTransmitterDelegate: self, m5StackBluetoothTransmitterDelegate: self, blePassword: m5Stack.blepassword, bluetoothPeripheralType: m5Stack.isM5StickC ? .M5StickCType : .M5StackType), at: index)
-                            
-                        } else {
-                            
-                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-                        
-                    }
-                    
-                case .WatlaaType:
-                    
-                    if let watlaa = blePeripheral.watlaa {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: watlaa)
-                        
-                        if watlaa.blePeripheral.shouldconnect {
-                            
-                            // create an instance of WatlaaBluetoothTransmitter, WatlaaBluetoothTransmitter will automatically try to connect to the watlaa with the address that is stored in watlaa
-                            // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(WatlaaBluetoothTransmitter(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, sensorSerialNumber: watlaa.blePeripheral.sensorSerialNumber, webOOPEnabled: watlaa.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: watlaa.blePeripheral.nonFixedSlopeEnabled), at: index)
-                            
-                            // if watlaa is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
-                            if bluetoothPeripheralType.category() == .CGM {
-                                currentCgmTransmitterAddress = blePeripheral.address
-                            }
-                        
-                        } else {
-                            
-                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-
-                    }
-                    
-                case .DexcomType:
-                
-                    if let dexcomG5orG6 = blePeripheral.dexcomG5 {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG5orG6)
-                        
-                        if dexcomG5orG6.blePeripheral.shouldconnect {
-                            
-                            if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId {
-
-                                // create an instance of CGMG5Transmitter, will automatically try to connect to the dexcom with the address that is stored in dexcom
-                                // add it to the array of bluetoothTransmitters
-                                bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp), at: index)
-
-                                // if DexcomG5Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
-                                if bluetoothPeripheralType.category() == .CGM {
-                                    currentCgmTransmitterAddress = blePeripheral.address
-                                }
-                                
-                            }
-                            
-                        } else {
-                            
-                            // bluetoothTransmitters array (which should have the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-                        
-                        // because two types are being handled here (DexcomG5Type and DexcomG6Type) we need to avoid that the same blePeripheral is added two times
-                        // this we do by breaking the bluetoothPeripheralTypeLoop
-                        break bluetoothPeripheralTypeLoop
-                        
-                    }
-                    
-                case .BubbleType:
-                    
-                    if let bubble = blePeripheral.bubble {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: bubble)
-                        
-                        if bubble.blePeripheral.shouldconnect {
-                            
-                            // create an instance of BubbleBluetoothTransmitter, BubbleBluetoothTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
-                            // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMBubbleTransmitter(address: bubble.blePeripheral.address, name: bubble.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: bubble.blePeripheral.sensorSerialNumber, webOOPEnabled: bubble.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: bubble.blePeripheral.nonFixedSlopeEnabled), at: index)
-                            
-                            // if BubbleType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
-                            if bluetoothPeripheralType.category() == .CGM {
-                                currentCgmTransmitterAddress = blePeripheral.address
-                            }
-
-                        } else {
-                            
-                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-                        
-                    }
-                    
-                case .MiaoMiaoType:
-                    
-                    if let miaoMiao = blePeripheral.miaoMiao {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: miaoMiao)
-                        
-                        if miaoMiao.blePeripheral.shouldconnect {
-                            
-                            // create an instance of CGMMiaoMiaoTransmitter, CGMMiaoMiaoTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
-                            // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMMiaoMiaoTransmitter(address: miaoMiao.blePeripheral.address, name: miaoMiao.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate,  sensorSerialNumber: miaoMiao.blePeripheral.sensorSerialNumber, webOOPEnabled: miaoMiao.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: miaoMiao.blePeripheral.nonFixedSlopeEnabled), at: index)
-                            
-                            // if MiaoMiaoType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
-                            if bluetoothPeripheralType.category() == .CGM {
-                                currentCgmTransmitterAddress = blePeripheral.address
-                            }
-                            
-                        } else {
-                            
-                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-                        
-                    }
-                 
-                case .AtomType:
-                    
-                    if let atom = blePeripheral.atom {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: atom)
-                        
-                        if atom.blePeripheral.shouldconnect {
-                            
-                            // create an instance of CGMAtomTransmitter, CGMAtomTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
-                            // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMAtomTransmitter(address: atom.blePeripheral.address, name: atom.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMAtomTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: atom.blePeripheral.sensorSerialNumber, webOOPEnabled: atom.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: atom.blePeripheral.nonFixedSlopeEnabled, firmWare: atom.firmware), at: index)
-                            
-                            // if AtomType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
-                            if bluetoothPeripheralType.category() == .CGM {
-                                currentCgmTransmitterAddress = blePeripheral.address
-                            }
-                            
-                        } else {
-                            
-                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-                        
-                    }
-                    
-                case .DexcomG4Type:
-                    
-                    if let dexcomG4 = blePeripheral.dexcomG4 {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG4)
-                        
-                        if dexcomG4.blePeripheral.shouldconnect {
-
-                            if let transmitterId = dexcomG4.blePeripheral.transmitterId {
-
-                                // create an instance of CGMDexcomG4Transmitter, CGMDexcomG4Transmitter will automatically try to connect to the Bubble with the address that is stored in bubble
-                                // add it to the array of bluetoothTransmitters
-                                bluetoothTransmitters.insert(CGMG4xDripTransmitter(address: dexcomG4.blePeripheral.address, name: dexcomG4.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMDexcomG4TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
-                                
-                                // if DexcomG4Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
-                                if bluetoothPeripheralType.category() == .CGM {
-                                    currentCgmTransmitterAddress = blePeripheral.address
-                                }
-                                
-                            }
-                            
-                        } else {
-                            
-                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-                        
-                    }
-                    
-                case .Libre2Type:
-                    
-                    if let libre2 = blePeripheral.libre2 {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: libre2)
-                        
-                        if libre2.blePeripheral.shouldconnect {
-                            
-                            // create an instance of CGMDropletTransmitter, CGMDropletTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
-                            // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMLibre2Transmitter(address: libre2.blePeripheral.address, name: libre2.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMLibre2TransmitterDelegate: self, sensorSerialNumber: libre2.blePeripheral.sensorSerialNumber, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: libre2.blePeripheral.nonFixedSlopeEnabled, webOOPEnabled: libre2.blePeripheral.webOOPEnabled), at: index)
-                            
-                            // if Libre2Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
-                            if bluetoothPeripheralType.category() == .CGM {
-                                currentCgmTransmitterAddress = blePeripheral.address
-                            }
-                            
-                        } else {
-                            
-                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-                        
-                        
-                    }
-                    
-                case .DropletType:
-                    
-                    if let droplet = blePeripheral.droplet {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: droplet)
-                        
-                        if droplet.blePeripheral.shouldconnect {
-                            
-                            // create an instance of CGMDropletTransmitter, CGMDropletTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
-                            // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMDroplet1Transmitter(address: droplet.blePeripheral.address, name: droplet.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMDropletTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: droplet.blePeripheral.nonFixedSlopeEnabled), at: index)
-                            
-                            // if DropletType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
-                            if bluetoothPeripheralType.category() == .CGM {
-                                currentCgmTransmitterAddress = blePeripheral.address
-                            }
-                            
-                        } else {
-                            
-                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-                        
-                    }
-                    
-                case .BlueReaderType:
-                    
-                    if let blueReader = blePeripheral.blueReader {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: blueReader)
-                        
-                        if blueReader.blePeripheral.shouldconnect {
-                            
-                            // create an instance of CGMBlueReaderTransmitter, CGMBlueReaderTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
-                            // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMBlueReaderTransmitter(address: blueReader.blePeripheral.address, name: blueReader.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBlueReaderTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: blueReader.blePeripheral.nonFixedSlopeEnabled), at: index)
-                            
-                            // if BlueReaderType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
-                            if bluetoothPeripheralType.category() == .CGM {
-                                currentCgmTransmitterAddress = blePeripheral.address
-                            }
-                            
-                        } else {
-                            
-                            // bluetoothTransmitters array (which should have the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-                        
-                    }
-                    
-                case .GNSentryType:
-                    
-                    if let gNSEntry = blePeripheral.gNSEntry {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: gNSEntry)
-                        
-                        if gNSEntry.blePeripheral.shouldconnect {
-                            
-                            // create an instance of CGMGNSEntryTransmitter, CGMGNSEntryTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
-                            // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMGNSEntryTransmitter(address: gNSEntry.blePeripheral.address, name: gNSEntry.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: gNSEntry.blePeripheral.nonFixedSlopeEnabled), at: index)
-                            
-                            // if GNSentryType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
-                            if bluetoothPeripheralType.category() == .CGM {
-                                currentCgmTransmitterAddress = blePeripheral.address
-                            }
-                            
-                        } else {
-                            
-                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-                        
-                    }
-                    
-                case .BluconType:
-                    
-                    if let blucon = blePeripheral.blucon {
-                        
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: blucon)
-                        
-                        if blucon.blePeripheral.shouldconnect {
-                            
-                            if let transmitterId = blucon.blePeripheral.transmitterId {
-                                
-                                // create an instance of CGMBluconTransmitter, CGMBluconTransmitter will automatically try to connect to the Bluon with the address that is stored in blucon
-                                // add it to the array of bluetoothTransmitters
-                                bluetoothTransmitters.insert(CGMBluconTransmitter(address: blucon.blePeripheral.address, name: blucon.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: blucon.blePeripheral.sensorSerialNumber, nonFixedSlopeEnabled: blucon.blePeripheral.nonFixedSlopeEnabled), at: index)
-                                
-                                // if bluconType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
-                                if bluetoothPeripheralType.category() == .CGM {
-                                    currentCgmTransmitterAddress = blePeripheral.address
-                                }
-                                
-                            }
-                            
-                        } else {
-                            
-                            // bluetoothTransmitters array (which should have the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-                            
-                        }
-                        
-                    }
-                }
-
-            }
-            
-        }
-        
-        
-        // CAN BE DELETED ONCE 3.X IS NOT USED ANYMORE
-        // if cgmTransUserDefaults.standard.cgmTransmitterTypemitterType is nil but UserDefaults.standard.cgmTransmitterDeviceAddress is not nil, then this is the first install of 4.x after 3.x
-        if UserDefaults.standard.cgmTransmitterType != nil &&  UserDefaults.standard.cgmTransmitterDeviceAddress != nil {
-            
-            uIViewController.present(UIAlertController(title: Texts_Common.warning, message: "Transmitters are now created in the bluetooth tab. You will need to recreate your transmitter first. Your sensor status will remain", actionHandler: nil), animated: true, completion: nil)
-            
-            UserDefaults.standard.cgmTransmitterDeviceAddress = nil
-            
-        }
-        // DELETE UP TO HERE
-        
-        
         // when user changes any of the buetooth peripheral related settings, that need to be sent to the transmitter
         addObservers()
+        
+        // by calling this function in defer block, it will be executed after init has finished.
+        // when assigning a value to currentCgmTransmitterAddress, the didset in that func will be triggered (which was not the case if the assignment happens within the init function)
+        defer {
+            setupBLEPeripherals(cgmTransmitterDelegate: cgmTransmitterDelegate)
+        }
 
     }
     
@@ -956,6 +600,41 @@ class BluetoothPeripheralManager: NSObject {
 
     // MARK: - private functions
     
+    /// sets cgmTransmitterDeviceAddress, cgmTransmitter_CBUUID_Service, cgmTransmitter_CBUUID_Receive in shared userdefaults
+    ///  for use with xdrip-client-swift
+    private func setCGMTransmitterInSharedUserDefaults() {
+     
+        if let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) {
+            
+            if let cgmTransmitter = getCGMTransmitter(), let cgmtransmitterAddress = currentCgmTransmitterAddress {
+
+                debuglogging("setting shared user defaults to cgmtransmitteraddress " + cgmtransmitterAddress)
+                
+                // store getCBUUID_Receive
+                sharedUserDefaults.set(cgmTransmitter.getCBUUID_Receive(), forKey: "cgmTransmitter_CBUUID_Receive")
+                
+                // store cgm transmitter device address
+                sharedUserDefaults.set(cgmtransmitterAddress, forKey: "cgmTransmitterDeviceAddress")
+
+                // store getCBUUID_Service
+                sharedUserDefaults.set(cgmTransmitter.getCBUUID_Service(), forKey: "cgmTransmitter_CBUUID_Service")
+
+            } else {
+                
+                // there's no cgm transmitter currently active (ie configured as 'connect')
+                // store nil as cgm transmitter device address
+                // we don't care about CBUUID_Service and CBUUID_Receive
+
+                debuglogging("setting shared user defaults to nil")
+                
+                sharedUserDefaults.set(nil, forKey: "cgmTransmitterDeviceAddress")
+                
+            }
+            
+        }
+        
+    }
+
     /// when user changes M5Stack related settings, then the transmitter need to get that info, add observers
     private func addObservers() {
         
@@ -1023,6 +702,368 @@ class BluetoothPeripheralManager: NSObject {
         
         return nil
         
+    }
+    
+    /// setup bleperipherals
+    private func setupBLEPeripherals(cgmTransmitterDelegate: CGMTransmitterDelegate) {
+        
+        // loop through blePeripherals
+        for blePeripheral in bLEPeripheralAccessor.getBLEPeripherals() {
+
+            // each time the app launches, we will send the parameters to all BluetoothPeripherals (only used for M5Stack for now)
+            blePeripheral.parameterUpdateNeededAtNextConnect = true
+
+            // need to initialize all types of bluetoothperipheral
+            // using enum here to make sure future types are not forgotten
+            bluetoothPeripheralTypeLoop: for bluetoothPeripheralType in BluetoothPeripheralType.allCases {
+
+                switch bluetoothPeripheralType {
+                    
+                case .M5StackType:
+                    // no seperate handling needed for M5StickC because M5StickC is stored in coredata as M5Stack objecct, so it will be handled when going through case M5StackType
+                    // in other words this case will never be applicable
+                    break
+                    
+                case .M5StickCType:
+                    if let m5Stack = blePeripheral.m5Stack {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: m5Stack)
+                        
+                        if m5Stack.blePeripheral.shouldconnect {
+                            
+                            // create an instance of M5StackBluetoothTransmitter, M5StackBluetoothTransmitter will automatically try to connect to the M5Stack with the address that is stored in m5Stack
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(M5StackBluetoothTransmitter(address: m5Stack.blePeripheral.address, name: m5Stack.blePeripheral.name, bluetoothTransmitterDelegate: self, m5StackBluetoothTransmitterDelegate: self, blePassword: m5Stack.blepassword, bluetoothPeripheralType: m5Stack.isM5StickC ? .M5StickCType : .M5StackType), at: index)
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .WatlaaType:
+                    
+                    if let watlaa = blePeripheral.watlaa {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: watlaa)
+                        
+                        if watlaa.blePeripheral.shouldconnect {
+                            
+                            // create an instance of WatlaaBluetoothTransmitter, WatlaaBluetoothTransmitter will automatically try to connect to the watlaa with the address that is stored in watlaa
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(WatlaaBluetoothTransmitter(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self, sensorSerialNumber: watlaa.blePeripheral.sensorSerialNumber, webOOPEnabled: watlaa.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: watlaa.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if watlaa is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                        
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+
+                    }
+                    
+                case .DexcomType:
+                
+                    if let dexcomG5orG6 = blePeripheral.dexcomG5 {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG5orG6)
+                        
+                        if dexcomG5orG6.blePeripheral.shouldconnect {
+                            
+                            if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId {
+
+                                // create an instance of CGMG5Transmitter, will automatically try to connect to the dexcom with the address that is stored in dexcom
+                                // add it to the array of bluetoothTransmitters
+                                bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp), at: index)
+
+                                // if DexcomG5Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                                if bluetoothPeripheralType.category() == .CGM {
+                                    currentCgmTransmitterAddress = blePeripheral.address
+                                }
+                                
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which should have the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                        // because two types are being handled here (DexcomG5Type and DexcomG6Type) we need to avoid that the same blePeripheral is added two times
+                        // this we do by breaking the bluetoothPeripheralTypeLoop
+                        break bluetoothPeripheralTypeLoop
+                        
+                    }
+                    
+                case .BubbleType:
+                    
+                    if let bubble = blePeripheral.bubble {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: bubble)
+                        
+                        if bubble.blePeripheral.shouldconnect {
+                            
+                            // create an instance of BubbleBluetoothTransmitter, BubbleBluetoothTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMBubbleTransmitter(address: bubble.blePeripheral.address, name: bubble.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBubbleTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: bubble.blePeripheral.sensorSerialNumber, webOOPEnabled: bubble.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: bubble.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if BubbleType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .MiaoMiaoType:
+                    
+                    if let miaoMiao = blePeripheral.miaoMiao {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: miaoMiao)
+                        
+                        if miaoMiao.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMMiaoMiaoTransmitter, CGMMiaoMiaoTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMMiaoMiaoTransmitter(address: miaoMiao.blePeripheral.address, name: miaoMiao.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate,  sensorSerialNumber: miaoMiao.blePeripheral.sensorSerialNumber, webOOPEnabled: miaoMiao.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: miaoMiao.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if MiaoMiaoType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                 
+                case .AtomType:
+                    
+                    if let atom = blePeripheral.atom {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: atom)
+                        
+                        if atom.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMAtomTransmitter, CGMAtomTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMAtomTransmitter(address: atom.blePeripheral.address, name: atom.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMAtomTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: atom.blePeripheral.sensorSerialNumber, webOOPEnabled: atom.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: atom.blePeripheral.nonFixedSlopeEnabled, firmWare: atom.firmware), at: index)
+                            
+                            // if AtomType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .DexcomG4Type:
+                    
+                    if let dexcomG4 = blePeripheral.dexcomG4 {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG4)
+                        
+                        if dexcomG4.blePeripheral.shouldconnect {
+
+                            if let transmitterId = dexcomG4.blePeripheral.transmitterId {
+
+                                // create an instance of CGMDexcomG4Transmitter, CGMDexcomG4Transmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                                // add it to the array of bluetoothTransmitters
+                                bluetoothTransmitters.insert(CGMG4xDripTransmitter(address: dexcomG4.blePeripheral.address, name: dexcomG4.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMDexcomG4TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+                                
+                                // if DexcomG4Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                                if bluetoothPeripheralType.category() == .CGM {
+                                    currentCgmTransmitterAddress = blePeripheral.address
+                                }
+                                
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .Libre2Type:
+                    
+                    if let libre2 = blePeripheral.libre2 {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: libre2)
+                        
+                        if libre2.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMDropletTransmitter, CGMDropletTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMLibre2Transmitter(address: libre2.blePeripheral.address, name: libre2.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMLibre2TransmitterDelegate: self, sensorSerialNumber: libre2.blePeripheral.sensorSerialNumber, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: libre2.blePeripheral.nonFixedSlopeEnabled, webOOPEnabled: libre2.blePeripheral.webOOPEnabled), at: index)
+                            
+                            // if Libre2Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                        
+                    }
+                    
+                case .DropletType:
+                    
+                    if let droplet = blePeripheral.droplet {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: droplet)
+                        
+                        if droplet.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMDropletTransmitter, CGMDropletTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMDroplet1Transmitter(address: droplet.blePeripheral.address, name: droplet.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMDropletTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: droplet.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if DropletType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .BlueReaderType:
+                    
+                    if let blueReader = blePeripheral.blueReader {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: blueReader)
+                        
+                        if blueReader.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMBlueReaderTransmitter, CGMBlueReaderTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMBlueReaderTransmitter(address: blueReader.blePeripheral.address, name: blueReader.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMBlueReaderTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: blueReader.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if BlueReaderType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which should have the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .GNSentryType:
+                    
+                    if let gNSEntry = blePeripheral.gNSEntry {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: gNSEntry)
+                        
+                        if gNSEntry.blePeripheral.shouldconnect {
+                            
+                            // create an instance of CGMGNSEntryTransmitter, CGMGNSEntryTransmitter will automatically try to connect to the Bubble with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMGNSEntryTransmitter(address: gNSEntry.blePeripheral.address, name: gNSEntry.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMGNSEntryTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, nonFixedSlopeEnabled: gNSEntry.blePeripheral.nonFixedSlopeEnabled), at: index)
+                            
+                            // if GNSentryType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                    
+                case .BluconType:
+                    
+                    if let blucon = blePeripheral.blucon {
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: blucon)
+                        
+                        if blucon.blePeripheral.shouldconnect {
+                            
+                            if let transmitterId = blucon.blePeripheral.transmitterId {
+                                
+                                // create an instance of CGMBluconTransmitter, CGMBluconTransmitter will automatically try to connect to the Bluon with the address that is stored in blucon
+                                // add it to the array of bluetoothTransmitters
+                                bluetoothTransmitters.insert(CGMBluconTransmitter(address: blucon.blePeripheral.address, name: blucon.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMBluconTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, sensorSerialNumber: blucon.blePeripheral.sensorSerialNumber, nonFixedSlopeEnabled: blucon.blePeripheral.nonFixedSlopeEnabled), at: index)
+                                
+                                // if bluconType is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                                if bluetoothPeripheralType.category() == .CGM {
+                                    currentCgmTransmitterAddress = blePeripheral.address
+                                }
+                                
+                            }
+                            
+                        } else {
+                            
+                            // bluetoothTransmitters array (which should have the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
+                }
+
+            }
+            
+        }
+
     }
     
     // MARK:- override observe function

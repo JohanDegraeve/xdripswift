@@ -36,4 +36,12 @@ extension WatlaaBluetoothTransmitter: CGMTransmitter {
         _ = sendStartReadingCommand()
     }
     
+    func getCBUUID_Service() -> String {
+        return CBUUID_Data_Service
+    }
+    
+    func getCBUUID_Receive() -> String {
+        return CBUUID_Characteristic_UUID.CBUUID_ReceiveCharacteristic.rawValue
+    }
+
 }
