@@ -77,12 +77,66 @@ enum ConstantsGlucoseChart {
     /// glucose colors - for values between highMarkValue and urgentHighMarkValue or between urgentLowMarkValue and lowMarkValue
     static let glucoseNotUrgentRangeColor = UIColor.yellow
     
-    /// calibration circle color (inside circle)
-    static let calibrationInsideColor = UIColor.red
+    /// diameter of the circle for blood glucose readings. The more hours on the chart, the smaller the circles should be
+    static let glucoseCircleDiameter3h: CGFloat = 7
+    static let glucoseCircleDiameter6h: CGFloat = 6
+    static let glucoseCircleDiameter12h: CGFloat = 5
+    static let glucoseCircleDiameter24h: CGFloat = 4
     
-    /// calibration circle border color (outside circle)
-    static let calibrationOutsideColor = UIColor.white
+    /// calibration circle color + scaling
+    static let calibrationCircleColorInner = UIColor.red
+    static let calibrationCircleColorOuter = UIColor.white
+    static let calibrationCircleScaleOuter: CGFloat = 1.9
+    static let calibrationCircleScaleInner: CGFloat = 1.4
+    
+    /// bolus treament chart colour + y-axis scaling + offset.
+    static let bolusTreatmentColor = UIColor.systemBlue
+    
+    /// how far above the bottom of the chart should the bolus treatment start? 0 would be touching
+    static let bolusTreatmentChartPointYAxisOffsetInMgDl: Double = 2
+    
+    /// how should we scale the bolus values vertically? A value of 5-7 seems to be reasonable to give context to the bolus size without disturbing the rest of the elements
+    static let bolusTreatmentChartPointYAxisScaleFactor: Double = 6
+    
+    /// values below this threshold will be shown as micro-boluses without labels and scaled accordingly
+    static let defaultSmallBolusTreamentThreshold: Double = 1.0
+    static let smallBolusTreamentScale: CGFloat = 0.5
+    
+    /// triangle size for bolus treatments. The more hours on the chart, the smaller the triangles should be. If the bolus is considered a micro-bolus, then it will be scaled down accordingly
+    static let bolusTriangleSize3h: CGFloat = 20
+    static let bolusTriangleSize6h: CGFloat = 18
+    static let bolusTriangleSize12h: CGFloat = 16
+    static let bolusTriangleSize24h: CGFloat = 14
+    
+    /// carbs treament chart colour + y-axis scaling. These are set for 6hr chart width - they will bec scaled accordingly as needed
+    static let carbsTreatmentColor = UIColor.systemOrange
+    
+    /// threshold below which carbs will be added to this array
+    /// the scale will determine how big the carb circle is (compared to the glucose point size)
+    static let smallCarbsTreamentThreshold: CGFloat = 6.0
+    static let smallCarbsTreamentScale: CGFloat = 2.5
+    
+    static let mediumCarbsTreamentThreshold: CGFloat = 15.0
+    static let mediumCarbsTreamentScale: CGFloat = 3.3
+    
+    static let largeCarbsTreamentThreshold: CGFloat = 35.0
+    static let largeCarbsTreamentScale: CGFloat = 4.5
+    
+    static let veryLargeCarbsTreamentScale: CGFloat = 6.6
 
+    /// default label settings for the treatments labels. These are set for 6hr chart width - they will bec scaled accordingly as needed
+    static let treatmentLabelFontSize: Double = 12
+    
+    /// additional label separation (in mg/dl) when using mmol/l (needed due to the scaling/conversion)
+    static let treatmentLabelMmolOffset: Double = 2
+    
+    static let mediumBolusLabelSeparation: Double = 7
+    
+    static let smallCarbsLabelSeparation: Double = 7
+    static let mediumCarbsLabelSeparation: Double = 8
+    static let largeCarbsLabelSeparation: Double = 10
+    static let veryLargeCarbsLabelSeparation: Double = 12
+    
     /// labels width for vertical axis
     static let yAxisLabelsWidth: CGFloat = 30
     
@@ -103,18 +157,6 @@ enum ConstantsGlucoseChart {
     
     /// The spacing in points between axis title labels and axis labels
     static let axisTitleLabelsToLabelsSpacing: CGFloat = 0
-    
-    /// diameter of the circle for blood glucose readings. The more hours on the chart, the smaller the circles should be
-    static let glucoseCircleDiameter3h: CGFloat = 7
-    static let glucoseCircleDiameter6h: CGFloat = 6
-    static let glucoseCircleDiameter12h: CGFloat = 5
-    static let glucoseCircleDiameter24h: CGFloat = 4
-    
-    /// diameter of the circle for calibration chart points (outer circle)
-    static let calibrationCircleScaleOuter: CGFloat = 1.9
-    
-    /// diameter of the circle for calibration chart points (inner circle)
-    static let calibrationCircleScaleInner: CGFloat = 1.4
     
     /// when user pans the chart, when ending the gesture, deceleration is done. At regular intervals the chart needs to be redrawn. This is the interval in seconds
     static let decelerationTimerValueInSeconds = 0.030

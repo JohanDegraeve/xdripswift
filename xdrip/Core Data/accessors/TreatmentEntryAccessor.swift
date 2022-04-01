@@ -77,6 +77,47 @@ class TreatmentEntryAccessor {
    func getLatestTreatments(limit:Int?, fromDate:Date?) -> [TreatmentEntry] {
 		return fetchTreatments(limit: limit, fromDate: fromDate)
 	}
+    
+    /// Gets treatments, synchronously, in the managedObjectContext's thread between fromDate and toDate
+    /// Keep the fromDate and toDate as optional (and build the predicate with this in mind) just in case we want to use this function later on to pull all treatments using only one parameter
+    ///
+    /// - parameters:
+    ///     - fromDate : treatment must have date > fromDate
+    ///     - toDate : treatment must have date > fromDate
+    ///     - managedObjectContext : the ManagedObjectContext to use
+    /// - returns: an array with treatments, can be empty array.
+    ///     Order by timestamp, descending meaning the treatment at index 0 is the youngest
+    func getTreatments(fromDate: Date?, toDate: Date?, on managedObjectContext: NSManagedObjectContext) -> [TreatmentEntry] {
+        
+        let fetchRequest: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(TreatmentEntry.date), ascending: false)]
+        
+        // create predicate between two dates
+        if let from = fromDate, toDate == nil {
+            let predicate = NSPredicate(format: "date >= %@", NSDate(timeIntervalSince1970: from.timeIntervalSince1970))
+            fetchRequest.predicate = predicate
+        } else if let to = toDate, fromDate == nil {
+            let predicate = NSPredicate(format: "date <= %@", NSDate(timeIntervalSince1970: to.timeIntervalSince1970))
+            fetchRequest.predicate = predicate
+        } else if let to = toDate, let from = fromDate {
+            let predicate = NSPredicate(format: "date <= %@ AND date >= %@", NSDate(timeIntervalSince1970: to.timeIntervalSince1970), NSDate(timeIntervalSince1970: from.timeIntervalSince1970))
+            fetchRequest.predicate = predicate
+        }
+                
+        var treatments = [TreatmentEntry]()
+        
+        managedObjectContext.performAndWait {
+            do {
+                // Execute Fetch Request
+                treatments = try fetchRequest.execute()
+            } catch {
+                let fetchError = error as NSError
+                trace("in fetchTreatments, Unable to Execute fetchTreatments Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
+            }
+        }
+        
+        return treatments
+    }
 	
 	/// gets most recent treatment
 	func latest() -> TreatmentEntry? {

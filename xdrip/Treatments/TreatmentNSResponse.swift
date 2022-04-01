@@ -54,9 +54,9 @@ public struct TreatmentNSResponse {
                 
             }
             
-            if let exercise = dictionary["duration"] as? Double {
-                
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Exercise, nightscoutEventType: nightScoutEventType, value: exercise))
+            if nightScoutEventType == "Exercise", let duration = dictionary["duration"] as? Double {
+                    
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Exercise, nightscoutEventType: nightScoutEventType, value: duration))
                 
             }
             

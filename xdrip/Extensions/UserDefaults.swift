@@ -62,6 +62,14 @@ extension UserDefaults {
         /// target value
         case targetMarkValue = "targetMarkValue"
         
+        // Treatment settings
+        
+        /// should the treatments be shown on the main chart?
+        case showTreatmentsOnChart = "showTreatmentsOnChart"
+        
+        /// micro-bolus threshold level in units
+        case smallBolusTreatmentThreshold = "smallBolusTreatmentThreshold"
+        
         // Statistics settings
         
         /// show the statistics? How many days should we use for the calculations?
@@ -710,6 +718,39 @@ extension UserDefaults {
             set(!newValue, forKey: Key.showClockWhenScreenIsLocked.rawValue)
         }
     }
+    
+    
+    // MARK: Treatments Settings
+    
+    /// should the app show the treatments on the main chart?
+    @objc dynamic var showTreatmentsOnChart: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to show the treatments on the chart
+        get {
+            return !bool(forKey: Key.showTreatmentsOnChart.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showTreatmentsOnChart.rawValue)
+        }
+    }
+    
+    /// micro-bolus threshold level in units as a Double
+    @objc dynamic var smallBolusTreatmentThreshold:Double {
+        get {
+
+            var returnValue = double(forKey: Key.smallBolusTreatmentThreshold.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsGlucoseChart.defaultSmallBolusTreamentThreshold
+            }
+
+            return returnValue
+        }
+        set {
+
+            set(newValue, forKey: Key.smallBolusTreatmentThreshold.rawValue)
+        }
+    }
+    
     
     // MARK: Statistics Settings
     
