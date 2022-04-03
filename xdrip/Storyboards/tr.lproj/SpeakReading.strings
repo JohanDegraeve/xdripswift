@@ -6,9 +6,12 @@
 "trenddoubledown" = "aşırı ölçüde aşağı";
 /// hızlı düşüyor
 "trendsingledown" = "önemli ölçüde aşağı";
-"trendfortyfivedown" = "aşağı";
-"trendflat" = "düz";
-"trendfortyfiveup" = "yukarı";
+/// aşağı
+"trendfortyfivedown" = "azalmakta";
+/// düz
+"trendflat" = "sabit";
+/// yukarı
+"trendfortyfiveup" = "artmakta";
 /// önemli ölçüde yukarı
 "trendsingleup" = "hızlı yükseliyor";
 /// aşırı ölçüde yukarı
