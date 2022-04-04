@@ -17,7 +17,7 @@ public class GlucoseChartManager {
     typealias GlucoseChartPointsType = (urgentRange: [ChartPoint], inRange: [ChartPoint], notUrgentRange: [ChartPoint], firstGlucoseChartPoint: ChartPoint?, lastGlucoseChartPoint: ChartPoint?, maximumValueInGlucoseChartPoints: Double?)
     
     /// to hold the treatment chartpoints
-    /// - smallBolus = bolus values below themicro-bolus threshold (usually around 1.0U or less)
+    /// - smallBolus = bolus values below the micro-bolus threshold (usually around 1.0U or less)
     /// - mediumBolus = all boluses over the micro-bolus threshold ("normal" boluses and will be shown with a label)
     /// - smallCarbs / mediumCarbs / largeCarbs / veryLargeCarbs = groups of each aproximate size to be represented by a different size chart point. The exact carb size context is given using a label
     typealias TreatmentChartPointsType = (smallBolus: [ChartPoint], mediumBolus: [ChartPoint], smallCarbs: [ChartPoint], mediumCarbs: [ChartPoint], largeCarbs: [ChartPoint], veryLargeCarbs: [ChartPoint])
@@ -36,16 +36,25 @@ public class GlucoseChartManager {
     /// CalibrationPoints to be shown on chart
     private var calibrationChartPoints = [ChartPoint]()
         
+    /// treatmentChartPoints to be shown on chart
     private var treatmentChartPoints: TreatmentChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
         
     /// smallBolusTreatmentChartPoints to be shown on chart
     private var smallBolusTreatmentChartPoints = [ChartPoint]()
+    
+    /// mediumBolusTreatmentChartPoints to be shown on chart
     private var mediumBolusTreatmentChartPoints = [ChartPoint]()
     
-    /// carbsTreatmentChartPoints to be shown on chart
+    /// smallCarbsTreatmentChartPoints to be shown on chart
     private var smallCarbsTreatmentChartPoints = [ChartPoint]()
+    
+    /// mediumCarbsTreatmentChartPoints to be shown on chart
     private var mediumCarbsTreatmentChartPoints = [ChartPoint]()
+    
+    /// largeCarbsTreatmentChartPoints to be shown on chart
     private var largeCarbsTreatmentChartPoints = [ChartPoint]()
+    
+    /// veryLargeCarbsTreatmentChartPoints to be shown on chart
     private var veryLargeCarbsTreatmentChartPoints = [ChartPoint]()
 
     /// ChartPoints to be shown on chart, processed only in main thread - urgent Range
@@ -1038,9 +1047,9 @@ public class GlucoseChartManager {
         
         managedObjectContext.performAndWait {
             
-            // cycle through the treatment entries and append the chart points
-            for treatmentEntry in treatmentEntries {
-                
+            // filter the treatment entries that have not been marked as deleted and append them to the relevant chart point array
+            for treatmentEntry in treatmentEntries.filter({ treatment in return !treatment.treatmentdeleted}) {
+
                 switch treatmentEntry.treatmentType {
                     
                 case .Insulin:
@@ -1110,34 +1119,34 @@ public class GlucoseChartManager {
         // in normal circumstances there will always be CGM data but in the unlikely event that there is no data point to calculate 1 hour before and after, we'll just pin it to the user's target objective which should be in the middle of their desired range
         let bgReadingsBefore = bgReadingsAccessor.getBgReadings(from: treatmentDate.addingTimeInterval(-minutesEitherSide * 60), to: treatmentDate, on: managedObjectContext)
         
-        if bgReadingsBefore.count > 0 {
+        if let lastBgReading = bgReadingsBefore.last {
             
-            lowerValueToUse = bgReadingsBefore.last!.calculatedValue
+            lowerValueToUse = lastBgReading.calculatedValue
             
         } else {
             
             let bgReadingsBeforeExtended = bgReadingsAccessor.getBgReadings(from: treatmentDate.addingTimeInterval(-minutesEitherSideExtended * 60), to: treatmentDate, on: managedObjectContext)
             
-            if bgReadingsBeforeExtended.count > 0 {
+            if let lastBgReading = bgReadingsBeforeExtended.last {
                 
-                lowerValueToUse = bgReadingsBeforeExtended.last!.calculatedValue
-            
+                lowerValueToUse = lastBgReading.calculatedValue
+                
             }
         }
         
         let bgReadingsAfter = bgReadingsAccessor.getBgReadings(from: treatmentDate, to: treatmentDate.addingTimeInterval(minutesEitherSide * 60), on: managedObjectContext)
         
-        if bgReadingsAfter.count > 0 {
+        if let firstBgReading = bgReadingsAfter.last {
             
-            upperValueToUse = bgReadingsAfter.first!.calculatedValue
+            upperValueToUse = firstBgReading.calculatedValue
             
         } else {
             
             let bgReadingsAfterExtended = bgReadingsAccessor.getBgReadings(from: treatmentDate, to: treatmentDate.addingTimeInterval(minutesEitherSideExtended * 60), on: managedObjectContext)
             
-            if bgReadingsAfterExtended.count > 0 {
+            if let firstBgReading = bgReadingsAfterExtended.last {
                 
-                upperValueToUse = bgReadingsAfterExtended.first!.calculatedValue
+                upperValueToUse = firstBgReading.calculatedValue
                 
             }
         }

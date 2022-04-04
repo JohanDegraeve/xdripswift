@@ -81,7 +81,7 @@ import CoreData
         case .Insulin:
             return ConstantsGlucoseChart.bolusTreatmentChartPointYAxisOffsetInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
-            // if no offset is defined or  this treatment type, just return zero offset
+            // if no offset is defined or needed for this treatment type, just return zero offset
         default:
             return 0
             
