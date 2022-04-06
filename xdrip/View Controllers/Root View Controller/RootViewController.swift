@@ -449,6 +449,10 @@ final class RootViewController: UIViewController {
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
         
+        // force chart refresh when user goes back to home screen
+        updateLabelsAndChart()
+        
+        // update Watch app values
         updateWatchApp()
         
     }
