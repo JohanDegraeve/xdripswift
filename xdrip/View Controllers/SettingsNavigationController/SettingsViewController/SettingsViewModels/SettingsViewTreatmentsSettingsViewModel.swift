@@ -71,7 +71,7 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
             })
             
         case .smallBolusTreatmentThreshold:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_smallBolusTreatmentThreshold, message: Texts_SettingsView.settingsviews_smallBolusTreatmentThresholdMessage, keyboardType: .numberPad, text: UserDefaults.standard.smallBolusTreatmentThreshold.description, placeHolder: "0.0", actionTitle: nil, cancelTitle: nil, actionHandler: {(threshold:String) in if let threshold = Double(threshold) {UserDefaults.standard.smallBolusTreatmentThreshold = Double(threshold)}}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_smallBolusTreatmentThreshold, message: Texts_SettingsView.settingsviews_smallBolusTreatmentThresholdMessage, keyboardType: .decimalPad, text: UserDefaults.standard.smallBolusTreatmentThreshold.description, placeHolder: "0.0", actionTitle: nil, cancelTitle: nil, actionHandler: {(threshold:String) in if let threshold = Double(threshold) {UserDefaults.standard.smallBolusTreatmentThreshold = Double(threshold)}}, cancelHandler: nil, inputValidator: nil)
             
         }
     }
