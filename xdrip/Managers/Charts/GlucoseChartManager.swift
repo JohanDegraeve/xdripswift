@@ -1250,7 +1250,8 @@ public class GlucoseChartManager {
     /// - returns: a double with the actual value for the treatment requested
     private func getTreatmentValueFromTimeStamp(treatmentDate: ChartAxisValueDate, treatmentType: TreatmentType, treatmentEntryAccessor: TreatmentEntryAccessor, on managedObjectContext: NSManagedObjectContext) -> Double {
         
-        let treatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: treatmentDate.date, toDate: treatmentDate.date, on: managedObjectContext)
+        // We need to increase slightly the "window" that we are using to locate the treament. The ChartPoint class seems to slightly round the values which might result in not getting an exact match. ±1ms seems to work, but we'll leave it at ±50ms just to be sure.
+        let treatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: Date(timeInterval: -0.05, since: treatmentDate.date), toDate: Date(timeInterval: 0.05, since: treatmentDate.date), on: managedObjectContext)
         
         // intialize the treatmentValue that we will return
         var treatmentValue: Double = 0
