@@ -42,16 +42,16 @@
 "8jK-jB-QOG.text" = "Etiket";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[0] = "3h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[0]" = "3sa";
+"9LS-Vp-uGd.segmentTitles[0]" = "3s";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[1] = "6h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[1]" = "6sa";
+"9LS-Vp-uGd.segmentTitles[1]" = "6s";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[2] = "12h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[2]" = "12sa";
+"9LS-Vp-uGd.segmentTitles[2]" = "12s";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[3] = "24h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[3]" = "24sa";
+"9LS-Vp-uGd.segmentTitles[3]" = "24s";
 
 /* Class = "UILabel"; text = "HbA1c"; ObjectID = "9Ud-mR-3u4"; */
 "9Ud-mR-3u4.text" = "HbA1c";
