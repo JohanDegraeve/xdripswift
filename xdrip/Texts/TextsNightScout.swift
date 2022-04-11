@@ -1,7 +1,7 @@
 import Foundation
 
-/// all texts for NightScout related texts
-class Texts_NightScoutTestResult {
+/// all NightScout related texts
+class TextsNightScout {
     static private let filename = "NightScoutTestResult"
     
     static let verificationSuccessfulAlertTitle: String = {
@@ -17,7 +17,6 @@ class Texts_NightScoutTestResult {
     }()
     
     static let warningAPIKeyOrURLIsnil: String = {
-        
         return NSLocalizedString("warningAPIKeyOrURLIsnil", tableName: filename, bundle: Bundle.main, value: "Your Nightscout URL (and optionally API_SECRET or Token) must be set before you can run the test", comment: "in settings screen, user tries to test url and API Key but one of them is not set")
     }()
     
@@ -28,4 +27,5 @@ class Texts_NightScoutTestResult {
     static let nightScoutAPIKeyAndURLStartedBody : String = {
         return NSLocalizedString("nightScoutAPIKeyAndURLStartedBody", tableName: filename, bundle: Bundle.main, value: "Nightscout Verification Test Started\n\nThis message should automatically disappear shortly", comment: "in settings screen, user clicked test button for nightscout url and apikey - this is the body")
     }()
+    
 }

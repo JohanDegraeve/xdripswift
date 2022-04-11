@@ -112,6 +112,24 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_showtarget", tableName: filename, bundle: Bundle.main, value: "Show Target Line?", comment: "home screen settings, show target line")
     }()
     
+    // MARK: - Section Treatments
+    
+    static let sectionTitleTreatments: String = {
+        return NSLocalizedString("settingsviews_sectiontitletreatments", tableName: filename, bundle: Bundle.main, value: "Treatments", comment: "treatments settings, section title")
+    }()
+
+    static let settingsviews_showTreatmentsOnChart: String = {
+        return NSLocalizedString("settingsviews_showTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Treatments on Chart?", comment: "treatments settings, show the treatments on main chart")
+    }()
+    
+    static let settingsviews_smallBolusTreatmentThreshold = {
+        return NSLocalizedString("settingsviews_smallBolusTreatmentThreshold", tableName: filename, bundle: Bundle.main, value: "Micro-Bolus Threshold:", comment: "When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus")
+    }()
+    
+    static let settingsviews_smallBolusTreatmentThresholdMessage = {
+        return NSLocalizedString("settingsviews_smallBolusTreatmentThresholdMessage", tableName: filename, bundle: Bundle.main, value: "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)", comment: "When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus")
+    }()
+    
     // MARK: - Section Statistics
     
     static let sectionTitleStatistics: String = {

@@ -51,6 +51,9 @@ enum ConstantsLog {
     
     /// application data bgreadings
     static let categoryApplicationDataBgReadings =   "ApplicationDataBgReadings     "
+	
+	/// application data Treatments
+	static let categoryApplicationDataTreatments =   "ApplicationDataTreatments     "
     
     /// application data calibrations
     static let categoryApplicationDataCalibrations = "ApplicationDataCalibrations   "

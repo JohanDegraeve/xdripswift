@@ -1,6 +1,6 @@
 PODS:
   - ActionClosurable (2.0.0)
-  - CryptoSwift (1.4.0)
+  - CryptoSwift (1.4.2)
   - PieCharts (0.0.7)
   - SwiftCharts (0.6.5)
 
@@ -27,7 +27,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   ActionClosurable: 92729a0f0bb4b38d2744319ea8282a3ce8fb1e0a
-  CryptoSwift: 7cc902df1784de3b389a387756c7d710f197730c
+  CryptoSwift: a532e74ed010f8c95f611d00b8bbae42e9fe7c17
   PieCharts: 30e50dfa7dc19e5b84e9878d32089673ef5d0453
   SwiftCharts: 2e755ea292f0b87d3e4b2c1eb5afc080a20cdc15
 

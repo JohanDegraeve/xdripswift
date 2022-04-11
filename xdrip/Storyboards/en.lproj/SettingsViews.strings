@@ -22,6 +22,10 @@
 "settingsviews_useobjectives" = "Show Objectives in Graph?";
 "settingsviews_showcoloredobjectives" = "Show Colored Lines?";
 "settingsviews_showtarget" = "Show Target Line?";
+"settingsviews_sectiontitletreatments" = "Treatments";
+"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart?";
+"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold:";
+"settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Statistics";
 "settingsviews_showStatistics" = "Show Statistics?";
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate?";

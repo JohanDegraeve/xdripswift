@@ -8,6 +8,7 @@
 
 import Foundation
 
+
 public class LoopManager:NSObject {
     
     // MARK: - private properties
@@ -88,7 +89,6 @@ public class LoopManager:NSObject {
         UserDefaults.standard.timeStampLatestLoopSharedBgReading = lastReadings.first!.timeStamp
         
         UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
-        
     }
     
 }

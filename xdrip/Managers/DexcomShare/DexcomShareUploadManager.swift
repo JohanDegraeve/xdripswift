@@ -68,7 +68,7 @@ class DexcomShareUploadManager:NSObject {
     /// uploads latest BgReadings to Dexcom Share
     /// - parameters:
     ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
-    public func upload(lastConnectionStatusChangeTimeStamp: Date?) {
+    public func uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date?) {
         
         // check if dexcomShare is enabled
         guard UserDefaults.standard.uploadReadingstoDexcomShare else {
@@ -129,7 +129,7 @@ class DexcomShareUploadManager:NSObject {
                                         trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                                         
                                         // set lastConnectionStatusChangeTimeStamp to as late as possible, to make sure that the most recent reading is uploaded if user is testing the credentials
-                                        self.upload(lastConnectionStatusChangeTimeStamp: Date())
+                                        self.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date())
                                         
                                     } else {
                                         trace("in observeValue, Dexcom Share credential check failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
@@ -160,7 +160,7 @@ class DexcomShareUploadManager:NSObject {
                                             trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                                             
                                             // set lastConnectionStatusChangeTimeStamp to as late as possible, to make sure that the most recent reading is uploaded if user is testing the credentials
-                                            self.upload(lastConnectionStatusChangeTimeStamp: Date())
+                                            self.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date())
                                             
                                         } else {
                                             

@@ -293,6 +293,10 @@ final class RootViewController: UIViewController {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to dismiss screenLockAlertController
     private let applicationManagerKeyDismissScreenLockAlertController = "applicationManagerKeyDismissScreenLockAlertController"
     
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to do a NightScout Treatment sync
+    private let applicationManagerKeyStartNightScoutTreatmentSync = "applicationManagerKeyStartNightScoutTreatmentSync"
+
+    
     // MARK: - Properties - other private properties
     
     /// for logging
@@ -312,7 +316,7 @@ final class RootViewController: UIViewController {
     
     /// CalibrationsAccessor instance
     private var calibrationsAccessor:CalibrationsAccessor?
-    
+	
     /// NightScoutUploadManager instance
     private var nightScoutUploadManager:NightScoutUploadManager?
     
@@ -625,6 +629,9 @@ final class RootViewController: UIViewController {
                 
             }
             
+            // launch Nightscout sync
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+            
         })
         
         // Setup View
@@ -726,6 +733,11 @@ final class RootViewController: UIViewController {
             
         })
         
+        // launch nightscout treatment sync whenever the app comes to the foreground
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStartNightScoutTreatmentSync, closure: {
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        })
+        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -784,7 +796,7 @@ final class RootViewController: UIViewController {
         guard let bgReadingsAccessor = bgReadingsAccessor else {
             fatalError("In setupApplicationData, failed to initialize bgReadings")
         }
-        
+		
         // instantiate calibrations
         calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         
@@ -977,24 +989,18 @@ final class RootViewController: UIViewController {
             var timeStampToDelete = Date(timeIntervalSinceNow: -60.0 * (Double)(ConstantsLibreSmoothing.readingsToDeleteInMinutes))
             
             trace("timeStampToDelete =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, timeStampToDelete.toString(timeStyle: .long, dateStyle: .none))
-            
+
             // now check if we'll delete readings
-            // there must be a glucoseData.last, here assigning lastGlucoseData just to unwrap it
-            // checking lastGlucoseData.timeStamp < timeStampToDelete guarantees the oldest reading is older than the one we'll delete, so we're sur we have enough readings in glucoseData to refill the BgReadings
-            if let lastGlucoseData = glucoseData.last, lastGlucoseData.timeStamp < timeStampToDelete, UserDefaults.standard.smoothLibreValues {
+            // there must be a glucoseData.last, here assigning oldestGlucoseData just to unwrap it
+            // checking oldestGlucoseData.timeStamp < timeStampToDelete guarantees the oldest reading is older than the one we'll delete, so we're sur we have enough readings in glucoseData to refill the BgReadings
+            if let oldestGlucoseData = glucoseData.last, oldestGlucoseData.timeStamp < timeStampToDelete, UserDefaults.standard.smoothLibreValues  {
 
-                trace("lastGlucoseData =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, lastGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .none))
-
-                // older than the timestamp of the latest reading
-                if let last = glucoseData.last {
-                    timeStampToDelete = max(timeStampToDelete, last.timeStamp)
-                }
-                
                 // older than the timestamp of the latest calibration (would only be applicable if recalibration is used)
                 if let lastCalibrationForActiveSensor = lastCalibrationForActiveSensor {
                     timeStampToDelete = max(timeStampToDelete, lastCalibrationForActiveSensor.timeStamp)
+                    trace("after lastcalibrationcheck timeStampToDelete =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, timeStampToDelete.toString(timeStyle: .long, dateStyle: .none))
                 }
-                
+
                 // there should be one reading per minute for the period that we want to delete readings, otherwise we may not be able to fill up a gap that is created by deleting readings, because the next readings are per 15 minutes. This will typically happen the first time the app runs (or reruns), the first range of readings is only 16 readings not enough to fill up a gap of more than 20 minutes
                 // we calculate the number of minutes between timeStampToDelete and now, use the result as index in glucoseData, the timestamp of that element is a number of minutes away from now, that number should be equal to index (as we expect one reading per minute)
                 // if that's not the case add 1 minute to timeStampToDelete
@@ -1008,8 +1014,9 @@ final class RootViewController: UIViewController {
                     
                     if minutes < glucoseData.count {
                         
-                        if abs(glucoseData[minutes].timeStamp.timeIntervalSince(timeStampToDelete)) > 1.0 {
-                            // increase timeStampToDelete with 5 minutes, this is in the assumption that ConstantsSmoothing.readingsToDeleteInMinutes is not more than 21, by reducing to 16 we should never have a gap because there's always minimum 16 values per minute
+                        if abs(glucoseData[minutes].timeStamp.timeIntervalSince(timeStampToDelete)) > 60.0 {
+                            
+                            // increase timeStampToDelete with 1 minute
                             timeStampToDelete = timeStampToDelete.addingTimeInterval(1.0 * 60)
                             
                             return false
@@ -1049,6 +1056,7 @@ final class RootViewController: UIViewController {
                 // this is the easiest way to achieve it
                 glucoseChartManager?.cleanUpMemory()
                 
+
             }
             
             // was a new reading created or not ?
@@ -1136,13 +1144,13 @@ final class RootViewController: UIViewController {
                     
                 }
                 
-                nightScoutUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                nightScoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 healthKitManager?.storeBgReadings()
                 
                 bgReadingSpeaker?.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
-                dexcomShareUploadManager?.upload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                dexcomShareUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 bluetoothPeripheralManager?.sendLatestReading()
                 
@@ -1558,12 +1566,12 @@ final class RootViewController: UIViewController {
                 
                 // initiate upload to NightScout, if needed
                 if let nightScoutUploadManager = self.nightScoutUploadManager {
-                    nightScoutUploadManager.upload(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
+                    nightScoutUploadManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 }
                 
                 // initiate upload to Dexcom Share, if needed
                 if let dexcomShareUploadManager = self.dexcomShareUploadManager {
-                    dexcomShareUploadManager.upload(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
+                    dexcomShareUploadManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 }
                 
                 // update labels
@@ -1922,12 +1930,6 @@ final class RootViewController: UIViewController {
         
         // update the chart up to now
         updateChartWithResetEndDate()
-//
-//        let minutesAgoTextLabel = (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) + " " + Texts_HomeView.ago
-                
-//        updateWatchApp(currentBGValueText: calculatedValueAsString, currentBGValue: lastReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), currentBGTimeStamp: ISO8601DateFormatter().string(from: lastReading.timeStamp), minutesAgoTextLocalized: minutesAgoTextLabel, deltaTextLocalized: diffLabelText)
-//
-//        updateWatchApp(urgentLowMarkValueInUserChosenUnit: UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded.description, lowMarkValueInUserChosenUnit: UserDefaults.standard.lowMarkValueInUserChosenUnitRounded.description, highMarkValueInUserChosenUnit: UserDefaults.standard.highMarkValueInUserChosenUnitRounded.description, urgentHighMarkValueInUserChosenUnit: UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded.description)
         
     }
     
@@ -2922,7 +2924,9 @@ extension RootViewController: UITabBarControllerDelegate {
             
             navigationController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
             
-        }
+        } else if let navigationController = viewController as? TreatmentsNavigationController, let coreDataManager = coreDataManager {
+			navigationController.configure(coreDataManager: coreDataManager)
+		}
     }
     
 }

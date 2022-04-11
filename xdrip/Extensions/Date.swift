@@ -37,7 +37,22 @@ extension Date {
         let timeInterval = TimeInterval(-Double(hour * 3600 + minute * 60 + seconds))
         return Date(timeInterval: timeInterval, since: self)
     }
+	
+	/// Given a date represented as a string, returns a Date object, the reverse of ISOStringFromDate.
+    ///
+	/// Example string: "2022-01-12T23:04:17.190Z"
+	static func fromISOString(_ string: String) -> Date? {
+		let dateFormatter = DateFormatter()
+		dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+		dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
+		dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+		
+		return dateFormatter.date(from: string)
+	}
     
+	/// Returns the date represented as a ISO string.
+    ///
+	/// Example return: "2022-01-12T23:04:17.190Z"
     func ISOStringFromDate() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
