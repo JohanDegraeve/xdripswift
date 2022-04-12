@@ -80,32 +80,20 @@ public enum LibreSensorType: String {
         
     }
     
-    /// checks crc if needed for the sensor type (not for libreProH)
+    /// checks crc if needed for the sensor type
     func crcIsOk(rxBuffer:inout Data, headerLength: Int, log: OSLog?) -> Bool {
         
-        switch self {
-            
-        case .libreProH:
+        guard Crc.LibreCrc(data: &rxBuffer, headerOffset: headerLength, libreSensorType: self) else {
             
             if let log = log {
-                trace("    libreProH sensor, no CRC check", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                trace("    in crcIsOk, CRC check failed", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
             }
             
-        case .libre1, .libre1A2, .libre2, .libreUS:
-            
-            guard Crc.LibreCrc(data: &rxBuffer, headerOffset: headerLength) else {
-                
-                if let log = log {
-                    trace("    in crcIsOk, CRC check failed", log: log, category: ConstantsLog.categoryCGMBubble, type: .info)
-                }
-                
-                return false
-            }
-            
+            return false
         }
-        
+
         return true
-        
+
     }
 
     /// - reads the first byte in patchInfo and dependent on that value, returns type of sensor
@@ -161,7 +149,7 @@ public enum LibreSensorType: String {
             return nil
 
         case .libreProH:
-            return nil
+            return 14
 
         }
         

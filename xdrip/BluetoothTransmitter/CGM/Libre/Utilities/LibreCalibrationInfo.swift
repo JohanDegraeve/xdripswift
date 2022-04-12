@@ -10,22 +10,22 @@ public struct LibreCalibrationInfo: Codable {
         var i6: Double
         
     
-    init(bytes: Data) {
+    init(bytes: Data, libreSensorType: LibreSensorType?) {
         
-        i1 = Self.readBits(bytes, 2, 0, 3)
+        i1 = Self.readBits(bytes, (libreSensorType == .libreProH ? 26 : 2), 0, 3)
         
-        i2 = Self.readBits(bytes, 2, 3, 0xa)
+        i2 = Self.readBits(bytes, (libreSensorType == .libreProH ? 26 : 2), 3, 0xa)
         
-        i3 = Double(Self.readBits(bytes, 0x150, 0, 8))
-        if Self.readBits(bytes, 0x150, 0x21, 1) != 0 {
+        i3 = Double(Self.readBits(bytes, (libreSensorType == .libreProH ? 56 : 0x150), 0, 8))
+        if Self.readBits(bytes, (libreSensorType == .libreProH ? 56 : 0x150), 0x21, 1) != 0 {
             i3 = -i3
         }
         
-        i4 = Double(Self.readBits(bytes, 0x150, 8, 0xe))
+        i4 = Double(Self.readBits(bytes, (libreSensorType == .libreProH ? 56 : 0x150), 8, 0xe))
         
-        i5 = Double(Self.readBits(bytes, 0x150, 0x28, 0xc) << 2)
+        i5 = Double(Self.readBits(bytes, (libreSensorType == .libreProH ? 56 : 0x150), 0x28, 0xc) << 2)
         
-        i6 = Double(Self.readBits(bytes, 0x150, 0x34, 0xc) << 2)
+        i6 = Double(Self.readBits(bytes, (libreSensorType == .libreProH ? 56 : 0x150), 0x34, 0xc) << 2)
         
     }
     
