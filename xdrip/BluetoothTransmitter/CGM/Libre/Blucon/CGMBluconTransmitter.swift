@@ -544,5 +544,13 @@ extension CGMBluconTransmitter: CGMTransmitter {
         return nonFixedSlopeEnabled
     }
     
+    func getCBUUID_Service() -> String {
+        return CBUUID_BluconService
+    }
+    
+    func getCBUUID_Receive() -> String {
+        return CBUUID_ReceiveCharacteristic_Blucon
+    }
+
 }
 

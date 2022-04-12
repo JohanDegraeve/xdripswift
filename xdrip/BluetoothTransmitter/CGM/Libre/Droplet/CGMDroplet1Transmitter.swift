@@ -140,4 +140,12 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
         return nonFixedSlopeEnabled
     }
 
+    func getCBUUID_Service() -> String {
+        return CBUUID_Service_Droplet
+    }
+    
+    func getCBUUID_Receive() -> String {
+        return CBUUID_ReceiveCharacteristic_Droplet
+    }
+
 }

@@ -914,6 +914,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         return !transmitterId.isFireFly()
     }
     
+    func getCBUUID_Service() -> String {
+        return CBUUID_Service_G5
+    }
+    
+    func getCBUUID_Receive() -> String {
+        return CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue
+    }
+    
     // MARK: - private helper functions
     
     /// sends SensorTxMessage to transmitter

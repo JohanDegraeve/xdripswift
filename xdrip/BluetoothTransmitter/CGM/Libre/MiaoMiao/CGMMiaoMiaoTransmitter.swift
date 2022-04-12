@@ -333,6 +333,14 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
 
+    func getCBUUID_Service() -> String {
+        return CBUUID_Service_MiaoMiao
+    }
+    
+    func getCBUUID_Receive() -> String {
+        return CBUUID_ReceiveCharacteristic_MiaoMiao
+    }
+
     // MARK: - helpers
     
     /// reset rxBuffer, reset startDate, set resendPacketCounter to 0

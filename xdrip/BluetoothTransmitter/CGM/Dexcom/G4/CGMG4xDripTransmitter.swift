@@ -155,10 +155,18 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
         
     }
     
-    // MARK:- CGMTransmitter protocol functions
+    // MARK: - CGMTransmitter protocol functions
     
     func cgmTransmitterType() -> CGMTransmitterType {
         return .dexcomG4
+    }
+
+    func getCBUUID_Service() -> String {
+        return CBUUID_Service_G4
+    }
+    
+    func getCBUUID_Receive() -> String {
+        return CBUUID_ReceiveCharacteristic_G4
     }
 
     // MARK:- helper functions
