@@ -326,3 +326,19 @@
 
 "settingsviews_showHelpIcon" = "Hilfe-Symbol anzeigen?";
 "settingsviews_restartNeeded" = "(Neustart notwendig)";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
+"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold:";
+
+/// treatments settings, section title
+"settingsviews_sectiontitletreatments" = "Treatments";
+
+/// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
+"settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
+
+/// treatments settings, show the treatments on main chart
+"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart?";
