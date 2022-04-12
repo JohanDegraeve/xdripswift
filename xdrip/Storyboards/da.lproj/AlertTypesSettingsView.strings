@@ -1,0 +1,17 @@
+"alerttypessettingsview_screentitle" = "Alarm Types";
+"alerttypesettingsview_screentitle" = "Edit Alarm Type";
+"alerttypesettingsview_name" = "Name";
+"alerttypesettingsview_enabled" = "Enabled?";
+"alerttypesettingsview_vibrate" = "Vibrate?";
+"alerttypesettingsview_snoozevianotification" = "Allow Snooze Via Notification?";
+"alerttypesettingsview_defaultsnoozeperiod" = "Default Snooze Time (mins)";
+"alerttypesettingsview_overridemute" = "Override Mute?";
+"alerttypesettingsview_sound" = "Sound";
+"alerttypesettingsview_defaultiossound" = "iOS Sound";
+"alerttypesettingsview_givename" = "Alarm Name";
+"alerttypesettingsview_givesnoozeperiod" = "Snooze Time in Minutes";
+"alerttypesettingsview_picksoundname" = "Sound Name";
+"alertTypeNoSound" = "No Sound";
+"alerttypenamealreadyexistsmessages" = "An Alarm Type with this name already exists. Use a different name";
+"confirmdeletionalerttype" = "Delete Alarm Type: ";
+

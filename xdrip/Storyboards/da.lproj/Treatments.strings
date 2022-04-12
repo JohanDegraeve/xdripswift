@@ -1,0 +1,15 @@
+"treatments_title" = "Treatments";
+"treatments_new_button" = "New";
+"treatments_new_entry" = "New Entry";
+"treatments_carbs_with_unit" = "Carbs (g):";
+"treatments_insulin_with_unit" = "Insulin (U):";
+"treatments_exercise_with_unit" = "Exercise (min):";
+"treatments_carbs_unit" = "g";
+"treatments_insulin_unit" = "U";
+"treatments_exercise_unit" = "min";
+"treatments_carbs" = "Carbs";
+"treatments_insulin" = "Insulin";
+"treatments_exercise" = "Exercise";
+"treatments_question_mark" = "?";
+"treatments_success" = "Success";
+"treatments_sync_complete" = "Synchronization complete.";

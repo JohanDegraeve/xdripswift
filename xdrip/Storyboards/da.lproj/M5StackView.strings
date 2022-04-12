@@ -1,0 +1,13 @@
+"screenTitle" = "M5Stack";
+"authenticationFailureWarning" = "Authentication to M5Stack Failed, either set the pre-configured password in the Settings, or, if the M5Stack does not have a preconfigured password then reset the M5Stack. M5Stack will disconnect now. You can make a new attempt by clicking ";
+"blePasswordMissingWarning" = "You need to set the password in the Settings";
+"m5StackResetRequiredWarning" = "M5Stack must be reset in order to generate a new temporary password. When done click ";
+"m5StackSoftWhereHelpCellText" = "Where to find the M5Stack software?";
+"m5StickCSoftWhereHelpCellText" = "Where to find the M5StickC software?";
+"m5StackSoftWareHelpText" = "Go to";
+"m5StackViewscreenTitle" = "M5Stack";
+"m5StickCViewscreenTitle" = "M5StickC";
+"deviceMustBeConnectedToPowerOff" = "M5Stack must be connected to be able to power it off";
+"powerOffConfirm" = "Are you sure you want to power off the M5Stack?";
+"powerOff" = "Power Off";
+"connectToWiFi" = "Connect to WiFi";
