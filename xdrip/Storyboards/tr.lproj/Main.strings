@@ -42,16 +42,16 @@
 "8jK-jB-QOG.text" = "Etiket";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[0] = "3h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[0]" = "3sa";
+"9LS-Vp-uGd.segmentTitles[0]" = "3s";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[1] = "6h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[1]" = "6sa";
+"9LS-Vp-uGd.segmentTitles[1]" = "6s";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[2] = "12h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[2]" = "12sa";
+"9LS-Vp-uGd.segmentTitles[2]" = "12s";
 
 /* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[3] = "24h"; ObjectID = "9LS-Vp-uGd"; */
-"9LS-Vp-uGd.segmentTitles[3]" = "24sa";
+"9LS-Vp-uGd.segmentTitles[3]" = "24s";
 
 /* Class = "UILabel"; text = "HbA1c"; ObjectID = "9Ud-mR-3u4"; */
 "9Ud-mR-3u4.text" = "HbA1c";
@@ -135,16 +135,16 @@
 "Xuy-hn-ozf.segmentTitles[0]" = "Bugün";
 
 /* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[1] = "24h"; ObjectID = "Xuy-hn-ozf"; */
-"Xuy-hn-ozf.segmentTitles[1]" = "24sa";
+"Xuy-hn-ozf.segmentTitles[1]" = "24s";
 
 /* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[2] = "7d"; ObjectID = "Xuy-hn-ozf"; */
-"Xuy-hn-ozf.segmentTitles[2]" = "7gün";
+"Xuy-hn-ozf.segmentTitles[2]" = "7g";
 
 /* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[3] = "30d"; ObjectID = "Xuy-hn-ozf"; */
-"Xuy-hn-ozf.segmentTitles[3]" = "30gün";
+"Xuy-hn-ozf.segmentTitles[3]" = "30g";
 
 /* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[4] = "90d"; ObjectID = "Xuy-hn-ozf"; */
-"Xuy-hn-ozf.segmentTitles[4]" = "90gün";
+"Xuy-hn-ozf.segmentTitles[4]" = "90g";
 
 /* Class = "UINavigationItem"; title = "Title"; ObjectID = "YQZ-eK-OoJ"; */
 "YQZ-eK-OoJ.title" = "Başlık";
