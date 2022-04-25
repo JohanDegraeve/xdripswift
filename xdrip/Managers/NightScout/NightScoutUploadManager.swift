@@ -101,9 +101,14 @@ public class NightScoutUploadManager: NSObject {
     public func uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date?) {
                 
         // check that NightScout is enabled
-        // and master is enabled
         // and nightScoutUrl exists
-        guard UserDefaults.standard.nightScoutEnabled, UserDefaults.standard.isMaster, UserDefaults.standard.nightScoutUrl != nil else {return}
+        guard UserDefaults.standard.nightScoutEnabled, UserDefaults.standard.nightScoutUrl != nil else {return}
+
+        trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        
+        // check that master is enabled
+        guard UserDefaults.standard.isMaster else {return}
         
         // check that either the API_SECRET or Token exists, if both are nil then return
         if UserDefaults.standard.nightScoutAPIKey == nil && UserDefaults.standard.nightscoutToken == nil {
