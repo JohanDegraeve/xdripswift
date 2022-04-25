@@ -145,6 +145,9 @@ class NightScoutFollowManager:NSObject {
         
         trace("in download", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
 
+        trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        
         // nightscout URl must be non-nil - could be that url is not valid, this is not checked here, the app will just retry every x minutes
         guard let nightScoutUrl = UserDefaults.standard.nightScoutUrl else {return}
         
