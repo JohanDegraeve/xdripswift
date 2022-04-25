@@ -13,7 +13,7 @@ enum Texts_TreatmentsView {
 	}()
 	
 	static let newEntryTitle:String = {
-		return NSLocalizedString("treatments_new_entry", tableName: filename, bundle: Bundle.main, value: "New Entry", comment: "New entry view title.")
+		return NSLocalizedString("treatments_new_entry", tableName: filename, bundle: Bundle.main, value: "New Treatment", comment: "New entry view title.")
 	}()
 	
 	static let carbsWithUnit:String = {
