@@ -24,10 +24,12 @@ final class Crc {
     /// crc check for Libre data, also length is checkec, should be 344 minimum
     /// - parameters:
     ///     - headerOffset: for example MiaoMiao adds own header in front of data, this parameter specifies the length of that data, it will be ignored
-    public static func LibreCrc(data:inout Data, headerOffset:Int) -> Bool {
-        let headerRange =   headerOffset + 0..<headerOffset + 24   //  24 bytes, i.e.  3 blocks a 8 bytes
-        let bodyRange   =  headerOffset + 24..<headerOffset + 320  // 296 bytes, i.e. 37 blocks a 8 bytes
-        let footerRange = headerOffset + 320..<headerOffset + 344  //  24 bytes, i.e.  3 blocks a 8 bytes
+    ///     - libreSensorType. if nil means not known.  For transmitters that don't know the sensorType, this will not work for Libre ProH
+    public static func LibreCrc(data:inout Data, headerOffset:Int, libreSensorType: LibreSensorType?) -> Bool {
+        
+        let headerRange =   headerOffset + 0..<headerOffset + (libreSensorType == .libreProH ? 40:24)
+        let bodyRange   =  headerOffset + (libreSensorType == .libreProH ? 40:24)..<headerOffset + (libreSensorType == .libreProH ? 72:320)
+        let footerRange = headerOffset + (libreSensorType == .libreProH ? 72:320)..<headerOffset + (libreSensorType == .libreProH ? 176:344)
 
         if data.count < 344 {
             print("data.count < 344")

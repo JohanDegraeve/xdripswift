@@ -37,13 +37,14 @@ public struct Libre1DerivedAlgorithmParameters: Codable, CustomStringConvertible
         
     }
     
-    public init(bytes: Data, serialNumber: String) {
+    ///     - libreSensorType. if nil means not known.  For transmitters that don't know the sensorType, this will not work for Libre ProH
+    public init(bytes: Data, serialNumber: String, libreSensorType: LibreSensorType?) {
         
         self.serialNumber = serialNumber
         
         let thresholds = LibreAlgorithmThresholds(glucoseLowerThreshold: 1000, glucoseUpperThreshold: 3000, temperatureLowerThreshold: 6000, temperatureUpperThreshold: 9000, forSensorIdentifiedBy: 49778)
         
-        let libreCalibrationInfo = LibreCalibrationInfo(bytes: bytes)
+        let libreCalibrationInfo = LibreCalibrationInfo(bytes: bytes, libreSensorType: libreSensorType)
         
         let responseb1 = LibreMeasurement(rawGlucose: Int(thresholds.glucoseLowerThreshold), rawTemperature: Int(thresholds.temperatureLowerThreshold)).roundedGlucoseValueFromRaw2(libreCalibrationInfo: libreCalibrationInfo)
         
@@ -70,7 +71,7 @@ public struct Libre1DerivedAlgorithmParameters: Codable, CustomStringConvertible
         offset_offset = offset2 - (slope_offset * Double(thresholds.temperatureUpperThreshold))
         
         // from SensorData and GlucoseFromRaw
-        let footerRange = 320..<344
+        let footerRange = (libreSensorType == .libreProH ? 72..<176 : 320..<344)
         let footer = Array(bytes[footerRange])
         let b0 = UInt16(footer[1])
         let b1 = UInt16(footer[0])

@@ -286,7 +286,7 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                     if rxBuffer.count >= 363  {
                         trace("in peripheral didUpdateValueFor, Buffer complete", log: log, category: ConstantsLog.categoryWatlaa, type: .info)
                         
-                        if (Crc.LibreCrc(data: &rxBuffer, headerOffset: miaoMiaoHeaderLength)) {
+                        if (Crc.LibreCrc(data: &rxBuffer, headerOffset: miaoMiaoHeaderLength, libreSensorType: nil)) {
 
                             // get batteryPercentage
                             let batteryPercentage = Int(rxBuffer[13])

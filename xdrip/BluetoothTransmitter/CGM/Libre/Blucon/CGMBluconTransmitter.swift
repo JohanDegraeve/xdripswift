@@ -171,7 +171,7 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             trace("in handleNewHistoricData, reached minimum length, processing data", log: log, category: ConstantsLog.categoryBlucon, type: .info)
             
             // crc check
-            guard Crc.LibreCrc(data: &rxBuffer, headerOffset: 0) else {
+            guard Crc.LibreCrc(data: &rxBuffer, headerOffset: 0, libreSensorType: nil) else {
                 
                 trace("    crc check failed, no further processing", log: log, category: ConstantsLog.categoryBlucon, type: .error)
                 
