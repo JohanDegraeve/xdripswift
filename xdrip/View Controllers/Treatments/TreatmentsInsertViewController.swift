@@ -220,7 +220,7 @@ class TreatmentsInsertViewController : UIViewController {
             // if yes, creates a new TreatmentEntry
             let createFunction = { [self] (text: String?, treatmentType: TreatmentType) in
                 
-                if let text = text, let value = Double(text), value > 0 {
+                if let text = text, let value = Double(text.replacingOccurrences(of: ",", with: ".")), value > 0 {
 
                     // create the treatment and append to treatments
                     _ = TreatmentEntry(date: Date(timeInterval: dateOffset, since: datePicker.date), value: value, treatmentType: treatmentType, nightscoutEventType: nil, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
