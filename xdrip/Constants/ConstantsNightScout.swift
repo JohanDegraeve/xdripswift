@@ -13,7 +13,10 @@ enum ConstantsNightScout {
     /// if the time between the last and last but one reading is less than minimiumTimeBetweenTwoReadingsInMinutes, then the last reading will not be uploaded - except if there's been a disconnect in between these two readings
     static let minimiumTimeBetweenTwoReadingsInMinutes = 4.75
     
-    /// maximum amount of treatments to sync with Nightscout
-    static let maxTreatmentsToSync = 50
+    /// maximum amount of treatments to upload to NightScout (inclusive updated treatments and treatments marked as deleted)
+    static let maxTreatmentsToUpload = 50
+    
+    /// download treatments from nightscout, how manyhours
+    static let maxHoursTreatmentsToDownload = 24.0
 
 }

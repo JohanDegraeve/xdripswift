@@ -183,7 +183,7 @@ public class NightScoutUploadManager: NSObject {
         
         // get the latest treatments from the last maxTreatmentsDaysToUpload days
         // this includes treatments in with treatmentDeleted = true
-        let treatmentsToSync = treatmentEntryAccessor.getLatestTreatments(limit: ConstantsNightScout.maxTreatmentsToSync)
+        let treatmentsToSync = treatmentEntryAccessor.getLatestTreatments(limit: ConstantsNightScout.maxTreatmentsToUpload)
 
         trace("in syncTreatmentsWithNightScout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
         
@@ -848,7 +848,8 @@ public class NightScoutUploadManager: NSObject {
         
         trace("in getLatestTreatmentsNSResponses", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
 
-        let queries = [URLQueryItem(name: "count", value: String(ConstantsNightScout.maxTreatmentsToSync))]
+        // query for treatments older than maxHoursTreatmentsToDownload
+        let queries = [URLQueryItem(name: "find[created_at][$gte]", value: String(Date(timeIntervalSinceNow: TimeInterval(hours: -ConstantsNightScout.maxHoursTreatmentsToDownload)).ISOStringFromDate()))]
         
         getOrDeleteRequest(path: nightScoutTreatmentPath, queries: queries, httpMethod: nil) { (data: Data?, nightScoutResult: NightScoutResult) in
             
