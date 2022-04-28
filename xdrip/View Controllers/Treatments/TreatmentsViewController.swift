@@ -28,14 +28,6 @@ class TreatmentsViewController : UIViewController {
     
 	@IBOutlet weak var tableView: UITableView!
 	
-	/// Sync button action.
-	@IBAction func syncButtonTapped(_ sender: UIBarButtonItem) {
-        
-        // nightscout upload manager observes this value and will initialize a sync
-        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
-        
-	}
-	
     // MARK: - View Life Cycle
     
 	override func viewWillAppear(_ animated: Bool) {
