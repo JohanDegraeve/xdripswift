@@ -195,7 +195,7 @@ class NightScoutFollowManager:NSObject {
                     }
 
                     // schedule new download
-                    self.scheduleNewDownload(followGlucoseDataArray: &followGlucoseDataArray)
+                    self.scheduleNewDownload()
 
                 }
                 
@@ -208,28 +208,13 @@ class NightScoutFollowManager:NSObject {
 
     }
     
-    /// wel schedule new download with timer, when timer expires download() will be called
-    /// - parameters:
-    ///     - followGlucoseDataArray : array of FollowGlucoseData, first element is the youngest, can be empty. This is the data downloaded during previous download. This parameter is just there to get the timestamp of the latest reading, in order to calculate the next download time
-    private func scheduleNewDownload(followGlucoseDataArray:inout [NightScoutBgReading]) {
+    /// schedule new download with timer, when timer expires download() will be called
+    private func scheduleNewDownload() {
         
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
         
-        // start with timestamp now + 5 minutes and 10 seconds
-        var nextFollowDownloadTimeStamp = Date(timeIntervalSinceNow: 5 * 60 + 10)
-        
-        // followGlucoseDataArray.count > 0 then use the timestamp of the latest reading to calculate the next downloadtimestamp
-        if followGlucoseDataArray.count > 0 {
-            // use timestamp of latest stored reading + 5 minutes + 10 seconds
-            nextFollowDownloadTimeStamp = Date(timeInterval: 5 * 60 + 10, since: followGlucoseDataArray[0].timeStamp)
-            // now increase till next timestamp is bigger than now
-            while (nextFollowDownloadTimeStamp < Date()) {
-                nextFollowDownloadTimeStamp = Date(timeInterval: 5 * 60, since: nextFollowDownloadTimeStamp)
-            }
-        }
-        
-        // schedule timer and assign it to a let property
-        let downloadTimer = Timer.scheduledTimer(timeInterval: nextFollowDownloadTimeStamp.timeIntervalSince1970 - Date().timeIntervalSince1970, target: self, selector: #selector(self.download), userInfo: nil, repeats: false)
+        // schedule a timer for 15 seconds and assign it to a let property
+        let downloadTimer = Timer.scheduledTimer(timeInterval: 15, target: self, selector: #selector(self.download), userInfo: nil, repeats: false)
         
         // assign invalidateDownLoadTimerClosure to a closure that will invalidate the downloadTimer
         invalidateDownLoadTimerClosure = {
