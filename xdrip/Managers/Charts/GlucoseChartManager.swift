@@ -1221,9 +1221,10 @@ public class GlucoseChartManager {
             let originalTreatmentValue = self.getTreatmentValueFromTimeStamp(treatmentDate: chartPointModel.chartPoint.x as! ChartAxisValueDate, treatmentType: treatmentType, treatmentEntryAccessor: self.data().treatmentEntryAccessor, on: self.coreDataManager.privateManagedObjectContext)
             
             // format the label with the correct value, decimal places, unit and also the position and font size/color/weight
-            label.text = "\(labelFormatter.string(from: NSNumber(value: originalTreatmentValue))! + treatmentType.unit())"
+            label.text = " \(labelFormatter.string(from: NSNumber(value: originalTreatmentValue))! + treatmentType.unit()) "
             label.font = UIFont.systemFont(ofSize: treatmentLabelFontSize, weight: UIFont.Weight.bold)
-            label.textColor = UIColor.white
+            label.backgroundColor = ConstantsGlucoseChart.treatmentLabelBackgroundColor
+            label.textColor = ConstantsGlucoseChart.treatmentLabelFontColor
             label.sizeToFit()
             label.center = CGPoint(x: chartPointModel.screenLoc.x, y: pos ? y : y + height)
             label.alpha = 0
