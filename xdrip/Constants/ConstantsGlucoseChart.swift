@@ -128,6 +128,9 @@ enum ConstantsGlucoseChart {
     /// triangle size for bolus treatments with a 24h chart width. The more hours on the chart, the smaller the triangles should be.
     static let bolusTriangleSize24h: CGFloat = 14
     
+    /// make the triangle height slightly less than the width to prevent it looking too "pointy"
+    static let bolusTriangleHeightScale: CGFloat = 0.9
+    
     /// carbs treament marker colour
     static let carbsTreatmentColor = UIColor.systemOrange
     
