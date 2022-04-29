@@ -58,8 +58,8 @@ public struct TreatmentNSResponse {
                 
             }
             
-            // assign the date to the optional nightscoutDate. We can safely unwrap createdAt
-            nightscoutDate = dateFormatter.date(from: createdAt)!
+            // assign the date to the optional nightscoutDate
+            nightscoutDate = dateFormatter.date(from: createdAt)
             
         }
         
