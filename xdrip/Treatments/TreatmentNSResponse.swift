@@ -36,7 +36,35 @@ public struct TreatmentNSResponse {
         
         var treatmentNSResponses: [TreatmentNSResponse] = []
         
-		if let id = dictionary["_id"] as? String, let createdAt = dictionary["created_at"] as? String, let date = Date.fromISOString(createdAt) {
+        // we need this to be optional in case created_at cannot be transformed successfully into a date
+        var nightscoutDate: Date?
+        
+        if let createdAt = dictionary["created_at"] as? String {
+            
+            let dateFormatter = DateFormatter()
+            
+            // let's check which date format is stored in Nightscout and deal with it accordingly
+            // if the date string contains a decimal point, then it must contain milliseconds
+            // if we don't take this into account, .date(from: string) could be returned as nil
+            if createdAt.contains(".") {
+                
+                // this is the way Loop, FreeAPS (Loop), OpenAPS and FreeAPS X store the created_at date/time
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SZ"
+                
+            } else {
+                
+                // and AndroidAPS stores it without milliseconds
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+                
+            }
+            
+            // assign the date to the optional nightscoutDate
+            nightscoutDate = dateFormatter.date(from: createdAt)
+            
+        }
+        
+        // first check that _id exists and that created_at was successfully converted into a Date
+		if let id = dictionary["_id"] as? String, let date = nightscoutDate {
 			
             // retrieve nightScoutEventType from the nightscout response
             // if not present then it's set to nil (it should be present)

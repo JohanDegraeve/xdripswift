@@ -776,9 +776,9 @@ public class GlucoseChartManager {
         let calibrationCirclesInnerLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: calibrationChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.calibrationCircleScaleInner, height: glucoseCircleDiameter * ConstantsGlucoseChart.calibrationCircleScaleInner), itemFillColor: ConstantsGlucoseChart.calibrationCircleColorInner, optimized: true)
         
         // bolus triangle layers
-        let mediumBolusTriangleLayer = ChartPointsScatterDownTrianglesWithDropdownLineLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: mediumBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize, height: bolusTriangleSize), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
+        let mediumBolusTriangleLayer = ChartPointsScatterDownTrianglesWithDropdownLineLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: mediumBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize, height: bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
         
-        let smallBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.smallBolusTreamentScale, height: bolusTriangleSize * ConstantsGlucoseChart.smallBolusTreamentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
+        let smallBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.smallBolusTreamentScale, height: (bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale) * ConstantsGlucoseChart.smallBolusTreamentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
         
         //  carb circle layers
         let smallCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
@@ -1221,9 +1221,10 @@ public class GlucoseChartManager {
             let originalTreatmentValue = self.getTreatmentValueFromTimeStamp(treatmentDate: chartPointModel.chartPoint.x as! ChartAxisValueDate, treatmentType: treatmentType, treatmentEntryAccessor: self.data().treatmentEntryAccessor, on: self.coreDataManager.privateManagedObjectContext)
             
             // format the label with the correct value, decimal places, unit and also the position and font size/color/weight
-            label.text = "\(labelFormatter.string(from: NSNumber(value: originalTreatmentValue))! + treatmentType.unit())"
+            label.text = " \(labelFormatter.string(from: NSNumber(value: originalTreatmentValue))! + treatmentType.unit()) "
             label.font = UIFont.systemFont(ofSize: treatmentLabelFontSize, weight: UIFont.Weight.bold)
-            label.textColor = UIColor.white
+            label.backgroundColor = ConstantsGlucoseChart.treatmentLabelBackgroundColor
+            label.textColor = ConstantsGlucoseChart.treatmentLabelFontColor
             label.sizeToFit()
             label.center = CGPoint(x: chartPointModel.screenLoc.x, y: pos ? y : y + height)
             label.alpha = 0

@@ -128,6 +128,9 @@ enum ConstantsGlucoseChart {
     /// triangle size for bolus treatments with a 24h chart width. The more hours on the chart, the smaller the triangles should be.
     static let bolusTriangleSize24h: CGFloat = 14
     
+    /// make the triangle height slightly less than the width to prevent it looking too "pointy"
+    static let bolusTriangleHeightScale: CGFloat = 0.9
+    
     /// carbs treament marker colour
     static let carbsTreatmentColor = UIColor.systemOrange
     
@@ -154,6 +157,12 @@ enum ConstantsGlucoseChart {
 
     /// default label settings for the treatments labels. These are set for 6hr chart width - they will be scaled accordingly as needed
     static let treatmentLabelFontSize: Double = 12
+
+    /// treament label font colour
+    static let treatmentLabelFontColor = UIColor.white
+    
+    /// treament label background colour (should have some transparency)
+    static let treatmentLabelBackgroundColor = UIColor.black.withAlphaComponent(0.5)
     
     /// additional label separation (in mg/dl) when using mmol/l (needed due to the scaling/conversion)
     static let treatmentLabelMmolOffset: Double = 2
