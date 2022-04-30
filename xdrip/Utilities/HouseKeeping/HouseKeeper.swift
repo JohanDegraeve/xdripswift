@@ -16,6 +16,9 @@ class HouseKeeper {
     /// CalibrationsAccessor instance
     private var calibrationsAccessor:CalibrationsAccessor
     
+    /// TreatmentEntryAccessor instance
+    private var treatmentsEntryAccessor: TreatmentEntryAccessor
+    
     /// CoreDataManager instance
     private var coreDataManager: CoreDataManager
 
@@ -30,9 +33,11 @@ class HouseKeeper {
         
         self.calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         
+        self.treatmentsEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
+        
         self.coreDataManager = coreDataManager
         
-        self.toDate = Date(timeIntervalSinceNow: -ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsInDays*24*3600)
+        self.toDate = Date(timeIntervalSinceNow: -ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays*24*3600)
         
     }
     
@@ -62,11 +67,19 @@ class HouseKeeper {
             
         }
         
+        // delete delete OldTreatments on the private managedObjectContext, asynchronously
+        managedObjectContext.perform {
+            
+            // delete  delete OldTreatments
+            self.deleteOldTreatments(on: managedObjectContext)
+            
+        }
+        
     }
     
     // MARK: - private functions
     
-    /// deletes old readings. Readings older than ConstantsHousekeeping.retentionPeriodBgReadingsInDays will be deleted
+    /// deletes old readings. Readings older than ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays will be deleted
     ///     - managedObjectContext : the ManagedObjectContext to use
     private func deleteOldReadings(on managedObjectContext: NSManagedObjectContext) {
         
@@ -90,7 +103,7 @@ class HouseKeeper {
         
     }
     
-    /// deletes old calibrations. Readings older than ConstantsHousekeeping.retentionPeriodBgReadingsInDays will be deleted
+    /// deletes old calibrations. Readings older than ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays will be deleted
     private func deleteOldCalibrations(on managedObjectContext: NSManagedObjectContext) {
         
         // get old calibrations to delete
@@ -120,5 +133,31 @@ class HouseKeeper {
         }
         
     }
+    
+    /// deletes old treatments. Treatments older than ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays will be deleted
+    ///     - managedObjectContext : the ManagedObjectContext to use
+    private func deleteOldTreatments(on managedObjectContext: NSManagedObjectContext) {
+        
+        // get old treatments to delete
+        let oldTreatments = self.treatmentsEntryAccessor.getTreatments(fromDate: nil, toDate: Date(timeIntervalSinceNow: -ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays*24*3600), on: managedObjectContext)
+        
+        if oldTreatments.count > 0 {
+            
+            trace("in deleteOldTreatments, number of treatments to delete : %{public}@, to date = %{public}@", log: self.log, category: ConstantsLog.categoryHouseKeeper, type: .info, oldTreatments.count.description, self.toDate.description(with: .current))
+            
+        }
+        
+        // delete them
+        for oldTreatment in oldTreatments {
+            
+            treatmentsEntryAccessor.delete(treatmentEntry: oldTreatment, on: managedObjectContext)
+            
+            coreDataManager.saveChanges()
+            
+        }
+        
+    }
+    
+
 
 }

@@ -2,7 +2,7 @@ import Foundation
 
 enum ConstantsHousekeeping {
     
-    /// how long to keep bgReadings can calibrations
-    static let retentionPeriodBgReadingsAndCalibrationsInDays = 90.0
+    /// how long to keep bgReadings can calibrations and treatments
+    static let retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays = 90.0
     
 }
