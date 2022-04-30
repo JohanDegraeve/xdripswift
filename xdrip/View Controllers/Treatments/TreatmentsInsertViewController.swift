@@ -175,20 +175,25 @@ class TreatmentsInsertViewController : UIViewController {
                         UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
 
                     }
-
+                    
                 } else {
                     
-                    // text is nil or "0", set treatmentdeleted to true
-                    treatMentEntryToUpdate.treatmentdeleted = true
+                    // even though there is not a valid/useable number entered, only delete the treatment if the user has really changed it to zero. If they didn't enter zero then just disregard the input.
+                    if let text = textField.text, let value = Double(text.replacingOccurrences(of: ",", with: ".")), value == 0 {
+                        
+                        // text is nil or "0", set treatmentdeleted to true
+                        treatMentEntryToUpdate.treatmentdeleted = true
+                        
+                        // set uploaded to false so that the entry is synced with NightScout
+                        treatMentEntryToUpdate.uploaded = false
+                        
+                        // trigger nightscoutsync
+                        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+                        
+                        self.treatMentEntryToUpdate = nil
+                        
+                    }
                     
-                    // set uploaded to false so that the entry is synced with NightScout
-                    treatMentEntryToUpdate.uploaded = false
-
-                    // trigger nightscoutsync
-                    UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
-                    
-                    self.treatMentEntryToUpdate = nil
-
                 }
                 
             }
