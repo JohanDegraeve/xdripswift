@@ -138,7 +138,8 @@ class TreatmentsInsertViewController : UIViewController {
             // if no deletes treatMentEntryToUpdate
             let updateFunction = { (textField: UITextField) in
                 
-                if let text = textField.text, let value = Double(text), value > 0 {
+                // the values are stored in coredate with a "." decimal point. We need to just ensure the decimal separator is a point and not a comma (which some locales use)
+                if let text = textField.text, let value = Double(text.replacingOccurrences(of: ",", with: ".")), value > 0 {
                     
                     // keep track if changed or not
                     var treatMentEntryToUpdateChanged = false
