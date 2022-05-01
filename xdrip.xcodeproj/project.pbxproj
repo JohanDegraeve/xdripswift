@@ -44,6 +44,9 @@
 		D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E499AC277B4CE7000F8CBA /* DateOnly.swift */; };
 		D4FD899727772F9100689788 /* TreatmentEntryAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */; };
 		F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */; };
+		F64039B0281C3F9D0051EFFE /* QuickActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */; };
+		F64039B2281E90CF0051EFFE /* QuickActions.strings in Resources */ = {isa = PBXBuildFile; fileRef = F64039B1281E90CF0051EFFE /* QuickActions.strings */; };
+		F64039B5281E91500051EFFE /* TextsQuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64039B4281E91500051EFFE /* TextsQuickActions.swift */; };
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
 		F8025C1321DA683400ECF0C0 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1221DA683400ECF0C0 /* Data.swift */; };
 		F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4D21ED450300ECF0C0 /* Double.swift */; };
@@ -745,6 +748,9 @@
 		D4E499AC277B4CE7000F8CBA /* DateOnly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateOnly.swift; sourceTree = "<group>"; };
 		D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreatmentEntryAccessor.swift; sourceTree = "<group>"; };
 		F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre1NonFixedSlopeCalibrator.swift; sourceTree = "<group>"; };
+		F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsManager.swift; sourceTree = "<group>"; };
+		F64039B1281E90CF0051EFFE /* QuickActions.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = QuickActions.strings; sourceTree = "<group>"; };
+		F64039B4281E91500051EFFE /* TextsQuickActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsQuickActions.swift; sourceTree = "<group>"; };
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
 		F8025C1221DA683400ECF0C0 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		F8025E4D21ED450300ECF0C0 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
@@ -1620,6 +1626,14 @@
 			path = Treatments;
 			sourceTree = "<group>";
 		};
+		F64039AE281C3F8D0051EFFE /* QuickActions */ = {
+			isa = PBXGroup;
+			children = (
+				F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */,
+			);
+			path = QuickActions;
+			sourceTree = "<group>";
+		};
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -2010,6 +2024,7 @@
 				F821CF4F229BF43A005C1E43 /* NightScout */,
 				F821CF9922AEF2DF005C1E43 /* Speak */,
 				F8E3A2A723D906B600E5E98A /* Watch */,
+				F64039AE281C3F8D0051EFFE /* QuickActions */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -2041,6 +2056,7 @@
 				F81F370A25C1584A00520946 /* LibreStates.strings */,
 				F8E6C79324CEC2E3007C1199 /* Snooze.strings */,
 				4749EB9D25B36E010072DF8B /* LibreNFC.strings */,
+				F64039B1281E90CF0051EFFE /* QuickActions.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -2521,6 +2537,7 @@
 				F82436FB24BE014000BED341 /* TextsLibreStates.swift */,
 				F869188B23A044340065B607 /* TextsM5StackView.swift */,
 				F84DDF4A279DF03400F7B5A4 /* TextsNightScout.swift */,
+				F64039B4281E91500051EFFE /* TextsQuickActions.swift */,
 				F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */,
 				F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */,
 				F8B48A9322B2A705009BCC01 /* TextsSpeakReading.swift */,
@@ -3278,6 +3295,7 @@
 				F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */,
 				F824378524CB7A9900BED341 /* Siri_Low_Glucose.caf in Resources */,
 				F824378124CB7A9800BED341 /* Cartoon_Uh_Oh.caf in Resources */,
+				F64039B2281E90CF0051EFFE /* QuickActions.strings in Resources */,
 				F824377F24CB7A9800BED341 /* Sci-Fi_Alarm.caf in Resources */,
 				F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */,
 				F82437C324CB7A9900BED341 /* Metallic.caf in Resources */,
@@ -3560,6 +3578,7 @@
 				F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */,
 				F80D915C24F06A40006840B5 /* PreLibre2.swift in Sources */,
 				470F021326DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift in Sources */,
+				F64039B5281E91500051EFFE /* TextsQuickActions.swift in Sources */,
 				F8F9722223A5915900C3F17D /* CRC.swift in Sources */,
 				F8CB59C02734976D00BA199E /* DexcomTransmitterTimeTxMessage.swift in Sources */,
 				F821CF6F229FC280005C1E43 /* Endpoint+NightScout.swift in Sources */,
@@ -3795,6 +3814,7 @@
 				F8B3A820227DEC92004BA588 /* AlertTypesAccessor.swift in Sources */,
 				F8F9720623A5915900C3F17D /* AuthRequestTxMessage.swift in Sources */,
 				F8F9721123A5915900C3F17D /* KeepAliveTxMessage.swift in Sources */,
+				F64039B0281C3F9D0051EFFE /* QuickActionsManager.swift in Sources */,
 				F8B3A81E227DEC92004BA588 /* BgReadingsAccessor.swift in Sources */,
 				F8F1671327274557001AA3D8 /* DexcomCalibrationRxMessage.swift in Sources */,
 				F8E51D63244B3386001C9E5A /* MiaoMiaoResponseType.swift in Sources */,
