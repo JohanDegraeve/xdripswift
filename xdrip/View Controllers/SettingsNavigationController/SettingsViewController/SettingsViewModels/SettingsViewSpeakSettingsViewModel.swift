@@ -20,9 +20,20 @@ fileprivate enum Setting:Int, CaseIterable {
 }
 
 /// conforms to SettingsViewModelProtocol for all speak settings in the first sections screen
-class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
+class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
     
+    override init() {
+        super.init()
+        addObservers()
+    }
+
+    var sectionReloadClosure: (() -> Void)?
+
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
+    
+    func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {
+        self.sectionReloadClosure = sectionReloadClosure
+    }
     
     func storeUIViewController(uIViewController: UIViewController) {}
     
@@ -153,6 +164,28 @@ class SettingsViewSpeakSettingsViewModel:SettingsViewModelProtocol {
             
         case .speakBgReadingLanguage:
             return nil
+        }
+    }
+    
+    // MARK: - observe functions
+    
+    private func addObservers() {
+        // Listen for changes in the Speak Readings setting as it may be changed with a Quick Action
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.speakReadings.rawValue, options: .new, context: nil)
+    }
+
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        guard let keyPath = keyPath,
+              let keyPathEnum = UserDefaults.Key(rawValue: keyPath)
+        else { return }
+        
+        switch keyPathEnum {
+            case UserDefaults.Key.speakReadings:
+                // Speak readings setting has been changed from other model, likely by a Quick Action. Update UI to reflect current state.
+                sectionReloadClosure?()
+
+            default:
+                break
         }
     }
 }
