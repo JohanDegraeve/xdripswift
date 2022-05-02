@@ -169,11 +169,14 @@ final class SettingsViewController: UIViewController {
             // store self as uiViewController in the viewModel
             viewModel.storeUIViewController(uIViewController: self)
             
-            // store reload closure in the viewModel
+            // store row reload closure in the viewModel
             viewModel.storeRowReloadClosure(rowReloadClosure: {row in
-                
                 self.tableView.reloadRows(at: [IndexPath(row: row, section: section.rawValue)], with: .none)
-                    
+            })
+          
+            // store section reload closure in the viewModel
+            viewModel.storeSectionReloadClosure(sectionReloadClosure: { [weak self] in
+                self?.tableView.reloadSections([section.rawValue], with: .none)
             })
 
             // store the viewModel

@@ -72,6 +72,13 @@ protocol SettingsViewModelProtocol {
     /// just an additional method to force row reloads, (there's also the method completeSettingsViewRefreshNeeded which may return true or false depending on row number and which will be called from within the SettingsViewController. The rowReloadClosure is useful when the reload needs to be handled asynchronously
     func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void))
     
+    /// closure to call to reload the current section that the viewmodel is implementing
+    func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void))
+}
+
+// Add default implementations here so that ViewModels don't need to implement empty methods
+extension SettingsViewModelProtocol {
+    func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {}
 }
 
 /// to make the coding a bit easier, just one function defined for now, which is to get the viewModel for a specific setting
