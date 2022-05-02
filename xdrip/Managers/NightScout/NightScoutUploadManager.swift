@@ -159,6 +159,15 @@ public class NightScoutUploadManager: NSObject {
     /// synchronize treatments with NightScout
     public func syncTreatmentsWithNightScout() {
         
+        // check that NightScout is enabled
+        // and nightScoutUrl exists
+        guard UserDefaults.standard.nightScoutEnabled, UserDefaults.standard.nightScoutUrl != nil else {return}
+
+        // check that either the API_SECRET or Token exists, if both are nil then return
+        if UserDefaults.standard.nightScoutAPIKey == nil && UserDefaults.standard.nightscoutToken == nil {
+            return
+        }
+
         // if sync already running, then set nightScoutTreatmentSyncRequired to true
         // sync is running already, once stopped it will rerun
         if let nightScoutTreatmentsSyncStartTimeStamp = nightScoutTreatmentsSyncStartTimeStamp {
@@ -396,7 +405,7 @@ public class NightScoutUploadManager: NSObject {
                     if UserDefaults.standard.nightScoutSyncTreatmentsRequired {
 
                         UserDefaults.standard.nightScoutSyncTreatmentsRequired = false
-                            
+
                         syncTreatmentsWithNightScout()
 
                     }
@@ -573,7 +582,12 @@ public class NightScoutUploadManager: NSObject {
         
         // check if there's other treatmenentries that have the same id and if yes add them to treatmentToUploadToNightscout
         // filter on items that have treatmentdeleted to false
-        let otherTreatmentEntries = treatmentEntryAccessor.getTreatments(thatContainId: String(treatmentToUpdate.id.split(separator: "-")[0])).filter({ treatment in return !treatment.treatmentdeleted })
+        // in case the treatmentToUpdate would not yet have been uploaded to NS, then the id will be an empty string and split will return a zero length array. Check that first
+        var otherTreatmentEntries: [TreatmentEntry] = []
+        let treatmentToUpdateIdSplitted = treatmentToUpdate.id.split(separator: "-")
+        if treatmentToUpdateIdSplitted.count > 0 {
+            otherTreatmentEntries = treatmentEntryAccessor.getTreatments(thatContainId: String(treatmentToUpdateIdSplitted[0])).filter({ treatment in return !treatment.treatmentdeleted })
+        }
         
         // iterate through otherTreatmentEntries with the same starting id (ie id that starts with same string ad treatment to delete)
         for otherTreatmentEntry in otherTreatmentEntries {
@@ -628,7 +642,13 @@ public class NightScoutUploadManager: NSObject {
 
         // before deleting, check first if there's treatmenentries that have the same id (id sthat starts with same string) and if yes add them to treatmentToUploadToNightscout
         // filter on items that have treatmentdeleted to false (except if treatmentToDelete)
-        let otherTreatmentEntries = treatmentEntryAccessor.getTreatments(thatContainId: String(treatmentToDelete.id.split(separator: "-")[0])).filter({ treatment in return !treatment.treatmentdeleted  || (treatment.treatmentdeleted && treatment.id == treatmentToDelete.id) })
+        // check if there's other treatmenentries that have the same id and if yes add them to treatmentToUploadToNightscout
+        // filter on items that have treatmentdeleted to false
+        var otherTreatmentEntries: [TreatmentEntry] = []
+        let treatmentToDeleteIdSplitted = treatmentToDelete.id.split(separator: "-")
+        if treatmentToDeleteIdSplitted.count > 0 {
+            otherTreatmentEntries = treatmentEntryAccessor.getTreatments(thatContainId: String(treatmentToDeleteIdSplitted[0])).filter({ treatment in return !treatment.treatmentdeleted  || (treatment.treatmentdeleted && treatment.id == treatmentToDelete.id) })
+        }
         
         // if otherTreatmentEntries size > 1, then the treatmentToDelete will not be deleted, but an update will be sent to NightScout, with the other treatments with same starting id, in this update, and wihtout the treatment to be deleted
         // as a result, the treatmentToDelete will be deleted at NightScout
@@ -683,7 +703,20 @@ public class NightScoutUploadManager: NSObject {
             
         }
         
-        /// there's no other treatmentEntries with the same id, so it's ok to delete it
+        // there's no other treatmentEntries with the same id, so it's ok to delete it
+        
+        // first check if it's uploaded, otherwise it makes no sense to delete it at NightScout
+        guard treatmentToDelete.uploaded else {
+            completionHandler(.success(0))
+            return
+        }
+        
+        // now check that id exists, it should otherwise it's not uploaded, anyway let's check
+        guard treatmentToDelete.id != TreatmentEntry.EmptyId && treatmentToDelete.id.count > 0 else {
+            completionHandler(.success(0))
+            return
+        }
+
         getOrDeleteRequest(path: nightScoutTreatmentPath + "/" + treatmentToDelete.id.split(separator: "-")[0], queries: [], httpMethod: "DELETE", completionHandler: { (data: Data?, nightScoutResult: NightScoutResult)  in
 
             // trace data to upload as string in debug  mode
