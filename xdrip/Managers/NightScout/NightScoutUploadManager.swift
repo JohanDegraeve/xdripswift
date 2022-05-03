@@ -163,11 +163,6 @@ public class NightScoutUploadManager: NSObject {
         // and nightScoutUrl exists
         guard UserDefaults.standard.nightScoutEnabled, UserDefaults.standard.nightScoutUrl != nil else {return}
 
-        // check that either the API_SECRET or Token exists, if both are nil then return
-        if UserDefaults.standard.nightScoutAPIKey == nil && UserDefaults.standard.nightscoutToken == nil {
-            return
-        }
-
         // if sync already running, then set nightScoutTreatmentSyncRequired to true
         // sync is running already, once stopped it will rerun
         if let nightScoutTreatmentsSyncStartTimeStamp = nightScoutTreatmentsSyncStartTimeStamp {
