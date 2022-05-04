@@ -700,13 +700,7 @@ public class NightScoutUploadManager: NSObject {
         
         // there's no other treatmentEntries with the same id, so it's ok to delete it
         
-        // first check if it's uploaded, otherwise it makes no sense to delete it at NightScout
-        guard treatmentToDelete.uploaded else {
-            completionHandler(.success(0))
-            return
-        }
-        
-        // now check that id exists, it should otherwise it's not uploaded, anyway let's check
+        // check that id exists, if not then it's never been uploaded, and so makes no sense to delete
         guard treatmentToDelete.id != TreatmentEntry.EmptyId && treatmentToDelete.id.count > 0 else {
             completionHandler(.success(0))
             return
