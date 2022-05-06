@@ -163,11 +163,6 @@ public class NightScoutUploadManager: NSObject {
         // and nightScoutUrl exists
         guard UserDefaults.standard.nightScoutEnabled, UserDefaults.standard.nightScoutUrl != nil else {return}
 
-        // check that either the API_SECRET or Token exists, if both are nil then return
-        if UserDefaults.standard.nightScoutAPIKey == nil && UserDefaults.standard.nightscoutToken == nil {
-            return
-        }
-
         // if sync already running, then set nightScoutTreatmentSyncRequired to true
         // sync is running already, once stopped it will rerun
         if let nightScoutTreatmentsSyncStartTimeStamp = nightScoutTreatmentsSyncStartTimeStamp {
@@ -705,13 +700,7 @@ public class NightScoutUploadManager: NSObject {
         
         // there's no other treatmentEntries with the same id, so it's ok to delete it
         
-        // first check if it's uploaded, otherwise it makes no sense to delete it at NightScout
-        guard treatmentToDelete.uploaded else {
-            completionHandler(.success(0))
-            return
-        }
-        
-        // now check that id exists, it should otherwise it's not uploaded, anyway let's check
+        // check that id exists, if not then it's never been uploaded, and so makes no sense to delete
         guard treatmentToDelete.id != TreatmentEntry.EmptyId && treatmentToDelete.id.count > 0 else {
             completionHandler(.success(0))
             return
