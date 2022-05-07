@@ -2,7 +2,10 @@ import Foundation
 
 enum ConstantsHousekeeping {
     
-    /// how long to keep bgReadings can calibrations and treatments
-    static let retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays = 90.0
-    
+    /// Minimum time to keep bgReadings and calibrations and treatments
+    static let minimumRetentionPeriodInDays = 90
+
+    /// Maximum time to keep bgReadings and calibrations and treatments
+    static let maximumRetentionPeriodInDays = 365
+
 }

@@ -37,7 +37,7 @@ class HouseKeeper {
         
         self.coreDataManager = coreDataManager
         
-        self.toDate = Date(timeIntervalSinceNow: -ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays*24*3600)
+        self.toDate = Date(timeIntervalSinceNow: -Double(UserDefaults.standard.retentionPeriodInDays*24*3600))
         
     }
     
@@ -139,7 +139,7 @@ class HouseKeeper {
     private func deleteOldTreatments(on managedObjectContext: NSManagedObjectContext) {
         
         // get old treatments to delete
-        let oldTreatments = self.treatmentsEntryAccessor.getTreatments(fromDate: nil, toDate: Date(timeIntervalSinceNow: -ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays*24*3600), on: managedObjectContext)
+        let oldTreatments = self.treatmentsEntryAccessor.getTreatments(fromDate: nil, toDate: Date(timeIntervalSinceNow: -Double(UserDefaults.standard.retentionPeriodInDays*24*3600)), on: managedObjectContext)
         
         if oldTreatments.count > 0 {
             

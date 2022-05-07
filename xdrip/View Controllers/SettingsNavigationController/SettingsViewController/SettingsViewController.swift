@@ -40,6 +40,9 @@ final class SettingsViewController: UIViewController {
         
         /// statistics settings
         case statistics
+
+        /// housekeeper settings
+        case housekeeper
         
         /// sensor countdown settings
         case sensorCountdown
@@ -87,6 +90,8 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewTreatmentsSettingsViewModel()
             case .statistics:
                 return SettingsViewStatisticsSettingsViewModel()
+            case .housekeeper:
+                return SettingsViewHousekeeperSettingsViewModel()
             case .sensorCountdown:
                 return SettingsViewSensorCountdownSettingsViewModel()
             case .alarms:

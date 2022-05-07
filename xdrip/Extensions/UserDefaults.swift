@@ -80,6 +80,11 @@ extension UserDefaults {
         case useIFCCA1C = "useIFCCA1C"
         /// use the "standard" range of 70-180mg/dl to calculate the statistics?
         case useStandardStatisticsRange = "useStandardStatisticsRange"
+
+        // Housekeeper settings
+
+        /// For how many days should we keep Readings, Treatments and Calibrations?
+        case retentionPeriodInDays = "retentionPeriodInDays"
         
         // Sensor Countdown settings
         
@@ -823,6 +828,28 @@ extension UserDefaults {
         }
     }
     
+
+    // MARK: Housekeeper Settings
+
+    /// For how many days should data be stored. Should always be <= maximumRetentionPeriodInDays and >= minimumRetentionPeriodInDays.
+    @objc dynamic var retentionPeriodInDays: Int {
+        get {
+            var returnValue = integer(forKey: Key.retentionPeriodInDays.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsHousekeeping.minimumRetentionPeriodInDays
+            }
+
+            return returnValue
+        }
+        set {
+            // Constrains the newValue to be <= than maximumRetentionPeriodInDays and >= than minimumRetentionPeriodInDays.
+            var value = min(newValue, ConstantsHousekeeping.maximumRetentionPeriodInDays)
+            value = max(value, ConstantsHousekeeping.minimumRetentionPeriodInDays)
+
+            set(value, forKey: Key.retentionPeriodInDays.rawValue)
+        }
+    }
     
     // MARK: Transmitter Settings
     
