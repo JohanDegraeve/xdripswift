@@ -34,6 +34,11 @@ enum SettingsSelectedRowAction {
     ///
     /// example, the chosen unit, is either mgdl or mmol. When user clicks, there's no need to show pop up with the two options. Just switch immediately. The function would do that in this case (ie change the setting)
     case callFunction(function :(() -> Void))
+	
+	/// when clicked, the function parameter needs to be called
+	/// but takes as argument a callback that when called returns an optional URL,
+	/// that if not nil the user should be presented with a share menu.
+	case callFunctionAndShareFile(function: ((_ callback: @escaping ((_ file: URL?) -> Void)) -> Void))
     
     /// when clicked a list of items must be presented form which the user needs to pick one, for example transmitter type
     /// - title: title that can be shown when asking for input

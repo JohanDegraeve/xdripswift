@@ -100,6 +100,26 @@ class SettingsViewUtilities {
                 
                 // check if refresh is needed, either complete settingsview or individual section
                 self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: settingsViewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
+				
+			case let .callFunctionAndShareFile(function):
+				
+				// call function and in the callback present the share file menu.
+				function({ fileURL in
+					if let fileURL = fileURL {
+						// UI Code must be done at main thread.
+						DispatchQueue.main.async {
+							// Present the user with a share file menu.
+							let activityViewController = UIActivityViewController(activityItems: [fileURL], applicationActivities: [])
+							uIViewController.present(activityViewController, animated: true)
+						}
+					} else {
+						// TODO: add trace
+					}
+				})
+				
+				// check if refresh is needed, either complete settingsview or individual section
+				self.checkIfReloadNeededAndReloadIfNeeded(tableView: tableView, viewModel: settingsViewModel, rowIndex: rowIndex, sectionIndex: sectionIndex)
+				
                 
             case let .selectFromList(title, data, selectedRow, actionTitle, cancelTitle, actionHandler, cancelHandler, didSelectRowHandler):
                 
