@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OSLog
 
 
 /// DataExporter is tha class responsible for
@@ -31,6 +32,10 @@ public class DataExporter {
 	
 	/// Calibrations instance
 	private let calibrationsAccessor: CalibrationsAccessor
+	
+	/// Log instance
+	private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.dataExporter)
+
 	
 	// MARK: - initializer
 	
@@ -57,8 +62,7 @@ public class DataExporter {
 			let asString = String(data: jsonData, encoding: .utf8)
 			return asString
 		} catch let error {
-			// TODO: add trace
-			// trace("in convertToJSON, error = %{public}@", log: self.log, category: ConstantsLog., type: .error, error.localizedDescription)
+			trace("in convertToJSON, error = %{public}@", log: self.log, category: ConstantsLog.dataExporter, type: .error, error.localizedDescription)
 		}
 		
 		return nil
@@ -149,8 +153,7 @@ public class DataExporter {
 		self.generateJSON { json in
 			/// Json must not be nil.
 			guard let json = json else {
-				// TODO: add trace
-				// trace("in convertToJSON, error = %{public}@", log: self.log, category: ConstantsLog., type: .error, error.localizedDescription)
+				trace("in exportAllData, json is nil", log: self.log, category: ConstantsLog.dataExporter, type: .error)
 				callback(nil)
 				return
 			}
@@ -171,8 +174,7 @@ public class DataExporter {
 					try json.write(to: filePath, atomically: false, encoding: .utf8)
 					callback(filePath)
 				} catch let error {
-					// TODO: add trace
-					// trace("in convertToJSON, error = %{public}@", log: self.log, category: ConstantsLog., type: .error, error.localizedDescription)
+					trace("in exportAllData, error = %{public}@", log: self.log, category: ConstantsLog.dataExporter, type: .error, error.localizedDescription)
 					callback(nil)
 				}
 			}
