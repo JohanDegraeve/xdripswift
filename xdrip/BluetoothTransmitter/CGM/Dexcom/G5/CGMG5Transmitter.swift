@@ -879,12 +879,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         dexcomSessionStopTxMessageToSendToTransmitter = DexcomSessionStopTxMessage(stopDate: stopDate, transmitterStartDate: transmitterStartDate)
         
-        // if there's still a pending calibration message, set it to nil
-        if let calibrationToSendToTransmitter = calibrationToSendToTransmitter {
+        // set it to nil
+        calibrationToSendToTransmitter = nil
             
-            trace("in stopsensor, setting calibrationToSendToTransmitter to nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-            
-        }
+        trace("in stopsensor, setting calibrationToSendToTransmitter to nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
         
     }
 
