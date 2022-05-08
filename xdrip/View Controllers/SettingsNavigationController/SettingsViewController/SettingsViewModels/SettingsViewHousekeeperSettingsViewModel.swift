@@ -93,12 +93,11 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 				(retention:String) in if let retentionInt = Int(retention) {UserDefaults.standard.retentionPeriodInDays = retentionInt}}, cancelHandler: nil, inputValidator: nil)
 			
 		case .exportAllData:
-			return SettingsSelectedRowAction.callFunction(function: {
+			return SettingsSelectedRowAction.callFunctionAndShareFile { callback in
 				if let coreDataManager = coreDataManager {
-					DataExporter(coreDataManager: coreDataManager).exportAllData()
+					DataExporter(coreDataManager: coreDataManager).exportAllData(callback: callback)
 				}
-			})
-			
+			}
 		}
 	}
 	
