@@ -22,6 +22,12 @@ fileprivate enum Setting: Int, CaseIterable {
 
 
 struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
+
+	private var coreDataManager: CoreDataManager?
+    
+    init(coreDataManager: CoreDataManager?) {
+        self.coreDataManager = coreDataManager
+    }
 	
 	func sectionTitle() -> String? {
 		return Texts_SettingsView.sectionTitleHousekeeper;
@@ -88,7 +94,9 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 			
 		case .exportAllData:
 			return SettingsSelectedRowAction.callFunction(function: {
-				// TODO: Add export all data.
+				if let coreDataManager = coreDataManager {
+					DataExporter(coreDataManager: coreDataManager).exportAllData()
+				}
 			})
 			
 		}

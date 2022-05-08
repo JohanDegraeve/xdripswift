@@ -36,6 +36,7 @@
 		D40C3DA4277542C400111B73 /* TreatmentEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */; };
 		D40C3DA62775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */; };
 		D41F32922827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */; };
+		D41F32942827332000861B3D /* DataExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41F32932827332000861B3D /* DataExporter.swift */; };
 		D482BD942776153F003C4FB2 /* TreatmentsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D482BD932776153F003C4FB2 /* TreatmentsNavigationController.swift */; };
 		D484BC292774F783008490E9 /* TreatmentsInsertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D484BC282774F783008490E9 /* TreatmentsInsertViewController.swift */; };
 		D48E8F78278E49B300CCEE08 /* TreatmentNSResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48E8F77278E49B300CCEE08 /* TreatmentNSResponse.swift */; };
@@ -728,6 +729,7 @@
 		D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TreatmentEntry+CoreDataClass.swift"; sourceTree = "<group>"; };
 		D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TreatmentEntry+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewHousekeeperSettingsViewModel.swift; sourceTree = "<group>"; };
+		D41F32932827332000861B3D /* DataExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExporter.swift; sourceTree = "<group>"; };
 		D482BD932776153F003C4FB2 /* TreatmentsNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsNavigationController.swift; sourceTree = "<group>"; };
 		D484BC282774F783008490E9 /* TreatmentsInsertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsInsertViewController.swift; sourceTree = "<group>"; };
 		D48E8F77278E49B300CCEE08 /* TreatmentNSResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentNSResponse.swift; sourceTree = "<group>"; };
@@ -2087,6 +2089,7 @@
 			isa = PBXGroup;
 			children = (
 				F85FF39025288870004E6FF1 /* HouseKeeper.swift */,
+				D41F32932827332000861B3D /* DataExporter.swift */,
 			);
 			path = HouseKeeping;
 			sourceTree = "<group>";
@@ -3819,6 +3822,7 @@
 				F8F9721123A5915900C3F17D /* KeepAliveTxMessage.swift in Sources */,
 				F64039B0281C3F9D0051EFFE /* QuickActionsManager.swift in Sources */,
 				F8B3A81E227DEC92004BA588 /* BgReadingsAccessor.swift in Sources */,
+				D41F32942827332000861B3D /* DataExporter.swift in Sources */,
 				F8F1671327274557001AA3D8 /* DexcomCalibrationRxMessage.swift in Sources */,
 				F8E51D63244B3386001C9E5A /* MiaoMiaoResponseType.swift in Sources */,
 				F821CF6B229FC22D005C1E43 /* Endpoint.swift in Sources */,

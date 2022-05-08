@@ -91,7 +91,7 @@ final class SettingsViewController: UIViewController {
             case .statistics:
                 return SettingsViewStatisticsSettingsViewModel()
             case .housekeeper:
-                return SettingsViewHousekeeperSettingsViewModel()
+                return SettingsViewHousekeeperSettingsViewModel(coreDataManager: coreDataManager)
             case .sensorCountdown:
                 return SettingsViewSensorCountdownSettingsViewModel()
             case .alarms:

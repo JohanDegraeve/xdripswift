@@ -836,7 +836,7 @@ extension UserDefaults {
         get {
             var returnValue = integer(forKey: Key.retentionPeriodInDays.rawValue)
             // if 0 set to defaultvalue
-            if returnValue == 0.0 {
+            if returnValue == 0 {
                 returnValue = ConstantsHousekeeping.minimumRetentionPeriodInDays
             }
 
