@@ -288,6 +288,11 @@ extension UserDefaults {
         /// case smooth libre values
         case smoothLibreValues = "smoothLibreValues"
         
+        /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+        ///
+        /// Default value 0, if used then recommende value between 4 and 9
+        case loopDelay = "loopDelay"
+        
         /// used for Libre data parsing - only for Libre 1 or Libre 2 read via transmitter, ie full NFC block
         case previousRawLibreValues = "previousRawLibreValues"
         
@@ -394,6 +399,18 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.notificationInterval.rawValue)
+        }
+    }
+    
+    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+    ///
+    /// Default value 0, if used then recommende value between 4 and 9
+    @objc dynamic var loopDelay: Int {
+        get {
+            return integer(forKey: Key.loopDelay.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.loopDelay.rawValue)
         }
     }
 
