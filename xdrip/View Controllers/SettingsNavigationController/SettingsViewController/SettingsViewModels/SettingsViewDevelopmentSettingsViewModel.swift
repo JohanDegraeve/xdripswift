@@ -11,6 +11,11 @@ fileprivate enum Setting:Int, CaseIterable {
     /// case smooth libre values
     case smoothLibreValues = 2
     
+    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+    ///
+    /// Default value 0, if used then recommende value between 4 and 9
+    case loopDelay = 3
+    
 }
 
 struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
@@ -42,6 +47,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .smoothLibreValues:
             return Texts_SettingsView.smoothLibreValues
             
+        case .loopDelay:
+            return "Loop Delay"
+            
         }
     }
     
@@ -53,6 +61,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
         case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues:
             return UITableViewCell.AccessoryType.none
+            
+        case .loopDelay:
+            return UITableViewCell.AccessoryType.disclosureIndicator
             
         }
     }
@@ -71,6 +82,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
         case .smoothLibreValues:
             return nil
+            
+        case .loopDelay:
+            return UserDefaults.standard.loopDelay.description
             
         }
         
@@ -106,6 +120,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                 
             })
 
+        case .loopDelay:
+            return nil
+            
         }
         
     }
@@ -123,6 +140,10 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues:
             return .nothing
             
+        case .loopDelay:
+            return SettingsSelectedRowAction.askText(title: "Loop Delay", message: "Artificial delay in readings when sending to Loop (minutes) - 0 means no delay. Use maximum 10 minutes.", keyboardType: .numberPad, text: UserDefaults.standard.loopDelay.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.loopDelay = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
+            
+
         }
     }
     
