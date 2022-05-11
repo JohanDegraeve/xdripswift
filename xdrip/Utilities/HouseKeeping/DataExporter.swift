@@ -58,7 +58,8 @@ public class DataExporter {
 	///     - String? : the JSON output as a string. nil if an error happened.
 	private func convertToJSON(dict: Any) -> String? {
 		do {
-			let jsonData = try JSONSerialization.data(withJSONObject: dict, options: [])
+			// Set sortedKeys, without sortedKeys the key order is random for each element.
+			let jsonData = try JSONSerialization.data(withJSONObject: dict, options: [.sortedKeys])
 			let asString = String(data: jsonData, encoding: .utf8)
 			return asString
 		} catch let error {
