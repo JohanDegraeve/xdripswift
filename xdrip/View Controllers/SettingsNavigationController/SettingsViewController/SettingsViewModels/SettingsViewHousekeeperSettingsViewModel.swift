@@ -103,6 +103,9 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 				/// coreDataManager must not be nil.
 				if let coreDataManager = coreDataManager {
 					DataExporter(coreDataManager: coreDataManager).exportAllData(callback: callback)
+				} else {
+					/// All routines MUST call callback
+					callback(nil)
 				}
 			}
 		}

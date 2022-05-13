@@ -103,8 +103,16 @@ class SettingsViewUtilities {
 				
 			case let .callFunctionAndShareFile(function):
 				
+				// Start loading indicator
+				let loadingIndicator = ActivityIndicatorViewController()
+				loadingIndicator.start(onParent: uIViewController)
+				
 				// call function and in the callback present the share file menu.
 				function({ fileURL in
+					
+					// Stop loading indicator
+					loadingIndicator.end()
+					
 					if let fileURL = fileURL {
 						// UI Code must be done at main thread.
 						DispatchQueue.main.async {
