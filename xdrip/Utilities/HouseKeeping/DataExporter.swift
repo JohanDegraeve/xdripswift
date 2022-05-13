@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreData
 import OSLog
 
 
@@ -20,6 +21,12 @@ public class DataExporter {
 	
 	/// This date will determine when the exported data will begin.
 	private let onlyFromDate: Date
+	
+	/// This date determines when the exported data will stop. (Now)
+	private let endDate: Date
+	
+	/// NSManagedObjectContext to be used
+	private let managedObjectContext: NSManagedObjectContext
 	
 	/// CoreDataManager instance
 	private let coreDataManager: CoreDataManager
@@ -46,7 +53,10 @@ public class DataExporter {
 		self.treatmentsAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
 		self.calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
 		
+		self.managedObjectContext = self.coreDataManager.privateManagedObjectContext
+		
 		self.onlyFromDate = Date(timeIntervalSinceNow: -Double(UserDefaults.standard.retentionPeriodInDays*24*3600))
+		self.endDate = Date()
 	}
 	
 	
@@ -76,7 +86,7 @@ public class DataExporter {
 	/// - returns:
 	///     - [[String: Any]] : an array of dicts, each element is a reading.
 	private func readingsAsDicts() -> [[String: Any]] {
-		let readings = self.bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: self.onlyFromDate, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+		let readings = self.bgReadingsAccessor.getBgReadings(from: self.onlyFromDate, to: self.endDate, on: self.managedObjectContext)
 		let readingsAsDicts = readings.map { reading in
 			return reading.dictionaryRepresentationForNightScoutUpload
 		}
@@ -90,7 +100,7 @@ public class DataExporter {
 	/// - returns:
 	///     - [[String: Any]] : an array of dicts, each element is a treatment.
 	private func treatmentsAsDicts() -> [[String: Any]] {
-		let treatments = self.treatmentsAccessor.getLatestTreatments(limit: nil, fromDate: self.onlyFromDate)
+		let treatments = self.treatmentsAccessor.getTreatments(fromDate: self.onlyFromDate, toDate: self.endDate, on: self.managedObjectContext)
 		let treatmentsAsDicts = treatments.map { treatment in
 			return treatment.dictionaryRepresentationForNightScoutUpload()
 		}
@@ -104,7 +114,7 @@ public class DataExporter {
 	/// - returns:
 	///     - [[String: Any]] : an array of dicts, each element is a calibration.
 	private func calibrationsAsDicts() -> [[String: Any]] {
-		let calibrations = self.calibrationsAccessor.getLatestCalibrations(howManyDays: UserDefaults.standard.retentionPeriodInDays, forSensor: nil)
+		let calibrations = self.calibrationsAccessor.getCalibrations(from: self.onlyFromDate, to: self.endDate, on: self.managedObjectContext)
 		let calibrationsAsDicts = calibrations.map { calibration -> [String: Any] in
 			/// Use the Cal representation, but add the mbg key with bg value.
 			var representation =  calibration.dictionaryRepresentationForCalRecordNightScoutUpload
@@ -126,11 +136,11 @@ public class DataExporter {
 		/// In order for this method to be called from any thread in
 		/// a safe way, we must make sure that we only access CoreData
 		/// from a safe thread, so use mainManagedObjectContext for that.
-		coreDataManager.mainManagedObjectContext.perform {
+		coreDataManager.privateManagedObjectContext.perform {
 			let dataDict: [String : Any] = [
 				"ExportInformation": [
 					"BeginDate:": self.onlyFromDate.ISOStringFromDate(),
-					"EndDate:": Date().ISOStringFromDate(),
+					"EndDate:": self.endDate.ISOStringFromDate(),
 				],
 				"BgReadings": self.readingsAsDicts(),
 				"Treatments": self.treatmentsAsDicts(),
