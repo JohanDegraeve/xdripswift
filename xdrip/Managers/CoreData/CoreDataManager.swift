@@ -170,6 +170,17 @@ public final class CoreDataManager {
         }
         
     }
+    
+    /// creates an NSManagedObjectContext with concurrencyType = privateQueueConcurrencyType and parent = mainManagedObjectContext
+    public func privateChildManagedObjectContext() -> NSManagedObjectContext {
+        // Initialize Managed Object Context
+        let managedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+
+        // Configure Managed Object Context
+        managedObjectContext.parent = mainManagedObjectContext
+
+        return managedObjectContext
+    }
 
     /// to be used when app terminates, difference with savechanges is that it calls privateManagedObjectContext.save synchronously
     private func saveChangesAtTermination() {

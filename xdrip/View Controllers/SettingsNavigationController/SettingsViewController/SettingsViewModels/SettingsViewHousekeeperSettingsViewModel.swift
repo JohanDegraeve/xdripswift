@@ -13,10 +13,10 @@ import UIKit
 /// Enum used for each row of HousekeeperSettings.
 fileprivate enum Setting: Int, CaseIterable {
 	
-	// For how many days should we store BgReadings, Calibrations and Treatments, in days
+	/// For how many days should we store BgReadings, Calibrations and Treatments, in days
 	case housekeeperRetentionPeriod = 0
 	
-	// Export all data button
+	/// Export all data button
 	case exportAllData = 1
 	
 }
@@ -92,19 +92,19 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 		
 		switch setting {
 		
-		/// When housekeeperRetentionPeriod is selected, display a popup asking for the new retention period.
+		// When housekeeperRetentionPeriod is selected, display a popup asking for the new retention period.
 		case .housekeeperRetentionPeriod:
 			return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_housekeeperRetentionPeriod, message: Texts_SettingsView.settingsviews_housekeeperRetentionPeriodMessage, keyboardType: .numberPad, text: UserDefaults.standard.retentionPeriodInDays.description, placeHolder: "90", actionTitle: nil, cancelTitle: nil, actionHandler: {
 				(retention:String) in if let retentionInt = Int(retention) {UserDefaults.standard.retentionPeriodInDays = retentionInt}}, cancelHandler: nil, inputValidator: nil)
 		
-		/// When exportAllData is selected, calls DataExporter for generating and writing the data to a file, passing the callback down to exportAllData.
+		// When exportAllData is selected, calls DataExporter for generating and writing the data to a file, passing the callback down to exportAllData.
 		case .exportAllData:
 			return SettingsSelectedRowAction.callFunctionAndShareFile { callback in
-				/// coreDataManager must not be nil.
+				// coreDataManager must not be nil.
 				if let coreDataManager = coreDataManager {
 					DataExporter(coreDataManager: coreDataManager).exportAllData(callback: callback)
 				} else {
-					/// All routines MUST call callback
+					// All routines MUST call callback
 					callback(nil)
 				}
 			}

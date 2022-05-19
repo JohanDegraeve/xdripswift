@@ -120,9 +120,8 @@ class SettingsViewUtilities {
 							let activityViewController = UIActivityViewController(activityItems: [fileURL], applicationActivities: [])
 							uIViewController.present(activityViewController, animated: true)
 						}
-					} else {
-						// TODO: add trace
 					}
+                    
 				})
 				
 				// check if refresh is needed, either complete settingsview or individual section
