@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import OSLog
 
 public class LoopManager:NSObject {
     
@@ -22,6 +22,9 @@ public class LoopManager:NSObject {
     /// shared UserDefaults to publish data
     private let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName)
     
+    // for trace,
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLoopManager)
+
     // MARK: - initializer
     
     init(coreDataManager:CoreDataManager) {
@@ -43,14 +46,32 @@ public class LoopManager:NSObject {
         // unwrap sharedUserDefaults
         guard let sharedUserDefaults = sharedUserDefaults else {return}
 
+        trace("in share", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+
         // get last readings with calculated value
         var lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: UserDefaults.standard.timeStampLatestLoopSharedBgReading, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
 
+        trace("    list of readings before applying delay:",log: log, category: ConstantsLog.categoryLoopManager, type: .info)
+        
+        for reading in lastReadings {
+
+            trace("    timestamp %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, reading.timeStamp.toString(timeStyle: .long, dateStyle: .long))
+            trace("        value %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, reading.calculatedValue.description)
+            trace("", log: log, category: ConstantsLog.categoryLoopManager, type: .info)
+            
+        }
+        
         // if needed, remove readings less than loopDelay minutes old
         if UserDefaults.standard.loopDelay > 0 {
             
+            trace("    loopDelay > 0. Deleting readings",log: log, category: ConstantsLog.categoryLoopManager, type: .info)
+            
             while lastReadings.count > 0 &&  lastReadings[0].timeStamp.addingTimeInterval(TimeInterval(minutes: Double(UserDefaults.standard.loopDelay))) > Date() {
 
+                trace("    removing reading with timestamp %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, lastReadings[0].timeStamp.toString(timeStyle: .long, dateStyle: .long))
+                trace("        value %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, lastReadings[0].calculatedValue.description)
+                trace("", log: log, category: ConstantsLog.categoryLoopManager, type: .info)
+                
                 lastReadings.remove(at: 0)
                 
             }
@@ -112,6 +133,10 @@ public class LoopManager:NSObject {
                             ]
 
                         newDictionary.append(newReading)
+                        
+                        trace("    adding reading with timestamp %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, newReadingTimeStamp.toString(timeStyle: .long, dateStyle: .long))
+                        trace("        value %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, value.description)
+                        trace("", log: log, category: ConstantsLog.categoryLoopManager, type: .info)
 
                     }
                     
@@ -149,9 +174,11 @@ public class LoopManager:NSObject {
         
         sharedUserDefaults.set(data, forKey: "latestReadings")
         
-        UserDefaults.standard.timeStampLatestLoopSharedBgReading = lastReadings.first!.timeStamp
+        // add 5 seconds to last Readings timestamp, because due to the way timestamp for libre readings is calculated, it may happen that the same reading shifts 1 or 2 seconds in next reading cycle
+        UserDefaults.standard.timeStampLatestLoopSharedBgReading = lastReadings.first!.timeStamp.addingTimeInterval(5.0)
         
         UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
+        
     }
     
     private func parseTimestamp(_ timestamp: String) throws -> Date? {

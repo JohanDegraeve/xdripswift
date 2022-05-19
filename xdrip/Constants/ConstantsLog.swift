@@ -161,7 +161,10 @@ enum ConstantsLog {
     static let categoryAppDelegate =                    "AppDelegate              "
 	
 	/// for use in DataExporter
-	static let dataExporter =                           "DataExporter             "
+	static let categoryDataExporter =                           "DataExporter             "
 
+    // for use in LoopManager
+    static let categoryLoopManager =                            "LoopManager              "
+    
 }
 
