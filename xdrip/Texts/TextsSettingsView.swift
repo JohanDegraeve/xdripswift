@@ -123,7 +123,7 @@ class Texts_SettingsView {
     }()
     
     static let settingsviews_smallBolusTreatmentThreshold = {
-        return NSLocalizedString("settingsviews_smallBolusTreatmentThreshold", tableName: filename, bundle: Bundle.main, value: "Micro-Bolus Threshold:", comment: "When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus")
+        return NSLocalizedString("settingsviews_smallBolusTreatmentThreshold", tableName: filename, bundle: Bundle.main, value: "Micro-bolus Threshold:", comment: "When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus")
     }()
     
     static let settingsviews_smallBolusTreatmentThresholdMessage = {
@@ -131,11 +131,11 @@ class Texts_SettingsView {
     }()
     
     static let settingsviews_showSmallBolusTreatmentsOnChart: String = {
-        return NSLocalizedString("settingsviews_showSmallBolusTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Micro-Bolus on Chart?", comment: "treatments settings, show the micro-bolus on main chart")
+        return NSLocalizedString("settingsviews_showSmallBolusTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Micro-bolus on Chart?", comment: "treatments settings, show the micro-bolus on main chart")
     }()
     
     static let settingsviews_showSmallBolusTreatmentsInList: String = {
-        return NSLocalizedString("settingsviews_showSmallBolusTreatmentsInList", tableName: filename, bundle: Bundle.main, value: "Show Micro-Bolus in List?", comment: "treatments settings, show the micro-bolus in the treatment list")
+        return NSLocalizedString("settingsviews_showSmallBolusTreatmentsInList", tableName: filename, bundle: Bundle.main, value: "Show Micro-bolus in List?", comment: "treatments settings, show the micro-bolus in the treatment list")
     }()
     
     // MARK: - Section Statistics
