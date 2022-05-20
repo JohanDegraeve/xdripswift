@@ -18,5 +18,11 @@ enum ConstantsNightScout {
     
     /// download treatments from nightscout, how manyhours
     static let maxHoursTreatmentsToDownload = 24.0
+    
+    /// the text used by Nightscout for the "unit" json attribute for BG Checks stored in mg/dl
+    static let mgDlNightscoutUnitString = "mg/dl"
+    
+    /// the text used by Nightscout for the "unit" json attribute for BG Checks stored in mmol/l
+    static let mmolNightscoutUnitString = "mmol"
 
 }

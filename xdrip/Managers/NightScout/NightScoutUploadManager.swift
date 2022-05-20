@@ -601,6 +601,10 @@ public class NightScoutUploadManager: NSObject {
                 case .Exercise:
                     treatmentToUploadToNightscoutAsDictionary["duration"] = otherTreatmentEntry.value
                     
+                case .BgCheck:
+                    treatmentToUploadToNightscoutAsDictionary["glucose"] = otherTreatmentEntry.value.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                    treatmentToUploadToNightscoutAsDictionary["units"] = String(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ConstantsNightScout.mgDlNightscoutUnitString : ConstantsNightScout.mmolNightscoutUnitString)
+                    
                 default:
                     break
                     

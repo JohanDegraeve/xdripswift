@@ -23,7 +23,7 @@ extension TreatmentEntry {
 	/// Date represents the date of the treatment, not the date of creation.
 	@NSManaged public var date: Date
 
-	/// Value represents the amount (e.g. insulin units or carbs grams).
+	/// Value represents the amount (e.g. insulin units, carbs grams, BG check glucose value).
 	@NSManaged public var value: Double
 
 	/// Enum TreatmentType defines which treatment this instance is.

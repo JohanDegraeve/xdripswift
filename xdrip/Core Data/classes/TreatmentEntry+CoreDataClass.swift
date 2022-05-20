@@ -19,6 +19,7 @@ import CoreData
 	case Insulin
 	case Carbs
 	case Exercise
+    case BgCheck
 	
 	/// String representation.
 	public func asString() -> String {
@@ -29,6 +30,8 @@ import CoreData
 			return Texts_TreatmentsView.carbs
 		case .Exercise:
 			return Texts_TreatmentsView.exercise
+        case .BgCheck:
+            return Texts_TreatmentsView.bgCheck
 		default:
 			return Texts_TreatmentsView.questionMark
 		}
@@ -43,6 +46,8 @@ import CoreData
 			return Texts_TreatmentsView.carbsUnit
 		case .Exercise:
 			return Texts_TreatmentsView.exerciseUnit
+        case .BgCheck:
+            return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
 		default:
 			return Texts_TreatmentsView.questionMark
 		}
@@ -68,6 +73,9 @@ import CoreData
             
         case .Exercise:
             return "exericse"
+            
+        case .BgCheck:
+            return "glucose"
             
         }
         
@@ -157,7 +165,25 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 	
 	/// Returns the displayValue: the .value with the proper unit.
 	public func displayValue() -> String {
-		return self.value.stringWithoutTrailingZeroes + " " + self.treatmentType.unit()
+		
+        var displayValueString: String
+        
+        // if the treatmentType is a BG Check then convert the value to mmol/l if that is what the user is using. All BG checks are stored in coredata as mg/dl
+        if self.treatmentType == .BgCheck {
+            
+            // save typing
+            let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+            
+            // convert to mmol/l if needed, round accordingly and add the correct units
+            displayValueString = self.value.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).stringWithoutTrailingZeroes + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+            
+        } else {
+            
+            displayValueString = self.value.stringWithoutTrailingZeroes + " " + self.treatmentType.unit()
+            
+        }
+        
+        return displayValueString
 	}
 	
 	/// - get the dictionary representation required for creating a new treatment @ NighScout using POST or updating an existing treatment @ NightScout using PUT
@@ -188,6 +214,11 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		case .Exercise:
 			dict["eventType"] = "Exercise" // maybe overwritten in next statement
 			dict["duration"] = self.value
+        case .BgCheck:
+            dict["eventType"] = "BG Check" // maybe overwritten in next statement
+            dict["glucose"] = self.value
+            dict["glucoseType"] = "Finger"
+            dict["units"] = String(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ConstantsNightScout.mgDlNightscoutUnitString : ConstantsNightScout.mmolNightscoutUnitString)
 		default:
 			break
 		}

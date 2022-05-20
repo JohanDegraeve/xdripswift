@@ -51,6 +51,10 @@ enum Texts_TreatmentsView {
 	static let exercise:String = {
 		return NSLocalizedString("treatments_exercise", tableName: filename, bundle: Bundle.main, value: "Exercise", comment: "Exercise.")
 	}()
+    
+    static let bgCheck:String = {
+        return NSLocalizedString("treatments_bgcheck", tableName: filename, bundle: Bundle.main, value: "BG Check", comment: "Blood Glucose Check")
+    }()
 
 	static let questionMark:String = {
 		return NSLocalizedString("treatments_question_mark", tableName: filename, bundle: Bundle.main, value: "?", comment: "Literally a question mark, used as unknown abbreviation.")

@@ -46,7 +46,8 @@ class TreatmentsViewController : UIViewController {
         // add observer for nightScoutTreatmentsUpdateCounter, to reload the screen whenever the value changes
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
         
-
+        // add observer for bloodGlucoseUnitIsMgDl, to reload the screen whenever the bg unit changes
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
         
 	}
 	
@@ -109,7 +110,7 @@ class TreatmentsViewController : UIViewController {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.nightScoutTreatmentsUpdateCounter :
+                case UserDefaults.Key.nightScoutTreatmentsUpdateCounter, UserDefaults.Key.bloodGlucoseUnitIsMgDl :
                     // Reloads data and table.
                     self.reload()
                     

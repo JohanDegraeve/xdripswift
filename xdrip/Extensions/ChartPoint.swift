@@ -33,6 +33,16 @@ extension ChartPoint {
 
     }
     
+    /// the bg check treatment value is always stored in mg/dl so needs to be converted/rounded as required to show correctly on the chart
+    convenience init(bgCheck: TreatmentEntry, formatter: DateFormatter, unitIsMgDl: Bool) {
+        
+            self.init(
+                x: ChartAxisValueDate(date: bgCheck.date, formatter: formatter),
+                y: ChartAxisValueDouble(bgCheck.value.mgdlToMmol(mgdl: unitIsMgDl).bgValueRounded(mgdl: unitIsMgDl))
+            )
+
+    }
+    
     /// the chartpoints defined for certain treatment entries (such as carbs) are positioned relative to other elements and need to be re-scaled to fit the y-axis values of the glucose chart points (and therefore avoid needing a secondary axis)
     convenience init(treatmentEntry: TreatmentEntry, formatter: DateFormatter, newYAxisValue: Double? = 0) {
         
