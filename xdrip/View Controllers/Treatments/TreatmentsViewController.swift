@@ -221,12 +221,12 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 		// Set textcolor to white and increase font
 		if let textLabel = titleView.textLabel {
 			textLabel.textColor = UIColor.white
-			textLabel.font = textLabel.font.withSize(18)
+			textLabel.font = textLabel.font.withSize(16)
 		}
 	}
 
 	func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-		return 40.0
+		return 32.0
 	}
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

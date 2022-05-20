@@ -12,10 +12,15 @@ class TreatmentTableViewCell: UITableViewCell {
 	@IBOutlet weak var typeLabel: UILabel!
 	@IBOutlet weak var valueLabel: UILabel!
 	@IBOutlet weak var dateLabel: UILabel!
-	
+    @IBOutlet weak var unitLabel: UILabel!
+    @IBOutlet weak var iconImageView: UIImageView!
+    
 	public func setupWithTreatment(_ treatment: TreatmentEntry) {
 		self.typeLabel.text = treatment.treatmentType.asString()
 		self.valueLabel.text = treatment.displayValue()
+        self.unitLabel.text = treatment.displayUnit()
+        self.iconImageView.tintColor = treatment.treatmentType.iconColor()
+        self.iconImageView.image = treatment.treatmentType.iconImage()
 		
 		let formatter = DateFormatter()
 		formatter.dateFormat = "HH:mm"
