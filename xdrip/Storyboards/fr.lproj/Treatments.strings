@@ -14,6 +14,7 @@
 "treatments_carbs" = "Carbs";
 "treatments_insulin" = "Insulin";
 "treatments_exercise" = "Exercise";
+"treatments_bgcheck" = "Contrôle Glycémie";
 "treatments_question_mark" = "?";
 "treatments_success" = "Success";
 "treatments_sync_complete" = "Synchronization complete.";
