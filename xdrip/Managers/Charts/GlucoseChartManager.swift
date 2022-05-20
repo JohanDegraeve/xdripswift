@@ -844,7 +844,16 @@ public class GlucoseChartManager {
                 mediumCarbsLayer,
                 smallCarbsLayer,
                 // bolus treatment layers
-                mediumBolusTriangleLayer,
+                mediumBolusTriangleLayer
+            ]
+            
+            layers.append(contentsOf: layersTreatments)
+            
+        }
+        
+        if UserDefaults.standard.showTreatmentsOnChart && UserDefaults.standard.showSmallBolusTreatmentsOnChart {
+            
+            let layersTreatments: [ChartLayer?] = [
                 smallBolusTriangleLayer
             ]
             

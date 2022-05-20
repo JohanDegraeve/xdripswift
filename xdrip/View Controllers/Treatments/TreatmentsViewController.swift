@@ -49,6 +49,9 @@ class TreatmentsViewController : UIViewController {
         // add observer for bloodGlucoseUnitIsMgDl, to reload the screen whenever the bg unit changes
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
         
+        // add observer for showSmallBolusTreatmentsInList, to reload the screen whenever the user wants to show or hide the micro-bolus treatments
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSmallBolusTreatmentsInList.rawValue, options: .new, context: nil)
+        
 	}
 	
 
@@ -94,7 +97,15 @@ class TreatmentsViewController : UIViewController {
 	/// Reloads treatmentCollection and calls reloadData on tableView.
 	private func reload() {
         
-        self.treatmentCollection = TreatmentCollection(treatments: treatmentEntryAccessor.getLatestTreatments(howOld: TimeInterval(days: 100)).filter( {!$0.treatmentdeleted} ))
+        if UserDefaults.standard.showSmallBolusTreatmentsInList {
+            
+            self.treatmentCollection = TreatmentCollection(treatments: treatmentEntryAccessor.getLatestTreatments(howOld: TimeInterval(days: 100)).filter( {!$0.treatmentdeleted} ))
+            
+        } else {
+            
+            self.treatmentCollection = TreatmentCollection(treatments: treatmentEntryAccessor.getLatestTreatments(howOld: TimeInterval(days: 100)).filter( {!$0.treatmentdeleted && (($0.treatmentType != .Insulin) || ($0.treatmentType == .Insulin && $0.value >= UserDefaults.standard.smallBolusTreatmentThreshold))} ))
+            
+        }
 
 		self.tableView.reloadData()
         
@@ -110,7 +121,7 @@ class TreatmentsViewController : UIViewController {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.nightScoutTreatmentsUpdateCounter, UserDefaults.Key.bloodGlucoseUnitIsMgDl :
+                case UserDefaults.Key.nightScoutTreatmentsUpdateCounter, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.showSmallBolusTreatmentsInList :
                     // Reloads data and table.
                     self.reload()
                     

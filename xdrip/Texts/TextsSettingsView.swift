@@ -130,6 +130,14 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_smallBolusTreatmentThresholdMessage", tableName: filename, bundle: Bundle.main, value: "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)", comment: "When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus")
     }()
     
+    static let settingsviews_showSmallBolusTreatmentsOnChart: String = {
+        return NSLocalizedString("settingsviews_showSmallBolusTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Micro-Bolus on Chart?", comment: "treatments settings, show the micro-bolus on main chart")
+    }()
+    
+    static let settingsviews_showSmallBolusTreatmentsInList: String = {
+        return NSLocalizedString("settingsviews_showSmallBolusTreatmentsInList", tableName: filename, bundle: Bundle.main, value: "Show Micro-Bolus in List?", comment: "treatments settings, show the micro-bolus in the treatment list")
+    }()
+    
     // MARK: - Section Statistics
     
     static let sectionTitleStatistics: String = {
