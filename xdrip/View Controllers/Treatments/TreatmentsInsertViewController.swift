@@ -170,14 +170,22 @@ class TreatmentsInsertViewController : UIViewController {
                     var treatMentEntryToUpdateChanged = false
                     
                     if treatMentEntryToUpdate.value != value {
+        
+                        if treatMentEntryToUpdate.treatmentType == .BgCheck {
+            
+                            treatMentEntryToUpdate.value = value.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                            
+                        } else {
+                            
+                            treatMentEntryToUpdate.value = value
+                            
+                        }
                         
-                        treatMentEntryToUpdate.value = value
-
                         // sets text in textField to "0" to avoid that new treatmentEntry is created
                         textField.text = "0"
-
+                        
                         treatMentEntryToUpdateChanged = true
-                                                
+                        
                     }
                     
                     if treatMentEntryToUpdate.date != self.datePicker.date {
@@ -254,8 +262,14 @@ class TreatmentsInsertViewController : UIViewController {
             // if yes, creates a new TreatmentEntry
             let createFunction = { [self] (text: String?, treatmentType: TreatmentType) in
                 
-                if let text = text, let value = Double(text.replacingOccurrences(of: ",", with: ".")), value > 0 {
-
+                if let text = text, var value = Double(text.replacingOccurrences(of: ",", with: ".")), value > 0 {
+        
+                        if treatmentType == .BgCheck {
+            
+                            value = value.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                            
+                        }
+                    
                     // create the treatment and append to treatments
                     _ = TreatmentEntry(date: Date(timeInterval: dateOffset, since: datePicker.date), value: value, treatmentType: treatmentType, nightscoutEventType: nil, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
                     

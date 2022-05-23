@@ -283,7 +283,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
             dict["eventType"] = "BG Check" // maybe overwritten in next statement
             dict["glucose"] = self.value
             dict["glucoseType"] = "Finger"
-            dict["units"] = String(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ConstantsNightScout.mgDlNightscoutUnitString : ConstantsNightScout.mmolNightscoutUnitString)
+            dict["units"] = ConstantsNightScout.mgDlNightscoutUnitString
 		default:
 			break
 		}
