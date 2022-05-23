@@ -52,6 +52,9 @@ class TreatmentsViewController : UIViewController {
         // add observer for showSmallBolusTreatmentsInList, to reload the screen whenever the user wants to show or hide the micro-bolus treatments
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSmallBolusTreatmentsInList.rawValue, options: .new, context: nil)
         
+        // add observer for smallBolusTreatmentThreshold, to reload the screen whenever the user changes the threshold value (this can mean we need to show more, or less, bolus treatments)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.smallBolusTreatmentThreshold.rawValue, options: .new, context: nil)
+        
 	}
 	
 
@@ -121,7 +124,7 @@ class TreatmentsViewController : UIViewController {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.nightScoutTreatmentsUpdateCounter, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.showSmallBolusTreatmentsInList :
+                case UserDefaults.Key.nightScoutTreatmentsUpdateCounter, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.showSmallBolusTreatmentsInList, UserDefaults.Key.smallBolusTreatmentThreshold :
                     // Reloads data and table.
                     self.reload()
                     
