@@ -129,7 +129,8 @@ public class LoopManager:NSObject {
                             "ST" : dateAsString,
                             "DT" : dateAsString,
                             "Value" : value,
-                            "direction" : slopeOrdinal
+                            "direction" : slopeOrdinal,
+                            "from" : "xDrip"
                             ]
 
                         newDictionary.append(newReading)
