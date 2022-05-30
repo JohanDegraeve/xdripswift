@@ -77,7 +77,7 @@ public class LoopManager:NSObject {
             }
             
         }
-
+        
         // if there's no readings, then no further processing
         if lastReadings.count == 0 {
             return
@@ -173,13 +173,32 @@ public class LoopManager:NSObject {
             return
         }
         
+        // write readings to shared user defaults
         sharedUserDefaults.set(data, forKey: "latestReadings")
         
+        // store in local userdefaults
+        UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
+
+        // initially set timeStampLatestLoopSharedBgReading to timestamp of first reading - may get another value later, in case loopdelay > 0
         // add 5 seconds to last Readings timestamp, because due to the way timestamp for libre readings is calculated, it may happen that the same reading shifts 1 or 2 seconds in next reading cycle
         UserDefaults.standard.timeStampLatestLoopSharedBgReading = lastReadings.first!.timeStamp.addingTimeInterval(5.0)
         
-        UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
-        
+        // in case loopdelay is used, then update UserDefaults.standard.timeStampLatestLoopSharedBgReading with value of timestamp of first element in the dictionary
+        if let element = dictionary.first, UserDefaults.standard.loopDelay > 0 {
+
+            if let elementDateAsString = element["DT"] as? String {
+                
+                do {
+                    if let readingTimeStamp = try self.parseTimestamp(elementDateAsString) {
+                        UserDefaults.standard.timeStampLatestLoopSharedBgReading = readingTimeStamp
+                    }
+                } catch  {
+                    // timeStampLatestLoopSharedBgReading keeps initially set value
+                }
+
+            }
+        }
+
     }
     
     private func parseTimestamp(_ timestamp: String) throws -> Date? {
