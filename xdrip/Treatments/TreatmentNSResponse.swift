@@ -26,12 +26,6 @@ public struct TreatmentNSResponse {
     
     /// - eventType received from NightScout (for downloaded treatments) or uploaded to NightScout (for treatments created in xdrip4ios)
     public let nightscoutEventType: String?
-    
-    /// - eventType received from NightScout (for downloaded treatments) or uploaded to NightScout (for treatments created in xdrip4ios)
-//    public let nightscoutGlucoseType: String?
-    
-    /// - eventType received from NightScout (for downloaded treatments) or uploaded to NightScout (for treatments created in xdrip4ios)
-//    public let nightscoutUnits: String?
 	
     public let value: Double
     
