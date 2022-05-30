@@ -10,21 +10,93 @@ import Foundation
 
 class TreatmentTableViewCell: UITableViewCell {
 	@IBOutlet weak var typeLabel: UILabel!
-	@IBOutlet weak var valueLabel: UILabel!
-	@IBOutlet weak var dateLabel: UILabel!
+    @IBOutlet weak var valueLabel: UILabel!
+    @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var unitLabel: UILabel!
     @IBOutlet weak var iconImageView: UIImageView!
     
-	public func setupWithTreatment(_ treatment: TreatmentEntry) {
-		self.typeLabel.text = treatment.treatmentType.asString()
-		self.valueLabel.text = treatment.displayValue()
-        self.unitLabel.text = treatment.displayUnit()
-        self.iconImageView.tintColor = treatment.treatmentType.iconColor()
-        self.iconImageView.image = treatment.treatmentType.iconImage()
-		
-		let formatter = DateFormatter()
-		formatter.dateFormat = "HH:mm"
-
-		self.dateLabel.text = formatter.string(from: treatment.date)
-	}
+    public func setupWithTreatment(_ treatment: TreatmentEntry) {
+        
+        // date label
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        
+        self.dateLabel.text = formatter.string(from: treatment.date)
+        
+        
+        // treatment type icon
+        switch treatment.treatmentType {
+            
+        case .Insulin:
+            self.iconImageView.tintColor =  ConstantsGlucoseChart.bolusTreatmentColor
+            
+        case .Carbs:
+            self.iconImageView.tintColor =  ConstantsGlucoseChart.carbsTreatmentColor
+            
+        case .Exercise:
+            self.iconImageView.tintColor =  UIColor.magenta
+            
+        case .BgCheck:
+            self.iconImageView.tintColor =  ConstantsGlucoseChart.bgCheckTreatmentColorInner
+            
+        }
+        
+        if #available(iOS 13.0, *) {
+            
+            switch treatment.treatmentType {
+                
+            case .Insulin:
+                self.iconImageView.image =  UIImage(systemName: "arrowtriangle.down.fill")!
+                
+            case .Carbs:
+                self.iconImageView.image =  UIImage(systemName: "circle.fill")!
+                
+            case .Exercise:
+                self.iconImageView.image =  UIImage(systemName: "heart.fill")!
+                
+            case .BgCheck:
+                self.iconImageView.image =  UIImage(systemName: "drop.fill")!
+                
+            }
+            
+        } else {
+            
+            self.iconImageView.image =  nil
+            
+        }
+        
+        
+        // treatment type label
+        self.typeLabel.text = treatment.treatmentType.asString()
+        
+        // treatment value label
+        if treatment.treatmentType == .BgCheck {
+            
+            // save typing
+            let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+            
+            // convert to mmol/l if needed, round accordingly and add the correct units
+            self.valueLabel.text = treatment.value.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).stringWithoutTrailingZeroes
+            
+        } else {
+            
+            self.valueLabel.text = treatment.value.stringWithoutTrailingZeroes
+            
+        }
+        
+        
+        // treatment unit label
+        if treatment.treatmentType == .BgCheck {
+            
+            // convert to mmol/l if needed, round accordingly and add the correct units
+            self.unitLabel.text =  String(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+            
+        } else {
+            
+            self.unitLabel.text = treatment.treatmentType.unit()
+            
+        }
+        
+    }
+    
 }

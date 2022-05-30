@@ -8,7 +8,6 @@
 
 import Foundation
 import CoreData
-import UIKit
 
 
 // @objc and Int16 allows enums to work with CoreData
@@ -113,56 +112,6 @@ import UIKit
         }
         
     }
-    
-    /// Returns the displayUnit: the .unit as required by the treatment type and the user settings
-    public func iconColor() -> UIColor {
-        
-        switch self {
-            
-        case .Insulin:
-            return ConstantsGlucoseChart.bolusTreatmentColor
-            
-        case .Carbs:
-            return ConstantsGlucoseChart.carbsTreatmentColor
-            
-        case .Exercise:
-            return UIColor.magenta
-            
-        case .BgCheck:
-            return ConstantsGlucoseChart.bgCheckTreatmentColorInner
-            
-        }
-        
-    }
-    
-    /// Returns the displayUnit: the .unit as required by the treatment type and the user settings
-    public func iconImage() -> UIImage? {
-        
-        if #available(iOS 13.0, *) {
-            
-            switch self {
-                
-            case .Insulin:
-                return UIImage(systemName: "arrowtriangle.down.fill")!
-                
-            case .Carbs:
-                return UIImage(systemName: "circle.fill")!
-                
-            case .Exercise:
-                return UIImage(systemName: "heart.fill")!
-                
-            case .BgCheck:
-                return UIImage(systemName: "drop.fill")!
-                
-            }
-            
-        } else {
-            
-            return nil
-            
-        }
-        
-    }
 	
 }
 
@@ -213,43 +162,6 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 	private override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {
 		super.init(entity: entity, insertInto: context)
 	}
-	
-	/// Returns the displayValue: the .value in the correct value if any changes are required
-	public func displayValue() -> String {
-        
-        // if the treatmentType is a BG Check then convert the value to mmol/l if that is what the user is using. All BG checks are stored in coredata as mg/dl
-        if self.treatmentType == .BgCheck {
-            
-            // save typing
-            let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-            
-            // convert to mmol/l if needed, round accordingly and add the correct units
-            return self.value.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).stringWithoutTrailingZeroes
-            
-        } else {
-            
-            return self.value.stringWithoutTrailingZeroes
-            
-        }
-        
-	}
-    
-    /// Returns the displayUnit: the .unit as required by the treatment type and the user settings
-    public func displayUnit() -> String {
-        
-        // if the treatmentType is a BG Check then convert the value to mmol/l if that is what the user is using. All BG checks are stored in coredata as mg/dl
-        if self.treatmentType == .BgCheck {
-            
-            // convert to mmol/l if needed, round accordingly and add the correct units
-            return String(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-            
-        } else {
-            
-            return self.treatmentType.unit()
-            
-        }
-        
-    }
 	
 	/// - get the dictionary representation required for creating a new treatment @ NighScout using POST or updating an existing treatment @ NightScout using PUT
     /// - splits of "-carbs" "-insulin" or "-exercise" from the id
