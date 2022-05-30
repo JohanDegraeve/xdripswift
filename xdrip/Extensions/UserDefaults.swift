@@ -70,6 +70,12 @@ extension UserDefaults {
         /// micro-bolus threshold level in units
         case smallBolusTreatmentThreshold = "smallBolusTreatmentThreshold"
         
+        /// should the micro-boluses be shown on the main chart?
+        case showSmallBolusTreatmentsOnChart = "showSmallBolusTreatmentsOnChart"
+        
+        /// should the micro-boluses be listed in the treatment list/table?
+        case showSmallBolusTreatmentsInList = "showSmallBolusTreatmentsInList"
+        
         // Statistics settings
         
         /// show the statistics? How many days should we use for the calculations?
@@ -770,6 +776,28 @@ extension UserDefaults {
         set {
 
             set(newValue, forKey: Key.smallBolusTreatmentThreshold.rawValue)
+        }
+    }
+    
+    /// should the app show the micro-bolus treatments on the main chart?
+    @objc dynamic var showSmallBolusTreatmentsOnChart: Bool {
+        // default value for bool in userdefaults is false, by default we want the app to *show* the micro-bolus treatments on the chart
+        get {
+            return !bool(forKey: Key.showSmallBolusTreatmentsOnChart.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showSmallBolusTreatmentsOnChart.rawValue)
+        }
+    }
+    
+    /// should the app show the micro-bolus treatments in the treatments list/table?
+    @objc dynamic var showSmallBolusTreatmentsInList: Bool {
+        // default value for bool in userdefaults is false, by default we want the app to *hide* the micro-bolus treatments in the treatments table
+        get {
+            return bool(forKey: Key.showSmallBolusTreatmentsInList.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.showSmallBolusTreatmentsInList.rawValue)
         }
     }
     

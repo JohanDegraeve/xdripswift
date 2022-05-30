@@ -32,7 +32,7 @@ public struct TreatmentNSResponse {
 	/// Takes a NSDictionary from nightscout response and returns an array TreatmentNSResponse. Can be more than one, eg NightScout treatment of type 'Snack Bolus' could contain an insulin value and a carbs value
     ///
     /// id will be the id retrieved from nightscout + "-insulin", "-carbs", "-exercise", according to treatment type
-    public static func fromNighscout(dictionary: NSDictionary) -> [TreatmentNSResponse] {
+    public static func fromNightscout(dictionary: NSDictionary) -> [TreatmentNSResponse] {
         
         var treatmentNSResponses: [TreatmentNSResponse] = []
         
@@ -92,6 +92,12 @@ public struct TreatmentNSResponse {
                 
             }
             
+            if let glucose = dictionary["glucose"] as? Double, let units = dictionary["units"] as? String {
+                
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.BgCheck.idExtension(), createdAt: date, eventType: .BgCheck, nightscoutEventType: nightScoutEventType, value: units == "mg/dl" ? glucose : glucose.mmolToMgdl()))
+                
+            }
+            
 		}
         
 		return treatmentNSResponses
@@ -106,7 +112,7 @@ public struct TreatmentNSResponse {
 		for element in array {
 			if let dictionary = element as? NSDictionary {
                 
-                responses = responses + TreatmentNSResponse.fromNighscout(dictionary: dictionary)
+                responses = responses + TreatmentNSResponse.fromNightscout(dictionary: dictionary)
                 
 			}
 		}

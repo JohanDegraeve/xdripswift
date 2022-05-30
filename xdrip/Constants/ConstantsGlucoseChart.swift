@@ -68,6 +68,8 @@ enum ConstantsGlucoseChart {
     /// color for target line
     static let guidelineTargetColor = UIColor.green.withAlphaComponent(0.3)
     
+    // glucose circle/dot color and sizes
+    
     /// glucose colors - for values in range
     static let glucoseInRangeColor = UIColor.green
     
@@ -89,6 +91,8 @@ enum ConstantsGlucoseChart {
     /// diameter of the circle for blood glucose readings with a 24h chart width. The more hours on the chart, the smaller the circles should be
     static let glucoseCircleDiameter24h: CGFloat = 4
     
+    // calibration circle fill/border color/sizes
+    
     /// calibration inner circle color
     static let calibrationCircleColorInner = UIColor.red
     
@@ -100,6 +104,8 @@ enum ConstantsGlucoseChart {
     
     /// calibration inner circle scale factor compared to the chart glucose circle size
     static let calibrationCircleScaleInner: CGFloat = 1.4
+    
+    // bolus treatment marker color/sizes
     
     /// bolus treament marker colour
     static let bolusTreatmentColor = UIColor.systemBlue
@@ -131,6 +137,8 @@ enum ConstantsGlucoseChart {
     /// make the triangle height slightly less than the width to prevent it looking too "pointy"
     static let bolusTriangleHeightScale: CGFloat = 0.9
     
+    // carb treatment marker color/sizes
+    
     /// carbs treament marker colour
     static let carbsTreatmentColor = UIColor.systemOrange
     
@@ -154,6 +162,22 @@ enum ConstantsGlucoseChart {
     
     /// The scale will determine how big the veryLargeCarbs circle is scaled compared to the glucose point size)
     static let veryLargeCarbsTreamentScale: CGFloat = 6.6
+    
+    // bg check circle fill/border color/sizes
+    
+    /// bg check outer circle color
+    static let bgCheckTreatmentColorOuter = UIColor.gray
+    
+    /// bg check inner circle color
+    static let bgCheckTreatmentColorInner = UIColor.red
+    
+    /// bg check outer circle scale factor compared to the chart glucose circle size
+    static let bgCheckTreatmentScaleOuter: CGFloat = 1.9
+    
+    /// bg check inner circle scale factor compared to the chart glucose circle size
+    static let bgCheckTreatmentScaleInner: CGFloat = 1.4
+    
+    // treatment label font size/color/background
 
     /// default label settings for the treatments labels. These are set for 6hr chart width - they will be scaled accordingly as needed
     static let treatmentLabelFontSize: Double = 12
@@ -181,6 +205,8 @@ enum ConstantsGlucoseChart {
     
     /// how far should the label be separated from the veryLargeCarbs marker by default
     static let veryLargeCarbsLabelSeparation: Double = 12
+    
+    // chart format parameters
     
     /// labels width for vertical axis
     static let yAxisLabelsWidth: CGFloat = 30

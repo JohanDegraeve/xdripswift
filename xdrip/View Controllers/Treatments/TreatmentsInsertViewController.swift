@@ -12,18 +12,31 @@ import Foundation
 class TreatmentsInsertViewController : UIViewController {
 	
 	@IBOutlet weak var titleNavigation: UINavigationItem!
+    
 	@IBOutlet weak var carbsLabel: UILabel!
 	@IBOutlet weak var insulinLabel: UILabel!
 	@IBOutlet weak var exerciseLabel: UILabel!
+    @IBOutlet weak var bgCheckLabel: UILabel!
+    
 	@IBOutlet weak var doneButton: UIBarButtonItem!
+    
 	@IBOutlet weak var datePicker: UIDatePicker!
+    
 	@IBOutlet weak var carbsTextField: UITextField!
 	@IBOutlet weak var insulinTextField: UITextField!
 	@IBOutlet weak var exerciseTextField: UITextField!
+    @IBOutlet weak var bgCheckTextField: UITextField!
+    
+    @IBOutlet weak var carbsUnitLabel: UILabel!
+    @IBOutlet weak var insulinUnitLabel: UILabel!
+    @IBOutlet weak var exerciseUnitLabel: UILabel!
+    @IBOutlet weak var bgCheckUnitLabel: UILabel!
+    
     @IBOutlet weak var carbsStackView: UIStackView!
     @IBOutlet weak var insulinStackView: UIStackView!
     @IBOutlet weak var exerciseStackView: UIStackView!
-    
+    @IBOutlet weak var bgCheckStackView: UIStackView!
+
     // MARK: - private properties
     
 	/// reference to coreDataManager
@@ -67,15 +80,26 @@ class TreatmentsInsertViewController : UIViewController {
 		// Title
 		self.titleNavigation.title = Texts_TreatmentsView.newEntryTitle
         
+        // update the BG Check placeholder text depending on BG unit being used
+        self.bgCheckTextField.placeholder = Double(0).mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        
 		// Labels for each TextField
-		self.carbsLabel.text = Texts_TreatmentsView.carbsWithUnit
-		self.insulinLabel.text = Texts_TreatmentsView.insulinWithUnit
-		self.exerciseLabel.text = Texts_TreatmentsView.exerciseWithUnit
+		self.carbsLabel.text = Texts_TreatmentsView.carbs
+		self.insulinLabel.text = Texts_TreatmentsView.insulin
+		self.exerciseLabel.text = Texts_TreatmentsView.exercise
+        self.bgCheckLabel.text = Texts_TreatmentsView.bgCheck
 		
+        // Unit labels for each TextField
+        self.carbsUnitLabel.text = Texts_TreatmentsView.carbsUnit
+        self.insulinUnitLabel.text = Texts_TreatmentsView.insulinUnit
+        self.exerciseUnitLabel.text = Texts_TreatmentsView.exerciseUnit
+        self.bgCheckUnitLabel.text = String(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+        
 		// Done button
 		self.addDoneButtonOnNumpad(textField: self.carbsTextField)
 		self.addDoneButtonOnNumpad(textField: self.insulinTextField)
 		self.addDoneButtonOnNumpad(textField: self.exerciseTextField)
+        self.addDoneButtonOnNumpad(textField: self.bgCheckTextField)
         
 		self.setDismissKeyboard()
 
@@ -87,36 +111,37 @@ class TreatmentsInsertViewController : UIViewController {
                 // set text to value of treatMentEntryToUpdate
                 carbsTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
                 
-                // hide the other fields
-                insulinTextField.isHidden = true
-                insulinLabel.isHidden = true
+                // hide the other stack views
                 insulinStackView.isHidden = true
-                exerciseTextField.isHidden = true
-                exerciseLabel.isHidden = true
                 exerciseStackView.isHidden = true
+                bgCheckStackView.isHidden = true
 
             case .Exercise:
                 // set text to value of treatMentEntryToUpdate
                 exerciseTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
                 
-                // hide the other fields
-                carbsTextField.isHidden = true
-                carbsLabel.isHidden = true
+                // hide the other stack views
                 carbsStackView.isHidden = true
-                insulinTextField.isHidden = true
-                insulinLabel.isHidden = true
                 insulinStackView.isHidden = true
+                bgCheckStackView.isHidden = true
 
             case .Insulin:
                 // set text to value of treatMentEntryToUpdate
                 insulinTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
                 
-                // hide the other fields
-                carbsTextField.isHidden = true
-                carbsLabel.isHidden = true
+                // hide the other stack views
                 carbsStackView.isHidden = true
-                exerciseTextField.isHidden = true
-                exerciseLabel.isHidden = true
+                exerciseStackView.isHidden = true
+                bgCheckStackView.isHidden = true
+                
+            case .BgCheck:
+                // set text to value of treatMentEntryToUpdate
+                // as the BG Check values are always stored in coredata as mg/dl, the number must be converted and rounded as needed
+                bgCheckTextField.text = treatMentEntryToUpdate.value.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).stringWithoutTrailingZeroes
+                
+                // hide the other stack views
+                insulinStackView.isHidden = true
+                carbsStackView.isHidden = true
                 exerciseStackView.isHidden = true
 
             }
@@ -145,14 +170,22 @@ class TreatmentsInsertViewController : UIViewController {
                     var treatMentEntryToUpdateChanged = false
                     
                     if treatMentEntryToUpdate.value != value {
+        
+                        if treatMentEntryToUpdate.treatmentType == .BgCheck {
+            
+                            treatMentEntryToUpdate.value = value.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                            
+                        } else {
+                            
+                            treatMentEntryToUpdate.value = value
+                            
+                        }
                         
-                        treatMentEntryToUpdate.value = value
-
                         // sets text in textField to "0" to avoid that new treatmentEntry is created
                         textField.text = "0"
-
+                        
                         treatMentEntryToUpdateChanged = true
-                                                
+                        
                     }
                     
                     if treatMentEntryToUpdate.date != self.datePicker.date {
@@ -209,6 +242,9 @@ class TreatmentsInsertViewController : UIViewController {
             case .Exercise:
                 updateFunction(exerciseTextField)
                 
+            case .BgCheck:
+                updateFunction(bgCheckTextField)
+                
             }
             
         } else {
@@ -226,8 +262,14 @@ class TreatmentsInsertViewController : UIViewController {
             // if yes, creates a new TreatmentEntry
             let createFunction = { [self] (text: String?, treatmentType: TreatmentType) in
                 
-                if let text = text, let value = Double(text.replacingOccurrences(of: ",", with: ".")), value > 0 {
-
+                if let text = text, var value = Double(text.replacingOccurrences(of: ",", with: ".")), value > 0 {
+        
+                        if treatmentType == .BgCheck {
+            
+                            value = value.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                            
+                        }
+                    
                     // create the treatment and append to treatments
                     _ = TreatmentEntry(date: Date(timeInterval: dateOffset, since: datePicker.date), value: value, treatmentType: treatmentType, nightscoutEventType: nil, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
                     
@@ -248,6 +290,7 @@ class TreatmentsInsertViewController : UIViewController {
             createFunction(carbsTextField.text, .Carbs)
             createFunction(insulinTextField.text, .Insulin)
             createFunction(exerciseTextField.text, .Exercise)
+            createFunction(bgCheckTextField.text, .BgCheck)
 
         }
         

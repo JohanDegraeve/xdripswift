@@ -21,7 +21,7 @@ class Texts_Common {
         return NSLocalizedString("common_mmol", tableName: filename, bundle: Bundle.main, value: "mmol/l", comment: "mmol/l")
     }()
 
-    static let bloodGLucoseUnit: String = {
+    static let bloodGlucoseUnit: String = {
         return NSLocalizedString("common_bloodglucoseunit", tableName: filename, bundle: Bundle.main, value: "Blood Glucose Unit", comment: "can be used in several screens, just the words Bloodglucose unit")
     }()
     
