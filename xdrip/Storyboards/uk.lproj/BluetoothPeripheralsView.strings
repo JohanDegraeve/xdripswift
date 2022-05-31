@@ -1,0 +1,19 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// title of the cell where transmitter battery level is shown in detailed screen
+"batteryLevel" = "Battery Level:";
+
+/// when Bluetooth Peripheral list is shown, title of the view
+"screenTitle" = "Bluetooth";
+
+/// When adding a new cgm transmitter, but the user has another one already which is either connected or trying to connect
+"noMultipleActiveCGMsAllowed" = "You cannot have more than one CGM Transmitter which is connected or being scanned for.\nVerify your other CGM Transmitters and click 'Stop Scanning', 'Disconnect' or just delete them";
+
+/// when clicking add button in screen with list of bluetoothperipherals, title of pop up where user  needs to select bluetooth peripheral category
+"selectCategory" = "Select Device Type";
+
+/// when clicking add button in screen with list of bluetoothperipherals, after having selected the category, a new pop up appears, this is the title of pop up where user  needs to select bluetooth peripheral type
+"selectType" = "Select Transmitter Type";

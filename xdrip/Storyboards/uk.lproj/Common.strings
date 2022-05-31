@@ -1,0 +1,148 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// literal translation needed
+"common_minute" = "min";
+
+/// literally password
+"common_password" = "Password:";
+
+/// the words in range
+"common_statistics_inRange" = "In Range";
+
+/// the word HIGH, in capitals
+"common_high" = "HIGH";
+
+/// literally 'Cancel'
+"common_cancel" = "Cancel";
+
+/// literally warning
+"warning" = "Warning!";
+
+/// 
+"delete" = "Delete";
+
+/// literal translation needed
+"common_hour" = "hour";
+
+/// literal translation needed
+"common_minutes" = "mins";
+
+/// the word low
+"common_statistics_low" = "Low";
+
+/// can be used in several screens, just the words Bloodglucose unit
+"common_bloodglucoseunit" = "Blood Glucose Unit";
+
+/// literally 'OK'
+"common_Ok" = "OK";
+
+/// the word today
+"common_today" = "Today";
+
+/// literal translation needed
+"common_dayshort" = "d";
+
+/// mmol/l
+"common_mmol" = "mmol/l";
+
+/// literally add
+"add" = "Add";
+
+/// literally yes, without capital
+"yes" = "Yes";
+
+/// mg/dl
+"common_mgdl" = "mg/dl";
+
+/// white
+"white" = "white";
+
+/// WiFi
+"WiFi" = "WiFi";
+
+/// on
+"on" = "On";
+
+/// don't show again
+"common_dontshowagain" = "Don't Show Again";
+
+/// green
+"green" = "green";
+
+/// the word LOW, in capitals
+"common_low" = "LOW";
+
+/// yellow
+"yellow" = "yellow";
+
+/// literal translation needed
+"common_week" = "week";
+
+/// 
+"off" = "Off";
+
+/// literal translation needed
+"common_day" = "day";
+
+/// for settings row, literally firmware
+"firmware" = "Firmware";
+
+/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
+"invalidAccountOrPassword" = "Invalid account or password";
+
+/// for settings row, literally hardware
+"hardware" = "Hardware";
+
+/// the word average
+"common_statistics_average" = "Average";
+
+/// phrase HbA1c
+"common_statistics_a1c" = "HbA1c";
+
+/// to show the sensor status
+"sensorStatus" = "Sensor status:";
+
+/// blood glucose unit in short, for text field title
+"common_bloodglucoseunit_short" = "BG Unit";
+
+/// literal translation needed
+"common_hours" = "hours";
+
+/// the word high
+"common_statistics_high" = "High";
+
+/// coefficient of variation
+"common_statistics_cv" = "CV";
+
+/// literally update
+"update" = "Edit";
+
+/// literal translation needed
+"common_days" = "days";
+
+/// the word today
+"common_todayshort" = "Today";
+
+/// literally no, without capital
+"no" = "No";
+
+/// red
+"red" = "red";
+
+/// general usage
+"unknown" = "Unknown";
+
+/// literal translation needed
+"common_hourshort" = "h";
+
+/// literally default, will be the name of default alerttypes that will be created during initial app launch
+"common_default" = "Default";
+
+/// name
+"name" = "Name:";
+
+/// whenever invalid value is given by user somewhere in a field
+"invalidValue" = "Invalid Value";

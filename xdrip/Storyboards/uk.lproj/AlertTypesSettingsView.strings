@@ -1,0 +1,52 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// shown on top of the screen that allows user to view all the alert types or add a new alert type
+"alerttypessettingsview_screentitle" = "Alarm Types";
+
+/// when editing the name of an alert type, 
+"alerttypesettingsview_givename" = "Alarm Name";
+
+/// when editing an alert type, if alert type sound name is default iOS sound
+"alerttypesettingsview_defaultiossound" = "iOS Sound";
+
+/// 
+"alertTypeNoSound" = "No Sound";
+
+/// when adding a new alert type, but the name is already used for another alert type, this is the error messages
+"alerttypenamealreadyexistsmessages" = "An Alarm Type with this name already exists. Use a different name";
+
+/// when editing the snoozeperiod of an alert type, 
+"alerttypesettingsview_givesnoozeperiod" = "Snooze Time in Minutes";
+
+/// when editing an alert type, field title for name
+"alerttypesettingsview_name" = "Name";
+
+/// shown on top of the screen that allows user to edit an alert type
+"alerttypesettingsview_screentitle" = "Edit Alarm Type";
+
+/// when editing an alert type, field title for Snooze Period
+"alerttypesettingsview_defaultsnoozeperiod" = "Default Snooze Time (mins)";
+
+/// when trying to delete an alert type, user needs to confirm first, this is the message
+"confirmdeletionalerttype" = "Delete Alarm Type: ";
+
+/// when editing an alert type, field title for Override Mute
+"alerttypesettingsview_overridemute" = "Override Mute?";
+
+/// when editing an alert type, field title for Vibrate
+"alerttypesettingsview_vibrate" = "Vibrate?";
+
+/// when editing an alert type, field title for Enabled
+"alerttypesettingsview_enabled" = "Enabled?";
+
+/// when editing an alert type, field title for Snooze Via Notification
+"alerttypesettingsview_snoozevianotification" = "Allow Snooze Via Notification?";
+
+/// when editing an alert type, field title for Sound
+"alerttypesettingsview_sound" = "Sound";
+
+/// when selecting the sound of an alert type, 
+"alerttypesettingsview_picksoundname" = "Sound Name";

@@ -1,0 +1,106 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// text in status row, if ready to start scanning
+"readyToScan" = "Ready to Scan";
+
+/// cell text, transmitter start time
+"transmittterStartDate" = "Transmitter Start";
+
+/// Confirm that the user wants to really disconnect the transmitter, title
+"confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
+
+/// BluetoothPeripheral view, this is a name of a BluetoothPeripheral assigned by the user, to recognize the device
+"bluetoothPeripheralAlias" = "Alias:";
+
+/// cell text, if user needs to set the transmitter id
+"needsTransmitterId" = "Missing Transmitter ID";
+
+/// cell text, shows when last reset was done, if known. Only for Dexcom
+"lastReset" = "Last Reset:";
+
+/// Bluetooth Peripheral view, when user clicks alias field
+"selectAliasText" = "Choose an alias for this bluetooth device, the name will be shown in the app and is easier for you to recognize";
+
+/// row in bluetoothperipheral view, title
+"bootLoader" = "Bootloader";
+
+/// 
+"notConnected" = "Not Connected";
+
+/// cell text, where the disconnection timestamp is shown
+"disConnectedAt" = "Disconnected At:";
+
+/// when Bluetooth Peripheral is shown, connection status, connected
+"connected" = "Connected";
+
+/// User tries to add a CGM or connect an already existing CGM, while in follower mode.
+"cannotActiveCGMInFollowerMode" = "You can not activate a CGM in Follower Mode";
+
+/// when Bluetooth Peripheral is shown, title of the cell with the status
+"status" = "Status:";
+
+/// Disconnect transmitter, title
+"confirmDisconnectTitle" = "Confirm Disconnect";
+
+/// BluetoothPeripheral view, text of the cell with the sensor type (only used for Libre)
+"sensorType" = "Sensor Type:";
+
+/// when M5Stack is shown, title of the cell with the address
+"address" = "Address:";
+
+/// text in status row, when not connected and app is not scanning
+"notTryingToConnect" = "Not Scanning";
+
+/// cell text, where the connection timestamp is shown
+"connectedAt" = "Connected At:";
+
+/// BluetoothPeripheral view, text of the cell with the sensor serial number
+"SensorSerialNumber" = "Serial Number:";
+
+/// 
+"battery" = "Battery:";
+
+/// button text, to disconnect
+"disconnect" = "Disconnect";
+
+/// text in button to start scanning
+"scan" = "Scan";
+
+/// cell text, where user can select to reset a transmitter at next connect. Only for Dexcom
+"resetRequired" = "Reset Transmitter?";
+
+/// cell text, shows when last reset was done, if known. Only for Dexcom
+"lastResetNotKnown" = "Last Reset Timestamp is not known";
+
+/// Bluetooth Peripheral view, when user clicks the trash button - this is not the complete sentence, it will be followed either by 'name' or 'alias', depending on the availability of an alias
+"confirmDeletionPeripheral" = "Do you want to delete bluetooth device: ";
+
+/// button text, to connect
+"connect" = "Connect";
+
+/// cell text, sensor start time
+"sensorStartDate" = "Sensor Start";
+
+/// text in status row, if scanning ongoing
+"scanning" = "Scanning";
+
+/// text in status rown, when not connect but app is trying to connect
+"tryingToConnect" = "Scanning";
+
+/// BluetoothPeripheral view, text of the cell with the serial number (this is not the sensor serial number
+"serialNumber" = "Serial Number:";
+
+/// Dexcom bluetooth screen. Is another app used in parallel or not
+"useOtherDexcomApp" = "Follow Dexcom-app";
+
+/// To give result about transitter result in notification body
+"transmitterResultResult" = "Transmitter Reset Result";
+
+/// text in button top right, this button will disable automatic connect
+"donotconnect" = "Stop Scanning";
+
+/// Bluetooth Peripheral view, when user clicks alias field
+"aliasAlreadyExists" = "There is already a bluetooth device with this alias";

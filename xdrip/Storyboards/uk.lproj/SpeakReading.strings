@@ -1,0 +1,46 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// For speak reading functionality
+"currentdelta" = "Difference from last reading is";
+
+/// the word low
+"low" = "low";
+
+/// 
+"trendfortyfiveup" = "up";
+
+/// the word high
+"high" = "high";
+
+/// For speak reading functionality
+"deltanoncomputable" = "non computable";
+
+/// For speak reading functionality
+"trendsingledown" = "significantly downward";
+
+/// For speak reading functionality
+"currenttrend" = "It's trending";
+
+/// For speak reading functionality
+"trendnoncomputable" = "non computable";
+
+/// For speak reading functionality
+"currentglucose" = "Your current blood glucose is";
+
+/// For speak reading functionality
+"trendfortyfivedown" = "down";
+
+/// For speak reading functionality
+"trenddoubleup" = "dramatically upward";
+
+/// For speak reading functionality
+"trendflat" = "flat";
+
+/// For speak reading functionality
+"trenddoubledown" = "dramatically downward";
+
+/// For speak reading functionality
+"trendsingleup" = "significantly upward";

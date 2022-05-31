@@ -1,0 +1,58 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// When very high alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert
+"alerts_veryhighalerttitle" = "Very High Alarm";
+
+/// an alentry is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule
+"alerttype" = "Alarm Type";
+
+/// When fast drop alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert
+"alerts_fastdrop" = "Fast Drop Alarm";
+
+/// When fast drop alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert
+"alerts_fastrise" = "Fast Rise Alarm";
+
+/// When Missed reading alert happens, this is the title of the alert notification, also in alert settings list, for the name of the alert
+"alerts_missedreadingalerttitle" = "Missed Readings";
+
+/// Action text for alerts. This is the button that allows to snooze the alert
+"alerts_snooze" = "Snooze";
+
+/// shown on top of the screen that allows user to view all the alerts in one table
+"alertssettingsview_screentitle" = "Edit Alarm";
+
+/// When pop up is shown to let user pick the snooze time, this is the title of this pop up
+"alerts_select_snooze_time" = "Select Snooze Time";
+
+/// shown on top of the screen that allows user to edit an alert
+"alertsettingsview_screentitle" = "Alarms";
+
+/// an alentry is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule
+"alertvalue" = "Value";
+
+/// when editing an alert value, a pop is shown, this is the explanation message in the pop up
+"changealertvalue" = "Change Alarm Value";
+
+/// When very low alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert
+"alerts_lowalerttitle" = "Low Alarm";
+
+/// transmitter battery low, this is the title of the alert notification, also in alert settings list, for the name of the alert
+"alerts_batterylow" = "Transmitter Battery Low";
+
+/// When high alarm rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alarm
+"alerts_highalerttitle" = "High Alarm";
+
+/// when trying to delete an alert, user needs to confirm first, this is the message
+"confirmdeletionalert" = "Delete Alarm?";
+
+/// an alentry is applicable as of a certain timestamp in the day, this is the text in the field in the settings screen that allows to modify this timestamp
+"alertstart" = "Apply from:";
+
+/// When very low alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert
+"alerts_verylowalerttitle" = "Very Low Alarm";
+
+/// when calibration is needed, this is the title of the alert notification, also in alert settings list, for the name of the alert
+"alerts_calibrationneeded" = "Calibration Needed";

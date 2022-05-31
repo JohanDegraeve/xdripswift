@@ -1,0 +1,31 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// If serial number is not assigned to the account, this is the 2nd part in a series of 3 to form a complete sentence
+"dexcomsharetestresult_monitored_receiver_not_assigned_2" = "is not assigned to";
+
+/// If serial number is not assigned to the account, this is the 3rd part in a series of 3 to form a complete sentence
+"dexcomsharetestresult_monitored_receiver_not_assigned_3" = "Use the official Dexcom app to register the Transmitter (G5) or Share receiver (G4)\r\n\r\nYou are possibly just using the wrong URL, verify the setting 'Use US URL?'";
+
+/// POP up after verifying DexcomShare credentials, to say that verification of url and password was not successful - this is the title
+"dexcomsharetestresult_verificationerroralerttitle" = "Verification Error";
+
+/// POP up after verifying DexcomShare credentials, to say that verification of url and password were successful - this is the body
+"dexcomsharetestresult_verificationsuccessfulalertbody" = "Your Dexcom Share account was verified successfully";
+
+/// POP up after verifying DexcomShare credentials, to say that verification of url and password key were successful - this is the title
+"dexcomsharetestresult_verificationsuccessfulalerttitle" = "Verification Successful";
+
+/// If dexcom share upload fails because serial number does not match for the account
+"dexcomsharetestresult_monitored_receiver_sn_doesnotmatch" = "The Dexcom Share Serial Number does not match the serial number for this account. Verify the Serial Number in the settings.";
+
+/// if dexcom share login fails , too many attempts
+"dexcomsharetestresult_SSO_AuthenticateMaxAttemptsExceeed" = "Maximum login attempts exceeded. Wait 10 minutes and try again.";
+
+/// If dexcom share upload fails, and info is giving to user, this is the title of the pop up
+"dexcomsharetestresult_uploadErrorWarning" = "Dexcom Share Upload Error";
+
+/// If serial number is not assigned to the account, this is the 1st part in a series of 3 to form a complete sentence
+"dexcomsharetestresult_monitored_receiver_not_assigned_1" = "It seems that the Transmitter ID or serial number";
