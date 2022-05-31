@@ -49,7 +49,8 @@ public class LoopManager:NSObject {
         trace("in share", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
 
         // get last readings with calculated value
-        var lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: UserDefaults.standard.timeStampLatestLoopSharedBgReading, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        // reduce timeStampLatestLoopSharedBgReading with 30 minutes. Because maybe Loop wasn't running for a while and so missed one or more readings. By adding 30 minutes of readings, we fill up a gap of maximum 30 minutes in Loop
+        var lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: UserDefaults.standard.timeStampLatestLoopSharedBgReading?.addingTimeInterval(-TimeInterval(minutes: 30)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
 
         trace("    list of readings before applying delay:",log: log, category: ConstantsLog.categoryLoopManager, type: .info)
         
