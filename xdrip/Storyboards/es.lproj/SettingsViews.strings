@@ -135,3 +135,8 @@
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
+
+"settingsviews_sectionTitleHousekeeper" = "Gestión de Datos";
+"settingsviews_housekeeperRetentionPeriod" = "Periodo de Retención (días):";
+"settingsviews_housekeeperExportAllData" = "Exportar Todo";
+"settingsviews_housekeeperRetentionPeriodMessage" = "¿Durante cuántos días debemos guardar los datos? (Min 90, Max 365)\n\n(Recomendado: 90 días)";

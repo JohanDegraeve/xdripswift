@@ -62,6 +62,17 @@ extension Date {
         return dateFormatter.string(from: self).appending("Z")
     }
     
+    /// Returns a short date string for use in the filename of the json export file - this should reflect the user's local time
+    ///
+    /// Example return: "20220112-2304"
+    func jsonFilenameStringFromDate() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyyMMdd-HHmm"
+        
+        return dateFormatter.string(from: self)
+    }
+    
     /// date to string, with date and time as specified by one of the values in DateFormatter.Style
     func toString(timeStyle: DateFormatter.Style, dateStyle: DateFormatter.Style) -> String {
         let dateFormatter = DateFormatter()

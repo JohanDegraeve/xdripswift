@@ -17,7 +17,7 @@ import OSLog
 public class DataExporter {
 	
 	/// Imutable file name for the export.
-	private static let exportFileName: String = "XDripExportedData.json"
+    private static let exportFileName: String = ConstantsHomeView.applicationName + "_ExportedData_" + Date().jsonFilenameStringFromDate() + ".json"
 	
 	/// This date will determine when the exported data will begin.
 	private let onlyFromDate: Date
