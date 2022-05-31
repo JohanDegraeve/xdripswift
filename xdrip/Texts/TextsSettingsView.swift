@@ -163,24 +163,6 @@ class Texts_SettingsView {
     static let labelUseIFFCA1C: String = {
         return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "Show HbA1c in mmols/mol?", comment: "statistics settings, use IFCC method for HbA1c?")
     }()
-
-    // MARK - Section Housekeeper
-
-    static let sectionTitleHousekeeper: String = {
-        return NSLocalizedString("settingsviews_sectionTitleHousekeeper", tableName: filename, bundle: Bundle.main, value: "Data Storage", comment: "Housekeeper settings, section title")
-    }()
-
-    static let settingsviews_housekeeperRetentionPeriod: String = {
-        return NSLocalizedString("settingsviews_housekeeperRetentionPeriod", tableName: filename, bundle: Bundle.main, value: "Retention Period", comment: "Housekeeper retention period, for how long to store data")
-    }()
-
-    static let settingsviews_housekeeperExportAllData: String = {
-        return NSLocalizedString("settingsviews_housekeeperExportAllData", tableName: filename, bundle: Bundle.main, value: "Export All Data", comment: "Button to export all data")
-    }()
-    
-    static let settingsviews_housekeeperRetentionPeriodMessage = {
-        return NSLocalizedString("settingsviews_housekeeperRetentionPeriodMessage", tableName: filename, bundle: Bundle.main, value: "For how many days should data be stored? (Min 90, Max 365)", comment: "When clicking the retention setting, a pop up asks for how many days should data be stored")
-    }()
     
     // MARK: - Section Sensor Countdown
     
@@ -539,6 +521,24 @@ class Texts_SettingsView {
     
     static let osLog: String = {
         return NSLocalizedString("oslog", tableName: filename, bundle: Bundle.main, value: "OSLog", comment: "deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog")
+    }()
+    
+    // MARK: - Section Housekeeper
+
+    static let sectionTitleHousekeeper: String = {
+        return NSLocalizedString("settingsviews_sectionTitleHousekeeper", tableName: filename, bundle: Bundle.main, value: "Data Management", comment: "Housekeeper settings, section title")
+    }()
+
+    static let settingsviews_housekeeperRetentionPeriod: String = {
+        return NSLocalizedString("settingsviews_housekeeperRetentionPeriod", tableName: filename, bundle: Bundle.main, value: "Retention Period (days):", comment: "Housekeeper retention period, for how long to store data")
+    }()
+
+    static let settingsviews_housekeeperExportAllData: String = {
+        return NSLocalizedString("settingsviews_housekeeperExportAllData", tableName: filename, bundle: Bundle.main, value: "Export All Data", comment: "Button to export all data")
+    }()
+    
+    static let settingsviews_housekeeperRetentionPeriodMessage = {
+        return NSLocalizedString("settingsviews_housekeeperRetentionPeriodMessage", tableName: filename, bundle: Bundle.main, value: "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)", comment: "When clicking the retention setting, a pop up asks for how many days should data be stored")
     }()
     
 }

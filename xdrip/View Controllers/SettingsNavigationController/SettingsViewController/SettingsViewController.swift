@@ -40,9 +40,6 @@ final class SettingsViewController: UIViewController {
         
         /// statistics settings
         case statistics
-
-        /// housekeeper settings
-        case housekeeper
         
         /// sensor countdown settings
         case sensorCountdown
@@ -68,6 +65,9 @@ final class SettingsViewController: UIViewController {
         /// Apple Watch settings
         case AppleWatch
         
+        /// housekeeper settings
+        case housekeeper
+        
         /// tracing
         case trace
         
@@ -90,8 +90,6 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewTreatmentsSettingsViewModel()
             case .statistics:
                 return SettingsViewStatisticsSettingsViewModel()
-            case .housekeeper:
-                return SettingsViewHousekeeperSettingsViewModel(coreDataManager: coreDataManager)
             case .sensorCountdown:
                 return SettingsViewSensorCountdownSettingsViewModel()
             case .alarms:
@@ -106,14 +104,16 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewSpeakSettingsViewModel()
             case .M5stack:
                 return SettingsViewM5StackSettingsViewModel()
-            case .info:
-                return SettingsViewInfoViewModel()
             case .developer:
                 return SettingsViewDevelopmentSettingsViewModel()
             case .AppleWatch:
                 return SettingsViewAppleWatchSettingsViewModel()
+            case .housekeeper:
+                return SettingsViewHousekeeperSettingsViewModel(coreDataManager: coreDataManager)
             case .trace:
                 return SettingsViewTraceSettingsViewModel()
+            case .info:
+                return SettingsViewInfoViewModel()
                 
             }
         }
