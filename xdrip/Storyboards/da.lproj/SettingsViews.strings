@@ -116,3 +116,25 @@
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
  
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Button to export all data
+"settingsviews_housekeeperExportAllData" = "Export All Data";
+
+/// Housekeeper settings, section title
+"settingsviews_sectionTitleHousekeeper" = "Data Management";
+
+/// treatments settings, show the micro-bolus on main chart
+"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart?";
+
+/// When clicking the retention setting, a pop up asks for how many days should data be stored
+"settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
+
+/// treatments settings, show the micro-bolus in the treatment list
+"settingsviews_showSmallBolusTreatmentsInList" = "Show Micro-bolus in List?";
+
+/// Housekeeper retention period, for how long to store data
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days):";
