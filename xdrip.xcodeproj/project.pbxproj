@@ -35,7 +35,7 @@
 		D4028CC02774A50600341476 /* TreatmentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4028CBF2774A50600341476 /* TreatmentsViewController.swift */; };
 		D40C3DA4277542C400111B73 /* TreatmentEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */; };
 		D40C3DA62775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */; };
-		D417E51C282EC8DB008DC467 /* ActivityIndicatorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D417E51B282EC8DB008DC467 /* ActivityIndicatorViewController.swift */; };
+		D417E51C282EC8DB008DC467 /* ProgressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D417E51B282EC8DB008DC467 /* ProgressBarViewController.swift */; };
 		D41F32922827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */; };
 		D41F32942827332000861B3D /* DataExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41F32932827332000861B3D /* DataExporter.swift */; };
 		D482BD942776153F003C4FB2 /* TreatmentsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D482BD932776153F003C4FB2 /* TreatmentsNavigationController.swift */; };
@@ -729,7 +729,7 @@
 		D4028CBF2774A50600341476 /* TreatmentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsViewController.swift; sourceTree = "<group>"; };
 		D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TreatmentEntry+CoreDataClass.swift"; sourceTree = "<group>"; };
 		D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TreatmentEntry+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		D417E51B282EC8DB008DC467 /* ActivityIndicatorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorViewController.swift; sourceTree = "<group>"; };
+		D417E51B282EC8DB008DC467 /* ProgressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBarViewController.swift; sourceTree = "<group>"; };
 		D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewHousekeeperSettingsViewModel.swift; sourceTree = "<group>"; };
 		D41F32932827332000861B3D /* DataExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExporter.swift; sourceTree = "<group>"; };
 		D482BD932776153F003C4FB2 /* TreatmentsNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsNavigationController.swift; sourceTree = "<group>"; };
@@ -2408,7 +2408,7 @@
 				F8B3A82E227F085A004BA588 /* SettingsTableViewCell */,
 				F8B3A7F22278E0E7004BA588 /* SettingsViewModelProtocol.swift */,
 				F8B3A807227A2933004BA588 /* SettingsSelectedRowAction.swift */,
-				D417E51B282EC8DB008DC467 /* ActivityIndicatorViewController.swift */,
+				D417E51B282EC8DB008DC467 /* ProgressBarViewController.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -3665,7 +3665,7 @@
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
 				F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */,
 				F8F7B8EB259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift in Sources */,
-				D417E51C282EC8DB008DC467 /* ActivityIndicatorViewController.swift in Sources */,
+				D417E51C282EC8DB008DC467 /* ProgressBarViewController.swift in Sources */,
 				F830991C23C2909E005741DF /* Watlaa+CoreDataClass.swift in Sources */,
 				F808D2CC240328FA0084B5DB /* Bubble+CoreDataClass.swift in Sources */,
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,

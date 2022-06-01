@@ -162,12 +162,12 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 	
 	/// - get the dictionary representation required for creating a new treatment @ NighScout using POST or updating an existing treatment @ NightScout using PUT
     /// - splits of "-carbs" "-insulin" or "-exercise" from the id
-	public func dictionaryRepresentationForNightScoutUpload() -> [String: Any] {
+	func dictionaryRepresentationForNightScoutUpload(reuseDateFormatter: DateFormatter? = nil) -> [String: Any] {
         
 		// Universal fields.
 		var dict: [String: Any] = [
 			"enteredBy": "xDrip4iOS",
-			"eventTime": self.date.ISOStringFromDate(),
+			"eventTime": self.date.ISOStringFromDate(reuseDateFormatter: reuseDateFormatter),
 		]
 		
         // if id exists, then add it also

@@ -38,29 +38,50 @@ extension Date {
         return Date(timeInterval: timeInterval, since: self)
     }
 	
-	/// Given a date represented as a string, returns a Date object, the reverse of ISOStringFromDate.
-    ///
+	/// The same ISO Formtter is used for various conversions, e.g. fromISOString and ISOStringFromDate.
+	/// ISODateFormatter abstracts the creation of this DateFormatter.
+	/// DateFormatter creation is expensive, and having it as a separate func allows reusing.
 	/// Example string: "2022-01-12T23:04:17.190Z"
-	static func fromISOString(_ string: String) -> Date? {
+	static func ISODateFormatter() -> DateFormatter {
 		let dateFormatter = DateFormatter()
 		dateFormatter.locale = Locale(identifier: "en_US_POSIX")
 		dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
 		dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-		
-		return dateFormatter.date(from: string)
+		return dateFormatter
 	}
-    
+
+	/// Given a date represented as a string, returns a Date object, the reverse of ISOStringFromDate.
+	/// Example string: "2022-01-12T23:04:17.190Z"
+	/// Overloads accepts and uses an optional reuseDateFormatter.
+	static func fromISOString(_ string: String, reuseDateFormatter: DateFormatter? = nil) -> Date? {
+		guard let reuseDateFormatter = reuseDateFormatter else {
+			return Date.ISODateFormatter().date(from: string)
+		}
+		return reuseDateFormatter.date(from: string)
+	}
+	
+	/// Given a date represented as a string, returns a Date object, the reverse of ISOStringFromDate.
+	/// Example string: "2022-01-12T23:04:17.190Z"
+	static func fromISOString(_ string: String) -> Date? {
+		return Date.fromISOString(string, reuseDateFormatter: Date.ISODateFormatter())
+	}
+
+
 	/// Returns the date represented as a ISO string.
-    ///
 	/// Example return: "2022-01-12T23:04:17.190Z"
-    func ISOStringFromDate() -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
-        
-        return dateFormatter.string(from: self).appending("Z")
-    }
+	/// Overloads accepts and uses an optional reuseDateFormatter.
+	func ISOStringFromDate(reuseDateFormatter: DateFormatter? = nil) -> String {
+		guard let reuseDateFormatter = reuseDateFormatter else {
+			return Date.ISODateFormatter().string(from: self)
+		}
+		return reuseDateFormatter.string(from: self)
+	}
+
+	/// Returns the date represented as a ISO string.
+	/// Example return: "2022-01-12T23:04:17.190Z"
+	func ISOStringFromDate() -> String {
+		return self.ISOStringFromDate(reuseDateFormatter: Date.ISODateFormatter())
+	}
     
     /// date to string, with date and time as specified by one of the values in DateFormatter.Style
     func toString(timeStyle: DateFormatter.Style, dateStyle: DateFormatter.Style) -> String {

@@ -43,9 +43,24 @@ public class DataExporter {
     /// used for reading from coredata in background thread
     private var privateManagedObjectContext: NSManagedObjectContext
 	
+	/// The callback used to report the progress and result
+	private let callback: ((_ progress: ProgressBarStatus<URL>?) -> Void)
+	
+	/// DateFormatter is expensive, instantiate once and reuse it.
+	private let reusableISODateFormatter = Date.ISODateFormatter()
+	
+	/// Keep track of progress 0.0-1.0 so we can update the callback.
+	private var progress: Float = 0
+	
+
 	// MARK: - initializer
 	
-	init(coreDataManager: CoreDataManager) {
+	
+	/// - parameters:
+	///     - callback: ((_ progress: ProgressBarStatus<URL>?) -> Void)): a callback
+	///     that will be called with the information to update the progress
+	///     and the URL when done.
+	init(coreDataManager: CoreDataManager, callback: @escaping ((_ progress: ProgressBarStatus<URL>?) -> Void)) {
         
 		// initialize properties
         
@@ -60,22 +75,25 @@ public class DataExporter {
         
         operationQueue = OperationQueue()
         
+		self.callback = callback
+	}
+	
+	/// Method that updates the progress and calls the callback with the new value
+	private func partialUpdateCallback(_ increase: Float) {
+		self.progress += increase
+		self.callback(ProgressBarStatus(progress: self.progress))
 	}
 	
     /// exportAllData generates the JSON will all data, writes it to a file in a background thread. When finished  it calls the callback function in the UI thread with the file URL as parameter.
     /// - The callback may be called with nil in case of an internal error.
-    /// - parameters:
-    ///     - callback: ((_ json: URL?) -> Void)): a callback that will
-    ///     be called with the JSON file URL as argument.
-    public func exportAllData(callback: @escaping ((_ file: URL?) -> Void)) {
-        
+    public func exportAllData() {
         let operation = BlockOperation(block: {
         
             self.generateJSON { json in
                 /// Json must not be nil.
                 guard let json = json else {
                     trace("in exportAllData, json is nil", log: self.log, category: ConstantsLog.categoryDataExporter, type: .error)
-                    callback(nil)
+					self.callback(nil)
                     return
                 }
                 
@@ -92,12 +110,12 @@ public class DataExporter {
                     
                     // call the callback function on the main thread
                     DispatchQueue.main.async {
-                        callback(filePath)
+						self.callback(ProgressBarStatus(complete: true, progress: 1.0, data: filePath))
                     }
                     
                 } catch let error {
                     trace("in exportAllData, error = %{public}@", log: self.log, category: ConstantsLog.categoryDataExporter, type: .error, error.localizedDescription)
-                    callback(nil)
+					self.callback(nil)
                 }
             }
         })
@@ -135,9 +153,23 @@ public class DataExporter {
 	///     - [[String: Any]] : an array of dicts, each element is a reading.
 	private func readingsAsDicts() -> [[String: Any]] {
         let readings = self.bgReadingsAccessor.getBgReadings(from: self.onlyFromDate, to: self.endDate, on: privateManagedObjectContext)
-        let readingsAsDicts = readings.map { reading in
-			return reading.dictionaryRepresentationForNightScoutUpload
+	
+		// Figure out how frequent we must update the progress, 50 updates at total
+		let amountOfUpdates: Float = 50
+		let updateEveryNReadings = Int(floor(Float(readings.count) / amountOfUpdates))
+
+		var readingsAsDicts : [[String: Any]] = []
+		// reserveCapacity so the array will not be reallocated multiple times.
+		readingsAsDicts.reserveCapacity(readings.count)
+		
+		for (index, reading) in readings.enumerated() {
+			if (index % updateEveryNReadings == 0) {
+				self.partialUpdateCallback(0.50 / amountOfUpdates)
+			}
+			
+			readingsAsDicts.append(reading.dictionaryRepresentationForNightScoutUpload(reuseDateFormatter: reusableISODateFormatter))
 		}
+		
         return readingsAsDicts
 	}
 	
@@ -150,7 +182,7 @@ public class DataExporter {
 	private func treatmentsAsDicts() -> [[String: Any]] {
 		let treatments = treatmentsAccessor.getTreatments(fromDate: onlyFromDate, toDate: endDate, on: privateManagedObjectContext)
 		let treatmentsAsDicts = treatments.map { treatment in
-			return treatment.dictionaryRepresentationForNightScoutUpload()
+			return treatment.dictionaryRepresentationForNightScoutUpload(reuseDateFormatter: reusableISODateFormatter)
 		}
 		return treatmentsAsDicts
 	}
@@ -183,18 +215,33 @@ public class DataExporter {
 	private func generateJSON(callback: @escaping ((_ json: String?) -> Void)) {
         
         privateManagedObjectContext.performAndWait {
+			
+			self.partialUpdateCallback(0.01)
+
+			///calibrations
+			let calibrations = calibrationsAsDicts()
+			self.partialUpdateCallback(0.09)
+			
+			/// treatments
+			let treatments = treatmentsAsDicts()
+			self.partialUpdateCallback(0.20)
+			
+			/// readings
+			let readings = readingsAsDicts()
+			self.partialUpdateCallback(0.05)
 
             let dataDict: [String : Any] = [
                 "ExportInformation": [
                     "BeginDate:": onlyFromDate.ISOStringFromDate(),
                     "EndDate:": endDate.ISOStringFromDate(),
                 ],
-                "BgReadings": readingsAsDicts(),
-                "Treatments": treatmentsAsDicts(),
-                "Calibrations": calibrationsAsDicts()
+                "BgReadings": readings,
+                "Treatments": treatments,
+                "Calibrations": calibrations
             ]
             // Convert dataDict to JSON and returns it.
             let asJSON = convertToJSON(dict: dataDict)
+			self.callback(ProgressBarStatus(progress: 0.90))
             callback(asJSON)
 
         }
