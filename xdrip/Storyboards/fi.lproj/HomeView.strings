@@ -31,35 +31,23 @@
 "success" = "Onnistui";
 "failed" = "Epäonnistui";
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+/// Text in button on home screen
+"unlock" = "Avaa";
 
 /// Text in button on home screen
-"unlock" = "Unlock";
-
-/// Text in button on home screen
-"lock" = "Lock";
+"lock" = "Lukitse";
 
 /// Screen Lock Title
-"screenlocktitle" = "Screen Lock Enabled";
+"screenlocktitle" = "Näytön lukitus käytössä";
 
 /// Info message to explain screen lock function
-"screenlockinfo" = "This will keep the screen awake until you move to another app or click Unlock.\r\n\nIt is recommended that you keep the phone plugged into a charger to prevent battery drain.";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"screenlockinfo" = "Tämä pitää näytön hereillä, kunnes siirryt toiseen sovellukseen tai napsautat Avaa.\r\n\nOn suositeltavaa, että pidät puhelin kytkettynä laturiin, jotta akku ei tyhjene.";
 
 /// When user clicks stop sensor, ask confirmation
-"stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
+"stopSensorConfirmation" = "Oletko varma, että haluat pysäyttää sensorin?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"enterSensorCode" = "jos sinulla ei ole koodia, käytä 0000, mutta muista, että et saa lukemia ennen kuin olet kalibroinut";
 
 /// status info : literally 'Sensor End'
-"sensorend" = "Sensor Ends";
+"sensorend" = "Sensori loppuu";

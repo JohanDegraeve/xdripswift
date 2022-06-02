@@ -3,10 +3,4 @@
 "nightscouttestresult_verificationerroralerttitle" = "Vahvistaminen epäonnistui";
 "warningAPIKeyOrURLIsnil" = "Nightscout URL ja API_SECRET pitää olla asetettu ennen testin suorittamista";
 "nightScoutAPIKeyAndURLStartedBody" = "Testi aloitettu";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// in settings screen, user clicked test button for nightscout url and apikey - this is the title
-"nightScoutAPIKeyAndURLStartedTitle" = "Verifying...";
+"nightScoutAPIKeyAndURLStartedTitle" = "Tarkistetaan...";
