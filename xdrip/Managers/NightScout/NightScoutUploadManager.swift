@@ -527,7 +527,7 @@ public class NightScoutUploadManager: NSObject {
             bgReadingsToUpload = bgReadingsToUpload.suffix(ConstantsNightScout.maxReadingsToUpload)
             
             // map readings to dictionaryRepresentation
-            let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map({$0.dictionaryRepresentationForNightScoutUpload})
+            let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map({$0.dictionaryRepresentationForNightScoutUpload()})
             
             // store the timestamp of the last reading to upload, here in the main thread, because we use a bgReading for it, which is retrieved in the main mangedObjectContext
             let timeStampLastReadingToUpload = bgReadingsToUpload.first != nil ? bgReadingsToUpload.first!.timeStamp : nil

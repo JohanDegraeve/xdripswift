@@ -3,13 +3,13 @@ import Foundation
 extension BgReading {
     
     /// dictionary representation for upload to NightScout
-    public var dictionaryRepresentationForNightScoutUpload: [String: Any] {
-        
+	func dictionaryRepresentationForNightScoutUpload(reuseDateFormatter: DateFormatter? = nil) -> [String: Any] {
+
         return  [
             "_id": id,
             "device": deviceName ?? "",
             "date": timeStamp.toMillisecondsAsInt64(),
-            "dateString": timeStamp.ISOStringFromDate(),
+            "dateString": timeStamp.ISOStringFromDate(reuseDateFormatter: reuseDateFormatter),
             "type": "sgv",
             "sgv": Int(calculatedValue.round(toDecimalPlaces: 0)),
             "direction": slopeName,

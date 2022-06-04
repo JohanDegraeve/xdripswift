@@ -102,7 +102,7 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 			return SettingsSelectedRowAction.callFunctionAndShareFile { callback in
 				// coreDataManager must not be nil.
 				if let coreDataManager = coreDataManager {
-					DataExporter(coreDataManager: coreDataManager).exportAllData(callback: callback)
+					DataExporter(coreDataManager: coreDataManager, callback: callback).exportAllData()
 				} else {
 					// All routines MUST call callback
 					callback(nil)

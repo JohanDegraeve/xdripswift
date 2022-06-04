@@ -103,25 +103,32 @@ class SettingsViewUtilities {
 				
 			case let .callFunctionAndShareFile(function):
 				
-				// Start loading indicator
-				let loadingIndicator = ActivityIndicatorViewController()
-				loadingIndicator.start(onParent: uIViewController)
+				// Start a ProgressBar
+				let progressBar = ProgressBarViewController()
+				progressBar.start(onParent: uIViewController)
 				
-				// call function and in the callback present the share file menu.
-				function({ fileURL in
+				// call function and in the callback handles updating
+				// the progress bar and presenting the share file menu.
+				// The callback is called multiple times until .complete is true.
+				function({ (progress : ProgressBarStatus<URL>?) in
 					
-					// Stop loading indicator
-					loadingIndicator.end()
+					guard let progress = progress else {
+						progressBar.end()
+						return
+					}
 					
-					if let fileURL = fileURL {
-						// UI Code must be done at main thread.
+					// update the loading bar
+					// This will destroy the bar if .complete
+					progressBar.update(status: progress)
+					
+					// If URL is not nil and progress is complete, attempt to share the file.
+					if let fileURL = progress.data, progress.complete {
 						DispatchQueue.main.async {
 							// Present the user with a share file menu.
 							let activityViewController = UIActivityViewController(activityItems: [fileURL], applicationActivities: [])
 							uIViewController.present(activityViewController, animated: true)
 						}
 					}
-                    
 				})
 				
 				// check if refresh is needed, either complete settingsview or individual section
