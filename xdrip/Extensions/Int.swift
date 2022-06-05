@@ -2,17 +2,30 @@ import Foundation
 
 extension Int {
     /// example value 320 minutes is 5 hours and 20 minutes, would be converted to 05:20
+    /// this is then returned as a time string as per the user's locale and region
+    /// Example return: "17:48" (spain locale)
+    /// Example return: "5:48 pm" (us locale)
     func convertMinutesToTimeAsString() -> String {
+        
         let hours = (self / 60)
-        let minutes = self - hours * 60 
+        let minutes = self - hours * 60
+
+        // create calendar object
+        let calendar = Calendar.current
         
-        var hoursAsString = String(describing: hours)
-        var minutesAsString = String(describing: minutes)
+        // create a date based upon today's date (it could be any date as we will ignore it later) and set the hours and minutes
+        let date = calendar.date(bySettingHour: hours, minute: minutes, second: 0, of: Date())
+
+        let dateFormatter = DateFormatter()
         
-        if hoursAsString.count == 1 {hoursAsString = "0" + hoursAsString}
-        if minutesAsString.count == 1 {minutesAsString = "0" + minutesAsString}
+        dateFormatter.amSymbol = ConstantsUI.timeFormatAM
         
-        return hoursAsString + ":" + minutesAsString
+        dateFormatter.pmSymbol = ConstantsUI.timeFormatPM
+        
+        dateFormatter.setLocalizedDateFormatFromTemplate("jj:mm")
+
+        return dateFormatter.string(from: date!)
+        
     }
     
     /// converts Int to array of UInt8 - (probably only works for positive values <= 2147483647 ?)

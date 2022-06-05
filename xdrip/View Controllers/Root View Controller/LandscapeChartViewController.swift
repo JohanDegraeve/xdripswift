@@ -72,7 +72,7 @@ class LandscapeChartViewController: UIViewController {
         
         let dateFormatter = DateFormatter()
 
-        dateFormatter.dateFormat = ConstantsGlucoseChart.dateFormatLandscapeChart
+        dateFormatter.setLocalizedDateFormatFromTemplate(ConstantsGlucoseChart.dateFormatLandscapeChart)
 
         return dateFormatter
         

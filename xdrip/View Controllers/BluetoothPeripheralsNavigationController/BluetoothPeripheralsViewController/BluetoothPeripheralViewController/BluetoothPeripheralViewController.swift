@@ -1007,7 +1007,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                         
                     }
                     
-                    cell.detailTextLabel?.text = lastConnectionStatusChangeTimeStamp.toString(timeStyle: .short, dateStyle: .short)
+                    cell.detailTextLabel?.text = lastConnectionStatusChangeTimeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
                     
                 } else {
                     cell.textLabel?.text = Texts_BluetoothPeripheralView.connectedAt

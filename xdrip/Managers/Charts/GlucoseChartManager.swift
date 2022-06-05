@@ -1458,10 +1458,12 @@ public class GlucoseChartManager {
             chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: UserDefaults.standard.useObjectives ? ConstantsGlucoseChart.gridColorObjectives : ConstantsGlucoseChart.gridColor,  linesWidth: 0.5)
         }
         
-        // intialize axisLabelTimeFormatter
+        // intialize axisLabelTimeFormatter to use the user's locale and region settings
         if axisLabelTimeFormatter == nil {
             axisLabelTimeFormatter = DateFormatter()
-            axisLabelTimeFormatter!.dateFormat = UserDefaults.standard.chartTimeAxisLabelFormat
+            axisLabelTimeFormatter!.amSymbol = ConstantsUI.timeFormatAM
+            axisLabelTimeFormatter!.pmSymbol = ConstantsUI.timeFormatPM
+            axisLabelTimeFormatter!.setLocalizedDateFormatFromTemplate(ConstantsUI.timeFormatHoursOnly)
         }
         
         // initialize bgReadingsAccessor

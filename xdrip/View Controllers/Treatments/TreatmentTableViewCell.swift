@@ -17,10 +17,11 @@ class TreatmentTableViewCell: UITableViewCell {
     
     public func setupWithTreatment(_ treatment: TreatmentEntry) {
         
-        // date label
+        // date label - formatted as per the user's locale and region settings
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        
+        formatter.amSymbol = ConstantsUI.timeFormatAM
+        formatter.pmSymbol = ConstantsUI.timeFormatPM
+        formatter.setLocalizedDateFormatFromTemplate(ConstantsUI.timeFormatHoursMins)
         self.dateLabel.text = formatter.string(from: treatment.date)
         
         

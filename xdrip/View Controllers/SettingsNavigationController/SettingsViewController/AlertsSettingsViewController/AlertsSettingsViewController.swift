@@ -162,11 +162,11 @@ extension AlertsSettingsViewController:UITableViewDataSource, UITableViewDelegat
         // get alertValue as Double
         let alertValue = alertEntry.value
         
-        // start creating the textLabel, star with start time in presentation hh:mm
+        // start creating the textLabel, start with start time in user's locale and region format
         var textLabelToUse = (Int(alertEntry.start)).convertMinutesToTimeAsString()
         
         // add a space
-        textLabelToUse = textLabelToUse + " "
+        textLabelToUse = textLabelToUse + "   "
         
         // do we add the alert value or not ?
         //   - is the alerttype enabled ? If it's not no need to show the value (it was like that in iosxdrip, seems a good approach)
@@ -178,7 +178,7 @@ extension AlertsSettingsViewController:UITableViewDataSource, UITableViewDelegat
             } else {
                 textLabelToUse = textLabelToUse + alertValue.description
             }
-            textLabelToUse = textLabelToUse + " "
+            textLabelToUse = textLabelToUse + "   "
         }
         
         // and now the name of the alerttype

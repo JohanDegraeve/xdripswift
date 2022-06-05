@@ -5,11 +5,6 @@ enum ConstantsGlucoseChart {
     /// default value for glucosechart width in hours
     static let defaultChartWidthInHours = 6.0;
     
-    /// default value for timeformat for labels in chart, time axis
-    /// H is hour 24 hour format, "h a" is hour 12 hour format  with a either am or pm
-    /// options can be "H", "HH", "HH:00"
-    static let defaultTimeAxisLabelFormat = "HH"
-    
     /// usually 40.0 mgdl is the lowest value that cgm's give, putting it to 38 guarantees the points will always be visible
     /// only in mgdl because the label will not be shown, hence no bizar values to be shown when going to mgdl
     static let absoluteMinimumChartValueInMgdl = 38.0
@@ -239,7 +234,7 @@ enum ConstantsGlucoseChart {
     static let maximumElementsInGlucoseChartPointsArray:Int = 1000
 
     /// dateformat for minutesAgo label when user is panning the chart back in time. The label will show the timestamp of the latest shown value in the chart
-    static let dateFormatLatestChartPointWhenPanning = "E d MMM HH:mm"
+    static let dateFormatLatestChartPointWhenPanning = "E d MMM jj:mm"
     
     /// dateformat for the date label in the 24 hours static landscape chart
     static let dateFormatLandscapeChart = "EEEE dd/MM/yyyy"

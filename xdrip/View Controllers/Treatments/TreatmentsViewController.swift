@@ -174,7 +174,13 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 		
 		let treatment = treatmentCollection.getTreatment(dateIndex: indexPath.section, treatmentIndex: indexPath.row)
 		cell.setupWithTreatment(treatment)
-		
+        
+        // clicking the cell will always open a new screen which allows the user to edit the treatment
+        cell.accessoryType = .disclosureIndicator
+        
+        // set color of disclosureIndicator to ConstantsUI.disclosureIndicatorColor
+        cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+        
 		return cell
 	}
 	
@@ -219,7 +225,7 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 		let date = treatmentCollection.dateOnlyAt(section).date
 
 		let formatter = DateFormatter()
-		formatter.dateFormat = "dd/MM/yyyy"
+        formatter.setLocalizedDateFormatFromTemplate(ConstantsUI.dateFormatDayMonthYear)
 
 		return formatter.string(from: date)
 	}
