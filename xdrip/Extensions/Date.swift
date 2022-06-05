@@ -102,6 +102,19 @@ extension Date {
         return dateFormatter.string(from: self)
     }
     
+    /// date to string, with date and time as specified by one of the values in DateFormatter.Style and formatted to match the user's locale
+    /// Example return: "31/12/2022, 17:48" (spain locale)
+    /// Example return: "12/31/2022, 5:48 pm" (us locale)
+    func toStringInUserLocale(timeStyle: DateFormatter.Style, dateStyle: DateFormatter.Style) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = timeStyle
+        dateFormatter.dateStyle = dateStyle
+        dateFormatter.amSymbol = ConstantsUI.timeFormatAM
+        dateFormatter.pmSymbol = ConstantsUI.timeFormatPM
+        dateFormatter.setLocalizedDateFormatFromTemplate("dd/MM/yyyy, jj:mm")
+        return dateFormatter.string(from: self)
+    }
+    
     /// returns seconds since 1.1.1970 local time for current timezone
     func toSecondsAsInt64Local() -> Int64 {
         let calendar = Calendar.current
@@ -112,6 +125,30 @@ extension Date {
     func toLowerHour() -> Date {
         return Date(timeIntervalSinceReferenceDate:
             (timeIntervalSinceReferenceDate / 3600.0).rounded(.down) * 3600.0)
+    }
+    
+    /// returns the Nightscout style string showing the days and hours since a date (e.g. "6d11h")
+    /// Example return: "6d11h" if optional appendAgo is false or not used
+    /// Example return: "6d11h ago" if optional appendAgo is true
+    func daysAndHoursAgo(appendAgo: Bool? = false) -> String {
+        
+        // set a default value assuming that we're unable to calculate the hours + days
+        var daysAndHoursAgoString: String = "n/a"
+
+        let diffComponents = Calendar.current.dateComponents([.day, .hour], from: self, to: Date())
+
+        if let days = diffComponents.day, let hours = diffComponents.hour {
+            
+            daysAndHoursAgoString = days.description + "d" + hours.description + "h"
+            
+            // if the function was called using appendAgo == true, then add the "ago" string
+            if appendAgo ?? false {
+                daysAndHoursAgoString += " " + Texts_HomeView.ago
+            }
+        }
+
+        return daysAndHoursAgoString
+        
     }
     
 }

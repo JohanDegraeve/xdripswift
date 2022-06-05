@@ -8,9 +8,6 @@ extension UserDefaults {
         /// chart width in hours
         case chartWidthInHours = "chartWidthInHours"
         
-        /// timeformat for labels in chart, time axis
-        case chartTimeAxisLabelFormat = "chartTimeAxisLabelFormat"
-        
     }
     
     /// chart width in hours
@@ -30,18 +27,5 @@ extension UserDefaults {
             set(newValue, forKey: KeysCharts.chartWidthInHours.rawValue)
         }
     }
-
-    /// timeformat for labels in chart, time axis
-    @objc dynamic var chartTimeAxisLabelFormat:String {
-        get {
-            if let returnValue = string(forKey: KeysCharts.chartTimeAxisLabelFormat.rawValue) {
-                return returnValue
-            } else {
-                return ConstantsGlucoseChart.defaultTimeAxisLabelFormat
-            }
-        }
-        set {
-            set(newValue, forKey: KeysCharts.chartTimeAxisLabelFormat.rawValue)
-        }
-    }
+    
 }

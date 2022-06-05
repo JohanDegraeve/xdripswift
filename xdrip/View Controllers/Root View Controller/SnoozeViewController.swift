@@ -114,7 +114,7 @@ extension SnoozeViewController: UITableViewDataSource {
             // if snoozed till after 00:00 then show date and time when it ends, else only show time
             let showDate = snoozedTillDate.toMidnight() > Date()
             
-            cell.textLabel?.text = TextsSnooze.snoozed_until + " " + snoozedTillDate.toString(timeStyle: .short, dateStyle: showDate ? .short : .none)
+            cell.textLabel?.text = TextsSnooze.snoozed_until + " " + snoozedTillDate.toStringInUserLocale(timeStyle: .short, dateStyle: showDate ? .short : .none)
             
         } else {
 

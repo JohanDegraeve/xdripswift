@@ -219,7 +219,7 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 		let date = treatmentCollection.dateOnlyAt(section).date
 
 		let formatter = DateFormatter()
-		formatter.dateFormat = "dd/MM/yyyy"
+        formatter.setLocalizedDateFormatFromTemplate(ConstantsUI.dateFormatDayMonthYear)
 
 		return formatter.string(from: date)
 	}

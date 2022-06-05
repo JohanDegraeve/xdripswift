@@ -38,4 +38,19 @@ enum ConstantsUI {
     /// clock label font size (ideally should be set to the same as the bigger valueLabel font size
     static let clockLabelFontSize = UIFont.systemFont(ofSize: 120)
     
+    /// time format for displaying just the hour
+    static let timeFormatHoursOnly = "j"
+    
+    /// time format for displaying hours and minutes
+    static let timeFormatHoursMins = "jj:mm"
+    
+    /// date format for displaying the full short date
+    static let dateFormatDayMonthYear = "dd/MM/yyyy"
+    
+    /// string to be used to show am time if the user locale shows a 12 hour clock
+    static let timeFormatAM = "am"
+    
+    /// string to be used to show pm time if the user locale shows a 12 hour clock
+    static let timeFormatPM = "pm"
+    
 }

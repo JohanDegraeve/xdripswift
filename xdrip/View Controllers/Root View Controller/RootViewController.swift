@@ -360,8 +360,14 @@ final class RootViewController: UIViewController {
     
     /// dateformatter for minutesLabelOutlet, when user is panning the chart
     private let dateTimeFormatterForMinutesLabelWhenPanning: DateFormatter = {
+        
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = ConstantsGlucoseChart.dateFormatLatestChartPointWhenPanning
+        
+        dateFormatter.amSymbol = ConstantsUI.timeFormatAM
+        
+        dateFormatter.pmSymbol = ConstantsUI.timeFormatPM
+        
+        dateFormatter.setLocalizedDateFormatFromTemplate(ConstantsGlucoseChart.dateFormatLatestChartPointWhenPanning)
         
         return dateFormatter
     }()
@@ -1188,7 +1194,7 @@ final class RootViewController: UIViewController {
         // first check keyValueObserverTimeKeeper
         switch keyPathEnumCharts {
         
-        case UserDefaults.KeysCharts.chartWidthInHours, UserDefaults.KeysCharts.chartTimeAxisLabelFormat :
+        case UserDefaults.KeysCharts.chartWidthInHours :
             
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnumCharts.rawValue, withMinimumDelayMilliSeconds: 200) {
                 return

@@ -226,13 +226,13 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             case .sensorStartDate:
                 
                 cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorStartDate
-                cell.detailTextLabel?.text = dexcomG5.sensorStartDate?.toString(timeStyle: .short, dateStyle: .short)
+                cell.detailTextLabel?.text = dexcomG5.sensorStartDate?.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
                 cell.accessoryType = .none
                 
             case .transmitterStartDate:
                 
                 cell.textLabel?.text = Texts_BluetoothPeripheralView.transmittterStartDate
-                cell.detailTextLabel?.text = dexcomG5.transmitterStartDate?.toString(timeStyle: .short, dateStyle: .short)
+                cell.detailTextLabel?.text = dexcomG5.transmitterStartDate?.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
                 cell.accessoryType = .none
                 
             case .firmWareVersion:
@@ -296,7 +296,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 if let lastResetTimeStamp = dexcomG5.lastResetTimeStamp {
 
                     cell.textLabel?.text = Texts_BluetoothPeripheralView.lastResetTimeStamp
-                    cell.detailTextLabel?.text = lastResetTimeStamp.toString(timeStyle: .short, dateStyle: .short)
+                    cell.detailTextLabel?.text = lastResetTimeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
                     cell.accessoryType = .none
 
                 } else {

@@ -175,20 +175,23 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JuE-mg-S0t">
-                                                    <rect key="frame" x="19.999999999999996" y="3.3333333333333339" width="43.666666666666657" height="19.333333333333329"/>
+                                                    <rect key="frame" x="4" y="3.3333333333333339" width="75" height="19.333333333333329"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="75" id="fJv-mh-fXl"/>
+                                                    </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </label>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.80000000000000004" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="v0f-JH-O27">
-                                                    <rect key="frame" x="80" y="6" width="14" height="14"/>
+                                                    <rect key="frame" x="95" y="6" width="14" height="14"/>
                                                     <imageReference key="image" image="circle.fill" catalog="system" symbolScale="small"/>
                                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="font" scale="small" weight="regular">
                                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                     </preferredSymbolConfiguration>
                                                 </imageView>
                                                 <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Insulin" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U6e-jp-cms">
-                                                    <rect key="frame" x="110.00000000000001" y="3.3333333333333339" width="46.666666666666671" height="19.333333333333329"/>
+                                                    <rect key="frame" x="125.00000000000001" y="3.3333333333333339" width="46.666666666666671" height="19.333333333333329"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -207,17 +210,17 @@
                                                 </label>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="JuE-mg-S0t" firstAttribute="centerY" secondItem="DBW-d4-0o5" secondAttribute="centerY" id="84R-oM-joS"/>
-                                                <constraint firstItem="v0f-JH-O27" firstAttribute="leading" secondItem="DBW-d4-0o5" secondAttribute="leading" constant="80" id="FgJ-Op-Uvh"/>
+                                                <constraint firstItem="v0f-JH-O27" firstAttribute="leading" secondItem="JuE-mg-S0t" secondAttribute="trailing" constant="16" id="6X4-GL-hxL"/>
+                                                <constraint firstItem="JuE-mg-S0t" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="DBW-d4-0o5" secondAttribute="leading" constant="4" id="6bY-sY-17o"/>
+                                                <constraint firstItem="v0f-JH-O27" firstAttribute="leading" secondItem="DBW-d4-0o5" secondAttribute="leading" constant="95" id="FgJ-Op-Uvh"/>
+                                                <constraint firstItem="JuE-mg-S0t" firstAttribute="baseline" secondItem="U6e-jp-cms" secondAttribute="baseline" id="Hwo-Ak-Tsf"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="ACN-iY-zpP" secondAttribute="trailing" id="J1K-Uc-ySX"/>
                                                 <constraint firstItem="0na-qZ-kDB" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="U6e-jp-cms" secondAttribute="trailing" constant="8" symbolic="YES" id="M2z-50-BVR"/>
                                                 <constraint firstItem="v0f-JH-O27" firstAttribute="centerY" secondItem="DBW-d4-0o5" secondAttribute="centerY" id="X4l-JC-GWN"/>
                                                 <constraint firstItem="ACN-iY-zpP" firstAttribute="centerY" secondItem="DBW-d4-0o5" secondAttribute="centerY" id="ctq-Os-Q9z"/>
-                                                <constraint firstItem="v0f-JH-O27" firstAttribute="leading" secondItem="JuE-mg-S0t" secondAttribute="trailing" constant="16.333333333333343" id="eZh-Jc-02b"/>
-                                                <constraint firstItem="JuE-mg-S0t" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="DBW-d4-0o5" secondAttribute="leadingMargin" id="je8-Tg-HZP"/>
-                                                <constraint firstItem="U6e-jp-cms" firstAttribute="leading" secondItem="DBW-d4-0o5" secondAttribute="leadingMargin" constant="90" id="jun-UY-ULN"/>
+                                                <constraint firstItem="JuE-mg-S0t" firstAttribute="baseline" secondItem="ACN-iY-zpP" secondAttribute="baseline" id="jMs-h7-cjn"/>
+                                                <constraint firstItem="U6e-jp-cms" firstAttribute="leading" secondItem="DBW-d4-0o5" secondAttribute="leadingMargin" constant="105" id="jun-UY-ULN"/>
                                                 <constraint firstItem="0na-qZ-kDB" firstAttribute="baseline" secondItem="U6e-jp-cms" secondAttribute="baseline" id="msL-Ny-DNX"/>
-                                                <constraint firstItem="0na-qZ-kDB" firstAttribute="baseline" secondItem="JuE-mg-S0t" secondAttribute="baseline" id="oc4-P3-VQ8"/>
                                                 <constraint firstItem="ACN-iY-zpP" firstAttribute="leading" secondItem="0na-qZ-kDB" secondAttribute="trailing" constant="3" id="ysQ-u2-2AH"/>
                                             </constraints>
                                         </tableViewCellContentView>
@@ -800,7 +803,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="390" height="43.666667938232422"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="tIz-Hj-yxH">
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" id="tIz-Hj-yxH">
                                                     <rect key="frame" x="20" y="11.999999999999998" width="33" height="20.333333333333332"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -1198,7 +1201,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="390" height="43.666667938232422"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="c4h-5z-5mU">
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" id="c4h-5z-5mU">
                                                     <rect key="frame" x="20" y="11.999999999999998" width="33" height="20.333333333333332"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
