@@ -1058,9 +1058,10 @@ public class GlucoseChartManager {
     ///     - managedObjectContext : the ManagedObjectContext to use
     /// - returns: a tuple with chart point arrays for each classification of treatment type + size
     private func getTreatmentEntryChartPoints(startDate: Date, endDate: Date, treatmentEntryAccessor: TreatmentEntryAccessor, bgReadingsAccessor: BgReadingsAccessor, on managedObjectContext: NSManagedObjectContext) -> ([ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint]) {
-        
-        // get treaments between the two timestamps from coredata
-        let treatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: startDate, toDate: endDate, on: managedObjectContext)
+		
+		// get bgReadings between the two dates
+		// this will later be used to calculate the Y value for each carbsTreatment.
+		let bgReadings = bgReadingsAccessor.getBgReadings(from: startDate, to: endDate, on: managedObjectContext)
         
         // intialize the treatment chart point arrays
         var smallBolusTreatmentEntryChartPoints = [ChartPoint]()
@@ -1072,134 +1073,194 @@ public class GlucoseChartManager {
         var veryLargeCarbsTreatmentEntryChartPoints = [ChartPoint]()
         
         var bgCheckTreatmentEntryChartPoints = [ChartPoint]()
-        
-        managedObjectContext.performAndWait {
-            
-            // filter the treatment entries that have not been marked as deleted and append them to the relevant chart point array
-            for treatmentEntry in treatmentEntries.filter({ treatment in return !treatment.treatmentdeleted}) {
+		
+		managedObjectContext.performAndWait {
+			// get treaments between the two timestamps from coredata
+			// filter the treatment entries that have not been marked as deleted
+			let treatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: startDate, toDate: endDate, on: managedObjectContext).filter({ !$0.treatmentdeleted })
 
-                switch treatmentEntry.treatmentType {
-                    
-                case .Insulin:
-                    
-                    // cycle through the possible bolus threshold value(s) and append to the correct array
-                    if treatmentEntry.value < UserDefaults.standard.smallBolusTreatmentThreshold {
-                        smallBolusTreatmentEntryChartPoints.append(ChartPoint(treatmentEntry: treatmentEntry, formatter: data().chartPointDateFormatter))
-                    } else {
-                        mediumBolusTreatmentEntryChartPoints.append(ChartPoint(treatmentEntry: treatmentEntry, formatter: data().chartPointDateFormatter))
-                    }
-                    
-                case .Carbs:
-                    
-                    // get glucose point values from before and after the current treatment time. We can then calculate a proposed y-axis value and assign this to the Y attribute of the chart point to ensure it is floating in-line with the CGM data as per Nightscout style
-                    let calculatedYAxisValue = calculateClosestYAxisValue(treatmentDate: treatmentEntry.date, bgReadingsAccessor: bgReadingsAccessor, on: managedObjectContext)
-                    
-                    // cycle through the possible threshold values and append the carb chart point to the correct array. We use an extended ChartPoint class to pass the new y axis value
-                    if treatmentEntry.value < ConstantsGlucoseChart.smallCarbsTreamentThreshold {
-                        
-                        smallCarbsTreatmentEntryChartPoints.append(ChartPoint(treatmentEntry: treatmentEntry, formatter: data().chartPointDateFormatter, newYAxisValue: calculatedYAxisValue))
-                        
-                    } else if treatmentEntry.value < ConstantsGlucoseChart.mediumCarbsTreamentThreshold {
-                        
-                        mediumCarbsTreatmentEntryChartPoints.append(ChartPoint(treatmentEntry: treatmentEntry, formatter: data().chartPointDateFormatter, newYAxisValue: calculatedYAxisValue))
-                        
-                    } else if treatmentEntry.value < ConstantsGlucoseChart.largeCarbsTreamentThreshold {
-                        
-                        largeCarbsTreatmentEntryChartPoints.append(ChartPoint(treatmentEntry: treatmentEntry, formatter: data().chartPointDateFormatter, newYAxisValue: calculatedYAxisValue))
-                        
-                    } else {
-                        
-                        veryLargeCarbsTreatmentEntryChartPoints.append(ChartPoint(treatmentEntry: treatmentEntry, formatter: data().chartPointDateFormatter, newYAxisValue: calculatedYAxisValue))
-                        
-                    }
-                    
-                case .BgCheck:
-                    
-                    bgCheckTreatmentEntryChartPoints.append(ChartPoint(bgCheck: treatmentEntry, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl))
-                    
-                default:
-                    break
-                    
-                }
-                
-            }
-        
-        }
+			// Filter the treatments by treatmentType.
+			let insulinTreatments = treatmentEntries.filter { $0.treatmentType == .Insulin }
+			let carbsTreatments = treatmentEntries.filter { $0.treatmentType == .Carbs }
+			let bgCheckTreatments = treatmentEntries.filter { $0.treatmentType == .BgCheck }
+			
+			// For each insulin treatment, check it value and append to the correct list.
+			for insulinTreatment in insulinTreatments {
+				let chartPoint = ChartPoint(treatmentEntry: insulinTreatment, formatter: data().chartPointDateFormatter)
+				if insulinTreatment.value < UserDefaults.standard.smallBolusTreatmentThreshold {
+					smallBolusTreatmentEntryChartPoints.append(chartPoint)
+				} else {
+					mediumBolusTreatmentEntryChartPoints.append(chartPoint)
+				}
+			}
+			
+			// For each bgCheckTreatment, create and append a ChartPoint to bgCheckTreatmentEntryChartPoints.
+			for bgCheckTreatment in bgCheckTreatments {
+				bgCheckTreatmentEntryChartPoints.append(ChartPoint(bgCheck: bgCheckTreatment, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl))
+			}
+			
+            // Calculate the Y value for each carbsTreatment.
+			let carbsYValues = calculateClosestYAxisValues(carbsTreatments: carbsTreatments, bgReadings: bgReadings)
+			
+            // For each carbsTreatment, get its Y value from carbsYValues, create a ChartPoint
+            // and append it to the correct chart points list.
+			for (indexCarbsTreatment, carbsTreatment) in carbsTreatments.enumerated() {
+				// Retrieve the Y value from carbsYValues
+				let calculatedYAxisValue = carbsYValues[indexCarbsTreatment]
+				
+				// We use an extended ChartPoint class to pass the new y axis value
+				let chartPoint = ChartPoint(treatmentEntry: carbsTreatment, formatter: data().chartPointDateFormatter, newYAxisValue: calculatedYAxisValue)
+				
+				// cycle through the possible threshold values and append the carb chart point to the correct array.
+				if carbsTreatment.value < ConstantsGlucoseChart.smallCarbsTreamentThreshold {
+					smallCarbsTreatmentEntryChartPoints.append(chartPoint)
+				} else if carbsTreatment.value < ConstantsGlucoseChart.mediumCarbsTreamentThreshold {
+					mediumCarbsTreatmentEntryChartPoints.append(chartPoint)
+				} else if carbsTreatment.value < ConstantsGlucoseChart.largeCarbsTreamentThreshold {
+					largeCarbsTreatmentEntryChartPoints.append(chartPoint)
+				} else {
+					veryLargeCarbsTreatmentEntryChartPoints.append(chartPoint)
+				}
+			}
+		}
+
         
         // return all treatment arrays based upon treatment type and size (as defined by the threshold values)
         return (smallBolusTreatmentEntryChartPoints, mediumBolusTreatmentEntryChartPoints, smallCarbsTreatmentEntryChartPoints, mediumCarbsTreatmentEntryChartPoints, largeCarbsTreatmentEntryChartPoints, veryLargeCarbsTreatmentEntryChartPoints, bgCheckTreatmentEntryChartPoints)
         
     }
-    
-    
-    /// Receives a treatment timestamp and searches for the closest glucose values. It will then take the average of the before and after values and use this to return a new Y value where the carb treatments can be placed
+	
+	
+    /// Calculate the Y axis value for multiple carbsTreatments.
+    /// The calculation searches for the two closest bgReadings and interpolates
+    /// the Y value between them.
     ///
     /// - parameters:
-    ///     - treatmentDate : treatment date timestamp that we want to use
-    ///     - bgReadingsAccessor : bg readings accessor object
-    ///     - managedObjectContext : the ManagedObjectContext to use
-    /// - returns: a double with the Y axis value for the treatment time calculated from the closest glucose point y-axis values
-    private func calculateClosestYAxisValue(treatmentDate: Date, bgReadingsAccessor: BgReadingsAccessor, on managedObjectContext: NSManagedObjectContext) -> Double {
-        
-        // how many minutes either side of the treatmentDate we will look for glucose values. First we do a quick check and if nothing is returned we can check for an hour or two.
-        let minutesEitherSide: Double = 10
-        let minutesEitherSideExtended: Double = 70
-        
-        var lowerValueToUse: Double = 0
-        var upperValueToUse: Double = 0
-        
-        // in normal circumstances there will always be CGM data but in the unlikely event that there is no data point to calculate 1 hour before and after, we'll just pin it to the user's target objective which should be in the middle of their desired range
-        let bgReadingsBefore = bgReadingsAccessor.getBgReadings(from: treatmentDate.addingTimeInterval(-minutesEitherSide * 60), to: treatmentDate, on: managedObjectContext)
-        
-        if let lastBgReading = bgReadingsBefore.last {
-            
-            lowerValueToUse = lastBgReading.calculatedValue
-            
-        } else {
-            
-            let bgReadingsBeforeExtended = bgReadingsAccessor.getBgReadings(from: treatmentDate.addingTimeInterval(-minutesEitherSideExtended * 60), to: treatmentDate, on: managedObjectContext)
-            
-            if let lastBgReading = bgReadingsBeforeExtended.last {
-                
-                lowerValueToUse = lastBgReading.calculatedValue
-                
-            }
-        }
-        
-        let bgReadingsAfter = bgReadingsAccessor.getBgReadings(from: treatmentDate, to: treatmentDate.addingTimeInterval(minutesEitherSide * 60), on: managedObjectContext)
-        
-        if let firstBgReading = bgReadingsAfter.last {
-            
-            upperValueToUse = firstBgReading.calculatedValue
-            
-        } else {
-            
-            let bgReadingsAfterExtended = bgReadingsAccessor.getBgReadings(from: treatmentDate, to: treatmentDate.addingTimeInterval(minutesEitherSideExtended * 60), on: managedObjectContext)
-            
-            if let firstBgReading = bgReadingsAfterExtended.last {
-                
-                upperValueToUse = firstBgReading.calculatedValue
-                
-            }
-        }
-        
-        // if there is both an upper or lower value, return the average. If there is just one, return it.
-        if lowerValueToUse != 0 && upperValueToUse != 0 {
-            
-            return (lowerValueToUse + upperValueToUse) / 2
-            
-        } else if lowerValueToUse != 0 || upperValueToUse != 0 {
-            
-            return lowerValueToUse + upperValueToUse
-            
-        } else {
-            
-            // Both values are missing, so just return the user's target objective and peg the treatment there
-            return UserDefaults.standard.targetMarkValueInUserChosenUnit
-            
-        }
-        
-    }
+    ///     - carbsTreatments : a list of TreatmentEntries to calculate the Y axis.
+    ///     - bgReadings : list of BgReadings to be searched and calculate the Y axis
+    ///         based on the nearby readings by date.
+    /// - returns: a list of Doubles, with the same amount of elements of carbsTreatments
+    ///       so that each carbTreatment maps to a Y axis (by index).
+	/// IMPORTANT: Must be called inside managedObjectContext perfom block.
+	private func calculateClosestYAxisValues(carbsTreatments: [TreatmentEntry], bgReadings: [BgReading]) -> [Double] {
+		
+		// 0 bgReadings is an invalid argument.
+		guard bgReadings.count > 0 else {
+			return [Double](repeating: 120.0, count: carbsTreatments.count)
+		}
+		
+		var calculatedYValues: [Double] = []
+		
+        // For each carbsTreatment, find the two closest BgReading.
+        // Then calculates the Y value based on them.
+		for carbsTreatment in carbsTreatments {
+            // Find the closest bgReading.
+			let indexOfClosest = findIndexOfNearestBgReadingToDate(carbsTreatment.date, bgReadings: bgReadings)
+			let closestBgReading = bgReadings[indexOfClosest]
+
+            // Not always there will be a second closest one.
+            // (If the closest reading is at the border of the graph, for exemple).
+			var secondClosestBgReading: BgReading? = nil
+			if carbsTreatment.date >= closestBgReading.timeStamp {
+                // If the carbsTreatment is newer than the closest bgReading,
+                // attempt to get the one after it, if exists.
+				let nextIndex = indexOfClosest + 1
+				if nextIndex < bgReadings.count {
+					secondClosestBgReading = bgReadings[nextIndex]
+				}
+			} else {
+                // If the carbsTreatment is older than the closest bgReading,
+                // attempt to get the one before it, if exists.
+				let previousIndex = indexOfClosest - 1
+				if previousIndex >= 0 {
+					secondClosestBgReading = bgReadings[previousIndex]
+				}
+			}
+			
+            // Calculate the Y value and append to the result list.
+			let yValue = calculateYValue(carbsDate: carbsTreatment.date, closestBgReading: closestBgReading, secondClosestBgReading: secondClosestBgReading)
+			calculatedYValues.append(yValue)
+		}
+		
+		return calculatedYValues
+	}
+	
+	
+    /// Calculate the Y axis value for a date between two bgReadings.
+    /// Calculation is done using linear interpolation.
+    ///
+    /// - parameters:
+    ///     - carbsDate : the date to calculate the Y value of.
+    ///     - closestBgReading : the closest BgReading to carbsDate. 
+    ///     - secondClosestBgReading : the second closest BgReading to carbsDate,
+    ///           if it exists, optional.
+    /// - returns: the result of the interpolation.
+	/// IMPORTANT: Must be called inside managedObjectContext perfom block.
+	private func calculateYValue(carbsDate: Date, closestBgReading: BgReading, secondClosestBgReading: BgReading?) -> Double {
+		
+		// If there is no second closest, return the closestBgReading calculatedValue.
+		guard let secondClosestBgReading = secondClosestBgReading else {
+			return closestBgReading.calculatedValue
+		}
+
+		// If there is a second closest, interpolate the Y value using a linear aproach.
+		
+        // First, figure out which of the bgReadings is the oldest.
+        // It is safe to unwrap the first and last elements.
+		let sortedReadings = [closestBgReading, secondClosestBgReading].sorted(by: { $0.timeStamp < $1.timeStamp })
+		let olderBgReading = sortedReadings.first!
+		let newerBgReading = sortedReadings.last!
+		
+		// Calculate the interpolation based on the time difference
+		// Time difference from newerBgReading to olderBgReading
+		let timeDifference: Double = newerBgReading.timeStamp.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
+		// Time difference from carbsDate to olderBgReading
+		let timeOffset: Double = carbsDate.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
+		
+		// timeOffsetFactor as a double from 0 to 1.
+		let timeOffsetFactor: Double = timeOffset / timeDifference
+		
+        // Calculate the SGV difference between the readings.
+		let yDifference: Double = newerBgReading.calculatedValue - olderBgReading.calculatedValue
+        // Linear interpolation for Y
+		let yValue = olderBgReading.calculatedValue + (yDifference * timeOffsetFactor)
+
+		return yValue
+	}
+	
+	
+    /// Given a date and list of BgReadings, find the index of the bgReading closest to the date.
+    ///
+    /// - parameters:
+    ///     - date : the date to find the index of the bgReading closest to.
+    ///     - bgReadings : list of bgReading to find the closest. 
+    /// - returns: the index of the nearest bgReading.
+    ///
+	/// IMPORTANT: Must be called inside managedObjectContext perfom block.
+    ///
+    /// About performance and optimization:
+    ///     The complexity of this search algorithm is O(n).
+    ///     This may seen like a good place to optimize and implement a binary search, since it is O(log n).
+    ///     However, profiling did not show any significant differece between the two possible implementations, since the amount of elements in bgReadings is relative small (50-200).
+    ///
+	private func findIndexOfNearestBgReadingToDate(_ date: Date, bgReadings: [BgReading]) -> Int {
+		
+        // Variables to keep track of the nearest
+		var indexOfNearest = 0
+		var nearestDiff: Double = Double.greatestFiniteMagnitude
+
+        // Iterate over bgReadings and compare the date difference to see if it is less than the previous nearestDiff.
+		for (i, bgReading) in bgReadings.enumerated() {
+			let difference: Double = (bgReading.timeStamp.timeIntervalSince1970 - date.timeIntervalSince1970).magnitude
+
+			if difference < nearestDiff {
+				nearestDiff = difference
+				indexOfNearest = i
+			}
+		}
+
+		return indexOfNearest
+	}
     
     
     /// Receives a view layer with treatment labels (text and position).
