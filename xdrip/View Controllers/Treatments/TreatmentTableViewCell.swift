@@ -56,7 +56,7 @@ class TreatmentTableViewCell: UITableViewCell {
                 self.iconImageView.image =  UIImage(systemName: "heart.fill")!
                 
             case .BgCheck:
-                self.iconImageView.image =  UIImage(systemName: "drop.fill")!
+                self.iconImageView.image =  UIImage(systemName: "drop.fill") ?? nil
                 
             }
             
