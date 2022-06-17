@@ -111,6 +111,13 @@ final class RootViewController: UIViewController {
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
     
+    
+    /// outlet for mini-chart showing a fixed history of x hours
+    @IBOutlet weak var miniChartOutlet: BloodGlucoseChartView!
+
+    @IBOutlet weak var miniChartHoursLabelOutlet: UILabel!
+    
+    
     @IBOutlet weak var segmentedControlsView: UIView!
     
     /// outlets for chart time period selector
@@ -261,6 +268,36 @@ final class RootViewController: UIViewController {
     @IBOutlet var chartDoubleTapGestureRecognizerOutlet: UITapGestureRecognizer!
     
     
+    @IBAction func miniChartDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
+        
+        // if the mini-chart is double tapped then toggle the hours to show
+        UserDefaults.standard.miniChartHoursToShow = UserDefaults.standard.miniChartHoursToShow == ConstantsGlucoseChart.miniChartHoursToShow1 ? ConstantsGlucoseChart.miniChartHoursToShow2 : ConstantsGlucoseChart.miniChartHoursToShow1
+        
+        miniChartHoursLabelOutlet.text = " " + Int(UserDefaults.standard.miniChartHoursToShow).description + Texts_Common.hourshort + " "
+        
+        // restore the alpha of the label
+        miniChartHoursLabelOutlet.alpha = 1.0
+        
+        // now show the label
+        miniChartHoursLabelOutlet.isHidden = false
+        
+        // wait for a second (or two) and then fade the label out
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            
+            // make a animated transition with the label. Fade it out over a couple of seconds.
+            UIView.transition(with: self.miniChartHoursLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
+                self.miniChartHoursLabelOutlet.alpha = 0.0
+            })
+            
+            // once faded out, just hide it properly so that it doesn't block the tap gesture of the chart in case the user clicks where the label is
+            self.miniChartHoursLabelOutlet.isHidden = true
+            
+        }
+    }
+    
+    @IBOutlet var miniChartDoubleTapGestureRecognizer: UITapGestureRecognizer!
+    
+    
     // MARK: - Constants for ApplicationManager usage
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create updateLabelsAndChartTimer
@@ -355,6 +392,11 @@ final class RootViewController: UIViewController {
     /// - will be reinitialized each time the app comes to the foreground
     private var glucoseChartManager: GlucoseChartManager?
     
+    /// - manage the mini glucose chart that shows a fixed amount of data
+    /// - will be nillified each time the app goes to the background, to avoid unnecessary ram usage (which seems to cause app getting killed)
+    /// - will be reinitialized each time the app comes to the foreground
+    private var glucoseMiniChartManager: GlucoseMiniChartManager?
+    
     /// statisticsManager instance
     private var statisticsManager: StatisticsManager?
     
@@ -430,10 +472,14 @@ final class RootViewController: UIViewController {
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
         
+        // show the mini-chart as required
+        miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
+        
         // show the statistics view as required. If not, hide it and show the spacer view to keep segmentedControlChartHours separated a bit more away from the main Tab bar
         if !screenIsLocked {
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
         }
+        
         segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
         
         if inRangeStatisticLabelOutlet.text == "-" {
@@ -607,6 +653,9 @@ final class RootViewController: UIViewController {
             // update label texts, minutes ago, diff and value
             self.updateLabelsAndChart(overrideApplicationState: true)
             
+            // update the mini-chart
+            self.updateMiniChart()
+            
             // update sensor countdown
             self.updateSensorCountdown()
             
@@ -649,6 +698,12 @@ final class RootViewController: UIViewController {
 
         // see if the user has changed the chart x axis timescale
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.KeysCharts.chartWidthInHours.rawValue, options: .new, context: nil)
+        
+        // have the mini-chart hours been changed?
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.miniChartHoursToShow.rawValue, options: .new, context: nil)
+        
+        // showing or hiding the mini-chart
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showMiniChart.rawValue, options: .new, context: nil)
         
         // see if the user has changed the statistic days to use
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.daysToUseStatistics.rawValue, options: .new, context: nil)
@@ -727,6 +782,7 @@ final class RootViewController: UIViewController {
             
             self.updateLabelsAndChart(overrideApplicationState: true)
             
+            self.updateMiniChart()
             
             self.updateSensorCountdown()
             
@@ -924,12 +980,20 @@ final class RootViewController: UIViewController {
         // initialize glucoseChartManager
         glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
         
+        // initialize glucoseMiniChartManager
+        glucoseMiniChartManager = GlucoseMiniChartManager(coreDataManager: coreDataManager)
+        
         // initialize statisticsManager
         statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
         
         // initialize chartGenerator in chartOutlet
         self.chartOutlet.chartGenerator = { [weak self] (frame) in
             return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
+        }
+        
+        // initialize chartGenerator in miniChartOutlet
+        self.miniChartOutlet.chartGenerator = { [weak self] (frame) in
+            return self?.glucoseMiniChartManager?.glucoseChartWithFrame(frame)?.view
         }
         
     }
@@ -1145,6 +1209,9 @@ final class RootViewController: UIViewController {
                     // update all text in  first screen
                     updateLabelsAndChart(overrideApplicationState: false)
                     
+                    // update mini-chart
+                    updateMiniChart()
+                    
                     // update statistics related outlets
                     updateStatistics(animatePieChart: false)
                     
@@ -1226,7 +1293,7 @@ final class RootViewController: UIViewController {
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
         
-        case UserDefaults.Key.isMaster, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.daysToUseStatistics :
+        case UserDefaults.Key.isMaster, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.daysToUseStatistics, UserDefaults.Key.showMiniChart :
             
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -1277,8 +1344,21 @@ final class RootViewController: UIViewController {
             // redraw chart is necessary
             updateChartWithResetEndDate()
             
+            // redraw mini-chart
+            updateMiniChart()
+            
             // update Watch App with the new objective values
             updateWatchApp()
+            
+        case UserDefaults.Key.showMiniChart:
+            
+            // show/hide mini-chart view as required
+            miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
+            
+        case UserDefaults.Key.miniChartHoursToShow:
+            
+            // redraw mini-chart
+            updateMiniChart()
 
         case UserDefaults.Key.daysToUseStatistics:
             
@@ -1351,6 +1431,8 @@ final class RootViewController: UIViewController {
         
         // at this moment, coreDataManager is not yet initialized, we're just calling here prerender and reloadChart to show the chart with x and y axis and gridlines, but without readings. The readings will be loaded once coreDataManager is setup, after which updateChart() will be called, which will initiate loading of readings from coredata
         self.chartOutlet.reloadChart()
+        
+        self.miniChartOutlet.reloadChart()
         
     }
     
@@ -1942,6 +2024,20 @@ final class RootViewController: UIViewController {
         
         // update the chart up to now
         updateChartWithResetEndDate()
+        
+        self.updateMiniChart()
+        
+    }
+    
+    /// if the user has chosen to show the mini-chart, then update it. If not, just return without doing anything.
+    private func updateMiniChart() {
+        
+        if UserDefaults.standard.showMiniChart {
+            
+            // update the chart
+            glucoseMiniChartManager?.updateChartPoints(chartOutlet: miniChartOutlet, completionHandler: nil)
+            
+        }
         
     }
     
@@ -3089,6 +3185,9 @@ extension RootViewController:NightScoutFollowerDelegate {
                 
                 // update all text in  first screen
                 updateLabelsAndChart(overrideApplicationState: false)
+                
+                // update the mini-chart
+                updateMiniChart()
                 
                 // update statistics related outlets
                 updateStatistics(animatePieChart: false)

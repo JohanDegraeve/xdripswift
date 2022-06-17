@@ -83,6 +83,10 @@ class Texts_SettingsView {
     static let allowScreenRotation: String = {
         return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Chart Rotation?", comment: "home screen settings, should the main glucose chart screen be allowed?")
     }()
+    
+    static let showMiniChart: String = {
+        return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show the Mini-Chart?", comment: "home screen settings, should the mini-chart be shown?")
+    }()
 
     static let labelUseObjectives: String = {
         return NSLocalizedString("settingsviews_useobjectives", tableName: filename, bundle: Bundle.main, value: "Show Objectives in Graph?", comment: "home screen settings, use objectives in graph")

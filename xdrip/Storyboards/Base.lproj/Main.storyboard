@@ -335,7 +335,7 @@
                                         </items>
                                     </toolbar>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="C16-NQ-F1Y">
-                                        <rect key="frame" x="0.0" y="50" width="390" height="389"/>
+                                        <rect key="frame" x="0.0" y="50" width="390" height="319"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="x mins ago" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uyn-2k-K74">
                                                 <rect key="frame" x="10" y="0.0" width="102" height="26.333333333333332"/>
@@ -364,7 +364,7 @@
                                                 </connections>
                                             </label>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0nE-AX-r0w" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
-                                                <rect key="frame" x="10" y="132.66666666666666" width="380" height="256.33333333333337"/>
+                                                <rect key="frame" x="10" y="132.66666666666663" width="380" height="186.33333333333337"/>
                                                 <gestureRecognizers/>
                                                 <connections>
                                                     <outletCollection property="gestureRecognizers" destination="Fi5-iu-Usk" appends="YES" id="Rkv-hK-sLH"/>
@@ -388,6 +388,30 @@
                                             <constraint firstItem="We3-bN-ffR" firstAttribute="centerX" secondItem="C16-NQ-F1Y" secondAttribute="centerX" id="vhA-TS-y2Z"/>
                                             <constraint firstItem="We3-bN-ffR" firstAttribute="top" secondItem="C16-NQ-F1Y" secondAttribute="top" constant="25" id="xak-Qv-s0j"/>
                                         </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YJB-T6-p3Y" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="369" width="390" height="70"/>
+                                        <subviews>
+                                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" alpha="0.90000000000000002" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=" 24h " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WIO-Oh-Z4T">
+                                                <rect key="frame" x="15" y="50" width="32" height="20"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="20" id="ACV-EP-M2d"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+                                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                        <gestureRecognizers/>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="WIO-Oh-Z4T" secondAttribute="trailing" symbolic="YES" id="1RU-Mc-elX"/>
+                                            <constraint firstAttribute="height" constant="70" id="40A-Zk-fOI"/>
+                                            <constraint firstItem="WIO-Oh-Z4T" firstAttribute="leading" secondItem="YJB-T6-p3Y" secondAttribute="leading" constant="15" id="rea-6b-zUM"/>
+                                            <constraint firstAttribute="bottom" secondItem="WIO-Oh-Z4T" secondAttribute="bottom" id="uJt-rF-x1l"/>
+                                        </constraints>
+                                        <connections>
+                                            <outletCollection property="gestureRecognizers" destination="AyP-F5-KtO" appends="YES" id="gXU-Ha-MP8"/>
+                                        </connections>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="x9u-yg-PXE" userLabel="segmentControlsView">
                                         <rect key="frame" x="0.0" y="439" width="390" height="34"/>
@@ -704,9 +728,6 @@
                                         </constraints>
                                     </imageView>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstItem="x9u-yg-PXE" firstAttribute="top" secondItem="C16-NQ-F1Y" secondAttribute="bottom" id="WZ6-cn-zwk"/>
-                                </constraints>
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="PQr-Ze-W5v"/>
@@ -743,6 +764,9 @@
                         <outlet property="lowLabelOutlet" destination="Ncy-6l-nO2" id="11g-UN-f9n"/>
                         <outlet property="lowStatisticLabelOutlet" destination="4LK-sw-cBS" id="0gk-05-iOl"/>
                         <outlet property="lowTitleLabelOutlet" destination="B0Q-ux-IHf" id="ATk-vB-TVw"/>
+                        <outlet property="miniChartDoubleTapGestureRecognizer" destination="AyP-F5-KtO" id="5Zi-rx-OgB"/>
+                        <outlet property="miniChartHoursLabelOutlet" destination="WIO-Oh-Z4T" id="Qsu-SO-ClV"/>
+                        <outlet property="miniChartOutlet" destination="YJB-T6-p3Y" id="A7b-PQ-INx"/>
                         <outlet property="minutesLabelOutlet" destination="uyn-2k-K74" id="XXm-rq-Suy"/>
                         <outlet property="pieChartLabelOutlet" destination="c1z-wL-Eye" id="tBn-RJ-oiQ"/>
                         <outlet property="pieChartOutlet" destination="vm5-IB-4CY" id="t8a-2d-t5l"/>
@@ -779,6 +803,11 @@
                 <tapGestureRecognizer numberOfTapsRequired="2" id="KGx-wX-6Ap">
                     <connections>
                         <action selector="chartDoubleTapGestureRecognizer:" destination="9pv-A4-QxB" id="KJ1-MA-2o8"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <tapGestureRecognizer numberOfTapsRequired="2" id="AyP-F5-KtO">
+                    <connections>
+                        <action selector="miniChartDoubleTapGestureRecognizer:" destination="9pv-A4-QxB" id="5IT-6c-SZi"/>
                     </connections>
                 </tapGestureRecognizer>
             </objects>

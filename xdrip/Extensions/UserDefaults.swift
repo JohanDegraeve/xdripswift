@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 extension UserDefaults {
     
@@ -43,6 +44,10 @@ extension UserDefaults {
         
         // Home Screen and main chart settings
         
+        /// should the screen/chart be allowed to rotate?
+        case showMiniChart = "showMiniChart"
+        /// hours to show on the mini-chart?
+        case miniChartHoursToShow = "miniChartHoursToShow"
         /// should the screen/chart be allowed to rotate?
         case allowScreenRotation = "allowScreenRotation"
         /// should the clock view be shown when the screen is locked?
@@ -449,6 +454,58 @@ extension UserDefaults {
     
     // MARK: Home Screen Settings
     
+    /// the amount of hours to show in the mini-chart. Usually 24 hours but can be set to 48 hours by the user
+    @objc dynamic var miniChartHoursToShow: Double {
+        get {
+            let returnValue = double(forKey: Key.miniChartHoursToShow.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0 {
+                set(ConstantsGlucoseChart.miniChartHoursToShow1, forKey: Key.miniChartHoursToShow.rawValue)
+            }
+
+            return returnValue
+        }
+        set {
+            
+            set(newValue, forKey: Key.miniChartHoursToShow.rawValue)
+        }
+    }
+    
+    /// should the mini-chart be shown on the home screen?
+    @objc dynamic var showMiniChart: Bool {
+        
+        get {
+            
+            // check if the showMiniChart key has already been previously set. If so, then just return it
+            if let _ = UserDefaults.standard.object(forKey: "showMiniChart") {
+                
+                return !bool(forKey: Key.showMiniChart.rawValue)
+                
+            } else {
+                
+                // this means that this is the first time setting the showMiniChart key. To to avoid crowding the screen we want to only show the mini-chart by default if the user has display zoom disabled
+                if UIScreen.main.scale < UIScreen.main.nativeScale {
+                    
+                    set(true, forKey: Key.showMiniChart.rawValue)
+                    
+                } else {
+                    
+                    // if not, then hide it by default
+                    
+                    set(false, forKey: Key.showMiniChart.rawValue)
+                    
+                }
+                
+                return !bool(forKey: Key.showMiniChart.rawValue)
+                
+            }
+        }
+        set {
+            
+            set(!newValue, forKey: Key.showMiniChart.rawValue)
+        }
+    }
+    
     /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var urgentHighMarkValueInUserChosenUnit:Double {
         get {
@@ -809,7 +866,30 @@ extension UserDefaults {
     @objc dynamic var showStatistics: Bool {
         // default value for bool in userdefaults is false, by default we want the statistics view to show (true)
         get {
-            return !bool(forKey: Key.showStatistics.rawValue)
+            
+            // check if the showStatistics key has already been previously set. If so, then just return it
+            if let _ = UserDefaults.standard.object(forKey: "showStatistics") {
+                
+                return !bool(forKey: Key.showStatistics.rawValue)
+                
+            } else {
+                
+                // this means that this is the first time setting the showStatistics key. To to avoid crowding the screen we want to only show the statistics view by default if the user has display zoom disabled
+                if UIScreen.main.scale < UIScreen.main.nativeScale {
+                    
+                    set(true, forKey: Key.showStatistics.rawValue)
+                    
+                } else {
+                    
+                    // if not, then hide it by default
+                    
+                    set(false, forKey: Key.showStatistics.rawValue)
+                    
+                }
+                
+                return !bool(forKey: Key.showStatistics.rawValue)
+                
+            }
         }
         set {
             set(!newValue, forKey: Key.showStatistics.rawValue)

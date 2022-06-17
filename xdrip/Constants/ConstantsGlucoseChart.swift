@@ -239,4 +239,16 @@ enum ConstantsGlucoseChart {
     /// dateformat for the date label in the 24 hours static landscape chart
     static let dateFormatLandscapeChart = "EEEE dd/MM/yyyy"
     
+    /// the amount of hours of bg readings that the mini-chart should show (first range)
+    static let miniChartHoursToShow1: Double = 24
+    
+    /// the amount of hours of bg readings that the mini-chart should show (second range)
+    static let miniChartHoursToShow2: Double = 48
+    
+    /// the size of the glucose circles used in the mini-chart
+    static let miniChartGlucoseCircleDiameter: CGFloat = 3
+    
+    /// color for high and urgent low lines in the mini-chart
+    static let guidelineMiniChartHighLowColor = UIColor.white
+    
 }
