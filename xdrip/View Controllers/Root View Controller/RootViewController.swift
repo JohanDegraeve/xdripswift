@@ -270,27 +270,51 @@ final class RootViewController: UIViewController {
     
     @IBAction func miniChartDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
         
-        // if the mini-chart is double tapped then toggle the hours to show
-        UserDefaults.standard.miniChartHoursToShow = UserDefaults.standard.miniChartHoursToShow == ConstantsGlucoseChart.miniChartHoursToShow1 ? ConstantsGlucoseChart.miniChartHoursToShow2 : ConstantsGlucoseChart.miniChartHoursToShow1
+        switch UserDefaults.standard.miniChartHoursToShow {
+            
+        case ConstantsGlucoseChart.miniChartHoursToShow1:
+            
+            UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow2
+            
+            miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
+            
+        case ConstantsGlucoseChart.miniChartHoursToShow2:
+            
+            UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow3
+            
+            miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
+            
+        case ConstantsGlucoseChart.miniChartHoursToShow3:
+            
+            UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow4
+            
+            miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
+            
+        case ConstantsGlucoseChart.miniChartHoursToShow4:
+            
+            UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
+            
+            miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
+            
+        // this will never get resolved as there is always an expected value assigned, but we need to include it to keep the compiler happy
+        default:
+            
+            UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
+            
+            miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
+            
+        }
         
-        miniChartHoursLabelOutlet.text = " " + Int(UserDefaults.standard.miniChartHoursToShow).description + Texts_Common.hourshort + " "
-        
-        // restore the alpha of the label
+        // change alpha to fuly brighten the label temporarily
         miniChartHoursLabelOutlet.alpha = 1.0
         
-        // now show the label
-        miniChartHoursLabelOutlet.isHidden = false
-        
-        // wait for a second (or two) and then fade the label out
+        // wait for a second and then fade the label back out
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             
             // make a animated transition with the label. Fade it out over a couple of seconds.
             UIView.transition(with: self.miniChartHoursLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
-                self.miniChartHoursLabelOutlet.alpha = 0.0
+                self.miniChartHoursLabelOutlet.alpha = ConstantsGlucoseChart.miniChartHoursToShowLabelAlpha
             })
-            
-            // once faded out, just hide it properly so that it doesn't block the tap gesture of the chart in case the user clicks where the label is
-            self.miniChartHoursLabelOutlet.isHidden = true
             
         }
     }
@@ -2033,6 +2057,19 @@ final class RootViewController: UIViewController {
     private func updateMiniChart() {
         
         if UserDefaults.standard.showMiniChart {
+            
+            switch UserDefaults.standard.miniChartHoursToShow {
+                
+            case ConstantsGlucoseChart.miniChartHoursToShow1, ConstantsGlucoseChart.miniChartHoursToShow2:
+                miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
+                
+            case ConstantsGlucoseChart.miniChartHoursToShow3, ConstantsGlucoseChart.miniChartHoursToShow4:
+                miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
+                
+            default:
+                miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
+                
+            }
             
             // update the chart
             glucoseMiniChartManager?.updateChartPoints(chartOutlet: miniChartOutlet, completionHandler: nil)

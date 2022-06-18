@@ -392,21 +392,21 @@
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YJB-T6-p3Y" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="369" width="390" height="70"/>
                                         <subviews>
-                                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" alpha="0.90000000000000002" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=" 24h " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WIO-Oh-Z4T">
-                                                <rect key="frame" x="15" y="50" width="32" height="20"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" alpha="0.40000000000000002" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=" 24 hours" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WIO-Oh-Z4T">
+                                                <rect key="frame" x="5.9999999999999964" y="50" width="58.666666666666657" height="20"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="20" id="ACV-EP-M2d"/>
                                                 </constraints>
-                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+                                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="13"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                         </subviews>
                                         <gestureRecognizers/>
                                         <constraints>
-                                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="WIO-Oh-Z4T" secondAttribute="trailing" symbolic="YES" id="1RU-Mc-elX"/>
+                                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="WIO-Oh-Z4T" secondAttribute="trailing" id="1RU-Mc-elX"/>
                                             <constraint firstAttribute="height" constant="70" id="40A-Zk-fOI"/>
-                                            <constraint firstItem="WIO-Oh-Z4T" firstAttribute="leading" secondItem="YJB-T6-p3Y" secondAttribute="leading" constant="15" id="rea-6b-zUM"/>
+                                            <constraint firstItem="WIO-Oh-Z4T" firstAttribute="leading" secondItem="YJB-T6-p3Y" secondAttribute="leading" constant="6" id="rea-6b-zUM"/>
                                             <constraint firstAttribute="bottom" secondItem="WIO-Oh-Z4T" secondAttribute="bottom" id="uJt-rF-x1l"/>
                                         </constraints>
                                         <connections>
