@@ -213,6 +213,21 @@ public class GlucoseMiniChartManager {
         // let's set up the x-axis for the chart. We just want the first and late values - no need for anything in between
         var xAxisValues = [ ChartAxisValueDate(date: startDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettingsHidden) ]
         
+        // let's set a visible axis for each midnight we find between the start and end dates. This helps the user to get context from a quick glance at the mini-chart
+        
+        // get the timestamp of the previous midnight as our starting point. This will be before the start date but we'll add 24 hours to it in the next step
+        var midnightDate = startDate.toMidnight()
+            
+        // add 24hrs to the midnightDate and add it to the xAxisValues array. Repeat until we've gone past the endDate. The first loop will always work. Subsequent loops will be processed if the mini-chart hours to show is long enough
+        repeat {
+            
+            // add 24 hours to midnightDate
+            midnightDate = midnightDate.addingTimeInterval(60 * 60 * 24)
+            
+            xAxisValues += [ ChartAxisValueDate(date: midnightDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettingsHidden) ]
+            
+        } while midnightDate < endDate
+        
         xAxisValues += [ ChartAxisValueDate(date: endDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettingsHidden) ]
         
         // don't show the first and last hour, because this is usually not something like 13 but rather 13:26
@@ -423,7 +438,7 @@ public class GlucoseMiniChartManager {
         // intialize chartlabelsettings - this is used for the standard grid labels
         if chartLabelSettings == nil {
             chartLabelSettings = ChartLabelSettings(
-                font: .systemFont(ofSize: 14),
+                font: .systemFont(ofSize: 1),
                 fontColor: ConstantsGlucoseChart.axisLabelColor
             )
         }
@@ -436,14 +451,16 @@ public class GlucoseMiniChartManager {
             )
         }
         
-        // intialize chartGuideLinesLayerSettings
+        // intialize chartGuideLinesLayerSettingsalp
         if chartGuideLinesLayerSettings == nil {
-            chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: UIColor.lightGray,  linesWidth: 1)
+            chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: UIColor.darkGray.withAlphaComponent(0.8), linesWidth: 1.5)
         }
             
         // intialize axisLabelTimeFormatter
         if axisLabelTimeFormatter == nil {
             axisLabelTimeFormatter = DateFormatter()
+            axisLabelTimeFormatter?.timeStyle = .none
+            axisLabelTimeFormatter?.dateStyle = .none
         }
             
         // initialize bgReadingsAccessor

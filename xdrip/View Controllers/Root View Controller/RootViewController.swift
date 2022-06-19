@@ -270,13 +270,15 @@ final class RootViewController: UIViewController {
     
     @IBAction func miniChartDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
         
+        
+        // move the days range to the next one (or back to the first one) and also set the text. We'll use "24 hours" for the first range (to make it clear it's not a full day, but the last 24 hours), but to keep the UI simpler, we'll use "x days" for the rest.
         switch UserDefaults.standard.miniChartHoursToShow {
             
         case ConstantsGlucoseChart.miniChartHoursToShow1:
             
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow2
             
-            miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
+            miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
             
         case ConstantsGlucoseChart.miniChartHoursToShow2:
             
@@ -292,11 +294,12 @@ final class RootViewController: UIViewController {
             
         case ConstantsGlucoseChart.miniChartHoursToShow4:
             
+            // we're already on the last range, so roll back to the first range
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
             
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
             
-        // this will never get resolved as there is always an expected value assigned, but we need to include it to keep the compiler happy
+        // the default will never get resolved as there is always an expected value assigned, but we need to include it to keep the compiler happy
         default:
             
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
@@ -305,7 +308,7 @@ final class RootViewController: UIViewController {
             
         }
         
-        // change alpha to fuly brighten the label temporarily
+        // increase alpha to fully brighten the label temporarily
         miniChartHoursLabelOutlet.alpha = 1.0
         
         // wait for a second and then fade the label back out
@@ -2062,10 +2065,10 @@ final class RootViewController: UIViewController {
             
             switch UserDefaults.standard.miniChartHoursToShow {
                 
-            case ConstantsGlucoseChart.miniChartHoursToShow1, ConstantsGlucoseChart.miniChartHoursToShow2:
+            case ConstantsGlucoseChart.miniChartHoursToShow1:
                 miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
                 
-            case ConstantsGlucoseChart.miniChartHoursToShow3, ConstantsGlucoseChart.miniChartHoursToShow4:
+            case ConstantsGlucoseChart.miniChartHoursToShow2, ConstantsGlucoseChart.miniChartHoursToShow3, ConstantsGlucoseChart.miniChartHoursToShow4:
                 miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
                 
             default:
