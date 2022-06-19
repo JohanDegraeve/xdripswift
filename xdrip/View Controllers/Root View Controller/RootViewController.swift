@@ -497,7 +497,9 @@ final class RootViewController: UIViewController {
         updateLabelsAndChart(overrideApplicationState: true)
         
         // show the mini-chart as required
-        miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
+        if !screenIsLocked {
+            miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
+        }
         
         // show the statistics view as required. If not, hide it and show the spacer view to keep segmentedControlChartHours separated a bit more away from the main Tab bar
         if !screenIsLocked {
@@ -2611,7 +2613,8 @@ final class RootViewController: UIViewController {
                 // set the value label font size to big
                 valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
                 
-                // de-clutter the screen. Hide the statistics view, controls and show the clock view
+                // de-clutter the screen. Hide the mini-chart, statistics view, controls and show the clock view
+                miniChartOutlet.isHidden = true
                 statisticsView.isHidden = true
                 segmentedControlsView.isHidden = true
                 
@@ -2667,6 +2670,7 @@ final class RootViewController: UIViewController {
             valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
             
             // hide
+            miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
             segmentedControlsView.isHidden = false
             
