@@ -2605,7 +2605,7 @@ final class RootViewController: UIViewController {
             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
             
             // check if iOS13 or newer is being used. If it is, then take advantage of SF Symbols to fill in the lock icon to make it stand out more
-            if #available(iOS 13.0, *) {
+            if #available(iOS 13.0, *), showClock {
 
                 screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock.fill")
             
