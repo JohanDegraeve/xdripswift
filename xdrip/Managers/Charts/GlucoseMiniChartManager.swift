@@ -76,11 +76,6 @@ public class GlucoseMiniChartManager {
     /// a coreDataManager
     private var coreDataManager: CoreDataManager
     
-    /// difference in seconds between two pixels (or x values, not sure if it's pixels)
-//    private var diffInSecondsBetweenTwoPoints: Double  {
-//        endDate.timeIntervalSince(startDate)/Double(innerFrameWidth)
-//    }
-    
     /// innerFrame width
     ///
     /// default value 300.0 which is probably not correct but it can't be initiated as long as glusoseChart is not initialized, to avoid having to work with optional, i assign it to 300.0
