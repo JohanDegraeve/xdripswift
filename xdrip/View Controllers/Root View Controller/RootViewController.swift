@@ -1261,8 +1261,10 @@ final class RootViewController: UIViewController {
                 
                 watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
-                loopManager?.share()
-                
+                if !UserDefaults.standard.suppressLoopShare {
+                    loopManager?.share()
+                }
+
                 updateWatchApp()
                 
             }
@@ -1704,7 +1706,10 @@ final class RootViewController: UIViewController {
                 self.watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
-                self.loopManager?.share()
+                if !UserDefaults.standard.suppressLoopShare {
+                    self.loopManager?.share()
+                }
+
                 
             }
             
@@ -3256,7 +3261,9 @@ extension RootViewController:NightScoutFollowerDelegate {
                 watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: nil)
                 
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
-                self.loopManager?.share()
+                if !UserDefaults.standard.suppressLoopShare {
+                    self.loopManager?.share()
+                }
                                 
                 updateWatchApp()
                 

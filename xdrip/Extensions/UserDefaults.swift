@@ -304,9 +304,15 @@ extension UserDefaults {
         /// case smooth libre values
         case smoothLibreValues = "smoothLibreValues"
         
+        /// for Libre 2 : suppress sending unlockPayLoad, this will allow to run xDrip4iOS/Libre 2 in parallel with other app(s)
+        case suppressUnLockPayLoad = "suppressUnLockPayLoad"
+        
+        /// if true, then readings will not be written to shared user defaults (for loop)
+        case suppressLoopShare = "suppressLoopShare"
+        
         /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
         ///
-        /// Default value 0, if used then recommende value between 4 and 9
+        /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
         case loopDelay = "loopDelay"
         
         /// used for Libre data parsing - only for Libre 1 or Libre 2 read via transmitter, ie full NFC block
@@ -420,7 +426,7 @@ extension UserDefaults {
     
     /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
     ///
-    /// Default value 0, if used then recommende value between 4 and 9
+    /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
     @objc dynamic var loopDelay: Int {
         get {
             return integer(forKey: Key.loopDelay.rawValue)
@@ -1614,6 +1620,26 @@ extension UserDefaults {
         }
     }
     
+    /// for Libre 2 : suppress sending unlockPayLoad, this will allow to run xDrip4iOS/Libre 2 in parallel with other app(s)
+    var suppressUnLockPayLoad: Bool {
+        get {
+            return bool(forKey: Key.suppressUnLockPayLoad.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.suppressUnLockPayLoad.rawValue)
+        }
+    }
+    
+    /// if true, then readings will not be written to shared user defaults (for loop)
+    var suppressLoopShare: Bool {
+        get {
+            return bool(forKey: Key.suppressLoopShare.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.suppressLoopShare.rawValue)
+        }
+    }
+
     /// used for Libre data parsing - for processing in LibreDataParser which is only in case of reading with NFC (ie bubble etc)
     var previousRawLibreValues: [Double] {
         get {
