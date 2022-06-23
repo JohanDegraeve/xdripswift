@@ -138,10 +138,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_showSmallBolusTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Micro-bolus on Chart?", comment: "treatments settings, show the micro-bolus on main chart")
     }()
     
-    static let settingsviews_showSmallBolusTreatmentsInList: String = {
-        return NSLocalizedString("settingsviews_showSmallBolusTreatmentsInList", tableName: filename, bundle: Bundle.main, value: "Show Micro-bolus in List?", comment: "treatments settings, show the micro-bolus in the treatment list")
-    }()
-    
     // MARK: - Section Statistics
     
     static let sectionTitleStatistics: String = {

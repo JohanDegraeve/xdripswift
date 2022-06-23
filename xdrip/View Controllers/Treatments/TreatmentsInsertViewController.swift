@@ -154,7 +154,7 @@ class TreatmentsInsertViewController : UIViewController {
 	@IBAction func doneButtonTapped(_ sender: UIBarButtonItem) {
         
         // if treatMentEntryToUpdate not nil, then assign new value or delete it
-        // it's either type carbs, insulin or exercise
+        // it's either type carbs, insulin, exercise or a BG check
         if let treatMentEntryToUpdate = treatMentEntryToUpdate {
 
             // code reused three times
@@ -185,6 +185,17 @@ class TreatmentsInsertViewController : UIViewController {
                         textField.text = "0"
                         
                         treatMentEntryToUpdateChanged = true
+                        
+                    }
+                    
+                    // check if the user is editing a future bg check or trying to edit one into the future. This can be dangerous for some APS systems that use BG checks as well as CGM values for their predictions. Set the current time to now.
+                    if treatMentEntryToUpdate.treatmentType == .BgCheck && (treatMentEntryToUpdate.date > Date() || self.datePicker.date > Date()) {
+                        
+                        self.datePicker.setDate(Date(), animated: true)
+                        
+                        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_TreatmentsView.cannotStoreFutureBGCheck, actionHandler: nil)
+                        
+                        self.present(alert, animated: true, completion: nil)
                         
                     }
                     
@@ -268,6 +279,16 @@ class TreatmentsInsertViewController : UIViewController {
             
                             value = value.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                             
+                            // For safety in some APS systems, ensure the user isn't trying to add a future BG Check. If so, warn/inform them and set the datePicker date to the actual date/time.
+                            if datePicker.date > Date() {
+                                
+                                datePicker.setDate(Date(), animated: true)
+                                
+                                let alert = UIAlertController(title: Texts_Common.warning, message: Texts_TreatmentsView.cannotStoreFutureBGCheck, actionHandler: nil)
+                                
+                                self.present(alert, animated: true, completion: nil)
+                                
+                            }
                         }
                     
                     // create the treatment and append to treatments

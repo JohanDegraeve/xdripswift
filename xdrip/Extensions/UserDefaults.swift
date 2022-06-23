@@ -81,6 +81,15 @@ extension UserDefaults {
         /// should the micro-boluses be listed in the treatment list/table?
         case showSmallBolusTreatmentsInList = "showSmallBolusTreatmentsInList"
         
+        /// should the normal boluses be listed in the treatment list/table?
+        case showBolusTreatmentsInList = "showBolusTreatmentsInList"
+        
+        /// should the carbs be listed in the treatment list/table?
+        case showCarbsTreatmentsInList = "showCarbsTreatmentsInList"
+        
+        /// should the BG Checks be listed in the treatment list/table?
+        case showBgCheckTreatmentsInList = "showBgCheckTreatmentsInList"
+        
         // Statistics settings
         
         /// show the statistics? How many days should we use for the calculations?
@@ -861,6 +870,39 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.showSmallBolusTreatmentsInList.rawValue)
+        }
+    }
+    
+    /// should the app show the normal bolus treatments in the treatments list/table?
+    @objc dynamic var showBolusTreatmentsInList: Bool {
+        // default value for bool in userdefaults is false, by default we want the app to *show* the normal bolus treatments in the treatments table
+        get {
+            return !bool(forKey: Key.showBolusTreatmentsInList.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showBolusTreatmentsInList.rawValue)
+        }
+    }
+    
+    /// should the app show the normal bolus treatments in the treatments list/table?
+    @objc dynamic var showCarbsTreatmentsInList: Bool {
+        // default value for bool in userdefaults is false, by default we want the app to *show* the normal bolus treatments in the treatments table
+        get {
+            return !bool(forKey: Key.showCarbsTreatmentsInList.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showCarbsTreatmentsInList.rawValue)
+        }
+    }
+    
+    /// should the app show the BG Check treatments in the treatments list/table?
+    @objc dynamic var showBgCheckTreatmentsInList: Bool {
+        // default value for bool in userdefaults is false, by default we want the app to *show* the BG Check treatments in the treatments table
+        get {
+            return !bool(forKey: Key.showBgCheckTreatmentsInList.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showBgCheckTreatmentsInList.rawValue)
         }
     }
     

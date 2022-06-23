@@ -24,7 +24,6 @@
 "settingsviews_smallBolusTreatmentThreshold" = "Límite Micro-bolo:";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Por debajo de cuántas unidades debemos considerar un bolo como micro-bolo?\n\n(Valor recomendado: 1.0U)";
 "settingsviews_showSmallBolusTreatmentsOnChart" = "Mostrar Micro-bolos en Gráfica?";
-"settingsviews_showSmallBolusTreatmentsInList" = "Mostrar Micro-bolos en Listado?";
 "settingsviews_sectiontitlestatistics" = "Estadísticas";
 "settingsviews_showStatistics" = "Mostrar Estadísticas?";
 "settingsviews_daysToUseStatisticsTitle" = "Días a Calcular?";
