@@ -51,5 +51,9 @@ enum Texts_TreatmentsView {
     static let filterTreatmentsLabel:String = {
         return NSLocalizedString("treatments_filterTreatmentsLabel", tableName: filename, bundle: Bundle.main, value: "Filter:", comment: "filter the treatments by type")
     }()
+    
+    static let cannotStoreFutureBGCheck:String = {
+        return NSLocalizedString("treatments_cannotStoreFutureBGCheck", tableName: filename, bundle: Bundle.main, value: "You cannot store a BG Check in the future.\n\nIt will be stored at the actual time.", comment: "warn about trying to set a future bg value")
+    }()
 
 }
