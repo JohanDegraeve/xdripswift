@@ -3127,7 +3127,12 @@ extension RootViewController: UNUserNotificationCenterDelegate {
         }  else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForVolumeTest {
             
             // user is testing iOS Sound volume in the settings. Only the sound should be played, the alert itself will not be shown
-            completionHandler([.sound])
+            if #available(iOS 14.0, *) {
+                completionHandler([.sound, .list])
+            } else {
+                // Fallback on earlier versions
+                completionHandler([.sound])
+            }
             
         } else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForxCGMTransmitterDelegatexDripError {
             
