@@ -2,19 +2,20 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-"treatments_title" = "Treatments";
-"treatments_new_button" = "New";
-"treatments_new_entry" = "New Treatment";
+"treatments_title" = "Tratamientos";
+"treatments_new_button" = "Nuevo";
+"treatments_new_entry" = "Nuevo Tratamiento";
 "treatments_carbs_with_unit" = "Carbs (g):";
-"treatments_insulin_with_unit" = "Insulin (U):";
-"treatments_exercise_with_unit" = "Exercise (min):";
+"treatments_insulin_with_unit" = "Insulina (U):";
+"treatments_exercise_with_unit" = "Ejercicio (min):";
 "treatments_carbs_unit" = "g";
 "treatments_insulin_unit" = "U";
 "treatments_exercise_unit" = "min";
 "treatments_carbs" = "Carbs";
-"treatments_insulin" = "Insulin";
-"treatments_exercise" = "Exercise";
+"treatments_insulin" = "Insulina";
+"treatments_exercise" = "Ejercicio";
 "treatments_bgcheck" = "Control Glucemia";
 "treatments_question_mark" = "?";
 "treatments_success" = "Success";
 "treatments_sync_complete" = "Synchronization complete.";
+"treatments_filterTreatmentsLabel" = "Filtrar:";

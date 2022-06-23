@@ -21,9 +21,6 @@ fileprivate enum Setting:Int, CaseIterable {
     //should we show the micro-boluses on the main chart?
     case showSmallBolusTreatmentsOnChart = 2
     
-    //should we show the micro-boluses in the treatment list/table?
-    case showSmallBolusTreatmentsInList = 3
-    
     
 }
 
@@ -44,9 +41,6 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
             
         case .showSmallBolusTreatmentsOnChart:
             return UISwitch(isOn: UserDefaults.standard.showSmallBolusTreatmentsOnChart, action: {(isOn:Bool) in UserDefaults.standard.showSmallBolusTreatmentsOnChart = isOn})
-            
-        case .showSmallBolusTreatmentsInList:
-            return UISwitch(isOn: UserDefaults.standard.showSmallBolusTreatmentsInList, action: {(isOn:Bool) in UserDefaults.standard.showSmallBolusTreatmentsInList = isOn})
             
         }
     }
@@ -94,15 +88,6 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
                 }
             })
             
-        case .showSmallBolusTreatmentsInList:
-            return SettingsSelectedRowAction.callFunction(function: {
-                if UserDefaults.standard.showSmallBolusTreatmentsInList {
-                    UserDefaults.standard.showSmallBolusTreatmentsInList = false
-                } else {
-                    UserDefaults.standard.showSmallBolusTreatmentsInList = true
-                }
-            })
-            
         }
     }
     
@@ -128,9 +113,6 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
         case .showSmallBolusTreatmentsOnChart:
             return Texts_SettingsView.settingsviews_showSmallBolusTreatmentsOnChart
             
-        case .showSmallBolusTreatmentsInList:
-            return Texts_SettingsView.settingsviews_showSmallBolusTreatmentsInList
-            
         }
     }
     
@@ -139,7 +121,7 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showTreatmentsOnChart, .showSmallBolusTreatmentsOnChart, .showSmallBolusTreatmentsInList:
+        case .showTreatmentsOnChart, .showSmallBolusTreatmentsOnChart:
             return UITableViewCell.AccessoryType.none
             
         case .smallBolusTreatmentThreshold:
@@ -153,7 +135,7 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showTreatmentsOnChart, .showSmallBolusTreatmentsOnChart, .showSmallBolusTreatmentsInList:
+        case .showTreatmentsOnChart, .showSmallBolusTreatmentsOnChart:
             return nil
             
         case .smallBolusTreatmentThreshold:

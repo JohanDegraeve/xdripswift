@@ -28,7 +28,6 @@
 "settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold:";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 "settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart?";
-"settingsviews_showSmallBolusTreatmentsInList" = "Show Micro-bolus in List?";
 "settingsviews_sectiontitlestatistics" = "Statistics";
 "settingsviews_showStatistics" = "Show Statistics?";
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate?";
