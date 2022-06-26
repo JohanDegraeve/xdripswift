@@ -121,7 +121,7 @@ final class SettingsViewController: UIViewController {
     }
     
 
-    // MARK:- public functions
+    // MARK: - public functions
     
     /// configure
     public func configure(coreDataManager:CoreDataManager?, soundPlayer:SoundPlayer?) {
@@ -233,7 +233,11 @@ final class SettingsViewController: UIViewController {
             if let vc = segue.destination as? TimeScheduleViewController, let sender = sender as? TimeSchedule {
                 vc.configure(timeSchedule: sender)
             }
-            
+
+        case .settingsToLoopDelaySchedule:
+            //nothing to configure
+            break
+
         }
     }
 
@@ -338,6 +342,9 @@ extension SettingsViewController {
         
         /// to go from general settings to schedule screen
         case settingsToSchedule = "settingsToSchedule"
+        
+        /// to go from general settings to loop delay schedule
+        case settingsToLoopDelaySchedule = "settingsToLoopDelaySchedule"
         
     }
 }

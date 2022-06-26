@@ -322,7 +322,9 @@ extension UserDefaults {
         /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
         ///
         /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
-        case loopDelay = "loopDelay"
+        case loopDelaySchedule = "loopDelaySchedule"
+        
+        case loopDelayValueInMinutes = "loopDelayValueInMinutes"
         
         /// used for Libre data parsing - only for Libre 1 or Libre 2 read via transmitter, ie full NFC block
         case previousRawLibreValues = "previousRawLibreValues"
@@ -436,12 +438,24 @@ extension UserDefaults {
     /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
     ///
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
-    @objc dynamic var loopDelay: Int {
+    @objc dynamic var loopDelaySchedule: String? {
         get {
-            return integer(forKey: Key.loopDelay.rawValue)
+            return string(forKey: Key.loopDelaySchedule.rawValue)
         }
         set {
-            set(newValue, forKey: Key.loopDelay.rawValue)
+            set(newValue, forKey: Key.loopDelaySchedule.rawValue)
+        }
+    }
+
+    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+    ///
+    /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
+    @objc dynamic var loopDelayValueInMinutes: String? {
+        get {
+            return string(forKey: Key.loopDelayValueInMinutes.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.loopDelayValueInMinutes.rawValue)
         }
     }
 

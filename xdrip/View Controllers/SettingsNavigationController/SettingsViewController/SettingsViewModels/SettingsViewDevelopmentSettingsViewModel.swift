@@ -60,7 +60,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.suppressLoopShare
             
         case .loopDelay:
-            return "Loop Delay"
+            return Texts_SettingsView.loopDelaysScreenTitle
             
         }
     }
@@ -102,7 +102,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             return nil
             
         case .loopDelay:
-            return UserDefaults.standard.loopDelay.description
+            return nil
             
         }
         
@@ -175,7 +175,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             return .nothing
             
         case .loopDelay:
-            return SettingsSelectedRowAction.askText(title: "Loop Delay", message: "Artificial delay in readings when sending to Loop (minutes) - 0 means no delay. Use maximum 10 minutes.", keyboardType: .numberPad, text: UserDefaults.standard.loopDelay.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.loopDelay = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
+            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToLoopDelaySchedule.rawValue, sender: self)
             
 
         }

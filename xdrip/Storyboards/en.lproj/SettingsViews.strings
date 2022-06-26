@@ -123,3 +123,8 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";
 "suppressLoopShare" = "Suppress Loop Share";
+"Select Time" = "Select Time";
+"Select Value" = "Select Value";
+"expanatoryTextSelectTime" = "As of what time should the value apply";
+"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with Loop";
+"warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
