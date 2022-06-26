@@ -1197,6 +1197,7 @@
                         <segue destination="eUt-Xg-tDZ" kind="show" identifier="settingsToAlertTypeSettings" id="dX4-1s-1fK"/>
                         <segue destination="d2Q-Tq-3zC" kind="show" identifier="settingsToM5StackSettings" id="wOc-Vw-59X"/>
                         <segue destination="Yrn-pr-SQ1" kind="show" identifier="settingsToSchedule" id="GkN-Bx-7f5"/>
+                        <segue destination="bzY-sy-ivl" kind="show" identifier="settingsToLoopDelaySchedule" id="Yl3-hC-05i"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4Nw-L8-lE0" sceneMemberID="firstResponder"/>
@@ -1805,6 +1806,22 @@
             </objects>
             <point key="canvasLocation" x="3971" y="1500"/>
         </scene>
+        <!--Loop Delay Schedule View Controller-->
+        <scene sceneID="I0j-hn-Oz3">
+            <objects>
+                <viewController id="bzY-sy-ivl" userLabel="Loop Delay Schedule View Controller" customClass="LoopDelayScheduleViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="rPP-0H-ZN9">
+                        <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="rTK-eV-Clg"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Title" id="D3W-pP-Yk9"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cdK-b9-772" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4794" y="1500"/>
+        </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="yl2-sM-qoP">
             <objects>
@@ -2197,6 +2214,9 @@
         <image name="questionmark.circle" catalog="system" width="128" height="121"/>
         <image name="scope" catalog="system" width="128" height="122"/>
         <image name="sensor14_14_alt" width="390" height="14"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="systemBlueColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

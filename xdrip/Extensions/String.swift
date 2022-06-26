@@ -172,7 +172,7 @@ extension String {
     /// - Example :
     /// - string = 5-480-660-1080
     /// - will return  [5, 480, 660, 1080]
-    func getSchedule() -> [Int] {
+    func splitToInt() -> [Int] {
         
         var schedule = [Int]()
         

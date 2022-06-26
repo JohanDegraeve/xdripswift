@@ -523,6 +523,30 @@ class Texts_SettingsView {
         return NSLocalizedString("suppressLoopShare", tableName: filename, bundle: Bundle.main, value: "Suppress Loop Share", comment: "When enabled, readings will not be reading to shared user defaults (for loop)")
     }()
     
+    static let selectTime: String = {
+        return NSLocalizedString("Select Time", tableName: filename, bundle: Bundle.main, value: "Select Time", comment: "Settings screen for loop delay")
+    }()
+
+    static let expanatoryTextSelectTime: String = {
+        return NSLocalizedString("expanatoryTextSelectTime", tableName: filename, bundle: Bundle.main, value: "As of what time should the value apply", comment: "Settings screen for loop delay, explanatory text for time")
+    }()
+
+    static let selectValue: String = {
+        return NSLocalizedString("Select Value", tableName: filename, bundle: Bundle.main, value: "Select Value", comment: "Settings screen for loop delay")
+    }()
+
+    static let loopDelaysScreenTitle: String = {
+        return NSLocalizedString("loopDelaysScreenTitle", tableName: filename, bundle: Bundle.main, value: "Loop delays", comment: "Title for screen where loop delays are configured.")
+    }()
+
+    static let expanatoryTextSelectValue: String = {
+        return NSLocalizedString("expanatoryTextSelectValue", tableName: filename, bundle: Bundle.main, value: "Delay in minutes, applied to readings shared with Loop", comment: "Settings screen for loop delay, explanatory text for value")
+    }()
+
+    static let warningLoopDelayAlreadyExists: String = {
+        return NSLocalizedString("warningLoopDelayAlreadyExists", tableName: filename, bundle: Bundle.main, value: "There is already a loopDelay for this time.", comment: "When user creates new loopdelay, with a timestamp that already exists - this is the warning text")
+    }()
+
     static let nsLog: String = {
         return NSLocalizedString("nslog", tableName: filename, bundle: Bundle.main, value: "NSLog", comment: "deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog")
     }()
