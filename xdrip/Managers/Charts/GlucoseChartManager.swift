@@ -70,6 +70,9 @@ public class GlucoseChartManager {
     /// ChartPoints to be shown on chart, processed only in main thread - not Urgent Range
     private var notUrgentRangeGlucoseChartPoints = [ChartPoint]()
     
+	/// Points used to draw the Insulin On Board line.
+	private var insulinOnBoardChartPoints = [ChartPoint]()
+	
     /// for logging
     private var oslog = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
     
@@ -114,6 +117,9 @@ public class GlucoseChartManager {
     
     /// initialise treatmentEntryAccessor
     private var treatmentEntryAccessor: TreatmentEntryAccessor?
+	
+	/// initialize insulinOnBoardCalculator
+	private var insulinOnBoardCalculator: InsulinOnBoardCalculator?
     
     /// a coreDataManager
     private var coreDataManager: CoreDataManager
@@ -321,6 +327,13 @@ public class GlucoseChartManager {
                 self.treatmentChartPoints.bgChecks = treatmentChartPoints.bgChecks
                 
             }
+			
+			/// IOB chart points. We do not need a property just to pass the new value,
+			/// a local variable is enough.
+			var newInsulinOnBoardChartPoints: [ChartPoint] = []
+			if UserDefaults.standard.insulinOnBoardShowOnChart {
+				newInsulinOnBoardChartPoints = self.getInsulinOnBoardChartPoints(startDate: startDateToUse, endDate: endDate, treatmentEntryAccessor: self.data().treatmentEntryAccessor, on: self.coreDataManager.mainManagedObjectContext)
+			}
             
             DispatchQueue.main.async {
                 
@@ -348,6 +361,9 @@ public class GlucoseChartManager {
                 
                 // assign the BG check treatment chart points
                 self.bgCheckTreatmentChartPoints = self.treatmentChartPoints.bgChecks
+				
+				/// Update insulinOnBoardChartPoints to the new points.
+				self.insulinOnBoardChartPoints = newInsulinOnBoardChartPoints
                     
                 // update the chart outlet
                 chartOutlet.reloadChart()
@@ -872,6 +888,12 @@ public class GlucoseChartManager {
         ]
         
         layers.append(contentsOf: layersGlucoseCircles)
+		
+		if UserDefaults.standard.insulinOnBoardShowOnChart {
+			let lineModel = ChartLineModel(chartPoints: self.insulinOnBoardChartPoints, lineColor: UIColor.systemBlue, lineWidth: 2, lineJoin: .bevel, lineCap: .round, animDuration: 0, animDelay: 0, dashPattern: nil)
+			let insulinOnBoardLayer: ChartLayer = ChartPointsLineLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, lineModels: [lineModel])
+			layers.append(insulinOnBoardLayer)
+		}
         
         if UserDefaults.standard.showTreatmentsOnChart {
             
@@ -880,6 +902,7 @@ public class GlucoseChartManager {
                 bgCheckCirclesOuterLayer,
                 bgCheckCirclesInnerLayer,
                 // treatment label layers
+				// Labels must be the last thing, in order to appear in front of everything else .
                 smallCarbsLabelsLayer,
                 mediumCarbsLabelsLayer,
                 largeCarbsLabelsLayer,
@@ -1046,6 +1069,37 @@ public class GlucoseChartManager {
         return (calibrationChartPoints)
         
     }
+	
+	
+	/// GetInsulinOnBoardChartPoints - Receives a start and end date and returns the ChartPoints of IOB between these dates.
+	/// These dates will typically be the start and end dates of the chart x-axis.
+	///
+	/// - parameters:
+	///     - startDate : start date to calculate the IOB
+	///     - endDate : end date to calculate the IOB
+	///     - treatmentEntryAccessor : treatment entry accessor object
+	///     - managedObjectContext : the ManagedObjectContext to use
+	/// - returns: a list of ChartPoint, each a point of the IOB line.
+	private func getInsulinOnBoardChartPoints(startDate: Date, endDate: Date, treatmentEntryAccessor: TreatmentEntryAccessor, on managedObjectContext: NSManagedObjectContext) -> [ChartPoint] {
+		
+		/// Since calculating the IOB for each second would be impracticable,
+		/// we must select some dates for it.
+		/// To prevent the line from being inconsistent when the user moves the graph,
+		/// dates should be selected at regular intervals and from regular points.
+		
+		///
+		let calculator = data().insulinOnBoardCalculator
+		let (xAxisDates, yAxisIOB) = calculator.insulinYetToBeConsumed(startDate: startDate, endDate: endDate, steps: 40, surroundTreatments: true)
+		
+		/// Now that we have the x axis and the y values, create the ChartPoints from it
+		/// using zip and them mapping to ChartPoint is the easier way to do it.
+		let formatter = data().chartPointDateFormatter
+		let insulinOnBoardChartPoints: [ChartPoint] = zip(xAxisDates, yAxisIOB).map {
+			return ChartPoint(date: $0, insulin: $1, formatter: formatter)
+		}
+		
+		return insulinOnBoardChartPoints
+	}
     
         
     /// Receives a start and end date and returns the treatment entries from coredata between these dates. These dates will typically be the start and end dates of the chart x-axis. These individual treatment entries are returned as a tuple with multiple chartPoint arrays as defined in TreatmentChartPointsTypes.
@@ -1388,6 +1442,8 @@ public class GlucoseChartManager {
         smallCarbsTreatmentChartPoints = [ChartPoint]()
         mediumCarbsTreatmentChartPoints = [ChartPoint]()
         largeCarbsTreatmentChartPoints = [ChartPoint]()
+		
+		insulinOnBoardChartPoints = [ChartPoint]()
         
         bgCheckTreatmentChartPoints = [ChartPoint]()
         
@@ -1408,6 +1464,8 @@ public class GlucoseChartManager {
         calibrationsAccessor = nil
         
         treatmentEntryAccessor = nil
+		
+		insulinOnBoardCalculator = nil
         
         urgentRangeGlucoseChartPoints = []
 
@@ -1428,7 +1486,7 @@ public class GlucoseChartManager {
     }
     
     /// function which gives is variables that are set back to nil when nillifyData is called
-    private func data() -> (chartSettings: ChartSettings, chartPointDateFormatter: DateFormatter, operationQueue: OperationQueue, chartLabelSettings: ChartLabelSettings, chartLabelSettingsObjectives: ChartLabelSettings, chartLabelSettingsObjectivesSecondary: ChartLabelSettings, chartLabelSettingsTarget: ChartLabelSettings, chartLabelSettingsDimmed: ChartLabelSettings, chartLabelSettingsHidden: ChartLabelSettings, chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings, axisLabelTimeFormatter: DateFormatter, bgReadingsAccessor: BgReadingsAccessor, calibrationsAccessor: CalibrationsAccessor, treatmentEntryAccessor: TreatmentEntryAccessor) {
+	private func data() -> (chartSettings: ChartSettings, chartPointDateFormatter: DateFormatter, operationQueue: OperationQueue, chartLabelSettings: ChartLabelSettings, chartLabelSettingsObjectives: ChartLabelSettings, chartLabelSettingsObjectivesSecondary: ChartLabelSettings, chartLabelSettingsTarget: ChartLabelSettings, chartLabelSettingsDimmed: ChartLabelSettings, chartLabelSettingsHidden: ChartLabelSettings, chartGuideLinesLayerSettings: ChartGuideLinesLayerSettings, axisLabelTimeFormatter: DateFormatter, bgReadingsAccessor: BgReadingsAccessor, calibrationsAccessor: CalibrationsAccessor, treatmentEntryAccessor: TreatmentEntryAccessor, insulinOnBoardCalculator: InsulinOnBoardCalculator) {
         
         // setup chartSettings
         if chartSettings == nil {
@@ -1541,8 +1599,13 @@ public class GlucoseChartManager {
         if treatmentEntryAccessor == nil {
             treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
         }
+		
+		// initialize insulinOnBoardCalculator
+		if insulinOnBoardCalculator == nil {
+			insulinOnBoardCalculator = InsulinOnBoardCalculator(coreDataManager: coreDataManager)
+		}
         
-        return (chartSettings!, chartPointDateFormatter!, operationQueue!, chartLabelSettings!, chartLabelSettingsObjectives!, chartLabelSettingsObjectivesSecondary!, chartLabelSettingsTarget!, chartLabelSettingsDimmed!, chartLabelSettingsHidden!, chartGuideLinesLayerSettings!, axisLabelTimeFormatter!, bgReadingsAccessor!, calibrationsAccessor!, treatmentEntryAccessor!)
+        return (chartSettings!, chartPointDateFormatter!, operationQueue!, chartLabelSettings!, chartLabelSettingsObjectives!, chartLabelSettingsObjectivesSecondary!, chartLabelSettingsTarget!, chartLabelSettingsDimmed!, chartLabelSettingsHidden!, chartGuideLinesLayerSettings!, axisLabelTimeFormatter!, bgReadingsAccessor!, calibrationsAccessor!, treatmentEntryAccessor!, insulinOnBoardCalculator!)
         
     }
     

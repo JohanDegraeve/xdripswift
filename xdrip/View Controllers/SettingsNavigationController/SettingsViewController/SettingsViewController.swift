@@ -37,6 +37,9 @@ final class SettingsViewController: UIViewController {
         
         /// treatments settings
         case treatments
+
+        /// InsulinOnBoard settings
+        case insulinOnBoard
         
         /// statistics settings
         case statistics
@@ -88,6 +91,8 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewHomeScreenSettingsViewModel()
             case .treatments:
                 return SettingsViewTreatmentsSettingsViewModel()
+            case .insulinOnBoard:
+                return SettingsViewInsulinOnBoardModel()
             case .statistics:
                 return SettingsViewStatisticsSettingsViewModel()
             case .sensorCountdown:

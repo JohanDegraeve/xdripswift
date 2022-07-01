@@ -42,6 +42,21 @@ extension ChartPoint {
             )
 
     }
+
+	/// Convenience init from a Date, a insulin Double and a DateFormatter
+	/// used for IOB.
+    convenience init(date: Date, insulin: Double, formatter: DateFormatter) {
+        
+		/// Calculates a scaled value for display.
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        let scaledValue = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: isMgDl) + ConstantsGlucoseChart.bolusTreatmentChartPointYAxisOffsetInMgDl.mgdlToMmol(mgdl: isMgDl) + (insulin * ConstantsGlucoseChart.bolusTreatmentChartPointYAxisScaleFactor.mgdlToMmol(mgdl: isMgDl))
+        
+        self.init(
+            x: ChartAxisValueDate(date: date, formatter: formatter),
+            y: ChartAxisValueDouble(scaledValue)
+        )
+
+    }
     
     /// the chartpoints defined for certain treatment entries (such as carbs) are positioned relative to other elements and need to be re-scaled to fit the y-axis values of the glucose chart points (and therefore avoid needing a secondary axis)
     convenience init(treatmentEntry: TreatmentEntry, formatter: DateFormatter, newYAxisValue: Double? = 0) {

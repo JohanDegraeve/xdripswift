@@ -34,6 +34,8 @@
 		CE1B2FE125D0264B00F642F5 /* Main.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD425D0264900F642F5 /* Main.strings */; };
 		D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */; };
 		D4028CC02774A50600341476 /* TreatmentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4028CBF2774A50600341476 /* TreatmentsViewController.swift */; };
+		D4082870286B9EA60004FD0B /* SettingsViewInsulinOnBoardModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D408286F286B9EA60004FD0B /* SettingsViewInsulinOnBoardModel.swift */; };
+		D4082878286CAD020004FD0B /* InsulinOnBoardCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4082877286CAD020004FD0B /* InsulinOnBoardCalculator.swift */; };
 		D40C3DA4277542C400111B73 /* TreatmentEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */; };
 		D40C3DA62775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */; };
 		D417E51C282EC8DB008DC467 /* ProgressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D417E51B282EC8DB008DC467 /* ProgressBarViewController.swift */; };
@@ -729,6 +731,8 @@
 		CE1B2FE425D026B400F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Common.strings; sourceTree = "<group>"; };
 		D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsTreatmentsView.swift; sourceTree = "<group>"; };
 		D4028CBF2774A50600341476 /* TreatmentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsViewController.swift; sourceTree = "<group>"; };
+		D408286F286B9EA60004FD0B /* SettingsViewInsulinOnBoardModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewInsulinOnBoardModel.swift; sourceTree = "<group>"; };
+		D4082877286CAD020004FD0B /* InsulinOnBoardCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinOnBoardCalculator.swift; sourceTree = "<group>"; };
 		D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TreatmentEntry+CoreDataClass.swift"; sourceTree = "<group>"; };
 		D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TreatmentEntry+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		D417E51B282EC8DB008DC467 /* ProgressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBarViewController.swift; sourceTree = "<group>"; };
@@ -1650,6 +1654,7 @@
 				D4E499AA277B43E3000F8CBA /* TreatmentCollection.swift */,
 				D4E499AC277B4CE7000F8CBA /* DateOnly.swift */,
 				D48E8F77278E49B300CCEE08 /* TreatmentNSResponse.swift */,
+				D4082877286CAD020004FD0B /* InsulinOnBoardCalculator.swift */,
 			);
 			path = Treatments;
 			sourceTree = "<group>";
@@ -2511,6 +2516,7 @@
 				47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */,
 				47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */,
 				D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */,
+				D408286F286B9EA60004FD0B /* SettingsViewInsulinOnBoardModel.swift */,
 			);
 			path = SettingsViewModels;
 			sourceTree = "<group>";
@@ -3541,6 +3547,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4082878286CAD020004FD0B /* InsulinOnBoardCalculator.swift in Sources */,
 				F8BDD450221CAA64006EAB84 /* TextsCommon.swift in Sources */,
 				F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */,
 				F8A5EEC2257D18DC0085E660 /* LibreNFCDelegate.swift in Sources */,
@@ -3556,6 +3563,7 @@
 				F8F9721923A5915900C3F17D /* CGMGNSEntryTransmitter.swift in Sources */,
 				F8B3A84A227F090E004BA588 /* SettingsViewGeneralSettingsViewModel.swift in Sources */,
 				F83098FE23AD3F84005741DF /* UITabBarController.swift in Sources */,
+				D4082870286B9EA60004FD0B /* SettingsViewInsulinOnBoardModel.swift in Sources */,
 				F816E11A243923B2009EE65B /* Droplet+CoreDataClass.swift in Sources */,
 				F80D916D24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift in Sources */,
 				F8B955EB2591355200C06016 /* CGMLibre2Transmitter+TestData.swift in Sources */,
