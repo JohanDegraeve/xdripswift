@@ -52,23 +52,13 @@ public class LoopManager:NSObject {
         // reduce timeStampLatestLoopSharedBgReading with 30 minutes. Because maybe Loop wasn't running for a while and so missed one or more readings. By adding 30 minutes of readings, we fill up a gap of maximum 30 minutes in Loop
         var lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: UserDefaults.standard.timeStampLatestLoopSharedBgReading?.addingTimeInterval(-TimeInterval(minutes: 30)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
 
-        trace("    list of readings before applying delay:",log: log, category: ConstantsLog.categoryLoopManager, type: .info)
-        
-        for reading in lastReadings {
-
-            trace("    timestamp %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, reading.timeStamp.toString(timeStyle: .long, dateStyle: .long))
-            trace("        value %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, reading.calculatedValue.description)
-            trace("", log: log, category: ConstantsLog.categoryLoopManager, type: .info)
-            
-        }
-        
         // calculate loopDelay, to avoid having to do it multiple times
         let loopDelay = loopDelay()
 
         // if needed, remove readings less than loopDelay minutes old
         if loopDelay > 0 {
             
-            trace("    loopDelay= %{public}@. Deleting readings.",log: log, category: ConstantsLog.categoryLoopManager, type: .info, loopDelay.description)
+            trace("    loopDelay = %{public}@. Deleting %{public}@ readings.",log: log, category: ConstantsLog.categoryLoopManager, type: .info, loopDelay.description, lastReadings.count)
             
             while lastReadings.count > 0 &&  lastReadings[0].timeStamp.addingTimeInterval(loopDelay) > Date() {
 

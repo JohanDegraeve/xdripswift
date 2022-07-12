@@ -608,8 +608,6 @@ class BluetoothPeripheralManager: NSObject {
             
             if let cgmTransmitter = getCGMTransmitter(), let cgmtransmitterAddress = currentCgmTransmitterAddress {
 
-                debuglogging("setting shared user defaults to cgmtransmitteraddress " + cgmtransmitterAddress)
-                
                 // store getCBUUID_Receive
                 sharedUserDefaults.set(cgmTransmitter.getCBUUID_Receive(), forKey: "cgmTransmitter_CBUUID_Receive")
                 
@@ -625,8 +623,6 @@ class BluetoothPeripheralManager: NSObject {
                 // store nil as cgm transmitter device address
                 // we don't care about CBUUID_Service and CBUUID_Receive
 
-                debuglogging("setting shared user defaults to nil")
-                
                 sharedUserDefaults.set(nil, forKey: "cgmTransmitterDeviceAddress")
                 
             }
