@@ -1273,11 +1273,17 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
 
             cgmTransmitter.setNonFixedSlopeEnabled(enabled: nonFixedSlopeEnabled)
             
-            // nonFixedSlopeEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of nonFixedSlopeEnabled
-            cgmTransmitter.requestNewReading()
+            // if this is the active CGM, then request new reading and call cgmTransmitterInfoChanged
+            if bluetoothPeripheral.blePeripheral.shouldconnect {
+                
+                // nonFixedSlopeEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of nonFixedSlopeEnabled
+                cgmTransmitter.requestNewReading()
+                
+                // call cgmTransmitterInfoChanged
+                cgmTransmitterInfoChanged()
+
+            }
             
-            // call cgmTransmitterInfoChanged
-            cgmTransmitterInfoChanged()
 
         }
         
@@ -1289,11 +1295,17 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
 
             cgmTransmitter.setWebOOPEnabled(enabled: webOOPEnabled)
             
-            // webOOPEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of webOOPEnabled
-            cgmTransmitter.requestNewReading()
-            
-            // call cgmTransmitterInfoChanged
-            cgmTransmitterInfoChanged()
+            // if this is the active CGM, then request new reading and call cgmTransmitterInfoChanged
+            if bluetoothPeripheral.blePeripheral.shouldconnect {
+
+                // webOOPEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of webOOPEnabled
+                cgmTransmitter.requestNewReading()
+                
+                // call cgmTransmitterInfoChanged
+                cgmTransmitterInfoChanged()
+
+            }
+                
 
         }
         
