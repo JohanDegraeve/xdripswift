@@ -572,6 +572,35 @@ class Texts_SettingsView {
     static let settingsviews_housekeeperRetentionPeriodMessage = {
         return NSLocalizedString("settingsviews_housekeeperRetentionPeriodMessage", tableName: filename, bundle: Bundle.main, value: "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)", comment: "When clicking the retention setting, a pop up asks for how many days should data be stored")
     }()
+
+    // MARK: - Section Insulin On Board
     
+    static let sectionTitleInsulinOnBoard: String = {
+        return NSLocalizedString("settingsviews_sectionTitleInsulinOnBoard", tableName: filename, bundle: Bundle.main, value: "Insulin On Board", comment: "Insulin on board section title.")
+    }()
+
+    static let sectionTitleInsulinOnBoardToggleDisplay: String = {
+        return NSLocalizedString("settingsviews_sectionTitleInsulinOnBoardToggleDisplay", tableName: filename, bundle: Bundle.main, value: "Enable Display", comment: "Toggle the IOB label display at root view.")
+    }()
+
+    static let sectionTitleInsulinOnBoardShowIOBOnChart: String = {
+        return NSLocalizedString("settingsviews_sectionTitleInsulinOnBoardShowIOBOnChart", tableName: filename, bundle: Bundle.main, value: "Show On Chart", comment: "Display IOB on the chart.")
+    }()
+
+    static let sectionTitleInsulinOnBoardInsulinActivityDuration: String = {
+        return NSLocalizedString("settingsviews_sectionTitleInsulinOnBoardInsulinActivityDuration", tableName: filename, bundle: Bundle.main, value: "Duration of Insulin Activity", comment: "IOB 'dia' time in minutes.")
+    }()
+
+    static let sectionTitleInsulinOnBoardInsulinActivityDurationMessage: String = {
+        return NSLocalizedString("settingsviews_sectionTitleInsulinOnBoardInsulinActivityDurationMessage", tableName: filename, bundle: Bundle.main, value: "Duration of Insulin Activity in minutes", comment: "IOB 'dia' time in minutes. Description message.")
+    }()
+	
+	static let sectionTitleInsulinOnBoardInsulinPeakTime: String = {
+		return NSLocalizedString("settingsviews_sectionTitleInsulinOnBoardInsulinPeakTime", tableName: filename, bundle: Bundle.main, value: "Insulin Peak Time", comment: "Insulin peak time in minutes.")
+	}()
+
+    static let sectionTitleInsulinOnBoardInsulinPeakTimeMessage: String = {
+        return NSLocalizedString("settingsviews_sectionTitleInsulinOnBoardInsulinPeakTime", tableName: filename, bundle: Bundle.main, value: "Insulin Peak Time in minutes. Setting to 0 will calculate a default value based on Duration of Insulin Activity.", comment: "Insulin peak time in minutes. Description message.")
+    }()
 }
 

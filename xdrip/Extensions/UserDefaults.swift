@@ -89,6 +89,20 @@ extension UserDefaults {
         
         /// should the BG Checks be listed in the treatment list/table?
         case showBgCheckTreatmentsInList = "showBgCheckTreatmentsInList"
+
+        // Insulin On Board settings
+
+        /// Should the display label be enabled?
+        case insulinOnBoardEnabledDisplay = "insulinOnBoardEnabledDisplay"
+        
+        /// Draw on chart?
+        case insulinOnBoardShowOnChart = "insulinOnBoardShowOnChart"
+        
+        /// Insulin Activity Duration in minutes
+        case insulinOnBoardInsulinActivityDuration = "insulinOnBoardInsulinActivityDuration"
+        
+        /// Insulin Peak Time in minutes
+        case insulinOnBoardInsulinPeakTime = "insulinOnBoardInsulinPeakTime"
         
         // Statistics settings
         
@@ -919,7 +933,65 @@ extension UserDefaults {
             set(!newValue, forKey: Key.showBgCheckTreatmentsInList.rawValue)
         }
     }
-    
+
+
+    // MARK: Insulin On Board Settings
+
+
+    /// Should the IOB display label be enabled?
+    @objc dynamic var insulinOnBoardEnabledDisplay: Bool {
+        // default value for bool in userdefaults is false
+        get {
+            return bool(forKey: Key.insulinOnBoardEnabledDisplay.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.insulinOnBoardEnabledDisplay.rawValue)
+        }
+    }
+
+    /// Draw on chart?
+    @objc dynamic var insulinOnBoardShowOnChart: Bool {
+        // default value for bool in userdefaults is false
+        get {
+            return bool(forKey: Key.insulinOnBoardShowOnChart.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.insulinOnBoardShowOnChart.rawValue)
+        }
+    }
+
+    /// IOB insulin activity duration in minutes.
+    @objc dynamic var insulinOnBoardInsulinActivityDuration: Int {
+        get {
+            let returnValue = integer(forKey: Key.insulinOnBoardInsulinActivityDuration.rawValue)
+            /// if not set yet, or set to 0, return 300
+            if returnValue == 0 {
+                return 300
+            }
+            return returnValue
+        }
+        set {
+            set(newValue, forKey: Key.insulinOnBoardInsulinActivityDuration.rawValue)
+        }
+    }
+
+    /// IOB insulin peak time in minutes.
+    @objc dynamic var insulinOnBoardInsulinPeakTime: Int {
+        get {
+            let returnValue = integer(forKey: Key.insulinOnBoardInsulinPeakTime.rawValue)
+            /// if not set yet, or set to 0, defaults to 75
+            if returnValue == 0 {
+				return 75
+            }
+            return returnValue
+        }
+        set {
+            // Constrains the newValue to be < insulinOnBoardInsulinActivityDuration.
+			let value = min(newValue, self.insulinOnBoardInsulinActivityDuration - 1)
+            set(value, forKey: Key.insulinOnBoardInsulinPeakTime.rawValue)
+        }
+    }
+
     
     // MARK: Statistics Settings
     
