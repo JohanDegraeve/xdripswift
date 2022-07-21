@@ -341,6 +341,10 @@ extension UserDefaults {
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
         
+        /// will be set to true when UIApplication.willEnterForegroundNotification is triggered. And to false when app goes back to background
+        ///
+        /// Can be used if status needs to be known, app in for or background. UIApplication.shared.applicationState seems to come a bit too late to active, when the app is coming to the foreground, in cases where it's needed, this UserDefaults key can be used
+        case appInForeGround = "appInForeGround"
         
         // Libre
         /// Libre unlock code
@@ -1773,6 +1777,18 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.addDebugLevelLogsInTraceFileAndNSLog.rawValue)
+        }
+    }
+    
+    /// will be set to true when UIApplication.willEnterForegroundNotification is triggered. And to false when app goes back to background
+    ///
+    /// Can be used if status needs to be known, app in for or background. UIApplication.shared.applicationState seems to come a bit too late to active, when the app is coming to the foreground, in cases where it's needed, this UserDefaults key can be used. Default false
+    var appInForeGround: Bool {
+        get {
+            return bool(forKey: Key.appInForeGround.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.appInForeGround.rawValue)
         }
     }
     
