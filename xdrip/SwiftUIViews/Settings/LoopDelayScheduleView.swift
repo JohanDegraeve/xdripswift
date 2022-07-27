@@ -44,7 +44,7 @@ struct LoopDelayScheduleView: View {
             List {
 
                 ForEach(loopDelays, id: \.self.0) { loopDelay in
-                    
+
                     HStack {
                         
                         // example 320 is converted to 05:20
@@ -195,9 +195,14 @@ struct LoopDelayScheduleView: View {
         // only delete the first element in offsets (don't know if there can be many)
         loopDelays.remove(at: first)
         
+        // store in loopDelays
+        sortAndStoreLoopDelaysInUserDefaults()
+        
     }
     
-    /// intialize the state variable loopDelays based on contents in UserDefaults
+    /// initialize the state variable loopDelays based on contents in UserDefaults
+    ///
+    /// will only initialize loopDelays if the array size is still 0, in other words will only initialize the array once
     private func initializeLoopDelays() {
         
         if loopDelays.count == 0, let storedloopDelaySchedule = UserDefaults.standard.loopDelaySchedule?.splitToInt(), let storedloopDelayValues = UserDefaults.standard.loopDelayValueInMinutes?.splitToInt() , storedloopDelaySchedule.count == storedloopDelayValues.count  {

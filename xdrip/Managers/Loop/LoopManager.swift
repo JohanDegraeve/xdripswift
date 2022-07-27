@@ -240,9 +240,10 @@ public class LoopManager:NSObject {
                     break
                 }
             } else {
-                indexInLoopDelayScheduleArray = indexInLoopDelayScheduleArray + 1
+                indexInLoopDelayScheduleArray = index
+                break
             }
-            
+            indexInLoopDelayScheduleArray = indexInLoopDelayScheduleArray + 1
         }
 
         return TimeInterval(minutes: Double(loopDelayValueInMinutesArray[indexInLoopDelayScheduleArray]))
