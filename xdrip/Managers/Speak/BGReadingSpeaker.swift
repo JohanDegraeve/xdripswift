@@ -153,9 +153,24 @@ class BGReadingSpeaker:NSObject {
             currentBgReadingOutput += Texts_SpeakReading.currentDelta + " " + currentDelta + "."
             
         }
+      
+      
+      // currentBgReadingFormatted "10.9"
+      let parts = currentBgReadingFormatted.split(separator: ".")
+        .map { "\($0).mp3" }
+      
+      var speechFiles = ["your-current-blood-glucose-is.mp3"]
+      if let ones = parts.first {
+        speechFiles.append(ones)
+      }
+      if let digits = parts.last {
+        speechFiles.append("point.mp3")
+        speechFiles.append(digits)
+      }
+      sharedSoundPlayer.enqueue(files: speechFiles)
         
         // say the text
-        say(text: currentBgReadingOutput, language: Texts_SpeakReading.languageCode)
+        // say(text: currentBgReadingOutput, language: Texts_SpeakReading.languageCode)
         
         // set timeStampLastSpokenReading
         timeStampLastSpokenReading = bgReadingToSpeak.timeStamp
