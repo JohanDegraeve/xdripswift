@@ -233,6 +233,12 @@ extension UserDefaults {
         /// calendar interval
         case calendarInterval = "calendarInterval"
         
+        /// should a visual coloured emojii be shown in the calendar title yes or no
+        case displayVisualTargetIndicator = "displayVisualTargetIndicator"
+        
+        /// the shape of the visual indicator circle or square
+        case visualIndicatorShape = "visualIndicatorShape"
+        
         // Other Settings (not user configurable)
         
         /// - in case missed reading alert settings are changed by user, this value will be set to true
@@ -1354,8 +1360,27 @@ extension UserDefaults {
         }
     }
     
-
+    /// should a visual coloured emojii be shown in the calendar title,  yes or no, default no
+    @objc dynamic var displayVisualTargetIndicator: Bool {
+        get {
+            return bool(forKey: Key.displayVisualTargetIndicator.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.displayVisualTargetIndicator.rawValue)
+        }
+    }
     
+    /// the shape of the visual indicator circle or square
+    @objc dynamic var visualIndicatorShape: String? {
+        get {
+            return string(forKey: Key.visualIndicatorShape.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.visualIndicatorShape.rawValue)
+        }
+    }
+    
+
     // MARK: - =====  Other Settings ======
     
     /// - in case missed reading alert settings are changed by user, this value will be set to true

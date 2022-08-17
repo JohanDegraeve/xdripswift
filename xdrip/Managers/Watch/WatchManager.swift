@@ -91,6 +91,32 @@ class WatchManager: NSObject {
         // start with the reading in correct unit
         var title = lastReading[0].unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).description
         
+        // add the visual indicator to the title to show if result is in range?
+        if (UserDefaults.standard.displayVisualTargetIndicator){
+            
+            var visualIndicator = ""
+            let showSquare = true //todo get this from settings
+    
+            // Grab the last reading and convert to relevant value
+            let bgValue = lastReading[0].calculatedValue.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            
+            if (bgValue >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit
+               || bgValue <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit){
+                // BG is higher than urgentHigh or lower than urgentLow objectives
+                visualIndicator = showSquare ? "🟥": "🔴"
+                
+            } else if (bgValue >= UserDefaults.standard.highMarkValueInUserChosenUnit
+                      || bgValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit){
+                // BG is between urgentHigh/high and low/urgentLow objectives
+                visualIndicator = showSquare ? "🟨": "🟡"
+            }else {
+                // BG is between high and low objectives so considered "in range"
+                visualIndicator = showSquare ? "🟩": "🟢"
+            }
+            
+            title = visualIndicator + " " + title
+        }
+        
         // add trend if needed and available
         if (!lastReading[0].hideSlope && UserDefaults.standard.displayTrendInCalendarEvent) {
             title = title + " " + lastReading[0].slopeArrow()

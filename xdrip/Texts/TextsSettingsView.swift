@@ -459,6 +459,16 @@ class Texts_SettingsView {
         return String(format: NSLocalizedString("infoCalendarAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
     }()
     
+    static let displayVisualTargetIndicator: String = {
+        return NSLocalizedString("settingsviews_displayVisualTargetIndicator", tableName: filename, bundle: Bundle.main, value: "Display Visual Indicator?", comment: "Calendar Events Settings - text in row where user needs to say if the visual target indicator should be displayed or not")
+    }()
+    
+    static let visualIndicatorShape: String = {
+        return NSLocalizedString("settingsviews_visualIndicatorShape", tableName: filename, bundle: Bundle.main, value: "Visual Indicator Shape?", comment: "Calendar Events Settings - text in row where user needs to say what shape the visual indicator should be")
+    }()
+
+    
+    
     // MARK: - Issue Reporting
     
     static let sectionTitleTrace: String = {
