@@ -236,8 +236,6 @@ extension UserDefaults {
         /// should a visual coloured emojii be shown in the calendar title yes or no
         case displayVisualTargetIndicator = "displayVisualTargetIndicator"
         
-        /// the shape of the visual indicator circle or square
-        case visualIndicatorShape = "visualIndicatorShape"
         
         // Other Settings (not user configurable)
         
@@ -1367,16 +1365,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.displayVisualTargetIndicator.rawValue)
-        }
-    }
-    
-    /// the shape of the visual indicator circle or square
-    @objc dynamic var visualIndicatorShape: String? {
-        get {
-            return string(forKey: Key.visualIndicatorShape.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.visualIndicatorShape.rawValue)
         }
     }
     

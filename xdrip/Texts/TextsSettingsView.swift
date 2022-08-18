@@ -462,10 +462,6 @@ class Texts_SettingsView {
     static let displayVisualTargetIndicator: String = {
         return NSLocalizedString("settingsviews_displayVisualTargetIndicator", tableName: filename, bundle: Bundle.main, value: "Display Visual Indicator?", comment: "Calendar Events Settings - text in row where user needs to say if the visual target indicator should be displayed or not")
     }()
-    
-    static let visualIndicatorShape: String = {
-        return NSLocalizedString("settingsviews_visualIndicatorShape", tableName: filename, bundle: Bundle.main, value: "Visual Indicator Shape?", comment: "Calendar Events Settings - text in row where user needs to say what shape the visual indicator should be")
-    }()
 
     
     

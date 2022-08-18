@@ -95,7 +95,6 @@ class WatchManager: NSObject {
         if (UserDefaults.standard.displayVisualTargetIndicator){
             
             var visualIndicator = ""
-            let showSquare = true //todo get this from settings
     
             // Grab the last reading and convert to relevant value
             let bgValue = lastReading[0].calculatedValue.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
@@ -103,15 +102,15 @@ class WatchManager: NSObject {
             if (bgValue >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit
                || bgValue <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit){
                 // BG is higher than urgentHigh or lower than urgentLow objectives
-                visualIndicator = showSquare ? "🟥": "🔴"
+                visualIndicator = "🔴"
                 
             } else if (bgValue >= UserDefaults.standard.highMarkValueInUserChosenUnit
                       || bgValue <= UserDefaults.standard.lowMarkValueInUserChosenUnit){
                 // BG is between urgentHigh/high and low/urgentLow objectives
-                visualIndicator = showSquare ? "🟨": "🟡"
+                visualIndicator = "🟡"
             }else {
                 // BG is between high and low objectives so considered "in range"
-                visualIndicator = showSquare ? "🟩": "🟢"
+                visualIndicator = "🟢"
             }
             
             title = visualIndicator + " " + title
