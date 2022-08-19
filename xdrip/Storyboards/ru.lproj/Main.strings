@@ -19,3 +19,9 @@
 
 /* Class = "UILabel"; text = "Second View"; ObjectID = "zEq-FU-wV5"; */
 "zEq-FU-wV5.text" = "Second View";
+
+/* Class = "UITabBarItem"; title = "Treatments"; ObjectID = "EM7-TR-8Pt"; */
+"EM7-TR-8Pt.title" = "Терапия";
+
+/* Class = "UITabBarItem"; title = "Treatments"; ObjectID = "Jgh-Nb-wg6"; */
+"Jgh-Nb-wg6.title" = "Терапия";
