@@ -1,25 +1,8 @@
+"notYetStarted" = "еще не началось";
+"starting" = "начат";
+"ready" = "готовый";
+"expired" = "истекший";
+"shutdown" = "неисправность";
+"failure" = "не успешно";
+"unknown" = "неизвестный";
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Possible Libre Sensor states
-"failure" = "failed";
-
-/// Possible Libre Sensor states
-"shutdown" = "shut down";
-
-/// Possible Libre Sensor states
-"starting" = "starting";
-
-/// Possible Libre Sensor states
-"expired" = "expired";
-
-/// general usage
-"unknown" = "unknown";
-
-/// Possible Libre Sensor states
-"ready" = "ready";
-
-/// Possible Libre Sensor states
-"notYetStarted" = "not yet started";

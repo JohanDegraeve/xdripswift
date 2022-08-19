@@ -1,139 +1,41 @@
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// for home view, Info how to start : set transmitter and id, then go back to home screen, start scanning
-"transmitterinfo" = "First go to the Bluetooth screen where you can add and scan for your transmitter.\r\n\nThen come back to the Home screen and start your sensor.";
-
-/// After clicking scan button, this message will appear
-"startScanningInfo" = "Scanning Started.\n\nKeep %@ open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
-
-/// status info : literally 'Transmitter Battery Level', shows the battery level
-"transmitterbatterylevel" = "Transmitter Battery Level";
-
-/// for home view, title of pop up that gives info about how to select the transmitter. Simply the word Info
-"info" = "Please Read";
-
-/// Text in button on home screen
-"calibrate" = "Calibrate";
-
-/// If transmitter needs pairing, user needs to click the notification
-"transmitternotpaired" = "The Transmitter is not paired with this iPhone. Open the application.";
-
-/// when user manually starts scanning, this is the message that scanning is ongoing
-"scanbluetoothdeviceongoing" = "Scanning for Transmitter...";
-
-/// when user clicks transmitterButton, this is the action to start scanning
-"scanbluetoothdeviceactiontitle" = "Scan for Transmitter";
-
-/// for home view, where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'
-"ago" = "ago";
-
-/// when user starts scanning for bluetooth device, but bluetooth is not authorized
-"bluetoothIsNotAuthorized" = "You did not give bluetooth permission for %@. Go to the settings, find the %@ app, and enable Bluetooth.";
-
-/// for home view, license info
-"licenseinfo" = "This program is free software distributed under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\r\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.\r\n\nSee http://www.gnu.org/licenses/gpl.txt for more details.\r\n\r\nInfo: ";
-
-/// To give info to user that the transmitter pairing requeset timed out
-"transmitterpairingattempttimeout" = "Transmitter did not reply to pairing request.";
-
-/// for home view, user clicks calibrate but there's no sensor started yet
-"startsensorbeforecalibration" = "You cannot calibrate unless you have started a sensor.";
-
-/// Text in button on home screen
-"presnooze" = "Snooze";
-
-/// for home view, user clicks calibrate but there's no reading yet
-"theremustbeareadingbeforecalibration" = "There must be at least two readings before you can calibrate. You will be requested to calibrate as soon as there is another reading.";
-
-/// status info : literally 'Sensor Start'
-"sensorstart" = "Sensor Started";
-
-/// To give info to user that the transmitter is successfully paired
-"transmitterpairingsuccessful" = "The Transmitter was successfully paired.";
-
-/// When user has no CGM transmitter created with 'Always connect', and tries to calibrate, then this message is shown
-"theresNoCGMTransmitterActive" = "You cannot calibrate unless you have a transmitter connected.";
-
-/// for home view, miaomiao doesn't detect a sensor
-"sensornotdetected" = "The sensor was not detected. Check if the Transmitter is correctly placed on the sensor.";
-
-/// If transmitter needs pairing, a notification was fired, user clicked it more than 60 seconds later, which is too late
-"transmitterpairingtoolate" = "Too late! The Transmitter has already been disconnected. You should get a new pairing request in a few minutes.";
-
-/// Literally 'Sensor', used as name in the button in the home screen, but also in text in pop ups
-"sensor" = "Sensor";
-
-/// status info : literally 'not known', used if transmitter name is not known
-"notknown" = "Not Known";
-
-/// when user clicks transmitterButton, this is the first action, to show the status
-"statusactiontitle" = "Status";
-
-/// To give result about transitter result in notification body, successful
-"success" = "Success";
-
-/// when user clicks transmitterButton, this is the action to stop the sensor
-"stopsensor" = "Stop Sensor";
-
-/// when user manually starts sensor, this is the message that explains that time should be correct
-"startsensortimeinfo" = "In the next dialogs, you will need to set the date and time the sensor was inserted. It is important that you set the date and time as correct as possible.";
-
-/// when user clicks transmitterButton, this is the action to forget the device, so that user can scan for a new device, in case user switches device
-"forgetbluetoothdeviceactiontitle" = "Forget Transmitter";
-
-/// when user starts scanning but bluetooth is not on
-"bluetoothisnoton" = "Bluetooth is not on. Switch on bluetooth first and then try again.";
-
-/// when user clicks transmitterButton, this is the action to start the sensor
-"startsensor" = "Start Sensor";
-
-/// Error message in case Dexcom G5 (and G6?) battery is too low. This is deteced by wrong G5 values 2096896
-"dexcomBatteryTooLow" = "The Transmitter battery is too low!";
-
-/// if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible
-"calibrationNotNecessary" = "When using the Libre algoritm, it is not necessary to calibrate the sensor.";
-
-/// status info : literally 'not started', used if sensor is not started
-"notstarted" = "Not Started";
-
-/// To give result about transitter result in notification body, failed
-"failed" = "Failed";
-
-/// status info : literally 'Last connection', shows when the last connection to a transmitter occured
-"lastconnection" = "Last Connection";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Text in button on home screen
-"unlock" = "Unlock";
-
-/// Text in button on home screen
-"lock" = "Lock";
-
-/// Screen Lock Title
-"screenlocktitle" = "Screen Lock Enabled";
-
-/// Info message to explain screen lock function
-"screenlockinfo" = "This will keep the screen awake until you move to another app or click Unlock.\r\n\nIt is recommended that you keep the phone plugged into a charger to prevent battery drain.";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// When user clicks stop sensor, ask confirmation
-"stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
-
-/// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "if you don't have a sensor code use 0000 but be aware that you will not get readings until you calibrate";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// status info : literally 'Sensor End'
-"sensorend" = "Sensor Ends";
+"presnooze" = "Отложить";
+"sensor" = "Сенсор";
+"calibrate" = "Откалибровать";
+"lock" = "Заблокировать";
+"unlock" = "Разблокировать";
+"screenlocktitle" = "Блокировка экрана включена";
+"screenlockinfo" = "Это будет держать экран активным, пока вы не перейдете в другое приложение или не нажмете 'Разблокировать'.\r\n\nРекомендуется держать телефон подключенным к зарядному устройству, чтобы предотвратить разрядку аккумулятора.";
+"statusactiontitle" = "Статус";
+"scanbluetoothdeviceactiontitle" = "Сканировать трансмиттер";
+"forgetbluetoothdeviceactiontitle" = "Забыть трансмиттер";
+"startsensor" = "Сканировать сенсор";
+"stopsensor" = "Остановать сенсор";
+"startsensortimeinfo" = "В следующих диалоговых окнах вам нужно будет установить дату и время установки датчика. Важно, чтобы вы установили дату и время как можно точнее.";
+"scanbluetoothdeviceongoing" = "Сканирование трансмиттера...";
+"bluetoothisnoton" = "Bluetooth не включен. Сначала включите Bluetooth, а затем повторите попытку.";
+"bluetoothIsNotAuthorized" = "Вы не предоставили разрешение Bluetooth для %@. Зайдите в настройки, найдите приложение %@ и включите Bluetooth.";
+"startScanningInfo" = "Сканирование запущено.\n\nДержите %@ открытым на переднем плане, пока не будет установлено подключение.\n\n(Нет необходимости отключать автоматическую блокировку. Просто не нажимайте кнопку 'Домой' и не заблокируй свой айфон)";
+"sensorstart" = "Сенсор активирован";
+"sensorend" = "Сенсор закончится";
+"notstarted" = "Не начат";
+"notknown" = "Неизвестно";
+"lastconnection" = "Крайнее подключение";
+"transmitterbatterylevel" = "Заряд трансмиттера";
+"ago" = "назад";
+"licenseinfo" = "Эта программа является свободным программным обеспечением, распространяемым в соответствии с условиями Стандартной общественной лицензии GNU, опубликованной Фондом свободного программного обеспечения, либо версии 3 Лицензии, либо любой более поздней версии.\r\n\nЭта программа распространяется в надежде, что она будет быть полезным, но БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ.\r\n\nПодробнее см. http://www.gnu.org/licenses/gpl.txt.\r\n\r\nИнформация: ";
+"info" = "Пожалуйста прочитайте";
+"transmitterinfo" = "Сначала перейдите на экран Bluetooth, где вы можете добавить и отсканировать передатчик.\r\n\nЗатем вернитесь на главный экран и запустите датчик.";
+"startsensorbeforecalibration" = "Вы не можете выполнить калибровку, пока не запустите сенсор.";
+"theresNoCGMTransmitterActive" = "Вы не можете выполнить калибровку, если у вас не подключен трансмиттер.";
+"theremustbeareadingbeforecalibration" = "Здесь должно быть по крайней мере два показания, прежде чем вы сможете откалибровать. Вам будет предложено выполнить калибровку, как только будет получено другое показание.";
+"sensornotdetected" = "Датчик не обнаружен. Проверьте правильность установки трансмиттера на сенсоре";
+"transmitternotpaired" = "Трасмиттер не сопряжен с этим iPhone. Откройте приложение.";
+"transmitterpairingtoolate" = "Слишком поздно! Трансмиттер уже отключен. Через несколько минут вы должны получить новый запрос на сопряжение.";
+"transmitterpairingsuccessful" = "Трансмиттер был успешно сопряжен.";
+"transmitterpairingattempttimeout" = "Трансмиттер не ответил на запрос сопряжения.";
+"success" = "Успешно";
+"failed" = "Не успешно";
+"calibrationNotNecessary" = "При использовании алгоритма Libre нет необходимости калибровать датчик.";
+"dexcomBatteryTooLow" = "Батарея трансмиттера слишком разряжена!";
+"enterSensorCode" = "если у вас нет кода датчика, используйте 0000, но имейте в виду, что вы не получите показания, пока не откалибруете";
+"stopSensorConfirmation" = "Вы уверены, что хотите остановить датчик?";
