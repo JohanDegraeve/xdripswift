@@ -43,10 +43,10 @@
 "settingsviews_transmitterid_text_for_button"  = "Идентификатор трансмиттера";
 "settingsviews_givetransmitterid" = "Введите идентификатор трансмиттера";
 "settingsviews_resettransmitter" = "Перезапустить трансмиттер?";
-"settingsviews_webooptransmitter" = "Алгоритм трансмиттера?";
+"settingsviews_webooptransmitter" = "Калибровка трансмиттера?";
 "settingsviews_nonfixedtransmitter" = "Многоточечная калибровка?";
 "settingsviews_labelNonFixed" = "Многоточечная калибровка";
-"settingsviews_labelWebOOP" = "xDrip или Трансмиттер алгоритм";
+"settingsviews_labelWebOOP" = "Калибровка xDrip или Трансмиттер";
 "settingsviews_sectiontitlealerting" = "Сигналы тревог";
 "settingsviews_row_alert_types" = "Типы сигналов тревоги";
 "settingsviews_row_alerts" = "Уведомления";
