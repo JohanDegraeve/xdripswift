@@ -1,11 +1,11 @@
 "alertsettingsview_screentitle" = "Тревоги";
 "alertssettingsview_screentitle" = "Редактировать тревоги";
-"alerts_highalerttitle" = "Высокий уровень тревоги";
-"alerts_veryhighalerttitle" = "Очень высокий уровень тревоги";
-"alerts_lowalerttitle" = "Низкий уровень тревоги";
-"alerts_verylowalerttitle" = "Очень низкий уровень тревоги";
+"alerts_highalerttitle" = "Высокий уровень ГК";
+"alerts_veryhighalerttitle" = "Очень высокий уровень ГК";
+"alerts_lowalerttitle" = "Низкий уровень ГК";
+"alerts_verylowalerttitle" = "Очень низкий уровень ГК";
 "alerts_snooze" = "Отложить";
-"alerts_select_snooze_time" = "Выберите время повтора";
+"alerts_select_snooze_time" = "Отключить тревогу на";
 "alerts_missedreadingalerttitle" = "Пропущенные чтения";
 "alerts_dicationneeded" = "Требуется калибровка";
 "alerts_batterylow" = "Батарея передатчика разряжена";
@@ -14,5 +14,5 @@
 "alerttype" = "Тип тревоги";
 "changealertvalue" = "Изменить значение сигнала тревоги";
 "confirmdeletionalert" = "Удалить тревогу?";
-"alerts_fastdrop" = "Тревога быстрого сброса";
+"alerts_fastdrop" = "Тревога о быстром падении";
 "alerts_fastrise" = "Тревога о быстром росте";
