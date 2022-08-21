@@ -1,16 +1,4 @@
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// error message for the case where Dexcom G5 transmitter id given by user doesn't have 6 characters
-"error_message_transmitter_id_should_have_length_6" = "The Transmitter ID should be 6 characters long";
-
-/// error message for the case where Dexcom G5 transmitter id given by user doesn't have 5 characters
-"error_message_transmitter_id_should_have_length_5" = "The Transmitter ID should be 5 characters long";
-
-/// error message for the case where Blucon transmitter id is given by user, but expected format is not correct
-"TransmitterIdBluCon" = "The Transmitter ID should be the last 5 numbers of the BluCon ID written on side of the device.\n\nExample: If the BluCon ID is BLU1742B01007, the Transmitter ID you should use is 01007.";
-
-/// transmitter id given by user has invalid characters, allowed characters are a-z, A-Z, 0-9
-"error_message_Dexcom_transmitter_id_invalid_characters" = "The Transmitter ID should only contain characters a-z, A-Z or 0-9";
+"error_message_Dexcom_transmitter_id_invalid_characters" = "Идентификатор передатчика должен содержать только символы a-z, A-Z или 0-9";
+"error_message_transmitter_id_should_have_length_6" = "Идентификатор передатчика должен состоять из 6 символов";
+"error_message_transmitter_id_should_have_length_5" = "Идентификатор передатчика должен состоять из 5 символов";
+"TransmitterIdBluCon" = "Идентификатор передатчика должен состоять из последних 5 цифр идентификатора BluCon, написанного на боковой стороне устройства.\n\nПример: если идентификатор BluCon — BLU1742B01007, идентификатор передатчика, который вы должны использовать, — 01007.";

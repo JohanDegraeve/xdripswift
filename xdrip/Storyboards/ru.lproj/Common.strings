@@ -1,160 +1,48 @@
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// literally 'OK'
 "common_Ok" = "OK";
-
-/// blood glucose unit in short, for text field title
-"common_bloodglucoseunit_short" = "BG Unit";
-
-/// for settings row, literally firmware
-"firmware" = "Firmware";
-
-/// literal translation needed
-"common_minute" = "min";
-
-/// on
-"on" = "On";
-
-/// red
-"red" = "red";
-
-/// mmol/l
-"common_mmol" = "mmol/l";
-
-/// the word LOW, in capitals
-"common_low" = "LOW";
-
-/// literal translation needed
-"common_day" = "day";
-
-/// 
-"off" = "Off";
-
-/// for settings row, literally hardware
-"hardware" = "Hardware";
-
-/// literal translation needed
-"common_week" = "week";
-
-/// to show the sensor status
-"sensorStatus" = "Sensor status:";
-
-/// can be used in several screens, just the words Bloodglucose unit
-"common_bloodglucoseunit" = "Blood Glucose Unit";
-
-/// literal translation needed
-"common_hours" = "hours";
-
-/// literally default, will be the name of default alerttypes that will be created during initial app launch
-"common_default" = "Default";
-
-/// literally add
-"add" = "Add";
-
-/// literal translation needed
-"common_hour" = "hour";
-
-/// yellow
-"yellow" = "yellow";
-
-/// literally update
-"update" = "Edit";
-
-/// 
-"delete" = "Delete";
-
-/// literally password
-"common_password" = "Password:";
-
-/// literally no, without capital
-"no" = "No";
-
-/// green
-"green" = "green";
-
-/// name
-"name" = "Name:";
-
-/// literal translation needed
-"common_minutes" = "mins";
-
-/// literally yes, without capital
-"yes" = "Yes";
-
-/// literally 'Cancel'
-"common_cancel" = "Cancel";
-
-/// literally warning
-"warning" = "Warning!";
-
-/// white
-"white" = "white";
-
-/// WiFi
-"WiFi" = "WiFi";
-
-/// mg/dl
+"common_cancel" = "Отмена";
 "common_mgdl" = "mg/dl";
-
-/// whenever invalid value is given by user somewhere in a field
-"invalidValue" = "Invalid Value";
-
-/// general usage
-"unknown" = "Unknown";
-
-/// the word HIGH, in capitals
-"common_high" = "HIGH";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Where credentials need to be given, if either account or password is invalid (for the moment only applicable to Dexcom Share
-"invalidAccountOrPassword" = "Invalid account or password";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// the word today
-"common_todayshort" = "Today";
-
-/// the word high
-"common_statistics_high" = "High";
-
-/// phrase HbA1c
+"common_mmol" = "mmol/l";
+"common_bloodglucoseunit" = "Единица глюкозы";
+"common_bloodglucoseunit_short" = "Ед. ГК";
+"common_password" = "Пароль:";
+"common_default" = "По умолчанию";
+"common_high" = "ВЫСОКИЙ";
+"common_low" = "НИЗКИЙ";
+"common_hour" = "час";
+"common_hours" = "часов";
+"common_minutes" = "мин";
+"common_minute" = "мин";
+"common_day" = "день";
+"common_days" = "дней";
+"common_today" = "Сегодня";
+"common_week" = "неделя";
+"common_hourshort" = "ч";
+"common_dayshort" = "д";
+"common_todayshort" = "Сегодня";
+"warning" ="Предупреждение!";
+"update" = "Изменить";
+"add" = "Добавить";
+"yes" = "Да";
+"no" = "Нет";
+"red" = "красный";
+"green" = "зеленый";
+"white" = "белый";
+"yellow" = "желтый";
+"name" = "Имя:";
+"WiFi" = "WiFi";
+"on" = "Вкл";
+"off" = "Выкл";
+"delete" = "Удалить";
+"invalidValue" = "Неверное значение";
+"firmware" = "Прошивка";
+"hardware" = "Аппаратное обеспечение";
+"unknown" = "Неизвестно";
+"sensorStatus" = "Статус сенсора:";
+"invalidAccountOrPassword" = "Неверный аккаунт или пароль";
+"common_statistics_low" = "Низ";
+"common_statistics_inRange" = "В диапозоне";
+"common_statistics_high" = "Выс";
+"common_statistics_average" = "Средний";
 "common_statistics_a1c" = "HbA1c";
-
-/// coefficient of variation
 "common_statistics_cv" = "CV";
-
-/// the word low
-"common_statistics_low" = "Low";
-
-/// literal translation needed
-"common_days" = "days";
-
-/// the word average
-"common_statistics_average" = "Average";
-
-/// literal translation needed
-"common_dayshort" = "d";
-
-/// the word today
-"common_today" = "Today";
-
-/// the words in range
-"common_statistics_inRange" = "In Range";
-
-/// literal translation needed
-"common_hourshort" = "h";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// don't show again
-"common_dontshowagain" = "Don't Show Again";
+"common_dontshowagain" = "Не показывать снова";
