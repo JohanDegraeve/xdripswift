@@ -13,7 +13,7 @@
 "treatments_exercise_unit" = "min";
 
 /// Insulin.
-"treatments_insulin" = "Insulin";
+"treatments_insulin" = "Bolus";
 
 /// 
 "treatments_sync_complete" = "Synchronization complete.";

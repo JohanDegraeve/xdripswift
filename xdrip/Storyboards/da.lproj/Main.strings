@@ -137,8 +137,8 @@
 /* Class = "UILabel"; text = "Detail"; ObjectID = "Tpl-mr-dqb"; */
 "Tpl-mr-dqb.text" = "Detail";
 
-/* Class = "UILabel"; text = "Insulin"; ObjectID = "U6e-jp-cms"; */
-"U6e-jp-cms.text" = "Insulin";
+/* Class = "UILabel"; text = "Bolus"; ObjectID = "U6e-jp-cms"; */
+"U6e-jp-cms.text" = "Bolus";
 
 /* Class = "UILabel"; text = "-%"; ObjectID = "Vdh-xP-Z0Y"; */
 "Vdh-xP-Z0Y.text" = "-%";
