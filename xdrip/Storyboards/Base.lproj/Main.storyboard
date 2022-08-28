@@ -249,7 +249,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TOp-MQ-ekU">
-                                        <rect key="frame" x="302" y="4.6666666666666714" width="35" height="31"/>
+                                        <rect key="frame" x="158.66666666666666" y="4.6666666666666714" width="35" height="31"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="35" id="DTj-KO-pri"/>
                                         </constraints>
@@ -264,7 +264,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ajs-26-kaa">
-                                        <rect key="frame" x="345" y="4.6666666666666714" width="35" height="31"/>
+                                        <rect key="frame" x="201.66666666666666" y="4.6666666666666714" width="35" height="31"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="35" id="jwI-Mt-2xL"/>
                                         </constraints>
@@ -280,14 +280,14 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H0N-EK-5JX">
-                                        <rect key="frame" x="259" y="4.6666666666666714" width="35" height="31"/>
+                                        <rect key="frame" x="115.66666666666669" y="4.6666666666666714" width="35" height="31"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="35" id="Kch-nb-3re"/>
                                         </constraints>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="tinted" title=" ">
-                                            <imageReference key="image" image="arrowtriangle.down.fill" catalog="system" symbolScale="small"/>
-                                            <fontDescription key="titleFontDescription" type="system" pointSize="3"/>
+                                            <imageReference key="image" image="arrowtriangle.down" catalog="system" symbolScale="small"/>
+                                            <fontDescription key="titleFontDescription" type="system" pointSize="5"/>
                                             <color key="baseForegroundColor" systemColor="systemBlueColor"/>
                                             <color key="baseBackgroundColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </buttonConfiguration>
@@ -296,7 +296,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WHF-BG-N8A">
-                                        <rect key="frame" x="216" y="4.6666666666666714" width="35" height="31"/>
+                                        <rect key="frame" x="72.666666666666671" y="4.6666666666666714" width="35" height="31"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="35" id="eK9-uP-9Td"/>
                                         </constraints>
@@ -316,7 +316,6 @@
                                     <constraint firstAttribute="height" constant="40" id="4MD-px-ask"/>
                                     <constraint firstItem="TOp-MQ-ekU" firstAttribute="centerY" secondItem="ENW-aW-U8f" secondAttribute="centerY" id="DV0-6w-GDv"/>
                                     <constraint firstItem="GAt-uS-uta" firstAttribute="leading" secondItem="ENW-aW-U8f" secondAttribute="leading" constant="10" id="F30-pg-uC7"/>
-                                    <constraint firstAttribute="trailing" secondItem="ajs-26-kaa" secondAttribute="trailing" constant="10" id="IZX-7g-OnD"/>
                                     <constraint firstItem="ajs-26-kaa" firstAttribute="centerY" secondItem="ENW-aW-U8f" secondAttribute="centerY" id="Ixx-ci-HcP"/>
                                     <constraint firstItem="TOp-MQ-ekU" firstAttribute="leading" secondItem="H0N-EK-5JX" secondAttribute="trailing" constant="8" id="Xs3-0i-h4q"/>
                                     <constraint firstItem="H0N-EK-5JX" firstAttribute="centerY" secondItem="ENW-aW-U8f" secondAttribute="centerY" id="kWl-TM-Ftm"/>
@@ -324,6 +323,7 @@
                                     <constraint firstItem="GAt-uS-uta" firstAttribute="centerY" secondItem="ENW-aW-U8f" secondAttribute="centerY" id="vPy-zS-OGO"/>
                                     <constraint firstItem="H0N-EK-5JX" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="GAt-uS-uta" secondAttribute="trailing" constant="8" symbolic="YES" id="wVK-yg-ll4"/>
                                     <constraint firstItem="ajs-26-kaa" firstAttribute="leading" secondItem="TOp-MQ-ekU" secondAttribute="trailing" constant="8" id="ybQ-Y1-HIW"/>
+                                    <constraint firstItem="WHF-BG-N8A" firstAttribute="leading" secondItem="GAt-uS-uta" secondAttribute="trailing" constant="20" id="z99-h3-mGI"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -2203,6 +2203,7 @@
         <image name="Home" width="30" height="30"/>
         <image name="Settings" width="30" height="30"/>
         <image name="Treatments" width="30" height="30"/>
+        <image name="arrowtriangle.down" catalog="system" width="128" height="124"/>
         <image name="arrowtriangle.down.fill" catalog="system" width="128" height="124"/>
         <image name="chevron.backward" catalog="system" width="96" height="128"/>
         <image name="chevron.forward" catalog="system" width="96" height="128"/>
