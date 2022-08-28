@@ -33,7 +33,7 @@ enum Texts_TreatmentsView {
 	}()
 	
 	static let insulin:String = {
-		return NSLocalizedString("treatments_insulin", tableName: filename, bundle: Bundle.main, value: "Insulin", comment: "Insulin.")
+		return NSLocalizedString("treatments_insulin", tableName: filename, bundle: Bundle.main, value: "Bolus", comment: "Bolus.")
 	}()
 	
 	static let exercise:String = {

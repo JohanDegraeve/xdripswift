@@ -8,7 +8,7 @@
 "treatments_insulin_unit" = "U";
 "treatments_exercise_unit" = "min";
 "treatments_carbs" = "Carbs";
-"treatments_insulin" = "Insulin";
+"treatments_insulin" = "Bolus";
 "treatments_exercise" = "Exercise";
 "treatments_bgcheck" = "BG Check";
 "treatments_question_mark" = "?";
