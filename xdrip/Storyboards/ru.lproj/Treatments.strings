@@ -8,7 +8,7 @@
 "treatments_insulin_unit" = "U";
 "treatments_exercise_unit" = "мин";
 "treatments_carbs" = "Углеводы";
-"treatments_insulin" = "Болюс"
+"treatments_insulin" = "Болюс";
 "treatments_exercise" = "Тренировка";
 "treatments_bgcheck" = "Проверка ГК";
 "treatments_question_mark" = "?";
