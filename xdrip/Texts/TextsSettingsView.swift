@@ -83,6 +83,10 @@ class Texts_SettingsView {
     static let allowScreenRotation: String = {
         return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Chart Rotation?", comment: "home screen settings, should the main glucose chart screen be allowed?")
     }()
+    
+    static let showMiniChart: String = {
+        return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show the Mini-Chart?", comment: "home screen settings, should the mini-chart be shown?")
+    }()
 
     static let labelUseObjectives: String = {
         return NSLocalizedString("settingsviews_useobjectives", tableName: filename, bundle: Bundle.main, value: "Show Objectives in Graph?", comment: "home screen settings, use objectives in graph")
@@ -132,10 +136,6 @@ class Texts_SettingsView {
     
     static let settingsviews_showSmallBolusTreatmentsOnChart: String = {
         return NSLocalizedString("settingsviews_showSmallBolusTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Micro-bolus on Chart?", comment: "treatments settings, show the micro-bolus on main chart")
-    }()
-    
-    static let settingsviews_showSmallBolusTreatmentsInList: String = {
-        return NSLocalizedString("settingsviews_showSmallBolusTreatmentsInList", tableName: filename, bundle: Bundle.main, value: "Show Micro-bolus in List?", comment: "treatments settings, show the micro-bolus in the treatment list")
     }()
     
     // MARK: - Section Statistics
@@ -521,6 +521,38 @@ class Texts_SettingsView {
         return NSLocalizedString("smoothLibreValues", tableName: filename, bundle: Bundle.main, value: "Smooth Libre Values?", comment: "deloper settings, row title for 'Smooth Libre Values?'")
     }()
     
+    static let suppressUnLockPayLoad: String = {
+        return NSLocalizedString("suppressUnLockPayLoad", tableName: filename, bundle: Bundle.main, value: "Suppress Unlock Payload", comment: "When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)")
+    }()
+    
+    static let suppressLoopShare: String = {
+        return NSLocalizedString("suppressLoopShare", tableName: filename, bundle: Bundle.main, value: "Suppress Loop Share", comment: "When enabled, readings will not be reading to shared user defaults (for loop)")
+    }()
+    
+    static let selectTime: String = {
+        return NSLocalizedString("Select Time", tableName: filename, bundle: Bundle.main, value: "Select Time", comment: "Settings screen for loop delay")
+    }()
+
+    static let expanatoryTextSelectTime: String = {
+        return NSLocalizedString("expanatoryTextSelectTime", tableName: filename, bundle: Bundle.main, value: "As of what time should the value apply", comment: "Settings screen for loop delay, explanatory text for time")
+    }()
+
+    static let selectValue: String = {
+        return NSLocalizedString("Select Value", tableName: filename, bundle: Bundle.main, value: "Select Value", comment: "Settings screen for loop delay")
+    }()
+
+    static let loopDelaysScreenTitle: String = {
+        return NSLocalizedString("loopDelaysScreenTitle", tableName: filename, bundle: Bundle.main, value: "Loop delays", comment: "Title for screen where loop delays are configured.")
+    }()
+
+    static let expanatoryTextSelectValue: String = {
+        return NSLocalizedString("expanatoryTextSelectValue", tableName: filename, bundle: Bundle.main, value: "Delay in minutes, applied to readings shared with Loop", comment: "Settings screen for loop delay, explanatory text for value")
+    }()
+
+    static let warningLoopDelayAlreadyExists: String = {
+        return NSLocalizedString("warningLoopDelayAlreadyExists", tableName: filename, bundle: Bundle.main, value: "There is already a loopDelay for this time.", comment: "When user creates new loopdelay, with a timestamp that already exists - this is the warning text")
+    }()
+
     static let nsLog: String = {
         return NSLocalizedString("nslog", tableName: filename, bundle: Bundle.main, value: "NSLog", comment: "deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog")
     }()

@@ -1,33 +1,7 @@
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// after scanning NFC, scan complete message
-"scanComplete" = "Scan Complete";
-
-/// when NFC scanning is started, this message will appear
-"holdTopOfIphoneNearSensor" = "Hold the top of your iOS device near the sensor to scan";
-
-/// Device must support at least iOS 14.0
-"deviceMustSupportIOS14" = "To connect to Libre 2, this iPhone needs upgrading to iOS14";
-
-/// Device must support NFC
-"deviceMustSupportNFC" = "This iPhone does not support NFC";
-
-/// After Libre NFC scanning, and after successful bluetooth connection, this message will be shown to explain that he or she should not allow bluetooth permission on the Libre app
-"donotusethelibrelinkapp" = "Connected to Libre 2.\r\n\r\nIf you want to keeping scanning sometimes the Libre sensor with the official Libre app, then disallow bluetooth permission for the Libre app. \r\n\r\nOtherwise, scanning the NFC with the Libre app and with the bluetooth permission allowed will break the connection between %@ and the Libre 2.";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.
-"connectedLibre2DoesNotMatchScannedLibre2" = "You seem to have scanned a new sensor, but %@ is having the Bluetooth connection to the old sensor.\r\n\r\nTo solve this :\r\n- Click 'disconnect' or 'stop scanning'\r\n- Go back to previous screen and add a new CGM of type Libre 2 and scan again.\r\n\r\n%@ should now connect to the new sensor.";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Sometimes NFC scanning creates errors, retrying solves the problem. This is to explain this to the user
-"nfcErrorRetryScan" = "Error occured while scanning the sensor. Click 'Scan' top left and scan the sensor again";
+"scanComplete" = "Сканирование завершено";
+"holdTopOfIphoneNearSensor" = "Держите верхнюю часть устройства iOS рядом с датчиком для сканирования.";
+"deviceMustSupportNFC" = "Этот iPhone не поддерживает NFC";
+"deviceMustSupportIOS14" = "Для подключения к Libre 2 обновите iPhone до iOS14.";
+"donotusethelibrelinkapp" = "Подключено к Libre 2.\r\n\r\nЕсли вы хотите иногда сканировать датчик Libre с помощью официального приложения Libre, запретите разрешение Bluetooth для приложения Libre. \r\n\r\nВ противном случае сканирование NFC с помощью приложения Libre и с разрешенным разрешением Bluetooth разорвет соединение между %@ и Libre 2.";
+"connectedLibre2DoesNotMatchScannedLibre2" = "Кажется, вы просканировали новый датчик, но %@ имеет соединение Bluetooth со старым датчиком.\r\n\r\nЧтобы решить эту проблему:\r\n- Нажмите «Отключить» или «Остановить сканирование»\r \n- Вернитесь к предыдущему экрану и добавьте новый CGM типа Libre 2 и повторите сканирование.\r\n\r\n%@ теперь должен подключиться к новому датчику.";
+"nfcErrorRetryScan" = "Произошла ошибка при сканировании датчика. Нажмите 'Сканировать' вверху слева или нажмите 'Назад', снова добавьте Libre 2 и снова отсканируйте.";

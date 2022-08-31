@@ -238,8 +238,11 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
             let unLockPayLoad = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: UserDefaults.standard.libreActiveSensorUnlockCode, unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount))
             
             trace("in peripheral didUpdateNotificationStateFor, writing streaming unlock payload: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unLockPayLoad.toHexString())
-            
-            _ = writeDataToPeripheral(data: unLockPayLoad, type: .withResponse)
+                
+            // user may have chosen to run xDrip4iOS in parallel with other apps, in this case suppress sending unlockpayload
+            if !UserDefaults.standard.suppressUnLockPayLoad {
+                _ = writeDataToPeripheral(data: unLockPayLoad, type: .withResponse)
+            }
 
         }
         

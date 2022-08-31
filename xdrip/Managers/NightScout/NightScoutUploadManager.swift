@@ -163,6 +163,16 @@ public class NightScoutUploadManager: NSObject {
         // and nightScoutUrl exists
         guard UserDefaults.standard.nightScoutEnabled, UserDefaults.standard.nightScoutUrl != nil else {return}
 
+        // if schedule is on, check if Nightscout is enabled according to schedule
+        // if app is in foreground then overrule this setting - if the app is in the foreground, then probably it's not the aim to save battery (which is the reason why the schedule is useful) - and if the app is in the foreground, user probably wants to see treatments added by other app (eg Loop), even if nightScout schedule says to not schedule
+        if UserDefaults.standard.nightScoutUseSchedule && !UserDefaults.standard.appInForeGround {
+            if let schedule = UserDefaults.standard.nightScoutSchedule {
+                if !schedule.indicatesOn(forWhen: Date()) {
+                    return
+                }
+            }
+        }
+
         // if sync already running, then set nightScoutTreatmentSyncRequired to true
         // sync is running already, once stopped it will rerun
         if let nightScoutTreatmentsSyncStartTimeStamp = nightScoutTreatmentsSyncStartTimeStamp {

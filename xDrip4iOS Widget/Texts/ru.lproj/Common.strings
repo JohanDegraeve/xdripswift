@@ -1,25 +1,7 @@
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// literal translation needed
-"common_minute" = "min";
-
-/// the word HIGH, in capitals
-"common_high" = "HIGH";
-
-/// the word LOW, in capitals
-"common_low" = "LOW";
-
-/// literal translation needed
-"common_minutes" = "mins";
-
-/// mmol/l
-"common_mmol" = "mmol/l";
-
-/// mg/dl
 "common_mgdl" = "mg/dl";
-
-/// where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'
-"ago" = "ago";
+"common_mmol" = "mmol/l";
+"common_high" = "ВЫСОКИЙ";
+"common_low" = "НИЗКИЙ";
+"common_minutes" = "мин";
+"common_minute" = "мин";
+"ago" = "назад";

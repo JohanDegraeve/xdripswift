@@ -138,7 +138,7 @@ public static func setLanguageCode(code:String?) {
     
     static var trendfortyfiveup:String {
         get {
-            return NSLocalizedString("trendflat", tableName: filename, bundle: bundle!, value: "up", comment: "For speak reading functionality")
+            return NSLocalizedString("trendfortyfiveup", tableName: filename, bundle: bundle!, value: "up", comment: "For speak reading functionality")
         }
     }
     

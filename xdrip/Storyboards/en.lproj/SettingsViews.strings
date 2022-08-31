@@ -13,6 +13,7 @@
 "settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge?";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
+"settingsviews_showMiniChart" = "Show the Mini-Chart?";
 "settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";
 "settingsviews_urgentHighValue" = "Urgent High Value:";
 "settingsviews_highValue" = "High Value:";
@@ -27,7 +28,6 @@
 "settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold:";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 "settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart?";
-"settingsviews_showSmallBolusTreatmentsInList" = "Show Micro-bolus in List?";
 "settingsviews_sectiontitlestatistics" = "Statistics";
 "settingsviews_showStatistics" = "Show Statistics?";
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate?";
@@ -121,3 +121,10 @@
 "settingsviews_housekeeperRetentionPeriod" = "Retention Period (days):";
 "settingsviews_housekeeperExportAllData" = "Export All Data";
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
+"suppressUnLockPayLoad" = "Suppress Unlock Payload";
+"suppressLoopShare" = "Suppress Loop Share";
+"Select Time" = "Select Time";
+"Select Value" = "Select Value";
+"expanatoryTextSelectTime" = "As of what time should the value apply";
+"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with Loop";
+"warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";

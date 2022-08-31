@@ -1,20 +1,18 @@
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-"treatments_title" = "Treatments";
-"treatments_new_button" = "New";
-"treatments_new_entry" = "New Treatment";
-"treatments_carbs_with_unit" = "Carbs (g):";
-"treatments_insulin_with_unit" = "Insulin (U):";
-"treatments_exercise_with_unit" = "Exercise (min):";
-"treatments_carbs_unit" = "g";
+"treatments_title" = "Терапия";
+"treatments_new_button" = "Создать";
+"treatments_new_entry" = "Новая терапия";
+"treatments_carbs_with_unit" = "Углеводы (г):";
+"treatments_insulin_with_unit" = "Инсулин (U):";
+"treatments_exercise_with_unit" = "Тренировка (мин):";
+"treatments_carbs_unit" = "г";
 "treatments_insulin_unit" = "U";
-"treatments_exercise_unit" = "min";
-"treatments_carbs" = "Carbs";
-"treatments_insulin" = "Insulin";
-"treatments_exercise" = "Exercise";
-"treatments_bgcheck" = "BG Check";
+"treatments_exercise_unit" = "мин";
+"treatments_carbs" = "Углеводы";
+"treatments_insulin" = "Болюс";
+"treatments_exercise" = "Тренировка";
+"treatments_bgcheck" = "Проверка ГК";
 "treatments_question_mark" = "?";
-"treatments_success" = "Success";
-"treatments_sync_complete" = "Synchronization complete.";
+"treatments_success" = "Успех";
+"treatments_sync_complete" = "Синхронизация завершена.";
+"treatments_filterTreatmentsLabel" = "Фильтр:";
+"treatments_cannotStoreFutureBGCheck" = "Вы не можете сохранить проверку ГК в будущем.\n\nОна будет сохранена в фактическое время.";

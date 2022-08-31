@@ -6,9 +6,6 @@
 /// used in settings, section Info, title of the license setting
 "settingsviews_license" = "License";
 
-/// treatments settings, show the micro-bolus in the treatment list
-"settingsviews_showSmallBolusTreatmentsInList" = "Show Micro-bolus in List?";
-
 /// help settings, should the online help be translated automatically if needed
 "settingsviews_translateOnlineHelp" = "Translate Automatically?";
 

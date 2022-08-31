@@ -26,6 +26,16 @@ class ApplicationManager {
         
         // setup notification handling
         setupNotificationHandling()
+        
+        // add here to closures to update UserDefaults.standard.appInForeGround
+        
+        closuresToRunWhenAppWillEnterForeground[UserDefaults.Key.appInForeGround.rawValue] = {
+            UserDefaults.standard.appInForeGround = true
+        }
+        closuresToRunWhenAppDidEnterBackground[UserDefaults.Key.appInForeGround.rawValue] = {
+            UserDefaults.standard.appInForeGround = false
+        }
+        
     }
     
     // MARK: - public functions

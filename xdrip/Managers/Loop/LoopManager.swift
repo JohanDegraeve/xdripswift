@@ -52,27 +52,16 @@ public class LoopManager:NSObject {
         // reduce timeStampLatestLoopSharedBgReading with 30 minutes. Because maybe Loop wasn't running for a while and so missed one or more readings. By adding 30 minutes of readings, we fill up a gap of maximum 30 minutes in Loop
         var lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: UserDefaults.standard.timeStampLatestLoopSharedBgReading?.addingTimeInterval(-TimeInterval(minutes: 30)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
 
-        trace("    list of readings before applying delay:",log: log, category: ConstantsLog.categoryLoopManager, type: .info)
-        
-        for reading in lastReadings {
+        // calculate loopDelay, to avoid having to do it multiple times
+        let loopDelay = loopDelay()
 
-            trace("    timestamp %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, reading.timeStamp.toString(timeStyle: .long, dateStyle: .long))
-            trace("        value %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, reading.calculatedValue.description)
-            trace("", log: log, category: ConstantsLog.categoryLoopManager, type: .info)
-            
-        }
-        
         // if needed, remove readings less than loopDelay minutes old
-        if UserDefaults.standard.loopDelay > 0 {
+        if loopDelay > 0 {
             
-            trace("    loopDelay > 0. Deleting readings",log: log, category: ConstantsLog.categoryLoopManager, type: .info)
+            trace("    loopDelay = %{public}@. Deleting %{public}@ readings.",log: log, category: ConstantsLog.categoryLoopManager, type: .info, loopDelay.description, lastReadings.count)
             
-            while lastReadings.count > 0 &&  lastReadings[0].timeStamp.addingTimeInterval(TimeInterval(minutes: Double(UserDefaults.standard.loopDelay))) > Date() {
+            while lastReadings.count > 0 &&  lastReadings[0].timeStamp.addingTimeInterval(loopDelay) > Date() {
 
-                trace("    removing reading with timestamp %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, lastReadings[0].timeStamp.toString(timeStyle: .long, dateStyle: .long))
-                trace("        value %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, lastReadings[0].calculatedValue.description)
-                trace("", log: log, category: ConstantsLog.categoryLoopManager, type: .info)
-                
                 lastReadings.remove(at: 0)
                 
             }
@@ -94,7 +83,7 @@ public class LoopManager:NSObject {
         }
         
         // now, if needed, increase the timestamp for each reading
-        if UserDefaults.standard.loopDelay > 0 {
+        if loopDelay > 0 {
             
             // create new dictionary that will have the readings with timestamp increased
             var newDictionary = [Dictionary<String, Any>]()
@@ -116,7 +105,7 @@ public class LoopManager:NSObject {
                 if let readingTimeStamp = readingTimeStamp, let slopeOrdinal = reading["Trend"] as? Int, let value = reading["Value"] as? Double {
 
                     // create new date : original date + loopDelay
-                    let newReadingTimeStamp = readingTimeStamp.addingTimeInterval(TimeInterval(minutes: Double(UserDefaults.standard.loopDelay)))
+                    let newReadingTimeStamp = readingTimeStamp.addingTimeInterval(loopDelay)
 
                     // ignore the reading if newReadingTimeStamp > now
                     if newReadingTimeStamp < Date() {
@@ -135,10 +124,6 @@ public class LoopManager:NSObject {
                             ]
 
                         newDictionary.append(newReading)
-                        
-                        trace("    adding reading with timestamp %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, newReadingTimeStamp.toString(timeStyle: .long, dateStyle: .long))
-                        trace("        value %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .info, value.description)
-                        trace("", log: log, category: ConstantsLog.categoryLoopManager, type: .info)
 
                     }
                     
@@ -185,7 +170,7 @@ public class LoopManager:NSObject {
         UserDefaults.standard.timeStampLatestLoopSharedBgReading = lastReadings.first!.timeStamp.addingTimeInterval(5.0)
         
         // in case loopdelay is used, then update UserDefaults.standard.timeStampLatestLoopSharedBgReading with value of timestamp of first element in the dictionary
-        if let element = dictionary.first, UserDefaults.standard.loopDelay > 0 {
+        if let element = dictionary.first, loopDelay > 0 {
 
             if let elementDateAsString = element["DT"] as? String {
                 
@@ -202,6 +187,8 @@ public class LoopManager:NSObject {
 
     }
     
+    // MARK: - private functions
+
     private func parseTimestamp(_ timestamp: String) throws -> Date? {
         let regex = try NSRegularExpression(pattern: "\\((.*)\\)")
         if let match = regex.firstMatch(in: timestamp, range: NSMakeRange(0, timestamp.count)) {
@@ -211,4 +198,55 @@ public class LoopManager:NSObject {
         return nil
     }
 
+    /// calculate loop delay to use dependent on the time of the day, based on UserDefaults loopDelaySchedule and loopDelayValueInMinutes
+    ///
+    /// finds element in loopDelaySchedule with value > actual minutes and uses previous element in loopDelayValueInMinutes as value to use as loopDelay
+    private func loopDelay() -> TimeInterval {
+        
+        // loopDelaySchedule is array of ints, giving minutes starting at 00:00 as of which new value for loopDelay should be used
+        // if nil then user didn't set yet any value
+        guard let loopDelaySchedule = UserDefaults.standard.loopDelaySchedule else {return TimeInterval(0)}
+         
+        // split in array of Int
+        let loopDelayScheduleArray = loopDelaySchedule.splitToInt()
+        
+        // array size should be > 0
+        guard loopDelaySchedule.count > 0 else {return TimeInterval(0)}
+        
+        // loopDelayValueInMinutes is array of ints, giving values to be applied as loopdelay, for matching minutes values in loopDelaySchedule
+        guard let loopDelayValueInMinutes = UserDefaults.standard.loopDelayValueInMinutes else {return TimeInterval(0)}
+            
+        // splity in array of int
+        let loopDelayValueInMinutesArray = loopDelayValueInMinutes.splitToInt()
+        
+        // array size should be > 0, and size should be equal to size of loopDelayScheduleArray
+        guard loopDelayValueInMinutesArray.count > 0, loopDelayScheduleArray.count == loopDelayValueInMinutesArray.count else {return TimeInterval(0)}
+        
+        // minutes since midnight
+        let minutes = Int16(Date().minutesSinceMidNightLocalTime())
+        
+        // index in loopDelaySchedule and loopDelayValueInMinutes, start with first value
+        var indexInLoopDelayScheduleArray = 0
+        
+        // loop through Ints in loopDelayScheduleArray, until value > current minutes
+        for (index, schedule) in loopDelayScheduleArray.enumerated() {
+            
+            if schedule > minutes {
+                break
+            }
+            
+            if index < loopDelayScheduleArray.count - 1 {
+                if loopDelayScheduleArray[index + 1] > minutes {
+                    break
+                }
+            } else {
+                indexInLoopDelayScheduleArray = index
+                break
+            }
+            indexInLoopDelayScheduleArray = indexInLoopDelayScheduleArray + 1
+        }
+
+        return TimeInterval(minutes: Double(loopDelayValueInMinutesArray[indexInLoopDelayScheduleArray]))
+ 
+    }
 }

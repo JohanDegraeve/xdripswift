@@ -1,7 +1,28 @@
 import Foundation
 import UIKit
+import SwiftUI
 
 enum ConstantsUI {
+    
+    // MARK: - SwiftUI Colors
+
+    /// color for section headers
+    static let sectionHeaderColor = Color(UIColor.lightGray)
+    
+    /// color for section footer
+    static let sectionFooterColor = Color(UIColor.lightGray)
+
+    /// List background color
+    static let listBackGroundUIColor = UIColor.black
+    /// List background color
+    static let listBackGroundColor = Color(listBackGroundUIColor)
+    
+    /// color for cancel or dismiss button
+    static let dismissOrCancelColor = Color(UIColor.red)
+
+    static let plusButtonColor = Color(UIColor.yellow)
+    
+    // MARK: - Swift UIKit Colors
     
     /// color for section titles in grouped table views, example in settings view
     static let tableViewHeaderTextColor = UIColor.lightGray

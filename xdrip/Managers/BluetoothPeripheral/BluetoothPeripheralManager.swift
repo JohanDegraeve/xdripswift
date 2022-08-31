@@ -49,8 +49,14 @@ class BluetoothPeripheralManager: NSObject {
             if newValue != currentCgmTransmitterAddress {
                 
                 cgmTransmitterInfoChanged()
+
+                // share new address with loop, but not if suppressLoopShare is on
+                if !UserDefaults.standard.suppressLoopShare {
+
+                    setCGMTransmitterInSharedUserDefaults()
+
+                }
                 
-                setCGMTransmitterInSharedUserDefaults()
                 
             }
             
@@ -608,8 +614,6 @@ class BluetoothPeripheralManager: NSObject {
             
             if let cgmTransmitter = getCGMTransmitter(), let cgmtransmitterAddress = currentCgmTransmitterAddress {
 
-                debuglogging("setting shared user defaults to cgmtransmitteraddress " + cgmtransmitterAddress)
-                
                 // store getCBUUID_Receive
                 sharedUserDefaults.set(cgmTransmitter.getCBUUID_Receive(), forKey: "cgmTransmitter_CBUUID_Receive")
                 
@@ -625,8 +629,6 @@ class BluetoothPeripheralManager: NSObject {
                 // store nil as cgm transmitter device address
                 // we don't care about CBUUID_Service and CBUUID_Receive
 
-                debuglogging("setting shared user defaults to nil")
-                
                 sharedUserDefaults.set(nil, forKey: "cgmTransmitterDeviceAddress")
                 
             }
@@ -710,6 +712,10 @@ class BluetoothPeripheralManager: NSObject {
         // loop through blePeripherals
         for blePeripheral in bLEPeripheralAccessor.getBLEPeripherals() {
 
+            // some blePeripherals remain in coredata without one of the types having an assigned value (ie an M5Stack, or Dexcom etc.) This seems to happen due to an error
+            // a clean up of these ble peripherals will happen here
+            var blePeripheralFound = false
+            
             // each time the app launches, we will send the parameters to all BluetoothPeripherals (only used for M5Stack for now)
             blePeripheral.parameterUpdateNeededAtNextConnect = true
 
@@ -726,6 +732,8 @@ class BluetoothPeripheralManager: NSObject {
                     
                 case .M5StickCType:
                     if let m5Stack = blePeripheral.m5Stack {
+                        
+                        blePeripheralFound = true
                         
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: m5Stack)
@@ -748,6 +756,8 @@ class BluetoothPeripheralManager: NSObject {
                 case .WatlaaType:
                     
                     if let watlaa = blePeripheral.watlaa {
+                        
+                        blePeripheralFound = true
                         
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: watlaa)
@@ -775,6 +785,8 @@ class BluetoothPeripheralManager: NSObject {
                 case .DexcomType:
                 
                     if let dexcomG5orG6 = blePeripheral.dexcomG5 {
+                        
+                        blePeripheralFound = true
                         
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG5orG6)
@@ -811,6 +823,8 @@ class BluetoothPeripheralManager: NSObject {
                     
                     if let bubble = blePeripheral.bubble {
                         
+                        blePeripheralFound = true
+                        
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: bubble)
                         
@@ -837,6 +851,8 @@ class BluetoothPeripheralManager: NSObject {
                 case .MiaoMiaoType:
                     
                     if let miaoMiao = blePeripheral.miaoMiao {
+                        
+                        blePeripheralFound = true
                         
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: miaoMiao)
@@ -865,6 +881,8 @@ class BluetoothPeripheralManager: NSObject {
                     
                     if let atom = blePeripheral.atom {
                         
+                        blePeripheralFound = true
+                        
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: atom)
                         
@@ -891,6 +909,8 @@ class BluetoothPeripheralManager: NSObject {
                 case .DexcomG4Type:
                     
                     if let dexcomG4 = blePeripheral.dexcomG4 {
+                        
+                        blePeripheralFound = true
                         
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG4)
@@ -923,6 +943,8 @@ class BluetoothPeripheralManager: NSObject {
                     
                     if let libre2 = blePeripheral.libre2 {
                         
+                        blePeripheralFound = true
+                        
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: libre2)
                         
@@ -951,6 +973,8 @@ class BluetoothPeripheralManager: NSObject {
                     
                     if let droplet = blePeripheral.droplet {
                         
+                        blePeripheralFound = true
+                        
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: droplet)
                         
@@ -977,6 +1001,8 @@ class BluetoothPeripheralManager: NSObject {
                 case .BlueReaderType:
                     
                     if let blueReader = blePeripheral.blueReader {
+                        
+                        blePeripheralFound = true
                         
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: blueReader)
@@ -1005,6 +1031,8 @@ class BluetoothPeripheralManager: NSObject {
                     
                     if let gNSEntry = blePeripheral.gNSEntry {
                         
+                        blePeripheralFound = true
+                        
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: gNSEntry)
                         
@@ -1031,6 +1059,8 @@ class BluetoothPeripheralManager: NSObject {
                 case .BluconType:
                     
                     if let blucon = blePeripheral.blucon {
+                        
+                        blePeripheralFound = true
                         
                         // add it to the list of bluetoothPeripherals
                         let index = insertInBluetoothPeripherals(bluetoothPeripheral: blucon)
@@ -1060,6 +1090,16 @@ class BluetoothPeripheralManager: NSObject {
                     }
                 }
 
+            }
+            
+            if !blePeripheralFound {
+                
+                // this is a corruption in the database. blePeripheral was stored witout one of the types being assigned
+                // remove the blePeripheral from coredata
+                coreDataManager.mainManagedObjectContext.delete(blePeripheral)
+                
+                coreDataManager.saveChanges()
+                
             }
             
         }
@@ -1239,11 +1279,17 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
 
             cgmTransmitter.setNonFixedSlopeEnabled(enabled: nonFixedSlopeEnabled)
             
-            // nonFixedSlopeEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of nonFixedSlopeEnabled
-            cgmTransmitter.requestNewReading()
+            // if this is the active CGM, then request new reading and call cgmTransmitterInfoChanged
+            if bluetoothPeripheral.blePeripheral.shouldconnect {
+                
+                // nonFixedSlopeEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of nonFixedSlopeEnabled
+                cgmTransmitter.requestNewReading()
+                
+                // call cgmTransmitterInfoChanged
+                cgmTransmitterInfoChanged()
+
+            }
             
-            // call cgmTransmitterInfoChanged
-            cgmTransmitterInfoChanged()
 
         }
         
@@ -1255,11 +1301,17 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
 
             cgmTransmitter.setWebOOPEnabled(enabled: webOOPEnabled)
             
-            // webOOPEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of webOOPEnabled
-            cgmTransmitter.requestNewReading()
-            
-            // call cgmTransmitterInfoChanged
-            cgmTransmitterInfoChanged()
+            // if this is the active CGM, then request new reading and call cgmTransmitterInfoChanged
+            if bluetoothPeripheral.blePeripheral.shouldconnect {
+
+                // webOOPEnabled changed, initate a reading immediately should user gets either a new value or a calibration request, depending on value of webOOPEnabled
+                cgmTransmitter.requestNewReading()
+                
+                // call cgmTransmitterInfoChanged
+                cgmTransmitterInfoChanged()
+
+            }
+                
 
         }
         

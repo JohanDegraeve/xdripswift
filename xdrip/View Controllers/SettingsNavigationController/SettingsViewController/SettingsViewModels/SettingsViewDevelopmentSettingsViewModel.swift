@@ -11,10 +11,16 @@ fileprivate enum Setting:Int, CaseIterable {
     /// case smooth libre values
     case smoothLibreValues = 2
     
+    /// for Libre 2 only, to suppress that app sends unlock payload to Libre 2, in which case xDrip4iOS can run in parallel with other app(s)
+    case suppressUnLockPayLoad = 3
+
+    /// if true, then readings will not be written to shared user defaults (for loop)
+    case suppressLoopShare = 4
+    
     /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
     ///
-    /// Default value 0, if used then recommende value between 4 and 9
-    case loopDelay = 3
+    /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
+    case loopDelay = 5
     
 }
 
@@ -47,8 +53,14 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .smoothLibreValues:
             return Texts_SettingsView.smoothLibreValues
             
+        case .suppressUnLockPayLoad:
+            return Texts_SettingsView.suppressUnLockPayLoad
+            
+        case .suppressLoopShare:
+            return Texts_SettingsView.suppressLoopShare
+            
         case .loopDelay:
-            return "Loop Delay"
+            return Texts_SettingsView.loopDelaysScreenTitle
             
         }
     }
@@ -59,7 +71,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues:
+        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare:
             return UITableViewCell.AccessoryType.none
             
         case .loopDelay:
@@ -83,8 +95,14 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .smoothLibreValues:
             return nil
             
+        case .suppressUnLockPayLoad:
+            return nil
+            
+        case .suppressLoopShare:
+            return nil
+            
         case .loopDelay:
-            return UserDefaults.standard.loopDelay.description
+            return nil
             
         }
         
@@ -120,6 +138,22 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                 
             })
 
+        case .suppressUnLockPayLoad:
+            return UISwitch(isOn: UserDefaults.standard.suppressUnLockPayLoad, action: {
+                (isOn:Bool) in
+                
+                UserDefaults.standard.suppressUnLockPayLoad = isOn
+                
+            })
+            
+        case .suppressLoopShare:
+            return UISwitch(isOn: UserDefaults.standard.suppressLoopShare, action: {
+                (isOn:Bool) in
+                
+                UserDefaults.standard.suppressLoopShare = isOn
+                
+            })
+            
         case .loopDelay:
             return nil
             
@@ -137,11 +171,11 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues:
+        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare:
             return .nothing
             
         case .loopDelay:
-            return SettingsSelectedRowAction.askText(title: "Loop Delay", message: "Artificial delay in readings when sending to Loop (minutes) - 0 means no delay. Use maximum 10 minutes.", keyboardType: .numberPad, text: UserDefaults.standard.loopDelay.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.loopDelay = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
+            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToLoopDelaySchedule.rawValue, sender: self)
             
 
         }

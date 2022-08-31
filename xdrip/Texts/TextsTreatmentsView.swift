@@ -33,7 +33,7 @@ enum Texts_TreatmentsView {
 	}()
 	
 	static let insulin:String = {
-		return NSLocalizedString("treatments_insulin", tableName: filename, bundle: Bundle.main, value: "Insulin", comment: "Insulin.")
+		return NSLocalizedString("treatments_insulin", tableName: filename, bundle: Bundle.main, value: "Bolus", comment: "Bolus.")
 	}()
 	
 	static let exercise:String = {
@@ -47,5 +47,13 @@ enum Texts_TreatmentsView {
 	static let questionMark:String = {
 		return NSLocalizedString("treatments_question_mark", tableName: filename, bundle: Bundle.main, value: "?", comment: "Literally a question mark, used as unknown abbreviation.")
 	}()
+    
+    static let filterTreatmentsLabel:String = {
+        return NSLocalizedString("treatments_filterTreatmentsLabel", tableName: filename, bundle: Bundle.main, value: "Filter:", comment: "filter the treatments by type")
+    }()
+    
+    static let cannotStoreFutureBGCheck:String = {
+        return NSLocalizedString("treatments_cannotStoreFutureBGCheck", tableName: filename, bundle: Bundle.main, value: "You cannot store a BG Check in the future.\n\nIt will be stored at the actual time.", comment: "warn about trying to set a future bg value")
+    }()
 
 }
