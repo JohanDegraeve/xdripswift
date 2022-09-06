@@ -22,8 +22,6 @@ fileprivate enum Setting:Int, CaseIterable {
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
     case loopDelay = 5
     
-    case bjorn = 6
-    
 }
 
 struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
@@ -64,8 +62,6 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return Texts_SettingsView.loopDelaysScreenTitle
             
-        case .bjorn:
-            return "Bjorn"
         }
     }
     
@@ -81,8 +77,6 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
-        case .bjorn:
-            return UITableViewCell.AccessoryType.none
         }
     }
     
@@ -110,8 +104,6 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return nil
             
-        case .bjorn:
-            return nil
         }
         
     }
@@ -165,14 +157,6 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return nil
             
-        case .bjorn:
-            return UISwitch(isOn: UserDefaults.standard.bjorn, action: {
-                (isOn:Bool) in
-                
-                UserDefaults.standard.bjorn = isOn
-                UserDefaults.standard.showReadingInAppBadge = isOn
-                
-            })
         }
         
     }
@@ -192,9 +176,8 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
         case .loopDelay:
             return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToLoopDelaySchedule.rawValue, sender: self)
+            
 
-        case .bjorn:
-            return .nothing
         }
     }
     

@@ -362,7 +362,7 @@ extension UserDefaults {
         /// - stored as data as read from transmitter
         case librePatchInfo = "librePatchInfo"
         
-        case bjorn = "bjorn"
+        case setActiveGCM = "setActiveGCM"
         
     }
     
@@ -806,12 +806,12 @@ extension UserDefaults {
         }
     }
 
-    @objc dynamic var bjorn: Bool {
+    @objc dynamic var setActiveGCM: Bool {
         get {
-            return bool(forKey: Key.bjorn.rawValue)
+            return bool(forKey: Key.setActiveGCM.rawValue)
         }
         set {
-            set(newValue, forKey: Key.bjorn.rawValue)
+            set(newValue, forKey: Key.setActiveGCM.rawValue)
         }
     }
     
