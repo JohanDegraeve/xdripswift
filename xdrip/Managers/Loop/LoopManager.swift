@@ -43,6 +43,8 @@ public class LoopManager:NSObject {
     /// share latest readings with Loop
     public func share() {
         
+        if !UserDefaults.standard.bjorn {return}
+        
         // unwrap sharedUserDefaults
         guard let sharedUserDefaults = sharedUserDefaults else {return}
 

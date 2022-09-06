@@ -113,6 +113,10 @@ public class AlertManager:NSObject {
     ///     - if true then an immediate notification is created (immediate being not a future planned, like missed reading), which contains the bg reading in the text - so there's no need to create an additional notificationwith the text in it
     public func checkAlerts(maxAgeOfLastBgReadingInSeconds:Double) -> Bool {
         
+        if !UserDefaults.standard.bjorn {
+            return false
+        }
+        
         // first of all remove all existing notifications, there should be only one open alert on the home screen. The most relevant one will be reraised
         uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: alertNotificationIdentifers)
         uNUserNotificationCenter.removeAllPendingNotificationRequests()

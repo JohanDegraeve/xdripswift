@@ -808,10 +808,10 @@ extension UserDefaults {
 
     @objc dynamic var bjorn: Bool {
         get {
-            return !bool(forKey: Key.bjorn.rawValue)
+            return bool(forKey: Key.bjorn.rawValue)
         }
         set {
-            set(!newValue, forKey: Key.bjorn.rawValue)
+            set(newValue, forKey: Key.bjorn.rawValue)
         }
     }
     
