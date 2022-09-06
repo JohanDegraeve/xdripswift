@@ -10,5 +10,5 @@
 "trendsingleup" = "значительно вверх";
 "trenddoubleup" = "резко вверх";
 "currenttrend" = "Тренд идет";
-"deltanoncomputable" = "не вычиляемо";
+"deltanoncomputable" = "не вычисляемо";
 "currentdelta" = "Разница между последним результатом";

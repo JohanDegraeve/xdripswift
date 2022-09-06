@@ -10,7 +10,7 @@
 "settingsviews_master" = "Главный";
 "settingsviews_follower" = "Подписчик";
 "settingsviews_showReadingInNotification" = "Показывать ГК в уведомлениях?";
-"settingsviews_labelShowReadingInAppBadge" = "Показывать ГК на иконке приложения?";
+"settingsviews_labelShowReadingInAppBadge" = "Показывать ГК на иконке прил.?";
 "settingsviews_multipleAppBadgeValueWith10" = "Умножить ГК на иконке на 10?";
 "settingsviews_allowScreenRotation" = "Разрешить переворачивать график?";
 "settingsviews_showMiniChart" = "Показать мини-диаграмму?";
@@ -36,7 +36,7 @@
 "settingsviews_useIFCCA1C" = "Показывать HbA1c в mmols/mol?";
 "settingsviews_sectiontitlesensorcountdown" = "Возраст датчика";
 "settingsviews_showSensorCountdown" = "Показывать возраст датчика?";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Использовать альтернативный график?";
+"settingsviews_showSensorCountdownAlternativeGraphics" = "Альтернативный график?";
 "settingsviews_sectiontitletransmitter" = "Транисмиттер";
 "settingsviews_transmittertype" = "Тип трансмиттера:";
 "settingsviews_transmitterid" = "Идентификатор трансмиттера:";
@@ -107,9 +107,9 @@
 "failedToSendEmail" = "Не удалось отправить электронное письмо";
 "volumeTestSoundPlayerExplanation" = "Теперь звук будильника воспроизводится с той же громкостью, которая будет использоваться для типа будильника с параметром «Отменить отключение звука» = 'Вкл.'\n\n (используется для всех будильников, кроме предупреждений о пропущенном чтении, для которых всегда используется громкость iOS.)\n\ nИзмените громкость с помощью кнопок громкости и нажмите OK, когда закончите.";
 "volumeTestiOSSoundExplanation" = "Звук будильника теперь воспроизводится с той же громкостью, которая будет использоваться для типа будильника с параметром «Переопределить звук» = 'Выкл.'\n\n(Также всегда используется для сигналов о пропущенных чтениях, для которых используется громкость iOS.)\n\nНажмите один кнопок громкости, чтобы остановить звук, затем измените громкость с помощью кнопок громкости на желаемую громкость и повторите проверку.";
-"volumeTestSoundPlayer" = "Тестовая громкость (если включено переопределение отключения звука)";
-"volumeTestiOSSound" = "Тестовый объем (текущий звучание iPhone)";
-"debugLevel" = "Включить уровень отладки";
+"volumeTestSoundPlayer" = "Тест гром. (переопределение)";
+"volumeTestiOSSound" = "Тест гром. (текущая)";
+"debugLevel" = "Включить режим отладки";
 "warningChangeFromMasterToFollower" = "Переключение с главного на подписчика удалит ваш текущий сенсор. Вы хотите продолжить?";
 "nightScoutPort" = "Порт:";
 "developerSettings" = "Настройки разработчика";
