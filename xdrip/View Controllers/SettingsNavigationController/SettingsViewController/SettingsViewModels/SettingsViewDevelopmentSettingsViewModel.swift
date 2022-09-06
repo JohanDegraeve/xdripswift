@@ -22,7 +22,7 @@ fileprivate enum Setting:Int, CaseIterable {
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
     case loopDelay = 5
     
-    case bjorn = 6
+    case setActiveGCM = 6
     
 }
 
@@ -64,8 +64,8 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return Texts_SettingsView.loopDelaysScreenTitle
             
-        case .bjorn:
-            return "Bjorn"
+        case .setActiveGCM:
+            return "Set as active CGM"
         }
     }
     
@@ -81,7 +81,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
-        case .bjorn:
+        case .setActiveGCM:
             return UITableViewCell.AccessoryType.none
         }
     }
@@ -110,7 +110,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return nil
             
-        case .bjorn:
+        case .setActiveGCM:
             return nil
         }
         
@@ -165,11 +165,11 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return nil
             
-        case .bjorn:
-            return UISwitch(isOn: UserDefaults.standard.bjorn, action: {
+        case .setActiveGCM:
+            return UISwitch(isOn: UserDefaults.standard.setActiveGCM, action: {
                 (isOn:Bool) in
                 
-                UserDefaults.standard.bjorn = isOn
+                UserDefaults.standard.setActiveGCM = isOn
                 UserDefaults.standard.showReadingInAppBadge = isOn
                 
             })
@@ -193,7 +193,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToLoopDelaySchedule.rawValue, sender: self)
 
-        case .bjorn:
+        case .setActiveGCM:
             return .nothing
         }
     }
