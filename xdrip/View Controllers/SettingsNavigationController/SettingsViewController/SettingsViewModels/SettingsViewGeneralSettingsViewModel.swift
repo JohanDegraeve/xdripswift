@@ -2,24 +2,27 @@ import UIKit
 
 fileprivate enum Setting:Int, CaseIterable {
     
+    /// Toggle to set as active CGM for APS and Dexom share upload etc
+    case setActiveGCM = 0
+    
     /// blood glucose  unit
-    case bloodGlucoseUnit = 0
+    case bloodGlucoseUnit = 1
     
     /// choose between master and follower
-    case masterFollower = 1
+    case masterFollower = 2
     
     /// should reading be shown in notification
-    case showReadingInNotification = 2
+    case showReadingInNotification = 3
     
     /// - minimum time between two readings, for which notification should be created (in minutes)
     /// - except if there's been a disconnect, in that case this value is not taken into account
-    case notificationInterval = 3
+    case notificationInterval = 4
     
     /// show reading in app badge
-    case showReadingInAppBadge = 4
+    case showReadingInAppBadge = 5
     
     /// if reading is shown in app badge, should value be multiplied with 10 yes or no
-    case multipleAppBadgeValueWith10 = 5
+    case multipleAppBadgeValueWith10 = 6
     
 }
 
@@ -60,6 +63,9 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
         switch setting {
             
+        case .setActiveGCM:
+            return .nothing
+        
         case .bloodGlucoseUnit:
             return SettingsSelectedRowAction.callFunction(function: {
                 
@@ -143,6 +149,9 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
         switch setting {
             
+        case .setActiveGCM:
+            return "Set as active CGM"
+        
         case .bloodGlucoseUnit:
             return Texts_SettingsView.labelSelectBgUnit
             
@@ -169,6 +178,9 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
+        case .setActiveGCM:
+            return UITableViewCell.AccessoryType.none
+        
         case .bloodGlucoseUnit:
             return UITableViewCell.AccessoryType.none
     
@@ -189,6 +201,9 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
         switch setting {
             
+        case .setActiveGCM:
+            return nil
+        
         case .bloodGlucoseUnit:
             return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl:Texts_Common.mmol
             
@@ -209,6 +224,15 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
+        case .setActiveGCM:
+            return UISwitch(isOn: UserDefaults.standard.setActiveGCM, action: {
+                (isOn:Bool) in
+                
+                UserDefaults.standard.setActiveGCM = isOn
+                UserDefaults.standard.showReadingInAppBadge = isOn
+                
+            })
+        
         case .showReadingInNotification:
             
             return UISwitch(isOn: UserDefaults.standard.showReadingInNotification, action: {(isOn:Bool) in UserDefaults.standard.showReadingInNotification = isOn})
