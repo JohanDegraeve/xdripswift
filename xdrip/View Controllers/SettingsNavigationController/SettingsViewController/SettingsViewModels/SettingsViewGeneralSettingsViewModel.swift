@@ -231,6 +231,14 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
                 UserDefaults.standard.setActiveGCM = isOn
                 UserDefaults.standard.showReadingInAppBadge = isOn
                 
+                if !isOn {
+                    let uNUserNotificationCenter = UNUserNotificationCenter.current()
+                    // first of all remove all existing missedreading notifications
+                    uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
+                    uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
+                }
+
+                
             })
         
         case .showReadingInNotification:
