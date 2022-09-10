@@ -82,7 +82,7 @@ public class AlertManager:NSObject {
         
         // in snoozeValueStrings, replace all occurrences of minutes, minute, etc... by language dependent value
         for (index, _) in snoozeValueStrings.enumerated() {
-            snoozeValueStrings[index] = snoozeValueStrings[index].replacingOccurrences(of: "minutes", with: Texts_Common.minutes).replacingOccurrences(of: "hour", with: Texts_Common.hour).replacingOccurrences(of: "hours", with: Texts_Common.hours).replacingOccurrences(of: "day", with: Texts_Common.day).replacingOccurrences(of: "week", with: Texts_Common.week)
+            snoozeValueStrings[index] = snoozeValueStrings[index].replacingOccurrences(of: "minutes", with: Texts_Common.minutes).replacingOccurrences(of: "hours", with: Texts_Common.hours).replacingOccurrences(of: "hour", with: Texts_Common.hour).replacingOccurrences(of: "day", with: Texts_Common.day).replacingOccurrences(of: "week", with: Texts_Common.week)
         }
         
         //  initialize array of alertNotifications
