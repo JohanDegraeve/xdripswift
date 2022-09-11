@@ -9,6 +9,8 @@ class BGReadingSpeaker:NSObject {
     // MARK: - public properties
     
     // MARK: - private properties
+
+    private let syn = AVSpeechSynthesizer.init()
     
     /// reference to coreDataManager
     private var coreDataManager:CoreDataManager
@@ -166,8 +168,6 @@ class BGReadingSpeaker:NSObject {
     
     /// will speak the text, using language code for pronunciation
     private func say(text:String, language:String?) {
-        
-        let syn = AVSpeechSynthesizer.init()
         let utterance = AVSpeechUtterance(string: text)
         utterance.rate = 0.51
         utterance.pitchMultiplier = 1
