@@ -24,6 +24,14 @@ public class LoopManager:NSObject {
     
     // for trace,
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLoopManager)
+    
+    // MARK: - public properties
+    
+    /// latest glucose data values - to be used only if using loopDelay
+    /// - first is the youngest
+    ///
+    /// actually there's redundancy in data. Readings are normally read from coredata here in this module, and stored in lastReadings - disadvantage is that BgReadings in coredata only contain readings per 5 minutes + the latest reading (which can be less than 5 minutes later than latest but one reading. But when using loopdelay, we omit the most recent values, and end up with an array of readings, 5 minutes apart from each other, as a result Loop would receive a reading only every 5 minutes. For that reason, this second array glucoseData is introduced (later in the project). This array has readings per minute, smoothed. Ideally, glucoseData could be used no matter of loopDelay is used or not, but to avoid uncatched coding errors, I kept both
+    public var glucoseData = [GlucoseData]()
 
     // MARK: - initializer
     
@@ -50,36 +58,58 @@ public class LoopManager:NSObject {
 
         // get last readings with calculated value
         // reduce timeStampLatestLoopSharedBgReading with 30 minutes. Because maybe Loop wasn't running for a while and so missed one or more readings. By adding 30 minutes of readings, we fill up a gap of maximum 30 minutes in Loop
-        var lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: UserDefaults.standard.timeStampLatestLoopSharedBgReading?.addingTimeInterval(-TimeInterval(minutes: 30)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: UserDefaults.standard.timeStampLatestLoopSharedBgReading?.addingTimeInterval(-TimeInterval(minutes: 30)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
 
         // calculate loopDelay, to avoid having to do it multiple times
-        let loopDelay = loopDelay()
+        let loopDelay = LoopManager.loopDelay()
 
-        // if needed, remove readings less than loopDelay minutes old
+        // if needed, remove readings less than loopDelay minutes old from glucoseData
         if loopDelay > 0 {
             
-            trace("    loopDelay = %{public}@. Deleting %{public}@ readings.",log: log, category: ConstantsLog.categoryLoopManager, type: .info, loopDelay.description, lastReadings.count)
+            trace("    loopDelay = %{public}@. Deleting %{public}@ minutes of readings from glucoseData.",log: log, category: ConstantsLog.categoryLoopManager, type: .info, loopDelay.description)
             
-            while lastReadings.count > 0 &&  lastReadings[0].timeStamp.addingTimeInterval(loopDelay) > Date() {
+            while glucoseData.count > 0 &&  glucoseData[0].timeStamp.addingTimeInterval(loopDelay) > Date() {
 
-                lastReadings.remove(at: 0)
+                glucoseData.remove(at: 0)
                 
             }
             
-        }
-        
-        // if there's no readings, then no further processing
-        if lastReadings.count == 0 {
+            // if no readings anymore, then no need to continue
+            if glucoseData.count == 0 {
+                return
+            }
+            
+        } else if lastReadings.count == 0 {
+            // this is the case where loopdelay = 0 and lastReadings is empty
             return
         }
+
         
         // convert to json Dexcom Share format
         var dictionary = [Dictionary<String, Any>]()
-        for reading in lastReadings {
-            var representation = reading.dictionaryRepresentationForDexcomShareUpload
-            // Adding "from" field to be able to use multiple BG sources with the same shared group in FreeAPS X
-            representation["from"] = "xDrip"
-            dictionary.append(representation)
+        
+        if loopDelay > 0 {
+
+            for reading in glucoseData {
+                
+                var representation = reading.dictionaryRepresentationForLoopShare
+                
+                // Adding "from" field to be able to use multiple BG sources with the same shared group in FreeAPS X
+                representation["from"] = "xDrip"
+                dictionary.append(representation)
+            }
+
+        } else {
+
+            for reading in lastReadings {
+                
+                var representation = reading.dictionaryRepresentationForDexcomShareUpload
+                
+                // Adding "from" field to be able to use multiple BG sources with the same shared group in FreeAPS X
+                representation["from"] = "xDrip"
+                dictionary.append(representation)
+            }
+
         }
         
         // now, if needed, increase the timestamp for each reading
@@ -187,21 +217,10 @@ public class LoopManager:NSObject {
 
     }
     
-    // MARK: - private functions
-
-    private func parseTimestamp(_ timestamp: String) throws -> Date? {
-        let regex = try NSRegularExpression(pattern: "\\((.*)\\)")
-        if let match = regex.firstMatch(in: timestamp, range: NSMakeRange(0, timestamp.count)) {
-            let epoch = Double((timestamp as NSString).substring(with: match.range(at: 1)))! / 1000
-            return Date(timeIntervalSince1970: epoch)
-        }
-        return nil
-    }
-
     /// calculate loop delay to use dependent on the time of the day, based on UserDefaults loopDelaySchedule and loopDelayValueInMinutes
     ///
     /// finds element in loopDelaySchedule with value > actual minutes and uses previous element in loopDelayValueInMinutes as value to use as loopDelay
-    private func loopDelay() -> TimeInterval {
+    public static func loopDelay() -> TimeInterval {
         
         // loopDelaySchedule is array of ints, giving minutes starting at 00:00 as of which new value for loopDelay should be used
         // if nil then user didn't set yet any value
@@ -249,4 +268,16 @@ public class LoopManager:NSObject {
         return TimeInterval(minutes: Double(loopDelayValueInMinutesArray[indexInLoopDelayScheduleArray]))
  
     }
+
+    // MARK: - private functions
+
+    private func parseTimestamp(_ timestamp: String) throws -> Date? {
+        let regex = try NSRegularExpression(pattern: "\\((.*)\\)")
+        if let match = regex.firstMatch(in: timestamp, range: NSMakeRange(0, timestamp.count)) {
+            let epoch = Double((timestamp as NSString).substring(with: match.range(at: 1)))! / 1000
+            return Date(timeIntervalSince1970: epoch)
+        }
+        return nil
+    }
+
 }

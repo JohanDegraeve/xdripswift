@@ -458,6 +458,7 @@
 		F8DF766223E390D100063910 /* BLEPeripheral+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766123E390D100063910 /* BLEPeripheral+CoreDataProperties.swift */; };
 		F8DF766423E781C100063910 /* BLEPeripheralAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */; };
 		F8DF766D23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766C23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift */; };
+		F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */; };
 		F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */; };
 		F8E3A2A523D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A423D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift */; };
 		F8E3A2A923D906C200E5E98A /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A823D906C200E5E98A /* WatchManager.swift */; };
@@ -659,7 +660,7 @@
 		2867F5D925BC209B00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LibreErrors.strings; sourceTree = "<group>"; };
 		2867F5DA25BC209C00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Snooze.strings; sourceTree = "<group>"; };
 		2867F5DB25BC209C00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LibreNFC.strings; sourceTree = "<group>"; };
-		470B6186270C448000561E56 /* xDrip4iO5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xDrip4iO5.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		470B6186270C448000561E56 /* xDrip4iO5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = xDrip4iO5.app; path = xDripDex.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		470B6189270C448000561E56 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		470B618B270C448100561E56 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		470B6191270C448100561E56 /* Watch App WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Watch App WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1420,6 +1421,7 @@
 		F8DF766123E390D100063910 /* BLEPeripheral+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BLEPeripheral+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEPeripheralAccessor.swift; sourceTree = "<group>"; };
 		F8DF766C23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG5BluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
+		F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GlucoseData+LoopShare.swift"; sourceTree = "<group>"; };
 		F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		F8E3A2A423D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewAppleWatchSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8E3A2A823D906C200E5E98A /* WatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
@@ -2689,6 +2691,7 @@
 		F8E51D5B2448D8A3001C9E5A /* Loop */ = {
 			isa = PBXGroup;
 			children = (
+				F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */,
 				F8E51D5C2448D8B5001C9E5A /* LoopManager.swift */,
 			);
 			path = Loop;
@@ -3592,6 +3595,7 @@
 				F8B3A85D22821BB6004BA588 /* Int.swift in Sources */,
 				F808D2CE2403292C0084B5DB /* Bubble+CoreDataProperties.swift in Sources */,
 				F8A2BC1A25DB0C28001D1E78 /* CGMAtomTransmitterDelegate.swift in Sources */,
+				F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */,
 				F816E1002436734C009EE65B /* CGMGNSEntryTransmitterDelegate.swift in Sources */,
 				F82842322752CBE00097E0C9 /* DexcomSessionStopTxMessage.swift in Sources */,
 				F8C97853242AA70D00A09483 /* MiaoMiao+CoreDataClass.swift in Sources */,
