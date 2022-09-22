@@ -50,6 +50,8 @@ extension UserDefaults {
         case miniChartHoursToShow = "miniChartHoursToShow"
         /// should the screen/chart be allowed to rotate?
         case allowScreenRotation = "allowScreenRotation"
+        /// should the calibration assistant be enabled?
+        case showVisualCalibrationAssistant = "showVisualCalibrationAssistant"
         /// should the clock view be shown when the screen is locked?
         case showClockWhenScreenIsLocked = "showClockWhenScreenIsLocked"
         /// show the objectives and make them display on the graph? Or just hide it all because it's too complicated to waste time with?
@@ -340,6 +342,9 @@ extension UserDefaults {
         case loopDelaySchedule = "loopDelaySchedule"
         
         case loopDelayValueInMinutes = "loopDelayValueInMinutes"
+        
+        /// Default value is false. If true then the calibration assistant will show the results to the user
+        case showCalibrationAssistantResults = "showCalibrationAssistantResults"
         
         /// used for Libre data parsing - only for Libre 1 or Libre 2 read via transmitter, ie full NFC block
         case previousRawLibreValues = "previousRawLibreValues"
@@ -849,6 +854,17 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showClockWhenScreenIsLocked.rawValue)
+        }
+    }
+    
+    /// should the calibration assistant be enabled?
+    @objc dynamic var showVisualCalibrationAssistant: Bool {
+        // default value for bool in userdefaults is false, as default we want the calibration assistant to be enabled
+        get {
+            return !bool(forKey: Key.showVisualCalibrationAssistant.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showVisualCalibrationAssistant.rawValue)
         }
     }
     
@@ -1722,6 +1738,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.suppressLoopShare.rawValue)
+        }
+    }
+    
+    /// if true, then the calibration assistant will show all calculations and values. Set to false by default
+    var showCalibrationAssistantResults: Bool {
+        get {
+            return bool(forKey: Key.showCalibrationAssistantResults.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.showCalibrationAssistantResults.rawValue)
         }
     }
 

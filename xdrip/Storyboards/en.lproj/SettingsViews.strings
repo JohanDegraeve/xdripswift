@@ -16,6 +16,7 @@
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications (mins)";
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
 "settingsviews_showMiniChart" = "Show the Mini-Chart?";
+"settingsviews_showVisualCalibrationAssistant" = "Show Calibration Assistant?";
 "settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";
 "settingsviews_urgentHighValue" = "Urgent High Value:";
 "settingsviews_highValue" = "High Value:";
@@ -132,3 +133,4 @@
 "expanatoryTextSelectTime" = "As of what time should the value apply";
 "expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with Loop";
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
+"showCalibrationAssistantResults" = "Calibration Assistant Debug";

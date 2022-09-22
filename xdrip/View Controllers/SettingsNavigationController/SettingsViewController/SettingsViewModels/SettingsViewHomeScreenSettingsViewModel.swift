@@ -19,26 +19,29 @@ fileprivate enum Setting:Int, CaseIterable {
     // show a fixed scale mini-chart under the main scrollable chart?
     case showMiniChart = 2
     
+    // should the calibration assistant be enabled?
+    case showVisualCalibrationAssistant = 3
+    
     //urgent high value
-    case urgentHighMarkValue = 3
+    case urgentHighMarkValue = 4
     
     //high value
-    case highMarkValue = 4
+    case highMarkValue = 5
     
     //low value
-    case lowMarkValue = 5
+    case lowMarkValue = 6
     
     //urgent low value
-    case urgentLowMarkValue = 6
+    case urgentLowMarkValue = 7
     
     //use objectives in graph?
-    case useObjectives = 7
+    case useObjectives = 8
     
     //show target line?
-    case showTarget = 8
+    case showTarget = 9
     
     //target value
-    case targetMarkValue = 9
+    case targetMarkValue = 10
     
 }
 
@@ -59,6 +62,9 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             
         case .showMiniChart:
             return UISwitch(isOn: UserDefaults.standard.showMiniChart, action: {(isOn:Bool) in UserDefaults.standard.showMiniChart = isOn})
+            
+        case .showVisualCalibrationAssistant:
+            return UISwitch(isOn: UserDefaults.standard.showVisualCalibrationAssistant, action: {(isOn:Bool) in UserDefaults.standard.showVisualCalibrationAssistant = isOn})
             
         case .useObjectives:
             return UISwitch(isOn: UserDefaults.standard.useObjectives, action: {(isOn:Bool) in UserDefaults.standard.useObjectives = isOn})
@@ -133,6 +139,15 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
                 }
             })
             
+        case .showVisualCalibrationAssistant:
+            return SettingsSelectedRowAction.callFunction(function: {
+                if UserDefaults.standard.showVisualCalibrationAssistant {
+                    UserDefaults.standard.showVisualCalibrationAssistant = false
+                } else {
+                    UserDefaults.standard.showVisualCalibrationAssistant = true
+                }
+            })
+            
         case .useObjectives:
             return SettingsSelectedRowAction.callFunction(function: {
                 if UserDefaults.standard.useObjectives {
@@ -198,6 +213,9 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .showMiniChart:
             return Texts_SettingsView.showMiniChart
             
+        case .showVisualCalibrationAssistant:
+            return Texts_SettingsView.showVisualCalibrationAssistant
+            
         case .useObjectives:
             return Texts_SettingsView.labelUseObjectives
             
@@ -217,7 +235,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .useObjectives, .showTarget:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .useObjectives, .showTarget, .showVisualCalibrationAssistant:
             return UITableViewCell.AccessoryType.none
             
         }
@@ -243,7 +261,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .targetMarkValue:
             return UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .useObjectives, .showTarget:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .useObjectives, .showTarget, .showVisualCalibrationAssistant:
             return nil
             
         }
