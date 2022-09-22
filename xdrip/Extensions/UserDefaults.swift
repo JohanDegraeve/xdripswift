@@ -859,12 +859,12 @@ extension UserDefaults {
     
     /// should the calibration assistant be enabled?
     @objc dynamic var showVisualCalibrationAssistant: Bool {
-        // default value for bool in userdefaults is false, as default we want the calibration assistant to be enabled
+        // default value for bool in userdefaults is false, as default we want the visual calibration assistant to be disabled
         get {
-            return !bool(forKey: Key.showVisualCalibrationAssistant.rawValue)
+            return bool(forKey: Key.showVisualCalibrationAssistant.rawValue)
         }
         set {
-            set(!newValue, forKey: Key.showVisualCalibrationAssistant.rawValue)
+            set(newValue, forKey: Key.showVisualCalibrationAssistant.rawValue)
         }
     }
     
