@@ -3,7 +3,7 @@ import UIKit
 fileprivate enum Setting:Int, CaseIterable {
     
     /// Toggle to set as active CGM for APS and Dexom share upload etc
-    case setActiveGCM = 0
+    case setActiveCGM = 0
     
     /// blood glucose  unit
     case bloodGlucoseUnit = 1
@@ -63,7 +63,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
         switch setting {
             
-        case .setActiveGCM:
+        case .setActiveCGM:
             return .nothing
         
         case .bloodGlucoseUnit:
@@ -149,7 +149,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
         switch setting {
             
-        case .setActiveGCM:
+        case .setActiveCGM:
             return "Set as active CGM"
         
         case .bloodGlucoseUnit:
@@ -178,7 +178,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .setActiveGCM:
+        case .setActiveCGM:
             return UITableViewCell.AccessoryType.none
         
         case .bloodGlucoseUnit:
@@ -201,7 +201,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
         switch setting {
             
-        case .setActiveGCM:
+        case .setActiveCGM:
             return nil
         
         case .bloodGlucoseUnit:
@@ -224,11 +224,11 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .setActiveGCM:
-            return UISwitch(isOn: UserDefaults.standard.setActiveGCM, action: {
+        case .setActiveCGM:
+            return UISwitch(isOn: UserDefaults.standard.setActiveCGM, action: {
                 (isOn:Bool) in
                 
-                UserDefaults.standard.setActiveGCM = isOn
+                UserDefaults.standard.setActiveCGM = isOn
                 UserDefaults.standard.showReadingInAppBadge = isOn
                 
                 if !isOn {
