@@ -1,9 +1,9 @@
 "alertsettingsview_screentitle" = "Тревоги";
 "alertssettingsview_screentitle" = "Редактировать тревоги";
-"alerts_highalerttitle" = "Высокий уровень ГК";
-"alerts_veryhighalerttitle" = "Очень высокий уровень ГК";
-"alerts_lowalerttitle" = "Низкий уровень ГК";
-"alerts_verylowalerttitle" = "Очень низкий уровень ГК";
+"alerts_highalerttitle" = "Высокий ур. ГК";
+"alerts_veryhighalerttitle" = "Очень выс. ур. ГК";
+"alerts_lowalerttitle" = "Низкий уров. ГК";
+"alerts_verylowalerttitle" = "Очень низкий ур. ГК";
 "alerts_snooze" = "Отложить";
 "alerts_select_snooze_time" = "Отключить тревогу на";
 "alerts_missedreadingalerttitle" = "Пропущенные чтения";
@@ -14,5 +14,5 @@
 "alerttype" = "Тип тревоги";
 "changealertvalue" = "Изменить значение сигнала тревоги";
 "confirmdeletionalert" = "Удалить тревогу?";
-"alerts_fastdrop" = "Тревога о быстром падении";
-"alerts_fastrise" = "Тревога о быстром росте";
+"alerts_fastdrop" = "Быстрое снижение ГК";
+"alerts_fastrise" = "Быстрый рост ГК";
