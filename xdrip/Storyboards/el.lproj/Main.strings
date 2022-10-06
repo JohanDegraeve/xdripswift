@@ -1,0 +1,360 @@
+
+/* Class = "UIViewController"; title = "Treatments Scene"; ObjectID = "01q-Jv-AjA"; */
+"01q-Jv-AjA.title" = "Treatments Scene";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "0QS-QO-ffs"; */
+"0QS-QO-ffs.text" = "Title";
+
+/* Class = "UILabel"; text = "8"; ObjectID = "0na-qZ-kDB"; */
+"0na-qZ-kDB.text" = "8";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "0oo-Gz-k2G"; */
+"0oo-Gz-k2G.normalTitle" = "Cancel";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "1DE-2P-Qfh"; */
+"1DE-2P-Qfh.title" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "2fU-HY-PwD"; */
+"2fU-HY-PwD.text" = "Detail";
+
+/* Class = "UITextField"; placeholder = "0"; ObjectID = "3jm-to-PhE"; */
+"3jm-to-PhE.placeholder" = "0";
+
+/* Class = "UILabel"; text = "-"; ObjectID = "4LK-sw-cBS"; */
+"4LK-sw-cBS.text" = "-";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "5ta-po-Bsd"; */
+"5ta-po-Bsd.text" = "Detail";
+
+/* Class = "UILabel"; text = "In Range"; ObjectID = "63h-Q9-PbK"; */
+"63h-Q9-PbK.text" = "In Range";
+
+/* Class = "UILabel"; text = "-"; ObjectID = "6JK-yH-Ykh"; */
+"6JK-yH-Ykh.text" = "-";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "7NI-o7-nWK"; */
+"7NI-o7-nWK.text" = "Label";
+
+/* Class = "UILabel"; text = "delta"; ObjectID = "7Wo-wd-80o"; */
+"7Wo-wd-80o.text" = "delta";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "7vO-nL-nIV"; */
+"7vO-nL-nIV.text" = "Title";
+
+/* Class = "UILabel"; text = "92%"; ObjectID = "85k-YD-W2b"; */
+"85k-YD-W2b.text" = "92%";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "8Bd-7p-ZRp"; */
+"8Bd-7p-ZRp.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "8jK-jB-QOG"; */
+"8jK-jB-QOG.text" = "Label";
+
+/* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[0] = "3h"; ObjectID = "9LS-Vp-uGd"; */
+"9LS-Vp-uGd.segmentTitles[0]" = "3h";
+
+/* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[1] = "6h"; ObjectID = "9LS-Vp-uGd"; */
+"9LS-Vp-uGd.segmentTitles[1]" = "6h";
+
+/* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[2] = "12h"; ObjectID = "9LS-Vp-uGd"; */
+"9LS-Vp-uGd.segmentTitles[2]" = "12h";
+
+/* Class = "UISegmentedControl"; 9LS-Vp-uGd.segmentTitles[3] = "24h"; ObjectID = "9LS-Vp-uGd"; */
+"9LS-Vp-uGd.segmentTitles[3]" = "24h";
+
+/* Class = "UILabel"; text = "HbA1c"; ObjectID = "9Ud-mR-3u4"; */
+"9Ud-mR-3u4.text" = "HbA1c";
+
+/* Class = "UILabel"; text = "Exercise:"; ObjectID = "9tx-02-GXf"; */
+"9tx-02-GXf.text" = "Exercise:";
+
+/* Class = "UILabel"; text = "g"; ObjectID = "ACN-iY-zpP"; */
+"ACN-iY-zpP.text" = "g";
+
+/* Class = "UILabel"; text = "Low "; ObjectID = "B0Q-ux-IHf"; */
+"B0Q-ux-IHf.text" = "Low ";
+
+/* Class = "UILabel"; text = "113 mg/dl"; ObjectID = "B6N-bY-mFa"; */
+"B6N-bY-mFa.text" = "113 mg/dl";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "D3W-pP-Yk9"; */
+"D3W-pP-Yk9.title" = "Title";
+
+/* Class = "UIBarButtonItem"; title = "Help"; ObjectID = "DuN-xR-xYB"; */
+"DuN-xR-xYB.title" = "Help";
+
+/* Class = "UITabBarItem"; title = "Treatments"; ObjectID = "EM7-TR-8Pt"; */
+"EM7-TR-8Pt.title" = "Treatments";
+
+/* Class = "UILabel"; text = "-"; ObjectID = "EbR-T4-LIg"; */
+"EbR-T4-LIg.text" = "-";
+
+/* Class = "UIBarButtonItem"; title = "I"; ObjectID = "Fis-6U-di6"; */
+"Fis-6U-di6.title" = "I";
+
+/* Class = "UILabel"; text = "Filter:"; ObjectID = "GAt-uS-uta"; */
+"GAt-uS-uta.text" = "Filter:";
+
+/* Class = "UILabel"; text = "BG Check:"; ObjectID = "Gju-y6-ier"; */
+"Gju-y6-ier.text" = "BG Check:";
+
+/* Class = "UIButton"; configuration.title = " "; ObjectID = "H0N-EK-5JX"; */
+"H0N-EK-5JX.configuration.title" = " ";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "H0N-EK-5JX"; */
+"H0N-EK-5JX.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Hay-Q1-7fh"; */
+"Hay-Q1-7fh.text" = "Label";
+
+/* Class = "UILabel"; text = "31%"; ObjectID = "I1A-nd-fNX"; */
+"I1A-nd-fNX.text" = "31%";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "I1p-t1-Yls"; */
+"I1p-t1-Yls.text" = "Subtitle";
+
+/* Class = "UITabBarItem"; title = "Treatments"; ObjectID = "Jgh-Nb-wg6"; */
+"Jgh-Nb-wg6.title" = "Treatments";
+
+/* Class = "UILabel"; text = "00:00"; ObjectID = "JuE-mg-S0t"; */
+"JuE-mg-S0t.text" = "00:00";
+
+/* Class = "UILabel"; text = "Snooze Alarms"; ObjectID = "LzM-bz-Cnv"; */
+"LzM-bz-Cnv.text" = "Snooze Alarms";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "Mfz-72-6g0"; */
+"Mfz-72-6g0.text" = "Detail";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "N1U-VA-CRw"; */
+"N1U-VA-CRw.text" = "Detail";
+
+/* Class = "UIButton"; normalTitle = "OK"; ObjectID = "N9b-EE-lZm"; */
+"N9b-EE-lZm.normalTitle" = "OK";
+
+/* Class = "UILabel"; text = "(-)"; ObjectID = "Ncy-6l-nO2"; */
+"Ncy-6l-nO2.text" = "(-)";
+
+/* Class = "UILabel"; text = "- - -"; ObjectID = "On3-dy-RgB"; */
+"On3-dy-RgB.text" = "- - -";
+
+/* Class = "UILabel"; text = "CV"; ObjectID = "PZI-Ln-kfh"; */
+"PZI-Ln-kfh.text" = "CV";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "Pom-Rr-Zcn"; */
+"Pom-Rr-Zcn.text" = "Title";
+
+/* Class = "UIViewController"; title = "Treatments Insert Scene"; ObjectID = "QgE-Gq-57r"; */
+"QgE-Gq-57r.title" = "Treatments Insert Scene";
+
+/* Class = "UILabel"; text = "Average:"; ObjectID = "RLk-Au-VSf"; */
+"RLk-Au-VSf.text" = "Average:";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "S45-Yf-BHe"; */
+"S45-Yf-BHe.text" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "SQk-hK-fHN"; */
+"SQk-hK-fHN.text" = "Detail";
+
+/* Class = "UILabel"; text = "U"; ObjectID = "Sb5-Wd-8Ra"; */
+"Sb5-Wd-8Ra.text" = "U";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "TOp-MQ-ekU"; */
+"TOp-MQ-ekU.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "Tpl-mr-dqb"; */
+"Tpl-mr-dqb.text" = "Detail";
+
+/* Class = "UILabel"; text = "Insulin"; ObjectID = "U6e-jp-cms"; */
+"U6e-jp-cms.text" = "Insulin";
+
+/* Class = "UILabel"; text = "-%"; ObjectID = "Vdh-xP-Z0Y"; */
+"Vdh-xP-Z0Y.text" = "-%";
+
+/* Class = "UIButton"; configuration.title = " "; ObjectID = "WHF-BG-N8A"; */
+"WHF-BG-N8A.configuration.title" = " ";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "WHF-BG-N8A"; */
+"WHF-BG-N8A.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = " 24 hours"; ObjectID = "WIO-Oh-Z4T"; */
+"WIO-Oh-Z4T.text" = " 24 hours";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "WNo-rU-sXx"; */
+"WNo-rU-sXx.text" = "Title";
+
+/* Class = "UILabel"; text = "---"; ObjectID = "We3-bN-ffR"; */
+"We3-bN-ffR.text" = "---";
+
+/* Class = "UIButton"; normalTitle = "Connect"; ObjectID = "WtR-0P-RyL"; */
+"WtR-0P-RyL.normalTitle" = "Connect";
+
+/* Class = "UILabel"; text = "(-)"; ObjectID = "Xlz-6g-zzD"; */
+"Xlz-6g-zzD.text" = "(-)";
+
+/* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[0] = "Today"; ObjectID = "Xuy-hn-ozf"; */
+"Xuy-hn-ozf.segmentTitles[0]" = "Today";
+
+/* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[1] = "24h"; ObjectID = "Xuy-hn-ozf"; */
+"Xuy-hn-ozf.segmentTitles[1]" = "24h";
+
+/* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[2] = "7d"; ObjectID = "Xuy-hn-ozf"; */
+"Xuy-hn-ozf.segmentTitles[2]" = "7d";
+
+/* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[3] = "30d"; ObjectID = "Xuy-hn-ozf"; */
+"Xuy-hn-ozf.segmentTitles[3]" = "30d";
+
+/* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[4] = "90d"; ObjectID = "Xuy-hn-ozf"; */
+"Xuy-hn-ozf.segmentTitles[4]" = "90d";
+
+/* Class = "UILabel"; text = "mins"; ObjectID = "Xyz-4w-lz5"; */
+"Xyz-4w-lz5.text" = "mins";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "YQZ-eK-OoJ"; */
+"YQZ-eK-OoJ.title" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "Z96-ov-isg"; */
+"Z96-ov-isg.text" = "Detail";
+
+/* Class = "UIBarButtonItem"; title = "Sensor"; ObjectID = "ZIM-Wf-bUy"; */
+"ZIM-Wf-bUy.title" = "Sensor";
+
+/* Class = "UILabel"; text = "In Range:"; ObjectID = "aU7-G8-ash"; */
+"aU7-G8-ash.text" = "In Range:";
+
+/* Class = "UITabBarItem"; title = "Home"; ObjectID = "acW-dT-cKf"; */
+"acW-dT-cKf.title" = "Home";
+
+/* Class = "UILabel"; text = "Insulin:"; ObjectID = "agq-m8-HZ9"; */
+"agq-m8-HZ9.text" = "Insulin:";
+
+/* Class = "UIButton"; configuration.title = " "; ObjectID = "ajs-26-kaa"; */
+"ajs-26-kaa.configuration.title" = " ";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "ajs-26-kaa"; */
+"ajs-26-kaa.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "-"; ObjectID = "apa-6w-gic"; */
+"apa-6w-gic.text" = "-";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "b1J-rJ-H3K"; */
+"b1J-rJ-H3K.normalTitle" = "Cancel";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "bT9-HM-Wcp"; */
+"bT9-HM-Wcp.text" = "Label";
+
+/* Class = "UILabel"; text = "High"; ObjectID = "bUK-pC-4bd"; */
+"bUK-pC-4bd.text" = "High";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "c4h-5z-5mU"; */
+"c4h-5z-5mU.text" = "Title";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "cFe-Nd-8MW"; */
+"cFe-Nd-8MW.text" = "Label";
+
+/* Class = "UITabBarItem"; title = "Settings"; ObjectID = "cPa-gy-q4n"; */
+"cPa-gy-q4n.title" = "Settings";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "cVj-Us-dOZ"; */
+"cVj-Us-dOZ.text" = "Detail";
+
+/* Class = "UIViewController"; title = "M5 Stack Settings View Controller"; ObjectID = "d2Q-Tq-3zC"; */
+"d2Q-Tq-3zC.title" = "M5 Stack Settings View Controller";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "ekz-vj-3BZ"; */
+"ekz-vj-3BZ.text" = "Title";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "etA-fM-tGh"; */
+"etA-fM-tGh.title" = "Title";
+
+/* Class = "UIBarButtonItem"; title = "Snooze"; ObjectID = "f3E-Tt-LBV"; */
+"f3E-Tt-LBV.title" = "Snooze";
+
+/* Class = "UILabel"; text = "Friday 01/10/2021"; ObjectID = "fRg-Sl-fZq"; */
+"fRg-Sl-fZq.text" = "Friday 01/10/2021";
+
+/* Class = "UINavigationItem"; title = "Treatments"; ObjectID = "fUA-gv-91n"; */
+"fUA-gv-91n.title" = "Treatments";
+
+/* Class = "UILabel"; text = "Carbs:"; ObjectID = "fvP-G8-Gxk"; */
+"fvP-G8-Gxk.text" = "Carbs:";
+
+/* Class = "UITextField"; placeholder = "0.0"; ObjectID = "ggq-1D-Pj6"; */
+"ggq-1D-Pj6.placeholder" = "0.0";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "goS-0m-pgb"; */
+"goS-0m-pgb.text" = "Title";
+
+/* Class = "UILabel"; text = "CV:"; ObjectID = "h7N-aV-8eN"; */
+"h7N-aV-8eN.text" = "CV:";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "hfQ-Tt-xNH"; */
+"hfQ-Tt-xNH.text" = "Title";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "iIy-f4-6Ww"; */
+"iIy-f4-6Ww.text" = "Label";
+
+/* Class = "UILabel"; text = "mg/dl"; ObjectID = "iho-Ag-dJP"; */
+"iho-Ag-dJP.text" = "mg/dl";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "jx2-oc-XfQ"; */
+"jx2-oc-XfQ.text" = "Title";
+
+/* Class = "UITextField"; placeholder = "0"; ObjectID = "kl9-iM-MlH"; */
+"kl9-iM-MlH.placeholder" = "0";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "lBP-cK-gbT"; */
+"lBP-cK-gbT.title" = "Title";
+
+/* Class = "UILabel"; text = "-"; ObjectID = "n2x-3q-js1"; */
+"n2x-3q-js1.text" = "-";
+
+/* Class = "UINavigationItem"; title = "New Entry"; ObjectID = "nDn-qs-kKp"; */
+"nDn-qs-kKp.title" = "New Entry";
+
+/* Class = "UILabel"; text = "Average"; ObjectID = "na4-pU-1Ik"; */
+"na4-pU-1Ik.text" = "Average";
+
+/* Class = "UILabel"; text = "g"; ObjectID = "qyu-wZ-l4Q"; */
+"qyu-wZ-l4Q.text" = "g";
+
+/* Class = "UILabel"; text = "--:--"; ObjectID = "rSC-H3-vfk"; */
+"rSC-H3-vfk.text" = "--:--";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "raE-D9-ezV"; */
+"raE-D9-ezV.text" = "Detail";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "sBg-yb-0Iy"; */
+"sBg-yb-0Iy.text" = "Detail";
+
+/* Class = "UITextField"; placeholder = "0"; ObjectID = "saY-fP-EEW"; */
+"saY-fP-EEW.placeholder" = "0";
+
+/* Class = "UITabBarItem"; title = "Bluetooth"; ObjectID = "sgT-p5-hUt"; */
+"sgT-p5-hUt.title" = "Bluetooth";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "skm-we-lQ3"; */
+"skm-we-lQ3.text" = "Detail";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "tIz-Hj-yxH"; */
+"tIz-Hj-yxH.text" = "Title";
+
+/* Class = "UIBarButtonItem"; title = "Calibrate"; ObjectID = "u4d-bZ-Kw8"; */
+"u4d-bZ-Kw8.title" = "Calibrate";
+
+/* Class = "UITabBarItem"; title = "Treatments"; ObjectID = "ucH-hI-fdv"; */
+"ucH-hI-fdv.title" = "Treatments";
+
+/* Class = "UIButton"; normalTitle = "OK"; ObjectID = "uqL-UP-KZF"; */
+"uqL-UP-KZF.normalTitle" = "OK";
+
+/* Class = "UILabel"; text = "x mins ago"; ObjectID = "uyn-2k-K74"; */
+"uyn-2k-K74.text" = "x mins ago";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "vbi-WE-Mvc"; */
+"vbi-WE-Mvc.text" = "Title";
+
+/* Class = "UIBarButtonItem"; title = "Lock"; ObjectID = "wfX-50-2w6"; */
+"wfX-50-2w6.title" = "Lock";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "wi3-X0-YuZ"; */
+"wi3-X0-YuZ.title" = "Title";
