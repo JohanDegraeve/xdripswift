@@ -518,6 +518,10 @@ public class NightScoutUploadManager: NSObject {
             }
         }
         
+        // add 10 seconds because if Libre with smoothing is used, sometimes the older values reappear but with a slightly different timestamp
+        // this caused readings being uploaded to NS with just a few seconds difference
+        timeStamp = timeStamp.addingTimeInterval(10.0)
+        
         // get latest readings, filter : minimiumTimeBetweenTwoReadingsInMinutes beteen two readings, except for the first if a dis/reconnect occured since the latest reading
         var bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsNightScout.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: timeStamp)
         
