@@ -13,7 +13,9 @@ class SettingsViewUtilities {
         
         // first the two textfields
         cell.textLabel?.text = viewModel.settingsRowText(index: rowIndex)
+        cell.textLabel?.textColor = UIColor.white
         cell.detailTextLabel?.text = viewModel.detailedText(index: rowIndex)
+        cell.detailTextLabel?.textColor = UIColor.white
 
         // if not enabled, then no need to adding anything else
         if viewModel.isEnabled(index: rowIndex) {
