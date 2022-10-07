@@ -346,6 +346,10 @@ class Texts_SettingsView {
     static let labelSpeakBgReadings = {
         return NSLocalizedString("settingsviews_speakBgReadings", tableName: filename, bundle: Bundle.main, value: "Speak BG Readings?", comment: "speak settings, where user can enable or disable speak readings")
     }()
+
+    static let labelSpeakBgReadingsUseWorkaround = {
+        return NSLocalizedString("settingsviews_speakBgReadingsUseWorkaround", tableName: filename, bundle: Bundle.main, value: "Use iOS16 workaround?", comment: "speak settings, where user can enable or disable speak readings iOS 16 bug workaround")
+    }()
     
     static let labelSpeakLanguage = {
         return NSLocalizedString("settingsviews_speakBgReadingslanguage", tableName: filename, bundle: Bundle.main, value: "Language:", comment: "speak settings, where user can select the language")

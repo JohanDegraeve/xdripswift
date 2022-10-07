@@ -153,10 +153,14 @@ class BGReadingSpeaker:NSObject {
             currentBgReadingOutput += Texts_SpeakReading.currentDelta + " " + currentDelta + "."
             
         }
-        
+
         // say the text
-        say(text: currentBgReadingOutput, language: Texts_SpeakReading.languageCode)
-        
+        if UserDefaults.standard.speakReadingsUseWorkaround {
+            sayWithIOS16Workaround(currentBgReadingFormatted: currentBgReadingFormatted)
+        } else {
+            say(text: currentBgReadingOutput, language: Texts_SpeakReading.languageCode)
+        }
+
         // set timeStampLastSpokenReading
         timeStampLastSpokenReading = bgReadingToSpeak.timeStamp
         
@@ -174,6 +178,58 @@ class BGReadingSpeaker:NSObject {
         utterance.voice = AVSpeechSynthesisVoice(language: language)
         syn.speak(utterance)
 
+    }
+
+    /// Try to speak the reading with pre-exported speech sound files
+    private func sayWithIOS16Workaround(currentBgReadingFormatted: String) {
+        let normalizedReading = currentBgReadingFormatted
+            .replacingOccurrences(of: ",", with: ".") // normalize localized number reading
+
+        // The formatted reading must not contain anything else than numbers and a dot
+        let canSpeakReading = normalizedReading.allSatisfy { char in
+            char.isNumber || char == "."
+        }
+
+        guard canSpeakReading else {
+            // Inform the user that they should check the app for the value
+            sharedSoundPlayer.playSound(soundFileName: "invalid-reading.mp3")
+            return
+        }
+
+        // Separate decimals from ones ("12.4" => ["12", "4"])
+        var valueParts = normalizedReading
+            .split(separator: ".")
+
+        // Construct the sentence
+        var speechFiles = ["your-current-blood-glucose-is.mp3"]
+
+        // Add the ones into the sentence
+        if !valueParts.isEmpty {
+            let ones = String(valueParts.removeFirst())
+            speechFiles.append(contentsOf: filesToPlayForOnes(ones: ones))
+        }
+
+        // Add decimals if any
+        if !valueParts.isEmpty {
+            let tenths = valueParts.removeFirst()
+            speechFiles.append("point.mp3")
+            speechFiles.append("\(tenths).mp3")
+        }
+
+        // Play the files in order, producing a sensible sentence
+        sharedSoundPlayer.playSound(soundFileNames: speechFiles)
+    }
+
+    /// Handle mg/dl units for the iOS 16 text-to-speech bug workaround
+    private func filesToPlayForOnes(ones: String) -> [String] {
+        guard let num = Int(ones) else { return [] }
+
+        if num > 15 {
+            // Read digit by digit as it is not feasible to generate sound files for the whole range of mg/dl
+            return ones.map { "\($0).mp3" }
+        } else {
+            return ["\(ones).mp3"]
+        }
     }
 
     /// copied from Spike -

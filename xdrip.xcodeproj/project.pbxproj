@@ -51,6 +51,25 @@
 		F64039B0281C3F9D0051EFFE /* QuickActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */; };
 		F64039B2281E90CF0051EFFE /* QuickActions.strings in Resources */ = {isa = PBXBuildFile; fileRef = F64039B1281E90CF0051EFFE /* QuickActions.strings */; };
 		F64039B5281E91500051EFFE /* TextsQuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64039B4281E91500051EFFE /* TextsQuickActions.swift */; };
+		F659600628F093FE00473805 /* invalid-reading.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F659600528F093FE00473805 /* invalid-reading.mp3 */; };
+		F690188828A04CD100FD0D3E /* your-current-blood-glucose-is.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690187628A04CD100FD0D3E /* your-current-blood-glucose-is.mp3 */; };
+		F690188928A04CD100FD0D3E /* 13.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690187728A04CD100FD0D3E /* 13.mp3 */; };
+		F690188A28A04CD100FD0D3E /* 2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690187828A04CD100FD0D3E /* 2.mp3 */; };
+		F690188B28A04CD100FD0D3E /* 3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690187928A04CD100FD0D3E /* 3.mp3 */; };
+		F690188C28A04CD100FD0D3E /* 10.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690187A28A04CD100FD0D3E /* 10.mp3 */; };
+		F690188D28A04CD100FD0D3E /* 15.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690187B28A04CD100FD0D3E /* 15.mp3 */; };
+		F690188E28A04CD100FD0D3E /* point.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690187C28A04CD100FD0D3E /* point.mp3 */; };
+		F690188F28A04CD100FD0D3E /* 1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690187D28A04CD100FD0D3E /* 1.mp3 */; };
+		F690189028A04CD100FD0D3E /* 8.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690187E28A04CD100FD0D3E /* 8.mp3 */; };
+		F690189128A04CD100FD0D3E /* 5.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690187F28A04CD100FD0D3E /* 5.mp3 */; };
+		F690189228A04CD100FD0D3E /* 4.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690188028A04CD100FD0D3E /* 4.mp3 */; };
+		F690189328A04CD100FD0D3E /* 6.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690188128A04CD100FD0D3E /* 6.mp3 */; };
+		F690189428A04CD100FD0D3E /* 7.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690188228A04CD100FD0D3E /* 7.mp3 */; };
+		F690189528A04CD100FD0D3E /* 0.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690188328A04CD100FD0D3E /* 0.mp3 */; };
+		F690189628A04CD100FD0D3E /* 12.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690188428A04CD100FD0D3E /* 12.mp3 */; };
+		F690189728A04CD100FD0D3E /* 9.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690188528A04CD100FD0D3E /* 9.mp3 */; };
+		F690189828A04CD100FD0D3E /* 14.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690188628A04CD100FD0D3E /* 14.mp3 */; };
+		F690189928A04CD100FD0D3E /* 11.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F690188728A04CD100FD0D3E /* 11.mp3 */; };
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
 		F8025C1321DA683400ECF0C0 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1221DA683400ECF0C0 /* Data.swift */; };
 		F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4D21ED450300ECF0C0 /* Double.swift */; };
@@ -787,6 +806,25 @@
 		F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsManager.swift; sourceTree = "<group>"; };
 		F64039B1281E90CF0051EFFE /* QuickActions.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = QuickActions.strings; sourceTree = "<group>"; };
 		F64039B4281E91500051EFFE /* TextsQuickActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsQuickActions.swift; sourceTree = "<group>"; };
+		F659600528F093FE00473805 /* invalid-reading.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "invalid-reading.mp3"; sourceTree = "<group>"; };
+		F690187628A04CD100FD0D3E /* your-current-blood-glucose-is.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "your-current-blood-glucose-is.mp3"; sourceTree = "<group>"; };
+		F690187728A04CD100FD0D3E /* 13.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 13.mp3; sourceTree = "<group>"; };
+		F690187828A04CD100FD0D3E /* 2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 2.mp3; sourceTree = "<group>"; };
+		F690187928A04CD100FD0D3E /* 3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 3.mp3; sourceTree = "<group>"; };
+		F690187A28A04CD100FD0D3E /* 10.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 10.mp3; sourceTree = "<group>"; };
+		F690187B28A04CD100FD0D3E /* 15.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 15.mp3; sourceTree = "<group>"; };
+		F690187C28A04CD100FD0D3E /* point.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = point.mp3; sourceTree = "<group>"; };
+		F690187D28A04CD100FD0D3E /* 1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 1.mp3; sourceTree = "<group>"; };
+		F690187E28A04CD100FD0D3E /* 8.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 8.mp3; sourceTree = "<group>"; };
+		F690187F28A04CD100FD0D3E /* 5.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 5.mp3; sourceTree = "<group>"; };
+		F690188028A04CD100FD0D3E /* 4.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 4.mp3; sourceTree = "<group>"; };
+		F690188128A04CD100FD0D3E /* 6.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 6.mp3; sourceTree = "<group>"; };
+		F690188228A04CD100FD0D3E /* 7.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 7.mp3; sourceTree = "<group>"; };
+		F690188328A04CD100FD0D3E /* 0.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 0.mp3; sourceTree = "<group>"; };
+		F690188428A04CD100FD0D3E /* 12.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 12.mp3; sourceTree = "<group>"; };
+		F690188528A04CD100FD0D3E /* 9.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 9.mp3; sourceTree = "<group>"; };
+		F690188628A04CD100FD0D3E /* 14.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 14.mp3; sourceTree = "<group>"; };
+		F690188728A04CD100FD0D3E /* 11.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 11.mp3; sourceTree = "<group>"; };
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
 		F8025C1221DA683400ECF0C0 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		F8025E4D21ED450300ECF0C0 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
@@ -1693,6 +1731,32 @@
 			path = QuickActions;
 			sourceTree = "<group>";
 		};
+		F690187528A04CC100FD0D3E /* speech */ = {
+			isa = PBXGroup;
+			children = (
+				F690188328A04CD100FD0D3E /* 0.mp3 */,
+				F690187D28A04CD100FD0D3E /* 1.mp3 */,
+				F690187828A04CD100FD0D3E /* 2.mp3 */,
+				F690187928A04CD100FD0D3E /* 3.mp3 */,
+				F690188028A04CD100FD0D3E /* 4.mp3 */,
+				F690187F28A04CD100FD0D3E /* 5.mp3 */,
+				F690188128A04CD100FD0D3E /* 6.mp3 */,
+				F690188228A04CD100FD0D3E /* 7.mp3 */,
+				F690187E28A04CD100FD0D3E /* 8.mp3 */,
+				F690188528A04CD100FD0D3E /* 9.mp3 */,
+				F690187A28A04CD100FD0D3E /* 10.mp3 */,
+				F690188728A04CD100FD0D3E /* 11.mp3 */,
+				F690188428A04CD100FD0D3E /* 12.mp3 */,
+				F690187728A04CD100FD0D3E /* 13.mp3 */,
+				F690188628A04CD100FD0D3E /* 14.mp3 */,
+				F690187B28A04CD100FD0D3E /* 15.mp3 */,
+				F690187C28A04CD100FD0D3E /* point.mp3 */,
+				F690187628A04CD100FD0D3E /* your-current-blood-glucose-is.mp3 */,
+				F659600528F093FE00473805 /* invalid-reading.mp3 */,
+			);
+			path = speech;
+			sourceTree = "<group>";
+		};
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1749,6 +1813,7 @@
 		F8025E5A21F7AFA100ECF0C0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				F690187528A04CC100FD0D3E /* speech */,
 				F8B3A7B7226CC0B7004BA588 /* sounds */,
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
 			);
@@ -3363,12 +3428,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				F82437AF24CB7A9900BED341 /* Siri_Alert_Urgent_High_Glucose.caf in Resources */,
+				F690188D28A04CD100FD0D3E /* 15.mp3 in Resources */,
 				F82437CA24CB7A9900BED341 /* Marimba_Flutter_or_Shake.caf in Resources */,
+				F690188F28A04CD100FD0D3E /* 1.mp3 in Resources */,
 				F824377724CB7A9800BED341 /* Siri_Urgent_Low_Glucose.caf in Resources */,
 				CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */,
 				F82437D424CB7A9900BED341 /* Siri_Alert_Low_Glucose.caf in Resources */,
 				F8E6C79124CEC2E3007C1199 /* Snooze.strings in Resources */,
 				F824379B24CB7A9900BED341 /* Sci-Fi_Console_Alarm.caf in Resources */,
+				F690189228A04CD100FD0D3E /* 4.mp3 in Resources */,
 				47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */,
 				F824377324CB7A9800BED341 /* Store_Door_Chime.caf in Resources */,
 				F8AF11FD24B3B62D00AE5BA2 /* LibreErrors.strings in Resources */,
@@ -3395,18 +3463,23 @@
 				F8B48AA022B2FA7B009BCC01 /* HomeView.strings in Resources */,
 				F824377424CB7A9800BED341 /* Cartoon_Siren.caf in Resources */,
 				F824379424CB7A9900BED341 /* Cartoon_Ascend_Then_Descend.caf in Resources */,
+				F690188A28A04CD100FD0D3E /* 2.mp3 in Resources */,
 				F82437BC24CB7A9900BED341 /* Siri_Device_Muted.caf in Resources */,
 				F824377024CB7A9800BED341 /* Siri_Alert_Urgent_Low_Glucose.caf in Resources */,
 				F82437A824CB7A9900BED341 /* Sunny.caf in Resources */,
 				F8BDD448221C9D70006EAB84 /* ErrorMessages.strings in Resources */,
 				F82437CE24CB7A9900BED341 /* Cartoon_Ascend_Climb_Sneaky.caf in Resources */,
 				F824379F24CB7A9900BED341 /* Sci-Fi_Incoming_Message_Alert.caf in Resources */,
+				F690188E28A04CD100FD0D3E /* point.mp3 in Resources */,
 				F8B3A7C9226CC0B7004BA588 /* modern2.mp3 in Resources */,
 				F82437CD24CB7A9900BED341 /* Dhol_Shuffleloop.caf in Resources */,
 				F824379024CB7A9900BED341 /* CSFX-2_Alarm.caf in Resources */,
 				F82437CB24CB7A9900BED341 /* Orchestral_Horns.caf in Resources */,
 				F82437AA24CB7A9900BED341 /* Discreet.caf in Resources */,
+				F690189828A04CD100FD0D3E /* 14.mp3 in Resources */,
+				F690189628A04CD100FD0D3E /* 12.mp3 in Resources */,
 				F82437BF24CB7A9900BED341 /* Good_Morning.caf in Resources */,
+				F690189928A04CD100FD0D3E /* 11.mp3 in Resources */,
 				F82437B824CB7A9900BED341 /* Cuckoo_Clock.caf in Resources */,
 				F82437A224CB7A9900BED341 /* Sci-Fi_Eerie_Alarm.caf in Resources */,
 				F824379524CB7A9900BED341 /* Pager_Beeps.caf in Resources */,
@@ -3423,9 +3496,11 @@
 				F8B3A7D1226CC0B7004BA588 /* betterwakeup.mp3 in Resources */,
 				F824376C24CB7A9800BED341 /* Chimes_Glassy.caf in Resources */,
 				F82437A524CB7A9900BED341 /* Cartoon_Machine_Clumsy_Loop.caf in Resources */,
+				F690189528A04CD100FD0D3E /* 0.mp3 in Resources */,
 				F82437A324CB7A9900BED341 /* Siri_Alert_Glucose_Dropping_Fast.caf in Resources */,
 				F824379224CB7A9900BED341 /* Unpaved.caf in Resources */,
 				F824379D24CB7A9900BED341 /* Alarm_Buzzer.caf in Resources */,
+				F690188C28A04CD100FD0D3E /* 10.mp3 in Resources */,
 				F8B3A81F227DEC92004BA588 /* README.md in Resources */,
 				F82437B024CB7A9900BED341 /* In_A_Hurry.caf in Resources */,
 				F824378924CB7A9900BED341 /* Soft_Warm_Airy_Optimistic.caf in Resources */,
@@ -3436,6 +3511,7 @@
 				F82437AC24CB7A9900BED341 /* Siri_Alert_Calibration_Needed.caf in Resources */,
 				F824379624CB7A9900BED341 /* Oringz.caf in Resources */,
 				F824377D24CB7A9800BED341 /* Open_Your_Eyes_And_See.caf in Resources */,
+				F690188928A04CD100FD0D3E /* 13.mp3 in Resources */,
 				F82437A624CB7A9900BED341 /* Siri_Glucose_Rising_Fast.caf in Resources */,
 				F81F370825C1584A00520946 /* LibreStates.strings in Resources */,
 				F82437B724CB7A9900BED341 /* Cartoon_Tip_Toe_Sneaky_Walk.caf in Resources */,
@@ -3451,6 +3527,7 @@
 				F82437A024CB7A9900BED341 /* Siri_Missed_Readings.caf in Resources */,
 				F824377924CB7A9800BED341 /* Sci-Fi_Alarm_Loop_3.caf in Resources */,
 				F8B3A7CB226CC0B7004BA588 /* shortlow4.mp3 in Resources */,
+				F690189728A04CD100FD0D3E /* 9.mp3 in Resources */,
 				4749EB9B25B36E010072DF8B /* LibreNFC.strings in Resources */,
 				F82437C624CB7A9900BED341 /* Siri_Alert_High_Glucose.caf in Resources */,
 				F82437A924CB7A9900BED341 /* Wake_Up_Will_You.caf in Resources */,
@@ -3473,8 +3550,10 @@
 				F82437CC24CB7A9900BED341 /* Analog_Watch_Alarm.caf in Resources */,
 				F82437B524CB7A9900BED341 /* Alert_Tone_Busy.caf in Resources */,
 				F8EEDD552300136F00D2D610 /* DexcomShareTestResult.strings in Resources */,
+				F690189428A04CD100FD0D3E /* 7.mp3 in Resources */,
 				F82437AD24CB7A9900BED341 /* Laser_Shoot.caf in Resources */,
 				F824379824CB7A9900BED341 /* Not_Kiddin.caf in Resources */,
+				F690188828A04CD100FD0D3E /* your-current-blood-glucose-is.mp3 in Resources */,
 				F824378E24CB7A9900BED341 /* Win_Gain.caf in Resources */,
 				F824378624CB7A9900BED341 /* Alien_Siren.caf in Resources */,
 				F8B3A7CF226CC0B7004BA588 /* shorthigh4.mp3 in Resources */,
@@ -3495,6 +3574,7 @@
 				F82437C924CB7A9900BED341 /* Computer_Magic.caf in Resources */,
 				F82437A124CB7A9900BED341 /* Jingle_All_The_Way.caf in Resources */,
 				470CE1FC246802EB00D5CB74 /* BluetoothPeripheralsView.strings in Resources */,
+				F690189128A04CD100FD0D3E /* 5.mp3 in Resources */,
 				F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */,
 				F82437D324CB7A9900BED341 /* Soft_Marimba_Pad_Positive.caf in Resources */,
 				F824379924CB7A9900BED341 /* Magical_Twinkle.caf in Resources */,
@@ -3504,13 +3584,17 @@
 				F82437C524CB7A9900BED341 /* Marching_Heavy_Footed_Fat_Elephants.caf in Resources */,
 				F824376B24CB7A9800BED341 /* Thunder_Sound_FX.caf in Resources */,
 				F824376E24CB7A9800BED341 /* Burglar_Alarm_Siren_1.caf in Resources */,
+				F690188B28A04CD100FD0D3E /* 3.mp3 in Resources */,
 				F82437D124CB7A9900BED341 /* Signature_Corporate.caf in Resources */,
 				F824377224CB7A9800BED341 /* Ending_Reached.caf in Resources */,
 				F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */,
 				F8B48AA422B2FA9B009BCC01 /* CalibrationRequest.strings in Resources */,
 				F8B3A7B5226A0A71004BA588 /* Alerts.strings in Resources */,
+				F690189028A04CD100FD0D3E /* 8.mp3 in Resources */,
 				F8B3A7D2226CC0B7004BA588 /* spaceship.mp3 in Resources */,
 				F82437B224CB7A9900BED341 /* Burglar_Alarm_Siren_2.caf in Resources */,
+				F659600628F093FE00473805 /* invalid-reading.mp3 in Resources */,
+				F690189328A04CD100FD0D3E /* 6.mp3 in Resources */,
 				F82437BD24CB7A9900BED341 /* Sci-Fi_Spaceship_Warm_Up.caf in Resources */,
 				F824378D24CB7A9900BED341 /* Soft_Warm_Airy_Reassuring.caf in Resources */,
 			);

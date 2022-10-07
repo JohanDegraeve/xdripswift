@@ -74,6 +74,7 @@
 "testUrlAndAPIKey" = "Test Connection?";
 "settingsviews_sectiontitlespeak" = "Voice";
 "settingsviews_speakBgReadings" = "Speak BG Readings?";
+"settingsviews_speakBgReadingsUseWorkaround" = "Use iOS 16 workaround?";
 "settingsviews_speakBgReadingslanguage" = "Language:";
 "settingsviews_speakreadingslanguageselection" = "Select Language";
 "settingsviews_speakTrend" = "Speak Trend?";

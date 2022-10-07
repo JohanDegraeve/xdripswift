@@ -4,18 +4,21 @@ fileprivate enum Setting:Int, CaseIterable {
     
     ///should readings be spoken or not
     case speakBgReadings = 0
+
+    ///should use workaround for iOS 16 bug
+    case speakBgReadingsUseWorkaround = 1
     
     /// language to use
-    case speakBgReadingLanguage = 1
+    case speakBgReadingLanguage = 2
     
     ///should trend be spoken or not
-    case speakTrend = 2
+    case speakTrend = 3
     
     /// should delta be spoken or not
-    case speakDelta = 3
-    
+    case speakDelta = 4
+
     /// speak each reading, each 2 readings ...  integer value
-    case speakInterval = 4
+    case speakInterval = 5
     
 }
 
@@ -46,7 +49,25 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
     }
     
     func isEnabled(index: Int) -> Bool {
-        return true
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .speakBgReadings:
+            return true
+        case .speakBgReadingsUseWorkaround:
+            return true
+        case .speakBgReadingLanguage:
+            // language is locked to English when the workaround is in use
+            return !UserDefaults.standard.speakReadingsUseWorkaround
+        case .speakTrend:
+            // trend is not available when the workaround is in use
+            return !UserDefaults.standard.speakReadingsUseWorkaround
+        case .speakDelta:
+            // delta is not available when the workaround is in use
+            return !UserDefaults.standard.speakReadingsUseWorkaround
+        case .speakInterval:
+            return true
+        }
     }
     
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
@@ -54,6 +75,8 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         
         switch setting {
         case .speakBgReadings:
+            return .nothing
+        case .speakBgReadingsUseWorkaround:
             return .nothing
         case .speakTrend:
             return .nothing
@@ -99,6 +122,8 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         switch setting {
         case .speakBgReadings:
             return Texts_SettingsView.labelSpeakBgReadings
+        case .speakBgReadingsUseWorkaround:
+            return Texts_SettingsView.labelSpeakBgReadingsUseWorkaround
         case .speakBgReadingLanguage:
             return Texts_SettingsView.labelSpeakLanguage
         case .speakTrend:
@@ -115,6 +140,8 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         
         switch setting {
         case .speakBgReadings:
+            return UITableViewCell.AccessoryType.none
+        case .speakBgReadingsUseWorkaround:
             return UITableViewCell.AccessoryType.none
         case .speakTrend:
             return UITableViewCell.AccessoryType.none
@@ -133,6 +160,8 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         switch setting {
         case .speakBgReadings:
             return nil
+        case .speakBgReadingsUseWorkaround:
+            return nil
         case .speakTrend:
             return nil
         case .speakDelta:
@@ -140,7 +169,12 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         case .speakInterval:
             return UserDefaults.standard.speakInterval.description
         case .speakBgReadingLanguage:
-            return Texts_SpeakReading.languageName
+            if UserDefaults.standard.speakReadingsUseWorkaround {
+                // language is locked to English when the workaround is in use
+                return ConstantsSpeakReadingLanguages.languageName(forLanguageCode: Texts_SpeakReading.defaultLanguageCode)
+            } else {
+                return Texts_SpeakReading.languageName
+            }
         }
     }
     
@@ -150,8 +184,10 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         switch setting {
             
         case .speakBgReadings:
-            return UISwitch(isOn: UserDefaults.standard.speakReadings, action: {(isOn:Bool) in UserDefaults.standard.speakReadings = isOn
-            })
+            return UISwitch(isOn: UserDefaults.standard.speakReadings, action: {(isOn:Bool) in UserDefaults.standard.speakReadings = isOn})
+
+        case .speakBgReadingsUseWorkaround:
+            return UISwitch(isOn: UserDefaults.standard.speakReadingsUseWorkaround, action: {(isOn:Bool) in UserDefaults.standard.speakReadingsUseWorkaround = isOn})
 
         case .speakTrend:
             return UISwitch(isOn: UserDefaults.standard.speakTrend, action: {(isOn:Bool) in UserDefaults.standard.speakTrend = isOn})

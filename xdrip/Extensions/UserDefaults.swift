@@ -178,6 +178,8 @@ extension UserDefaults {
         
         /// speak readings
         case speakReadings = "speakReadings"
+        /// speak readings iOS 16 text-to-speech bug workaround
+        case speakReadingsUseWorkaround = "speakReadingsUseWorkaround"
         /// speak reading language
         case speakReadingLanguageCode = "speakReadingLanguageCode"
         /// speak delta
@@ -1275,6 +1277,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.speakReadings.rawValue)
+        }
+    }
+
+    /// should use workaround for iOS 16 text-to-speech bug
+    @objc dynamic var speakReadingsUseWorkaround: Bool {
+        get {
+            return bool(forKey: Key.speakReadingsUseWorkaround.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.speakReadingsUseWorkaround.rawValue)
         }
     }
 
