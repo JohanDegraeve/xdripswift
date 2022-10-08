@@ -3081,11 +3081,13 @@ final class RootViewController: UIViewController {
         
         // BG values to use in calculations
         var actualBgValue: Double = 0
-        var glucoseValues: [Double] = []
+        var shortTermGlucoseValues: [Double] = []
+        var longTermGlucoseValues: [Double] = []
         
         // calculated values
-        var stdDeviationValue: Double = 0
-        var deltaValue: Double = 0
+        var longTermStdDeviationValue: Double = 0
+        var shortTermStdDeviationValue: Double = 0
+        var shortTermDeltaValue: Double = 0
         var higherBgUpperValue: Double = 0
         var higherBgRecommendedValue: Double = 0
         var lowerBgRecommendedValue: Double = 0
@@ -3093,7 +3095,7 @@ final class RootViewController: UIViewController {
         
         // results after applying multipliers to the calculated values
         var stdDeviationResult: Double = 0
-        var deltaResult: Double = 0
+        var shortTermDeltaResult: Double = 0
         var higherBgUpperResult: Double = 0
         var higherBgRecommendedResult: Double = 0
         var lowerBgRecommendedResult: Double = 0
@@ -3104,15 +3106,18 @@ final class RootViewController: UIViewController {
         // make sure that the necessary objects are initialised and readings are available.
         if let bgReadingsAccessor = bgReadingsAccessor {
             
-            // get the last "x" minutes of BG readings from coredata where "x" is defined in ConstantsCalibrationAssistant
-            let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date(timeIntervalSinceNow: -ConstantsCalibrationAssistant.minutesToUseForCalculations * 60), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            // LONG-TERM BG READINGS
+            // get long term readings over the last hour or so and see if there is any really big deviation in values. This should help us detect a very noisy sensor
             
-            // if we successfully got BG readings, then pull out the calculated value and add it to a simple glucoseValues array
-            if bgReadings.count > 0 {
+            // get the last "x" minutes of BG readings from coredata where "x" is defined in ConstantsCalibrationAssistant
+            let longTermBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date(timeIntervalSinceNow: -ConstantsCalibrationAssistant.minutesToUseForLongTermCalculations * 60), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            
+            // if we successfully got BG readings, then pull out the calculated value and add it to the long-term glucose values array
+            if longTermBgReadings.count > 0 {
                 
                 isFirstValue = true
                 
-                for reading in bgReadings {
+                for reading in longTermBgReadings {
                     
                     let calculatedValue = reading.calculatedValue
                     
@@ -3124,7 +3129,55 @@ final class RootViewController: UIViewController {
                             actualBgValue = calculatedValue
                         }
                         
-                        glucoseValues.append(calculatedValue)
+                        longTermGlucoseValues.append(calculatedValue)
+                        
+                        isFirstValue = false
+                        
+                    }
+                }
+                
+                // assuming that there are glucose values stored in the array, we can start calculating
+                if longTermGlucoseValues.count > 0 {
+                    
+                    // calculate standard deviation
+                    var sum: Double = 0
+                    
+                    let averageGlucoseValue = Double(longTermGlucoseValues.reduce(0, +)) / Double(longTermGlucoseValues.count)
+                    
+                    for glucoseValue in longTermGlucoseValues {
+                        sum += (glucoseValue - averageGlucoseValue) * (glucoseValue - averageGlucoseValue)
+                    }
+                    
+                    longTermStdDeviationValue = sqrt(sum / Double(longTermGlucoseValues.count))
+                    
+                }
+            }
+            
+            
+            // SHORT-TERM BG READINGS
+            // get short-term readings over the last 20-30 minutes and run the full analyse to see if the conditions are currently ideal for calibrating
+            
+            // get the last "x" minutes of BG readings from coredata where "x" is defined in ConstantsCalibrationAssistant
+            let shortTermBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date(timeIntervalSinceNow: -ConstantsCalibrationAssistant.minutesToUseForShortTermCalculations * 60), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            
+            // if we successfully got BG readings, then pull out the calculated value and add it to the short-term glucose values array
+            if shortTermBgReadings.count > 0 {
+                
+                isFirstValue = true
+                
+                for reading in shortTermBgReadings {
+                    
+                    let calculatedValue = reading.calculatedValue
+                    
+                    // only append the BG values if they are not zero or out of range. This is just to avoid strange errors in the calculations
+                    if (calculatedValue != 0.0) && (calculatedValue >= ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl) && (calculatedValue <= 450) {
+                        
+                        // set the actual BG value to the first BG reading in the returned array (which will be the last reading received)
+                        if isFirstValue {
+                            actualBgValue = calculatedValue
+                        }
+                        
+                        shortTermGlucoseValues.append(calculatedValue)
                         
                         isFirstValue = false
                         
@@ -3132,25 +3185,26 @@ final class RootViewController: UIViewController {
                 }
             }
             
+            
             // assuming that there are glucose values stored in the array, we can start calculating
-            if glucoseValues.count > 0 {
+            if shortTermGlucoseValues.count > 0 {
                 
                 // calculate standard deviation
                 var sum: Double = 0
                 
-                let averageGlucoseValue = Double(glucoseValues.reduce(0, +)) / Double(glucoseValues.count)
+                let averageGlucoseValue = Double(shortTermGlucoseValues.reduce(0, +)) / Double(shortTermGlucoseValues.count)
                 
-                for glucoseValue in glucoseValues {
+                for glucoseValue in shortTermGlucoseValues {
                     sum += (glucoseValue - averageGlucoseValue) * (glucoseValue - averageGlucoseValue)
                 }
                 
-                stdDeviationValue = sqrt(sum / Double(glucoseValues.count))
-                stdDeviationResult = stdDeviationValue * ConstantsCalibrationAssistant.stdDeviationMultiplier
+                shortTermStdDeviationValue = sqrt(sum / Double(shortTermGlucoseValues.count))
+                stdDeviationResult = shortTermStdDeviationValue * ConstantsCalibrationAssistant.shortTermStdDeviationMultiplier
                 
                 
-                // calculate delta change between the first and last BG value in the array
-                deltaValue = (glucoseValues.first ?? 0) - (glucoseValues.last ?? 0)
-                deltaResult = abs(deltaValue) * ConstantsCalibrationAssistant.deltaMultiplier
+                // calculate delta change between the minimum and maximum BG values in the array
+                shortTermDeltaValue = (shortTermGlucoseValues.first ?? 0) - (shortTermGlucoseValues.last ?? 0)
+                shortTermDeltaResult = abs(shortTermDeltaValue) * ConstantsCalibrationAssistant.shortTermDeltaMultiplier
                 
                 
                 // calculate upper outer limit bg result
@@ -3181,7 +3235,7 @@ final class RootViewController: UIViewController {
                 
                 
                 // calculate the final result
-                calibrationAssistantResult = stdDeviationResult + deltaResult + higherBgUpperResult + higherBgRecommendedResult + lowerBgRecommendedResult + lowerBgLowerResult
+                calibrationAssistantResult = stdDeviationResult + shortTermDeltaResult + higherBgUpperResult + higherBgRecommendedResult + lowerBgRecommendedResult + lowerBgLowerResult
                 
                 
                 // let's start to construct the alert message that should be shown to the user
@@ -3195,21 +3249,25 @@ final class RootViewController: UIViewController {
                 
                 
                 // if the result is over the ok limit, then we must give further explanations to the user.
-                if calibrationAssistantResult > ConstantsCalibrationAssistant.okToCalibrateLimit {
+                if calibrationAssistantResult > ConstantsCalibrationAssistant.okToCalibrateLimit || longTermStdDeviationValue > ConstantsCalibrationAssistant.longTermStdDeviationValueLimit {
                     
-                    if deltaResult > ConstantsCalibrationAssistant.deltaResultLimit {
+                    if longTermStdDeviationValue > ConstantsCalibrationAssistant.longTermStdDeviationValueLimit {
+                        
+                        calibrationAssistantAlertMessage += "\n\n🔃 " + Texts_Calibrations.bgValuesNotStableLongTerm
+                        
+                    }
+                    
+                    if shortTermDeltaResult > ConstantsCalibrationAssistant.shortTermDeltaResultLimit {
                         
                         // check if the delta is positive (rising) or negative (dropping)
-                        if deltaValue > 0 {
+                        if shortTermDeltaValue > 0 {
                             calibrationAssistantAlertMessage += "\n\n📈 " + Texts_Calibrations.bgValuesRising
                         } else {
                             calibrationAssistantAlertMessage += "\n\n📉 " + Texts_Calibrations.bgValuesDropping
                         }
                         
-                    }
-                    
-                    if stdDeviationResult > ConstantsCalibrationAssistant.stdDeviationResultLimit {
-                        calibrationAssistantAlertMessage += "\n\n↕️ " + Texts_Calibrations.bgValuesNotStable
+                    } else if stdDeviationResult > ConstantsCalibrationAssistant.shortTermStdDeviationResultLimit && longTermStdDeviationValue <= ConstantsCalibrationAssistant.longTermStdDeviationValueLimit {
+                        calibrationAssistantAlertMessage += "\n\n↕️ " + Texts_Calibrations.bgValuesNotStableShortTerm
                     }
                     
                     if actualBgValue > ConstantsCalibrationAssistant.higherBgUpperLimit {
@@ -3230,9 +3288,11 @@ final class RootViewController: UIViewController {
                     
                     calibrationAssistantAlertMessage += "\n\n*** DEBUG DATA ***"
                     
-                    calibrationAssistantAlertMessage += "\nDelta: " + deltaValue.bgValuetoString(mgdl: true) + " * " + Int(ConstantsCalibrationAssistant.deltaMultiplier).description + " = " + Int(deltaResult).description
+                    calibrationAssistantAlertMessage += "\nLong-term Std Dev: " + longTermStdDeviationValue.round(toDecimalPlaces: 1).description
                     
-                    calibrationAssistantAlertMessage += "\nStd Dev: " + stdDeviationValue.round(toDecimalPlaces: 1).description + " * " + Int(ConstantsCalibrationAssistant.stdDeviationMultiplier).description + " = " + Int(stdDeviationResult).description
+                    calibrationAssistantAlertMessage += "\nShort-term Delta: " + shortTermDeltaValue.bgValuetoString(mgdl: true) + " * " + Int(ConstantsCalibrationAssistant.shortTermDeltaMultiplier).description + " = " + Int(shortTermDeltaResult).description
+                    
+                    calibrationAssistantAlertMessage += "\nShort-term Std Dev: " + shortTermStdDeviationValue.round(toDecimalPlaces: 1).description + " * " + Int(ConstantsCalibrationAssistant.shortTermStdDeviationMultiplier).description + " = " + Int(stdDeviationResult).description
                     
                     if higherBgUpperResult > 0 {
                         calibrationAssistantAlertMessage += "\nVery High BG [>" + Int(ConstantsCalibrationAssistant.higherBgUpperLimit).description + "]: " + higherBgUpperValue.round(toDecimalPlaces: 1).description + " * " + Int(ConstantsCalibrationAssistant.higherBgUpperMultiplier).description + " = " + Int(higherBgUpperResult).description
@@ -3252,7 +3312,7 @@ final class RootViewController: UIViewController {
                     
                     calibrationAssistantAlertMessage += "\nLimits: [<=" + Int(ConstantsCalibrationAssistant.okToCalibrateLimit).description + " / <" + Int(ConstantsCalibrationAssistant.notIdealToCalibrateLimit).description + "]"
                     
-                    calibrationAssistantAlertMessage += "\nRESULT: " + Int(calibrationAssistantResult).description + " over " + Int(ConstantsCalibrationAssistant.minutesToUseForCalculations).description + " mins"
+                    calibrationAssistantAlertMessage += "\nRESULT: " + Int(calibrationAssistantResult).description + " over " + Int(ConstantsCalibrationAssistant.minutesToUseForShortTermCalculations).description + " mins"
                     
                 }
                 
@@ -3268,9 +3328,11 @@ final class RootViewController: UIViewController {
                 
                 calibrationAssistantTraceMessage += " Actual BG in mg/dl: " + Int(actualBgValue).description
                 
-                calibrationAssistantTraceMessage += "; delta: " + Int(deltaValue).description + "*" + Int(ConstantsCalibrationAssistant.deltaMultiplier).description + "=" + Int(deltaResult).description
+                calibrationAssistantTraceMessage += "; longTermStdDev [" + Int(ConstantsCalibrationAssistant.longTermStdDeviationValueLimit).description + "]:" + longTermStdDeviationValue.round(toDecimalPlaces: 1).description
                 
-                calibrationAssistantTraceMessage += "; stdDev: " + stdDeviationValue.round(toDecimalPlaces: 1).description + "*" + Int(ConstantsCalibrationAssistant.stdDeviationMultiplier).description + "=" + Int(stdDeviationResult).description
+                calibrationAssistantTraceMessage += "; shortTermDelta [" + Int(ConstantsCalibrationAssistant.shortTermDeltaResultLimit).description + "]:" + Int(shortTermDeltaValue).description + "*" + Int(ConstantsCalibrationAssistant.shortTermDeltaMultiplier).description + "=" + Int(shortTermDeltaResult).description
+                
+                calibrationAssistantTraceMessage += "; shortTermStdDev [" + Int(ConstantsCalibrationAssistant.shortTermStdDeviationResultLimit).description + "]:" + shortTermStdDeviationValue.round(toDecimalPlaces: 1).description + "*" + Int(ConstantsCalibrationAssistant.shortTermStdDeviationMultiplier).description + "=" + Int(stdDeviationResult).description
                 
                 calibrationAssistantTraceMessage += "; veryHighBG [>" + Int(ConstantsCalibrationAssistant.higherBgUpperLimit).description + "]:" + higherBgUpperValue.round(toDecimalPlaces: 1).description + "*" + Int(ConstantsCalibrationAssistant.higherBgUpperMultiplier).description + "=" + Int(higherBgUpperResult).description
                 
@@ -3282,7 +3344,7 @@ final class RootViewController: UIViewController {
                 
                 calibrationAssistantTraceMessage += "; limits: [<=" + Int(ConstantsCalibrationAssistant.okToCalibrateLimit).description + " / <" + Int(ConstantsCalibrationAssistant.notIdealToCalibrateLimit).description + "]"
                                 
-                calibrationAssistantTraceMessage += "; RESULT: " + Int(calibrationAssistantResult).description + " over " + Int(ConstantsCalibrationAssistant.minutesToUseForCalculations).description + " mins"
+                calibrationAssistantTraceMessage += "; RESULT: " + Int(calibrationAssistantResult).description + " over " + Int(ConstantsCalibrationAssistant.minutesToUseForShortTermCalculations).description + " mins"
                 
             }
             
@@ -3304,11 +3366,11 @@ final class RootViewController: UIViewController {
                 
             } else if calibrationAssistantResult < ConstantsCalibrationAssistant.notIdealToCalibrateLimit {
                 
-                calibrateToolbarButtonOutlet.tintColor = UIColor.systemYellow
+                calibrateToolbarButtonOutlet.tintColor = UIColor.systemOrange
                 
             } else {
                 
-                calibrateToolbarButtonOutlet.tintColor = UIColor.systemOrange
+                calibrateToolbarButtonOutlet.tintColor = UIColor.red
                 
             }
             

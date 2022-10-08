@@ -44,8 +44,12 @@ enum Texts_Calibrations {
         return NSLocalizedString("bgValuesDropping", tableName: filename, bundle: Bundle.main, value: "BG values have been dropping", comment: "a message to inform that the BG values have been dropping too much to calibrate")
     }()
     
-    static let bgValuesNotStable:String = {
-        return NSLocalizedString("bgValuesNotStable", tableName: filename, bundle: Bundle.main, value: "BG values are not stable enough", comment: "a message to inform that the BG values are not stable enough to calibrate")
+    static let bgValuesNotStableShortTerm:String = {
+        return NSLocalizedString("bgValuesNotStableShortTerm", tableName: filename, bundle: Bundle.main, value: "BG is not currently stable", comment: "a message to inform that the BG values are not stable enough to calibrate")
+    }()
+    
+    static let bgValuesNotStableLongTerm:String = {
+        return String(format: NSLocalizedString("bgValuesNotStableLongTerm", tableName: filename, bundle: Bundle.main, value: "BG values have been unstable over the last %@ minutes", comment: "a message to inform that the historical BG values are not stable enough to consider calibrating"), Int(ConstantsCalibrationAssistant.minutesToUseForLongTermCalculations).description)
     }()
     
     static let bgValueTooHigh:String = {

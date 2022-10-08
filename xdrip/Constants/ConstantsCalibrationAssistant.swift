@@ -11,23 +11,31 @@ import Foundation
 /// constants used by the calibration assistant
 enum ConstantsCalibrationAssistant {
     
-    /// the number of minutes of readings that we should use for the calibration assistant calculations
-    static let minutesToUseForCalculations: Double = 20
+    /// the number of minutes of readings that we should use for the long-term calibration assistant calculations
+    static let minutesToUseForLongTermCalculations: Double = 90
+    
+    /// the number of minutes of readings that we should use for the short-term calibration assistant calculations
+    static let minutesToUseForShortTermCalculations: Double = 25
     
     // Delta
     /// the value over which we will consider that the delta change is significant to display as a concern to the user
-    static let deltaResultLimit: Double = 90
+    static let shortTermDeltaResultLimit: Double = 90
 
     /// the weighting that will be applied to the delta change value to push the result up
-    static let deltaMultiplier: Double = 30
+    static let shortTermDeltaMultiplier: Double = 30
     
     
-    // Standard Deviation
-    /// the value over which we will consider that the variation in change is significant to display as a concern to the user
-    static let stdDeviationResultLimit: Double = 60
+    // Standard Deviation (long-term)
+    /// the value over which we will consider that the long-term variance value is significant to display as a concern to the user
+    static let longTermStdDeviationValueLimit: Double = 20
     
-    /// the weighting that will be applied to the standard deviation value to push the result up
-    static let stdDeviationMultiplier: Double = 50
+    
+    // Standard Deviation (short-term)
+    /// the value over which we will consider that the short-term variance result is significant to display as a concern to the user
+    static let shortTermStdDeviationResultLimit: Double = 60
+    
+    /// the weighting that will be applied to the short-term standard deviation value to push the result up
+    static let shortTermStdDeviationMultiplier: Double = 50
     
     
     // Very high BG levels

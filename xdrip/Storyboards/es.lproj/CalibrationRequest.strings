@@ -11,8 +11,9 @@
 "doNotCalibrate" = "No se debe calibrar ahora mismo";
 "bgValuesRising" = "Los valores de glucosa han estado subiendo";
 "bgValuesDropping" = "Los valores de glucosa han estado bajando";
-"bgValuesNotStable" = "Los valores de glucosa son poco estables";
-"bgValueTooHigh" = "La glucosa actual es demasiado alto";
-"bgValuesSlightlyHigh" = "La glucosa actual es ligeramente alto";
-"bgValueTooLow" = "La glucosa actual es demasiado bajo";
-"bgValuesSlightlyLow" = "La glucosa actual es ligeramente bajo";
+"bgValuesNotStableShortTerm" = "Los valores de glucosa son poco estables";
+"bgValuesNotStableLongTerm" = "Los valores de glucosa no han sido suficientes estables durante los últimos %@ minutos";
+"bgValueTooHigh" = "El valor de glucosa actual es demasiado alto";
+"bgValuesSlightlyHigh" = "El valor de glucosa actual es ligeramente alto";
+"bgValueTooLow" = "El valor de glucosa actual es demasiado bajo";
+"bgValuesSlightlyLow" = "El valor de glucosa actual es ligeramente bajo";
