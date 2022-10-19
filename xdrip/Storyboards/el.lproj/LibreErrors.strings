@@ -1,0 +1,4 @@
+"receivedDataIsNil" = "OOP δεν βρέθηκαν δεδομένα"; //"No data received from oop web server";
+"oOPWebServerError" = "OOP Πρόβλημα διακοσμητή: "; //"OOP Web Server error: ";
+"libreUSNotSupported" = "Libre US δεν υποστιρίζεται"; //"Libre US is not supported";
+"libreSensorNotReady" = "Ο αισθητήρας δεν είναι ακόμα έτοιμος"; //"Libre sensor not in status ready";

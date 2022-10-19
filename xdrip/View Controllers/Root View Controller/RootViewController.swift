@@ -1170,6 +1170,14 @@ final class RootViewController: UIViewController {
                 timeStampLastBgReading = lastReading.timeStamp
             }
             
+            /// in case loopdelay > 0, this will be used to share with Loop
+            /// - it will contain the full range off per minute readings (in stead of filtered by 5 minutes
+            /// - reset to empty array
+            loopManager?.glucoseData = [GlucoseData]()
+            
+            // initialize latest3BgReadings
+            var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+            
             // iterate through array, elements are ordered by timestamp, first is the youngest, we need to start with the oldest
             for (index, glucose) in glucoseData.enumerated().reversed() {
                 
@@ -1181,9 +1189,6 @@ final class RootViewController: UIViewController {
                     
                     // check on glucoseLevelRaw > 0 because I've had a case where a faulty sensor was giving negative values
                     if glucose.glucoseLevelRaw > 0 {
-                        
-                        // get latest3BgReadings
-                        var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
                         
                         let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                         
@@ -1202,12 +1207,30 @@ final class RootViewController: UIViewController {
                         // set timeStampLastBgReading to new timestamp
                         timeStampLastBgReading = glucose.timeStamp
                         
+                        // reset latest3BgReadings
+                        latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+                        
+                        if LoopManager.loopDelay() > 0 {
+                            loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.calculatedValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
+                        }
                         
                     } else {
                         
                         trace("reading skipped, rawValue <= 0, looks like a faulty sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                         
                     }
+                    
+                } else if LoopManager.loopDelay() > 0 && glucose.glucoseLevelRaw > 0 {
+                    
+                    // loopdelay > 0, LoopManager will use loopShareGoucoseData
+                    // create a reading just to be able to fill up loopShareGoucoseData, to have them per minute
+                    
+                    let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+
+                    loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.calculatedValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
+                    
+                    // delete the newReading, otherwise it stays in coredata and we would end up with per minute readings
+                    coreDataManager.mainManagedObjectContext.delete(newReading)
                     
                 }
                 
@@ -1266,8 +1289,8 @@ final class RootViewController: UIViewController {
                 }
 
                 updateWatchApp()
-                
             }
+            
         }
         
     }

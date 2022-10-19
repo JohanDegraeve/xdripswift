@@ -10,7 +10,8 @@ extension String {
             
         }
         
-        if self >= "8G" {
+        // changed from 8G to 8A as Dexcom seemed to have gone through the alphabet and started again for G6 transmitters as from summer 2022
+        if self >= "8A" {
             
             return true
             

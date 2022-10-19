@@ -16,7 +16,7 @@
 "readyToScan" = "Готов к сканированию";
 "scanning" = "Сканирование";
 "disconnect" = "Отключить";
-"tryingToConnect" = "Скинирование";
+"tryingToConnect" = "Сканирование";
 "notTryingToConnect" = "Не сканирует";
 "connect" = "Соединение";
 "connectedAt" = "Подключено в:";
