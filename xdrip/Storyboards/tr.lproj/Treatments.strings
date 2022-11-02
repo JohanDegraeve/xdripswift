@@ -1,0 +1,16 @@
+"treatments_title" = "Tedaviler";
+"treatments_new_button" = "Yeni";
+"treatments_new_entry" = "Yeni Tedavi";
+"treatments_carbs_with_unit" = "Karbonhidrat (gr):";
+"treatments_insulin_with_unit" = "İnsülin (Ü):";
+"treatments_exercise_with_unit" = "Egzersiz (dak):";
+"treatments_carbs_unit" = "gr";
+"treatments_insulin_unit" = "Ü";
+"treatments_exercise_unit" = "dak";
+"treatments_carbs" = "Karbonhidrat";
+"treatments_insulin" = "Bolus";
+"treatments_exercise" = "Egzersiz";
+"treatments_bgcheck" = "KŞ-Ölçümü";
+"treatments_question_mark" = "?";
+"treatments_success" = "Başarı";
+"treatments_sync_complete" = "Senkronizasyon tamamlandı.";
