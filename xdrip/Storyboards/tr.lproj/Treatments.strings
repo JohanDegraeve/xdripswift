@@ -1,10 +1,10 @@
 "treatments_title" = "Tedaviler";
 "treatments_new_button" = "Yeni";
 "treatments_new_entry" = "Yeni Tedavi";
-"treatments_carbs_with_unit" = "Karbonhidrat (gr):";
+"treatments_carbs_with_unit" = "Karbonhidrat (g):";
 "treatments_insulin_with_unit" = "İnsülin (Ü):";
 "treatments_exercise_with_unit" = "Egzersiz (dak):";
-"treatments_carbs_unit" = "gr";
+"treatments_carbs_unit" = "g";
 "treatments_insulin_unit" = "Ü";
 "treatments_exercise_unit" = "dak";
 "treatments_carbs" = "Karbonhidrat";
