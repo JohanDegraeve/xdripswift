@@ -71,6 +71,12 @@
 /* Class = "UIBarButtonItem"; title = "I"; ObjectID = "Fis-6U-di6"; */
 "Fis-6U-di6.title" = "I";
 
+/* Class = "UILabel"; text = "Filter:"; ObjectID = "GAt-uS-uta"; */
+"GAt-uS-uta.text" = "Filtre:";
+
+/* Class = "UILabel"; text = "BG Check:"; ObjectID = "Gju-y6-ier"; */
+"Gju-y6-ier.text" = "KŞ Kontrolü:";
+
 /* Class = "UILabel"; text = "Label"; ObjectID = "Hay-Q1-7fh"; */
 "Hay-Q1-7fh.text" = "Etiket";
 
@@ -146,6 +152,9 @@
 /* Class = "UISegmentedControl"; Xuy-hn-ozf.segmentTitles[4] = "90d"; ObjectID = "Xuy-hn-ozf"; */
 "Xuy-hn-ozf.segmentTitles[4]" = "90g";
 
+/* Class = "UILabel"; text = "mins"; ObjectID = "Xyz-4w-lz5"; */
+"Xyz-4w-lz5.text" = "dak";
+
 /* Class = "UINavigationItem"; title = "Title"; ObjectID = "YQZ-eK-OoJ"; */
 "YQZ-eK-OoJ.title" = "Başlık";
 
@@ -160,6 +169,15 @@
 
 /* Class = "UITabBarItem"; title = "Home"; ObjectID = "acW-dT-cKf"; */
 "acW-dT-cKf.title" = "Ana Ekran";
+
+/* Class = "UILabel"; text = "Insulin:"; ObjectID = "agq-m8-HZ9"; */
+"agq-m8-HZ9.text" = "İnsülin:";
+
+/* Class = "UIButton"; configuration.title = " "; ObjectID = "ajs-26-kaa"; */
+"ajs-26-kaa.configuration.title" = " ";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "ajs-26-kaa"; */
+"ajs-26-kaa.normalTitle" = "Buton";
 
 /* Class = "UILabel"; text = "-"; ObjectID = "apa-6w-gic"; */
 "apa-6w-gic.text" = "-";
@@ -197,6 +215,15 @@
 /* Class = "UIBarButtonItem"; title = "Snooze"; ObjectID = "f3E-Tt-LBV"; */
 "f3E-Tt-LBV.title" = "Ertele";
 
+/* Class = "UINavigationItem"; title = "Treatments"; ObjectID = "fUA-gv-91n"; */
+"fUA-gv-91n.title" = "Tedaviler";
+
+/* Class = "UILabel"; text = "Carbs:"; ObjectID = "fvP-G8-Gxk"; */
+"fvP-G8-Gxk.text" = "Karbonhidrat:";
+
+/* Class = "UITextField"; placeholder = "0.0"; ObjectID = "ggq-1D-Pj6"; */
+"ggq-1D-Pj6.placeholder" = "0.0";
+
 /* Class = "UILabel"; text = "Friday 01/10/2021"; ObjectID = "fRg-Sl-fZq"; */
 "fRg-Sl-fZq.text" = "Cuma 01/10/2021";
 
@@ -218,8 +245,22 @@
 /* Class = "UINavigationItem"; title = "Title"; ObjectID = "lBP-cK-gbT"; */
 "lBP-cK-gbT.title" = "Başlık";
 
+/* Class = "UILabel"; text = "mg/dl"; ObjectID = "iho-Ag-dJP"; */
+"iho-Ag-dJP.text" = "mg/dl";
+
+/* Class = "UITextField"; placeholder = "0"; ObjectID = "kl9-iM-MlH"; */
+"kl9-iM-MlH.placeholder" = "0";
+
+/* Class = "UINavigationItem"; title = "New Entry"; ObjectID = "nDn-qs-kKp"; */
+"nDn-qs-kKp.title" = "Yeni Giriş";
+
+
 /* Class = "UILabel"; text = "-"; ObjectID = "n2x-3q-js1"; */
 "n2x-3q-js1.text" = "-";
+
+/* Class = "UILabel"; text = "g"; ObjectID = "qyu-wZ-l4Q"; */
+"qyu-wZ-l4Q.text" = "g";
+
 
 /* Class = "UILabel"; text = "Average"; ObjectID = "na4-pU-1Ik"; */
 "na4-pU-1Ik.text" = "Ortalama";
@@ -236,6 +277,9 @@
 /* Class = "UITabBarItem"; title = "Bluetooth"; ObjectID = "sgT-p5-hUt"; */
 "sgT-p5-hUt.title" = "Bluetooth";
 
+/* Class = "UITextField"; placeholder = "0"; ObjectID = "saY-fP-EEW"; */
+"saY-fP-EEW.placeholder" = "0";
+
 /* Class = "UILabel"; text = "Detail"; ObjectID = "skm-we-lQ3"; */
 "skm-we-lQ3.text" = "Detay";
 
@@ -244,6 +288,9 @@
 
 /* Class = "UIBarButtonItem"; title = "Calibrate"; ObjectID = "u4d-bZ-Kw8"; */
 "u4d-bZ-Kw8.title" = "Kalibre et";
+
+/* Class = "UITabBarItem"; title = "Treatments"; ObjectID = "ucH-hI-fdv"; */
+"ucH-hI-fdv.title" = "Tedaviler";
 
 /* Class = "UIButton"; normalTitle = "OK"; ObjectID = "uqL-UP-KZF"; */
 "uqL-UP-KZF.normalTitle" = "Tamam";
