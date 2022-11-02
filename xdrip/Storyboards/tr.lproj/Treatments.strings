@@ -14,3 +14,5 @@
 "treatments_question_mark" = "?";
 "treatments_success" = "Başarı";
 "treatments_sync_complete" = "Senkronizasyon tamamlandı.";
+"treatments_filterTreatmentsLabel" = "Filtre:";
+"treatments_cannotStoreFutureBGCheck" = "Gelecekte bir KŞ Kontürolü kaydedemezsiniz.\n\nGerçek zamanda kaydedilir.";
