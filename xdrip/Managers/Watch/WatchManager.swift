@@ -91,7 +91,8 @@ class WatchManager: NSObject {
         // start with the reading in correct unit
         var title = lastReading[0].unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).description
         
-        // add the visual indicator to the title to show if result is in range?
+        // add the visual indicator to the title to show what range the current
+        // reading is in
         if (UserDefaults.standard.displayVisualTargetIndicator){
             
             var visualIndicator = ""
