@@ -247,7 +247,7 @@ extension UserDefaults {
         /// calendar interval
         case calendarInterval = "calendarInterval"
         
-        /// should a visual coloured emojii be shown in the calendar title yes or no
+        /// should a visual coloured indicator be shown in the calendar title yes or no
         case displayVisualTargetIndicator = "displayVisualTargetIndicator"
         
         
@@ -1504,7 +1504,7 @@ extension UserDefaults {
         }
     }
     
-    /// should a visual coloured emojii be shown in the calendar title,  yes or no, default no
+    /// should a visual coloured indicator be shown in the calendar title,  yes or no, default no
     @objc dynamic var displayVisualTargetIndicator: Bool {
         get {
             return bool(forKey: Key.displayVisualTargetIndicator.rawValue)
