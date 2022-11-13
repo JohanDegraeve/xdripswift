@@ -93,7 +93,7 @@ class WatchManager: NSObject {
         
         // add the visual indicator to the title to show what range the current
         // reading is in
-        if (UserDefaults.standard.displayVisualTargetIndicator){
+        if (UserDefaults.standard.displayVisualIndicatorInCalendarEvent){
             
             var visualIndicator = ""
         

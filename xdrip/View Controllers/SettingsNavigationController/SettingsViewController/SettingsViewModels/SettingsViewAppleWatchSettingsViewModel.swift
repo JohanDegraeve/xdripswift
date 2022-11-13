@@ -20,11 +20,11 @@ fileprivate enum Setting:Int, CaseIterable {
     /// should units be displayed yes or no
     case displayUnits = 4
     
-    /// minimum time between two readings, for which event should be created (in minutes)
-    case calendarInterval = 5
-    
     /// should a visual indicator be shown on the calendar title
-    case displayVisualTargetIndicator = 6
+    case displayVisualTargetIndicator = 5
+    
+    /// minimum time between two readings, for which event should be created (in minutes)
+    case calendarInterval = 6
 
 }
 
@@ -70,7 +70,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
             return Texts_SettingsView.displayUnitInCalendarEvent
             
         case .displayVisualTargetIndicator:
-            return Texts_SettingsView.displayVisualTargetIndicator
+            return Texts_SettingsView.displayVisualIndicatorInCalendar
             
         case .calendarInterval:
             return Texts_SettingsView.settingsviews_IntervalTitle
@@ -213,7 +213,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
             return UISwitch(isOn: UserDefaults.standard.displayUnitInCalendarEvent, action: {(isOn:Bool) in UserDefaults.standard.displayUnitInCalendarEvent = isOn})
             
         case .displayVisualTargetIndicator:
-            return UISwitch(isOn: UserDefaults.standard.displayVisualTargetIndicator, action: {(isOn:Bool) in UserDefaults.standard.displayVisualTargetIndicator = isOn})
+            return UISwitch(isOn: UserDefaults.standard.displayVisualIndicatorInCalendarEvent, action: {(isOn:Bool) in UserDefaults.standard.displayVisualIndicatorInCalendarEvent = isOn})
             
         case .calendarInterval:
             return nil

@@ -248,7 +248,7 @@ extension UserDefaults {
         case calendarInterval = "calendarInterval"
         
         /// should a visual coloured indicator be shown in the calendar title yes or no
-        case displayVisualTargetIndicator = "displayVisualTargetIndicator"
+        case displayVisualIndicatorInCalendarEvent = "displayVisualIndicator"
         
         
         // Other Settings (not user configurable)
@@ -1505,12 +1505,12 @@ extension UserDefaults {
     }
     
     /// should a visual coloured indicator be shown in the calendar title,  yes or no, default no
-    @objc dynamic var displayVisualTargetIndicator: Bool {
+    @objc dynamic var displayVisualIndicatorInCalendarEvent: Bool {
         get {
-            return bool(forKey: Key.displayVisualTargetIndicator.rawValue)
+            return bool(forKey: Key.displayVisualIndicatorInCalendarEvent.rawValue)
         }
         set {
-            set(newValue, forKey: Key.displayVisualTargetIndicator.rawValue)
+            set(newValue, forKey: Key.displayVisualIndicatorInCalendarEvent.rawValue)
         }
     }
     
