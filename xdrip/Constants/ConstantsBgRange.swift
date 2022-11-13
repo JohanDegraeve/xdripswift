@@ -16,5 +16,5 @@ enum BgRange {
     case notUrgent
     
     /// bg range is "in range"
-    case InRange
+    case inRange
 }

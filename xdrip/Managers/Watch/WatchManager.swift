@@ -100,7 +100,7 @@ class WatchManager: NSObject {
             // get the current range of the last reading then
             // configure the indicator based on the relevant range
             switch lastReading[0].bgRange() {
-            case .InRange:
+            case .inRange:
                 visualIndicator = ConstantsWatch.visualIndicatorInRange
             case .notUrgent:
                 visualIndicator = ConstantsWatch.visualIndicatorNotUrgent

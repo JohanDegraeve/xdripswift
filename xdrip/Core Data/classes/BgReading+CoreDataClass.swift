@@ -223,7 +223,7 @@ public class BgReading: NSManagedObject {
         }
         
         // BG is not high or low so considered "in range"
-        return BgRange.InRange
+        return BgRange.inRange
     }
     
     /// taken over form xdripplus
