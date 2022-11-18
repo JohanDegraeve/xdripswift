@@ -1192,27 +1192,36 @@ final class RootViewController: UIViewController {
                         
                         let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                         
-                        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                        if newReading.calculatedValue >= ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue && newReading.calculatedValue <= ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue {
                             
-                            trace("new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ","))
+                            if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
+                                
+                                trace("new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ","))
+                                
+                            }
+                            
+                            // save the newly created bgreading permenantly in coredata
+                            coreDataManager.saveChanges()
+                            
+                            // a new reading was created
+                            newReadingCreated = true
+                            
+                            // set timeStampLastBgReading to new timestamp
+                            timeStampLastBgReading = glucose.timeStamp
+                            
+                            // reset latest3BgReadings
+                            latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+                            
+                            if LoopManager.loopDelay() > 0 {
+                                loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.calculatedValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
+                            }
+                            
+                        } else {
+                            
+                            trace("reading skipped, BG readings out of bounds, likely a brand new or faulty sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                             
                         }
                         
-                        // save the newly created bgreading permenantly in coredata
-                        coreDataManager.saveChanges()
-                        
-                        // a new reading was created
-                        newReadingCreated = true
-                        
-                        // set timeStampLastBgReading to new timestamp
-                        timeStampLastBgReading = glucose.timeStamp
-                        
-                        // reset latest3BgReadings
-                        latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
-                        
-                        if LoopManager.loopDelay() > 0 {
-                            loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.calculatedValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
-                        }
                         
                     } else {
                         
