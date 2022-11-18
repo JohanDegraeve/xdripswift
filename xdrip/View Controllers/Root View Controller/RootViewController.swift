@@ -1071,6 +1071,9 @@ final class RootViewController: UIViewController {
             let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
             let lastCalibrationForActiveSensor = calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
             
+            /// used if loopdelay > 0, to check if there was a recent calibration. If so then no readings are added in glucoseData array for a period of loopdelay + an amount of minutes
+            let timeStampLastCalibrationForActiveSensor = lastCalibrationForActiveSensor != nil ? lastCalibrationForActiveSensor!.timeStamp : Date(timeIntervalSince1970: 0)
+            
             
             
             // next is only if smoothing is enabled, and if there's at least 11 minutes of readings in the glucoseData array, which will normally only be the case for Libre with MM/Bubble
@@ -1222,14 +1225,13 @@ final class RootViewController: UIViewController {
                             
                         }
                         
-                        
                     } else {
                         
                         trace("reading skipped, rawValue <= 0, looks like a faulty sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                         
                     }
                     
-                } else if LoopManager.loopDelay() > 0 && glucose.glucoseLevelRaw > 0 {
+                } else if LoopManager.loopDelay() > 0 && glucose.glucoseLevelRaw > 0 && abs(Date().timeIntervalSince(timeStampLastCalibrationForActiveSensor)) >  LoopManager.loopDelay() + TimeInterval(minutes: 5.5) {
                     
                     // loopdelay > 0, LoopManager will use loopShareGoucoseData
                     // create a reading just to be able to fill up loopShareGoucoseData, to have them per minute
