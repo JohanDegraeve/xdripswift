@@ -1237,11 +1237,16 @@ final class RootViewController: UIViewController {
                     // create a reading just to be able to fill up loopShareGoucoseData, to have them per minute
                     
                     let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-
-                    loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.calculatedValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
                     
-                    // delete the newReading, otherwise it stays in coredata and we would end up with per minute readings
-                    coreDataManager.mainManagedObjectContext.delete(newReading)
+                    
+                    if newReading.calculatedValue >= ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue && newReading.calculatedValue <= ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue {
+                        
+                        loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.calculatedValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
+                        
+                        // delete the newReading, otherwise it stays in coredata and we would end up with per minute readings
+                        coreDataManager.mainManagedObjectContext.delete(newReading)
+                        
+                    }
                     
                 }
                 
