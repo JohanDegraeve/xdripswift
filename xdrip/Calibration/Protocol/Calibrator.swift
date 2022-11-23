@@ -497,8 +497,8 @@ extension Calibrator {
     ///
     /// new value is not stored in the database
     /// - parameters:
-    ///     - bgReading : reading that needs to be updated - inout parameter to improve performance
-    private func updateCalculatedValue(for bgReading:BgReading) {
+    ///     - bgReading : reading that needs to be updated
+    public func updateCalculatedValue(for bgReading:BgReading) {
         if (bgReading.calculatedValue < 10) {
             bgReading.calculatedValue = ConstantsCalibrationAlgorithms.bgReadingErrorValue
             bgReading.hideSlope = true
