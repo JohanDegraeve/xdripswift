@@ -826,6 +826,13 @@ class BluetoothPeripheralViewController: UIViewController {
         // first ask user if ok to delete and if yes delete
         let alert = UIAlertController(title: Texts_BluetoothPeripheralView.confirmDeletionBluetoothPeripheral + " " + textToAdd + "?", message: nil, actionHandler: {
             
+            // in case it's a Libre2 CGM, libre1DerivedAlgorithmParameters has a non nil value. When deleting the transmitter, by setting to nil, this will ensure that user first need to do a successful NFC scan.
+            if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), bluetoothTransmitter is CGMTransmitter {
+                
+                UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
+                
+            }
+
             // delete
             bluetoothPeripheralManager.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheral)
             
@@ -860,6 +867,14 @@ class BluetoothPeripheralViewController: UIViewController {
                 
                 // disconnect
                 setShouldConnectToFalse(for: bluetoothPeripheral)
+                
+                // in case it's a Libre2 CGM, libre1DerivedAlgorithmParameters has a non nil value. When disconnecting set to nil, user will need to scan again when reconnecting
+                // in case it's a Libre2 CGM, libre1DerivedAlgorithmParameters has a non nil value. When deleting the transmitter, by setting to nil, this will ensure that user first need to do a successful NFC scan.
+                if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), bluetoothTransmitter is CGMTransmitter {
+                    
+                    UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
+                    
+                }
                 
             } else {
                 
