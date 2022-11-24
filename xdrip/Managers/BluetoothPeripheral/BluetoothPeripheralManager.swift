@@ -609,31 +609,34 @@ class BluetoothPeripheralManager: NSObject {
     /// sets cgmTransmitterDeviceAddress, cgmTransmitter_CBUUID_Service, cgmTransmitter_CBUUID_Receive in shared userdefaults
     ///  for use with xdrip-client-swift
     private func setCGMTransmitterInSharedUserDefaults() {
-     
+        
+        if UserDefaults.standard.setActiveCGM { // only store cgm transmitter device address to shared userdefaults if the app is set as Active CGM
+        
         if let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) {
             
             if let cgmTransmitter = getCGMTransmitter(), let cgmtransmitterAddress = currentCgmTransmitterAddress {
-
+                
                 // store getCBUUID_Receive
                 sharedUserDefaults.set(cgmTransmitter.getCBUUID_Receive(), forKey: "cgmTransmitter_CBUUID_Receive")
                 
                 // store cgm transmitter device address
                 sharedUserDefaults.set(cgmtransmitterAddress, forKey: "cgmTransmitterDeviceAddress")
-
+                
                 // store getCBUUID_Service
                 sharedUserDefaults.set(cgmTransmitter.getCBUUID_Service(), forKey: "cgmTransmitter_CBUUID_Service")
-
+                
             } else {
                 
                 // there's no cgm transmitter currently active (ie configured as 'connect')
                 // store nil as cgm transmitter device address
                 // we don't care about CBUUID_Service and CBUUID_Receive
-
+                
                 sharedUserDefaults.set(nil, forKey: "cgmTransmitterDeviceAddress")
                 
             }
             
         }
+    }
         
     }
 
