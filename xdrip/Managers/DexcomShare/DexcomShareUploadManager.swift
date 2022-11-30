@@ -70,7 +70,7 @@ class DexcomShareUploadManager:NSObject {
     ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
     public func uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date?) {
         
-        if !UserDefaults.standard.setActiveGCM {return}
+        if !UserDefaults.standard.setActiveCGM {return}
         
         // check if dexcomShare is enabled
         guard UserDefaults.standard.uploadReadingstoDexcomShare else {

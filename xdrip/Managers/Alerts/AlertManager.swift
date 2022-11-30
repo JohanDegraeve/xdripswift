@@ -113,7 +113,7 @@ public class AlertManager:NSObject {
     ///     - if true then an immediate notification is created (immediate being not a future planned, like missed reading), which contains the bg reading in the text - so there's no need to create an additional notificationwith the text in it
     public func checkAlerts(maxAgeOfLastBgReadingInSeconds:Double) -> Bool {
         
-        if !UserDefaults.standard.setActiveGCM {
+        if !UserDefaults.standard.setActiveCGM {
             return false
         }
         
