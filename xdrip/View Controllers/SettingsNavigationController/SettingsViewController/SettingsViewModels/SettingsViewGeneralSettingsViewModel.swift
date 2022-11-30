@@ -230,6 +230,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
                 
                 UserDefaults.standard.setActiveCGM = isOn
                 UserDefaults.standard.showReadingInAppBadge = isOn
+                UserDefaults.standard.suppressLoopShare = !isOn
                 
                 if !isOn {
                     let uNUserNotificationCenter = UNUserNotificationCenter.current()
