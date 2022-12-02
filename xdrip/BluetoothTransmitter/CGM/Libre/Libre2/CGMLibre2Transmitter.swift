@@ -138,8 +138,8 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
             
         }
         
-        // start the bluetooth scanning
-        return super.startScanning()
+        // start the NFC scan (not BLE scanning)
+        return .nfcScanNeeded
 
     }
     
@@ -376,7 +376,7 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
 // MARK: - LibreNFCDelegate functions
 
 extension CGMLibre2Transmitter: LibreNFCDelegate {
-    
+        
     func received(fram: Data) {
         
         trace("received fram :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, fram.toHexString())
@@ -455,6 +455,41 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
             trace("received streaming enabled message from NFC with result unsuccessful", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
 
         }
+        
+    }
+    
+    func nfcScanResult(successful: Bool) {
+        
+        if successful {
+            
+            print("setting userdefaults nfcScanSuccessful to true")
+            
+            trace("setting userdefaults nfcScanSuccessful to true", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            
+            // trying to check if false first to try and avoid BAD ACCESS crashes
+            if !UserDefaults.standard.nfcScanSuccessful {
+                
+                UserDefaults.standard.nfcScanSuccessful = true
+                
+            }
+            
+        } else {
+            
+            trace("setting userdefaults nfcScanFailed to true", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            
+            if !UserDefaults.standard.nfcScanFailed {
+                
+                UserDefaults.standard.nfcScanFailed = true
+                
+            }
+            
+        }
+        
+    }
+    
+    func startBLEScanning() {
+        
+        _ = super.startScanning()
         
     }
     

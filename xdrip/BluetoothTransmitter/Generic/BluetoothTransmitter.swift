@@ -605,6 +605,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         /// unauthorized
         case unauthorized
         
+        /// successful NFC scan needed before starting BLE scanning
+        case nfcScanNeeded
+        
         // any other, reason specified in text
         case other(reason:String)
         
@@ -634,6 +637,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 
             case .unauthorized:
                 return "unauthorized"
+                
+            case .nfcScanNeeded:
+                return "nfcScanNeeded"
                 
             }
         }

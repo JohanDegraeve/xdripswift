@@ -57,7 +57,7 @@
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
 
 /// if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible
-"calibrationNotNecessary" = "When using the Libre algoritm, it is not necessary to calibrate the sensor.";
+"calibrationNotNecessary" = "When using the Libre algorithm, manual calibration is not available.\n\nYou can switch to the xDrip algorithm in the transmitter screen.";
 
 /// To give result about transitter result in notification body, failed
 "failed" = "Failed";

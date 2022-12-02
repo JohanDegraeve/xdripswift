@@ -34,7 +34,7 @@
 "transmitterpairingattempttimeout" = "El transmisor no respondió a la solicitud para emparejar";
 "success" = "Exito";
 "failed" = "Error";
-"calibrationNotNecessary" = "Habilitando el uso del algoritmo Libre, no será necesario calibrar el sensor";
+"calibrationNotNecessary" = "Habilitando el uso del algorithmo Libre, no será necesario calibrar el sensor";
 "dexcomBatteryTooLow" = "El nivel de batería del Transmisor es demasiado bajo!";
 "sensor" = "Sensor";
 

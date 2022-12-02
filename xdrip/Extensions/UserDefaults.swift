@@ -292,6 +292,13 @@ extension UserDefaults {
         /// should debug level logs be added in trace file or not, and also in NSLog
         case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
         
+        // NFC scan failure indicator
+        /// used to indicate that a Libre 2 NFC pairing scan has failed
+        case nfcScanFailed = "nfcScanFailed"
+        // NFC scan failure indicator
+        /// used to indicate that a Libre 2 NFC pairing scan has been successful
+        case nfcScanSuccessful = "nfcScanSuccessful"
+        
         // non fixed slope values for oop web Libre
         /// web oop parameters, only for bubble, miaomiao and Libre 2
         case libre1DerivedAlgorithmParameters = "algorithmParameters"
@@ -979,7 +986,9 @@ extension UserDefaults {
             return bool(forKey: Key.useIFCCA1C.rawValue)
         }
         set {
-            set(newValue, forKey: Key.useIFCCA1C.rawValue)
+            if newValue != bool(forKey: Key.useIFCCA1C.rawValue) {
+                set(newValue, forKey: Key.useIFCCA1C.rawValue)
+            }
         }
     }
     
@@ -1077,7 +1086,9 @@ extension UserDefaults {
             return bool(forKey: Key.nightScoutEnabled.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightScoutEnabled.rawValue)
+            if newValue != bool(forKey: Key.nightScoutEnabled.rawValue) {
+                set(newValue, forKey: Key.nightScoutEnabled.rawValue)
+            }
         }
     }
     
@@ -1163,7 +1174,9 @@ extension UserDefaults {
             return bool(forKey: Key.nightScoutSyncTreatmentsRequired.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightScoutSyncTreatmentsRequired.rawValue)
+            if newValue != bool(forKey: Key.nightScoutSyncTreatmentsRequired.rawValue) {
+                set(newValue, forKey: Key.nightScoutSyncTreatmentsRequired.rawValue)
+            }
         }
     }
     
@@ -1616,6 +1629,7 @@ extension UserDefaults {
         }
     }
     
+    
     // MARK: - =====  Loop Share Settings ======
     
     /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
@@ -1870,7 +1884,35 @@ extension UserDefaults {
             }
         }
         set {
-            set(newValue, forKey: Key.librePatchInfo.rawValue)
+            if newValue != object(forKey: Key.librePatchInfo.rawValue) as? Data {
+                set(newValue, forKey: Key.librePatchInfo.rawValue)
+            }
+        }
+    }
+    
+    /// in case an NFC scan fails, this value will be set to true.
+    /// bluetoothPeripheralViewController will observe this value and if it becomes set to true, it should disconnect the transmitter and offer to scan again
+    @objc dynamic var nfcScanFailed: Bool {
+        get {
+            return bool(forKey: Key.nfcScanFailed.rawValue)
+        }
+        set {
+            if newValue != bool(forKey: Key.nfcScanFailed.rawValue) {
+                set(newValue, forKey: Key.nfcScanFailed.rawValue)
+            }
+        }
+    }
+    
+    /// in case an NFC completes successfuly, this value will be set to true.
+    /// bluetoothPeripheralViewController will observe this value and if it becomes set to true, it will advise the user and launch BLE scanning from the superclass
+    @objc dynamic var nfcScanSuccessful: Bool {
+        get {
+            return bool(forKey: Key.nfcScanSuccessful.rawValue)
+        }
+        set {
+            if newValue != bool(forKey: Key.nfcScanSuccessful.rawValue) {
+                set(newValue, forKey: Key.nfcScanSuccessful.rawValue)
+            }
         }
     }
     

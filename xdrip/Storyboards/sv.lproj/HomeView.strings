@@ -34,7 +34,7 @@
 "transmitterpairingattempttimeout" = "Sändaren svarade inte på parkopplingsförfrågan.";
 "success" = "Lyckades";
 "failed" = "Misslyckades";
-"calibrationNotNecessary" = "När du använder Libre-algoritmen behöver du inte kalibrera sensorn.";
+"calibrationNotNecessary" = "När du använder Libre-algorithmen behöver du inte kalibrera sensorn.";
 "dexcomBatteryTooLow" = "Sändarens batterinivå är för låg!";
 
 /////////////////////////////////////////////////////////////////////////////////////////////

@@ -405,16 +405,23 @@ public class NightScoutUploadManager: NSObject {
                     }
                     
                 case UserDefaults.Key.nightScoutSyncTreatmentsRequired :
-
-                    // if value is set to true, then a nightscout sync is required
-                    if UserDefaults.standard.nightScoutSyncTreatmentsRequired {
-
+                    
+                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
+                        
+                        // if nightScoutSyncTreatmentsRequired didn't change to true then no further processing
+                        guard UserDefaults.standard.nightScoutSyncTreatmentsRequired else {return}
+                        
                         UserDefaults.standard.nightScoutSyncTreatmentsRequired = false
-
-                        syncTreatmentsWithNightScout()
-
+                        
+                        // if Nightscout is enabled, then a nightscout sync is required
+                        if UserDefaults.standard.nightScoutEnabled {
+                            
+                            syncTreatmentsWithNightScout()
+                            
+                        }
+                        
                     }
-
+                    
                 default:
                     break
                 }

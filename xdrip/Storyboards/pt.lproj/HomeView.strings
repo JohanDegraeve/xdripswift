@@ -30,7 +30,7 @@
 "transmitterpairingattempttimeout" = "Transmissor não respondeu ao pedido de emparelhamento.";
 "success" = "Com Sucesso";
 "failed" = "Falhou";
-"calibrationNotNecessary" = "Quando se usa Algoritmo do Libre, não é necessário calibrar o sensor.";
+"calibrationNotNecessary" = "Quando se usa algorithmo do Libre, não é necessário calibrar o sensor.";
 "dexcomBatteryTooLow" = "O Nível de Bateria do Transmissor está muito baixo!";
 "unlock" = "Desbloquear";
 "lock" = "Bloquear";

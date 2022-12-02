@@ -34,7 +34,7 @@
 "transmitterpairingattempttimeout" = "Transmitter reageerde niet op verbindingsverzoek.";
 "success" = "Succes";
 "failed" = "Mislukt";
-"calibrationNotNecessary" = "Indien het Libre algoritme wordt gebruikt is kalibratie van de sensor niet nodig.";
+"calibrationNotNecessary" = "Indien het Libre algorithme wordt gebruikt is kalibratie van de sensor niet nodig.";
 "dexcomBatteryTooLow" = "Het Transmitter batterijniveau is te laag!";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
