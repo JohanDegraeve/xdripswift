@@ -986,9 +986,7 @@ extension UserDefaults {
             return bool(forKey: Key.useIFCCA1C.rawValue)
         }
         set {
-            if newValue != bool(forKey: Key.useIFCCA1C.rawValue) {
-                set(newValue, forKey: Key.useIFCCA1C.rawValue)
-            }
+            set(newValue, forKey: Key.useIFCCA1C.rawValue)
         }
     }
     
@@ -1086,9 +1084,7 @@ extension UserDefaults {
             return bool(forKey: Key.nightScoutEnabled.rawValue)
         }
         set {
-            if newValue != bool(forKey: Key.nightScoutEnabled.rawValue) {
-                set(newValue, forKey: Key.nightScoutEnabled.rawValue)
-            }
+            set(newValue, forKey: Key.nightScoutEnabled.rawValue)
         }
     }
     
@@ -1174,9 +1170,7 @@ extension UserDefaults {
             return bool(forKey: Key.nightScoutSyncTreatmentsRequired.rawValue)
         }
         set {
-            if newValue != bool(forKey: Key.nightScoutSyncTreatmentsRequired.rawValue) {
-                set(newValue, forKey: Key.nightScoutSyncTreatmentsRequired.rawValue)
-            }
+            set(newValue, forKey: Key.nightScoutSyncTreatmentsRequired.rawValue)
         }
     }
     
@@ -1884,9 +1878,7 @@ extension UserDefaults {
             }
         }
         set {
-            if newValue != object(forKey: Key.librePatchInfo.rawValue) as? Data {
-                set(newValue, forKey: Key.librePatchInfo.rawValue)
-            }
+            set(newValue, forKey: Key.librePatchInfo.rawValue)
         }
     }
     
@@ -1897,9 +1889,7 @@ extension UserDefaults {
             return bool(forKey: Key.nfcScanFailed.rawValue)
         }
         set {
-            if newValue != bool(forKey: Key.nfcScanFailed.rawValue) {
-                set(newValue, forKey: Key.nfcScanFailed.rawValue)
-            }
+            set(newValue, forKey: Key.nfcScanFailed.rawValue)
         }
     }
     
@@ -1910,9 +1900,7 @@ extension UserDefaults {
             return bool(forKey: Key.nfcScanSuccessful.rawValue)
         }
         set {
-            if newValue != bool(forKey: Key.nfcScanSuccessful.rawValue) {
-                set(newValue, forKey: Key.nfcScanSuccessful.rawValue)
-            }
+            set(newValue, forKey: Key.nfcScanSuccessful.rawValue)
         }
     }
     
