@@ -333,8 +333,9 @@ class BluetoothPeripheralViewController: UIViewController {
             // connect button label text needs to change because shouldconnect value has changed
             _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: self.transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
             
+            // TODO: needs checking - commented out as probably unnecessary
             // as transmitter is now set to nil, call again configure. Maybe not necessary, but it can't hurt
-            self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView, bluetoothPeripheralViewController: self)
+//            self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView, bluetoothPeripheralViewController: self)
             
             // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
             self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
@@ -369,11 +370,13 @@ class BluetoothPeripheralViewController: UIViewController {
                 // get bluetoothTransmitter
                 if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: true) {
                     
+                    // TODO: needs checking - commented out as probably unnecessary
                     // set delegate of the new transmitter to self
-                    bluetoothTransmitter.bluetoothTransmitterDelegate = self
+//                    bluetoothTransmitter.bluetoothTransmitterDelegate = self
                     
+                    // TODO: needs checking - commented out as probably unnecessary
                     // call configure in the model, as we have a new transmitter here
-                    self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView, bluetoothPeripheralViewController: self)
+//                    self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView, bluetoothPeripheralViewController: self)
                     
                     AudioServicesPlaySystemSound(1102)
                     

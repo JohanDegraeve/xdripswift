@@ -47,6 +47,9 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     /// use to keep track of if a successful NFC scan has happened
     private var nfcScanSuccessful: Bool = false
     
+    /// use to keep track of the sensor serial number so that we can pass it back to the delegate
+    private var serialNumber: String = ""
+    
     // MARK: - initalizer
     
     init(libreNFCDelegate: LibreNFCDelegate) {
@@ -118,6 +121,8 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                 xdrip.trace("NFC: passing NFC scan successful to the delegate and starting BLE scanning", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info)
                 
                 libreNFCDelegate?.nfcScanResult(successful: true)
+                
+                libreNFCDelegate?.nfcScanSerialNumber(sensorSerialNumber: serialNumber)
                 
                 libreNFCDelegate?.startBLEScanning()
                 
@@ -461,9 +466,9 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                         
                                         if subCmd == .enableStreaming && response.count == 6 {
                                             
-                                            let serialNumber: String = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))?.serialNumber ?? "unknown"
+                                            self.serialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))?.serialNumber ?? "unknown"
                                             
-                                            let debugInfo = "NFC: successfully enabled BLE streaming on Libre 2 " + serialNumber + " unlock code: " + self.unlockCode.description + " MAC address: " + Data(response.reversed()).hexAddress
+                                            let debugInfo = "NFC: successfully enabled BLE streaming on Libre 2 " + self.serialNumber + " unlock code: " + self.unlockCode.description + " MAC address: " + Data(response.reversed()).hexAddress
                                             
                                             xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
                                             

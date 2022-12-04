@@ -73,9 +73,11 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMLibre2TransmitterDelegate : CGMLibre2TransmitterDelegate, sensorSerialNumber:String?, cGMTransmitterDelegate:CGMTransmitterDelegate, nonFixedSlopeEnabled: Bool?, webOOPEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
-        var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "abbott")
+        // (actually this now isn't really necessary as for new devices, sensorSerialNumber will be nil and we'll update the superclass expectedName anyway after the NFC scan via the delegate)
+        var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "ABBOTT" + (sensorSerialNumber ?? ""))
+        
         if let address = address {
-            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
+            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: "ABBOTT" + (sensorSerialNumber ?? ""))
         }
         
         // initialize sensorSerialNumber
@@ -130,7 +132,6 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
                 bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.deviceMustSupportNFC)
                 
             }
-            
             
         } else {
             
@@ -394,6 +395,7 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
                 // we have all date to create libre1DerivedAlgorithmParameters
                 UserDefaults.standard.libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(bytes: framCopy, serialNumber: serialNumber, libreSensorType: libreSensorType)
                 
+                
             }
             
         }
@@ -462,11 +464,9 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         
         if successful {
             
-            print("setting userdefaults nfcScanSuccessful to true")
+            trace("received NFC scan result from NFC with result successful", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
             
-            trace("setting userdefaults nfcScanSuccessful to true", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
-            
-            // trying to check if false first to try and avoid BAD ACCESS crashes
+            // only process if userdefaults needs changing to true to avoid triggering the observer unnecessarily
             if !UserDefaults.standard.nfcScanSuccessful {
                 
                 UserDefaults.standard.nfcScanSuccessful = true
@@ -475,8 +475,9 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
             
         } else {
             
-            trace("setting userdefaults nfcScanFailed to true", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            trace("received NFC scan result from NFC with result unsuccessful", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
             
+            // only process if userdefaults needs changing to true to avoid triggering the observer unnecessarily
             if !UserDefaults.standard.nfcScanFailed {
                 
                 UserDefaults.standard.nfcScanFailed = true
@@ -487,9 +488,17 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         
     }
     
+    /// tell the superclass to initiate BLE scanning
     func startBLEScanning() {
         
         _ = super.startScanning()
+        
+    }
+    
+    /// used to pass the recently scanned serial number back
+    func nfcScanSerialNumber(sensorSerialNumber: String) {
+        
+        self.updateExpectedDeviceName(sensorSerialNumber: sensorSerialNumber)
         
     }
     
