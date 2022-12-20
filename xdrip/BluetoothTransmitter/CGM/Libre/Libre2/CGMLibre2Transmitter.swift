@@ -488,14 +488,12 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         
     }
     
-    /// tell the superclass to initiate BLE scanning
     func startBLEScanning() {
         
         _ = super.startScanning()
         
     }
     
-    /// used to pass the recently scanned serial number back
     func nfcScanSerialNumber(sensorSerialNumber: String) {
         
         self.updateExpectedDeviceName(sensorSerialNumber: sensorSerialNumber)
