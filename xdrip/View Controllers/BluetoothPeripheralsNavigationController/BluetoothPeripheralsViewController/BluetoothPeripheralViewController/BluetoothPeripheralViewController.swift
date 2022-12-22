@@ -113,7 +113,7 @@ class BluetoothPeripheralViewController: UIViewController {
     /// is the nonFixedSettingsSection currently shown or not
     private var nonFixedSettingsSectionIsShown = false
     
-    /// when user starts scanning, info will be shown in UIAlertController. This object will also be used when informing about a successful NFC scan
+    /// when user starts scanning, info will be shown in UIAlertController.
     private var infoAlertWhenScanningStarts: UIAlertController?
     
     /// for trace
@@ -266,16 +266,55 @@ class BluetoothPeripheralViewController: UIViewController {
     }
     
     /// sets shouldconnect for bluetoothPeripheral to false, and disconnect
-    public func setShouldConnectToFalse(for bluetoothPeripheral: BluetoothPeripheral) {
+    /// - parameters:
+    ///     - bluetoothPeripheral: the currently set bluetooth peripheral as defined by the delegate
+    ///     - asUser: should be set to true if we want to ask the user to confirm the disconnect
+    public func setShouldConnectToFalse(for bluetoothPeripheral: BluetoothPeripheral, askUser: Bool) {
         
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
         
-        // create uialertcontroller to ask the user if they really want to disconnect
-        let confirmDisconnectAlertController = UIAlertController(title: Texts_BluetoothPeripheralView.confirmDisconnectTitle , message: Texts_BluetoothPeripheralView.confirmDisconnectMessage, preferredStyle: .alert)
+        if askUser {
+            
+            // create uialertcontroller to ask the user if they really want to disconnect
+            let confirmDisconnectAlertController = UIAlertController(title: Texts_BluetoothPeripheralView.confirmDisconnectTitle , message: Texts_BluetoothPeripheralView.confirmDisconnectMessage, preferredStyle: .alert)
 
-        // create buttons for uialertcontroller
-        let OKAction = UIAlertAction(title: Texts_BluetoothPeripheralView.disconnect, style: .default) {
-            (action:UIAlertAction!) in
+            // create buttons for uialertcontroller
+            let OKAction = UIAlertAction(title: Texts_BluetoothPeripheralView.disconnect, style: .default) {
+                (action:UIAlertAction!) in
+                
+                // device should not automaticaly connect in future, which means, each time the app restarts, it will not try to connect to this bluetoothPeripheral
+                bluetoothPeripheral.blePeripheral.shouldconnect = false
+                
+                // save in coredata
+                self.coreDataManager?.saveChanges()
+                
+                // connect button label text needs to change because shouldconnect value has changed
+                _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: self.transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
+                
+                // this will set bluetoothTransmitter to nil which will result in disconnecting also
+                bluetoothPeripheralManager.setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheral)
+                
+                // as transmitter is now set to nil, call again configure. Maybe not necessary, but it can't hurt
+                self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView, bluetoothPeripheralViewController: self)
+                
+                // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
+                self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+                
+            }
+            
+            // create a cancel button. If the user clicks it then we will just return directly
+            let cancelAction = UIAlertAction(title: Texts_Common.Cancel, style: .cancel) {
+                (action:UIAlertAction!) in
+            }
+
+            // add buttons to the alert
+            confirmDisconnectAlertController.addAction(OKAction)
+            confirmDisconnectAlertController.addAction(cancelAction)
+
+            // show alert
+            present(confirmDisconnectAlertController, animated: true, completion:nil)
+            
+        } else {
             
             // device should not automaticaly connect in future, which means, each time the app restarts, it will not try to connect to this bluetoothPeripheral
             bluetoothPeripheral.blePeripheral.shouldconnect = false
@@ -297,112 +336,46 @@ class BluetoothPeripheralViewController: UIViewController {
             
         }
         
-        // create a cancel button. If the user clicks it then we will just return directly
-        let cancelAction = UIAlertAction(title: Texts_Common.Cancel, style: .cancel) {
-            (action:UIAlertAction!) in
-        }
-
-        // add buttons to the alert
-        confirmDisconnectAlertController.addAction(OKAction)
-        confirmDisconnectAlertController.addAction(cancelAction)
-
-        // show alert
-        present(confirmDisconnectAlertController, animated: true, completion:nil)
-        
     }
     
     
     /// based upon setShouldConnectToFalse(), this function will be called by the observer if the Libre 2 NFC scan fails
     /// the actions will depend on if a valid bluetoothPeripheral is passed to it (existing sensor) or if it is nil (adding a new sensor)
     /// after disconnecting the transmitter (if required), it will open a dialog to ask the user if they want to try scanning again
-    public func nfcScanFailed(for bluetoothPeripheral: BluetoothPeripheral?) {
+    ///
+    /// - parameters:
+    ///     - bluetoothPeripheral - the currently set bluetooth peripheral as defined by the delegate
+    private func nfcScanFailed(for bluetoothPeripheral: BluetoothPeripheral?) {
         
+        // unwrap bluetoothPeripheralManager
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
         
-        // check if there is an existing transmitter configured. If so, disconnect it and update the table and button labels
+        // check if there is an existing transmitter configured. If so, disconnect it using setShouldConnectToFalse (this will also update the table and button labels)
         if let bluetoothPeripheral = bluetoothPeripheral {
             
-            bluetoothPeripheral.blePeripheral.shouldconnect = false
-            
-            // this will set bluetoothTransmitter to nil which will result in disconnecting also
-            bluetoothPeripheralManager.setBluetoothTransmitterToNil(forBluetoothPeripheral: bluetoothPeripheral)
-            
-            // connect button label text needs to change because shouldconnect value has changed
-            _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: self.transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
-            
-            // TODO: needs checking - commented out as probably unnecessary
-            // as transmitter is now set to nil, call again configure. Maybe not necessary, but it can't hurt
-//            self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView, bluetoothPeripheralViewController: self)
-            
-            // save in coredata
-            self.coreDataManager?.saveChanges()
-            
-            // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
-            self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+            setShouldConnectToFalse(for: bluetoothPeripheral, askUser: true)
             
         } else {
             
             // connect button label text needs to change because shouldconnect value has changed
             _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: self.transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
             
-            // TODO: after updating the above we ideally need to reload the connection status row to show the user but this usually crashes the app if no transmitter exists due to the section count
-            
-            // reload the full screen , all rows in all sections in the tableView
-//            self.tableView.reloadData()
-            
-            // save in coredata
-            self.coreDataManager?.saveChanges()
-            
             // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
             self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
         }
         
-        // TODO: clean up
         // create UIAlertController to ask the user if they want to try running a new NFC scan, or just stay disconnected
-        self.infoAlertWhenScanningStarts = UIAlertController(title: TextsLibreNFC.nfcScanFailedTitle , message: TextsLibreNFC.nfcScanFailedMessage, preferredStyle: .alert)
+        let nfcScanFailedAlert = UIAlertController(title: TextsLibreNFC.nfcScanFailedTitle , message: TextsLibreNFC.nfcScanFailedMessage, preferredStyle: .alert)
         
         // create a scan again button. If the user clicks it, update everything and initiate a new connection (which will initiate an NFC scan first in this case).
         let scanAgainAction = UIAlertAction(title: TextsLibreNFC.nfcScanFailedScanAgainButton, style: .default) {
             (action:UIAlertAction!) in
             
-            // if the scan failed when a transmitter already exists, then set it to connect, save in coredata and then update the view model
-            if let bluetoothPeripheral = bluetoothPeripheral {
-                
-                // device should automatically connect, this will be stored in coredata
-                bluetoothPeripheral.blePeripheral.shouldconnect = true
-                
-                // save the update in coredata
-                self.coreDataManager?.saveChanges()
-                
-                // get bluetoothTransmitter
-                if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: true) {
-                    
-                    // TODO: needs checking - commented out as probably unnecessary
-                     // set delegate of the new transmitter to self
-                    bluetoothTransmitter.bluetoothTransmitterDelegate = self
-                    
-                    // TODO: needs checking - commented out as probably unnecessary
-                    // call configure in the model, as we have a new transmitter here
-//                    self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView, bluetoothPeripheralViewController: self)
-                    
-                    AudioServicesPlaySystemSound(1102)
-                    
-                    self.checkIfNFCScanIsNeeded()
-                    
-                    bluetoothTransmitter.connect()
-                    
-                }
-                
-            } else {
-                
-                AudioServicesPlaySystemSound(1102)
-                
-                self.checkIfNFCScanIsNeeded()
-                
-                // no bluetooth peripheral exists yet, so let's just "press" the "Scan" button again
-                self.connectButtonHandler()
-                
-            }
+            AudioServicesPlaySystemSound(1102)
+            
+            self.checkIfNFCScanIsNeeded()
+            
+            self.connectButtonHandler()
             
         }
         
@@ -436,11 +409,11 @@ class BluetoothPeripheralViewController: UIViewController {
         }
 
         // add the buttons to the UI alert
-        self.infoAlertWhenScanningStarts!.addAction(scanAgainAction)
-        self.infoAlertWhenScanningStarts!.addAction(cancelAction)
+        nfcScanFailedAlert.addAction(scanAgainAction)
+        nfcScanFailedAlert.addAction(cancelAction)
 
         // show the UI alert
-        present(self.infoAlertWhenScanningStarts!, animated: true, completion:nil)
+        present(nfcScanFailedAlert, animated: true, completion:nil)
         
     }
     
@@ -879,7 +852,7 @@ class BluetoothPeripheralViewController: UIViewController {
             if bluetoothPeripheral.blePeripheral.shouldconnect {
                 
                 // disconnect
-                setShouldConnectToFalse(for: bluetoothPeripheral)
+                setShouldConnectToFalse(for: bluetoothPeripheral, askUser: true)
                 
                 // in case it's a Libre2 CGM, libre1DerivedAlgorithmParameters has a non nil value. When disconnecting set to nil, user will need to scan again when reconnecting
                 // in case it's a Libre2 CGM, libre1DerivedAlgorithmParameters has a non nil value. When deleting the transmitter, by setting to nil, this will ensure that user first need to do a successful NFC scan.
@@ -1022,6 +995,10 @@ class BluetoothPeripheralViewController: UIViewController {
     }
     
     /// used to check if the current BLE peripheral type requires an NFC scan before BLE scanning
+    /// - parameters:
+    ///     - none
+    /// - returns:
+    ///     - none
     private func checkIfNFCScanIsNeeded() {
         
         // initialise both to false
@@ -1062,16 +1039,14 @@ class BluetoothPeripheralViewController: UIViewController {
         switch keyPathEnum {
         case UserDefaults.Key.nfcScanFailed:
             
-            // if failedToScan didn't change to true then no further processing
+            // if failedToScan wasn't change to true then no further processing
             guard UserDefaults.standard.nfcScanFailed else {return}
             
             // we know that the scan failed so set nfcScanSuccessful to false and also set nfcScanNeeded to false as it the scan process has finished so a scan isn't actually needed any more
             self.nfcScanSuccessful = false
             self.nfcScanNeeded = false
-            
-            // TODO: add trace logging
-            
-            print("This is the observer function. failedToScan has been set to true so will disconnect transmitter")
+                
+            trace("in observeValue, nfcScanFailed has been set to true so will disconnect and offer to scan again", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .error)
             
             // let's first check if bluetoothPeripheral exists and then call the nfcScanFailed function accordingly
             if let bluetoothPeripheral = bluetoothPeripheral {
@@ -1084,52 +1059,32 @@ class BluetoothPeripheralViewController: UIViewController {
                 
             }
             
+            
         case UserDefaults.Key.nfcScanSuccessful:
             
-            // if scanSuccessful didn't change to true then no further processing
+            // if scanSuccessful wasn't change to true then no further processing
             guard UserDefaults.standard.nfcScanSuccessful else {return}
             
             // we know that the scan was successful so set nfcScanSuccessful to true and also set nfcScanNeeded to false as it the scan process has finished so a scan isn't actually needed any more
             self.nfcScanSuccessful = true
             self.nfcScanNeeded = false
-            
-            // TODO: add trace logging
-            
-            // unwrap bluetoothPeripheralManager
-            guard let bluetoothPeripheralManager = self.bluetoothPeripheralManager else {return}
-            
-            // let's first check if bluetoothPeripheral exists
-            if let bluetoothPeripheral = bluetoothPeripheral {
                 
-                // connect button label text needs to change because shouldconnect value has changed
-                _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: self.transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
-                
-                // TODO: crash
-                
-                // save in coredata
-                self.coreDataManager?.saveChanges()
-                
-                // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
-                self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
-                
-            } else {
-                
-                // save in coredata
-                self.coreDataManager?.saveChanges()
-                
-                // TODO: add a way to update the table rows without crashing when no transmitter exists
-                self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
-                
-            }
+            trace("in observeValue, nfcScanSuccessful has been set to true so will inform the user and try and update the connection status to Scanning", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .error)
             
             // create uialertcontroller to inform the user that the scan is successful and to just wait patiently for the sensor to connect via bluetooth
-            self.infoAlertWhenScanningStarts = UIAlertController(title: TextsLibreNFC.nfcScanSuccessfulTitle , message: TextsLibreNFC.nfcScanSuccessfulMessage, actionHandler: nil)
+            let nfcScanSuccessfulAlert = UIAlertController(title: TextsLibreNFC.nfcScanSuccessfulTitle , message: TextsLibreNFC.nfcScanSuccessfulMessage, actionHandler: nil)
             
-            self.present(self.infoAlertWhenScanningStarts!, animated:true)
+            self.present(nfcScanSuccessfulAlert, animated:true)
+            
+            guard let bluetoothPeripheralManager = self.bluetoothPeripheralManager else {return}
+            
+            // connect button label text needs to change because we should now be scanning
+            _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: self.transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
+            
+            self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
             
         default:
             break
-            
         }
         
     }
@@ -1166,13 +1121,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             
             var numberOfSections = numberOfGeneralSections()
             
-            var BPVnumberOfSections = 0
-            
             if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel {
                 
-                BPVnumberOfSections = bluetoothPeripheralViewModel.numberOfSections()
-                
-                numberOfSections = numberOfSections + BPVnumberOfSections
+                numberOfSections = numberOfSections + bluetoothPeripheralViewModel.numberOfSections()
                 
             }
 
@@ -1244,10 +1195,6 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
         // this is the section with the transmitter specific settings
         // unwrap bluetoothPeripheralViewModel
         if let bluetoothPeripheralViewModel = bluetoothPeripheralViewModel {
-            let test = bluetoothPeripheralViewModel.numberOfSettings(inSection: section)
-            if test != 2 {
-                print("test")
-            }
             return bluetoothPeripheralViewModel.numberOfSettings(inSection: section)
         } else {
                 fatalError("in tableView numberOfRowsInSection, bluetoothPeripheralViewModel is nil")
