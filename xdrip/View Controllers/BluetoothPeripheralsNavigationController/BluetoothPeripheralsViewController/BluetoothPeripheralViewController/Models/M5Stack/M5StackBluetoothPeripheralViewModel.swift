@@ -516,7 +516,7 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
             let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_BluetoothPeripheralView.connect, actionHandler: {
                 
                 // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
-                self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackPeripheral, dontAskUser: true)
+                self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackPeripheral, askUser: true)
                 
             })
             
@@ -535,7 +535,7 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
         let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.authenticationFailureWarning + " " + Texts_BluetoothPeripheralView.connect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
-            self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackPeripheral, dontAskUser: true)
+            self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackPeripheral, askUser: true)
             
         })
         
@@ -554,7 +554,7 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
         let alert = UIAlertController(title: Texts_Common.warning, message: Texts_M5StackView.m5StackResetRequiredWarning + " " + Texts_BluetoothPeripheralView.connect, actionHandler: {
             
             // by the time user clicks 'ok', the M5stack will be disconnected by the BluetoothPeripheralManager (see authentication in BluetoothPeripheralManager)
-            self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackBluetoothPeripheral, dontAskUser: true)
+            self.bluetoothPeripheralViewController?.setShouldConnectToFalse(for: m5StackBluetoothPeripheral, askUser: true)
             
         })
         
