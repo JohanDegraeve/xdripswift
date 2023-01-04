@@ -37,10 +37,10 @@
 "settingsviews_transmitterid_text_for_button"  = "Verici Kimliği";
 "settingsviews_givetransmitterid" = "Verici Kimliğine Gir";
 "settingsviews_resettransmitter" = "Vericiyi Sıfırla";
-"settingsviews_webooptransmitter" = "Verici Algoritması Kullanılsın mı?";
+"settingsviews_webooptransmitter" = "Verici algorithması Kullanılsın mı?";
 "settingsviews_nonfixedtransmitter" = "Çok Noktalı Kalibrasyon Etkinleştirilsin mi?";
 "settingsviews_labelNonFixed" = "Çok Noktalı Kalibrasyon";
-"settingsviews_labelWebOOP" = "xDrip veya Verici Algoritması";
+"settingsviews_labelWebOOP" = "xDrip veya Verici algorithması";
 "settingsviews_sectiontitlealerting" = "Uyarılar";
 "settingsviews_row_alert_types" = "Uyarı Türleri";
 "settingsviews_row_alerts" = "Uyarılar";

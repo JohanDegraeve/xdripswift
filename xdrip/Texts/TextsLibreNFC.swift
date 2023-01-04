@@ -5,11 +5,11 @@ class TextsLibreNFC {
     static private let filename = "LibreNFC"
     
     static let scanComplete: String = {
-        return NSLocalizedString("scanComplete", tableName: filename, bundle: Bundle.main, value: "Scan Complete", comment: "after scanning NFC, scan complete message")
+        return NSLocalizedString("scanComplete", tableName: filename, bundle: Bundle.main, value: "Sensor scan successful", comment: "after scanning NFC, scan complete message")
     }()
 
     static let holdTopOfIphoneNearSensor: String = {
-        return NSLocalizedString("holdTopOfIphoneNearSensor", tableName: filename, bundle: Bundle.main, value: "Hold the top of your iOS device near the sensor to scan", comment: "when NFC scanning is started, this message will appear")
+        return NSLocalizedString("holdTopOfIphoneNearSensor", tableName: filename, bundle: Bundle.main, value: "Hold the top of your iPhone near the sensor until it stops vibrating.", comment: "when NFC scanning is started, this message will appear")
     }()
     
     static let deviceMustSupportNFC: String = {
@@ -21,15 +21,43 @@ class TextsLibreNFC {
     }()
     
     static let donotusethelibrelinkapp: String = {
-        return String(format: NSLocalizedString("donotusethelibrelinkapp", tableName: filename, bundle: Bundle.main, value: "Connected to Libre 2.\r\n\r\nIf you want to keeping scanning sometimes the Libre sensor with the official Libre app, then disallow bluetooth permission for the Libre app. \r\n\r\nOtherwise, scanning the NFC with the Libre app and with the bluetooth permission allowed will break the connection between %@ and the Libre 2.", comment: "After Libre NFC scanning, and after successful bluetooth connection, this message will be shown to explain that he or she should not allow bluetooth permission on the Libre app"), ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("donotusethelibrelinkapp", tableName: filename, bundle: Bundle.main, value: "Connected to Libre 2.\n\nPlease ensure you have disabled bluetooth permission for the Libre app in your iPhone settings.\n\nIf you don't do this, when you scan with the Libre app you will break the connection between %@ and the Libre 2.", comment: "After Libre NFC scanning, and after successful bluetooth connection, this message will be shown to explain that he or she should not allow bluetooth permission on the Libre app"), ConstantsHomeView.applicationName)
     }()
     
     static let connectedLibre2DoesNotMatchScannedLibre2: String = {
-        return String(format: NSLocalizedString("connectedLibre2DoesNotMatchScannedLibre2", tableName: filename, bundle: Bundle.main, value: "You seem to have scanned a new sensor, but %@ is having the Bluetooth connection to the old sensor.\r\n\r\nTo solve this :\r\n- Click 'disconnect' or 'stop scanning'\r\n- Go back to previous screen and add a new CGM of type Libre 2 and scan again.\r\n\r\n%@ should now connect to the new sensor.", comment: "The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again."), ConstantsHomeView.applicationName, ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("connectedLibre2DoesNotMatchScannedLibre2", tableName: filename, bundle: Bundle.main, value: "You have scanned a new Libre sensor, but %@ has connected to a different sensor.\n\nTo solve this do NOT delete this old sensor just yet. Click 'Disconnect' or 'Stop Scanning', go back to the previous screen and add a new CGM of type Libre 2 and scan the sensor again.\n\n%@ should now try and connect to the new sensor.", comment: "The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again."), ConstantsHomeView.applicationName, ConstantsHomeView.applicationName)
     }()
     
+    // nfcErrorRetryScan is no longer used
     static let nfcErrorRetryScan: String = {
-        return NSLocalizedString("nfcErrorRetryScan", tableName: filename, bundle: Bundle.main, value: "Error occured while scanning the sensor. Click 'Scan' top left or click 'back' and add the Libre 2 again, and scan again.", comment: "Sometimes NFC scanning creates errors, retrying solves the problem. This is to explain this to the user")
+        return NSLocalizedString("nfcErrorRetryScan", tableName: filename, bundle: Bundle.main, value: "NFC sensor scan failure.\n\nTry scanning again.", comment: "Sometimes NFC scanning creates errors, retrying solves the problem. This is to explain this to the user")
+    }()
+        
+    static let nfcScanFailedTitle: String = {
+        return NSLocalizedString("nfcScanFailedTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Scan Failed", comment: "Sensor scan error, title")
     }()
     
+    static let nfcScanFailedMessage: String = {
+        return NSLocalizedString("nfcScanFailedMessage", tableName: filename, bundle: Bundle.main, value: "\n⚠️ Please scan again ⚠️", comment: "Ask if the user wants to try and scan the sensor again")
+    }()
+    
+    static let nfcScanFailedScanAgainButton: String = {
+        return NSLocalizedString("nfcScanFailedScanAgainButton", tableName: filename, bundle: Bundle.main, value: "Scan Again", comment: "Scan again button")
+    }()
+    
+    static let nfcScanSuccessfulTitle: String = {
+        return NSLocalizedString("nfcScanSuccessfulTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Scan Successful!", comment: "Sensor scan successful, title")
+    }()
+    
+    static let nfcScanSuccessfulMessage: String = {
+        return NSLocalizedString("nfcScanSuccessfulMessage", tableName: filename, bundle: Bundle.main, value: "\n✅ Scan successful ✅\n\nClick OK and just wait to allow the sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.", comment: "Tell the user the scan was successful and to just wait now for connection")
+    }()
+    
+    static let nfcErrorMessageScanErrorRetrying: String = {
+        return NSLocalizedString("nfcErrorMessageScanErrorRetrying", tableName: filename, bundle: Bundle.main, value: "Sensor scan error\n\nRetrying... # ", comment: "Tell the user the scan has failed and we're retrying several times")
+    }()
+    
+    static let nfcErrorMessageScanFailed: String = {
+        return NSLocalizedString("nfcErrorMessageScanFailed", tableName: filename, bundle: Bundle.main, value: "Sensor scan has failed", comment: "Tell the user the scan has failed and we're retrying several times")
+    }()
 }

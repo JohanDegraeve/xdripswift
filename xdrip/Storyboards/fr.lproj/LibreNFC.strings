@@ -1,20 +1,16 @@
-/// after scanning NFC, scan complete message
-"scanComplete" = "Scan réalisé";
-
-/// when NFC scanning is started, this message will appear
-"holdTopOfIphoneNearSensor" = "Positionner le haut de votre iPhone près du capteur à scanner";
-
 /// Device must support at least iOS 14.0
 "deviceMustSupportIOS14" = "Pour connecter au Libre 2, votre iPhone doit être mis à jour à la version IOS14";
 
 /// Device must support NFC
 "deviceMustSupportNFC" = "Cet iPhone ne supporte pas le NFC";
 
-/// After Libre NFC scanning, and after successful bluetooth connection, this message will be shown to explain that he or she should not allow bluetooth permission on the Libre app
-"donotusethelibrelinkapp" = "Connecté au Libre 2.\r\n\r\nSi vous voulez conserver la possitibilité de scanner votre capteur avec l'application officielle Libre, il est nécessaire de desactiver l'autorisation du bluetooth à l'application Libre. \r\n\r\nSinon, scanner en NFC avec l'app Libre car l'autorisation de bluetooth de l'app Libre provoquera une coupure de fonctionnement entre %@ et le capteur Libre 2.";
-
-/// The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.
-"connectedLibre2DoesNotMatchScannedLibre2" = "Il semble que vous avez scanné un nouveau capteur mais %@ a une connexion Bluetooth avec un ancien capteur.\r\n\r\nPour résoudre :\r\n- Cliquez 'Déconnecter' ou 'Stopper Scan'\r\n- Retourner dans l'écran précédent et ajouter un new CGM de type Libre 2 et scanner en NFC à nouveau.\r\n\r\n%@ devrait se connecter au capteur Libre 2.";
-
 /// Sometimes NFC scanning creates errors, retrying solves the problem. This is to explain this to the user
 "nfcErrorRetryScan" = "Erreur durant le scan du capteur. Cliquez 'Scan' en haut à gauche et scanner à nouveau votre capteur.";
+
+"scanComplete" = "Scan du capteur réussi";
+
+"holdTopOfIphoneNearSensor" = "Tenez le haut de votre iPhone près du capteur jusqu'à ce qu'il arrète de vibrer.";
+
+"donotusethelibrelinkapp" = "Connecté au Libre 2.\n\nDésactivez la permission bluetooth de l'app Libre dans les réglages de l'iPhone.\n\nSi vous ne le faites pas, quand vous ferez un scan avec l'app Libre vous perdrez la connection entre %@ et le Libre 2.";
+
+"connectedLibre2DoesNotMatchScannedLibre2" = "Vous avez fait le scan d'un nouveau capteur Libre, mais %@ s'est connecté à un autre capteur (probablement le précédent).\n\nPour résoudre ce probleme N'EFFACEZ PAS le capteur précédent. Cliquez 'Déconnecter' ou 'Arreter le scan', retournez sur l'écran précédent et ajoutez un nouveau CGM Libre 2 et refaites le scan du capteur.\n\n%@ devrait essayer de se connecter au nouveau capteur.";

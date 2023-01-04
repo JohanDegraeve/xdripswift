@@ -10,7 +10,7 @@
 "screenTitle" = "Bluetooth";
 
 /// When adding a new cgm transmitter, but the user has another one already which is either connected or trying to connect
-"noMultipleActiveCGMsAllowed" = "You cannot have more than one CGM Transmitter which is connected or being scanned for.\nVerify your other CGM Transmitters and click 'Stop Scanning', 'Disconnect' or just delete them";
+"noMultipleActiveCGMsAllowed" = "You already have one CGM transmitter connected.\n\nVerify your other CGM transmitters and click 'Stop Scanning', 'Disconnect' or just delete them if needed.";
 
 /// when clicking add button in screen with list of bluetoothperipherals, title of pop up where user  needs to select bluetooth peripheral category
 "selectCategory" = "Select Device Type";

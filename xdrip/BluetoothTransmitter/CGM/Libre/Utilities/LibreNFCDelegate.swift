@@ -9,4 +9,13 @@ protocol LibreNFCDelegate: AnyObject {
     
     func streamingEnabled(successful : Bool)
     
+    /// used to pass back the result of the NFC scan 
+    func nfcScanResult(successful : Bool)
+    
+    /// tell the superclass to initiate BLE scanning
+    func startBLEScanning()
+    
+    /// used to pass the recently scanned serial number back
+    func nfcScanSerialNumber(sensorSerialNumber: String)
+    
 }

@@ -755,6 +755,9 @@ final class RootViewController: UIViewController {
 
         // add observer for nightScoutTreatmentsUpdateCounter, to reload the chart whenever a treatment is added or updated or deleted changes
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
+        
+        // add observer for stopActiveSensor, this will reset the active sensor to nil when the user disconnects an intergrated transmitter/sensor (e.g. Libre 2 Direct). This will help ensure that the sensor countdown is updated disabled until a new sensor is started.
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.stopActiveSensor.rawValue, options: .new, context: nil)
 
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -1428,6 +1431,19 @@ final class RootViewController: UIViewController {
             if screenIsLocked {
                 screenLockUpdate(enabled: true)
             }
+            
+        case UserDefaults.Key.stopActiveSensor:
+            
+            // if stopActiveSensor wasn't changed to true then no further processing
+            if UserDefaults.standard.stopActiveSensor {
+                
+                sensorStopDetected()
+                
+                updateSensorCountdown()
+                
+                UserDefaults.standard.stopActiveSensor = false
+                
+            }
 
         default:
             break
@@ -1976,8 +1992,9 @@ final class RootViewController: UIViewController {
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
+        // TODO: Figure out why this causes a bad access exception. Keep it commented out until then
         // force treatments sync
-        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+//        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
         if let glucoseChartManager = glucoseChartManager  {
@@ -2081,6 +2098,7 @@ final class RootViewController: UIViewController {
         let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         
         diffLabelOutlet.text = diffLabelText
+        
         
         // update the chart up to now
         updateChartWithResetEndDate()

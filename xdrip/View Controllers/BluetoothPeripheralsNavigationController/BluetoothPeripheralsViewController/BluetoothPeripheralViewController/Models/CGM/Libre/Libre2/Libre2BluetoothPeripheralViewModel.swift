@@ -128,10 +128,13 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
         case .sensorStartTime:
             
+            var sensorStartTimeText = "Not Connected"
+            
             cell.textLabel?.text = Texts_HomeView.sensorStart
             if let sensorTimeInMinutes = libre2.sensorTimeInMinutes {
-                cell.detailTextLabel?.text = Date(timeIntervalSinceNow: -Double(sensorTimeInMinutes*60)).toStringInUserLocale(timeStyle: .short, dateStyle: .short)
+                sensorStartTimeText = Date(timeIntervalSinceNow: -Double(sensorTimeInMinutes*60)).toStringInUserLocale(timeStyle: .short, dateStyle: .short)
             }
+            cell.detailTextLabel?.text = sensorStartTimeText
             cell.accessoryType = .none
             
         }

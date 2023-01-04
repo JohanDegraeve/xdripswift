@@ -34,7 +34,6 @@
 "transmitterpairingattempttimeout" = "Le transmetteur n'a pas répondu à la demande d'appareillage.";
 "success" = "Réussi";
 "failed" = "Echec";
-"calibrationNotNecessary" = "Avec l'activation d'OOPWeb, la calibration n'est plus nécessaire pour le capteur Libre.";
 "dexcomBatteryTooLow" = "La batterie du transmetteur est trop faible!";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,3 +52,5 @@
 
 /// status info : literally 'Sensor End'
 "sensorend" = "Sensor Ends";
+
+"calibrationNotNecessary" = "Le menu calibrations manuelles n'est pas disponible si vous utilisez l'algorithme natif.\n\nPour calibrer vous pouvez passer à l'algorithme xDrip dans le menu de l'émetteur.";

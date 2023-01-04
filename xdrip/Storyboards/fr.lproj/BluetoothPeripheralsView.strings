@@ -2,4 +2,4 @@
 "selectCategory" = "Sélectionner un type de périphérique";
 "selectType" = "Sélectionner un type";
 "batteryLevel" = "Niveau de batterie";
-"noMultipleActiveCGMsAllowed" = "Vous ne pouvez pas avoir plus d'un transmetteur connecté ou en cours de scan.\nVérifiez vos autres transmetteurs et appuyer sur le bouton 'Stopper Scan', 'Déconnecter' ou supprimez-les";
+"noMultipleActiveCGMsAllowed" = "Vous avez déjà un émetteur CGM connecté.\n\nVerifiez vos autres émetteurs CGM et cliquez 'Stopper Scan', 'Déconnecter' ou effacez-les si nécessaire.";

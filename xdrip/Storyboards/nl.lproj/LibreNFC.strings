@@ -1,11 +1,13 @@
-"scanComplete" = "Scan Voltooid";
-"holdTopOfIphoneNearSensor" = "Houd de bovenkant van je iOS nabij de sensor";
 "deviceMustSupportNFC" = "Deze iPhone ondersteunt geen NFC";
 "deviceMustSupportIOS14" = "Om te verbinden met Libre 2 moet deze iPhone worden geüpgraded naar iOS 14";
-"donotusethelibrelinkapp" = "Verbonden met Libre 2.\r\n\r\nIndien je de Libre sensor wilt blijven scannen met de officiële Libre app, trek dan de toegang tot bluetooth in voor de Libre app. \r\n\r\nIndien de sensor wordt gescand met de Libre app terwijl deze nog toegang heeft tot bluetooth, verbreekt de verbinding tussen %@ en de Libre 2.";
-
-/// The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect' or go back to previous screen, add a new CGM sensor and scan again.
-"connectedLibre2DoesNotMatchScannedLibre2" = "Je hebt blijkbaar een nieuwe sensor gescand maar %@ maakt nog altijd de Bluetooth verbinding naar de vorige sensor.\r\n\r\nOm dit op te lossen :\r\n- Klik 'Loskoppelen' of 'Stop Scannen'\r\n- Keer terug naar het vorige scherm en voeg een nieuwe CGM toe, type Libre 2, en scan opnieuw.\r\n\r\n%@ zal nu proberen te verbinden met de nieuwe sensor.";
 
 /// Sometimes NFC scanning creates errors, retrying solves the problem. This is to explain this to the user
 "nfcErrorRetryScan" = "Fout tijdens scan. Click 'scan' linksboven opnieuw of klik 'Vorige' en voeg opnieuw de Libre 2 toe, en scan de sensor opnieuw";
+
+"scanComplete" = "Sensor scan gelukt";
+
+"holdTopOfIphoneNearSensor" = "Houd de bovenkant van je iPhone nabij de sensor tot de vibratie stopt.";
+
+"donotusethelibrelinkapp" = "Verbonden met Libre 2.\n\nTrek de toegang tot bluetooth in voor de Libre app. \n\nIndien de sensor wordt gescand met de Libre app terwijl deze nog toegang heeft tot bluetooth, verbreekt de verbinding tussen %@ en de Libre 2.";
+
+"connectedLibre2DoesNotMatchScannedLibre2" = "Je hebt blijkbaar een nieuwe sensor gescand maar %@ maakt nog altijd de Bluetooth verbinding naar de vorige sensor.\r\n\r\nOm dit op te lossen, verwijder de oude sensor nog niet. Klik 'Loskoppelen' of 'Stop Scannen'. Keer terug naar het vorige scherm en voeg een nieuwe CGM toe, type Libre 2, en scan opnieuw.\r\n\r\n%@ zal nu proberen te verbinden met de nieuwe sensor.";

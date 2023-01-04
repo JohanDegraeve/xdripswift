@@ -61,9 +61,6 @@
 /// for home view, where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'
 "ago" = "her";
 
-/// if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible
-"calibrationNotNecessary" = "Bei Verwendung des Libre Algorithmus, muss der Sensor nicht kalibriert werden!";
-
 /// When user has no CGM transmitter created with 'Always connect', and tries to calibrate, then this message is shown
 "theresNoCGMTransmitterActive" = "Kalibrierung kann nur bei verbundenem Transmitter erfolgen.";
 
@@ -121,3 +118,5 @@
 
 /// status info : literally 'Sensor End'
 "sensorend" = "Sensor Ends";
+
+"calibrationNotNecessary" = "Bei Verwendung des originalen Sensor Algorithmus ist eine manuelle Kalibrierung nicht möglich.\n\nWenn Sie kalibrieren möchten, aktivieren Sie bitte den xDrip Algorithmus.";

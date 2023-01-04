@@ -1,10 +1,5 @@
-"scanComplete" = "Skannaus suoritettu";
-"holdTopOfIphoneNearSensor" = "Skannaa pitämällä iOS-laitteen yläosaa sensorin lähellä";
 "deviceMustSupportNFC" = "NFC ei ole tuettu tässä iPhonessa";
 "deviceMustSupportIOS14" = "Yhteyden muodostamiseksi Libre2:een tämä iPhone on päivitettävä iOS14:een";
-"donotusethelibrelinkapp" = "Libre2 yhdistetty.\r\n\r\nJos aiot skannata myös virallisella Libre-sovelluksella, kiellä Libre-sovelluksen bluetooth käyttöoikeus. \r\n\r\nMuussa tapauksessa NFC skannaus Libre-sovelluksella ja sallitulla Bluetooth-luvalla katkaisee %@:n ja Libre2:n välisen yhteyden.";
-/// The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.
-"connectedLibre2DoesNotMatchScannedLibre2" = "Olet ilmeisesti skannannut uuden sensorin, mutta %@:lla on Bluetooth-yhteys vanhaan sensoriin.\r\n\r\nRatkaistaksesi tämän:\r\n- Paina 'Katkaise'\r\n- Palaa edelliseen näyttöön ja lisää uusi Libre2 -tyypin CGM ja skannaa uudelleen.\r\n\r\n%@ pitäis nyt yhdistää uuteen sensoriin.";
 
 /// Sometimes NFC scanning creates errors, retrying solves the problem. This is to explain this to the user
 "nfcErrorRetryScan" = "Sensorin skannaus epäonnistui. Paina 'Skannaa' nappia vasemmassa yläkulmassa tai 'Takaisin' nappia ja lisää Libre2 ja skannaa uudestaan";

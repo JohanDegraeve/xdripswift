@@ -35,7 +35,6 @@
 "transmitterpairingattempttimeout" = "Transmitter did not reply to pairing request.";
 "success" = "Success";
 "failed" = "Failed";
-"calibrationNotNecessary" = "When using the Libre algoritm, it is not necessary to calibrate the sensor.";
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
 "enterSensorCode" = "if you don't have a sensor code use 0000 but be aware that you will not get readings until you calibrate";
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";

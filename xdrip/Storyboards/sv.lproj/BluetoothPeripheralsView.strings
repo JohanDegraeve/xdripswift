@@ -2,4 +2,4 @@
 "selectCategory" = "Välj typ av enhet";
 "selectType" = "Välj sändartyp";
 "batteryLevel" = "Batterinivå:";
-"noMultipleActiveCGMsAllowed" = "Du kan inte ha mer än en CGM ansluten. \nKontrollera dina andra CGM-sändare och klicka 'Sluta scanna', 'Koppla ifrån' eller ta bara bort dem";
+"noMultipleActiveCGMsAllowed" = "Du har redan en sändare ansluten.\n\nKontrollera dina andra CGM-sändare och klicka 'Stoppa scanning', 'Stoppa sensor' eller ta bort dem om nödvändigt.";

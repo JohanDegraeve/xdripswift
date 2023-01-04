@@ -93,9 +93,6 @@
 /// Error message in case Dexcom G5 (and G6?) battery is too low. This is deteced by wrong G5 values 2096896
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
 
-/// if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible
-"calibrationNotNecessary" = "When using the Libre algoritm, it is not necessary to calibrate the sensor.";
-
 /// status info : literally 'not started', used if sensor is not started
 "notstarted" = "Not Started";
 

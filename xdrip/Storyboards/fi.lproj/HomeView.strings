@@ -30,8 +30,6 @@
 "transmitterpairingattempttimeout" = "Lähetin ei vastannut pariliitospyyntöön.";
 "success" = "Onnistui";
 "failed" = "Epäonnistui";
-"calibrationNotNecessary" = "Libre sensorin kalibrointia ei tarvita kun OOPWeb on käytössä.";
-"dexcomBatteryTooLow" = "Lähettimen varaus on liian matala!";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
