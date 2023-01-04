@@ -13,7 +13,7 @@
 "nightScoutPort" = "Port:";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up title - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
-"settingsviews_IntervalTitle" = "Interval:";
+"settingsviews_IntervalTitle" = "Notification Interval:";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Urgent High Value:";
@@ -43,7 +43,7 @@
 "settingsviews_settingstitle" = "Settings";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
-"settingsviews_IntervalMessage" = "Minimum interval between two readings, in minutes";
+"settingsviews_IntervalMessage" = "Minimum interval between two notifications, in minutes";
 
 /// Apple Watch Settings - text in row where create event is enabled or disabled 
 "createCalendarEvent" = "Create Calendar Events?";
