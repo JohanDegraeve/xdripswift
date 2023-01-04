@@ -65,7 +65,7 @@
 "settingsviews_speakreadingslanguageselection" = "Selecteer Taal";
 "settingsviews_speakTrend" = "Spreek Trend Uit?";
 "settingsviews_speakDelta" = "Spreek Delta Uit?";
-"settingsviews_IntervalTitle" = "Interval:";
+"settingsviews_IntervalTitle" = "Notification Interval:";
 "settingsviews_IntervalMessage" = "Minimum interval tussen twee metingen, in minuten";
 "settingsviews_sectiontitleAbout" = "Over %@";
 "settingsviews_Version" = "Versie:";

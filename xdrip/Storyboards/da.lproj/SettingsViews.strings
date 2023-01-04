@@ -76,8 +76,8 @@
 "settingsviews_speakreadingslanguageselection" = "Select Language";
 "settingsviews_speakTrend" = "Speak Trend?";
 "settingsviews_speakDelta" = "Speak Delta?";
-"settingsviews_IntervalTitle" = "Interval:";
-"settingsviews_IntervalMessage" = "Minimum interval between two readings, in minutes";
+"settingsviews_IntervalTitle" = "Notification Interval:";
+"settingsviews_IntervalMessage" = "Minimum interval between two notifications, in minutes";
 "settingsviews_sectiontitleAbout" = "About %@";
 "settingsviews_Version" = "Version:";
 "settingsviews_license" = "License";

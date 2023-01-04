@@ -34,7 +34,6 @@
 "transmitterpairingattempttimeout" = "Sändaren svarade inte på parkopplingsförfrågan.";
 "success" = "Lyckades";
 "failed" = "Misslyckades";
-"calibrationNotNecessary" = "När du använder Libre-algoritmen behöver du inte kalibrera sensorn.";
 "dexcomBatteryTooLow" = "Sändarens batterinivå är för låg!";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,3 +52,5 @@
 
 /// status info : literally 'Sensor End'
 "sensorend" = "Sensor Ends";
+
+"calibrationNotNecessary" = "När du använder sändarens inbyggda algoritm går det inte att kalibrera.\n\nFör att kunna kalibrera behöver du byta till xDrip-algoritmen in sändarinställningarna.";

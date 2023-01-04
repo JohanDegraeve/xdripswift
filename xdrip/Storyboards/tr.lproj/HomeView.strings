@@ -35,7 +35,6 @@
 "transmitterpairingattempttimeout" = "Verici eşleştirme isteğine yanıt vermedi.";
 "success" = "Başarı";
 "failed" = "Başarısız oldu";
-"calibrationNotNecessary" = "Libre algoritmasını kullanırken sensörü kalibre etmek gerekli değildir.";
 "dexcomBatteryTooLow" = "Verici pili çok düşük!";
 "enterSensorCode" = "sensör kodunuz yoksa 0000 kullanın, ancak kalibre edene kadar okuma almayacağınızı unutmayın.";
 "stopSensorConfirmation" = "Sensörü durdurmak istediğinizden emin misiniz?";

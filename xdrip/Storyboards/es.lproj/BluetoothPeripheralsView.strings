@@ -2,4 +2,4 @@
 "selectCategory" = "Seleccionar Tipo de Dispositivo";
 "selectType" = "Seleccionar Tipo de Transmisor";
 "batteryLevel" = "Nivel de Batería:";
-"noMultipleActiveCGMsAllowed" = "No puedes tener más que un Transmisor MGC conectedo.\nVerificar los demás Transmisores y clickar 'Detener Escaneao', 'Disconectar' or simplemente eliminarlos";
+"noMultipleActiveCGMsAllowed" = "Ya tienes conectado un transmisor MGC.\n\nVerificar los demás transmisores y haz click en 'Detener Escaneao', 'Disconectar' or simplemente eliminarlos";

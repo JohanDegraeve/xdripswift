@@ -1,7 +1,6 @@
-"scanComplete" = "Escaneo Completado";
-"holdTopOfIphoneNearSensor" = "Escanear el sensor con tu iPhone";
+"scanComplete" = "Sensor escaneado con éxito";
+"holdTopOfIphoneNearSensor" = "Escanear el sensor con la parte superior de tu iPhone hasta que deje de vibrar";
 "deviceMustSupportNFC" = "Este iPhone no dispone de NFC";
 "deviceMustSupportIOS14" = "Para conectar a un sensor Libre 2, se debe actualizar este iPhone a iOS14";
-"donotusethelibrelinkapp" = "Conectado a Libre 2.\r\n\r\nSi quieres seguir escaneando con la app official del sensor Libre, es imprescindible deshabilitar el permiso de Bluetooth en la configuración de la app del Libre. \r\n\r\nSi no está deshabilitado el permiso de Bluetooth, al escanear con la app official, se perderá la conexión entre %@ y el sensor Libre 2.";
-"connectedLibre2DoesNotMatchScannedLibre2" = "Parece que acabas de escanear un sensor nuevo pero %@ sigue conectado por bluetooth al sensor anterior\r\n\r\nPara solucionar este problema:\r\n- Haz click en 'Disconectar' or 'Detener Escaneo'\r\n- Volver a la pantalla anterior, añadir un nuevo Libre 2 y volver a escanear.\r\n\r\n%@ debe conectarse al sensor nuevo.";
+"donotusethelibrelinkapp" = "Conectado a tu Libre 2.\n\nPor favor, asegurarse que haya deshabilitado el permiso de bluetooth para la app del Libre en la configuración de tu iPhone.\n\nSi no lo haces, al escanear con la app del Libre, se cortará la conexión entre %@ y tu Libre 2.";
 "nfcErrorRetryScan" = "Se ha producido un error al escanear el sensor. Haz click en 'Escanear' o si sigue fallando, haz click en 'Atrás', añadir de nuevo el Libre 2 y escanear otra vez.";

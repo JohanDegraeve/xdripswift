@@ -160,7 +160,7 @@
 "calendarEventsSectionTitle" = "Calendar Events";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
-"settingsviews_IntervalTitle" = "Interval:";
+"settingsviews_IntervalTitle" = "Notification Interval:";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
 "infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
@@ -202,7 +202,7 @@
 "settingsviews_housekeeperRetentionPeriod" = "Retention Period (days):";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
-"settingsviews_IntervalMessage" = "Minimum interval between two readings, in minutes";
+"settingsviews_IntervalMessage" = "Minimum interval between two notifications, in minutes";
 
 /// home screen settings, should the clock also be displayed when the screen is locked?
 "settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";

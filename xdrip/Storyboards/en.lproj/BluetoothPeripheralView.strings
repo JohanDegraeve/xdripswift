@@ -32,3 +32,12 @@
 "transmittterStartDate" = "Transmitter Start";
 "sensorStartDate" = "Sensor Start";
 "useOtherDexcomApp" = "Follow Dexcom-app";
+"nfcScanNeeded" = "NFC scan needed";
+"nfcScanFailedTitle" = "Sensor Scan Failed";
+"nfcScanFailedMessage" = "\n⚠️ Please scan again ⚠️";
+"nfcScanFailedScanAgainButton" = "Scan Again";
+"nfcScanSuccessfulTitle" = "Sensor Scan Successful!";
+"nfcScanSuccessfulMessage" = "\n✅ Scan successful ✅\n\nClick OK and just wait to allow the sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
+"nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
+"nfcErrorMessageScanFailed" = "Sensor scan has failed";
+

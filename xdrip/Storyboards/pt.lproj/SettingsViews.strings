@@ -73,8 +73,8 @@
 "settingsviews_speakreadingslanguageselection" = "Escolher Idioma";
 "settingsviews_speakTrend" = "Falar Tendência?";
 "settingsviews_speakDelta" = "Falar Delta?";
-"settingsviews_IntervalTitle" = "Intervalo:";
-"settingsviews_IntervalMessage" = "Intervalo minímo entre duas leituras, em minutos";
+"settingsviews_IntervalTitle" = "Intervalo entre Notificações:";
+"settingsviews_IntervalMessage" = "Intervalo minímo entre duas notificações, em minutos";
 "settingsviews_sectiontitleAbout" = "Sobre %@";
 "settingsviews_Version" = "Versão:";
 "settingsviews_license" = "Licença";

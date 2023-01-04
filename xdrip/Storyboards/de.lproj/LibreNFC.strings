@@ -1,21 +1,16 @@
-
-/// when NFC scanning is started, this message will appear
-"holdTopOfIphoneNearSensor" = "Halten Sie ihr iOS Gerät mit der Ohrhörerseite an ihren Sensor";
-
 /// Device must support NFC
 "deviceMustSupportNFC" = "Dieses iPhone unterstützt kein NFC";
-
-/// After Libre NFC scanning, and after successful bluetooth connection, this message will be shown to explain that he or she should not allow bluetooth permission on the Libre app
-"donotusethelibrelinkapp" = "Verbunden mit Libre 2.\r\n\r\nWenn Sie die Original Libre App weiterhin zum scannen verwenden möchten, deaktivieren Sie die Bluetooth Verbindung der Libre App. \r\n\r\Ansonsten verlieren Sie die Verbindung zwischen %@ und dem Libre 2.";
-
-/// after scanning NFC, scan complete message
-"scanComplete" = "Scan abgeschlossen";
 
 /// Device must support at least iOS 14.0
 "deviceMustSupportIOS14" = "Um dieses Gerät mit Libre 2 zu verbinden updaten Sie ihr Gerät bitte auf iOS14";
 
-/// The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.
-"connectedLibre2DoesNotMatchScannedLibre2" = "Es wurde ein neuer Sensor erkannt, während %@ noch mit einem anderen Sensor per Bluetooth verbunden ist.\r\n\r\nUm dieses Problem zu beheben stoppen Sie den Suchlauf bzw. beenden Sie die Verbindung.\r\n\r\nKehren Sie zum vorherigen Bildschirm zurück und verbinden ein neues CGM vom Typ Libre 2\r\n\r\n%@ wird sich dann mit dem neuen Sensor verbinden.";
-
 /// Sometimes NFC scanning creates errors, retrying solves the problem. This is to explain this to the user
 "nfcErrorRetryScan" = "Fehler während des Scanvorgangs. Gehen Sie links oben auf Scannen oder gehen Sie zurück und fügen einen Libre 2 erneut hinzu und versuchen dann ein weiteres Mal zu scannen";
+
+"scanComplete" = "Sensor Scan erfolgreich";
+
+"holdTopOfIphoneNearSensor" = " Halten Sie die den oberen Bereich des IPhones in die Nähe des Sensors, bis es vibriert.";
+
+"donotusethelibrelinkapp" = "Verbunden zu Libre 2.\n\nBitte stellen Sie sicher, dass Sie in den IPhone Einstellungen Bluetooth für die Libre-App deaktiviert haben.\n\nWenn Sie mit der Libre App scannen lassen verlieren Sie die Verbindung zwischen %@ und Libre 2.";
+
+"connectedLibre2DoesNotMatchScannedLibre2" = "Sie haben einen neuen Libre Sensor gescannt, aber %@ ist noch mit einem anderen Sensor verbunden (vermutlich mit dem Vorherigen).\n\nUm dieses Problem zu lösen, löschen Sie den alten Sensor nun noch NICHT. Klicken Sie auf 'Trennen' oder 'Stop Scanning', gehen Sie zurück zum vorherigen Bildschirm, fügen ein neues CGM Libre 2 hinzu und scannen erneut.\n\n%@ sollte nun versuchen eine Verbindung mit dem neuen Sensor herzustellen.";

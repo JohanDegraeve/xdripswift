@@ -1,7 +1,10 @@
-"scanComplete" = "Pesquisa Terminada";
-"holdTopOfIphoneNearSensor" = "Coloque o topo do seu dispositivo iOS no sensor para pesquisar";
 "deviceMustSupportNFC" = "Este iPhone não suporta NFC";
 "deviceMustSupportIOS14" = "Para ligar ao Libre 2, este iPhone precisa de ser actualizado para iOS14";
-"donotusethelibrelinkapp" = "Ligado ao Libre 2.\r\n\r\nSe quiser fazer leituras NFC com a app oficial do Libre, então desactive permissão Bluetooth para a app oficial do Libre. \r\n\r\nSenão, as leituras NFC com a app do Libre com a permissão do bluetooth activada vai romper a ligação entre %@ e o Libre 2.";
-"connectedLibre2DoesNotMatchScannedLibre2" = "Parece que foi lido um novo sensor, mas %@ ligado ao sensor antigo.\r\n\r\Para resolver :\r\n- Pressionar em 'Desligar'\r\n- Voltar ao menu anterior e adicionar um novo CGM do tipo Libre 2 e pesquisar novamente.\r\n\r\n%@ deverá ligar-se ao novo sensor.";
 "nfcErrorRetryScan" = "Ocorreu um erro ao ler o Sensor. Pressione em 'Pesquisar' no canto superior esquerdo ou pressione 'Voltar' e adicione novamente o Libre 2, pesquise outra vez.";
+"scanComplete" = "Pesquisa de Sensor Com Sucesso";
+
+"holdTopOfIphoneNearSensor" = "Mantenha o Topo do seu iPhone perto do Sensor até que pare de Vibrar.";
+
+"donotusethelibrelinkapp" = "Conectado ao Libre 2.\n\nPor favor confirme que desactivou a permissão de bluetooth para a Libre app nas definições do seu iPhone.\n\nSe não o fizer, quando ler o sensor com a Libre app a ligação será quebrada entre %@ e o Libre 2.";
+
+"connectedLibre2DoesNotMatchScannedLibre2" = "Pesquisou um novo Sensor Libre, mas %@ está conectado a um outro sensor (provavelmente ao sensor anterior).\n\nPara resolver NÃO elimine ainda o sensor anterior. Pressione 'Desconectar' ou 'Parar Pesquisa', volte ao ecrã anterior e adicione um novo CGM do tipo Libre 2 e pesquise sensor novamente.\n\n%@ deverá tentar conectar ao novo sensor.";

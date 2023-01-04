@@ -30,7 +30,6 @@
 "transmitterpairingattempttimeout" = "Transmissor não respondeu ao pedido de emparelhamento.";
 "success" = "Com Sucesso";
 "failed" = "Falhou";
-"calibrationNotNecessary" = "Quando se usa Algoritmo do Libre, não é necessário calibrar o sensor.";
 "dexcomBatteryTooLow" = "O Nível de Bateria do Transmissor está muito baixo!";
 "unlock" = "Desbloquear";
 "lock" = "Bloquear";
@@ -53,3 +52,5 @@
 
 /// status info : literally 'Sensor End'
 "sensorend" = "Sensor Ends";
+
+"calibrationNotNecessary" = "Quando em utilização do algoritmo nativo do transmissor, calibração manual não está disponível.\n\nSe pretende calibrar, terá que alterar para o algoritmo xDrip no menu do transmissor.";

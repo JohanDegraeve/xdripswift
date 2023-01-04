@@ -273,6 +273,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
     }
     
+    /// called by the delegate in the case of a transmitter that needs an NFC scan and used to update the expected name to include the recently scanned sensor serial number. This ensures that we only allow this sensor to connect.
+    func updateExpectedDeviceName(sensorSerialNumber: String) {
+        
+        self.expectedName = "ABBOTT" + sensorSerialNumber
+        
+    }
+    
     // MARK: - fileprivate functions
     
     /// stops scanning and connect. To be called after diddiscover
@@ -605,6 +612,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         /// unauthorized
         case unauthorized
         
+        /// successful NFC scan needed before starting BLE scanning
+        case nfcScanNeeded
+        
         // any other, reason specified in text
         case other(reason:String)
         
@@ -634,6 +644,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 
             case .unauthorized:
                 return "unauthorized"
+                
+            case .nfcScanNeeded:
+                return "nfcScanNeeded"
                 
             }
         }

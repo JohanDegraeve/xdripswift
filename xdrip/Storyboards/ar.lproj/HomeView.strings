@@ -30,7 +30,6 @@
 "transmitterpairingattempttimeout" = "لم يستجيب جهاز الإرسال على طلب الاقتران.";
 "success" = "نجاح";
 "failed" = "فشل";
-"calibrationNotNecessary" = "عند استخدام خوارزمية الليبري, لا يلزم ولايمكن معايرة الحساس.";
 "dexcomBatteryTooLow" = "بطارية جهاز الإرسال منخفضة جدًا!";
 "unlock" = "فتح القفل";
 "lock" = "قفل";

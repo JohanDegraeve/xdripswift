@@ -54,9 +54,6 @@
 /// To give info to user that the transmitter pairing requeset timed out
 "transmitterpairingattempttimeout" = "Transmitter did not reply to pairing request.";
 
-/// if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible
-"calibrationNotNecessary" = "When using the Libre algoritm, it is not necessary to calibrate the sensor.";
-
 /// status info : literally 'Last connection', shows when the last connection to a transmitter occured
 "lastconnection" = "Last Connection";
 

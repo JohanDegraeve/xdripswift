@@ -73,9 +73,11 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMLibre2TransmitterDelegate : CGMLibre2TransmitterDelegate, sensorSerialNumber:String?, cGMTransmitterDelegate:CGMTransmitterDelegate, nonFixedSlopeEnabled: Bool?, webOOPEnabled: Bool?) {
         
         // assign addressname and name or expected devicename
-        var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "abbott")
+        // (actually this now isn't really necessary as for new devices, sensorSerialNumber will be nil and we'll update the superclass expectedName anyway after the NFC scan via the delegate)
+        var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "ABBOTT" + (sensorSerialNumber ?? ""))
+        
         if let address = address {
-            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
+            newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: "ABBOTT" + (sensorSerialNumber ?? ""))
         }
         
         // initialize sensorSerialNumber
@@ -131,15 +133,14 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
                 
             }
             
-            
         } else {
             
             bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.deviceMustSupportIOS14)
             
         }
         
-        // start the bluetooth scanning
-        return super.startScanning()
+        // start the NFC scan (not BLE scanning)
+        return .nfcScanNeeded
 
     }
     
@@ -376,7 +377,7 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
 // MARK: - LibreNFCDelegate functions
 
 extension CGMLibre2Transmitter: LibreNFCDelegate {
-    
+        
     func received(fram: Data) {
         
         trace("received fram :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, fram.toHexString())
@@ -393,6 +394,7 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
                 
                 // we have all date to create libre1DerivedAlgorithmParameters
                 UserDefaults.standard.libre1DerivedAlgorithmParameters = Libre1DerivedAlgorithmParameters(bytes: framCopy, serialNumber: serialNumber, libreSensorType: libreSensorType)
+                
                 
             }
             
@@ -455,6 +457,46 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
             trace("received streaming enabled message from NFC with result unsuccessful", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
 
         }
+        
+    }
+    
+    func nfcScanResult(successful: Bool) {
+        
+        if successful {
+            
+            trace("received NFC scan result from NFC with result successful", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            
+            // only process if userdefaults needs changing to true to avoid triggering the observer unnecessarily
+            if !UserDefaults.standard.nfcScanSuccessful {
+                
+                UserDefaults.standard.nfcScanSuccessful = true
+                
+            }
+            
+        } else {
+            
+            trace("received NFC scan result from NFC with result unsuccessful", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            
+            // only process if userdefaults needs changing to true to avoid triggering the observer unnecessarily
+            if !UserDefaults.standard.nfcScanFailed {
+                
+                UserDefaults.standard.nfcScanFailed = true
+                
+            }
+            
+        }
+        
+    }
+    
+    func startBLEScanning() {
+        
+        _ = super.startScanning()
+        
+    }
+    
+    func nfcScanSerialNumber(sensorSerialNumber: String) {
+        
+        self.updateExpectedDeviceName(sensorSerialNumber: sensorSerialNumber)
         
     }
     
