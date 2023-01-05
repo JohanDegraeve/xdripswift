@@ -1,0 +1,30 @@
+name: Create Certificates
+on:
+  workflow_dispatch:
+
+jobs:
+  certificates:
+    runs-on: macos-12
+    steps:
+      # Uncomment to manually select latest Xcode if needed
+      #- name: Select Latest Xcode
+      #  run: "sudo xcode-select --switch /Applications/Xcode_13.0.app/Contents/Developer"
+      
+      # Checks-out the repo
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        
+      # Patch Fastlane Match to not print tables
+      - name: Patch Match Tables
+        run: find /usr/local/lib/ruby/gems -name table_printer.rb | xargs sed -i "" "/puts(Terminal::Table.new(params))/d"
+        
+      # Create or update certificates for app
+      - name: Create Certificates
+        run: fastlane certs
+        env:
+          TEAMID: ${{ secrets.TEAMID }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_KEY_ID: ${{ secrets.FASTLANE_KEY_ID }}
+          FASTLANE_ISSUER_ID: ${{ secrets.FASTLANE_ISSUER_ID }}
+          FASTLANE_KEY: ${{ secrets.FASTLANE_KEY }}
