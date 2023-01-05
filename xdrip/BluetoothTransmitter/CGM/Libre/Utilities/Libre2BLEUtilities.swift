@@ -148,32 +148,12 @@ class Libre2BLEUtilities {
             
         }
         
-        trace("=====in parseBLEData %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, Date().toString(timeStyle: .long, dateStyle: .long))
-        
-        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-            trace("=====in parseBLEData; rawGlucoseValues before appending previous values =  %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, rawGlucoseValues.reduce("", { $0 + "; " + $1.description.replacingOccurrences(of: ".", with: ",")}))
-        }
-        
-        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog, let firstRawTemperatureValue = rawTemperatureValues.first {
-            trace("=====in parseBLEData; firstRawTemperatureValue = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, firstRawTemperatureValue.description.replacingOccurrences(of: ".", with: ","))
-        }
-        
-        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog, let previousRawGlucoseValues = UserDefaults.standard.previousRawGlucoseValues {
-            trace("=====in parseBLEData; UserDefaults.standard.previousRawGlucoseValues =     %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, previousRawGlucoseValues.reduce("", { $0 + "; " + $1.description.replacingOccurrences(of: ".", with: ",") }))
-        }
-        
         // append previous rawvalues
         appendPreviousValues(to: &rawGlucoseValues, rawTemperatureValues: &rawTemperatureValues, temperatureAdjustmentValues: &temperatureAdjustmentValues)
-        
-        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-            trace("=====in parseBLEData; rawGlucoseValues after appending previous values =   %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, rawGlucoseValues.reduce("", { $0 + "; " + $1.description.replacingOccurrences(of: ".", with: ",") }))
-        }
         
         // check if the rawGlucoseValues and the previousRawGlucoseValues have at least 5 equal values, if so this is an expired sensor that keeps sending the same values, in that case no further processing
         if let previousRawGlucoseValues = UserDefaults.standard.previousRawGlucoseValues {
             if rawGlucoseValues.hasEqualValues(howManyToCheck: 5, otherArray: previousRawGlucoseValues) {
-                
-                trace("=====in parseBLEData; did detect flat values, returning empty GlucoseData array", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
                 
                 return ([GlucoseData](), wearTimeMinutes)
                 
@@ -185,10 +165,6 @@ class Libre2BLEUtilities {
         UserDefaults.standard.previousTemperatureAdjustmentValues = Array(temperatureAdjustmentValues[0..<(min(rawGlucoseValues.count, ConstantsLibreSmoothing.amountOfPreviousReadingsToStore))])
         UserDefaults.standard.previousRawTemperatureValues = Array(rawTemperatureValues[0..<(min(rawGlucoseValues.count, ConstantsLibreSmoothing.amountOfPreviousReadingsToStore))])
         
-        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog, let previousRawGlucoseValues = UserDefaults.standard.previousRawGlucoseValues {
-            trace("=====in parseBLEData; UserDefaults.standard.previousRawGlucoseValues after setting =     %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, previousRawGlucoseValues.reduce("", { $0 + "; " + $1.description.replacingOccurrences(of: ".", with: ",") }))
-        }
-        
         // create glucosedata for each known rawglucose and add to returnvallue
         for (index, _) in rawGlucoseValues.enumerated() {
             
@@ -199,17 +175,9 @@ class Libre2BLEUtilities {
             
         }
         
-        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-            trace("=====in parseBLEData; bleGlucose before filling gaps =                     %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, bleGlucose.reduce("", { $0 + "; " + $1.glucoseLevelRaw.description.replacingOccurrences(of: ".", with: ",") }))
-        }
-        
         // sensor gives values only every 1 minute but it gives only 7 readings for the last 16 minutes, with gaps between 1 and 4 minutes Try to fill those gaps using previous sessions, but this may not always be successful, (eg if there's been a disconnection of 2 minutes). So let's fill missing gaps
         // in case smoothing is used, then maximum gap is 4, if no smoothing is used, then maximum gap is 1
         bleGlucose.fill0Gaps(maxGapWidth: UserDefaults.standard.smoothLibreValues ? 4:1)
-        
-        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-            trace("=====in parseBLEData; bleGlucose after filling gaps =                      %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, bleGlucose.reduce("", { $0 + "; " + $1.glucoseLevelRaw.description.replacingOccurrences(of: ".", with: ",") }))
-        }
         
         // if first (most recent) value has rawGlucose 0.0 then return empty array
         if let first = bleGlucose.first {
@@ -226,17 +194,9 @@ class Libre2BLEUtilities {
             
         }
         
-        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-            trace("=====in parseBLEData; bleGlucose after smoothing =                         %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, bleGlucose.reduce("", { $0 + "; " + $1.glucoseLevelRaw.description.replacingOccurrences(of: ".", with: ",") }))
-        }
-        
         // there's still possibly 0 values, eg first or last
         // filter out readings with glucoseLevelRaw = 0, if any
         bleGlucose = bleGlucose.filter({return $0.glucoseLevelRaw > 0.0})
-        
-        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-            trace("=====in parseBLEData; bleGlucose after filtering out 0 values =            %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .debug, bleGlucose.reduce("", { $0 + "; " + $1.glucoseLevelRaw.description.replacingOccurrences(of: ".", with: ",") }))
-        }
         
         return (bleGlucose, wearTimeMinutes)
         

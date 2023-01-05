@@ -734,11 +734,6 @@ public class NightScoutUploadManager: NSObject {
 
         getOrDeleteRequest(path: nightScoutTreatmentPath + "/" + treatmentToDelete.id.split(separator: "-")[0], queries: [], httpMethod: "DELETE", completionHandler: { (data: Data?, nightScoutResult: NightScoutResult)  in
 
-            // trace data to upload as string in debug  mode
-            if let data = data, let dataAsString = String(bytes: data, encoding: .utf8) {
-                trace("    data : %{public}@", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .debug, dataAsString)
-            }
-            
             self.coreDataManager.mainManagedObjectContext.performAndWait {
 
                 if nightScoutResult.successFull() {
