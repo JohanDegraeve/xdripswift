@@ -24,12 +24,12 @@ DEVICE_ID = ENV["DEVICE_ID"]
 ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
 
 platform :ios do
-  desc "Build FreeAPS X"
-  lane :build_fax do
+  desc "Build Xdrip4iOS"
+  lane :build_xdrip4ios do
     setup_ci if ENV['CI']
     
     update_project_team(
-      path: "#{GITHUB_WORKSPACE}/FreeAPS.xcodeproj",
+      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
       teamid: "#{TEAMID}"
     )
 
@@ -40,14 +40,14 @@ platform :ios do
     )
 
     previous_build_number = latest_testflight_build_number(
-      app_identifier: "ru.artpancreas.#{TEAMID}.FreeAPS",
+      app_identifier: "com.#{TEAMID}.xdripswift",
       api_key: api_key,
     )
 
     current_build_number = previous_build_number + 1
 
     increment_build_number(
-      xcodeproj: "#{GITHUB_WORKSPACE}/FreeAPS.xcodeproj",
+      xcodeproj: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
       build_number: current_build_number
     )      
     
@@ -55,21 +55,22 @@ platform :ios do
       type: "appstore",
       git_basic_authorization: Base64.strict_encode64("#{GITHUB_REPOSITORY_OWNER}:#{GH_PAT}"),
       app_identifier: [
-        "ru.artpancreas.#{TEAMID}.FreeAPS",
-        "ru.artpancreas.#{TEAMID}.FreeAPS.watchkitapp",
-        "ru.artpancreas.#{TEAMID}.FreeAPS.watchkitapp.watchkitextension"
+        "com.#{TEAMID}.xdripswift",
+        "com.#{TEAMID}.xdripswift.xDrip4iOS-Widget",
+        "com.#{TEAMID}.xdripswift.watchkitapp",
+        "com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension"
       ]
     )
 
     previous_build_number = latest_testflight_build_number(
-      app_identifier: "ru.artpancreas.#{TEAMID}.FreeAPS",
+      app_identifier: "com.#{TEAMID}.xdripswift",
       api_key: api_key,
     )
 
     current_build_number = previous_build_number + 1
 
     increment_build_number(
-      xcodeproj: "#{GITHUB_WORKSPACE}/FreeAPS.xcodeproj",
+      xcodeproj: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
       build_number: current_build_number
     )
     
@@ -78,30 +79,37 @@ platform :ios do
     ]
 
     update_code_signing_settings(
-      path: "#{GITHUB_WORKSPACE}/FreeAPS.xcodeproj",
-      profile_name: mapping["ru.artpancreas.#{TEAMID}.FreeAPS"],
+      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      profile_name: mapping["com.#{TEAMID}.xdripswift"],
       code_sign_identity: "iPhone Distribution",
-      targets: ["FreeAPS"]
+      targets: ["xdrip"]
     )
 
     update_code_signing_settings(
-      path: "#{GITHUB_WORKSPACE}/FreeAPS.xcodeproj",
-      profile_name: mapping["ru.artpancreas.#{TEAMID}.FreeAPS.watchkitapp.watchkitextension"],
+      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      profile_name: mapping["com.#{TEAMID}.xdripswift.xDrip4iOS-Widget"],
       code_sign_identity: "iPhone Distribution",
-      targets: ["FreeAPSWatch WatchKit Extension"]
+      targets: ["xDrip4iOS Widget"]
     )
     
     update_code_signing_settings(
-      path: "#{GITHUB_WORKSPACE}/FreeAPS.xcodeproj",
-      profile_name: mapping["ru.artpancreas.#{TEAMID}.FreeAPS.watchkitapp"],
+      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      profile_name: mapping["com.#{TEAMID}.xdripswift.watchkitapp"],
       code_sign_identity: "iPhone Distribution",
-      targets: ["FreeAPSWatch"]
+      targets: ["Watch App"]
     )
 
+    update_code_signing_settings(
+      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      profile_name: mapping["com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension"],
+      code_sign_identity: "iPhone Distribution",
+      targets: ["Watch App WatchKit Extension"]
+    )
+    
     gym(
       export_method: "app-store",
-      scheme: "FreeAPS X",
-      output_name: "FAX.ipa",
+      scheme: "Xdrip4iOS",
+      output_name: "Xdrip4iOS.ipa",
       configuration: "Release",
       destination: 'generic/platform=iOS',
       buildlog_path: 'buildlog'
@@ -124,7 +132,7 @@ platform :ios do
     upload_to_testflight(
       api_key: api_key,
       skip_submission: false,
-      ipa: "FAX.ipa",
+      ipa: "Xdrip4iOS.ipa",
       skip_waiting_for_build_processing: true,
     )
   end
@@ -147,19 +155,23 @@ platform :ios do
       }
     end
 
-    configure_bundle_id("FreeAPS", "ru.artpancreas.#{TEAMID}.FreeAPS", [
+    configure_bundle_id("xdrip", "com.#{TEAMID}.xdripswift", [
       Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS,
       Spaceship::ConnectAPI::BundleIdCapability::Type::HEALTHKIT
     ])
 
-    configure_bundle_id("FreeAPSWatch WatchKit Extension", "ru.artpancreas.#{TEAMID}.FreeAPS.watchkitapp.watchkitextension", [
-      Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS,
-      Spaceship::ConnectAPI::BundleIdCapability::Type::HEALTHKIT
-    ])
-    
-    configure_bundle_id("FreeAPSWatch", "ru.artpancreas.#{TEAMID}.FreeAPS.watchkitapp", [
+    configure_bundle_id("xDrip4iOS Widget", "com.#{TEAMID}.xdripswift.xDrip4iOS-Widget", [
       Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS
     ])
+    
+    configure_bundle_id("Watch App", "com.#{TEAMID}.xdripswift.watchkitapp", [
+      Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS
+    ])
+    
+    configure_bundle_id("Watch App WatchKit Extension", "com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension", [
+      Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS,
+    ])
+    
     
   end
 
@@ -179,9 +191,10 @@ platform :ios do
       force: true,
       git_basic_authorization: Base64.strict_encode64("#{GITHUB_REPOSITORY_OWNER}:#{GH_PAT}"),
       app_identifier: [
-        "ru.artpancreas.#{TEAMID}.FreeAPS",
-        "ru.artpancreas.#{TEAMID}.FreeAPS.watchkitapp.watchkitextension",
-        "ru.artpancreas.#{TEAMID}.FreeAPS.watchkitapp",
+        "com.#{TEAMID}.xdripswift",
+        "com.#{TEAMID}.xdripswift.xDrip4iOS-Widget",
+        "com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension",
+        "com.#{TEAMID}.xdripswift.watchkitapp",
       ]
     )
   end
