@@ -113,7 +113,7 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         // create disclosureIndicator in color ConstantsUI.disclosureIndicatorColor
         // will be used whenever accessoryType is to be set to disclosureIndicator
-        let disclosureAaccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+        let  disclosureAccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
 
         guard let setting = Settings(rawValue: rawValue) else { fatalError("Libre2BluetoothPeripheralViewModel update, unexpected setting") }
         
@@ -124,15 +124,18 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
             cell.detailTextLabel?.text = libre2.blePeripheral.sensorSerialNumber
             cell.accessoryType = .disclosureIndicator
-            cell.accessoryView = disclosureAaccessoryView
+            cell.accessoryView =  disclosureAccessoryView
 
         case .sensorStartTime:
             
             var sensorStartTimeText = "Not Connected"
             
             cell.textLabel?.text = Texts_HomeView.sensorStart
+            
             if let sensorTimeInMinutes = libre2.sensorTimeInMinutes {
-                sensorStartTimeText = Date(timeIntervalSinceNow: -Double(sensorTimeInMinutes*60)).toStringInUserLocale(timeStyle: .short, dateStyle: .short)
+                let startDate = Date(timeIntervalSinceNow: -Double(sensorTimeInMinutes*60))
+                sensorStartTimeText = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
+                sensorStartTimeText += " (" + startDate.daysAndHoursAgo() + ")"
             }
             cell.detailTextLabel?.text = sensorStartTimeText
             cell.accessoryType = .none

@@ -121,7 +121,7 @@ extension BubbleBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
         // create disclosureIndicator in color ConstantsUI.disclosureIndicatorColor
         // will be used whenever accessoryType is to be set to disclosureIndicator
-        let disclosureAaccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+        let  disclosureAccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
 
         guard let setting = Settings(rawValue: rawValue) else { fatalError("BubbleBluetoothPeripheralViewModel update, unexpected setting") }
         
@@ -142,14 +142,14 @@ extension BubbleBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.textLabel?.text = Texts_Common.firmware
             cell.detailTextLabel?.text = bubble.firmware
             cell.accessoryType = .disclosureIndicator
-            cell.accessoryView = disclosureAaccessoryView
+            cell.accessoryView =  disclosureAccessoryView
             
         case .hardWare:
             
             cell.textLabel?.text = Texts_Common.hardware
             cell.detailTextLabel?.text = bubble.hardware
             cell.accessoryType = .disclosureIndicator
-            cell.accessoryView = disclosureAaccessoryView
+            cell.accessoryView =  disclosureAccessoryView
             
         case .sensorSerialNumber:
             
@@ -158,7 +158,7 @@ extension BubbleBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
 
                 cell.detailTextLabel?.text = sensorSerialNumber
                 cell.accessoryType = .disclosureIndicator
-                cell.accessoryView = disclosureAaccessoryView
+                cell.accessoryView =  disclosureAccessoryView
                 
             } else {
                 

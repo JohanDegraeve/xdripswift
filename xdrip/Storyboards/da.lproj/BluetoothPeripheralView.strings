@@ -29,6 +29,6 @@
 "cannotActiveCGMInFollowerMode" = "You can not activate a CGM in Follower Mode";
 "confirmDisconnectTitle" = "Confirm Disconnect";
 "confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
-"transmittterStartDate" = "Transmitter Start";
-"sensorStartDate" = "Sensor Start";
-"useOtherDexcomApp" = "Follow Dexcom-app";
+"transmittterStartDate" = "Transmitter Started";
+"sensorStartDate" = "Sensor Started";
+"useOtherDexcomApp" = "Read from Dexcom app";

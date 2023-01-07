@@ -224,7 +224,7 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
         
         // create disclosureIndicator in color ConstantsUI.disclosureIndicatorColor
         // will be used whenever accessoryType is to be set to disclosureIndicator
-        let disclosureAaccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+        let  disclosureAccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
 
         // configure the cell depending on setting
         switch setting {
@@ -233,7 +233,7 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
             cell.textLabel?.text = Texts_AlertTypeSettingsView.alertTypeName
             cell.detailTextLabel?.text = name
             cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
-            cell.accessoryView = disclosureAaccessoryView
+            cell.accessoryView =  disclosureAccessoryView
             
         case .enabled:
             cell.textLabel?.text = Texts_AlertTypeSettingsView.alertTypeEnabled
@@ -266,13 +266,13 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
             cell.textLabel?.text = Texts_AlertTypeSettingsView.alertTypeDefaultSnoozePeriod
             cell.detailTextLabel?.text = snoozePeriod.description
             cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
-            cell.accessoryView = disclosureAaccessoryView
+            cell.accessoryView =  disclosureAccessoryView
             
         case .soundName:
             cell.textLabel?.text = Texts_AlertTypeSettingsView.alertTypeSound
             cell.detailTextLabel?.text = soundName != nil ? soundName! == "" ? Texts_AlertTypeSettingsView.alertTypeNoSound : soundName! : Texts_AlertTypeSettingsView.alertTypeDefaultIOSSound
             cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
-            cell.accessoryView = disclosureAaccessoryView
+            cell.accessoryView =  disclosureAccessoryView
             
         case .overridemute:
             cell.textLabel?.text = Texts_AlertTypeSettingsView.alertTypeOverrideMute

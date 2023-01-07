@@ -12,7 +12,7 @@
 "delete" = "Löschen";
 
 /// to show the sensor status
-"sensorStatus" = "Sensor Status:";
+"sensorStatus" = "Sensor Status";
 
 /// yellow
 "yellow" = "gelb";

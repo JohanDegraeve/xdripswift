@@ -315,7 +315,7 @@ class M5StackBluetoothPeripheralViewModel {
 
         // create disclosureIndicator in color ConstantsUI.disclosureIndicatorColor
         // will be used whenever accessoryType is to be set to disclosureIndicator
-        let disclosureAaccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+        let  disclosureAccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
 
         switch section {
         case 1:
@@ -353,7 +353,7 @@ class M5StackBluetoothPeripheralViewModel {
                 cell.textLabel?.text = Texts_M5StackView.m5StackSoftWhereHelpCellText
                 cell.detailTextLabel?.text = nil
                 cell.accessoryType = .disclosureIndicator
-                cell.accessoryView = disclosureAaccessoryView
+                cell.accessoryView =  disclosureAccessoryView
                 
             case .blePassword:
                 cell.textLabel?.text = Texts_Common.password
@@ -374,7 +374,7 @@ class M5StackBluetoothPeripheralViewModel {
                 }
                 
                 cell.accessoryType = .disclosureIndicator
-                cell.accessoryView = disclosureAaccessoryView
+                cell.accessoryView =  disclosureAccessoryView
                 
             case .backGroundColor:
                 cell.textLabel?.text = Texts_SettingsView.m5StackbackGroundColor
@@ -386,13 +386,13 @@ class M5StackBluetoothPeripheralViewModel {
                 }
                 
                 cell.accessoryType = .disclosureIndicator
-                cell.accessoryView = disclosureAaccessoryView
+                cell.accessoryView =  disclosureAccessoryView
                 
             case .rotation:
                 cell.textLabel?.text = Texts_SettingsView.m5StackRotation
                 cell.detailTextLabel?.text = rotationStrings[Int(m5Stack.rotation)]
                 cell.accessoryType = .disclosureIndicator
-                cell.accessoryView = disclosureAaccessoryView
+                cell.accessoryView =  disclosureAccessoryView
                 
             }
             
@@ -410,7 +410,7 @@ class M5StackBluetoothPeripheralViewModel {
                 cell.textLabel?.text = Texts_SettingsView.m5StackBrightness
                 cell.detailTextLabel?.text = brightnessStrings[Int(m5Stack.brightness/10)]
                 cell.accessoryType = .disclosureIndicator
-                cell.accessoryView = disclosureAaccessoryView
+                cell.accessoryView =  disclosureAccessoryView
                 
             case .batteryLevel:
                 cell.textLabel?.text = Texts_BluetoothPeripheralsView.batteryLevel
@@ -425,7 +425,7 @@ class M5StackBluetoothPeripheralViewModel {
                 cell.textLabel?.text = Texts_M5StackView.powerOff
                 cell.accessoryType = .disclosureIndicator
                 cell.detailTextLabel?.text = nil
-                cell.accessoryView = disclosureAaccessoryView
+                cell.accessoryView =  disclosureAccessoryView
                 
             }
 

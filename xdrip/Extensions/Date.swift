@@ -105,13 +105,44 @@ extension Date {
     /// date to string, with date and time as specified by one of the values in DateFormatter.Style and formatted to match the user's locale
     /// Example return: "31/12/2022, 17:48" (spain locale)
     /// Example return: "12/31/2022, 5:48 pm" (us locale)
-    func toStringInUserLocale(timeStyle: DateFormatter.Style, dateStyle: DateFormatter.Style) -> String {
+    func toStringInUserLocale(timeStyle: DateFormatter.Style, dateStyle: DateFormatter.Style, showTimeZone: Bool? = false) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = timeStyle
         dateFormatter.dateStyle = dateStyle
         dateFormatter.amSymbol = ConstantsUI.timeFormatAM
         dateFormatter.pmSymbol = ConstantsUI.timeFormatPM
-        dateFormatter.setLocalizedDateFormatFromTemplate("dd/MM/yyyy, jj:mm")
+        
+        let showUserTimeZone = showTimeZone ?? false
+        
+        if timeStyle == .none {
+            
+            dateFormatter.setLocalizedDateFormatFromTemplate("dd/MM/yyyy")
+            
+        } else if dateStyle == .none {
+            
+            if showUserTimeZone {
+            
+            dateFormatter.setLocalizedDateFormatFromTemplate("jj:mm zzz")
+                
+            } else {
+                
+                dateFormatter.setLocalizedDateFormatFromTemplate("jj:mm")
+                
+            }
+            
+        } else {
+            
+            if showUserTimeZone {
+                
+                dateFormatter.setLocalizedDateFormatFromTemplate("dd/MM/yyyy, jj:mm zzz")
+                
+            } else {
+                
+                dateFormatter.setLocalizedDateFormatFromTemplate("dd/MM/yyyy, jj:mm")
+            }
+            
+        }
+        
         return dateFormatter.string(from: self)
     }
     
@@ -130,16 +161,33 @@ extension Date {
     /// returns the Nightscout style string showing the days and hours since a date (e.g. "6d11h")
     /// Example return: "6d11h" if optional appendAgo is false or not used
     /// Example return: "6d11h ago" if optional appendAgo is true
+    /// if less than 12 hours, return also minutes, e.g: "7h43m" or "58m" to give extra granularity
     func daysAndHoursAgo(appendAgo: Bool? = false) -> String {
         
         // set a default value assuming that we're unable to calculate the hours + days
         var daysAndHoursAgoString: String = "n/a"
 
-        let diffComponents = Calendar.current.dateComponents([.day, .hour], from: self, to: Date())
+        let diffComponents = Calendar.current.dateComponents([.day, .hour, .minute], from: self, to: Date())
 
-        if let days = diffComponents.day, let hours = diffComponents.hour {
+        if let days = diffComponents.day, let hours = diffComponents.hour, let minutes = diffComponents.minute {
             
-            daysAndHoursAgoString = days.description + "d" + hours.description + "h"
+            if days == 0 && hours < 1 {
+                
+                // show just minutes for less than one hour
+                daysAndHoursAgoString = abs(minutes).description + "m"
+                
+            } else if days == 0 && hours < 12 {
+                
+                // show just hours and minutes for less than twelve hours
+                daysAndHoursAgoString = abs(hours).description + "h" + abs(minutes).description + "m"
+                
+            } else {
+                
+                // default show days and hours
+                daysAndHoursAgoString = abs(days).description + "d" + abs(hours).description + "h"
+                
+            }
+            
             
             // if the function was called using appendAgo == true, then add the "ago" string
             if appendAgo ?? false {

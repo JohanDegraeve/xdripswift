@@ -103,7 +103,7 @@
 "common_statistics_a1c" = "HbA1c";
 
 /// to show the sensor status
-"sensorStatus" = "Sensor status:";
+"sensorStatus" = "Sensor Status";
 
 /// blood glucose unit in short, for text field title
 "common_bloodglucoseunit_short" = "BG Unit";

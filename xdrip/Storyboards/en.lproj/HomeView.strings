@@ -16,6 +16,7 @@
 "bluetoothIsNotAuthorized" = "You did not give bluetooth permission for %@. Go to the settings, find the %@ app, and enable Bluetooth.";
 "startScanningInfo" = "Scanning Started.\n\nKeep %@ open in the foreground until a connection is made.\n\n(There's no need to turn off Auto-Lock. Just don't press the home button and don't lock your iPhone)";
 "sensorstart" = "Sensor Started";
+"sensorDuration" = "Sensor Duration";
 "sensorend" = "Sensor Ends";
 "notstarted" = "Not Started";
 "notknown" = "Not Known";
