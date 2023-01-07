@@ -118,7 +118,7 @@ public enum LibreSensorType: String {
         case "9D":
             return .libre2
             
-        case "E5":
+        case "E5", "E6":
             return .libreUS
             
         case "70":

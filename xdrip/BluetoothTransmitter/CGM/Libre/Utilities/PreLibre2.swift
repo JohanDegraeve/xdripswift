@@ -48,7 +48,7 @@ class PreLibre2 {
                 y = 0xcadc
             }
             var s1: UInt16 = 0
-            if (sensorInfo[0] == 0xE5) {
+            if (sensorInfo[0] == 0xE5 || sensorInfo[0] == 0xE6) {
                 let ss1 = (word(sensorId[5], sensorId[4]) + y + i64)
                 s1 = UInt16(ss1 & 0xffff)
             } else {
