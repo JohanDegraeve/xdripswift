@@ -488,7 +488,7 @@ public class NightScoutUploadManager: NSObject {
         
         let dataToUpload = [
             "_id": sensor.id,
-            "eventType": "Sensor Start",
+            "eventType": "Sensor Started",
             "created_at": sensor.startDate.ISOStringFromDate(),
             "enteredBy": ConstantsHomeView.applicationName
         ]
