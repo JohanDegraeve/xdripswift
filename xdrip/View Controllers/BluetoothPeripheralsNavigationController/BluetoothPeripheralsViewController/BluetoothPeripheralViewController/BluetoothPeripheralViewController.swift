@@ -373,7 +373,7 @@ class BluetoothPeripheralViewController: UIViewController {
         // check if there is an existing transmitter configured. If so, disconnect it using setShouldConnectToFalse (this will also update the table and button labels)
         if let bluetoothPeripheral = bluetoothPeripheral {
             
-            setShouldConnectToFalse(for: bluetoothPeripheral, askUser: true)
+            setShouldConnectToFalse(for: bluetoothPeripheral, askUser: false)
             
         } else {
             
