@@ -45,6 +45,11 @@ class NoCalibrator: Calibrator {
         
         findSlope(for: bgReading, last2Readings: &last3Readings)
         
+        // just do a quick sanity check to ensure that we limit any very high values that come through unfiltered such as can occur with Libre 2 output immediately after start-up/insertion.
+        // this will limit it to around 600 maximum. Most errant readings are 600 > bg > 5000.
+        // we purposefully limit to 600 and not to 400 as Libre, unlike Dexcom, can send values between 400 and 600 and although we won't display them without "HIGH", we can use them to show the delta and trend to help the user
+        bgReading.calculatedValue = min(ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValueLimit, bgReading.calculatedValue)
+        
         return bgReading
     }
     
