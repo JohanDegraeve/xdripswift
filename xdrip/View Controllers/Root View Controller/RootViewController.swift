@@ -3099,8 +3099,30 @@ extension RootViewController: CGMTransmitterDelegate {
             
         }
         
-        // process new readings
-        processNewGlucoseData(glucoseData: &glucoseData, sensorAge: sensorAge)
+        // let's check to ensure that the sensor is not within the minimum warm-up time as defined in ConstantsMaster
+        var supressReadingIfSensorIsWarmingUp: Bool = false
+        
+        if let sensorAgeInSeconds = sensorAge {
+            
+            let secondsUntilWarmUpComplete = (ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) - sensorAgeInSeconds
+            
+            if secondsUntilWarmUpComplete > 0 {
+                
+                supressReadingIfSensorIsWarmingUp = true
+                
+                trace("Sensor is still warming up. BG reading processing will remain suppressed for another %{public}@ minutes. (%{public}@ minutes warm-up required).", log: log, category: ConstantsLog.categoryRootView, type: .info, Int(secondsUntilWarmUpComplete/60).description, ConstantsMaster.minimumSensorWarmUpRequiredInMinutes.description)
+                
+            }
+            
+        }
+        
+        // process new readings if sensor is not still warming up
+        if !supressReadingIfSensorIsWarmingUp {
+            
+            processNewGlucoseData(glucoseData: &glucoseData, sensorAge: sensorAge)
+            
+        }
+        
         
     }
     
