@@ -213,21 +213,21 @@ extension BubbleBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
             // firmware text could be longer than screen width, clicking the row allos to see it in pop up with more text place
             if let firmware = bubble.firmware {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.firmware + " : " + firmware)
+                return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.firmware + ": " + firmware)
             }
 
         case .hardWare:
 
             // hardware text could be longer than screen width, clicking the row allows to see it in pop up with more text place
             if let hardware = bubble.hardware {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.hardware + " : " + hardware)
+                return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.hardware + ": " + hardware)
             }
             
         case .sensorSerialNumber:
             
             // serial text could be longer than screen width, clicking the row allows to see it in a pop up with more text place
             if let serialNumber = bubble.blePeripheral.sensorSerialNumber {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " : " + serialNumber)
+                return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " " + serialNumber)
             }
             
         }
