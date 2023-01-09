@@ -1,0 +1,6 @@
+framework module ActionClosurable {
+  umbrella header "ActionClosurable-umbrella.h"
+
+  export *
+  module * { export * }
+}

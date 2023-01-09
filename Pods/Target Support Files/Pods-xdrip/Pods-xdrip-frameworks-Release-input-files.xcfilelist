@@ -1,0 +1,5 @@
+${PODS_ROOT}/Target Support Files/Pods-xdrip/Pods-xdrip-frameworks.sh
+${BUILT_PRODUCTS_DIR}/ActionClosurable/ActionClosurable.framework
+${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework
+${BUILT_PRODUCTS_DIR}/PieCharts/PieCharts.framework
+${BUILT_PRODUCTS_DIR}/SwiftCharts/SwiftCharts.framework
