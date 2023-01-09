@@ -112,7 +112,7 @@ xcuserdata
 *.moved-aside
 
 # CocoaPods
-#/Pods
+/Pods
 
 # wiki
 xdripswift.wiki/
