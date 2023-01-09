@@ -292,7 +292,7 @@
 		0FF66910B7CC30E19ECCAA7EC9179204 /* BarsChart.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BarsChart.swift; path = SwiftCharts/Convenience/BarsChart.swift; sourceTree = "<group>"; };
 		128FFFED9075FEA1286B3982782941F6 /* Pods-xdrip-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-xdrip-frameworks.sh"; sourceTree = "<group>"; };
 		1347F4EFCE9A6E94142747635E0C5536 /* ChartGuideLinesLayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartGuideLinesLayer.swift; path = SwiftCharts/Layers/ChartGuideLinesLayer.swift; sourceTree = "<group>"; };
-		141C771D00B32327501B56425523D398 /* PieCharts.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = PieCharts.framework; path = PieCharts.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		141C771D00B32327501B56425523D398 /* PieCharts.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PieCharts.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1474F989670B3AD72E327402CBE3A768 /* CryptoSwift-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CryptoSwift-prefix.pch"; sourceTree = "<group>"; };
 		149206D47E519CDAF9E0898E764D1A40 /* ChartPointCandleStick.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartPointCandleStick.swift; path = SwiftCharts/ChartPoint/ChartPointCandleStick.swift; sourceTree = "<group>"; };
 		14C6B60917EB8E2C54AF417D6ADB8A69 /* Digest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Digest.swift; path = Sources/CryptoSwift/Digest.swift; sourceTree = "<group>"; };
@@ -349,7 +349,7 @@
 		3D1450160399C4400D8DC20BF2F9AC3D /* Blowfish.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Blowfish.swift; path = Sources/CryptoSwift/Blowfish.swift; sourceTree = "<group>"; };
 		3DD2093776DDEC92BAB7BA06525CBB21 /* HKDF.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HKDF.swift; path = Sources/CryptoSwift/HKDF.swift; sourceTree = "<group>"; };
 		3F7D79E54433EB26F8E4C7F90795CF7D /* ChartLayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartLayer.swift; path = SwiftCharts/Layers/ChartLayer.swift; sourceTree = "<group>"; };
-		409A4B529D58329CC4F7B96AAFD342E0 /* SwiftCharts.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SwiftCharts.framework; path = SwiftCharts.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		409A4B529D58329CC4F7B96AAFD342E0 /* SwiftCharts.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftCharts.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		40D9756C981A435E6B0602BBDD2DF334 /* HMAC.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HMAC.swift; path = Sources/CryptoSwift/HMAC.swift; sourceTree = "<group>"; };
 		41CA46A5A48840A1EB5480C53A8F14B0 /* ChartCandleStickView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartCandleStickView.swift; path = SwiftCharts/Views/ChartCandleStickView.swift; sourceTree = "<group>"; };
 		423D8AED56CF6AF4F4CCC9DFB5D50AA0 /* ActionClosurable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ActionClosurable.swift; path = ActionClosurable/ActionClosurable.swift; sourceTree = "<group>"; };
@@ -398,7 +398,7 @@
 		6DE8F3B945E4697A9195989960C07DB4 /* ZeroPadding.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ZeroPadding.swift; path = Sources/CryptoSwift/ZeroPadding.swift; sourceTree = "<group>"; };
 		6E29642131896707D5752A41B1273117 /* PieSliceLayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PieSliceLayer.swift; path = PieCharts/Core/Slice/PieSliceLayer.swift; sourceTree = "<group>"; };
 		6FF363B0600F1CA105C39BE479CC48A8 /* PieCharts.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = PieCharts.debug.xcconfig; sourceTree = "<group>"; };
-		6FFBA2A488EB25E0C66C6CB2408754BC /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_xdrip.framework; path = "Pods-xdrip.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6FFBA2A488EB25E0C66C6CB2408754BC /* Pods_xdrip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xdrip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		706C11D89704A7B8D3C78DC3A2724036 /* CryptoSwift-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "CryptoSwift-dummy.m"; sourceTree = "<group>"; };
 		71072F26A080D80E149A24048742FFEB /* ChartAxisValuesGenerator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartAxisValuesGenerator.swift; path = SwiftCharts/Axis/ChartAxisValuesGenerator.swift; sourceTree = "<group>"; };
 		73D9C575DAE522857E46EF6F3DA6FDA5 /* ChartAxisYLayerDefault.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartAxisYLayerDefault.swift; path = SwiftCharts/Axis/ChartAxisYLayerDefault.swift; sourceTree = "<group>"; };
@@ -441,7 +441,7 @@
 		9BA7AE87272499072AF35E0DAF7D86E8 /* SwiftCharts.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = SwiftCharts.modulemap; sourceTree = "<group>"; };
 		9C7351DBB6A09BF411F2E67D68348778 /* UInt32+Extension.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UInt32+Extension.swift"; path = "Sources/CryptoSwift/UInt32+Extension.swift"; sourceTree = "<group>"; };
 		9CBD64B0318F6792CF16246AD30C32B7 /* UInt8+Extension.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UInt8+Extension.swift"; path = "Sources/CryptoSwift/UInt8+Extension.swift"; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9E9A7BD5532C86658A21C9F55D9CCAA1 /* ChartAxisValuesGeneratorNice.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartAxisValuesGeneratorNice.swift; path = SwiftCharts/Axis/ChartAxisValuesGeneratorNice.swift; sourceTree = "<group>"; };
 		9FD4D09946C76E47ED17B087853D10B4 /* ChartAxisLabelsGeneratorFixed.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartAxisLabelsGeneratorFixed.swift; path = SwiftCharts/Axis/ChartAxisLabelsGeneratorFixed.swift; sourceTree = "<group>"; };
 		A147D8E13824B71BC54789169F2E9F08 /* ActionClosurable-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "ActionClosurable-umbrella.h"; sourceTree = "<group>"; };
@@ -488,7 +488,7 @@
 		C5748BD8C45FAD9791146365F2464D7F /* ChartLayerBase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartLayerBase.swift; path = SwiftCharts/Layers/ChartLayerBase.swift; sourceTree = "<group>"; };
 		C5DC1DC8679EB6AF814A75F63E3BEF5E /* ChartPointTargetingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartPointTargetingView.swift; path = SwiftCharts/Views/ChartPointTargetingView.swift; sourceTree = "<group>"; };
 		C9B840A0968C58CC7E0514DA33F50716 /* ChartLinesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartLinesView.swift; path = SwiftCharts/Views/ChartLinesView.swift; sourceTree = "<group>"; };
-		C9D7D03233C8E7C7893EC8FF93C81340 /* ActionClosurable.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = ActionClosurable.framework; path = ActionClosurable.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9D7D03233C8E7C7893EC8FF93C81340 /* ActionClosurable.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ActionClosurable.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB9804C1027618A5F0D9059E22C7C15B /* ChaCha20.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChaCha20.swift; path = Sources/CryptoSwift/ChaCha20.swift; sourceTree = "<group>"; };
 		CBF831AC19582FA345E0B791B6687061 /* Globals.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Globals.swift; path = PieCharts/Util/Globals.swift; sourceTree = "<group>"; };
 		CE4DF9CEAF3F630CE27F5DA572BFD64B /* ChartPointsAreaLayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartPointsAreaLayer.swift; path = SwiftCharts/Layers/ChartPointsAreaLayer.swift; sourceTree = "<group>"; };
@@ -532,7 +532,7 @@
 		F4AB38CC10AF7AC258DABB2468DE4664 /* TrendlineGenerator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TrendlineGenerator.swift; path = SwiftCharts/Utils/Trendlines/TrendlineGenerator.swift; sourceTree = "<group>"; };
 		F542110F18B8C7610C20B89241B01103 /* CryptoSwift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CryptoSwift.debug.xcconfig; sourceTree = "<group>"; };
 		F61A3C1BCDB7842BE4DB6CDE19D8EC21 /* NSDate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NSDate.swift; path = SwiftCharts/NSDate.swift; sourceTree = "<group>"; };
-		F81274EDB681F11E7CB05F7DCA2BB33C /* CryptoSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = CryptoSwift.framework; path = CryptoSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F81274EDB681F11E7CB05F7DCA2BB33C /* CryptoSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CryptoSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F842AE1C03867583C4C5812ACDAFD03B /* ChartGroupedBarsLayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChartGroupedBarsLayer.swift; path = SwiftCharts/Layers/ChartGroupedBarsLayer.swift; sourceTree = "<group>"; };
 		F8B90EE54999EDB542727FBAA93ABA68 /* PKCS7.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PKCS7.swift; path = Sources/CryptoSwift/PKCS/PKCS7.swift; sourceTree = "<group>"; };
 		F9B6C6F1A531A6630CC38BF46619169D /* PiePlainTextLayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PiePlainTextLayer.swift; path = PieCharts/Layer/Impl/PlainText/PiePlainTextLayer.swift; sourceTree = "<group>"; };
@@ -632,7 +632,6 @@
 				8B9138BF06B6FB464B874A67C342E58B /* Extensions_UIKit.swift */,
 				8EA7FE1D6F6E31C5EC497C438BC895AA /* Support Files */,
 			);
-			name = ActionClosurable;
 			path = ActionClosurable;
 			sourceTree = "<group>";
 		};
@@ -712,7 +711,6 @@
 				A6EDC4D69E0BA64E7B504D47303D34C3 /* PieViewLayerAnimator.swift */,
 				77C152B57EDF79E67010D9416E964EE8 /* Support Files */,
 			);
-			name = PieCharts;
 			path = PieCharts;
 			sourceTree = "<group>";
 		};
@@ -837,7 +835,6 @@
 				3A8619EB5803C84CF4AA62AAED169C0B /* Zoomable.swift */,
 				DD7D8F84B0EB939B18AC5558C50E5D36 /* Support Files */,
 			);
-			name = SwiftCharts;
 			path = SwiftCharts;
 			sourceTree = "<group>";
 		};
@@ -923,7 +920,6 @@
 				6DE8F3B945E4697A9195989960C07DB4 /* ZeroPadding.swift */,
 				F4156B4DAF96AF220F0C6250E1CBA1AD /* Support Files */,
 			);
-			name = CryptoSwift;
 			path = CryptoSwift;
 			sourceTree = "<group>";
 		};
@@ -1492,7 +1488,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/CryptoSwift/CryptoSwift-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/CryptoSwift/CryptoSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1565,7 +1561,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/ActionClosurable/ActionClosurable-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/ActionClosurable/ActionClosurable-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1599,7 +1595,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/PieCharts/PieCharts-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/PieCharts/PieCharts-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1634,7 +1630,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/ActionClosurable/ActionClosurable-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/ActionClosurable/ActionClosurable-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1669,7 +1665,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/SwiftCharts/SwiftCharts-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/SwiftCharts/SwiftCharts-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1704,7 +1700,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/PieCharts/PieCharts-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/PieCharts/PieCharts-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1804,7 +1800,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/CryptoSwift/CryptoSwift-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/CryptoSwift/CryptoSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1937,7 +1933,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/SwiftCharts/SwiftCharts-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/SwiftCharts/SwiftCharts-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
