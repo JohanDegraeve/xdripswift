@@ -121,7 +121,7 @@ extension AtomBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         // create disclosureIndicator in color ConstantsUI.disclosureIndicatorColor
         // will be used whenever accessoryType is to be set to disclosureIndicator
-        let disclosureAaccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+        let  disclosureAccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
         
         guard let setting = Settings(rawValue: rawValue) else { fatalError("AtomBluetoothPeripheralViewModel update, unexpected setting") }
         
@@ -165,21 +165,21 @@ extension AtomBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.textLabel?.text = Texts_Common.firmware
             cell.detailTextLabel?.text = atom.firmware
             cell.accessoryType = .disclosureIndicator
-            cell.accessoryView = disclosureAaccessoryView
+            cell.accessoryView =  disclosureAccessoryView
             
         case .hardWare:
             
             cell.textLabel?.text = Texts_Common.hardware
             cell.detailTextLabel?.text = atom.hardware
             cell.accessoryType = .disclosureIndicator
-            cell.accessoryView = disclosureAaccessoryView
+            cell.accessoryView =  disclosureAccessoryView
             
         case .sensorSerialNumber:
             
             cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
             cell.detailTextLabel?.text = atom.blePeripheral.sensorSerialNumber
             cell.accessoryType = .disclosureIndicator
-            cell.accessoryView = disclosureAaccessoryView
+            cell.accessoryView =  disclosureAccessoryView
             
         }
         
@@ -203,21 +203,21 @@ extension AtomBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
             // firmware text could be longer than screen width, clicking the row allos to see it in pop up with more text place
             if let firmware = atom.firmware {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.firmware + " : " + firmware)
+                return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.firmware + ": " + firmware)
             }
             
         case .hardWare:
             
             // hardware text could be longer than screen width, clicking the row allows to see it in pop up with more text place
             if let hardware = atom.hardware {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.hardware + " : " + hardware)
+                return .showInfoText(title: Texts_HomeView.info, message: Texts_Common.hardware + ": " + hardware)
             }
             
         case .sensorSerialNumber:
             
             // serial text could be longer than screen width, clicking the row allows to see it in a pop up with more text place
             if let serialNumber = atom.blePeripheral.sensorSerialNumber {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " : " + serialNumber)
+                return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " " + serialNumber)
             }
             
         }

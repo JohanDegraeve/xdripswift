@@ -7,5 +7,6 @@ enum ConstantsCalibrationAlgorithms {
     // minimum and maxium values for a reading
     static let minimumBgReadingCalculatedValue = 39.0
     static let maximumBgReadingCalculatedValue = 400.0
+    static let maximumBgReadingCalculatedValueLimit = 600.0
     static let bgReadingErrorValue = 38.0
 }

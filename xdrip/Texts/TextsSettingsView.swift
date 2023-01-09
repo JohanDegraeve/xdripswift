@@ -389,6 +389,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_license", tableName: filename, bundle: Bundle.main, value: "License", comment: "used in settings, section Info, title of the license setting")
     }()
     
+    static let showGitHub = {
+        return NSLocalizedString("settingsviews_showGitHub", tableName: filename, bundle: Bundle.main, value: "GitHub", comment: "used in settings, section Info, open the GitHub page of the project")
+    }()
+    
     // MARK: - Section M5Stack
     
     static let m5StackSettingsViewScreenTitle: String = {

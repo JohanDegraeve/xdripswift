@@ -73,11 +73,19 @@ enum Texts_HomeView {
     }()
    
     static let sensorStart:String = {
-        return NSLocalizedString("sensorstart", tableName: filename, bundle: Bundle.main, value: "Sensor Start", comment: "status info : literally 'Sensor Start'")
+        return NSLocalizedString("sensorstart", tableName: filename, bundle: Bundle.main, value: "Sensor Started", comment: "status info : literally 'Sensor Start'")
+    }()
+    
+    static let sensorDuration:String = {
+        return NSLocalizedString("sensorDuration", tableName: filename, bundle: Bundle.main, value: "Sensor Duration", comment: "status info : literally 'Sensor Duration'")
     }()
 
     static let sensorEnd:String = {
         return NSLocalizedString("sensorend", tableName: filename, bundle: Bundle.main, value: "Sensor End", comment: "status info : literally 'Sensor End'")
+    }()
+    
+    static let sensorRemaining:String = {
+        return NSLocalizedString("sensorRemaining", tableName: filename, bundle: Bundle.main, value: "Sensor Remaining", comment: "status info : literally 'Sensor Remaining'")
     }()
     
     static let notStarted:String = {

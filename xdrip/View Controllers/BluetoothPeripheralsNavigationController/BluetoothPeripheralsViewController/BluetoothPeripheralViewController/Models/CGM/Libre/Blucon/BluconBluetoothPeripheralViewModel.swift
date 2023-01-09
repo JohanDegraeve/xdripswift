@@ -109,7 +109,7 @@ extension BluconBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         // create disclosureIndicator in color ConstantsUI.disclosureIndicatorColor
         // will be used whenever accessoryType is to be set to disclosureIndicator
-        let disclosureAaccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+        let  disclosureAccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
 
         guard let setting = Settings(rawValue: rawValue) else { fatalError("BluconBluetoothPeripheralViewModel update, unexpected setting") }
         
@@ -130,7 +130,7 @@ extension BluconBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
             cell.detailTextLabel?.text = blucon.blePeripheral.sensorSerialNumber
             cell.accessoryType = .disclosureIndicator
-            cell.accessoryView = disclosureAaccessoryView
+            cell.accessoryView =  disclosureAccessoryView
             
         }
 
@@ -154,7 +154,7 @@ extension BluconBluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
             // serial text could be longer than screen width, clicking the row allows to see it in a pop up with more text place
             if let serialNumber = blucon.blePeripheral.sensorSerialNumber {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " : " + serialNumber)
+                return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " " + serialNumber)
             }
             
         }

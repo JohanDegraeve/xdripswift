@@ -40,7 +40,7 @@
 "common_week" = "week";
 
 /// to show the sensor status
-"sensorStatus" = "Sensor status:";
+"sensorStatus" = "Sensor Status";
 
 /// can be used in several screens, just the words Bloodglucose unit
 "common_bloodglucoseunit" = "Blood Glucose Unit";

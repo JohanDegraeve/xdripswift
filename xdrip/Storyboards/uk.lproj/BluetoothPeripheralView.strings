@@ -7,7 +7,7 @@
 "readyToScan" = "Ready to Scan";
 
 /// cell text, transmitter start time
-"transmittterStartDate" = "Transmitter Start";
+"transmittterStartDate" = "Transmitter Started";
 
 /// Confirm that the user wants to really disconnect the transmitter, title
 "confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
@@ -82,7 +82,7 @@
 "connect" = "Connect";
 
 /// cell text, sensor start time
-"sensorStartDate" = "Sensor Start";
+"sensorStartDate" = "Sensor Started";
 
 /// text in status row, if scanning ongoing
 "scanning" = "Scanning";
@@ -94,7 +94,7 @@
 "serialNumber" = "Serial Number:";
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Follow Dexcom-app";
+"useOtherDexcomApp" = "Read from Dexcom app";
 
 /// To give result about transitter result in notification body
 "transmitterResultResult" = "Transmitter Reset Result";

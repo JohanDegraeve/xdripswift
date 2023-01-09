@@ -2217,12 +2217,16 @@ final class RootViewController: UIViewController {
     }
     
     private func appendEndDateInformation(_ activeSensor: Sensor, _ textToShow: String) -> String {
-        var result = "\r\n\r\n" + Texts_HomeView.sensorEnd + " : "
+        var result = "\r\n\r\n" + Texts_HomeView.sensorEnd + ":\n"
         if activeSensor.endDate != nil {
-            result += (activeSensor.endDate?.description(with: .current))!
+            result += (activeSensor.endDate?.toStringInUserLocale(timeStyle: .short, dateStyle: .short, showTimeZone: true))!
+            result += "\r\n\r\n" + Texts_HomeView.sensorRemaining + ":\n"
+            result += (activeSensor.endDate?.daysAndHoursAgo())!
         }
         else if UserDefaults.standard.maxSensorAgeInDays > 0 {
-            result += activeSensor.startDate.addingTimeInterval(TimeInterval(hours: Double(UserDefaults.standard.maxSensorAgeInDays * 24))).description(with: .current)
+            result += activeSensor.startDate.addingTimeInterval(TimeInterval(hours: Double(UserDefaults.standard.maxSensorAgeInDays * 24))).toStringInUserLocale(timeStyle: .short, dateStyle: .short, showTimeZone: true)
+            result += "\r\n\r\n" + Texts_HomeView.sensorRemaining + ":\n"
+            result += "-" + activeSensor.startDate.addingTimeInterval(TimeInterval(hours: Double(UserDefaults.standard.maxSensorAgeInDays * 24))).daysAndHoursAgo()
         }
         else { //No end date information could be retrieved, return nothing
             return ""
@@ -2235,9 +2239,11 @@ final class RootViewController: UIViewController {
     private func showStatus() {
         
         // first sensor status
-        var textToShow = Texts_HomeView.sensorStart + " : "
+        var textToShow = "\n" + Texts_HomeView.sensorStart + ":\n"
         if let activeSensor = activeSensor {
-            textToShow += activeSensor.startDate.description(with: .current)
+            textToShow += activeSensor.startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short, showTimeZone: true)
+            textToShow += "\n\n" + Texts_HomeView.sensorDuration + ":\n"
+            textToShow += activeSensor.startDate.daysAndHoursAgo()
             textToShow += appendEndDateInformation(activeSensor, textToShow)
         } else {
             textToShow += Texts_HomeView.notStarted
@@ -2248,7 +2254,7 @@ final class RootViewController: UIViewController {
         
         // add transmitterBatteryInfo if known
         if let transmitterBatteryInfo = UserDefaults.standard.transmitterBatteryInfo {
-            textToShow += Texts_HomeView.transmitterBatteryLevel + " : " + transmitterBatteryInfo.description
+            textToShow += Texts_HomeView.transmitterBatteryLevel + ":\n" + transmitterBatteryInfo.description
             // add 1 newline with last connection timestamp
             textToShow += "\r\n\r\n"
         }
@@ -3093,8 +3099,30 @@ extension RootViewController: CGMTransmitterDelegate {
             
         }
         
-        // process new readings
-        processNewGlucoseData(glucoseData: &glucoseData, sensorAge: sensorAge)
+        // let's check to ensure that the sensor is not within the minimum warm-up time as defined in ConstantsMaster
+        var supressReadingIfSensorIsWarmingUp: Bool = false
+        
+        if let sensorAgeInSeconds = sensorAge {
+            
+            let secondsUntilWarmUpComplete = (ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) - sensorAgeInSeconds
+            
+            if secondsUntilWarmUpComplete > 0 {
+                
+                supressReadingIfSensorIsWarmingUp = true
+                
+                trace("Sensor is still warming up. BG reading processing will remain suppressed for another %{public}@ minutes. (%{public}@ minutes warm-up required).", log: log, category: ConstantsLog.categoryRootView, type: .info, Int(secondsUntilWarmUpComplete/60).description, ConstantsMaster.minimumSensorWarmUpRequiredInMinutes.description)
+                
+            }
+            
+        }
+        
+        // process new readings if sensor is not still warming up
+        if !supressReadingIfSensorIsWarmingUp {
+            
+            processNewGlucoseData(glucoseData: &glucoseData, sensorAge: sensorAge)
+            
+        }
+        
         
     }
     

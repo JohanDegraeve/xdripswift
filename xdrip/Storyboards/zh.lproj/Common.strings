@@ -36,7 +36,7 @@
 "off" = "Off";
 
 /// to show the sensor status
-"sensorStatus" = "Sensor status:";
+"sensorStatus" = "Sensor Status";
 
 /// yellow
 "yellow" = "yellow";

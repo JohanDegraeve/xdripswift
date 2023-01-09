@@ -54,3 +54,5 @@
 
 /// status info : literally 'Sensor End'
 "sensorend" = "Fin del sensor";
+
+"sensorDuration" = "Duración Sensor";

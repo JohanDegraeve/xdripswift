@@ -373,7 +373,7 @@ class BluetoothPeripheralViewController: UIViewController {
         // check if there is an existing transmitter configured. If so, disconnect it using setShouldConnectToFalse (this will also update the table and button labels)
         if let bluetoothPeripheral = bluetoothPeripheral {
             
-            setShouldConnectToFalse(for: bluetoothPeripheral, askUser: true)
+            setShouldConnectToFalse(for: bluetoothPeripheral, askUser: false)
             
         } else {
             
@@ -1245,7 +1245,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
  
         // create disclosureIndicator in color ConstantsUI.disclosureIndicatorColor
         // will be used whenever accessoryType is to be set to disclosureIndicator
-        let disclosureAaccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+        let  disclosureAccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
 
         //it's a Setting defined here in BluetoothPeripheralViewController
         // is it a bluetooth setting or web oop setting ?
@@ -1273,7 +1273,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     cell.accessoryType = .none
                 } else {
                     cell.accessoryType = .disclosureIndicator
-                    cell.accessoryView = disclosureAaccessoryView
+                    cell.accessoryView =  disclosureAccessoryView
                 }
                 
             case .connectionStatus:
@@ -1290,7 +1290,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     cell.accessoryType = .none
                 } else {
                     cell.accessoryType = .disclosureIndicator
-                    cell.accessoryView = disclosureAaccessoryView
+                    cell.accessoryView =  disclosureAccessoryView
                 }
                 
             case .transmitterId:
@@ -1301,7 +1301,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 // if transmitterId already has a value, then it can't be changed anymore. To change it, user must delete the transmitter and recreate one.
                 cell.accessoryType = transmitterIdTempValue == nil ? .disclosureIndicator : .none
                 if (transmitterIdTempValue == nil) {
-                    cell.accessoryView = disclosureAaccessoryView
+                    cell.accessoryView =  disclosureAccessoryView
                 }
                 
             case .connectOrDisconnectTimeStamp:
