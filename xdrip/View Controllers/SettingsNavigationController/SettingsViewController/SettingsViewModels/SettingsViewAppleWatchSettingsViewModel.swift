@@ -20,8 +20,11 @@ fileprivate enum Setting:Int, CaseIterable {
     /// should units be displayed yes or no
     case displayUnits = 4
     
+    /// should a visual indicator be shown on the calendar title
+    case displayVisualIndicator = 5
+    
     /// minimum time between two readings, for which event should be created (in minutes)
-    case calendarInterval = 5
+    case calendarInterval = 6
 
 }
 
@@ -66,8 +69,11 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
         case .displayUnits:
             return Texts_SettingsView.displayUnitInCalendarEvent
             
+        case .displayVisualIndicator:
+            return Texts_SettingsView.displayVisualIndicatorInCalendar
+            
         case .calendarInterval:
-            return Texts_SettingsView.settingsviews_IntervalTitle
+            return Texts_SettingsView.settingsviews_CalenderIntervalTitle
 
         }
 
@@ -107,7 +113,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
         case .calenderId:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
-        case .displayTrend, .displayDelta, .displayUnits:
+        case .displayTrend, .displayDelta, .displayUnits, .displayVisualIndicator:
             return UITableViewCell.AccessoryType.none
             
         case .calendarInterval:
@@ -125,7 +131,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
         case .calenderId:
             return UserDefaults.standard.calenderId
             
-        case .createCalendarEvent, .displayTrend, .displayDelta, .displayUnits:
+        case .createCalendarEvent, .displayTrend, .displayDelta, .displayUnits, .displayVisualIndicator:
             return nil
             
         case .calendarInterval:
@@ -206,6 +212,9 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
         case .displayUnits:
             return UISwitch(isOn: UserDefaults.standard.displayUnitInCalendarEvent, action: {(isOn:Bool) in UserDefaults.standard.displayUnitInCalendarEvent = isOn})
             
+        case .displayVisualIndicator:
+            return UISwitch(isOn: UserDefaults.standard.displayVisualIndicatorInCalendarEvent, action: {(isOn:Bool) in UserDefaults.standard.displayVisualIndicatorInCalendarEvent = isOn})
+            
         case .calendarInterval:
             return nil
             
@@ -243,7 +252,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .createCalendarEvent, .displayDelta, .displayTrend, .displayUnits:
+        case .createCalendarEvent, .displayDelta, .displayTrend, .displayUnits, .displayVisualIndicator:
             
             // depending on status of authorization, we will either do nothing or show a message
             
@@ -301,7 +310,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
 
         case .calendarInterval:
         
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_IntervalTitle, message: Texts_SettingsView.settingsviews_IntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.calendarInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.calendarInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_CalenderIntervalTitle, message: Texts_SettingsView.settingsviews_CalenderIntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.calendarInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.calendarInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
 
         }
         

@@ -70,6 +70,14 @@ class Texts_SettingsView {
         return NSLocalizedString("warningChangeFromMasterToFollower", tableName: filename, bundle: Bundle.main, value: "Switch from master to follower will stop your current sensor. Do you want to continue ?", comment: "general settings, when switching from master to follower, if confirmation is asked, this message will be shown.")
     }()
     
+    static let settingsviews_IntervalTitle = {
+        return NSLocalizedString("settingsviews_IntervalTitle", tableName: filename, bundle: Bundle.main, value: "Notification Interval", comment: "When clicking the notification interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch")
+    }()
+    
+    static let settingsviews_IntervalMessage = {
+        return NSLocalizedString("settingsviews_IntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two notifications (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two notifications, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch")
+    }()
+    
     // MARK: - Section Home Screen
     
     static let sectionTitleHomeScreen: String = {
@@ -362,14 +370,15 @@ class Texts_SettingsView {
     static let labelSpeakDelta = {
         return NSLocalizedString("settingsviews_speakDelta", tableName: filename, bundle: Bundle.main, value: "Speak Delta?", comment: "speak settings, where user can enable or disable speak delta")
     }()
-
-    static let settingsviews_IntervalTitle = {
-        return NSLocalizedString("settingsviews_IntervalTitle", tableName: filename, bundle: Bundle.main, value: "Notification Interval:", comment: "When clicking the notification interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch")
+    
+    static let settingsviews_SpeakIntervalTitle = {
+        return NSLocalizedString("settingsviews_SpeakIntervalTitle", tableName: filename, bundle: Bundle.main, value: "Speak Interval", comment: "When clicking the speak interval setting, a pop up asks for minimum number of minutes between two speech events, this is the pop up message - this is used for setting the interval between two spoken bg announcements")
     }()
     
-    static let settingsviews_IntervalMessage = {
-        return NSLocalizedString("settingsviews_IntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two notifications (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two notifications, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch")
+    static let settingsviews_SpeakIntervalMessage = {
+        return NSLocalizedString("settingsviews_SpeakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two voice announcements (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch")
     }()
+    
     
     // MARK: - Section About Info
     
@@ -462,6 +471,19 @@ class Texts_SettingsView {
     static let infoCalendarAccessRestricted: String = {
         return String(format: NSLocalizedString("infoCalendarAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
     }()
+    
+    static let displayVisualIndicatorInCalendar: String = {
+        return NSLocalizedString("settingsviews_displayVisualIndicatorInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Visual Indicator?", comment: "Calendar Events Settings - text in row where user needs to say if the visual target indicator should be displayed or not")
+    }()
+    
+    static let settingsviews_CalenderIntervalTitle = {
+        return NSLocalizedString("settingsviews_CalenderIntervalTitle", tableName: filename, bundle: Bundle.main, value: "Event Interval:", comment: "When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events")
+    }()
+    
+    static let settingsviews_CalenderIntervalMessage = {
+        return NSLocalizedString("settingsviews_CalenderIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two calender events (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch")
+    }()
+    
     
     // MARK: - Issue Reporting
     

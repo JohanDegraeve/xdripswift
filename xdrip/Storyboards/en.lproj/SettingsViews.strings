@@ -12,6 +12,8 @@
 "settingsviews_showReadingInNotification" = "Show BG in Notifications?";
 "settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge?";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";
+"settingsviews_IntervalTitle" = "Notification Interval";
+"settingsviews_IntervalMessage" = "Minimum interval between two notifications (mins)";
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
 "settingsviews_showMiniChart" = "Show the Mini-Chart?";
 "settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";
@@ -78,8 +80,8 @@
 "settingsviews_speakreadingslanguageselection" = "Select Language";
 "settingsviews_speakTrend" = "Speak Trend?";
 "settingsviews_speakDelta" = "Speak Delta?";
-"settingsviews_IntervalTitle" = "Notification Interval:";
-"settingsviews_IntervalMessage" = "Minimum interval between two notifications, in minutes";
+"settingsviews_SpeakIntervalTitle" = "Speak Interval";
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
 "settingsviews_sectiontitleAbout" = "About %@";
 "settingsviews_Version" = "Version:";
 "settingsviews_license" = "License";
@@ -99,6 +101,8 @@
 "displayDeltaInCalendarEvent" = "Display Delta?";
 "infoCalendarAccessDeniedByUser" = "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it.";
 "infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
+"settingsviews_CalenderIntervalTitle" = "Event Interval";
+"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
 "sectionTitleTrace" = "Issue Reporting";
 "sendTraceFile" = "Send Issue Report";
 "describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
