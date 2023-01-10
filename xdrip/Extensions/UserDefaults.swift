@@ -247,6 +247,10 @@ extension UserDefaults {
         /// calendar interval
         case calendarInterval = "calendarInterval"
         
+        /// should a visual coloured indicator be shown in the calendar title yes or no
+        case displayVisualIndicatorInCalendarEvent = "displayVisualIndicator"
+        
+        
         // Other Settings (not user configurable)
         
         /// - in case missed reading alert settings are changed by user, this value will be set to true
@@ -1511,8 +1515,17 @@ extension UserDefaults {
         }
     }
     
-
+    /// should a visual coloured indicator be shown in the calendar title,  yes or no, default no
+    @objc dynamic var displayVisualIndicatorInCalendarEvent: Bool {
+        get {
+            return bool(forKey: Key.displayVisualIndicatorInCalendarEvent.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.displayVisualIndicatorInCalendarEvent.rawValue)
+        }
+    }
     
+
     // MARK: - =====  Other Settings ======
     
     /// - in case missed reading alert settings are changed by user, this value will be set to true

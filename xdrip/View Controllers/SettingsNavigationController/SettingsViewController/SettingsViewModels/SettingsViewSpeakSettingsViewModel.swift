@@ -60,7 +60,7 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         case .speakDelta:
             return .nothing
         case .speakInterval:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_IntervalTitle, message: Texts_SettingsView.settingsviews_IntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.speakInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.speakInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_SpeakIntervalTitle, message: Texts_SettingsView.settingsviews_SpeakIntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.speakInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.speakInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
         case .speakBgReadingLanguage:
             
             //find index for languageCode type currently stored in userdefaults
@@ -106,7 +106,7 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         case .speakDelta:
             return Texts_SettingsView.labelSpeakDelta
         case .speakInterval:
-            return Texts_SettingsView.settingsviews_IntervalTitle
+            return Texts_SettingsView.settingsviews_SpeakIntervalTitle
         }
     }
     

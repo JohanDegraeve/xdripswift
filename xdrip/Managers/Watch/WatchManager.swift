@@ -91,6 +91,27 @@ class WatchManager: NSObject {
         // start with the reading in correct unit
         var title = lastReading[0].unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).description
         
+        // add the visual indicator to the title to show what range the current
+        // reading is in
+        if (UserDefaults.standard.displayVisualIndicatorInCalendarEvent){
+            
+            var visualIndicator = ""
+        
+            // get the current range of the last reading then
+            // configure the indicator based on the relevant range
+            switch lastReading[0].bgRangeDescription() {
+            case .inRange:
+                visualIndicator = ConstantsWatch.visualIndicatorInRange
+            case .notUrgent:
+                visualIndicator = ConstantsWatch.visualIndicatorNotUrgent
+            case .urgent:
+                visualIndicator = ConstantsWatch.visualIndicatorUrgent
+            }
+            
+            // pre-append the indicator to the title
+            title = visualIndicator + " " + title
+        }
+        
         // add trend if needed and available
         if (!lastReading[0].hideSlope && UserDefaults.standard.displayTrendInCalendarEvent) {
             title = title + " " + lastReading[0].slopeArrow()
