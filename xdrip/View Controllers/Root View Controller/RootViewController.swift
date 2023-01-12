@@ -1992,9 +1992,8 @@ final class RootViewController: UIViewController {
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
-        // TODO: Figure out why this causes a bad access exception. Keep it commented out until then
         // force treatments sync
-//        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
         if let glucoseChartManager = glucoseChartManager  {
