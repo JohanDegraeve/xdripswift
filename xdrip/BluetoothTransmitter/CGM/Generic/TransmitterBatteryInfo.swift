@@ -17,7 +17,7 @@ enum TransmitterBatteryInfo: Equatable {
         case .DexcomG4(let level):
             return level.description
         case .DexcomG5(let voltA, let voltB, let res, let runt, let temp):
-            return "VoltageA = " + voltA.description + ", Voltage B = " + voltB.description + ", resistance = " + res.description + ", runtime = " + runt.description + ", temperature = " + temp.description
+            return "Voltage A: " + voltA.description + "0mV\nVoltage B: " + voltB.description + "0mV" + "\nResistance: " + res.description + "\nRuntime: " + (runt != -1 ? runt.description : "n/a") + "\nTemperature: " + temp.description
         case .percentage(let perc):
             return  perc.description + "%"
         }
