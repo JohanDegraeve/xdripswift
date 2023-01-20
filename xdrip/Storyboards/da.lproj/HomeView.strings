@@ -36,5 +36,5 @@
 "success" = "Success";
 "failed" = "Failed";
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
-"enterSensorCode" = "if you don't have a sensor code use 0000 but be aware that you will not get readings until you calibrate";
+"enterSensorCode" = "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.";
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";

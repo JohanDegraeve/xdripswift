@@ -1992,8 +1992,8 @@ final class RootViewController: UIViewController {
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
-        // force treatments sync
-        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        // force treatments sync TODO: crash here
+        // UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
         if let glucoseChartManager = glucoseChartManager  {
@@ -2306,7 +2306,7 @@ final class RootViewController: UIViewController {
     ///     - cGMTransmitter is required because startSensor command will be sent also to the transmitter
     private func startSensorAskUserForSensorCode(cGMTransmitter: CGMTransmitter) {
         
-        let alert = UIAlertController(title: Texts_HomeView.enterSensorCode, message: nil, keyboardType:.numberPad, text: nil, placeHolder: "0000", actionTitle: nil, cancelTitle: nil, actionHandler: {
+        let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.enterSensorCode, keyboardType:.numberPad, text: nil, placeHolder: "0000", actionTitle: nil, cancelTitle: nil, actionHandler: {
             (text:String) in
             
             if let coreDataManager = self.coreDataManager, let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {

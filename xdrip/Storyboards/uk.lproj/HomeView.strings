@@ -94,7 +94,7 @@
 "scanbluetoothdeviceongoing" = "Scanning for Transmitter...";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "if you don't have a sensor code use 0000 but be aware that you will not get readings until you calibrate";
+"enterSensorCode" = "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.";
 
 /// status info : literally 'not known', used if transmitter name is not known
 "notknown" = "Not Known";

@@ -104,6 +104,7 @@ public class NightScoutUploadManager: NSObject {
         // and nightScoutUrl exists
         guard UserDefaults.standard.nightScoutEnabled, UserDefaults.standard.nightScoutUrl != nil else {return}
 
+        // TODO: crash here
         trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
         UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         
