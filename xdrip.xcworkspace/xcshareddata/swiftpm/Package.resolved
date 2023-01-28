@@ -1,0 +1,41 @@
+{
+  "pins" : [
+    {
+      "identity" : "actionclosurable",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/takasek/ActionClosurable.git",
+      "state" : {
+        "revision" : "a1a589cd4189768c0ac7a49da7296d95a7f4f914",
+        "version" : "2.1.0"
+      }
+    },
+    {
+      "identity" : "cryptoswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/CryptoSwift.git",
+      "state" : {
+        "revision" : "19b3c3ceed117c5cc883517c4e658548315ba70b",
+        "version" : "1.6.0"
+      }
+    },
+    {
+      "identity" : "piecharts",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/paulplant/PieCharts",
+      "state" : {
+        "branch" : "master",
+        "revision" : "3d57b133b491c9be000aeeffc0c6db6cfc5af560"
+      }
+    },
+    {
+      "identity" : "swiftcharts",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ivanschuetz/SwiftCharts",
+      "state" : {
+        "branch" : "master",
+        "revision" : "c354c1945bb35a1f01b665b22474f6db28cba4a2"
+      }
+    }
+  ],
+  "version" : 2
+}
