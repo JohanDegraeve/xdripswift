@@ -57,7 +57,12 @@ class SettingsViewNightScoutSettingsViewModel {
     private func testNightScoutCredentials() {
         
         // unwrap siteUrl and apiKey
-        guard let siteUrl = UserDefaults.standard.nightScoutUrl else {return}
+        guard var siteUrl = UserDefaults.standard.nightScoutUrl else {return}
+        
+        // add port number if it exists
+        if UserDefaults.standard.nightScoutPort != 0 {
+            siteUrl += ":" + UserDefaults.standard.nightScoutPort.description
+        }
                 
         if let url = URL(string: siteUrl) {
             

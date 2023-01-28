@@ -9,6 +9,8 @@ extension Endpoint {
     /// - parameters:
     ///     - hostAndScheme : hostname, eg http://www.mysite.com or https://www.mysite.com - must include the scheme - IF HOST DOESN'T START WITH A KNOWN SCHEME, THEN A FATAL ERROR WILL BE THROWN - known scheme's can be found in type EndPointScheme
     ///     - count : maximum number of readings to get
+    ///     - token: the Nightscout token used for authentication (optional)
+    ///     - port: Nightscout server port number (optional)
     static func getEndpointForLatestNSEntries(hostAndScheme:String, count: Int, token: String?) -> Endpoint {
         
         // split hostAndScheme in host and scheme
@@ -30,10 +32,11 @@ extension Endpoint {
         }
         
         return Endpoint(
-            host:host,
-            scheme:scheme!,
+            host: host,
+            scheme: scheme!,
             path: "/api/v1/entries/sgv.json",
-            queryItems: queryItems
+            queryItems: queryItems,
+            port: UserDefaults.standard.nightScoutPort
         )
     }
 }
