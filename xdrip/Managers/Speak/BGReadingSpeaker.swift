@@ -27,6 +27,11 @@ class BGReadingSpeaker:NSObject {
     /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
     private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     
+    /// speech synthesizer object
+    /// this must be created here instead of locally in the say() function for it to work correctly in iOS16
+    /// https://developer.apple.com/forums/thread/714984
+    private let syn = AVSpeechSynthesizer.init()
+    
     // MARK: - initializer
     
     /// init is private, to avoid creation
@@ -167,7 +172,6 @@ class BGReadingSpeaker:NSObject {
     /// will speak the text, using language code for pronunciation
     private func say(text:String, language:String?) {
         
-        let syn = AVSpeechSynthesizer.init()
         let utterance = AVSpeechUtterance(string: text)
         utterance.rate = 0.51
         utterance.pitchMultiplier = 1
