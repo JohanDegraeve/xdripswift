@@ -2,8 +2,7 @@
 "holdTopOfIphoneNearSensor" = "Hold the top of your iPhone near the sensor until it stops vibrating.";
 "deviceMustSupportNFC" = "This iPhone does not support NFC";
 "deviceMustSupportIOS14" = "To connect to Libre 2, this iPhone needs upgrading to iOS14";
-"donotusethelibrelinkapp" = "Connected to Libre 2.\n\nPlease ensure you have disabled bluetooth permission for the Libre app in your iPhone settings.\n\nIf you don't do this, when you scan with the Libre app you will break the connection between %@ and the Libre 2.";
 "scanComplete" = "Sensor scan successful";
 "holdTopOfIphoneNearSensor" = "Hold the top of your iPhone near the sensor until it stops vibrating.";
-"donotusethelibrelinkapp" = "Connected to Libre 2.\n\nPlease ensure you have disabled bluetooth permission for the Libre app in your iPhone settings.\n\nIf you don't do this, when you scan with the Libre app you will break the connection between %@ and the Libre 2.";
+"donotusethelibrelinkapp" = "Connected to Libre 2.\n\nPlease ensure you have disabled bluetooth permission for the Libre app in your iPhone settings.\n\nIf you don't do this, when you scan with the Libre app you will break the connection between %@ and the Libre 2.\n\nPlease note that there is a %@ minute warm-up period after starting a new Libre 2 before you will get readings.";
 "connectedLibre2DoesNotMatchScannedLibre2" = "You have scanned a new Libre sensor, but %@ has connected to a different sensor (probably the previous one).\n\nTo solve this do NOT delete this old sensor just yet. Click 'Disconnect' or 'Stop Scanning', go back to the previous screen and add a new CGM of type Libre 2 and scan the sensor again.\n\n%@ should now try and connect to the new sensor.";
