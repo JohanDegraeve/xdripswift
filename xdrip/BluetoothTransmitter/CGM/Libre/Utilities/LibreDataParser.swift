@@ -223,7 +223,7 @@ class LibreDataParser {
                 
                 libre1DataProcessor(libreSensorSerialNumber: libreSensorSerialNumber, libreSensorType: libreSensorType, libreData: libreData, cgmTransmitterDelegate: cgmTransmitterDelegate, testTimeStamp: testTimeStamp, completionHandler: completionHandler)
                 
-            case .libreUS:// not sure if this works for libreUS
+            case .libreUS, .libreUSE6:// not sure if this works for libreUS
                 
                 // libreUS isn't working yet, create an error and send to delegate
                 cgmTransmitterDelegate?.errorOccurred(xDripError: LibreOOPWebError.libreUSNotSupported)

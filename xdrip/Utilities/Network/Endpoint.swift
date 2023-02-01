@@ -17,6 +17,9 @@ struct Endpoint {
     /// array of URLQueryItem
     let queryItems: [URLQueryItem]
     
+    /// the Nightscout server port number
+    let port: Int
+    
     /// gets url
     var url: URL? {
         var components = URLComponents()
@@ -24,6 +27,11 @@ struct Endpoint {
         components.host = host
         components.path = path
         components.queryItems = queryItems
+        
+        // add the port number component only if it exists (this avoids URLComponents adding a port number of 0 as port number is stored as non-optional integer in UserDefaults)
+        if port != 0 {
+            components.port = port
+        }
         
         return components.url
     }

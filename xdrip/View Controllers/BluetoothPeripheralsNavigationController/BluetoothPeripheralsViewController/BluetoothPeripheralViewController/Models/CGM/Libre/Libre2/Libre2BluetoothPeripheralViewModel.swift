@@ -124,7 +124,7 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorSerialNumber
             cell.detailTextLabel?.text = libre2.blePeripheral.sensorSerialNumber
             cell.accessoryType = .disclosureIndicator
-            cell.accessoryView =  disclosureAccessoryView
+            cell.accessoryView = disclosureAccessoryView
 
         case .sensorStartTime:
             
@@ -133,12 +133,27 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.textLabel?.text = Texts_HomeView.sensorStart
             
             if let sensorTimeInMinutes = libre2.sensorTimeInMinutes {
+                
                 let startDate = Date(timeIntervalSinceNow: -Double(sensorTimeInMinutes*60))
-                sensorStartTimeText = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
-                sensorStartTimeText += " (" + startDate.daysAndHoursAgo() + ")"
+                
+                if sensorTimeInMinutes < Int(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes) {
+                    
+                    // the Libre 2 is still in the forced warm-up time so let's make it clear to the user
+                    let sensorReadyDateTime = startDate.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60)
+                    sensorStartTimeText = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                    
+                } else {
+                    
+                    // Libre 2 is not warming up so let's show the sensor start date and age
+                    sensorStartTimeText = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
+                    sensorStartTimeText += " (" + startDate.daysAndHoursAgo() + ")"
+                    
+                }
+                
             }
             cell.detailTextLabel?.text = sensorStartTimeText
-            cell.accessoryType = .none
+            cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = disclosureAccessoryView
             
         }
         
@@ -159,12 +174,21 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
             // serial text could be longer than screen width, clicking the row allows to see it in a pop up with more text place
             if let serialNumber = libre2.blePeripheral.sensorSerialNumber {
-                return .showInfoText(title: Texts_HomeView.info, message: Texts_BluetoothPeripheralView.sensorSerialNumber + " " + serialNumber)
+                return .showInfoText(title: Texts_BluetoothPeripheralView.sensorSerialNumber, message: "\n" + serialNumber)
             }
 
         case .sensorStartTime:
             
-            return .nothing
+            if let sensorTimeInMinutes = libre2.sensorTimeInMinutes {
+                
+                let startDate = Date(timeIntervalSinceNow: -Double(sensorTimeInMinutes*60))
+                
+                var sensorStartTimeText = startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
+                
+                sensorStartTimeText += "\n\n" + startDate.daysAndHoursAgo() + " " + Texts_HomeView.ago
+                
+                return .showInfoText(title: Texts_BluetoothPeripheralView.sensorStartDate, message: "\n" + sensorStartTimeText)
+            }
             
         }
         

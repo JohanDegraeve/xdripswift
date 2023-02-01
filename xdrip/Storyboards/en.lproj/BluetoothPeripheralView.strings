@@ -40,4 +40,5 @@
 "nfcScanSuccessfulMessage" = "\n✅ Scan successful ✅\n\nClick OK and just wait to allow the sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 "nfcErrorMessageScanFailed" = "Sensor scan has failed";
-
+"nonFixedSlopeWarning" = "Multi-point calibration is an advanced feature.\n\nPlease do not use this feature until you have read the calibration section of the online help and understand how it works.";
+"warmingUpUntil" = "Warming up until";

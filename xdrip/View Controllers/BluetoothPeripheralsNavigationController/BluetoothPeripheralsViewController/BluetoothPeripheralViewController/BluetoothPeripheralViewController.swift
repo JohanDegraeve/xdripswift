@@ -1350,6 +1350,13 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     
                     self.bluetoothPeripheral?.blePeripheral.nonFixedSlopeEnabled = isOn
                     
+                    // show the user a warning if they enabled multi-point calibration as this should only be used by advanced users who understand how it works. Too many new users were enabling this and getting bad results.
+                    if isOn {
+                        
+                        self.present(UIAlertController(title: Texts_Common.warning, message: Texts_BluetoothPeripheralView.nonFixedSlopeWarning, actionHandler: nil), animated: true, completion: nil)
+                        
+                    }
+                    
                     // send info to bluetoothPeripheralManager
                     if let bluetoothPeripheral = self.bluetoothPeripheral {
 

@@ -169,7 +169,7 @@ enum Texts_HomeView {
     }()
     
     static let enterSensorCode: String = {
-        return NSLocalizedString("enterSensorCode", tableName: filename, bundle: Bundle.main, value: "if you don't have a sensor code use 0000 but be aware that you will not get readings until you calibrate", comment: "When user needs to enter sensor code, to start firefly sensor")
+        return NSLocalizedString("enterSensorCode", tableName: filename, bundle: Bundle.main, value: "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.", comment: "When user needs to enter sensor code, to start firefly sensor")
     }()
     
     static let stopSensorConfirmation: String = {
