@@ -41,3 +41,4 @@
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 "nfcErrorMessageScanFailed" = "Sensor scan has failed";
 "nonFixedSlopeWarning" = "Multi-point calibration is an advanced feature.\n\nPlease do not use this feature until you have read the calibration section of the online help and understand how it works.";
+"warmingUpUntil" = "Warming up until";

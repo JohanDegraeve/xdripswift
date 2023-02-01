@@ -144,4 +144,8 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("nonFixedSlopeWarning", tableName: filename, bundle: Bundle.main, value: "Multi-point calibration is an advanced feature.\n\nPlease do not use this feature until you have read the calibration section of the online help and understand how it works.", comment: "text to inform the user that multi-point calibration is an advanced option and could be dangerous if used incorrectly")
     }()
     
+    static let warmingUpUntil: String = {
+        return NSLocalizedString("warmingUpUntil", tableName: filename, bundle: Bundle.main, value: "Warming up until", comment: "sensor warm-up text")
+    }()
+    
 }
