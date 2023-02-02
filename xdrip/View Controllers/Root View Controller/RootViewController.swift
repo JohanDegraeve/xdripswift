@@ -2674,6 +2674,7 @@ final class RootViewController: UIViewController {
                 miniChartOutlet.isHidden = true
                 statisticsView.isHidden = true
                 segmentedControlsView.isHidden = true
+                sensorCountdownOutlet.isHidden = true
                 
                 if UserDefaults.standard.showClockWhenScreenIsLocked {
                     
@@ -2730,6 +2731,7 @@ final class RootViewController: UIViewController {
             miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
             segmentedControlsView.isHidden = false
+            sensorCountdownOutlet.isHidden = !UserDefaults.standard.showSensorCountdown
             
             clockView.isHidden = true
             
