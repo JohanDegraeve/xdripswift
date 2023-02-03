@@ -2009,6 +2009,9 @@ final class RootViewController: UIViewController {
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
+        // to make the following code a bit more readable
+        let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
         // set minutesLabelOutlet.textColor to white, might still be red due to panning back in time
         self.minutesLabelOutlet.textColor = UIColor.white
         
@@ -2034,10 +2037,10 @@ final class RootViewController: UIViewController {
         let lastReading = latestReadings[0]
         
         // assign last but one reading
-        let lastButOneReading = latestReadings.count > 1 ? latestReadings[1]:nil
+        let lastButOneReading = latestReadings.count > 1 ? latestReadings[1] : nil
         
         // start creating text for valueLabelOutlet, first the calculated value
-        var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: mgdl)
         
         // if latestReading is older than 11 minutes, then it should be strikethrough
         if lastReading.timeStamp < Date(timeIntervalSinceNow: -60.0 * 11) {
@@ -2060,9 +2063,6 @@ final class RootViewController: UIViewController {
             valueLabelOutlet.attributedText = attributeString
             
         }
-        
-        // to make follow code a bit more readable
-        let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
         // if data is stale (over 11 minutes old), show it as gray colour to indicate that it isn't current
         // if not, then set color, depending on value lower than low mark or higher than high mark
@@ -2094,7 +2094,7 @@ final class RootViewController: UIViewController {
         minutesLabelOutlet.text = minutesAgoText
         
         // create delta text
-        let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: mgdl)
         
         diffLabelOutlet.text = diffLabelText
         
