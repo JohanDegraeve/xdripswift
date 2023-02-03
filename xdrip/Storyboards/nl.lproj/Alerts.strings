@@ -9,7 +9,7 @@
 "alerts_missedreadingalerttitle" = "Gemiste Metingen";
 "alerts_calibrationneeded" = "Kalibratie Nodig";
 "alerts_batterylow" = "Transmitter Batterij Laag";
-"alertstart" = "Toepassen vanaf:";
+"alertstart" = "Toepassen vanaf";
 "alertvalue" = "Waarde";
 "alerttype" = "Alarm Type";
 "changealertvalue" = "Wijzig Alarm Waarde";

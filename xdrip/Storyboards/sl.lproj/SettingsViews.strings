@@ -10,13 +10,13 @@
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port:";
+"nightScoutPort" = "Port";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
-"settingsviews_IntervalTitle" = "Notification Interval:";
+"settingsviews_IntervalTitle" = "Notification Interval";
 
 /// home screen settings, urgent high value
-"settingsviews_urgentHighValue" = "Urgent High Value:";
+"settingsviews_urgentHighValue" = "Urgent High Value";
 
 /// nightscout settings, pop up that asks user to enter nightscout api key
 "settingsviews_giveNightScoutAPIKey" = "Enter your API_SECRET";
@@ -34,10 +34,10 @@
 "settingsviews_speakTrend" = "Speak Trend?";
 
 /// nightscout settings, where user can set the nightscout api key
-"settingsviews_nightScoutAPIKey" = "API_SECRET:";
+"settingsviews_nightScoutAPIKey" = "API_SECRET";
 
 /// nightscout settings, where user can set the nightscout url
-"settingsviews_nightScoutUrl" = "URL:";
+"settingsviews_nightScoutUrl" = "URL";
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
@@ -61,7 +61,7 @@
 "settingsviews_giveDexcomShareAccountName" = "Enter Dexcom Share Account Name";
 
 /// home screen settings, high value
-"settingsviews_highValue" = "High Value:";
+"settingsviews_highValue" = "High Value";
 
 /// speak settings, section title
 "settingsviews_sectiontitlespeak" = "Voice";
@@ -70,13 +70,13 @@
 "settingsviews_showReadingInNotification" = "Show BG in Notifications?";
 
 /// 
-"settingsviews_urgentLowValue" = "Urgent Low Value:";
+"settingsviews_urgentLowValue" = "Urgent Low Value";
 
 /// speak settings, where user can enable or disable speak delta
 "settingsviews_speakDelta" = "Speak Delta?";
 
 /// nightscout or dexcom share settings, where user can select to edit the schedule
-"schedule" = "Schedule:";
+"schedule" = "Schedule";
 
 /// in Settings, section title for Trace
 "sectionTitleTrace" = "Issue Reporting";
@@ -100,16 +100,16 @@
 "settingsviews_sectiontitlealerting" = "Alarms";
 
 /// used in settings, section Info, title of the version setting
-"settingsviews_Version" = "Version:";
+"settingsviews_Version" = "Version";
 
 /// dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload
-"settingsviews_dexcomShareSerialNumber" = "Receiver Serial Number:";
+"settingsviews_dexcomShareSerialNumber" = "Receiver Serial Number";
 
 /// used in settings, section Info, title of the build setting
-"settingsviews_build" = "Build:";
+"settingsviews_build" = "Build";
 
 /// dexcom share settings, where user can set the dexcom share account name
-"settingsviews_dexcomShareAccountName" = "Account Name:";
+"settingsviews_dexcomShareAccountName" = "Account Name";
 
 /// M5 stack bluetooth  settings, pop up that asks user to enter the password
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth Password";
@@ -118,10 +118,10 @@
 "settingsviews_useSchedule" = "Use Upload Schedule?";
 
 /// transmitter settings, just the words that explain that the settings is about transmitter type
-"settingsviews_transmittertype" = "Transmitter Type:";
+"settingsviews_transmittertype" = "Transmitter Type";
 
 /// home screen settings, target value
-"settingsviews_targetValue" = "Target Value:";
+"settingsviews_targetValue" = "Target Value";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share password
 "settingsviews_giveDexcomSharePassword" = "Give Dexcom Share Password";
@@ -136,7 +136,7 @@
 "settingsviews_showtarget" = "Show Target Line?";
 
 /// transmitter settings, just the words that explain that the settings is about transmitter id
-"settingsviews_transmitterid" = "Transmitter ID:";
+"settingsviews_transmitterid" = "Transmitter ID";
 
 /// transmitter settings, pop up that asks user to inter transmitter id
 "settingsviews_givetransmitterid" = "Enter Transmitter ID";
@@ -184,7 +184,7 @@
 "emailbodyText" = "Problem Description: ";
 
 /// speak settings, where user can select the language
-"settingsviews_speakBgReadingslanguage" = "Language:";
+"settingsviews_speakBgReadingslanguage" = "Language";
 
 /// speak reading settings, text in pop up where user can select the language
 "settingsviews_speakreadingslanguageselection" = "Select Language";
@@ -202,7 +202,7 @@
 "settingsviews_master" = "Master";
 
 /// home screen settings, low value
-"settingsviews_lowValue" = "Low Value:";
+"settingsviews_lowValue" = "Low Value";
 
 /// general settings, master or follower
 "settingsviews_masterorfollower" = "Master or Follower?";
@@ -226,7 +226,7 @@
 "warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
 
 /// for text in pop up where user can select bg unit
-"settingsviews_selectbgunit" = "Blood Glucose Units:";
+"settingsviews_selectbgunit" = "Blood Glucose Units";
 
 /// speak settings, where user can enable or disable speak readings
 "settingsviews_speakBgReadings" = "Speak BG Readings?";
@@ -379,7 +379,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold:";
+"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 
 /// treatments settings, section title
 "settingsviews_sectiontitletreatments" = "Treatments";
@@ -407,4 +407,4 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
 /// Housekeeper retention period, for how long to store data
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days):";
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";

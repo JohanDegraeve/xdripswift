@@ -87,7 +87,7 @@
 "failedToSendEmail" = "Echec d'envoi du Email";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port:";
+"nightScoutPort" = "Port";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Urgent Valeur Haute";
@@ -108,7 +108,7 @@
 "settingsviews_urgentLowValue" = "Urgent Valeur Faible";
 
 /// home screen settings, target value
-"settingsviews_targetValue" = "Valeur cible:";
+"settingsviews_targetValue" = "Valeur cible";
 
 /// home screen settings, show target line
 "settingsviews_showtarget" = "Montrer la ligne Cible?";
@@ -201,4 +201,4 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
 /// Housekeeper retention period, for how long to store data
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days):";
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";

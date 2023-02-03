@@ -4,7 +4,7 @@
 "common_mmol" = "mmol/L";
 "common_bloodglucoseunit" = "Blodglukosvärde";
 "common_bloodglucoseunit_short" = "BS-enhet";
-"common_password" = "Lösenord:";
+"common_password" = "Lösenord";
 "common_default" = "Standard";
 "common_high" = "HÖGT";
 "common_low" = "LÅGT";
@@ -28,7 +28,7 @@
 "green" = "grön";
 "white" = "vit";
 "yellow" = "gul";
-"name" = "Namn:";
+"name" = "Namn";
 "WiFi" = "Wi-Fi";
 "on" = "På";
 "off" = "Av";
@@ -37,7 +37,7 @@
 "firmware" = "Firmware";
 "hardware" = "Hårdvara";
 "unknown" = "Okänd";
-"sensorStatus" = "Sensorstatus:";
+"sensorStatus" = "Sensorstatus";
 "invalidAccountOrPassword" = "Ogitigt konto eller lösenord";
 "common_statistics_low" = "Lågt";
 "common_statistics_inRange" = "Normalvärde";

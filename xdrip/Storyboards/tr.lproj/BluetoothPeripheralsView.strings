@@ -1,5 +1,5 @@
 "screenTitle" = "Bluetooth";
 "selectCategory" = "Aygıt tipini Seç";
 "selectType" = "Verici tipini Seç";
-"batteryLevel" = "Pil Seviyesi:";
+"batteryLevel" = "Pil Seviyesi";
 "noMultipleActiveCGMsAllowed" = "Bağlı veya taranmakta olan birden fazla CGM Vericiniz olamaz.\nDiğer CGM Vericilerinizi doğrulayın ve 'Taramayı Durdur', 'Bağlantıyı Kes'i tıklayın veya sadece silin";

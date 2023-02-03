@@ -51,7 +51,7 @@
 "green" = "green";
 
 /// name
-"name" = "Name:";
+"name" = "Name";
 
 /// literally yes, without capital
 "yes" = "Yes";

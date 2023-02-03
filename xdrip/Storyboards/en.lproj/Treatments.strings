@@ -1,9 +1,9 @@
 "treatments_title" = "Treatments";
 "treatments_new_button" = "New";
 "treatments_new_entry" = "New Treatment";
-"treatments_carbs_with_unit" = "Carbs (g):";
-"treatments_insulin_with_unit" = "Insulin (U):";
-"treatments_exercise_with_unit" = "Exercise (min):";
+"treatments_carbs_with_unit" = "Carbs (g)";
+"treatments_insulin_with_unit" = "Insulin (U)";
+"treatments_exercise_with_unit" = "Exercise (min)";
 "treatments_carbs_unit" = "g";
 "treatments_insulin_unit" = "U";
 "treatments_exercise_unit" = "min";
@@ -14,5 +14,5 @@
 "treatments_question_mark" = "?";
 "treatments_success" = "Success";
 "treatments_sync_complete" = "Synchronization complete.";
-"treatments_filterTreatmentsLabel" = "Filter:";
+"treatments_filterTreatmentsLabel" = "Filter";
 "treatments_cannotStoreFutureBGCheck" = "You cannot store a BG Check in the future.\n\nIt will be stored at the actual time.";

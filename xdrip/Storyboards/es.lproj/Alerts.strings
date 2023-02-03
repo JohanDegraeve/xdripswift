@@ -9,7 +9,7 @@
 "alerts_missedreadingalerttitle" = "Lecturas Perdidas";
 "alerts_calibrationneeded" = "Se Requiere Calibración";
 "alerts_batterylow" = "Batería Transmisor Baja";
-"alertstart" = "Aplicar desde:";
+"alertstart" = "Aplicar desde";
 "alertvalue" = "Valor";
 "alerttype" = "Tipo de Alarma";
 "changealertvalue" = "Cambiar Valor de Alarma";

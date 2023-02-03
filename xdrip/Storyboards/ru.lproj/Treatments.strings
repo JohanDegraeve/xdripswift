@@ -1,9 +1,9 @@
 "treatments_title" = "Терапия";
 "treatments_new_button" = "Создать";
 "treatments_new_entry" = "Новая терапия";
-"treatments_carbs_with_unit" = "Углеводы (г):";
-"treatments_insulin_with_unit" = "Инсулин (U):";
-"treatments_exercise_with_unit" = "Тренировка (мин):";
+"treatments_carbs_with_unit" = "Углеводы (г)";
+"treatments_insulin_with_unit" = "Инсулин (U)";
+"treatments_exercise_with_unit" = "Тренировка (мин)";
 "treatments_carbs_unit" = "г";
 "treatments_insulin_unit" = "U";
 "treatments_exercise_unit" = "мин";
@@ -14,5 +14,5 @@
 "treatments_question_mark" = "?";
 "treatments_success" = "Успех";
 "treatments_sync_complete" = "Синхронизация завершена.";
-"treatments_filterTreatmentsLabel" = "Фильтр:";
+"treatments_filterTreatmentsLabel" = "Фильтр";
 "treatments_cannotStoreFutureBGCheck" = "Вы не можете сохранить проверку ГК в будущем.\n\nОна будет сохранена в фактическое время.";

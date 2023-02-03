@@ -46,10 +46,10 @@
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port:";
+"nightScoutPort" = "Port";
 
 /// home screen settings, urgent high value
-"settingsviews_urgentHighValue" = "Urgent High Value:";
+"settingsviews_urgentHighValue" = "Urgent High Value";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
 "volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
@@ -85,10 +85,10 @@
 "settingsviews_showReadingInNotification" = "Show BG in Notifications?";
 
 /// 
-"settingsviews_urgentLowValue" = "Urgent Low Value:";
+"settingsviews_urgentLowValue" = "Urgent Low Value";
 
 /// nightscout or dexcom share settings, where user can select to edit the schedule
-"schedule" = "Schedule:";
+"schedule" = "Schedule";
 
 /// In case user tries to send trace file via email but error occurs.
 "failedToSendEmail" = "Failed to Send Email";
@@ -100,16 +100,16 @@
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth Password";
 
 /// used in settings, section Info, title of the version setting
-"settingsviews_Version" = "Version:";
+"settingsviews_Version" = "Version";
 
 /// used in settings, section Info, title of the build setting
-"settingsviews_build" = "Build:";
+"settingsviews_build" = "Build";
 
 /// nightscout settings, where user can select to use schedule or not
 "settingsviews_useSchedule" = "Use Upload Schedule?";
 
 /// home screen settings, target value
-"settingsviews_targetValue" = "Target Value:";
+"settingsviews_targetValue" = "Target Value";
 
 /// home screen settings, show target line
 "settingsviews_showtarget" = "Show Target Line?";
@@ -148,7 +148,7 @@
 "emailbodyText" = "Problem Description: ";
 
 /// speak settings, where user can select the language
-"settingsviews_speakBgReadingslanguage" = "Language:";
+"settingsviews_speakBgReadingslanguage" = "Language";
 
 /// speak reading settings, text in pop up where user can select the language
 "settingsviews_speakreadingslanguageselection" = "Select Language";
@@ -303,7 +303,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold:";
+"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 
 /// treatments settings, section title
 "settingsviews_sectiontitletreatments" = "Treatments";
@@ -331,4 +331,4 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
 /// Housekeeper retention period, for how long to store data
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days):";
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";

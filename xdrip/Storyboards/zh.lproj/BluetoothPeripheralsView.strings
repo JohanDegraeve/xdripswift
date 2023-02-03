@@ -10,7 +10,7 @@
 "selectCategory" = "Select Device Type";
 
 /// title of the cell where transmitter battery level is shown in detailed screen
-"batteryLevel" = "Battery Level:";
+"batteryLevel" = "Battery Level";
 
 /// when clicking add button in screen with list of bluetoothperipherals, after having selected the category, a new pop up appears, this is the title of pop up where user  needs to select bluetooth peripheral type
 "selectType" = "Select Transmitter Type";

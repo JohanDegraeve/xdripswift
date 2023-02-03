@@ -9,7 +9,7 @@
 "alerts_missedreadingalerttitle" = "Missed Readings";
 "alerts_calibrationneeded" = "Calibration Needed";
 "alerts_batterylow" = "Transmitter Battery Low";
-"alertstart" = "Apply from:";
+"alertstart" = "Apply from";
 "alertvalue" = "Value";
 "alerttype" = "Alarm Type";
 "changealertvalue" = "Change Alarm Value";

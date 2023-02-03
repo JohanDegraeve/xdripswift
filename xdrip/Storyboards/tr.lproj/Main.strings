@@ -104,8 +104,8 @@
 /* Class = "UILabel"; text = "Title"; ObjectID = "Pom-Rr-Zcn"; */
 "Pom-Rr-Zcn.text" = "Başlık";
 
-/* Class = "UILabel"; text = "Average:"; ObjectID = "RLk-Au-VSf"; */
-"RLk-Au-VSf.text" = "Ortalama :";
+/* Class = "UILabel"; text = "Average"; ObjectID = "RLk-Au-VSf"; */
+"RLk-Au-VSf.text" = "Ortalama ";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "S45-Yf-BHe"; */
 "S45-Yf-BHe.text" = "Başlık";
@@ -155,8 +155,8 @@
 /* Class = "UIBarButtonItem"; title = "Sensor"; ObjectID = "ZIM-Wf-bUy"; */
 "ZIM-Wf-bUy.title" = "Sensör";
 
-/* Class = "UILabel"; text = "In Range:"; ObjectID = "aU7-G8-ash"; */
-"aU7-G8-ash.text" = "Aralık içinde:";
+/* Class = "UILabel"; text = "In Range"; ObjectID = "aU7-G8-ash"; */
+"aU7-G8-ash.text" = "Aralık içinde";
 
 /* Class = "UITabBarItem"; title = "Home"; ObjectID = "acW-dT-cKf"; */
 "acW-dT-cKf.title" = "Ana Ekran";
@@ -203,8 +203,8 @@
 /* Class = "UILabel"; text = "Title"; ObjectID = "goS-0m-pgb"; */
 "goS-0m-pgb.text" = "Başlık";
 
-/* Class = "UILabel"; text = "CV:"; ObjectID = "h7N-aV-8eN"; */
-"h7N-aV-8eN.text" = "CV:";
+/* Class = "UILabel"; text = "CV"; ObjectID = "h7N-aV-8eN"; */
+"h7N-aV-8eN.text" = "CV";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "hfQ-Tt-xNH"; */
 "hfQ-Tt-xNH.text" = "Başlık";

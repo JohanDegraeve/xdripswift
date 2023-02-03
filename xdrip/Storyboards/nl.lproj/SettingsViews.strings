@@ -4,7 +4,7 @@
 
 "settingsviews_settingstitle" = "Instellingen";
 "settingsviews_sectiontitlegeneral" = "Algemeen";
-"settingsviews_selectbgunit" = "Bloedglucose Eenheden:";
+"settingsviews_selectbgunit" = "Bloedglucose Eenheden";
 "settingsviews_masterorfollower" = "Master of Volger?";
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Volger";
@@ -12,11 +12,11 @@
 "settingsviews_labelShowReadingInAppBadge" = "Toon BG in de App Badge?";
 "settingsviews_multipleAppBadgeValueWith10" = "Vermenigvuldig App Badge Meting met 10?";
 "settingsviews_showClockWhenScreenIsLocked" = "Toon klok indien gelockt?";
-"settingsviews_urgentHighValue" = "Urgent Hoge Waarde:";
-"settingsviews_highValue" = "Hoge Waarde:";
-"settingsviews_targetValue" = "Doel Waarde:";
-"settingsviews_lowValue" = "Lage Waarde:";
-"settingsviews_urgentLowValue" = "Urgent Lage Waarde:";
+"settingsviews_urgentHighValue" = "Urgent Hoge Waarde";
+"settingsviews_highValue" = "Hoge Waarde";
+"settingsviews_targetValue" = "Doel Waarde";
+"settingsviews_lowValue" = "Lage Waarde";
+"settingsviews_urgentLowValue" = "Urgent Lage Waarde";
 "settingsviews_useobjectives" = "Toon Doelen in Grafiek?";
 "settingsviews_showcoloredobjectives" = "Toon Gekleurde Lijnen?";
 "settingsviews_showtarget" = "Toon Doel Lijn?";
@@ -41,19 +41,19 @@
 "settingsviews_healthkit" = "Schrijf Data naar Apple Gezondheid?";
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
 "settingsviews_uploadReadingstoDexcomShare" = "Uploaden naar Dexcom Share?";
-"settingsviews_dexcomShareSerialNumber" = "Ontvanger Serie Nummer:";
+"settingsviews_dexcomShareSerialNumber" = "Ontvanger Serie Nummer";
 "settingsviews_useUSDexcomShareurl" = "Gebruik Dexcom US Servers?";
-"settingsviews_dexcomShareAccountName" = "Account Naam:";
+"settingsviews_dexcomShareAccountName" = "Account Naam";
 "settingsviews_giveDexcomShareAccountName" = "Voer Dexcom Share Account Nama In";
 "settingsviews_giveDexcomSharePassword" = "Voer Dexcom Share Wachtwoord In";
 "settingsviews_giveDexcomShareSerialNumber" = "Voer het Dexcom Ontvanger Serie Nummer In";
 "settingsviews_sectiontitlenightscout" = "NightScout";
 "settingsviews_nightScoutEnabled" = "Nightscout Inschakelen?";
-"settingsviews_nightScoutUrl" = "URL:";
+"settingsviews_nightScoutUrl" = "URL";
 "settingsviews_useSchedule" = "Gebruik Upload Schema?";
-"schedule" = "Schema:";
+"schedule" = "Schema";
 "settingsviews_giveNightScoutUrl" = "Voer NightScout URL In";
-"settingsviews_nightScoutAPIKey" = "API_SECRET:";
+"settingsviews_nightScoutAPIKey" = "API_SECRET";
 "settingsviews_giveNightScoutAPIKey" = "Voer API_SECRET In";
 "editScheduleTimePickerSubtitle" = "Wijzig: ";
 "timeScheduleViewTitle" = "Aan/Uit Tijdschema Voor ";
@@ -61,16 +61,16 @@
 "testUrlAndAPIKey" = "Test Verbinding?";
 "settingsviews_sectiontitlespeak" = "Spraak";
 "settingsviews_speakBgReadings" = "Spreek BG Metingen Uit?";
-"settingsviews_speakBgReadingslanguage" = "Taal:";
+"settingsviews_speakBgReadingslanguage" = "Taal";
 "settingsviews_speakreadingslanguageselection" = "Selecteer Taal";
 "settingsviews_speakTrend" = "Spreek Trend Uit?";
 "settingsviews_speakDelta" = "Spreek Delta Uit?";
-"settingsviews_IntervalTitle" = "Notification Interval:";
+"settingsviews_IntervalTitle" = "Notification Interval";
 "settingsviews_IntervalMessage" = "Minimum interval tussen twee metingen, in minuten";
 "settingsviews_sectiontitleAbout" = "Over %@";
-"settingsviews_Version" = "Versie:";
+"settingsviews_Version" = "Versie";
 "settingsviews_license" = "Licentie";
-"settingsviews_build" = "Build:";
+"settingsviews_build" = "Build";
 "m5stack_settingsviews_settingstitle" = "M5 Stack Instellingen";
 "m5stack_settingsviews_textColor" = "Tekstkleur";
 "m5stack_settingsviews_backGroundColor" = "Achtergrondkleur";
@@ -97,7 +97,7 @@
 "volumeTestiOSSound" = "Test Volume (Huidig iPhone Volume)";
 "debugLevel" = "Inclusief Debug Niveau";
 "warningChangeFromMasterToFollower" = "Wisselen van Master naar Volger stopt de huidige sensor. Wil je doorgaan ?";
-"nightScoutPort" = "Port:";
+"nightScoutPort" = "Port";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -158,7 +158,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold:";
+"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 
 /// treatments settings, section title
 "settingsviews_sectiontitletreatments" = "Treatments";
@@ -186,4 +186,4 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
 /// Housekeeper retention period, for how long to store data
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days):";
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";

@@ -9,7 +9,7 @@
 "alerts_missedreadingalerttitle" = "Lecture manquante";
 "alerts_calibrationneeded" = "Calibration nécessaire ";
 "alerts_batterylow" = "Batterie faible du transmetteur";
-"alertstart" = "Appliquer à :";
+"alertstart" = "Appliquer à ";
 "alertvalue" = "Valeur";
 "alerttype" = "Type d'Alarme";
 "changealertvalue" = "Changer la valeur de l'alerte";

@@ -1,5 +1,5 @@
 "screenTitle" = "Bluetooth";
 "selectCategory" = "Seleccionar Tipo de Dispositivo";
 "selectType" = "Seleccionar Tipo de Transmisor";
-"batteryLevel" = "Nivel de Batería:";
+"batteryLevel" = "Nivel de Batería";
 "noMultipleActiveCGMsAllowed" = "Ya tienes conectado un transmisor MGC.\n\nVerificar los demás transmisores y haz click en 'Detener Escaneao', 'Disconectar' or simplemente eliminarlos";
