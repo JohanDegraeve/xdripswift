@@ -293,8 +293,8 @@
 /* Class = "UILabel"; text = "Label"; ObjectID = "iIy-f4-6Ww"; */
 "iIy-f4-6Ww.text" = "Label";
 
-/* Class = "UILabel"; text = "mg/dl"; ObjectID = "iho-Ag-dJP"; */
-"iho-Ag-dJP.text" = "mg/dl";
+/* Class = "UILabel"; text = "mg/dL"; ObjectID = "iho-Ag-dJP"; */
+"iho-Ag-dJP.text" = "mg/dL";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "jx2-oc-XfQ"; */
 "jx2-oc-XfQ.text" = "Title";

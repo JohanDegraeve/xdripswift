@@ -22,7 +22,7 @@
 "red" = "red";
 
 /// mmol/l
-"common_mmol" = "mmol/l";
+"common_mmol" = "mmol/L";
 
 /// the word LOW, in capitals
 "common_low" = "LOW";
@@ -97,7 +97,7 @@
 "WiFi" = "WiFi";
 
 /// mg/dl
-"common_mgdl" = "mg/dl";
+"common_mgdl" = "mg/dL";
 
 /// whenever invalid value is given by user somewhere in a field
 "invalidValue" = "Invalid Value";

@@ -46,7 +46,7 @@
 "common_dayshort" = "d";
 
 /// mmol/l
-"common_mmol" = "mmol/l";
+"common_mmol" = "mmol/L";
 
 /// literally add
 "add" = "Add";
@@ -55,7 +55,7 @@
 "yes" = "Yes";
 
 /// mg/dl
-"common_mgdl" = "mg/dl";
+"common_mgdl" = "mg/dL";
 
 /// white
 "white" = "white";
