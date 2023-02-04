@@ -812,6 +812,9 @@ final class RootViewController: UIViewController {
         // reinitialise glucose chart and also to update labels and chart
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             
+            // Schedule a call to updateLabelsAndChart when the app comes to the foreground, with a delay of 0.5 seconds. Because the application state is not immediately to .active, as a result, updates may not happen - especially the synctreatments may not happen because this may depend on the application state - by making a call just half a second later, when the status is surely = .active, the treatments sync will be done.
+            Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateLabelsAndChart), userInfo: nil, repeats:false)
+
             self.updateLabelsAndChart(overrideApplicationState: true)
             
             self.updateMiniChart()
