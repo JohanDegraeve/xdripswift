@@ -95,8 +95,14 @@ final class RootViewController: UIViewController {
     /// outlet for label that shows how many minutes ago and so on
     @IBOutlet weak var minutesLabelOutlet: UILabel!
     
+    @IBOutlet weak var minutesAgoLabelOutlet: UILabel!
+    
+    
     /// outlet for label that shows difference with previous reading
     @IBOutlet weak var diffLabelOutlet: UILabel!
+    
+    @IBOutlet weak var diffLabelUnitOutlet: UILabel!
+    
     
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
@@ -217,6 +223,9 @@ final class RootViewController: UIViewController {
                     // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
                     self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
                     self.minutesLabelOutlet.textColor = UIColor.red
+                    
+                    self.minutesAgoLabelOutlet.text = ""
+                    
                     self.valueLabelOutlet.textColor = UIColor.lightGray
                     
                     // apply strikethrough to the BG value text format
@@ -227,6 +236,8 @@ final class RootViewController: UIViewController {
                     
                     // don't show anything in diff outlet
                     self.diffLabelOutlet.text = ""
+                    
+                    self.diffLabelUnitOutlet.text = ""
                     
                 } else {
                     
@@ -2023,7 +2034,9 @@ final class RootViewController: UIViewController {
             
             valueLabelOutlet.textColor = UIColor.darkGray
             minutesLabelOutlet.text = ""
+            minutesAgoLabelOutlet.text = ""
             diffLabelOutlet.text = ""
+            diffLabelUnitOutlet.text = ""
                 
             let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: "---")
             attributeString.addAttribute(.strikethroughStyle, value: 0, range: NSMakeRange(0, attributeString.length))
@@ -2087,17 +2100,22 @@ final class RootViewController: UIViewController {
             valueLabelOutlet.textColor = UIColor.green
         }
         
-        // get minutes ago and create text for minutes ago label
+        // get minutes ago and create value text for minutes ago label
         let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
-        let minutesAgoText = minutesAgo.description + " " + (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) + " " + Texts_HomeView.ago
-        
+        let minutesAgoText = minutesAgo.description
         minutesLabelOutlet.text = minutesAgoText
         
-        // create delta text
-        let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: mgdl)
+        // configure the localized text in the "mins ago" label
+        let minutesAgoMinAgoText = (minutesAgo == 1 ? Texts_Common.minute : Texts_Common.minutes) + " " + Texts_HomeView.ago
+        minutesAgoLabelOutlet.text = minutesAgoMinAgoText
         
+        // create delta value text (without the units)
+        let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: false, highGranularity: true, mgdl: mgdl)
         diffLabelOutlet.text = diffLabelText
         
+        // set the delta unit label text
+        let diffLabelUnitText = mgdl ? Texts_Common.mgdl : Texts_Common.mmol
+        diffLabelUnitOutlet.text = diffLabelUnitText
         
         // update the chart up to now
         updateChartWithResetEndDate()
