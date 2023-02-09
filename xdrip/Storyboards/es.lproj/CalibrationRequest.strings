@@ -2,3 +2,18 @@
 "calibration_title" = "Calibración";
 "calibration_notification_title" = "Calibración";
 "calibration_notification_body" = "Haz click en la notificación para calibrar";
+
+// Calibration Assistant strings
+"calibrateButtonTitle" = "Calibrar";
+"calibrateAnywayButtonTitle" = "¡Calibrar Igualmente!";
+"okToCalibrate" = "Las condiciones son aptas para calibrar";
+"waitToCalibrate" = "Se puede calibrar ahora, pero sería mejor esperar";
+"doNotCalibrate" = "No se debe calibrar ahora mismo";
+"bgValuesRising" = "Los valores de glucosa han estado subiendo";
+"bgValuesDropping" = "Los valores de glucosa han estado bajando";
+"bgValuesNotStableShortTerm" = "Los valores de glucosa son poco estables";
+"bgValuesNotStableLongTerm" = "Los valores de glucosa no han sido suficientes estables durante los últimos %@ minutos";
+"bgValueTooHigh" = "El valor de glucosa actual es demasiado alto";
+"bgValuesSlightlyHigh" = "El valor de glucosa actual es ligeramente alto";
+"bgValueTooLow" = "El valor de glucosa actual es demasiado bajo";
+"bgValuesSlightlyLow" = "El valor de glucosa actual es ligeramente bajo";

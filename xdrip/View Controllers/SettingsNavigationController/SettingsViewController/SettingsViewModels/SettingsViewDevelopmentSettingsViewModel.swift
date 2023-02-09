@@ -22,6 +22,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
     case loopDelay = 5
     
+    /// show the Calibration Assistant results
+    case showCalibrationAssistantResults = 6
+    
 }
 
 struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
@@ -62,6 +65,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return Texts_SettingsView.loopDelaysScreenTitle
             
+        case .showCalibrationAssistantResults:
+            return Texts_SettingsView.showCalibrationAssistantResults
+            
         }
     }
     
@@ -71,7 +77,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare:
+        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare, .showCalibrationAssistantResults:
             return UITableViewCell.AccessoryType.none
             
         case .loopDelay:
@@ -102,6 +108,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             return nil
             
         case .loopDelay:
+            return nil
+            
+        case .showCalibrationAssistantResults:
             return nil
             
         }
@@ -157,6 +166,14 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return nil
             
+        case .showCalibrationAssistantResults:
+            return UISwitch(isOn: UserDefaults.standard.showCalibrationAssistantResults, action: {
+                (isOn:Bool) in
+                
+                UserDefaults.standard.showCalibrationAssistantResults = isOn
+                
+            })
+            
         }
         
     }
@@ -171,7 +188,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare:
+        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare, .showCalibrationAssistantResults:
             return .nothing
             
         case .loopDelay:

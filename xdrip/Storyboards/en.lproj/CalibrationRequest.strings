@@ -2,3 +2,18 @@
 "calibration_title" = "Calibration";
 "calibration_notification_title" = "Calibration";
 "calibration_notification_body" = "Click the Notification to Calibrate";
+
+// Calibration Assistant strings
+"calibrateButtonTitle" = "Calibrate";
+"calibrateAnywayButtonTitle" = "Calibrate Anyway!";
+"okToCalibrate" = "Conditions are OK to calibrate";
+"waitToCalibrate" = "You may calibrate, but it would be better to wait";
+"doNotCalibrate" = "You should not calibrate now. Wait for a better time";
+"bgValuesRising" = "BG values have been rising";
+"bgValuesDropping" = "BG values have been dropping";
+"bgValuesNotStableShortTerm" = "BG is not currently stable";
+"bgValuesNotStableLongTerm" = "BG values have been unstable over the last %@ minutes";
+"bgValueTooHigh" = "Current BG value is too high";
+"bgValuesSlightlyHigh" = "Current BG value is slightly high";
+"bgValueTooLow" = "Current BG value is too low";
+"bgValuesSlightlyLow" = "Current BG value is slightly low";

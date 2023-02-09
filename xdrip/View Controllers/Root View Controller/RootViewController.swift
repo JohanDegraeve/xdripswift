@@ -523,6 +523,9 @@ final class RootViewController: UIViewController {
         // update statistics related outlets
         updateStatistics(animatePieChart: true, overrideApplicationState: true)
         
+        // update the visual clues to indicate if calibration is feasible
+        updateCalibrationAssistantStatus(calibrationAssistantResult: calculateCalibrationAssistantResults().calibrationAssistantResult)
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -691,6 +694,9 @@ final class RootViewController: UIViewController {
             // update statistics related outlets
             self.updateStatistics(animatePieChart: true, overrideApplicationState: true)
             
+            // update the visual clues to indicate if calibration is feasible
+            self.updateCalibrationAssistantStatus(calibrationAssistantResult: self.calculateCalibrationAssistantResults().calibrationAssistantResult)
+            
             // create badge counter
             self.createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
             
@@ -733,6 +739,9 @@ final class RootViewController: UIViewController {
         
         // showing or hiding the mini-chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showMiniChart.rawValue, options: .new, context: nil)
+        
+        // has the visual calibration assistant been enabled or disabled?
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showVisualCalibrationAssistant.rawValue, options: .new, context: nil)
         
         // see if the user has changed the statistic days to use
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.daysToUseStatistics.rawValue, options: .new, context: nil)
@@ -1279,6 +1288,9 @@ final class RootViewController: UIViewController {
                     // update sensor countdown graphic
                     updateSensorCountdown()
                     
+                    // update visual calibration assistant status
+                    updateCalibrationAssistantStatus(calibrationAssistantResult: calculateCalibrationAssistantResults().calibrationAssistantResult)
+                    
                 }
                 
                 nightScoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
@@ -1342,9 +1354,6 @@ final class RootViewController: UIViewController {
                 glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, completionHandler: nil)
 
             }
-            
-        default:
-            break
             
         }
         
@@ -1422,6 +1431,11 @@ final class RootViewController: UIViewController {
             
             // redraw mini-chart
             updateMiniChart()
+            
+        case UserDefaults.Key.showVisualCalibrationAssistant:
+            
+            // refresh the visual calibration assistant status
+            updateCalibrationAssistantStatus(calibrationAssistantResult: calculateCalibrationAssistantResults().calibrationAssistantResult)
 
         case UserDefaults.Key.daysToUseStatistics:
             
@@ -1665,13 +1679,18 @@ final class RootViewController: UIViewController {
         // assign deviceName, needed in the closure when creating alert. As closures can create strong references (to bluetoothTransmitter in this case), I'm fetching the deviceName here
         let deviceName = bluetoothTransmitter.deviceName
         
-        let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: nil, placeHolder: "...", actionTitle: nil, cancelTitle: nil, actionHandler: {
-            (text:String) in
+        // run the calibration assistant function and store the returned result and messages.
+        let calibrationAssistantResultAndAlertMessage = calculateCalibrationAssistantResults()
+                
+        let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: calibrationAssistantResultAndAlertMessage.calibrationAssistantAlertMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: nil, placeHolder: "...", actionTitle: calibrationAssistantResultAndAlertMessage.calibrationAssistantResult <= ConstantsCalibrationAssistant.okToCalibrateLimit ? Texts_Calibrations.calibrateButtonTitle : Texts_Calibrations.calibrateAnywayButtonTitle, cancelTitle: nil, actionHandler: { (text:String) in
             
             guard let valueAsDouble = text.toDouble() else {
                 self.present(UIAlertController(title: Texts_Common.warning, message: Texts_Common.invalidValue, actionHandler: nil), animated: true, completion: nil)
                 return
             }
+            
+            // store the calibration assistant trace message
+            trace("calibration : %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, calibrationAssistantResultAndAlertMessage.calibrationAssistantTraceMessage)
             
             // store the calibration value entered by the user into the log
             trace("calibration : value %{public}@ entered by user", log: self.log, category: ConstantsLog.categoryRootView, type: .info, text.description)
@@ -2353,7 +2372,7 @@ final class RootViewController: UIViewController {
             calibrateToolbarButtonOutlet.enable()
         } else {
             sensorToolbarButtonOutlet.disable()
-            calibrateToolbarButtonOutlet.disable()
+//            calibrateToolbarButtonOutlet.disable()
         }
         
     }
@@ -3040,6 +3059,331 @@ final class RootViewController: UIViewController {
         // now that the activeSensor object has been destroyed, update (hide) the sensor countdown graphic
         updateSensorCountdown()
 
+    }
+    
+    
+    /// Calibration Assistant calculation function. This will run every time a new glucose reading is processed in master mode or if the calibration toolbar button is pressed.
+    /// It will use the BG readings over the last "x" minutes (as defined in ConstantsCalibrationAssistant) and runs several checks/calculations. The value derived from each check will then by multiplied by a weighting factor and all results added to give a final confidence score
+    /// The calculations take into account the standard deviation and overall glucose delta together with checking if the current BG is within a value considering acceptable for calibrating (generally 100-130 mg/dl). Anything outside of this value is penalised and adds to the total score making it less likely to recommend calibrating.
+    /// If the score is slightly high, the user is warned that it is not ideal to calibrate and to please wait
+    /// If the score is very high, the user is warned not to calibrate
+    /// - parameters :
+    ///     - enabled : when true this will force the screen to lock
+    ///     - showClock : when false, this will enable a simple screen lock without changing the UI - useful for keeping the screen open on your desk
+    /// - returns:
+    ///     - calibrationAssistantResult. Returns the calculated confidence score as a double
+    ///     - calibrationAssistantAlertMessage. The main formatted message that will be displayed in the UI Alert
+    ///     - calibrationAssistantTraceMessage. A compact string holding all the data about what the Calibration Assistant recommended to the user and the reasons why
+    private func calculateCalibrationAssistantResults() -> (calibrationAssistantResult: Double, calibrationAssistantAlertMessage: String, calibrationAssistantTraceMessage: String) {
+        
+        // private vars to return
+        var calibrationAssistantResult: Double = 0
+        var calibrationAssistantAlertMessage: String = ""
+        var calibrationAssistantTraceMessage: String = ""
+        
+        // BG values to use in calculations
+        var actualBgValue: Double = 0
+        var shortTermGlucoseValues: [Double] = []
+        var longTermGlucoseValues: [Double] = []
+        
+        // calculated values
+        var longTermStdDeviationValue: Double = 0
+        var shortTermStdDeviationValue: Double = 0
+        var shortTermDeltaValue: Double = 0
+        var higherBgUpperValue: Double = 0
+        var higherBgRecommendedValue: Double = 0
+        var lowerBgRecommendedValue: Double = 0
+        var lowerBgLowerValue: Double = 0
+        
+        // results after applying multipliers to the calculated values
+        var stdDeviationResult: Double = 0
+        var shortTermDeltaResult: Double = 0
+        var higherBgUpperResult: Double = 0
+        var higherBgRecommendedResult: Double = 0
+        var lowerBgRecommendedResult: Double = 0
+        var lowerBgLowerResult: Double = 0
+        var isFirstValue: Bool = true
+        
+        
+        // make sure that the necessary objects are initialised and readings are available.
+        if let bgReadingsAccessor = bgReadingsAccessor {
+            
+            // LONG-TERM BG READINGS
+            // get long term readings over the last hour or so and see if there is any really big deviation in values. This should help us detect a very noisy sensor
+            
+            // get the last "x" minutes of BG readings from coredata where "x" is defined in ConstantsCalibrationAssistant
+            let longTermBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date(timeIntervalSinceNow: -ConstantsCalibrationAssistant.minutesToUseForLongTermCalculations * 60), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            
+            // if we successfully got BG readings, then pull out the calculated value and add it to the long-term glucose values array
+            if longTermBgReadings.count > 0 {
+                
+                isFirstValue = true
+                
+                for reading in longTermBgReadings {
+                    
+                    let calculatedValue = reading.calculatedValue
+                    
+                    // only append the BG values if they are not zero or out of range. This is just to avoid strange errors in the calculations
+                    if (calculatedValue != 0.0) && (calculatedValue >= ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl) && (calculatedValue <= 450) {
+                        
+                        // set the actual BG value to the first BG reading in the returned array (which will be the last reading received)
+                        if isFirstValue {
+                            actualBgValue = calculatedValue
+                        }
+                        
+                        longTermGlucoseValues.append(calculatedValue)
+                        
+                        isFirstValue = false
+                        
+                    }
+                }
+                
+                // assuming that there are glucose values stored in the array, we can start calculating
+                if longTermGlucoseValues.count > 0 {
+                    
+                    // calculate standard deviation
+                    var sum: Double = 0
+                    
+                    let averageGlucoseValue = Double(longTermGlucoseValues.reduce(0, +)) / Double(longTermGlucoseValues.count)
+                    
+                    for glucoseValue in longTermGlucoseValues {
+                        sum += (glucoseValue - averageGlucoseValue) * (glucoseValue - averageGlucoseValue)
+                    }
+                    
+                    longTermStdDeviationValue = sqrt(sum / Double(longTermGlucoseValues.count))
+                    
+                }
+            }
+            
+            
+            // SHORT-TERM BG READINGS
+            // get short-term readings over the last 20-30 minutes and run the full analyse to see if the conditions are currently ideal for calibrating
+            
+            // get the last "x" minutes of BG readings from coredata where "x" is defined in ConstantsCalibrationAssistant
+            let shortTermBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date(timeIntervalSinceNow: -ConstantsCalibrationAssistant.minutesToUseForShortTermCalculations * 60), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            
+            // if we successfully got BG readings, then pull out the calculated value and add it to the short-term glucose values array
+            if shortTermBgReadings.count > 0 {
+                
+                isFirstValue = true
+                
+                for reading in shortTermBgReadings {
+                    
+                    let calculatedValue = reading.calculatedValue
+                    
+                    // only append the BG values if they are not zero or out of range. This is just to avoid strange errors in the calculations
+                    if (calculatedValue != 0.0) && (calculatedValue >= ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl) && (calculatedValue <= 450) {
+                        
+                        // set the actual BG value to the first BG reading in the returned array (which will be the last reading received)
+                        if isFirstValue {
+                            actualBgValue = calculatedValue
+                        }
+                        
+                        shortTermGlucoseValues.append(calculatedValue)
+                        
+                        isFirstValue = false
+                        
+                    }
+                }
+            }
+            
+            
+            // assuming that there are glucose values stored in the array, we can start calculating
+            if shortTermGlucoseValues.count > 0 {
+                
+                // calculate standard deviation
+                var sum: Double = 0
+                
+                let averageGlucoseValue = Double(shortTermGlucoseValues.reduce(0, +)) / Double(shortTermGlucoseValues.count)
+                
+                for glucoseValue in shortTermGlucoseValues {
+                    sum += (glucoseValue - averageGlucoseValue) * (glucoseValue - averageGlucoseValue)
+                }
+                
+                shortTermStdDeviationValue = sqrt(sum / Double(shortTermGlucoseValues.count))
+                stdDeviationResult = shortTermStdDeviationValue * ConstantsCalibrationAssistant.shortTermStdDeviationMultiplier
+                
+                
+                // calculate delta change between the minimum and maximum BG values in the array
+                shortTermDeltaValue = (shortTermGlucoseValues.first ?? 0) - (shortTermGlucoseValues.last ?? 0)
+                shortTermDeltaResult = abs(shortTermDeltaValue) * ConstantsCalibrationAssistant.shortTermDeltaMultiplier
+                
+                
+                // calculate upper outer limit bg result
+                if actualBgValue > ConstantsCalibrationAssistant.higherBgUpperLimit {
+                    higherBgUpperValue = ConstantsCalibrationAssistant.higherBgUpperLimit - actualBgValue
+                    higherBgUpperResult = abs(higherBgUpperValue) * ConstantsCalibrationAssistant.higherBgUpperMultiplier
+                }
+                
+                
+                // calculate upper recommended limit bg result
+                if actualBgValue > ConstantsCalibrationAssistant.higherBgRecommendedLimit {
+                    higherBgRecommendedValue = ConstantsCalibrationAssistant.higherBgRecommendedLimit - actualBgValue
+                    higherBgRecommendedResult = abs(higherBgRecommendedValue) * ConstantsCalibrationAssistant.higherBgRecommendedMultiplier
+                }
+                
+                
+                // calculate lower recommended limit bg result
+                if actualBgValue < ConstantsCalibrationAssistant.lowerBgRecommendedLimit {
+                    lowerBgRecommendedValue = ConstantsCalibrationAssistant.lowerBgRecommendedLimit - actualBgValue
+                    lowerBgRecommendedResult = abs(lowerBgRecommendedValue) * ConstantsCalibrationAssistant.lowerBgRecommendedMultiplier
+                }
+                
+                // calculate lower outer limit bg result
+                if actualBgValue < ConstantsCalibrationAssistant.lowerBgLowerLimit {
+                    lowerBgLowerValue = ConstantsCalibrationAssistant.lowerBgLowerLimit - actualBgValue
+                    lowerBgLowerResult = abs(lowerBgLowerValue) * ConstantsCalibrationAssistant.lowerBgLowerMultiplier
+                }
+                
+                
+                // calculate the final result
+                calibrationAssistantResult = stdDeviationResult + shortTermDeltaResult + higherBgUpperResult + higherBgRecommendedResult + lowerBgRecommendedResult + lowerBgLowerResult
+                
+                
+                // let's start to construct the alert message that should be shown to the user
+                if calibrationAssistantResult <= ConstantsCalibrationAssistant.okToCalibrateLimit {
+                    calibrationAssistantAlertMessage += "\n✅ " + Texts_Calibrations.okToCalibrate
+                } else if calibrationAssistantResult < ConstantsCalibrationAssistant.notIdealToCalibrateLimit {
+                    calibrationAssistantAlertMessage += "\n⚠️ " + Texts_Calibrations.waitToCalibrate
+                } else {
+                    calibrationAssistantAlertMessage += "\n⛔️ " + Texts_Calibrations.doNotCalibrate
+                }
+                
+                
+                // if the result is over the ok limit, then we must give further explanations to the user.
+                if calibrationAssistantResult > ConstantsCalibrationAssistant.okToCalibrateLimit || longTermStdDeviationValue > ConstantsCalibrationAssistant.longTermStdDeviationValueLimit {
+                    
+                    if longTermStdDeviationValue > ConstantsCalibrationAssistant.longTermStdDeviationValueLimit {
+                        
+                        calibrationAssistantAlertMessage += "\n\n🔃 " + Texts_Calibrations.bgValuesNotStableLongTerm
+                        
+                    }
+                    
+                    if shortTermDeltaResult > ConstantsCalibrationAssistant.shortTermDeltaResultLimit {
+                        
+                        // check if the delta is positive (rising) or negative (dropping)
+                        if shortTermDeltaValue > 0 {
+                            calibrationAssistantAlertMessage += "\n\n📈 " + Texts_Calibrations.bgValuesRising
+                        } else {
+                            calibrationAssistantAlertMessage += "\n\n📉 " + Texts_Calibrations.bgValuesDropping
+                        }
+                        
+                    } else if stdDeviationResult > ConstantsCalibrationAssistant.shortTermStdDeviationResultLimit && longTermStdDeviationValue <= ConstantsCalibrationAssistant.longTermStdDeviationValueLimit {
+                        calibrationAssistantAlertMessage += "\n\n↕️ " + Texts_Calibrations.bgValuesNotStableShortTerm
+                    }
+                    
+                    if actualBgValue > ConstantsCalibrationAssistant.higherBgUpperLimit {
+                        calibrationAssistantAlertMessage += "\n\n⏫ " + Texts_Calibrations.bgValueTooHigh
+                    } else if actualBgValue > ConstantsCalibrationAssistant.higherBgRecommendedLimit {
+                        calibrationAssistantAlertMessage += "\n\n⬆️ " + Texts_Calibrations.bgValuesSlightlyHigh
+                    } else if actualBgValue < ConstantsCalibrationAssistant.lowerBgLowerLimit {
+                        calibrationAssistantAlertMessage += "\n\n⏬ " + Texts_Calibrations.bgValueTooLow
+                    } else if actualBgValue < ConstantsCalibrationAssistant.lowerBgRecommendedLimit {
+                        calibrationAssistantAlertMessage += "\n\n⬇️ " + Texts_Calibrations.bgValuesSlightlyLow
+                    }
+                    
+                }
+                
+                
+                // if the user has enabled this in developer settings, then append the calculations values and results to the message. This will probably cause the alert message to be too big, but is easily scrolled and not meant for general use.
+                if UserDefaults.standard.showCalibrationAssistantResults {
+                    
+                    calibrationAssistantAlertMessage += "\n\n*** DEBUG DATA ***"
+                    
+                    calibrationAssistantAlertMessage += "\nLong-term Std Dev: " + longTermStdDeviationValue.round(toDecimalPlaces: 1).description
+                    
+                    calibrationAssistantAlertMessage += "\nShort-term Delta: " + shortTermDeltaValue.bgValuetoString(mgdl: true) + " * " + Int(ConstantsCalibrationAssistant.shortTermDeltaMultiplier).description + " = " + Int(shortTermDeltaResult).description
+                    
+                    calibrationAssistantAlertMessage += "\nShort-term Std Dev: " + shortTermStdDeviationValue.round(toDecimalPlaces: 1).description + " * " + Int(ConstantsCalibrationAssistant.shortTermStdDeviationMultiplier).description + " = " + Int(stdDeviationResult).description
+                    
+                    if higherBgUpperResult > 0 {
+                        calibrationAssistantAlertMessage += "\nVery High BG [>" + Int(ConstantsCalibrationAssistant.higherBgUpperLimit).description + "]: " + higherBgUpperValue.round(toDecimalPlaces: 1).description + " * " + Int(ConstantsCalibrationAssistant.higherBgUpperMultiplier).description + " = " + Int(higherBgUpperResult).description
+                    }
+                    
+                    if higherBgRecommendedResult > 0 {
+                        calibrationAssistantAlertMessage += "\nHigh BG [>" + Int(ConstantsCalibrationAssistant.higherBgRecommendedLimit).description + "]: " + higherBgRecommendedValue.round(toDecimalPlaces: 1).description + " * " + Int(ConstantsCalibrationAssistant.higherBgRecommendedMultiplier).description + " = " + Int(higherBgRecommendedResult).description
+                    }
+                    
+                    if lowerBgRecommendedResult > 0 {
+                        calibrationAssistantAlertMessage += "\nLow BG [<" + Int(ConstantsCalibrationAssistant.lowerBgRecommendedLimit).description + "]: " + lowerBgRecommendedValue.round(toDecimalPlaces: 1).description + " * " + Int(ConstantsCalibrationAssistant.lowerBgRecommendedMultiplier).description + " = " + Int(lowerBgRecommendedResult).description
+                    }
+                    
+                    if lowerBgLowerResult > 0 {
+                        calibrationAssistantAlertMessage += "\nVery Low BG [<" + Int(ConstantsCalibrationAssistant.lowerBgLowerLimit).description + "]: " + lowerBgLowerValue.round(toDecimalPlaces: 1).description + " * " + Int(ConstantsCalibrationAssistant.lowerBgLowerMultiplier).description + " = " + Int(lowerBgLowerResult).description
+                    }
+                    
+                    calibrationAssistantAlertMessage += "\nLimits: [<=" + Int(ConstantsCalibrationAssistant.okToCalibrateLimit).description + " / <" + Int(ConstantsCalibrationAssistant.notIdealToCalibrateLimit).description + "]"
+                    
+                    calibrationAssistantAlertMessage += "\nRESULT: " + Int(calibrationAssistantResult).description + " over " + Int(ConstantsCalibrationAssistant.minutesToUseForShortTermCalculations).description + " mins"
+                    
+                }
+                
+                
+                // let's create the trace file message that will be logged if the user decides to calibrate. We can shorten it to fit on one line.
+                if calibrationAssistantResult > ConstantsCalibrationAssistant.notIdealToCalibrateLimit {
+                    calibrationAssistantTraceMessage += "user warned not to calibrate."
+                } else if calibrationAssistantResult > ConstantsCalibrationAssistant.okToCalibrateLimit {
+                    calibrationAssistantTraceMessage += "user advised to wait before calibrating."
+                } else {
+                    calibrationAssistantTraceMessage += "user informed OK to calibrate."
+                }
+                
+                calibrationAssistantTraceMessage += " Actual BG in mg/dl: " + Int(actualBgValue).description
+                
+                calibrationAssistantTraceMessage += "; longTermStdDev [" + Int(ConstantsCalibrationAssistant.longTermStdDeviationValueLimit).description + "]:" + longTermStdDeviationValue.round(toDecimalPlaces: 1).description
+                
+                calibrationAssistantTraceMessage += "; shortTermDelta [" + Int(ConstantsCalibrationAssistant.shortTermDeltaResultLimit).description + "]:" + Int(shortTermDeltaValue).description + "*" + Int(ConstantsCalibrationAssistant.shortTermDeltaMultiplier).description + "=" + Int(shortTermDeltaResult).description
+                
+                calibrationAssistantTraceMessage += "; shortTermStdDev [" + Int(ConstantsCalibrationAssistant.shortTermStdDeviationResultLimit).description + "]:" + shortTermStdDeviationValue.round(toDecimalPlaces: 1).description + "*" + Int(ConstantsCalibrationAssistant.shortTermStdDeviationMultiplier).description + "=" + Int(stdDeviationResult).description
+                
+                calibrationAssistantTraceMessage += "; veryHighBG [>" + Int(ConstantsCalibrationAssistant.higherBgUpperLimit).description + "]:" + higherBgUpperValue.round(toDecimalPlaces: 1).description + "*" + Int(ConstantsCalibrationAssistant.higherBgUpperMultiplier).description + "=" + Int(higherBgUpperResult).description
+                
+                calibrationAssistantTraceMessage += "; highBG [>" + Int(ConstantsCalibrationAssistant.higherBgRecommendedLimit).description + "]:" + higherBgRecommendedValue.round(toDecimalPlaces: 1).description + "*" + Int(ConstantsCalibrationAssistant.higherBgRecommendedMultiplier).description + "=" + Int(higherBgRecommendedResult).description
+                
+                calibrationAssistantTraceMessage += "; lowBG [<" + Int(ConstantsCalibrationAssistant.lowerBgRecommendedLimit).description + "]:" + lowerBgRecommendedValue.round(toDecimalPlaces: 1).description + "*" + Int(ConstantsCalibrationAssistant.lowerBgRecommendedMultiplier).description + "=" + Int(lowerBgRecommendedResult).description
+                
+                calibrationAssistantTraceMessage += "; veryLowBG [<" + Int(ConstantsCalibrationAssistant.lowerBgLowerLimit).description + "]:" + lowerBgLowerValue.round(toDecimalPlaces: 1).description + "*" + Int(ConstantsCalibrationAssistant.lowerBgLowerMultiplier).description + "=" + Int(lowerBgLowerResult).description
+                
+                calibrationAssistantTraceMessage += "; limits: [<=" + Int(ConstantsCalibrationAssistant.okToCalibrateLimit).description + " / <" + Int(ConstantsCalibrationAssistant.notIdealToCalibrateLimit).description + "]"
+                                
+                calibrationAssistantTraceMessage += "; RESULT: " + Int(calibrationAssistantResult).description + " over " + Int(ConstantsCalibrationAssistant.minutesToUseForShortTermCalculations).description + " mins"
+                
+            }
+            
+        }
+        
+        return (calibrationAssistantResult, calibrationAssistantAlertMessage, calibrationAssistantTraceMessage)
+        
+    }
+    
+    
+    private func updateCalibrationAssistantStatus(calibrationAssistantResult: Double) {
+        
+        // if the user is using the Visual Calibration Assistant, then change the colour of the toolbar icon to indicate calibration suitability
+        if UserDefaults.standard.showVisualCalibrationAssistant {
+            
+            if calibrationAssistantResult < ConstantsCalibrationAssistant.okToCalibrateLimit {
+                
+                calibrateToolbarButtonOutlet.tintColor = nil
+                
+            } else if calibrationAssistantResult < ConstantsCalibrationAssistant.notIdealToCalibrateLimit {
+                
+                calibrateToolbarButtonOutlet.tintColor = UIColor.systemOrange
+                
+            } else {
+                
+                calibrateToolbarButtonOutlet.tintColor = UIColor.red
+                
+            }
+            
+        } else {
+            
+            // set it back to standard just in case
+            calibrateToolbarButtonOutlet.tintColor = nil
+            
+        }
+        
+        
     }
     
 }

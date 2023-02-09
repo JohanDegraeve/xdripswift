@@ -95,6 +95,10 @@ class Texts_SettingsView {
     static let showMiniChart: String = {
         return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show the Mini-Chart?", comment: "home screen settings, should the mini-chart be shown?")
     }()
+    
+    static let showVisualCalibrationAssistant: String = {
+        return NSLocalizedString("settingsviews_showVisualCalibrationAssistant", tableName: filename, bundle: Bundle.main, value: "Show Calibration Assistant?", comment: "home screen settings, should the visual calibration assistant be enabled?")
+    }()
 
     static let labelUseObjectives: String = {
         return NSLocalizedString("settingsviews_useobjectives", tableName: filename, bundle: Bundle.main, value: "Show Objectives in Graph?", comment: "home screen settings, use objectives in graph")
@@ -573,6 +577,10 @@ class Texts_SettingsView {
         return NSLocalizedString("warningLoopDelayAlreadyExists", tableName: filename, bundle: Bundle.main, value: "There is already a loopDelay for this time.", comment: "When user creates new loopdelay, with a timestamp that already exists - this is the warning text")
     }()
 
+    static let showCalibrationAssistantResults: String = {
+        return NSLocalizedString("showCalibrationAssistantResults", tableName: filename, bundle: Bundle.main, value: "Calibration Assistant Debug", comment: "When enabled, the results from the calibration assistant will be shown")
+    }()
+    
     static let nsLog: String = {
         return NSLocalizedString("nslog", tableName: filename, bundle: Bundle.main, value: "NSLog", comment: "deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog")
     }()

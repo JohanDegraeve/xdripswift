@@ -397,32 +397,32 @@
                                             <constraint firstAttribute="height" constant="50" id="2xB-Gd-4Tz"/>
                                         </constraints>
                                         <items>
-                                            <barButtonItem title="Snooze" image="moon.zzz" catalog="system" id="f3E-Tt-LBV">
+                                            <barButtonItem title="Snooze" image="moon.zzz" catalog="system" style="plain" id="f3E-Tt-LBV">
                                                 <connections>
                                                     <action selector="preSnoozeToolbarButtonAction:" destination="9pv-A4-QxB" id="IDv-ho-TZ2"/>
                                                     <segue destination="NvR-Zh-2Zn" kind="show" identifier="RootViewToSnoozeView" id="VtQ-ZG-btn"/>
                                                 </connections>
                                             </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="uM8-jT-s3T"/>
-                                            <barButtonItem title="Sensor" image="ellipsis.circle" catalog="system" id="ZIM-Wf-bUy">
+                                            <barButtonItem title="Sensor" image="ellipsis.circle" catalog="system" style="plain" id="ZIM-Wf-bUy">
                                                 <connections>
                                                     <action selector="sensorToolbarButtonAction:" destination="9pv-A4-QxB" id="2vd-6L-ifa"/>
                                                 </connections>
                                             </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="to4-9c-pNT"/>
-                                            <barButtonItem title="Calibrate" image="scope" catalog="system" id="u4d-bZ-Kw8">
+                                            <barButtonItem title="Calibrate" image="scope" catalog="system" style="plain" id="u4d-bZ-Kw8">
                                                 <connections>
                                                     <action selector="calibrateToolbarButtonAction:" destination="9pv-A4-QxB" id="qNA-1R-UK5"/>
                                                 </connections>
                                             </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="SlH-A4-F18"/>
-                                            <barButtonItem title="Lock" image="lock" catalog="system" id="wfX-50-2w6">
+                                            <barButtonItem title="Lock" image="lock" catalog="system" style="plain" id="wfX-50-2w6">
                                                 <connections>
                                                     <action selector="screenLockToolbarButtonAction:" destination="9pv-A4-QxB" id="L14-hJ-4a9"/>
                                                 </connections>
                                             </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="a6G-aW-JeE"/>
-                                            <barButtonItem title="Help" image="questionmark.circle" catalog="system" id="DuN-xR-xYB">
+                                            <barButtonItem title="Help" image="questionmark.circle" catalog="system" style="plain" id="DuN-xR-xYB">
                                                 <connections>
                                                     <action selector="helpToolbarButtonAction:" destination="9pv-A4-QxB" id="DGg-9c-TqQ"/>
                                                 </connections>
