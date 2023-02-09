@@ -227,6 +227,16 @@ final class RootViewController: UIViewController {
                     
                     // don't show anything in diff outlet
                     self.diffLabelOutlet.text = ""
+					
+					// Update IOB label.
+					if UserDefaults.standard.insulinOnBoardEnabledDisplay {
+						if let calculator = self.insulinOnBoardCalculator {
+							let iob = calculator.insulinYetToBeConsumedAt(date: chartAxisValueDate.date)
+							
+							// TODO: Implement a label for IOB. #2
+							print("Inside TODO: Implement a label for IOB #2: ", chartAxisValueDate.date, iob)
+						}
+					}
                     
                 } else {
                     
@@ -443,6 +453,9 @@ final class RootViewController: UIViewController {
     
     /// housekeeper instance
     private var houseKeeper: HouseKeeper?
+	
+	/// InsulinOnBoardCalculator instance
+	private var insulinOnBoardCalculator: InsulinOnBoardCalculator?
     
     /// current value of webOPEnabled, if nil then it means no cgmTransmitter connected yet , false is used as value
     /// - used to detect changes in the value
@@ -877,7 +890,7 @@ final class RootViewController: UIViewController {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, watchManager, housekeeper
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, watchManager, housekeeper, insulinOnBoardCalculator
     private func setupApplicationData() {
         
         // setup Trace
@@ -1020,6 +1033,9 @@ final class RootViewController: UIViewController {
         
         // initialize statisticsManager
         statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
+		
+		// initialize insulinOnBoardCalculator
+		insulinOnBoardCalculator = InsulinOnBoardCalculator(coreDataManager: coreDataManager)
         
         // initialize chartGenerator in chartOutlet
         self.chartOutlet.chartGenerator = { [weak self] (frame) in
@@ -2103,6 +2119,16 @@ final class RootViewController: UIViewController {
         
         // update the chart up to now
         updateChartWithResetEndDate()
+		
+		// Update IOB label
+		if UserDefaults.standard.insulinOnBoardEnabledDisplay {
+			if let calculator = insulinOnBoardCalculator {
+				let iob = calculator.insulinYetToBeConsumedAt(date: lastReading.timeStamp)
+				
+				// TODO: Implement a label for IOB. #1
+				print("Inside TODO: Implement a label for IOB #1: ", lastReading.timeStamp, iob)
+			}
+		}
         
         self.updateMiniChart()
         
