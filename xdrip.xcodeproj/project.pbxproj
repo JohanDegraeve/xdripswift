@@ -1632,8 +1632,8 @@
 		470B6187270C448000561E56 /* Watch App */ = {
 			isa = PBXGroup;
 			children = (
-				470B6188270C448000561E56 /* Interface.storyboard */,
 				470B618B270C448100561E56 /* Assets.xcassets */,
+				470B6188270C448000561E56 /* Interface.storyboard */,
 			);
 			path = "Watch App";
 			sourceTree = "<group>";
@@ -1641,12 +1641,12 @@
 		470B6195270C448100561E56 /* Watch App WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
-				470B6196270C448100561E56 /* InterfaceController.swift */,
-				470B6198270C448100561E56 /* ExtensionDelegate.swift */,
-				470B619A270C448100561E56 /* ComplicationController.swift */,
-				470B619C270C448200561E56 /* Assets.xcassets */,
 				470B619E270C448200561E56 /* Info.plist */,
+				470B619A270C448100561E56 /* ComplicationController.swift */,
 				47F8E9592710255C00B8B02B /* ConstantsWatchApp.swift */,
+				470B6198270C448100561E56 /* ExtensionDelegate.swift */,
+				470B6196270C448100561E56 /* InterfaceController.swift */,
+				470B619C270C448200561E56 /* Assets.xcassets */,
 			);
 			path = "Watch App WatchKit Extension";
 			sourceTree = "<group>";
@@ -1672,9 +1672,9 @@
 		D4028CBE2774A4B900341476 /* Treatments */ = {
 			isa = PBXGroup;
 			children = (
-				D4028CBF2774A50600341476 /* TreatmentsViewController.swift */,
 				D484BC282774F783008490E9 /* TreatmentsInsertViewController.swift */,
 				D482BD932776153F003C4FB2 /* TreatmentsNavigationController.swift */,
+				D4028CBF2774A50600341476 /* TreatmentsViewController.swift */,
 				D4BAF37527769B38009D3465 /* TreatmentTableViewCell.swift */,
 			);
 			path = Treatments;
@@ -1683,8 +1683,8 @@
 		D4E499A9277B4363000F8CBA /* Treatments */ = {
 			isa = PBXGroup;
 			children = (
-				D4E499AA277B43E3000F8CBA /* TreatmentCollection.swift */,
 				D4E499AC277B4CE7000F8CBA /* DateOnly.swift */,
+				D4E499AA277B43E3000F8CBA /* TreatmentCollection.swift */,
 				D48E8F77278E49B300CCEE08 /* TreatmentNSResponse.swift */,
 			);
 			path = Treatments;
@@ -1701,14 +1701,18 @@
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				F8FDD6CA2553385000625B49 /* Array.swift */,
 				F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */,
+				F8FDD6CA2553385000625B49 /* Array.swift */,
+				F8E51D602448E695001C9E5A /* Bundle.swift */,
 				F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */,
 				F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */,
+				F808592C23677D6A00F3829D /* ChartPoint.swift */,
 				F8025C1221DA683400ECF0C0 /* Data.swift */,
 				F8EA6C8121B723BC0082976B /* Date.swift */,
 				F8025E4D21ED450300ECF0C0 /* Double.swift */,
+				F8A1850B25643B16000EF8A0 /* Double+Smoothable.swift */,
 				F8B3A85C22821BB6004BA588 /* Int.swift */,
+				F8AF361A245D93ED00B5977B /* Int16.swift */,
 				F8EEDD5322FF685400D2D610 /* NSMutableURLRequest.swift */,
 				F897AAFA2201018800CDDD10 /* String.swift */,
 				F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */,
@@ -1721,14 +1725,10 @@
 				F898EDF5234A8A5700BFB79B /* UInt32.swift */,
 				F8025E6A21F7CD7600ECF0C0 /* UIStoryboard.swift */,
 				F8B3A857227F6971004BA588 /* UISwitch.swift */,
+				F83098FD23AD3F84005741DF /* UITabBarController.swift */,
+				F890E079247687AE008FB2EC /* URL.swift */,
 				F8BDD4232218790E006EAB84 /* UserDefaults.swift */,
 				F80859282364D61B00F3829D /* UserDefaults+charts.swift */,
-				F808592C23677D6A00F3829D /* ChartPoint.swift */,
-				F83098FD23AD3F84005741DF /* UITabBarController.swift */,
-				F8E51D602448E695001C9E5A /* Bundle.swift */,
-				F8AF361A245D93ED00B5977B /* Int16.swift */,
-				F890E079247687AE008FB2EC /* URL.swift */,
-				F8A1850B25643B16000EF8A0 /* Double+Smoothable.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1744,9 +1744,9 @@
 		F8025E5921F7861200ECF0C0 /* Root View Controller */ = {
 			isa = PBXGroup;
 			children = (
+				47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */,
 				F8AC425F21ADEBD60078C348 /* RootViewController.swift */,
 				F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */,
-				47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */,
 			);
 			path = "Root View Controller";
 			sourceTree = "<group>";
@@ -1754,8 +1754,8 @@
 		F8025E5A21F7AFA100ECF0C0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				F8B3A7B7226CC0B7004BA588 /* sounds */,
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
+				F8B3A7B7226CC0B7004BA588 /* sounds */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -1772,12 +1772,12 @@
 			isa = PBXGroup;
 			children = (
 				F8A2BBFB25D9D36C001D1E78 /* Atom */,
-				F80D916624F70840006840B5 /* Libre2 */,
+				F816E0EB2432A55F009EE65B /* Blucon */,
+				F808D2C6240323AE0084B5DB /* Bubble */,
 				F816E11F24392D27009EE65B /* Droplet */,
 				F816E10124367389009EE65B /* GNSENtry */,
-				F816E0EB2432A55F009EE65B /* Blucon */,
+				F80D916624F70840006840B5 /* Libre2 */,
 				F8C9784E242A9FD500A09483 /* MiaoMiao */,
-				F808D2C6240323AE0084B5DB /* Bubble */,
 			);
 			path = Libre;
 			sourceTree = "<group>";
@@ -1794,13 +1794,13 @@
 			isa = PBXGroup;
 			children = (
 				F8A2BC0B25DB0AF9001D1E78 /* Atom */,
-				F80D916E24F85C5A006840B5 /* Libre2 */,
-				F816E114243919ED009EE65B /* Droplet */,
-				F816E1062437E58E009EE65B /* BlueReader */,
-				F816E0FC24367338009EE65B /* GNSEntry */,
 				F816E0E02432A4D1009EE65B /* Blucon */,
-				F8C97857242AAE7A00A09483 /* MiaoMiao */,
+				F816E1062437E58E009EE65B /* BlueReader */,
 				F808D2D0240329D40084B5DB /* Bubble */,
+				F816E114243919ED009EE65B /* Droplet */,
+				F816E0FC24367338009EE65B /* GNSEntry */,
+				F80D916E24F85C5A006840B5 /* Libre2 */,
+				F8C97857242AAE7A00A09483 /* MiaoMiao */,
 			);
 			path = Libre;
 			sourceTree = "<group>";
@@ -1825,8 +1825,8 @@
 			isa = PBXGroup;
 			children = (
 				F80D916A24F82913006840B5 /* CGMLibre2Transmitter.swift */,
-				F80D916C24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift */,
 				F8B955EA2591355200C06016 /* CGMLibre2Transmitter+TestData.swift */,
+				F80D916C24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift */,
 			);
 			path = Libre2;
 			sourceTree = "<group>";
@@ -1924,8 +1924,8 @@
 		F81D6D4622BD5F43005EFAE2 /* DexcomShare */ = {
 			isa = PBXGroup;
 			children = (
-				F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */,
 				F81D6D5122C27F18005EFAE2 /* BgReading+DexcomShare.swift */,
+				F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */,
 			);
 			path = DexcomShare;
 			sourceTree = "<group>";
@@ -1934,8 +1934,8 @@
 			isa = PBXGroup;
 			children = (
 				F821CF49229BF43A005C1E43 /* AlertKind.swift */,
-				F821CF4A229BF43A005C1E43 /* SnoozeParameters.swift */,
 				F821CF4B229BF43A005C1E43 /* AlertManager.swift */,
+				F821CF4A229BF43A005C1E43 /* SnoozeParameters.swift */,
 			);
 			path = Alerts;
 			sourceTree = "<group>";
@@ -1951,14 +1951,14 @@
 		F821CF4F229BF43A005C1E43 /* NightScout */ = {
 			isa = PBXGroup;
 			children = (
+				F821CF53229BF43A005C1E43 /* BgReading+NightScout.swift */,
 				F8AF120024B9082000AE5BA2 /* Calibration+NightScout.swift */,
+				F821CF6E229FC280005C1E43 /* Endpoint+NightScout.swift */,
 				F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */,
+				F821CF7A22A1D359005C1E43 /* NightScoutFollowerDelegate.swift */,
 				F821CF65229EE68B005C1E43 /* NightScoutFollowManager.swift */,
 				F821CF60229BF4A2005C1E43 /* NightScoutUploadManager.swift */,
 				F821CF52229BF43A005C1E43 /* NSDateFormatter.swift */,
-				F821CF53229BF43A005C1E43 /* BgReading+NightScout.swift */,
-				F821CF6E229FC280005C1E43 /* Endpoint+NightScout.swift */,
-				F821CF7A22A1D359005C1E43 /* NightScoutFollowerDelegate.swift */,
 			);
 			path = NightScout;
 			sourceTree = "<group>";
@@ -2015,8 +2015,8 @@
 		F8297F47238DCAD800D74D66 /* BluetoothPeripheralsNavigationController */ = {
 			isa = PBXGroup;
 			children = (
-				F8297F48238DCAD800D74D66 /* BluetoothPeripheralsViewController */,
 				F8297F4C238DCAD800D74D66 /* BluetoothPeripheralNavigationController.swift */,
+				F8297F48238DCAD800D74D66 /* BluetoothPeripheralsViewController */,
 			);
 			path = BluetoothPeripheralsNavigationController;
 			sourceTree = "<group>";
@@ -2024,8 +2024,8 @@
 		F8297F48238DCAD800D74D66 /* BluetoothPeripheralsViewController */ = {
 			isa = PBXGroup;
 			children = (
-				F8297F50238ECA3200D74D66 /* BluetoothPeripheralViewController */,
 				F8297F4B238DCAD800D74D66 /* BluetoothPeripheralsViewController.swift */,
+				F8297F50238ECA3200D74D66 /* BluetoothPeripheralViewController */,
 			);
 			path = BluetoothPeripheralsViewController;
 			sourceTree = "<group>";
@@ -2033,9 +2033,9 @@
 		F8297F50238ECA3200D74D66 /* BluetoothPeripheralViewController */ = {
 			isa = PBXGroup;
 			children = (
-				F8F9723623A5928D00C3F17D /* Models */,
-				F8691887239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift */,
 				F8297F51238ECA3200D74D66 /* BluetoothPeripheralViewController.swift */,
+				F8691887239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift */,
+				F8F9723623A5928D00C3F17D /* Models */,
 			);
 			path = BluetoothPeripheralViewController;
 			sourceTree = "<group>";
@@ -2043,9 +2043,9 @@
 		F830991E23C291E2005741DF /* watlaa */ = {
 			isa = PBXGroup;
 			children = (
-				F8E51D66244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift */,
 				F830991F23C291E2005741DF /* WatlaaBluetoothTransmitter.swift */,
 				F830992F23C928E0005741DF /* WatlaaBluetoothTransmitterDelegate.swift */,
+				F8E51D66244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift */,
 			);
 			path = watlaa;
 			sourceTree = "<group>";
@@ -2076,7 +2076,6 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
-				47FB28052636AFE700042FFB /* Statistics */,
 				F821CF48229BF43A005C1E43 /* Alerts */,
 				F821CF54229BF43A005C1E43 /* Application */,
 				F8297F42238DC4AC00D74D66 /* BluetoothPeripheral */,
@@ -2086,9 +2085,10 @@
 				F821CF9122ADB064005C1E43 /* HealthKit */,
 				F8E51D5B2448D8A3001C9E5A /* Loop */,
 				F821CF4F229BF43A005C1E43 /* NightScout */,
-				F821CF9922AEF2DF005C1E43 /* Speak */,
-				F8E3A2A723D906B600E5E98A /* Watch */,
 				F64039AE281C3F8D0051EFFE /* QuickActions */,
+				F821CF9922AEF2DF005C1E43 /* Speak */,
+				47FB28052636AFE700042FFB /* Statistics */,
+				F8E3A2A723D906B600E5E98A /* Watch */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -2096,7 +2096,7 @@
 		F85DC2F921D2CCC000B9F74A /* Storyboards */ = {
 			isa = PBXGroup;
 			children = (
-				D4AC54412778C82B0097FF10 /* Treatments.strings */,
+				F64039B1281E90CF0051EFFE /* QuickActions.strings */,
 				F8B3A7B3226A0A71004BA588 /* Alerts.strings */,
 				F8B3A80B227A3E97004BA588 /* AlertTypesSettingsView.strings */,
 				470CE1FE246802EB00D5CB74 /* BluetoothPeripheralsView.strings */,
@@ -2107,20 +2107,20 @@
 				F8BDD44A221C9D70006EAB84 /* ErrorMessages.strings */,
 				F8B48A9E22B2FA7B009BCC01 /* HomeView.strings */,
 				F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */,
+				CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */,
+				F8AF11FF24B3B62D00AE5BA2 /* LibreErrors.strings */,
+				4749EB9D25B36E010072DF8B /* LibreNFC.strings */,
+				F81F370A25C1584A00520946 /* LibreStates.strings */,
 				F8BDD436221A0349006EAB84 /* Localizable.strings */,
 				F889CB71236D84AC00A81068 /* M5StackView.strings */,
 				F8AC426321ADEBD60078C348 /* Main.storyboard */,
-				F8B3A788225D4473004BA588 /* NightScoutTestResult.strings */,
 				CE1B2FD425D0264900F642F5 /* Main.strings */,
+				F8B3A788225D4473004BA588 /* NightScoutTestResult.strings */,
 				F8BDD457221DEF22006EAB84 /* SettingsViews.strings */,
-				F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */,
-				F81F370525C1583400520946 /* WatlaaView.strings */,
-				CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */,
-				F8AF11FF24B3B62D00AE5BA2 /* LibreErrors.strings */,
-				F81F370A25C1584A00520946 /* LibreStates.strings */,
 				F8E6C79324CEC2E3007C1199 /* Snooze.strings */,
-				4749EB9D25B36E010072DF8B /* LibreNFC.strings */,
-				F64039B1281E90CF0051EFFE /* QuickActions.strings */,
+				F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */,
+				D4AC54412778C82B0097FF10 /* Treatments.strings */,
+				F81F370525C1583400520946 /* WatlaaView.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -2128,11 +2128,11 @@
 		F85DC2FA21D2CD3000B9F74A /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				D4028CBE2774A4B900341476 /* Treatments */,
 				F8297F47238DCAD800D74D66 /* BluetoothPeripheralsNavigationController */,
 				F8B3A806227A28F9004BA588 /* Helpers */,
 				F8025E5921F7861200ECF0C0 /* Root View Controller */,
 				F8B3A823227E4B7D004BA588 /* SettingsNavigationController */,
+				D4028CBE2774A4B900341476 /* Treatments */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -2148,8 +2148,8 @@
 		F85FF38F25288860004E6FF1 /* HouseKeeping */ = {
 			isa = PBXGroup;
 			children = (
-				F85FF39025288870004E6FF1 /* HouseKeeper.swift */,
 				D41F32932827332000861B3D /* DataExporter.swift */,
+				F85FF39025288870004E6FF1 /* HouseKeeper.swift */,
 			);
 			path = HouseKeeping;
 			sourceTree = "<group>";
@@ -2173,12 +2173,12 @@
 		F870D3D425126A49008967B0 /* xDrip4iOS Widget */ = {
 			isa = PBXGroup;
 			children = (
-				F870D3EF25149EA0008967B0 /* Texts */,
-				F870D3E825129C0B008967B0 /* xDripClient */,
 				F870D3E22512701E008967B0 /* xDrip4iOS Widget.entitlements */,
+				F870D3DA25126A49008967B0 /* Info.plist */,
 				F870D3D525126A49008967B0 /* TodayViewController.swift */,
 				F870D3D725126A49008967B0 /* MainInterface.storyboard */,
-				F870D3DA25126A49008967B0 /* Info.plist */,
+				F870D3EF25149EA0008967B0 /* Texts */,
+				F870D3E825129C0B008967B0 /* xDripClient */,
 			);
 			path = "xDrip4iOS Widget";
 			sourceTree = "<group>";
@@ -2225,9 +2225,9 @@
 		F8A2BC1225DB0B4F001D1E78 /* Atom */ = {
 			isa = PBXGroup;
 			children = (
+				F8A2BC4425DB2679001D1E78 /* AtomResponseType.swift */,
 				F8A2BC1325DB0B61001D1E78 /* CGMAtomTransmitter.swift */,
 				F8A2BC1925DB0C28001D1E78 /* CGMAtomTransmitterDelegate.swift */,
-				F8A2BC4425DB2679001D1E78 /* AtomResponseType.swift */,
 			);
 			path = Atom;
 			sourceTree = "<group>";
@@ -2235,21 +2235,21 @@
 		F8A2BC1D25DB0D6D001D1E78 /* BluetoothPeripheral */ = {
 			isa = PBXGroup;
 			children = (
-				F8A2BC1E25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMG5TransmitterDelegate.swift */,
-				F8A2BC1F25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDropletTransmitterDelegate.swift */,
-				F8A2BC2025DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMBlueReaderTransmitterDelegate.swift */,
 				F8A2BC2125DB0D6D001D1E78 /* BluetoothPeripheralManager.swift */,
-				F8A2BC2225DB0D6D001D1E78 /* BluetoothPeripheralManager+M5StackBluetoothTransmitterDelegate.swift */,
-				F8A2BC2325DB0D6D001D1E78 /* BluetoothPeripheralManaging.swift */,
-				F8A2BC2425DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift */,
-				F8A2BC2525DB0D6D001D1E78 /* BluetoothPeripheralManager+WatlaaBluetoothTransmitterDelegate.swift */,
 				F8A2BC2625DB0D6D001D1E78 /* BluetoothPeripheralManager+BluetoothTransmitterDelegate.swift */,
-				F8A2BC2825DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMMiaoMiaoTransmitterDelegate.swift */,
-				F8A2BC2925DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMBluconTransmitterDelegate.swift */,
-				F8A2BC2A25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift */,
-				F8A2BC2B25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMGNSEntryTransmitterDelegate.swift */,
-				F8A2BC2C25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift */,
 				F8A2BC3E25DB0D89001D1E78 /* BluetoothPeripheralManager+CGMAtomTransmitterDelegate.swift */,
+				F8A2BC2925DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMBluconTransmitterDelegate.swift */,
+				F8A2BC2025DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMBlueReaderTransmitterDelegate.swift */,
+				F8A2BC2C25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift */,
+				F8A2BC2425DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift */,
+				F8A2BC1F25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDropletTransmitterDelegate.swift */,
+				F8A2BC1E25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMG5TransmitterDelegate.swift */,
+				F8A2BC2B25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMGNSEntryTransmitterDelegate.swift */,
+				F8A2BC2A25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift */,
+				F8A2BC2825DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMMiaoMiaoTransmitterDelegate.swift */,
+				F8A2BC2225DB0D6D001D1E78 /* BluetoothPeripheralManager+M5StackBluetoothTransmitterDelegate.swift */,
+				F8A2BC2525DB0D6D001D1E78 /* BluetoothPeripheralManager+WatlaaBluetoothTransmitterDelegate.swift */,
+				F8A2BC2325DB0D6D001D1E78 /* BluetoothPeripheralManaging.swift */,
 			);
 			name = BluetoothPeripheral;
 			sourceTree = "<group>";
@@ -2257,8 +2257,8 @@
 		F8A389CD232A6A6F0010F405 /* M5StackSettingsViewController */ = {
 			isa = PBXGroup;
 			children = (
-				F80ED2E8236F68D90005C035 /* M5StackSettingsViewModels */,
 				F8A389CE232AE2E90010F405 /* M5StackSettingsViewController.swift */,
+				F80ED2E8236F68D90005C035 /* M5StackSettingsViewModels */,
 			);
 			path = M5StackSettingsViewController;
 			sourceTree = "<group>";
@@ -2267,15 +2267,15 @@
 			isa = PBXGroup;
 			children = (
 				F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */,
-				F870D3D425126A49008967B0 /* xDrip4iOS Widget */,
-				470B6187270C448000561E56 /* Watch App */,
-				470B6195270C448100561E56 /* Watch App WatchKit Extension */,
-				F8AC425B21ADEBD60078C348 /* Products */,
-				F8AC425C21ADEBD60078C348 /* xdrip */,
-				F85DC29B21CFCEB800B9F74A /* Recovered References */,
-				48C0E851274A3BB6D42C6F20 /* Frameworks */,
 				666E283926F7E54C00ACE4DF /* Version.xcconfig */,
 				666E283826F7E54C00ACE4DF /* xDrip.xcconfig */,
+				48C0E851274A3BB6D42C6F20 /* Frameworks */,
+				F8AC425B21ADEBD60078C348 /* Products */,
+				F85DC29B21CFCEB800B9F74A /* Recovered References */,
+				470B6187270C448000561E56 /* Watch App */,
+				470B6195270C448100561E56 /* Watch App WatchKit Extension */,
+				F8AC425C21ADEBD60078C348 /* xdrip */,
+				F870D3D425126A49008967B0 /* xDrip4iOS Widget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2293,6 +2293,9 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
+				F821CF9822AE589E005C1E43 /* xdrip.entitlements */,
+				F8A5EEC5257EDC910085E660 /* xdripDebug.entitlements */,
+				F8A54B0A22D9215500934E7A /* xdrip-Bridging-Header.h */,
 				F85DC2FB21D2CD7000B9F74A /* Application Delegate */,
 				F8F971AD23A5914C00C3F17D /* BluetoothPeripheral */,
 				F8F971B923A5915900C3F17D /* BluetoothTransmitter */,
@@ -2310,9 +2313,6 @@
 				F8EA6C8021B723A80082976B /* Utilities */,
 				F85DC2FA21D2CD3000B9F74A /* View Controllers */,
 				F8BECB00235CE3E20060DAE1 /* Views */,
-				F8A54B0A22D9215500934E7A /* xdrip-Bridging-Header.h */,
-				F821CF9822AE589E005C1E43 /* xdrip.entitlements */,
-				F8A5EEC5257EDC910085E660 /* xdripDebug.entitlements */,
 			);
 			path = xdrip;
 			sourceTree = "<group>";
@@ -2320,9 +2320,9 @@
 		F8AC42D021B342910078C348 /* Core Data */ = {
 			isa = PBXGroup;
 			children = (
-				F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */,
 				F8B3A814227DEA69004BA588 /* accessors */,
 				F8EA6CA421B9A25B0082976B /* classes */,
+				F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */,
 			);
 			name = "Core Data";
 			path = "xdrip/Core Data";
@@ -2339,6 +2339,8 @@
 		F8B3A7B7226CC0B7004BA588 /* sounds */ = {
 			isa = PBXGroup;
 			children = (
+				F8B3A7C5226CC0B7004BA588 /* xdripalert.aif */,
+				F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */,
 				F824373224CB7A8D00BED341 /* Alarm_Buzzer.caf */,
 				F824373C24CB7A8F00BED341 /* Alarm_Clock.caf */,
 				F824374A24CB7A9200BED341 /* Alert_Tone_Busy.caf */,
@@ -2446,7 +2448,6 @@
 				F824373E24CB7A8F00BED341 /* Wake_Up_Will_You.caf */,
 				F824372324CB7A8900BED341 /* Win_Gain.caf */,
 				F824373124CB7A8D00BED341 /* Wrong_Answer.caf */,
-				F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */,
 				F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 */,
 				F8B3A7C3226CC0B7004BA588 /* betterwakeup.mp3 */,
 				F8B3A7BA226CC0B7004BA588 /* bruteforce.mp3 */,
@@ -2461,7 +2462,6 @@
 				F8B3A7B9226CC0B7004BA588 /* shortlow3.mp3 */,
 				F8B3A7BD226CC0B7004BA588 /* shortlow4.mp3 */,
 				F8B3A7C4226CC0B7004BA588 /* spaceship.mp3 */,
-				F8B3A7C5226CC0B7004BA588 /* xdripalert.aif */,
 			);
 			path = sounds;
 			sourceTree = "<group>";
@@ -2477,12 +2477,12 @@
 		F8B3A806227A28F9004BA588 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				D417E51B282EC8DB008DC467 /* ProgressBarViewController.swift */,
+				F8B3A807227A2933004BA588 /* SettingsSelectedRowAction.swift */,
+				F8B3A7F22278E0E7004BA588 /* SettingsViewModelProtocol.swift */,
 				F821CF8C22AB08F6005C1E43 /* Date Picker View Controller */,
 				F8B3A831227F08AC004BA588 /* Picker View Controller */,
 				F8B3A82E227F085A004BA588 /* SettingsTableViewCell */,
-				F8B3A7F22278E0E7004BA588 /* SettingsViewModelProtocol.swift */,
-				F8B3A807227A2933004BA588 /* SettingsSelectedRowAction.swift */,
-				D417E51B282EC8DB008DC467 /* ProgressBarViewController.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2490,15 +2490,15 @@
 		F8B3A814227DEA69004BA588 /* accessors */ = {
 			isa = PBXGroup;
 			children = (
-				D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */,
+				F8B3A819227DEC92004BA588 /* README.md */,
 				F8B3A816227DEC91004BA588 /* AlertEntriesAccessor.swift */,
 				F8B3A81A227DEC92004BA588 /* AlertTypesAccessor.swift */,
 				F8B3A818227DEC92004BA588 /* BgReadingsAccessor.swift */,
-				F8B3A817227DEC91004BA588 /* CalibrationsAccessor.swift */,
-				F8B3A819227DEC92004BA588 /* README.md */,
-				F8B3A815227DEC91004BA588 /* SensorsAccessor.swift */,
 				F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */,
+				F8B3A817227DEC91004BA588 /* CalibrationsAccessor.swift */,
+				F8B3A815227DEC91004BA588 /* SensorsAccessor.swift */,
 				F85FF3D6252FB1C0004E6FF1 /* SnoozeParametersAccessor.swift */,
+				D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */,
 			);
 			path = accessors;
 			sourceTree = "<group>";
@@ -2523,8 +2523,8 @@
 		F8B3A831227F08AC004BA588 /* Picker View Controller */ = {
 			isa = PBXGroup;
 			children = (
-				F8B3A832227F08AC004BA588 /* PickerViewData.swift */,
 				F8B3A833227F08AC004BA588 /* PickerViewController.swift */,
+				F8B3A832227F08AC004BA588 /* PickerViewData.swift */,
 			);
 			path = "Picker View Controller";
 			sourceTree = "<group>";
@@ -2532,14 +2532,14 @@
 		F8B3A836227F090D004BA588 /* SettingsViewController */ = {
 			isa = PBXGroup;
 			children = (
+				F866974B28679A0100025441 /* LoopDelayScheduleViewController.swift */,
+				F8B3A841227F090D004BA588 /* SettingsViewController.swift */,
+				F8A389E6232ECE7E0010F405 /* SettingsViewUtilities.swift */,
+				F830990423B94ED7005741DF /* TimeScheduleViewController.swift */,
 				F8B3A851227F2743004BA588 /* AlertsSettingsViewController */,
 				F8B3A84E227F26F8004BA588 /* AlertTypesSettingsViewController */,
 				F8A389CD232A6A6F0010F405 /* M5StackSettingsViewController */,
-				F8B3A841227F090D004BA588 /* SettingsViewController.swift */,
 				F8B3A837227F090D004BA588 /* SettingsViewModels */,
-				F8A389E6232ECE7E0010F405 /* SettingsViewUtilities.swift */,
-				F830990423B94ED7005741DF /* TimeScheduleViewController.swift */,
-				F866974B28679A0100025441 /* LoopDelayScheduleViewController.swift */,
 			);
 			path = SettingsViewController;
 			sourceTree = "<group>";
@@ -2547,23 +2547,23 @@
 		F8B3A837227F090D004BA588 /* SettingsViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */,
 				F8B3A838227F090D004BA588 /* SettingsViewAlertSettingsViewModel.swift */,
 				F8E3A2A423D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift */,
 				F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */,
 				F8B3A839227F090D004BA588 /* SettingsViewDexcomSettingsViewModel.swift */,
 				F8B3A83E227F090D004BA588 /* SettingsViewGeneralSettingsViewModel.swift */,
 				F8B3A83C227F090D004BA588 /* SettingsViewHealthKitSettingsViewModel.swift */,
+				47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */,
+				F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */,
+				D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */,
 				F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */,
 				F8A389EA233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift */,
 				F8B3A83B227F090D004BA588 /* SettingsViewNightScoutSettingsViewModel.swift */,
-				F8B3A83D227F090D004BA588 /* SettingsViewSpeakSettingsViewModel.swift */,
-				F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */,
-				4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */,
 				470F021226DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift */,
-				47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */,
+				F8B3A83D227F090D004BA588 /* SettingsViewSpeakSettingsViewModel.swift */,
+				4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */,
+				F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */,
 				47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */,
-				D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */,
 			);
 			path = SettingsViewModels;
 			sourceTree = "<group>";
@@ -2598,8 +2598,8 @@
 			isa = PBXGroup;
 			children = (
 				F8B3A85A2280CCD1004BA588 /* AlertSettingsViewController.swift */,
-				F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */,
 				F81F9FFF2289E4990028C70F /* AlertSettingsViewControllerData.swift */,
+				F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */,
 			);
 			path = AlertSettingsViewController;
 			sourceTree = "<group>";
@@ -2686,8 +2686,8 @@
 		F8DF766923ED9AF100063910 /* CGM */ = {
 			isa = PBXGroup;
 			children = (
-				F808D2C3240323750084B5DB /* Libre */,
 				F8DF766A23ED9AF100063910 /* Dexcom */,
+				F808D2C3240323750084B5DB /* Libre */,
 			);
 			path = CGM;
 			sourceTree = "<group>";
@@ -2729,7 +2729,6 @@
 		F8EA6C7D21B70DEA0082976B /* Constants */ = {
 			isa = PBXGroup;
 			children = (
-				F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */,
 				F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */,
 				F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */,
 				F8A1585222EDB602007F5B5D /* ConstantsBloodGlucose.swift */,
@@ -2756,10 +2755,11 @@
 				F8A1586222EDB86E007F5B5D /* ConstantsSounds.swift */,
 				F8B955B0258BEE9D00C06016 /* ConstantsSpeakReading.swift */,
 				F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */,
+				4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */,
 				F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */,
 				F8AF36142455C6F700B5977B /* ConstantsTrace.swift */,
+				F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */,
 				F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */,
-				4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -2768,16 +2768,16 @@
 		F8EA6C8021B723A80082976B /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */,
+				F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */,
+				F8C5EBE622F38F0E00563B5F /* Trace.swift */,
+				F8EA6CA821BBE3010082976B /* UniqueId.swift */,
 				F8FDFEA6260DE1A70047597D /* CustomColoredDisclosureIndicator */,
 				F8AF11F624B1E6D700AE5BA2 /* Errors */,
 				F85FF38F25288860004E6FF1 /* HouseKeeping */,
-				F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */,
 				F821CF69229FC22D005C1E43 /* Network */,
-				F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */,
 				F8F7B8E9259A7A9400C47B04 /* SavitzkyGolayFilter */,
 				F8B3A7DD226E48C1004BA588 /* SoundPlayer */,
-				F8C5EBE622F38F0E00563B5F /* Trace.swift */,
-				F8EA6CA821BBE3010082976B /* UniqueId.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -2821,10 +2821,10 @@
 				F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */,
 				F85FF3D0252F9FF9004E6FF1 /* SnoozeParameters+CoreDataClass.swift */,
 				F85FF3CC252F9FD7004E6FF1 /* SnoozeParameters+CoreDataProperties.swift */,
-				F830991A23C2909E005741DF /* Watlaa+CoreDataClass.swift */,
-				F830991B23C2909E005741DF /* Watlaa+CoreDataProperties.swift */,
 				D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */,
 				D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */,
+				F830991A23C2909E005741DF /* Watlaa+CoreDataClass.swift */,
+				F830991B23C2909E005741DF /* Watlaa+CoreDataProperties.swift */,
 			);
 			path = classes;
 			sourceTree = "<group>";
@@ -2834,10 +2834,10 @@
 			children = (
 				F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */,
 				F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */,
-				F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */,
-				F8025E5221EE8CE500ECF0C0 /* Protocol */,
-				F8A54AAC22D6859200934E7A /* SlopeParameters.swift */,
 				F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */,
+				F8EEDD6323020FAD00D2D610 /* NoCalibrator.swift */,
+				F8A54AAC22D6859200934E7A /* SlopeParameters.swift */,
+				F8025E5221EE8CE500ECF0C0 /* Protocol */,
 			);
 			path = Calibration;
 			sourceTree = "<group>";
@@ -2856,6 +2856,7 @@
 				F8CB59C7273EF9F800BA199E /* DexcomAlgorithmState.swift */,
 				F8F1671A272B3E4F001AA3D8 /* DexcomBackfillStream.swift */,
 				F8CB59C32739D1CD00BA199E /* DexcomBackfillTxMessage.swift */,
+				F828422F274ED56A0097E0C9 /* DexcomCalibrationParameters.swift */,
 				F8F16714272745A2001AA3D8 /* DexcomCalibrationResponseType.swift */,
 				F8F1671227274557001AA3D8 /* DexcomCalibrationRxMessage.swift */,
 				F8CB59C927405A6800BA199E /* DexcomCalibrationTxMessage.swift */,
@@ -2866,6 +2867,7 @@
 				F8CB59D2274D94AE00BA199E /* DexcomSessionStartTxMessage.swift */,
 				F8CB59CD27444D6300BA199E /* DexcomSessionStopResponse.swift */,
 				F8F1671627288B24001AA3D8 /* DexcomSessionStopRxMessage.swift */,
+				F82842312752CBE00097E0C9 /* DexcomSessionStopTxMessage.swift */,
 				F8F971C723A5915900C3F17D /* DexcomTransmitterOpCode.swift */,
 				F8F167092727317C001AA3D8 /* DexcomTransmitterTimeRxMessage.swift */,
 				F8CB59BF2734976D00BA199E /* DexcomTransmitterTimeTxMessage.swift */,
@@ -2878,12 +2880,10 @@
 				F8F971CB23A5915900C3F17D /* ResetMessage.swift */,
 				F8F971C823A5915900C3F17D /* SensorDataRxMessage.swift */,
 				F8F971C923A5915900C3F17D /* SensorDataTxMessage.swift */,
+				F8284236276BE78D0097E0C9 /* String+Dexcom.swift */,
 				F8F971C223A5915900C3F17D /* TransmitterMessage.swift */,
 				F8F971CE23A5915900C3F17D /* TransmitterVersionRxMessage.swift */,
 				F8F971C123A5915900C3F17D /* TransmitterVersionTxMessage.swift */,
-				F828422F274ED56A0097E0C9 /* DexcomCalibrationParameters.swift */,
-				F82842312752CBE00097E0C9 /* DexcomSessionStopTxMessage.swift */,
-				F8284236276BE78D0097E0C9 /* String+Dexcom.swift */,
 			);
 			path = Generic;
 			sourceTree = "<group>";
@@ -2899,10 +2899,10 @@
 		F8F971AD23A5914C00C3F17D /* BluetoothPeripheral */ = {
 			isa = PBXGroup;
 			children = (
-				F830992123C291EE005741DF /* watlaa */,
 				F8F971AE23A5914C00C3F17D /* CGM */,
-				F8F971AF23A5914C00C3F17D /* M5 */,
 				F8F971B323A5914C00C3F17D /* Generic */,
+				F8F971AF23A5914C00C3F17D /* M5 */,
+				F830992123C291EE005741DF /* watlaa */,
 			);
 			path = BluetoothPeripheral;
 			sourceTree = "<group>";
@@ -2910,8 +2910,8 @@
 		F8F971AE23A5914C00C3F17D /* CGM */ = {
 			isa = PBXGroup;
 			children = (
-				F808D2CF240329D40084B5DB /* Libre */,
 				F8DF765923E350B100063910 /* Dexcom */,
+				F808D2CF240329D40084B5DB /* Libre */,
 			);
 			path = CGM;
 			sourceTree = "<group>";
@@ -2944,9 +2944,9 @@
 		F8F971B323A5914C00C3F17D /* Generic */ = {
 			isa = PBXGroup;
 			children = (
-				F8F971B423A5914C00C3F17D /* BluetoothPeripheralType.swift */,
 				F8F971B523A5914C00C3F17D /* BluetoothPeripheral.swift */,
 				F8F9724623A69A8000C3F17D /* BluetoothPeripheralCategory.swift */,
+				F8F971B423A5914C00C3F17D /* BluetoothPeripheralType.swift */,
 			);
 			path = Generic;
 			sourceTree = "<group>";
@@ -2954,10 +2954,10 @@
 		F8F971B923A5915900C3F17D /* BluetoothTransmitter */ = {
 			isa = PBXGroup;
 			children = (
-				F830991E23C291E2005741DF /* watlaa */,
 				F8F971BA23A5915900C3F17D /* CGM */,
-				F8F971F523A5915900C3F17D /* M5Stack */,
 				F8F971FF23A5915900C3F17D /* Generic */,
+				F8F971F523A5915900C3F17D /* M5Stack */,
+				F830991E23C291E2005741DF /* watlaa */,
 			);
 			path = BluetoothTransmitter;
 			sourceTree = "<group>";
@@ -2966,8 +2966,8 @@
 			isa = PBXGroup;
 			children = (
 				F8F971BB23A5915900C3F17D /* Dexcom */,
-				F8F971D623A5915900C3F17D /* Libre */,
 				F8F971F023A5915900C3F17D /* Generic */,
+				F8F971D623A5915900C3F17D /* Libre */,
 			);
 			path = CGM;
 			sourceTree = "<group>";
@@ -2986,8 +2986,8 @@
 		F8F971BE23A5915900C3F17D /* G5 */ = {
 			isa = PBXGroup;
 			children = (
-				F897E24A23FC86CF0075E0E8 /* CGMG5TransmitterDelegate.swift */,
 				F8F971BF23A5915900C3F17D /* CGMG5Transmitter.swift */,
+				F897E24A23FC86CF0075E0E8 /* CGMG5TransmitterDelegate.swift */,
 			);
 			path = G5;
 			sourceTree = "<group>";
@@ -2995,8 +2995,8 @@
 		F8F971D423A5915900C3F17D /* G4 */ = {
 			isa = PBXGroup;
 			children = (
-				F8F971D523A5915900C3F17D /* CGMG4xDripTransmitter.swift */,
 				F816E1272439DE55009EE65B /* CGMDexomG4TransmitterDelegate.swift */,
+				F8F971D523A5915900C3F17D /* CGMG4xDripTransmitter.swift */,
 			);
 			path = G4;
 			sourceTree = "<group>";
@@ -3005,14 +3005,14 @@
 			isa = PBXGroup;
 			children = (
 				F8A2BC1225DB0B4F001D1E78 /* Atom */,
-				F80D916924F828D5006840B5 /* Libre2 */,
-				F8F971D723A5915900C3F17D /* Droplet */,
+				F8F971EC23A5915900C3F17D /* Blucon */,
 				F8F971D923A5915900C3F17D /* BlueReader */,
-				F8F971DB23A5915900C3F17D /* GNSEntry */,
 				F8F971DD23A5915900C3F17D /* Bubble */,
+				F8F971D723A5915900C3F17D /* Droplet */,
+				F8F971DB23A5915900C3F17D /* GNSEntry */,
+				F80D916924F828D5006840B5 /* Libre2 */,
 				F8F971DF23A5915900C3F17D /* MiaoMiao */,
 				F8F971E123A5915900C3F17D /* Utilities */,
-				F8F971EC23A5915900C3F17D /* Blucon */,
 			);
 			path = Libre;
 			sourceTree = "<group>";
@@ -3020,8 +3020,8 @@
 		F8F971D723A5915900C3F17D /* Droplet */ = {
 			isa = PBXGroup;
 			children = (
-				F8F971D823A5915900C3F17D /* CGMDroplet1Transmitter.swift */,
 				F816E117243921FB009EE65B /* CGMBDropletTransmitterDelegate.swift */,
+				F8F971D823A5915900C3F17D /* CGMDroplet1Transmitter.swift */,
 			);
 			path = Droplet;
 			sourceTree = "<group>";
@@ -3038,8 +3038,8 @@
 		F8F971DB23A5915900C3F17D /* GNSEntry */ = {
 			isa = PBXGroup;
 			children = (
-				F816E0FF2436734C009EE65B /* CGMGNSEntryTransmitterDelegate.swift */,
 				F8F971DC23A5915900C3F17D /* CGMGNSEntryTransmitter.swift */,
+				F816E0FF2436734C009EE65B /* CGMGNSEntryTransmitterDelegate.swift */,
 			);
 			path = GNSEntry;
 			sourceTree = "<group>";
@@ -3056,8 +3056,8 @@
 		F8F971DF23A5915900C3F17D /* MiaoMiao */ = {
 			isa = PBXGroup;
 			children = (
-				F8C97855242AA86B00A09483 /* CGMMiaoMiaoTransmitterDelegate.swift */,
 				F8F971E023A5915900C3F17D /* CGMMiaoMiaoTransmitter.swift */,
+				F8C97855242AA86B00A09483 /* CGMMiaoMiaoTransmitterDelegate.swift */,
 				F8E51D62244B3386001C9E5A /* MiaoMiaoResponseType.swift */,
 			);
 			path = MiaoMiao;
@@ -3089,10 +3089,10 @@
 		F8F971EC23A5915900C3F17D /* Blucon */ = {
 			isa = PBXGroup;
 			children = (
-				F816E0E32432A4FA009EE65B /* CGMBluconTransmitterDelegate.swift */,
 				F8F971ED23A5915900C3F17D /* BluconTransmitterOpCode.swift */,
-				F8F971EE23A5915900C3F17D /* CGMBluconTransmitter.swift */,
 				F8F971EF23A5915900C3F17D /* BluconUtilities.swift */,
+				F8F971EE23A5915900C3F17D /* CGMBluconTransmitter.swift */,
+				F816E0E32432A4FA009EE65B /* CGMBluconTransmitterDelegate.swift */,
 			);
 			path = Blucon;
 			sourceTree = "<group>";
@@ -3100,12 +3100,12 @@
 		F8F971F023A5915900C3F17D /* Generic */ = {
 			isa = PBXGroup;
 			children = (
+				F8C9784C2428052D00A09483 /* CGMSensorType.swift */,
 				F8F971F123A5915900C3F17D /* CGMTransmitter.swift */,
-				F8F971F223A5915900C3F17D /* TransmitterBatteryInfo.swift */,
 				F8F971F323A5915900C3F17D /* CGMTransmitterDelegate.swift */,
 				F8F971F423A5915900C3F17D /* GlucoseData.swift */,
-				F8C9784C2428052D00A09483 /* CGMSensorType.swift */,
 				F8797CE9255B43960033956B /* GlucoseData+Smoothable.swift */,
+				F8F971F223A5915900C3F17D /* TransmitterBatteryInfo.swift */,
 			);
 			path = Generic;
 			sourceTree = "<group>";
@@ -3143,8 +3143,8 @@
 		F8F971FF23A5915900C3F17D /* Generic */ = {
 			isa = PBXGroup;
 			children = (
-				F8F9720023A5915900C3F17D /* BluetoothTransmitterDelegate.swift */,
 				F8F9720123A5915900C3F17D /* BluetoothTransmitter.swift */,
+				F8F9720023A5915900C3F17D /* BluetoothTransmitterDelegate.swift */,
 			);
 			path = Generic;
 			sourceTree = "<group>";
@@ -3153,9 +3153,9 @@
 			isa = PBXGroup;
 			children = (
 				F8DF766923ED9AF100063910 /* CGM */,
-				F830992423C32226005741DF /* watlaa */,
-				F8F9723A23A5934300C3F17D /* M5StickC */,
 				F8F9723723A5928D00C3F17D /* M5Stack */,
+				F8F9723A23A5934300C3F17D /* M5StickC */,
+				F830992423C32226005741DF /* watlaa */,
 			);
 			path = Models;
 			sourceTree = "<group>";
