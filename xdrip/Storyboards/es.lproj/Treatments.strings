@@ -5,9 +5,9 @@
 "treatments_title" = "Tratamientos";
 "treatments_new_button" = "Nuevo";
 "treatments_new_entry" = "Nuevo Tratamiento";
-"treatments_carbs_with_unit" = "Carbs (g):";
-"treatments_insulin_with_unit" = "Insulina (U):";
-"treatments_exercise_with_unit" = "Ejercicio (min):";
+"treatments_carbs_with_unit" = "Carbs (g)";
+"treatments_insulin_with_unit" = "Insulina (U)";
+"treatments_exercise_with_unit" = "Ejercicio (min)";
 "treatments_carbs_unit" = "g";
 "treatments_insulin_unit" = "U";
 "treatments_exercise_unit" = "min";
@@ -18,4 +18,4 @@
 "treatments_question_mark" = "?";
 "treatments_success" = "Success";
 "treatments_sync_complete" = "Synchronization complete.";
-"treatments_filterTreatmentsLabel" = "Filtrar:";
+"treatments_filterTreatmentsLabel" = "Filtrar";

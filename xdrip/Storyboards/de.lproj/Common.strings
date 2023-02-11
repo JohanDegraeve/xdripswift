@@ -48,7 +48,7 @@
 "update" = "Bearbeiten";
 
 /// literally password
-"common_password" = "Passwort:";
+"common_password" = "Passwort";
 
 /// literal translation needed
 "common_hours" = "Stunden";
@@ -78,10 +78,10 @@
 "white" = "weiß";
 
 /// name
-"name" = "Name:";
+"name" = "Name";
 
 /// mmol/l
-"common_mmol" = "mmol/l";
+"common_mmol" = "mmol/L";
 
 /// 
 "off" = "Aus";
@@ -96,7 +96,7 @@
 "warning" = "Warnung!";
 
 /// mg/dl
-"common_mgdl" = "mg/dl";
+"common_mgdl" = "mg/dL";
 
 /// literal translation needed
 "common_week" = "Woche";

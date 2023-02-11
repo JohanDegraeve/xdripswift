@@ -1,6 +1,6 @@
  "common_Ok" = "确认"; "common_cancel" = "取消";
 "common_mgdl" = "mg/dL";
-"common_mmol" = "mmol/l";
+"common_mmol" = "mmol/L";
 "common_bloodglucoseunit" = "血糖值单位";
 "common_bloodglucoseunit_short" = "血糖单位";
 "common_password" = "密码";
@@ -51,7 +51,7 @@
 "green" = "green";
 
 /// name
-"name" = "Name:";
+"name" = "Name";
 
 /// literally yes, without capital
 "yes" = "Yes";

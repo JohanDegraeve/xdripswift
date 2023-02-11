@@ -1,5 +1,5 @@
 "screenTitle" = "Bluetooth";
 "selectCategory" = "Selecteer Apparaat Type";
 "selectType" = "Selecteer Transmitter Type";
-"batteryLevel" = "Batterij Niveau:";
-"noMultipleActiveCGMsAllowed" = "Je kunt niet meer dan een CGM Transmitter verbinden danwel laten scannen.\nVerifieer je andere CGM Transmitters en klik 'Stop Scannen', 'Loskoppelen' of verwijder deze";
+"batteryLevel" = "Batterij Niveau";
+"noMultipleActiveCGMsAllowed" = "Je kunt niet meer dan één CGM Transmitter verbinden.\nVerifieer je andere CGM Transmitters en klik 'Stop Scannen', 'Loskoppelen' of verwijder deze";

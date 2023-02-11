@@ -1,17 +1,17 @@
 "settingsviews_settingstitle" = "الإعدادات";
 "settingsviews_sectiontitlegeneral" = "عام";
-"settingsviews_selectbgunit" = "وحدة قياس السكر:";
+"settingsviews_selectbgunit" = "وحدة قياس السكر";
 "settingsviews_masterorfollower" = "الاستخدام كتطبيق رئيسي أو للمتابعة؟";
 "settingsviews_master" = "رئيسي";
 "settingsviews_follower" = "متابعة";
 "settingsviews_showReadingInNotification" = "عرض قراءات السكر في الإشعارات؟";
 "settingsviews_labelShowReadingInAppBadge" = "عرض قراءة السكر على أيقونة التطبيق؟";
 "settingsviews_multipleAppBadgeValueWith10" = "مضاعفة قراءة أيقونة التطبيق في 10؟";
-"settingsviews_urgentHighValue" = "قيمة الحد الأعلى الخطر:";
-"settingsviews_highValue" = "القيمة العليا:";
-"settingsviews_targetValue" = "قيمة الهدف:";
-"settingsviews_lowValue" = "القيمة الدنيا:";
-"settingsviews_urgentLowValue" = "قيمة الحد الأدنى الخطر:";
+"settingsviews_urgentHighValue" = "قيمة الحد الأعلى الخطر";
+"settingsviews_highValue" = "القيمة العليا";
+"settingsviews_targetValue" = "قيمة الهدف";
+"settingsviews_lowValue" = "القيمة الدنيا";
+"settingsviews_urgentLowValue" = "قيمة الحد الأدنى الخطر";
 "settingsviews_useobjectives" = "إظهار الأهداف في الرسم البياني?";
 "settingsviews_showcoloredobjectives" = "عرض خطوط ملونة?";
 "settingsviews_showtarget" = "عرض خط الهدف?";
@@ -22,8 +22,8 @@
 "settingsviews_useStandardStatisticsRange" = "استخدم النطاق القياسي?";
 "settingsviews_useIFCCA1C" = "اعرض وحدة التراكمي  mmols/mol?";
 "settingsviews_sectiontitletransmitter" = "جهاز الإرسال";
-"settingsviews_transmittertype" = "نوع جهاز الإرسال:";
-"settingsviews_transmitterid" = "رقم هوية جهاز الإرسال:";
+"settingsviews_transmittertype" = "نوع جهاز الإرسال";
+"settingsviews_transmitterid" = "رقم هوية جهاز الإرسال";
 "settingsviews_transmitterid_text_for_button" = "رقم هوية جهاز الإرسال";
 "settingsviews_givetransmitterid" = "أدخل رقم هوية جهاز الإرسال";
 "settingsviews_resettransmitter" = "إعادة تعيين جهاز الإرسال";
@@ -36,19 +36,19 @@
 "settingsviews_healthkit" = "كتابة البيانات إلى تطبيق صحتي؟";
 "settingsviews_sectiontitledexcomshare" = "ديكسكوم شير";
 "settingsviews_uploadReadingstoDexcomShare" = "التحميل إلى ديكسكوم شير؟";
-"settingsviews_dexcomShareSerialNumber" = "الرمز التسلسلي لجهاز الإستقبال:";
+"settingsviews_dexcomShareSerialNumber" = "الرمز التسلسلي لجهاز الإستقبال";
 "settingsviews_useUSDexcomShareurl" = "استخدم سيرفرات ديكسكوم الأمريكية؟";
-"settingsviews_dexcomShareAccountName" = "اسم الحساب:";
+"settingsviews_dexcomShareAccountName" = "اسم الحساب";
 "settingsviews_giveDexcomShareAccountName" = "أدخل اسم الحساب لديكسكوم شير";
 "settingsviews_giveDexcomSharePassword" = "أعط ديكسكوم شير كلمة مرور";
 "settingsviews_giveDexcomShareSerialNumber" = "أدخل الرقم التسلسلي لجهاز استقبال ديكسكوم";
 "settingsviews_sectiontitlenightscout" = "نايتسكاوت";
 "settingsviews_nightScoutEnabled" = "تفعيل نايتسكاوت؟";
-"settingsviews_nightScoutUrl" = "الرابط:";
+"settingsviews_nightScoutUrl" = "الرابط";
 "settingsviews_useSchedule" = "استخدام جدولة التحميل؟";
-"schedule" = "الجدولة:";
+"schedule" = "الجدولة";
 "settingsviews_giveNightScoutUrl" = "أدخل رابط منصة نايتسكاوت الخاص بك";
-"settingsviews_nightScoutAPIKey" = "API_SECRET:";
+"settingsviews_nightScoutAPIKey" = "API_SECRET";
 "settingsviews_giveNightScoutAPIKey" = "أدخل الـ API_SECRET الخاص بك";
 "editScheduleTimePickerSubtitle" = "تغيير: ";
 "timeScheduleViewTitle" = "جدولة وقت تفعيل/إغلاق لـ";
@@ -56,16 +56,16 @@
 "testUrlAndAPIKey" = "اختبر الاتصال؟";
 "settingsviews_sectiontitlespeak" = "النطق";
 "settingsviews_speakBgReadings" = "نطق قراءات السكر؟";
-"settingsviews_speakBgReadingslanguage" = "اللغة:";
+"settingsviews_speakBgReadingslanguage" = "اللغة";
 "settingsviews_speakreadingslanguageselection" = "اختر اللغة";
 "settingsviews_speakTrend" = "نطق الاتجاه؟";
 "settingsviews_speakDelta" = "نطق الفرق؟";
-"settingsviews_IntervalTitle" = "الفاصل الزمني:";
+"settingsviews_IntervalTitle" = "الفاصل الزمني";
 "settingsviews_IntervalMessage" = "الفاصل الزمني الأدنى بين قراءتين بالدقائق";
 "settingsviews_sectiontitleAbout" = "عن %@";
-"settingsviews_Version" = "الإصدار:";
+"settingsviews_Version" = "الإصدار";
 "settingsviews_license" = "رخصة";
-"settingsviews_build" = "رقم الإصدار:";
+"settingsviews_build" = "رقم الإصدار";
 "m5stack_settingsviews_settingstitle" = "إعدادات M5 Stack";
 "m5stack_settingsviews_textColor" = "لون الخط";
 "m5stack_settingsviews_backGroundColor" = "لون الخلفية";
@@ -92,7 +92,7 @@
 "volumeTestiOSSound" = "اختبر مستوى الصوت (مستوى الصوت الحالي للآيفون)";
 "debugLevel" = "تضمين مستوى التصحيح";
 "warningChangeFromMasterToFollower" = "سيؤدي التبديل من رئيسي إلى متابعة، إلى إيقاف الحساس الحالي. هل تريد الاستمرار ?";
-"nightScoutPort" = "المنفذ (اختياري):";
+"nightScoutPort" = "المنفذ (اختياري)";
 "developerSettings" = "إعدادات المطور";
 "smoothLibreValues" = "تناسق قيم اليبري ?";
 "nslog" = "NSتقرير";
@@ -117,7 +117,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold:";
+"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 
 /// treatments settings, section title
 "settingsviews_sectiontitletreatments" = "Treatments";
@@ -145,4 +145,4 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
 /// Housekeeper retention period, for how long to store data
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days):";
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";

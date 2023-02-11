@@ -19,7 +19,7 @@
 "treatments_sync_complete" = "Synchronization complete.";
 
 /// 
-"treatments_carbs_with_unit" = "Carbs (g):";
+"treatments_carbs_with_unit" = "Carbs (g)";
 
 /// Insulin unit.
 "treatments_insulin_unit" = "U";
@@ -34,10 +34,10 @@
 "treatments_carbs" = "Carbs";
 
 /// 
-"treatments_exercise_with_unit" = "Exercise (min):";
+"treatments_exercise_with_unit" = "Exercise (min)";
 
 /// 
-"treatments_insulin_with_unit" = "Insulin (U):";
+"treatments_insulin_with_unit" = "Insulin (U)";
 
 /// Exercise.
 "treatments_exercise" = "Exercise";

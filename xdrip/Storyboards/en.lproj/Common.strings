@@ -1,10 +1,10 @@
 "common_Ok" = "OK";
 "common_cancel" = "Cancel";
-"common_mgdl" = "mg/dl";
-"common_mmol" = "mmol/l";
+"common_mgdl" = "mg/dL";
+"common_mmol" = "mmol/L";
 "common_bloodglucoseunit" = "Blood Glucose Unit";
 "common_bloodglucoseunit_short" = "BG Unit";
-"common_password" = "Password:";
+"common_password" = "Password";
 "common_default" = "Default";
 "common_high" = "HIGH";
 "common_low" = "LOW";
@@ -28,7 +28,7 @@
 "green" = "green";
 "white" = "white";
 "yellow" = "yellow";
-"name" = "Name:";
+"name" = "Name";
 "WiFi" = "WiFi";
 "on" = "On";
 "off" = "Off";

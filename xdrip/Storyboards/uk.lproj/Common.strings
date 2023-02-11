@@ -7,7 +7,7 @@
 "common_minute" = "min";
 
 /// literally password
-"common_password" = "Password:";
+"common_password" = "Password";
 
 /// the words in range
 "common_statistics_inRange" = "In Range";
@@ -46,7 +46,7 @@
 "common_dayshort" = "d";
 
 /// mmol/l
-"common_mmol" = "mmol/l";
+"common_mmol" = "mmol/L";
 
 /// literally add
 "add" = "Add";
@@ -55,7 +55,7 @@
 "yes" = "Yes";
 
 /// mg/dl
-"common_mgdl" = "mg/dl";
+"common_mgdl" = "mg/dL";
 
 /// white
 "white" = "white";
@@ -142,7 +142,7 @@
 "common_default" = "Default";
 
 /// name
-"name" = "Name:";
+"name" = "Name";
 
 /// whenever invalid value is given by user somewhere in a field
 "invalidValue" = "Invalid Value";

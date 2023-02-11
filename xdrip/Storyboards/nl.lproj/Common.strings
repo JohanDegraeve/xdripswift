@@ -1,10 +1,10 @@
 "common_Ok" = "OK";
 "common_cancel" = "Annuleren";
-"common_mgdl" = "mg/dl";
-"common_mmol" = "mmol/l";
-"common_bloodglucoseunit" = "Bloedglucose Eenheid:";
+"common_mgdl" = "mg/dL";
+"common_mmol" = "mmol/L";
+"common_bloodglucoseunit" = "Bloedglucose Eenheid";
 "common_bloodglucoseunit_short" = "BG Eenheid";
-"common_password" = "Wachtwoord:";
+"common_password" = "Wachtwoord";
 "common_default" = "Standaard";
 "common_high" = "HOOG";
 "common_low" = "LAAG";
@@ -28,7 +28,7 @@
 "green" = "groen";
 "white" = "wit";
 "yellow" = "geel";
-"name" = "Naam:";
+"name" = "Naam";
 "WiFi" = "WiFi";
 "on" = "An";
 "off" = "Uit";

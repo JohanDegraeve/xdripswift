@@ -232,8 +232,25 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 var startDateString = ""
                 
                 if let startDate = dexcomG5.sensorStartDate {
-                    startDateString = dexcomG5.sensorStartDate?.toStringInUserLocale(timeStyle: .none, dateStyle: .short) ?? ""
-                    startDateString += " (" + startDate.daysAndHoursAgo() + ")"
+                    
+                    let sensorTimeInMinutes = -Int(startDate.timeIntervalSinceNow / 60)
+
+                    if sensorTimeInMinutes < Int(ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6) {
+                        
+                        // the Dexcom is still in the transmitter forced warm-up time so let's make it clear to the user
+                        let sensorReadyDateTime = startDate.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 * 60)
+                        
+                        startDateString = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                        
+                    } else {
+                        
+                        // Dexcom is not warming up so let's show the sensor start date and age
+                        startDateString = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
+                        
+                        startDateString += " (" + startDate.daysAndHoursAgo() + ")"
+                        
+                    }
+                    
                 }
                 
                 cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorStartDate

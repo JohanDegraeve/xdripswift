@@ -22,7 +22,7 @@
 "red" = "red";
 
 /// mmol/l
-"common_mmol" = "mmol/l";
+"common_mmol" = "mmol/L";
 
 /// the word LOW, in capitals
 "common_low" = "LOW";
@@ -67,7 +67,7 @@
 "delete" = "Delete";
 
 /// literally password
-"common_password" = "Password:";
+"common_password" = "Password";
 
 /// literally no, without capital
 "no" = "No";
@@ -76,7 +76,7 @@
 "green" = "green";
 
 /// name
-"name" = "Name:";
+"name" = "Name";
 
 /// literal translation needed
 "common_minutes" = "mins";
@@ -97,7 +97,7 @@
 "WiFi" = "WiFi";
 
 /// mg/dl
-"common_mgdl" = "mg/dl";
+"common_mgdl" = "mg/dL";
 
 /// whenever invalid value is given by user somewhere in a field
 "invalidValue" = "Invalid Value";

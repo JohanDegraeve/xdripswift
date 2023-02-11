@@ -17,7 +17,7 @@
 "alerttype" = "Alarm Type";
 
 /// an alentry is applicable as of a certain timestamp in the day, this is the text in the field in the settings screen that allows to modify this timestamp
-"alertstart" = "Apply from:";
+"alertstart" = "Apply from";
 
 /// When fast drop alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert
 "alerts_fastrise" = "Fast Rise Alarm";

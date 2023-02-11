@@ -1,10 +1,10 @@
 "common_Ok" = "OK";
 "common_cancel" = "Отмена";
-"common_mgdl" = "mg/dl";
-"common_mmol" = "mmol/l";
+"common_mgdl" = "mg/dL";
+"common_mmol" = "mmol/L";
 "common_bloodglucoseunit" = "Единица глюкозы";
 "common_bloodglucoseunit_short" = "Ед. ГК";
-"common_password" = "Пароль:";
+"common_password" = "Пароль";
 "common_default" = "По умолчанию";
 "common_high" = "ВЫСОКИЙ";
 "common_low" = "НИЗКИЙ";
@@ -28,7 +28,7 @@
 "green" = "зеленый";
 "white" = "белый";
 "yellow" = "желтый";
-"name" = "Имя:";
+"name" = "Имя";
 "WiFi" = "WiFi";
 "on" = "Вкл";
 "off" = "Выкл";
@@ -37,7 +37,7 @@
 "firmware" = "Прошивка";
 "hardware" = "Аппаратное обеспечение";
 "unknown" = "Неизвестно";
-"sensorStatus" = "Статус сенсора:";
+"sensorStatus" = "Статус сенсора";
 "invalidAccountOrPassword" = "Неверный аккаунт или пароль";
 "common_statistics_low" = "Низ";
 "common_statistics_inRange" = "В диапозоне";

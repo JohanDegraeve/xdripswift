@@ -1,11 +1,11 @@
 "settingsviews_settingstitle" = "Asetukset";
 "settingsviews_sectiontitlegeneral" = "Yleinen";
 "settingsviews_sectiontitlehomescreen" = "Kotinäyttö";
-"settingsviews_selectbgunit" = "Verensokeriyksikkö:";
-"settingsviews_urgentLowValue" = "Erittäin matala lukema:";
-"settingsviews_lowValue" = "Matala lukema:";
-"settingsviews_highValue" = "Korkea lukema:";
-"settingsviews_urgentHighValue" = "Erittäin korkea lukema:";
+"settingsviews_selectbgunit" = "Verensokeriyksikkö";
+"settingsviews_urgentLowValue" = "Erittäin matala lukema";
+"settingsviews_lowValue" = "Matala lukema";
+"settingsviews_highValue" = "Korkea lukema";
+"settingsviews_urgentHighValue" = "Erittäin korkea lukema";
 "settingsviews_masterorfollower" = "Isäntä vai seuraaja?";
 "settingsviews_master" = "Isäntä";
 "settingsviews_follower" = "Seuraaja";
@@ -13,8 +13,8 @@
 "settingsviews_labelShowReadingInAppBadge" = "Näytä lukema kuvakkeessa?";
 "settingsviews_multipleAppBadgeValueWith10" = "Kerrotaanko kuvake lukemat 10:llä?";
 "settingsviews_sectiontitletransmitter" = "Lähetin";
-"settingsviews_transmittertype" = "Lähettimen tyyppi:";
-"settingsviews_transmitterid" = "Lähettimen ID:";
+"settingsviews_transmittertype" = "Lähettimen tyyppi";
+"settingsviews_transmitterid" = "Lähettimen ID";
 "settingsviews_transmitterid_text_for_button" = "Lähettimen ID";
 "settingsviews_givetransmitterid" = "Anna lähetettimen ID";
 "settingsviews_resettransmitter" = "Nollaa lähetin";
@@ -27,19 +27,19 @@
 "settingsviews_healthkit" = "Kirjoita data Apple Healthiin?";
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
 "settingsviews_uploadReadingstoDexcomShare" = "Lähetä Dexcom Share palveluun?";
-"settingsviews_dexcomShareSerialNumber" = "Vastaanottimen sarjanumero:";
+"settingsviews_dexcomShareSerialNumber" = "Vastaanottimen sarjanumero";
 "settingsviews_useUSDexcomShareurl" = "Käytä Dexcom US palvelimia?";
-"settingsviews_dexcomShareAccountName" = "Käyttäjätunnus:";
+"settingsviews_dexcomShareAccountName" = "Käyttäjätunnus";
 "settingsviews_giveDexcomShareAccountName" = "Anna Dexcom Sharen käyttäjätunnus";
 "settingsviews_giveDexcomSharePassword" = "Anna Dexcom Sharen salasana";
 "settingsviews_giveDexcomShareSerialNumber" = "Anna Dexcom vastaanottimen sarjanumero";
 "settingsviews_sectiontitlenightscout" = "NightScout";
 "settingsviews_nightScoutEnabled" = "Ota Nightscout käyttöön?";
-"settingsviews_nightScoutUrl" = "URL:";
+"settingsviews_nightScoutUrl" = "URL";
 "settingsviews_useSchedule" = "Käytä lähetysaikataulua?";
-"schedule" = "Aikataulu:";
+"schedule" = "Aikataulu";
 "settingsviews_giveNightScoutUrl" = "Anna NightScout palvelimesi URL";
-"settingsviews_nightScoutAPIKey" = "API_SECRET:";
+"settingsviews_nightScoutAPIKey" = "API_SECRET";
 "settingsviews_giveNightScoutAPIKey" = "Anna API_SECRET";
 "editScheduleTimePickerSubtitle" = "Muuta: ";
 "timeScheduleViewTitle" = "Päällä/pois aikataulu ";
@@ -47,16 +47,16 @@
 "testUrlAndAPIKey" = "Testaa Nightscout URL ja API_SECRET?";
 "settingsviews_sectiontitlespeak" = "Ääni";
 "settingsviews_speakBgReadings" = "Puhu vs. lukemat?";
-"settingsviews_speakBgReadingslanguage" = "Kieli:";
+"settingsviews_speakBgReadingslanguage" = "Kieli";
 "settingsviews_speakreadingslanguageselection" = "Valitse kieli";
 "settingsviews_speakTrend" = "Puhu suunta?";
 "settingsviews_speakDelta" = "Puhu erotus?";
-"settingsviews_IntervalTitle" = "Intervalli:";
+"settingsviews_IntervalTitle" = "Intervalli";
 "settingsviews_IntervalMessage" = "Kahden lukeman välinen vähimmäisväli minuutteina";
 "settingsviews_sectiontitleAbout" = "%@ info";
-"settingsviews_Version" = "Versio:";
+"settingsviews_Version" = "Versio";
 "settingsviews_license" = "Lisenssi";
-"settingsviews_build" = "Build:";
+"settingsviews_build" = "Build";
 "m5stack_settingsviews_settingstitle" = "M5 Stack asetukset";
 "m5stack_settingsviews_textColor" = "Tekstiväri";
 "m5stack_settingsviews_backGroundColor" = "Taustaväri";
@@ -83,7 +83,7 @@
 "volumeTestiOSSound" = "Testaa ääni (nykyinen iPhone voimakkuus)";
 "debugLevel" = "Sisällytä debug taso";
 "warningChangeFromMasterToFollower" = "Vaihtaminen masterista seuraajaan pysäyttää nykyisen anturin. Haluatko jatkaa?";
-"nightScoutPort" = "Portti:";
+"nightScoutPort" = "Portti";
 "settingsviews_useobjectives" = "Käytä tavoitteita kaaviossa";
 "settingsviews_showcoloredobjectives" = "Näytä värilliset tavoiteviivat ";
 "settingsviews_showtarget" = "Näytä kohdeviiva";
@@ -187,7 +187,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold:";
+"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 
 /// treatments settings, section title
 "settingsviews_sectiontitletreatments" = "Treatments";
@@ -215,4 +215,4 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
 /// Housekeeper retention period, for how long to store data
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days):";
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";

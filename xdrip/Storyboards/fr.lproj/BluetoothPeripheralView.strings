@@ -27,7 +27,7 @@
 "bootLoader" = "Bootloader";
 "cannotActiveCGMInFollowerMode" = "Vous ne pouvez pas activer le capteur en mode Suiveur";
 "cgmDeActivateBecauseMovingToFollowerMode" = "Le capteur a été désactivé en raison d'un passage en mode Suiveur";
-"sensorType" = "Type de capteur:";
+"sensorType" = "Type de capteur";
 "confirmDisconnectTitle" = "Confirmer la déconnexion";
 "confirmDisconnectMessage" = "Sélectionner 'Déconnecter' pour confirmer que vous voulez vraiment déconnecter le transmetteur.";
 

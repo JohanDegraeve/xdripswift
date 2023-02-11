@@ -9,7 +9,7 @@
 "alerts_missedreadingalerttitle" = "Пропущенные чтения";
 "alerts_dicationneeded" = "Требуется калибровка";
 "alerts_batterylow" = "Батарея передатчика разряжена";
-"alertstart" = "Применить от:";
+"alertstart" = "Применить от";
 "alertvalue" = "Значение";
 "alerttype" = "Тип тревоги";
 "changealertvalue" = "Изменить значение сигнала тревоги";

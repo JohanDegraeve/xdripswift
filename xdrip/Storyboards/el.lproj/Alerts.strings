@@ -9,7 +9,7 @@
 "alerts_missedreadingalerttitle" = "Ελλιπείς μετρήσεις";
 "alerts_calibrationneeded" = "Χρειάζεται βαθμονόμηση";
 "alerts_batterylow" = "Μπαταρία αισθητήρα χαμηλή";
-"alertstart" = "Έναρξη από:";
+"alertstart" = "Έναρξη από";
 "alertvalue" = "Τιμή";
 "alerttype" = "Τύπος ειδοποίησης";
 "changealertvalue" = "Αλλαγή τιμής";

@@ -4,7 +4,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// title of the cell where transmitter battery level is shown in detailed screen
-"batteryLevel" = "Battery Level:";
+"batteryLevel" = "Battery Level";
 
 /// when Bluetooth Peripheral list is shown, title of the view
 "screenTitle" = "Bluetooth";

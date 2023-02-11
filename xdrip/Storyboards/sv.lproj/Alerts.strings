@@ -9,7 +9,7 @@
 "alerts_missedreadingalerttitle" = "Saknad avläsning";
 "alerts_calibrationneeded" = "Kalibrering behövs";
 "alerts_batterylow" = "Låg batterinivå i sändare";
-"alertstart" = "Använd from:";
+"alertstart" = "Använd from";
 "alertvalue" = "Värde";
 "alerttype" = "Larmtyp";
 "changealertvalue" = "ändra larmvärde";

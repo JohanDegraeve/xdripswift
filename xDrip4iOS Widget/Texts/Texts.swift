@@ -21,11 +21,11 @@ class Texts {
     }()
         
     static let mgdl: String = {
-        return NSLocalizedString("common_mgdl", tableName: filename, bundle: Bundle.main, value: "mg/dl", comment: "mg/dl")
+        return NSLocalizedString("common_mgdl", tableName: filename, bundle: Bundle.main, value: "mg/dL", comment: "mg/dL")
     }()
 
     static let mmol: String = {
-        return NSLocalizedString("common_mmol", tableName: filename, bundle: Bundle.main, value: "mmol/l", comment: "mmol/l")
+        return NSLocalizedString("common_mmol", tableName: filename, bundle: Bundle.main, value: "mmol/L", comment: "mmol/L")
     }()
 
     static let ago:String = {

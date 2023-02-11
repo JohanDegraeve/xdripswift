@@ -16,10 +16,10 @@
 "common_minutes" = "mins";
 
 /// mmol/l
-"common_mmol" = "mmol/l";
+"common_mmol" = "mmol/L";
 
 /// mg/dl
-"common_mgdl" = "mg/dl";
+"common_mgdl" = "mg/dL";
 
 /// where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'
 "ago" = "ago";

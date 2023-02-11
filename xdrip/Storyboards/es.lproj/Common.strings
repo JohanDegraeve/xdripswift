@@ -1,10 +1,10 @@
 "common_Ok" = "OK";
 "common_cancel" = "Cancelar";
-"common_mgdl" = "mg/dl";
-"common_mmol" = "mmol/l";
-"common_bloodglucoseunit" = "Unidades de Glucemia:";
+"common_mgdl" = "mg/dL";
+"common_mmol" = "mmol/L";
+"common_bloodglucoseunit" = "Unidades de Glucemia";
 "common_bloodglucoseunit_short" = "Unidad";
-"common_password" = "Contraseña:";
+"common_password" = "Contraseña";
 "common_default" = "Por Defecto";
 "common_high" = "ALTA";
 "common_low" = "BAJA";
@@ -24,7 +24,7 @@
 "add" = "Añadir";
 "yes" = "Sí";
 "no" = "No";
-"name" = "Nombre:";
+"name" = "Nombre";
 "delete" = "Borrar";
 "unknown" = "Desconocido";
 "red" = "rojo";
@@ -34,7 +34,7 @@
 "invalidValue" = "Valor Erroneo Value";
 "firmware" = "Firmware";
 "white" = "blanco";
-"sensorStatus" = "Estado Sensor:";
+"sensorStatus" = "Estado Sensor";
 "on" = "On";
 "yellow" = "amarillo";
 "off" = "Off";

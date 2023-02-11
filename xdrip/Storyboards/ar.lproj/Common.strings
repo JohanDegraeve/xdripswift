@@ -1,10 +1,10 @@
 "common_Ok" = "تم";
 "common_cancel" = "إلغاء";
-"common_mgdl" = "mg/dl";
-"common_mmol" = "mmol/l";
+"common_mgdl" = "mg/dL";
+"common_mmol" = "mmol/L";
 "common_bloodglucoseunit" = "وحدة قياس سكر الدم";
 "common_bloodglucoseunit_short" = "الوحدة";
-"common_password" = "الرقم السري:";
+"common_password" = "الرقم السري";
 "common_default" = "الافتراضي";
 "common_high" = "مرتفع";
 "common_low" = "منخفض";
@@ -28,7 +28,7 @@
 "green" = "أخضر";
 "white" = "أبيض";
 "yellow" = "أصفر";
-"name" = "الاسم:";
+"name" = "الاسم";
 "WiFi" = "WiFi";
 "on" = "تفعيل";
 "off" = "إغلاق";
@@ -37,7 +37,7 @@
 "firmware" = "البرنامج الثابت";
 "hardware" = "الجهاز";
 "unknown" = "غير معروف";
-"sensorStatus" = "حالة الحساس:";
+"sensorStatus" = "حالة الحساس";
 "invalidAccountOrPassword" = "حساب أو رقم سري غير صحيح";
 "common_statistics_low" = "منخفض";
 "common_statistics_inRange" = "في الهدف";

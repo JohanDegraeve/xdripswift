@@ -1,5 +1,5 @@
 "screenTitle" = "Bluetooth";
 "selectCategory" = "Välj typ av enhet";
 "selectType" = "Välj sändartyp";
-"batteryLevel" = "Batterinivå:";
+"batteryLevel" = "Batterinivå";
 "noMultipleActiveCGMsAllowed" = "Du har redan en sändare ansluten.\n\nKontrollera dina andra CGM-sändare och klicka 'Stoppa scanning', 'Stoppa sensor' eller ta bort dem om nödvändigt.";

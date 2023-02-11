@@ -1,10 +1,10 @@
 "common_Ok" = "TAMAM";
 "common_cancel" = "İptal";
-"common_mgdl" = "mg/dl";
-"common_mmol" = "mmol/l";
+"common_mgdl" = "mg/dL";
+"common_mmol" = "mmol/L";
 "common_bloodglucoseunit" = "Kan Şekeri Birimi";
 "common_bloodglucoseunit_short" = "KŞ Birimi";
-"common_password" = "Şifre:";
+"common_password" = "Şifre";
 "common_default" = "Varsayılan";
 "common_high" = "YÜKSEK";
 "common_low" = "DÜŞÜK";
@@ -28,7 +28,7 @@
 "green" = "yeşil";
 "white" = "beyaz";
 "yellow" = "sarı";
-"name" = "İsim:";
+"name" = "İsim";
 "WiFi" = "WiFi";
 "on" = "Aç";
 "off" = "Kapa";
@@ -37,7 +37,7 @@
 "firmware" = "Donanım yazılımı";
 "hardware" = "Donanım";
 "unknown" = "Bilinmeyen";
-"sensorStatus" = "Sensör durumu:";
+"sensorStatus" = "Sensör durumu";
 "invalidAccountOrPassword" = "Geçersiz hesap ya da şifre";
 "common_statistics_low" = "Düşük";
 "common_statistics_inRange" = "Hedef alanında";

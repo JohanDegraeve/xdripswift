@@ -6,10 +6,10 @@
 "settingsviews_uploadReadingstoDexcomShare" = "Upload zu Dexcom Share?";
 
 /// for text in pop up where user can select bg unit
-"settingsviews_selectbgunit" = "Blutzucker Einheit:";
+"settingsviews_selectbgunit" = "Blutzucker Einheit";
 
 /// transmitter settings, just the words that explain that the settings is about transmitter type
-"settingsviews_transmittertype" = "Transmitter Typ:";
+"settingsviews_transmittertype" = "Transmitter Typ";
 
 /// Apple Watch Settings - text in row where create event is enabled or disabled 
 "createCalendarEvent" = "Kalendereinträge anlegen?";
@@ -21,7 +21,7 @@
 "sectionTitleTrace" = "Fehlerbericht";
 
 /// used in settings, section Info, title of the build setting
-"settingsviews_build" = "Build:";
+"settingsviews_build" = "Build";
 
 /// general settings, literally master
 "settingsviews_master" = "Master";
@@ -30,7 +30,7 @@
 "volumeTestiOSSound" = "Lautstärke Test";
 
 /// transmitter settings, just the words that explain that the settings is about transmitter id
-"settingsviews_transmitterid" = "Transmitter ID:";
+"settingsviews_transmitterid" = "Transmitter ID";
 
 /// nightscout settings, title of row
 "uploadSensorStartTime" = "Sensor Startzeit hochladen?";
@@ -48,16 +48,16 @@
 "infoCalendarAccessDeniedByUser" = "Keine Freigabe für Kalender.\n\nZum Freigeben: Einstellungen, Datenschutz, Kalender und aktivieren.";
 
 /// 
-"settingsviews_urgentLowValue" = "Niedriger Wert dringend:";
+"settingsviews_urgentLowValue" = "Niedriger Wert dringend";
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Einstellungen";
 
 /// used in settings, section Info, title of the version setting
-"settingsviews_Version" = "Version:";
+"settingsviews_Version" = "Version";
 
 /// nightscout settings, where user can set the nightscout url
-"settingsviews_nightScoutUrl" = "URL:";
+"settingsviews_nightScoutUrl" = "URL";
 
 /// name of setting for back ground color
 "m5stack_settingsviews_backGroundColor" = "Hintergrund Farbe";
@@ -72,7 +72,7 @@
 "volumeTestiOSSoundExplanation" = "Ein Alarm mit eingestellter Systemlautstärke wird gespielt (nicht im Stummmodus).\n\n(gilt auch bei verpasster Datenübertragung.)\n\nLautstärketaste drücken um Test abzubrechen, danach können Sie die Lautstärke wie gewünscht einstellen und noch einmal testen.";
 
 /// home screen settings, high value
-"settingsviews_highValue" = "Hoher Wert:";
+"settingsviews_highValue" = "Hoher Wert";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
 "settingsviews_nonfixedtransmitter" = "Aktiviere Mehrpunkt-Kalibrierung?";
@@ -123,19 +123,19 @@
 "warningChangeFromMasterToFollower" = " Der Wechsel von Master zu Follower beendet die aktuelle Verbindung zu ihrem Sensor. Möchten Sie dennoch wechseln?";
 
 /// nightscout or dexcom share settings, where user can select to edit the schedule
-"schedule" = "Upload Plan:";
+"schedule" = "Upload Plan";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port:";
+"nightScoutPort" = "Port";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
-"settingsviews_IntervalTitle" = "Benachrichtigungsintervall:";
+"settingsviews_IntervalTitle" = "Benachrichtigungsintervall";
 
 /// general settings, literally follower
 "settingsviews_follower" = "Follower";
 
 /// home screen settings, target value
-"settingsviews_targetValue" = "Zielwert:";
+"settingsviews_targetValue" = "Zielwert";
 
 /// home screen settings, show target line
 "settingsviews_showtarget" = "Zielwert Linie anzeigen?";
@@ -168,7 +168,7 @@
 "settingsviews_speakBgReadings" = "BZ Werte vorlesen?";
 
 /// home screen settings, urgent high value
-"settingsviews_urgentHighValue" = "Hohe Werte dringend:";
+"settingsviews_urgentHighValue" = "Hohe Werte dringend";
 
 /// name of setting for text color
 "m5stack_settingsviews_textColor" = "Text Color";
@@ -177,7 +177,7 @@
 "settingsviews_useobjectives" = "Objekte im Diagram anzeigen?";
 
 /// nightscout settings, where user can set the nightscout api key
-"settingsviews_nightScoutAPIKey" = "API_SECRET:";
+"settingsviews_nightScoutAPIKey" = "API_SECRET";
 
 /// user tries to send trace file but there's no native email account configured
 "emailNotConfigured" = "Sie müssen einen E-Mail Konto auf ihrem Gerät aktiviert haben.";
@@ -201,7 +201,7 @@
 "m5stack_settingsviews_brightness" = "Bildschirmhelligkeit";
 
 /// dexcom share settings, where user can set the dexcom share account name
-"settingsviews_dexcomShareAccountName" = "Benutzername:";
+"settingsviews_dexcomShareAccountName" = "Benutzername";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
 "settingsviews_IntervalMessage" = "Mindestabstand zwischen zwei Benachrichtigungen in Minuten";
@@ -219,7 +219,7 @@
 "settingsviews_labelShowReadingInAppBadge" = "BZ Werte auf der App-Kachel anzeigen?";
 
 /// home screen settings, low value
-"settingsviews_lowValue" = "Niedriger Wert:";
+"settingsviews_lowValue" = "Niedriger Wert";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share serial number
 "settingsviews_giveDexcomShareSerialNumber" = "Eingabe der Dexcom Receiver Seriennummer";
@@ -231,7 +231,7 @@
 "sendTraceFile" = "Fehlerbericht senden";
 
 /// speak settings, where user can select the language
-"settingsviews_speakBgReadingslanguage" = "Sprache:";
+"settingsviews_speakBgReadingslanguage" = "Sprache";
 
 /// nightscout settings, where user can select to use schedule or not
 "settingsviews_useSchedule" = "Upload Planer nutzen?";
@@ -261,7 +261,7 @@
 "settingsviews_masterorfollower" = "Master or Follower?";
 
 /// dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload
-"settingsviews_dexcomShareSerialNumber" = "Empfänger Seriennummer:";
+"settingsviews_dexcomShareSerialNumber" = "Empfänger Seriennummer";
 
 /// deloper settings, row title for 'Smooth Libre Values?'
 "smoothLibreValues" = "Libre Werte glätten?";
@@ -332,7 +332,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold:";
+"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 
 /// treatments settings, section title
 "settingsviews_sectiontitletreatments" = "Treatments";
@@ -360,4 +360,4 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
 /// Housekeeper retention period, for how long to store data
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days):";
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";

@@ -65,8 +65,8 @@
 /* Class = "UILabel"; text = "HbA1c"; ObjectID = "9Ud-mR-3u4"; */
 "9Ud-mR-3u4.text" = "HbA1c";
 
-/* Class = "UILabel"; text = "Exercise:"; ObjectID = "9tx-02-GXf"; */
-"9tx-02-GXf.text" = "Exercise:";
+/* Class = "UILabel"; text = "Exercise"; ObjectID = "9tx-02-GXf"; */
+"9tx-02-GXf.text" = "Exercise";
 
 /* Class = "UILabel"; text = "g"; ObjectID = "ACN-iY-zpP"; */
 "ACN-iY-zpP.text" = "g";
@@ -92,11 +92,11 @@
 /* Class = "UIBarButtonItem"; title = "I"; ObjectID = "Fis-6U-di6"; */
 "Fis-6U-di6.title" = "I";
 
-/* Class = "UILabel"; text = "Filter:"; ObjectID = "GAt-uS-uta"; */
-"GAt-uS-uta.text" = "Filter:";
+/* Class = "UILabel"; text = "Filter"; ObjectID = "GAt-uS-uta"; */
+"GAt-uS-uta.text" = "Filter";
 
-/* Class = "UILabel"; text = "BG Check:"; ObjectID = "Gju-y6-ier"; */
-"Gju-y6-ier.text" = "BG Check:";
+/* Class = "UILabel"; text = "BG Check"; ObjectID = "Gju-y6-ier"; */
+"Gju-y6-ier.text" = "BG Check";
 
 /* Class = "UIButton"; configuration.title = " "; ObjectID = "H0N-EK-5JX"; */
 "H0N-EK-5JX.configuration.title" = " ";
@@ -146,8 +146,8 @@
 /* Class = "UIViewController"; title = "Treatments Insert Scene"; ObjectID = "QgE-Gq-57r"; */
 "QgE-Gq-57r.title" = "Treatments Insert Scene";
 
-/* Class = "UILabel"; text = "Average:"; ObjectID = "RLk-Au-VSf"; */
-"RLk-Au-VSf.text" = "Average:";
+/* Class = "UILabel"; text = "Average"; ObjectID = "RLk-Au-VSf"; */
+"RLk-Au-VSf.text" = "Average";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "S45-Yf-BHe"; */
 "S45-Yf-BHe.text" = "Title";
@@ -218,14 +218,14 @@
 /* Class = "UIBarButtonItem"; title = "Sensor"; ObjectID = "ZIM-Wf-bUy"; */
 "ZIM-Wf-bUy.title" = "Sensor";
 
-/* Class = "UILabel"; text = "In Range:"; ObjectID = "aU7-G8-ash"; */
-"aU7-G8-ash.text" = "In Range:";
+/* Class = "UILabel"; text = "In Range"; ObjectID = "aU7-G8-ash"; */
+"aU7-G8-ash.text" = "In Range";
 
 /* Class = "UITabBarItem"; title = "Home"; ObjectID = "acW-dT-cKf"; */
 "acW-dT-cKf.title" = "Home";
 
-/* Class = "UILabel"; text = "Insulin:"; ObjectID = "agq-m8-HZ9"; */
-"agq-m8-HZ9.text" = "Insulin:";
+/* Class = "UILabel"; text = "Insulin"; ObjectID = "agq-m8-HZ9"; */
+"agq-m8-HZ9.text" = "Insulin";
 
 /* Class = "UIButton"; configuration.title = " "; ObjectID = "ajs-26-kaa"; */
 "ajs-26-kaa.configuration.title" = " ";
@@ -275,8 +275,8 @@
 /* Class = "UINavigationItem"; title = "Treatments"; ObjectID = "fUA-gv-91n"; */
 "fUA-gv-91n.title" = "Treatments";
 
-/* Class = "UILabel"; text = "Carbs:"; ObjectID = "fvP-G8-Gxk"; */
-"fvP-G8-Gxk.text" = "Carbs:";
+/* Class = "UILabel"; text = "Carbs"; ObjectID = "fvP-G8-Gxk"; */
+"fvP-G8-Gxk.text" = "Carbs";
 
 /* Class = "UITextField"; placeholder = "0.0"; ObjectID = "ggq-1D-Pj6"; */
 "ggq-1D-Pj6.placeholder" = "0.0";
@@ -284,8 +284,8 @@
 /* Class = "UILabel"; text = "Title"; ObjectID = "goS-0m-pgb"; */
 "goS-0m-pgb.text" = "Title";
 
-/* Class = "UILabel"; text = "CV:"; ObjectID = "h7N-aV-8eN"; */
-"h7N-aV-8eN.text" = "CV:";
+/* Class = "UILabel"; text = "CV"; ObjectID = "h7N-aV-8eN"; */
+"h7N-aV-8eN.text" = "CV";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "hfQ-Tt-xNH"; */
 "hfQ-Tt-xNH.text" = "Title";
@@ -293,8 +293,8 @@
 /* Class = "UILabel"; text = "Label"; ObjectID = "iIy-f4-6Ww"; */
 "iIy-f4-6Ww.text" = "Label";
 
-/* Class = "UILabel"; text = "mg/dl"; ObjectID = "iho-Ag-dJP"; */
-"iho-Ag-dJP.text" = "mg/dl";
+/* Class = "UILabel"; text = "mg/dL"; ObjectID = "iho-Ag-dJP"; */
+"iho-Ag-dJP.text" = "mg/dL";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "jx2-oc-XfQ"; */
 "jx2-oc-XfQ.text" = "Title";

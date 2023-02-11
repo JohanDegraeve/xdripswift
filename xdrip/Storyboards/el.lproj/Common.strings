@@ -1,10 +1,10 @@
 "common_Ok" = "OK";
 "common_cancel" = "Ακύρωση";
-"common_mgdl" = "mg/dl";
-"common_mmol" = "mmol/l";
+"common_mgdl" = "mg/dL";
+"common_mmol" = "mmol/L";
 "common_bloodglucoseunit" = "Μονάδα μέτρησης γλυκόζης αίματος";
 "common_bloodglucoseunit_short" = "Μονάδα γλυκ.";
-"common_password" = "Κωδικός:";
+"common_password" = "Κωδικός";
 "common_default" = "Προεπιλεγμένο";
 "common_high" = "ΥΨΗΛΗ";
 "common_low" = "ΧΑΜΗΛΗ";
@@ -28,7 +28,7 @@
 "green" = "πράσινο";
 "white" = "άσπρο";
 "yellow" = "κίτρινο";
-"name" = "Όνομα:";
+"name" = "Όνομα";
 "WiFi" = "WiFi";
 "on" = "Ναι";
 "off" = "Όχι";
@@ -37,7 +37,7 @@
 "firmware" = "Firmware";
 "hardware" = "Hardware";
 "unknown" = "Άγνωστο";
-"sensorStatus" = "Κατάσταση αισθητήρα:";
+"sensorStatus" = "Κατάσταση αισθητήρα";
 "invalidAccountOrPassword" = "Λάθος όνομα χρήστη ή κωδικός";
 "common_statistics_low" = "Χαμηλή";
 "common_statistics_inRange" = "Εντός στόχου";

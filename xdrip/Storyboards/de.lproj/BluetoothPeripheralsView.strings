@@ -1,6 +1,6 @@
 
 /// title of the cell where transmitter battery level is shown in detailed screen
-"batteryLevel" = "Batteriestand:";
+"batteryLevel" = "Batteriestand";
 
 /// when clicking add button in screen with list of bluetoothperipherals, title of pop up where user  needs to select bluetooth peripheral category
 "selectCategory" = "Gerät wählen";

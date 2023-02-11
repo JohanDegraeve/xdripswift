@@ -9,7 +9,7 @@
 "alerts_missedreadingalerttitle" = "Kaçırılan Okumalar";
 "alerts_calibrationneeded" = "Kalibrasyon Gerekli";
 "alerts_batterylow" = "Verici Pili Düşük";
-"alertstart" = "Kadar geçerli:";
+"alertstart" = "Kadar geçerli";
 "alertvalue" = "Değer";
 "alerttype" = "Uyarı tipi";
 "changealertvalue" = "Uyarı değerini değiştir";

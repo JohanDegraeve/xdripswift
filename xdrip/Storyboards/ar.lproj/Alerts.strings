@@ -9,7 +9,7 @@
 "alerts_missedreadingalerttitle" = "فقدان القراءات";
 "alerts_calibrationneeded" = "الحاجة للمعايرة";
 "alerts_batterylow" = "انخفاض بطارية جهاز الإرسال";
-"alertstart" = "تفعيل من الساعة:";
+"alertstart" = "تفعيل من الساعة";
 "alertvalue" = "القيمة";
 "alerttype" = "نوع التنبيه";
 "changealertvalue" = "تغيير قيمة التنبيه";
