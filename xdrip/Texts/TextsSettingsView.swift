@@ -572,6 +572,10 @@ class Texts_SettingsView {
     static let warningLoopDelayAlreadyExists: String = {
         return NSLocalizedString("warningLoopDelayAlreadyExists", tableName: filename, bundle: Bundle.main, value: "There is already a loopDelay for this time.", comment: "When user creates new loopdelay, with a timestamp that already exists - this is the warning text")
     }()
+    
+    static let shareToLoopOnceEvery5Minutes: String = {
+        return NSLocalizedString("shareToLoopOnceEvery5Minutes", tableName: filename, bundle: Bundle.main, value: "Share to Loop every 5 mins", comment: "Should loop data be shared only every 5 minutes")
+    }()
 
     static let nsLog: String = {
         return NSLocalizedString("nslog", tableName: filename, bundle: Bundle.main, value: "NSLog", comment: "deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog")
