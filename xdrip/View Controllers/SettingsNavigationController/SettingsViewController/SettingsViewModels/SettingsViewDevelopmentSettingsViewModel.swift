@@ -17,10 +17,13 @@ fileprivate enum Setting:Int, CaseIterable {
     /// if true, then readings will not be written to shared user defaults (for loop)
     case suppressLoopShare = 4
     
+    /// if true, then readings will only be written to shared user defaults (for loop) every 5 minutes (>4.5 mins to be exact)
+    case shareToLoopOnceEvery5Minutes = 5
+    
     /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
     ///
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
-    case loopDelay = 5
+    case loopDelay = 6
     
 }
 
@@ -59,6 +62,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .suppressLoopShare:
             return Texts_SettingsView.suppressLoopShare
             
+        case .shareToLoopOnceEvery5Minutes:
+            return Texts_SettingsView.shareToLoopOnceEvery5Minutes
+            
         case .loopDelay:
             return Texts_SettingsView.loopDelaysScreenTitle
             
@@ -71,7 +77,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare:
+        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare:
             return UITableViewCell.AccessoryType.none
             
         case .loopDelay:
@@ -86,22 +92,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled:
-            return nil
-            
-        case .OSLogEnabled:
-            return nil
-            
-        case .smoothLibreValues:
-            return nil
-            
-        case .suppressUnLockPayLoad:
-            return nil
-            
-        case .suppressLoopShare:
-            return nil
-            
-        case .loopDelay:
+        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare, .shareToLoopOnceEvery5Minutes, .loopDelay:
             return nil
             
         }
@@ -154,6 +145,14 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                 
             })
             
+        case .shareToLoopOnceEvery5Minutes:
+            return UISwitch(isOn: UserDefaults.standard.shareToLoopOnceEvery5Minutes, action: {
+                (isOn:Bool) in
+                
+                UserDefaults.standard.shareToLoopOnceEvery5Minutes = isOn
+                
+            })
+            
         case .loopDelay:
             return nil
             
@@ -171,7 +170,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare:
+        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare:
             return .nothing
             
         case .loopDelay:

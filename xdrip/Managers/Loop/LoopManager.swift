@@ -53,168 +53,190 @@ public class LoopManager:NSObject {
         
         // unwrap sharedUserDefaults
         guard let sharedUserDefaults = sharedUserDefaults else {return}
-
-        trace("in share", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
-
-        // get last readings with calculated value
-        // reduce timeStampLatestLoopSharedBgReading with 30 minutes. Because maybe Loop wasn't running for a while and so missed one or more readings. By adding 30 minutes of readings, we fill up a gap of maximum 30 minutes in Loop
-        let lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: UserDefaults.standard.timeStampLatestLoopSharedBgReading?.addingTimeInterval(-TimeInterval(minutes: 30)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-
-        // calculate loopDelay, to avoid having to do it multiple times
-        let loopDelay = LoopManager.loopDelay()
-
-        // if needed, remove readings less than loopDelay minutes old from glucoseData
-        if loopDelay > 0 {
+        
+        guard let timeStampLatestLoopSharedBgReading = UserDefaults.standard.timeStampLatestLoopSharedBgReading else {
             
-            trace("    loopDelay = %{public}@. Deleting %{public}@ minutes of readings from glucoseData.",log: log, category: ConstantsLog.categoryLoopManager, type: .info, loopDelay.description)
+            // if the last share data hasn't been set previously (could only happen on the first run) then just set it and return until next bg reading is processed. We won't normally ever get to here
+            UserDefaults.standard.timeStampLatestLoopSharedBgReading = Date()
             
-            while glucoseData.count > 0 &&  glucoseData[0].timeStamp.addingTimeInterval(loopDelay) > Date() {
-
-                glucoseData.remove(at: 0)
+            return
+            
+        }
+        
+        // to make things easier to read
+        let shareToLoopOnceEvery5Minutes = UserDefaults.standard.shareToLoopOnceEvery5Minutes
+        
+        // if the user doesn't want to limit Loop Share OR (if they do AND more than 4.5 minutes has passed since the last time we shared data) then let's process the readings and share them
+        if !shareToLoopOnceEvery5Minutes || (shareToLoopOnceEvery5Minutes && Date().timeIntervalSince(timeStampLatestLoopSharedBgReading) > TimeInterval(minutes: 4.5)) {
+            
+            trace("    loopShare = Sharing data with Loop",log: log, category: ConstantsLog.categoryLoopManager, type: .info)
+            
+            // get last readings with calculated value
+            // reduce timeStampLatestLoopSharedBgReading with 30 minutes. Because maybe Loop wasn't running for a while and so missed one or more readings. By adding 30 minutes of readings, we fill up a gap of maximum 30 minutes in Loop
+            let lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: timeStampLatestLoopSharedBgReading.addingTimeInterval(-TimeInterval(minutes: 30)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            
+            // calculate loopDelay, to avoid having to do it multiple times
+            let loopDelay = LoopManager.loopDelay()
+            
+            // if needed, remove readings less than loopDelay minutes old from glucoseData
+            if loopDelay > 0 {
                 
-            }
-            
-            // if no readings anymore, then no need to continue
-            if glucoseData.count == 0 {
+                trace("    loopDelay = %{public}@. Deleting %{public}@ minutes of readings from glucoseData.",log: log, category: ConstantsLog.categoryLoopManager, type: .info, loopDelay.description)
+                
+                while glucoseData.count > 0 &&  glucoseData[0].timeStamp.addingTimeInterval(loopDelay) > Date() {
+                    
+                    glucoseData.remove(at: 0)
+                    
+                }
+                
+                // if no readings anymore, then no need to continue
+                if glucoseData.count == 0 {
+                    return
+                }
+                
+            } else if lastReadings.count == 0 {
+                // this is the case where loopdelay = 0 and lastReadings is empty
                 return
             }
             
-        } else if lastReadings.count == 0 {
-            // this is the case where loopdelay = 0 and lastReadings is empty
-            return
-        }
-
-        
-        // convert to json Dexcom Share format
-        var dictionary = [Dictionary<String, Any>]()
-        
-        if loopDelay > 0 {
-
-            for reading in glucoseData {
-                
-                var representation = reading.dictionaryRepresentationForLoopShare
-                
-                // Adding "from" field to be able to use multiple BG sources with the same shared group in FreeAPS X
-                representation["from"] = "xDrip"
-                dictionary.append(representation)
-            }
-
-        } else {
-
-            for reading in lastReadings {
-                
-                var representation = reading.dictionaryRepresentationForDexcomShareUpload
-                
-                // Adding "from" field to be able to use multiple BG sources with the same shared group in FreeAPS X
-                representation["from"] = "xDrip"
-                dictionary.append(representation)
-            }
-
-        }
-        
-        // now, if needed, increase the timestamp for each reading
-        if loopDelay > 0 {
             
-            // create new dictionary that will have the readings with timestamp increased
-            var newDictionary = [Dictionary<String, Any>]()
+            // convert to json Dexcom Share format
+            var dictionary = [Dictionary<String, Any>]()
             
-            // iterate through dictionary
-            for reading in dictionary {
+            if loopDelay > 0 {
                 
-                var readingTimeStamp: Date?
-                if let rawGlucoseStartDate = reading["DT"] as? String {
-                    do {
-                        
-                        readingTimeStamp = try self.parseTimestamp(rawGlucoseStartDate)
-                        
-                    } catch  {
-                        
-                    }
+                for reading in glucoseData {
+                    
+                    var representation = reading.dictionaryRepresentationForLoopShare
+                    
+                    // Adding "from" field to be able to use multiple BG sources with the same shared group in FreeAPS X
+                    representation["from"] = "xDrip"
+                    dictionary.append(representation)
                 }
-
-                if let readingTimeStamp = readingTimeStamp, let slopeOrdinal = reading["Trend"] as? Int, let value = reading["Value"] as? Double {
-
-                    // create new date : original date + loopDelay
-                    let newReadingTimeStamp = readingTimeStamp.addingTimeInterval(loopDelay)
-
-                    // ignore the reading if newReadingTimeStamp > now
-                    if newReadingTimeStamp < Date() {
-
-                        // this is for the json representation
-                        let dateAsString = "/Date(" + Int64(floor(newReadingTimeStamp.toMillisecondsAsDouble() / 1000) * 1000).description + ")/"
+                
+            } else {
+                
+                for reading in lastReadings {
+                    
+                    var representation = reading.dictionaryRepresentationForDexcomShareUpload
+                    
+                    // Adding "from" field to be able to use multiple BG sources with the same shared group in FreeAPS X
+                    representation["from"] = "xDrip"
+                    dictionary.append(representation)
+                }
+                
+            }
+            
+            // now, if needed, increase the timestamp for each reading
+            if loopDelay > 0 {
+                
+                // create new dictionary that will have the readings with timestamp increased
+                var newDictionary = [Dictionary<String, Any>]()
+                
+                // iterate through dictionary
+                for reading in dictionary {
+                    
+                    var readingTimeStamp: Date?
+                    if let rawGlucoseStartDate = reading["DT"] as? String {
+                        do {
+                            
+                            readingTimeStamp = try self.parseTimestamp(rawGlucoseStartDate)
+                            
+                        } catch  {
+                            
+                        }
+                    }
+                    
+                    if let readingTimeStamp = readingTimeStamp, let slopeOrdinal = reading["Trend"] as? Int, let value = reading["Value"] as? Double {
                         
-                        // create new reading and append to new dictionary
-                        let newReading: [String : Any] = [
-                            "Trend" : slopeOrdinal,
-                            "ST" : dateAsString,
-                            "DT" : dateAsString,
-                            "Value" : value,
-                            "direction" : slopeOrdinal,
-                            "from" : "xDrip"
+                        // create new date : original date + loopDelay
+                        let newReadingTimeStamp = readingTimeStamp.addingTimeInterval(loopDelay)
+                        
+                        // ignore the reading if newReadingTimeStamp > now
+                        if newReadingTimeStamp < Date() {
+                            
+                            // this is for the json representation
+                            let dateAsString = "/Date(" + Int64(floor(newReadingTimeStamp.toMillisecondsAsDouble() / 1000) * 1000).description + ")/"
+                            
+                            // create new reading and append to new dictionary
+                            let newReading: [String : Any] = [
+                                "Trend" : slopeOrdinal,
+                                "ST" : dateAsString,
+                                "DT" : dateAsString,
+                                "Value" : value,
+                                "direction" : slopeOrdinal,
+                                "from" : "xDrip"
                             ]
-
-                        newDictionary.append(newReading)
-
+                            
+                            newDictionary.append(newReading)
+                            
+                        }
+                        
+                    }
+                    
+                }
+                
+                dictionary = newDictionary
+                
+            }
+            
+            // get Dictionary stored in UserDefaults from previous session
+            // append readings already stored in this storedDictionary so that we get dictionary filled with maxReadingsToShareWithLoop readings, if possible
+            if let storedDictionary = UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary, storedDictionary.count > 0 {
+                
+                let maxAmountsOfReadingsToAppend = ConstantsShareWithLoop.maxReadingsToShareWithLoop - dictionary.count
+                
+                if maxAmountsOfReadingsToAppend > 0 {
+                    
+                    let rangeToAppend = 0..<(min(storedDictionary.count, maxAmountsOfReadingsToAppend))
+                    
+                    for value in storedDictionary[rangeToAppend] {
+                        
+                        dictionary.append(value)
+                        
                     }
                     
                 }
                 
             }
-
-            dictionary = newDictionary
             
-        }
-
-        // get Dictionary stored in UserDefaults from previous session
-        // append readings already stored in this storedDictionary so that we get dictionary filled with maxReadingsToShareWithLoop readings, if possible
-        if let storedDictionary = UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary, storedDictionary.count > 0 {
-            
-            let maxAmountsOfReadingsToAppend = ConstantsShareWithLoop.maxReadingsToShareWithLoop - dictionary.count
-            
-            if maxAmountsOfReadingsToAppend > 0 {
-                
-                let rangeToAppend = 0..<(min(storedDictionary.count, maxAmountsOfReadingsToAppend))
-                
-                for value in storedDictionary[rangeToAppend] {
-                    
-                    dictionary.append(value)
-                    
-                }
-                
+            guard let data = try? JSONSerialization.data(withJSONObject: dictionary) else {
+                return
             }
             
-        }
-        
-        guard let data = try? JSONSerialization.data(withJSONObject: dictionary) else {
-            return
-        }
-        
-        // write readings to shared user defaults
-        sharedUserDefaults.set(data, forKey: "latestReadings")
-        
-        // store in local userdefaults
-        UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
-
-        // initially set timeStampLatestLoopSharedBgReading to timestamp of first reading - may get another value later, in case loopdelay > 0
-        // add 5 seconds to last Readings timestamp, because due to the way timestamp for libre readings is calculated, it may happen that the same reading shifts 1 or 2 seconds in next reading cycle
-        UserDefaults.standard.timeStampLatestLoopSharedBgReading = lastReadings.first!.timeStamp.addingTimeInterval(5.0)
-        
-        // in case loopdelay is used, then update UserDefaults.standard.timeStampLatestLoopSharedBgReading with value of timestamp of first element in the dictionary
-        if let element = dictionary.first, loopDelay > 0 {
-
-            if let elementDateAsString = element["DT"] as? String {
+            // write readings to shared user defaults
+            sharedUserDefaults.set(data, forKey: "latestReadings")
+            
+            // store in local userdefaults
+            UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
+            
+            // initially set timeStampLatestLoopSharedBgReading to timestamp of first reading - may get another value later, in case loopdelay > 0
+            // add 5 seconds to last Readings timestamp, because due to the way timestamp for libre readings is calculated, it may happen that the same reading shifts 1 or 2 seconds in next reading cycle
+            UserDefaults.standard.timeStampLatestLoopSharedBgReading = lastReadings.first!.timeStamp.addingTimeInterval(5.0)
+            
+            // in case loopdelay is used, then update UserDefaults.standard.timeStampLatestLoopSharedBgReading with value of timestamp of first element in the dictionary
+            if let element = dictionary.first, loopDelay > 0 {
                 
-                do {
-                    if let readingTimeStamp = try self.parseTimestamp(elementDateAsString) {
-                        UserDefaults.standard.timeStampLatestLoopSharedBgReading = readingTimeStamp
+                if let elementDateAsString = element["DT"] as? String {
+                    
+                    do {
+                        if let readingTimeStamp = try self.parseTimestamp(elementDateAsString) {
+                            UserDefaults.standard.timeStampLatestLoopSharedBgReading = readingTimeStamp
+                        }
+                    } catch  {
+                        // timeStampLatestLoopSharedBgReading keeps initially set value
                     }
-                } catch  {
-                    // timeStampLatestLoopSharedBgReading keeps initially set value
+                    
                 }
-
+                
             }
+            
+        } else {
+                
+            trace("    loopDelay = Skipping Loop Share as user requests to limit sharing to 5 minutes and the last reading was <4.5 minutes ago at ",log: log, category: ConstantsLog.categoryLoopManager, type: .info, timeStampLatestLoopSharedBgReading.toStringInUserLocale(timeStyle: .short, dateStyle: .none, showTimeZone: false))
+            
         }
-
+        
     }
     
     /// calculate loop delay to use dependent on the time of the day, based on UserDefaults loopDelaySchedule and loopDelayValueInMinutes

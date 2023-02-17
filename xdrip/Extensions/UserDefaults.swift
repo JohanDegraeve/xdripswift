@@ -291,7 +291,11 @@ extension UserDefaults {
             
         /// timestamp lastest reading shared with Loop
         case timeStampLatestLoopSharedBgReading = "timeStampLatestLoopSharedBgReading"
-            
+        
+        /// Loop sharing will be limited to just once every 5 minutes if true
+        case shareToLoopOnceEvery5Minutes = "shareToLoopOnceEvery5Minutes"
+        
+
         // Trace
         /// should debug level logs be added in trace file or not, and also in NSLog
         case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
@@ -1653,13 +1657,23 @@ extension UserDefaults {
         }
     }
 
-    /// timestamp lastest reading uploaded to NightScout
+    /// timestamp lastest reading shared with Loop via App Group
     var timeStampLatestLoopSharedBgReading:Date? {
         get {
             return object(forKey: Key.timeStampLatestLoopSharedBgReading.rawValue) as? Date
         }
         set {
             set(newValue, forKey: Key.timeStampLatestLoopSharedBgReading.rawValue)
+        }
+    }
+    
+    /// Loop sharing will be limited to just once every 5 minutes if true - default false
+    var shareToLoopOnceEvery5Minutes: Bool {
+        get {
+            return bool(forKey: Key.shareToLoopOnceEvery5Minutes.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.shareToLoopOnceEvery5Minutes.rawValue)
         }
     }
     
