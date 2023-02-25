@@ -2,6 +2,14 @@ name: 4. Build Xdrip4iOS
 run-name: Build Xdrip4iOS
 on:
   workflow_dispatch:
+  
+  ## Remove the "#" sign from the beginning of the line below to get automated builds on push (code changes in your repository)
+  #push:
+  
+  ## Remove the "#" sign from the beginning of the two lines below to get automated builds every two months
+  #schedule:
+    #- cron: '0 17 1 */2 *' # Runs at 17:00 UTC on the 1st in Jan, Mar, May, Jul, Sep and Nov.
+
 
 jobs:
   secrets:
