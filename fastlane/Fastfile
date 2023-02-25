@@ -199,6 +199,24 @@ platform :ios do
     )
   end
 
+  desc "Validate Secrets"
+  lane :validate_secrets do
+    setup_ci if ENV['CI']
+    ENV["MATCH_READONLY"] = true.to_s
+
+    app_store_connect_api_key(
+      key_id: "#{FASTLANE_KEY_ID}",
+      issuer_id: "#{FASTLANE_ISSUER_ID}",
+      key_content: "#{FASTLANE_KEY}"
+    )
+
+    def find_bundle_id(identifier)
+      bundle_id = Spaceship::ConnectAPI::BundleId.find(identifier)
+    end
+
+    find_bundle_id("com.#{TEAMID}.loopkit.Loop")
+  end
+
   desc "Nuke Certs"
   lane :nuke_certs do
     setup_ci if ENV['CI']
