@@ -38,10 +38,17 @@ The setup steps are somewhat involved, but nearly all are one time steps. Subseq
     * `GH_PAT`
     * `MATCH_PASSWORD` - just make up a password for this
 
+## Validate repository secrets
+
+1. Click on the "Actions" tab of your Xdrip4iOS repository.
+1. Select "1. Validate Secrets".
+1. Wait, and within a minute or two you should see a green checkmark indicating the workflow succeeded.
+1. The workflow will check if the required secrets are added and that they are correctly formatted. If errors are detected, please check the run log for details. 
+
 ## Add Identifiers for Xdrip4iOS App
 
 1. Click on the "Actions" tab of your Xdrip4iOS repository.
-1. Select "Add Identifiers".
+1. Select "2. Add Identifiers".
 1. Click "Run Workflow", and tap the green button.
 1. Wait, and within a minute or two you should see a green checkmark indicating the workflow succeeded.
 
@@ -97,14 +104,14 @@ You do not need to fill out the next form. That is for submitting to the app sto
 ## Create Building Certficates
 
 1. Go back to the "Actions" tab of your Xdrip4iOS repository in github.
-1. Select "Create Certificates".
+1. Select "3. Create Certificates".
 1. Click "Run Workflow", and tap the green button.
 1. Wait, and within a minute or two you should see a green checkmark indicating the workflow succeeded.
 
 ## Build Xdrip4iOS!
 
 1. Click on the "Actions" tab of your Xdrip4iOS repository.
-1. Select "Build Xdrip4iOS". _Are you working on a previuos fork of Xdrip4iOS and not seeing any GitHub workflows in the Actions tab? You may have to change the default branch so that it contains the .github/workflows files, or merge these changes into your default branch (typically `master`)._
+1. Select "4. Build Xdrip4iOS". _Are you working on a previuos fork of Xdrip4iOS and not seeing any GitHub workflows in the Actions tab? You may have to change the default branch so that it contains the .github/workflows files, or merge these changes into your default branch (typically `master`)._
 1. Click "Run Workflow", select your branch, and tap the green button.
 1. You have some time now. Go enjoy a coffee. The build should take about 15 minutes.
 1. Your app should eventually appear on [App Store Connect](https://appstoreconnect.apple.com/apps).
