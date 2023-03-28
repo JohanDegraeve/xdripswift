@@ -4,18 +4,10 @@ extension String {
     
     func isFireFly() -> Bool {
         
-        if self.startsWith("4") {
-            
-            return false
-            
-        }
+        // updated 2023-03-27: Dexcom have started re-using the 8Xyyyy format now where X is again a number. So we'll basically just treat *all* G6 transmitters as firefly and only allow native mode for now.
         
-        // changed from 8G to 8A as Dexcom seemed to have gone through the alphabet and started again for G6 transmitters as from summer 2022
-        if self >= "8A" {
-            
-            return true
-            
-        } else if self >= "8" {
+        // let's check if it's an older G4/G5 transmitter (4xxxxx). If not, then assume it is a firefly (G6/One)
+        if self.startsWith("4") {
             
             return false
             
