@@ -89,12 +89,8 @@
 "settingsviews_showtarget" = "Näytä kohdeviiva";
 "settingsviews_targetValue" = "Tavoitearvo";
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
 /// deloper settings, row title for 'Smooth Libre Values?'
-"smoothLibreValues" = "Smooth Libre Values?";
+"smoothLibreValues" = "Tasaiset Libre-arvot?";
 
 /// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
 "oslog" = "OSLog";
@@ -103,116 +99,88 @@
 "nslog" = "NSLog";
 
 /// Developer Settings, section title
-"developerSettings" = "Developer Settings";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"developerSettings" = "Kehittäjäasetukset";
 
 /// statistics settings, how many days to use for calculations
-"settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
+"settingsviews_daysToUseStatisticsMessage" = "Enimmäispäivät tilastojen laskemiseen?\n\n(0 laskeaksesi tänään keskiyöstä lähtien)    ";
 
 /// statistics settings, section title
-"settingsviews_sectiontitlestatistics" = "Statistics";
+"settingsviews_sectiontitlestatistics" = "Tilastot";
 
 /// statistics settings, use standard range?
-"settingsviews_useStandardStatisticsRange" = "Use Standard Range?";
+"settingsviews_useStandardStatisticsRange" = "Käytä vakioaluetta?";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol?";
+"settingsviews_useIFCCA1C" = "Näytä HbA1c mmol/mol muodossa?";
 
 /// statistics settings, show statistics on home screen
-"settingsviews_showStatistics" = "Show Statistics?";
+"settingsviews_showStatistics" = "Näytä tilastot?";
 
 /// statistics settings, how many days to use for calculations
-"settingsviews_daysToUseStatisticsTitle" = "Days to Calculate?";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"settingsviews_daysToUseStatisticsTitle" = "Päiviä laskutoimitukseen?";
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"settingsviews_showClockWhenScreenIsLocked" = "Näytetäänkö kello kun näyttö on lukittuna?";
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically?";
+"settingsviews_translateOnlineHelp" = "Käännä automaattisesti?";
 
 /// sensor countdown settings, use alternative sensor countdown graphics on home screen
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Use Alternative Graphics?";
+"settingsviews_showSensorCountdownAlternativeGraphics" = "Käytä vaihtoehtoista grafiikkaa?";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
+"settingsviews_allowScreenRotation" = "Salli kaavion kierto?";
 
 /// sensor countdown settings, section title
-"settingsviews_sectiontitlesensorcountdown" = "Sensor Countdown";
+"settingsviews_sectiontitlesensorcountdown" = "Sensorin lähtölaskenta";
 
 /// help settings, section title
-"settingsviews_sectiontitlehelp" = "Help & Documentation";
+"settingsviews_sectiontitlehelp" = "Ohje ja dokumentaatio";
 
 /// Calendar Events Settings - section title
-"calendarEventsSectionTitle" = "Calendar Events";
+"calendarEventsSectionTitle" = "Kalenteritapahtumat";
 
 /// help settings, open the online help
-"settingsviews_showOnlineHelp" = "Open Online Help?";
+"settingsviews_showOnlineHelp" = "Avaa online ohje?";
 
 /// sensor countdown settings, show sensor countdown graphic on home screen
-"settingsviews_showSensorCountdown" = "Show Sensor Countdown?";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"settingsviews_showSensorCountdown" = "Näytä sensorin lähtölaskenta?";
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
+"settingsviews_webooptransmitter" = "Käytä lähettimen algoritmiä?";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
-"settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"settingsviews_labelWebOOP" = "xDrip tai lähetin algoritmi";
 
 /// help settings, should the help icon be shown on the toolbar
-"settingsviews_showHelpIcon" = "Show Help Icon?";
+"settingsviews_showHelpIcon" = "Näytä ohjeen ikoni?";
 
 /// help settings, restart needed
-"settingsviews_restartNeeded" = "(Restart required)";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"settingsviews_restartNeeded" = "(Uudelleenkäynnistys vaaditaan)";
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
+"settingsviews_smallBolusTreatmentThreshold" = "Mikroboluksen kynnys";
 
 /// treatments settings, section title
-"settingsviews_sectiontitletreatments" = "Treatments";
+"settingsviews_sectiontitletreatments" = "Hoidot";
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
+"settingsviews_smallBolusTreatmentThresholdMessage" = "Kuinka monen yksikön alapuolella bolusta pitäisi pitää mikroboluksena?\n\n(Suositeltu arvo: 1,0 U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart?";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
+"settingsviews_showTreatmentsOnChart" = "Näytä hoidot kaaviossa?";
 
 /// Button to export all data
-"settingsviews_housekeeperExportAllData" = "Export All Data";
+"settingsviews_housekeeperExportAllData" = "Vie kaikki tiedot";
 
 /// Housekeeper settings, section title
-"settingsviews_sectionTitleHousekeeper" = "Data Management";
+"settingsviews_sectionTitleHousekeeper" = "Tiedon hallinta";
 
 /// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart?";
+"settingsviews_showSmallBolusTreatmentsOnChart" = "Näytä mikrobolus kaaviossa?";
 
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
-"settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
+"settingsviews_housekeeperRetentionPeriodMessage" = "Montako päivää tietoja säilytetään (90-365)?\n\n(suositus: 90 päivää)";
 
 /// Housekeeper retention period, for how long to store data
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";
+"settingsviews_housekeeperRetentionPeriod" = "Säilytysaika (päivää)";
