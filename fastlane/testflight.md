@@ -94,14 +94,6 @@ _Please note that in default builds of Xdrip4iOS, the app group is actually iden
 1. Click "Confirm".
 1. Remember to do this for each of the identifiers above.
 
-## Add NFC Tag Reading to xdripswift App ID
-1. Go to [Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/identifiers/list) on the apple developer site.
-1. Click on the "xdripswift" identifier
-1. Scroll down to "NFC Tag Reading"
-1. Tap the check box to enable NFC Tag Reading.
-1. Click "Save".
-1. Click "Confirm".
-
 ## Create Xdrip4iOS App in App Store Connect
 
 If you have created a Xdrip4iOS app in App Store Connect before, you can skip this section as well.
