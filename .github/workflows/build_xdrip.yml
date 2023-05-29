@@ -10,14 +10,8 @@ on:
   #schedule:
     #- cron: '0 17 1 */2 *' # Runs at 17:00 UTC on the 1st in Jan, Mar, May, Jul, Sep and Nov.
 
-
 jobs:
-  secrets:
-    uses: ./.github/workflows/validate_secrets.yml
-    secrets: inherit
-
   build:
-    needs: secrets
     runs-on: macos-12
     steps:
       # Uncomment to manually select latest Xcode if needed
@@ -27,8 +21,6 @@ jobs:
       # Checks-out the repo
       - name: Checkout Repo
         uses: actions/checkout@v3
-        with:
-          submodules: recursive
       
       # Patch Fastlane Match to not print tables
       - name: Patch Match Tables
