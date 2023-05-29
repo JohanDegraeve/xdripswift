@@ -1,14 +1,22 @@
-# Using Github Actions + FastLane to deploy to TestFlight: the "Browser Build" method
+# Using Github Actions + FastLane to deploy to TestFlight
 
-These instructions allow you to build Xdrip4iOS without having access to a Mac. They also allow you to easily install Xdrip4iOS on phones that are not connected to your computer. So you can send builds and updates to those you care for easily, or have an easy to access backup if you run Xdrip4iOS for yourself. You do not need to worry about correct Xcode/Mac versions either. An app built using this method can easily be deployed to newer versions of iOS, as soon as they are available.
+These instructions allow you to build xDrip4iOS without having access to a Mac.
 
-The setup steps are somewhat involved, but nearly all are one time steps. Subsequent builds are trivial. Your app must be updated once every 90 days, but it's a simple click to make a new build and can be done from anywhere.
+* You can install xDrip4iOS on phones via TestFlight that are not connected to your computer
+* You can send builds and updates to those you care for
+* You can install xDrip4iOS on your phone using only the TestFlight app if a phone was lost or the app is accidentally deleted
+* You do not need to worry about specific Xcode/Mac versions for a given iOS
 
-Note that TestFlight requires apple id accounts 13 years or older. This can be circumvented by logging into Media & Purchase on the child's phone with an adult's account. More details on this can be found in [LoopDocs](https://loopkit.github.io/loopdocs/gh-actions/gh-deploy/#install-testflight-loop-for-child).
+The setup steps are somewhat involved, but nearly all are one time steps. Subsequent builds are trivial. Your app must be updated once every 90 days, but it's a simple click to make a new build and can be done from anywhere. The 90-day update is a TestFlight requirement, which can be automated.
 
-This method for building without a Mac was ported from Loop. If you have used this method for Loop or one of the other DIY apps (Loop Caregiver, Loop Follow, Xdrip4iOS, FreeAPS X), some of the steps can be re-used and the full set of instructions does not need to be repeated. This will be mentioned in relevant sections below.
+This method for building without a Mac was ported from Loop. If you have used this method for Loop or one of the other DIY apps (Loop Caregiver, Loop Follow or iAPS), some of the steps can be re-used and the full set of instructions does not need to be repeated. This will be mentioned in relevant sections below.
 
-There are more detailed instructions in LoopDocs for doing Browser Builds of Loop and other apps, including troubleshooting and build errors. Please refer to [LoopDocs](https://loopkit.github.io/loopdocs/gh-actions/gh-other-apps/) for more details.
+There are more detailed instructions in LoopDocs for using GitHub for Browser Builds of Loop, including troubleshooting and build errors. Please refer to:
+
+* [LoopDocs: GitHub Overview](https://loopkit.github.io/loopdocs/gh-actions/gh-overview/)
+* [LoopDocs: GitHub Errors](https://loopkit.github.io/loopdocs/gh-actions/gh-errors/)
+
+Note that installing with TestFlight, (in the US), requires the Apple ID account holder to be 13 years or older. For younger users, an adult must log into Media & Purchase on the child's phone to install Loop. More details on this can be found in [LoopDocs](https://loopkit.github.io/loopdocs/gh-actions/gh-deploy/#install-testflight-loop-for-child).
 
 ## Prerequisites
 
@@ -16,7 +24,6 @@ There are more detailed instructions in LoopDocs for doing Browser Builds of Loo
 * A paid [Apple Developer account](https://developer.apple.com). You may be able to use the free version, but that has not been tested.
 * Some time. Set aside a couple of hours to perform the setup. 
 * Use the same GitHub account for all "Browser Builds" of the various DIY apps.
-
 
 ## Generate App Store Connect API Key
 
