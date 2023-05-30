@@ -14,6 +14,7 @@ env:
   UPSTREAM_REPO: JohanDegraeve/xdripswift
   UPSTREAM_BRANCH: ${{ github.ref_name }} # branch on upstream repository to sync from (relpace with specific branch name if needed)
   TARGET_BRANCH: ${{ github.ref_name }} # target branch on fork to be kept in sync, and target branch on upstream to be kept alive (relpace with specific branch name if needed)
+  SYNC_UPSTREAM: 'true' # set to 'false' or 'true' to disable / enable syncing of fork with upstream repository
   
 jobs:
   check_latest_from_upstream:
@@ -34,7 +35,7 @@ jobs:
     # REQUIRED step
     # Step 2: run the sync action
     - name: Sync upstream changes
-      if: github.repository_owner != 'JohanDegraeve' # do not run the upstream sync action on the upstream repository
+      if: ${{ env.SYNC_UPSTREAM == 'true' }} && github.repository_owner != 'JohanDegraeve' # do not run the upstream sync action on the upstream repository
       id: sync
       uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
       with:
