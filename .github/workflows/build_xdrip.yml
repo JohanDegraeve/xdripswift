@@ -1,5 +1,5 @@
-name: 4. Build Xdrip4iOS
-run-name: Build Xdrip4iOS (${{ github.ref_name }})
+name: 4. Build xDrip4iOS
+run-name: Build xDrip4iOS (${{ github.ref_name }})
 on:
   workflow_dispatch:
   
