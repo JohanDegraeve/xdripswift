@@ -2067,6 +2067,7 @@ final class RootViewController: UIViewController {
             
         } else {
             
+            // Setup the BG value and the slope
             if !lastReading.hideSlope {
                 calculatedValueAsString = calculatedValueAsString + " " + lastReading.slopeArrow()
             }
