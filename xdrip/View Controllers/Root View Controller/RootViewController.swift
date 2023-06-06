@@ -104,8 +104,13 @@ final class RootViewController: UIViewController {
     @IBOutlet weak var diffLabelUnitOutlet: UILabel!
     
     
+    //MARK: - Outlets for main level display
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
+    
+    /// New outlet for value reading
+    @IBOutlet weak var valueViewOutlet: BGView!
+    //-------------------------------------------
     
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
         
@@ -218,7 +223,9 @@ final class RootViewController: UIViewController {
                     self.valueLabelOutlet.attributedText = nil
                     
                     // set value to value of latest chartPoint
-                    self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                    self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: self.userPrefsMgDL)
+                    
+                    self.valueViewOutlet.directSetBGValue(_value: lastChartPointEarlierThanEndDate.y.scalar)
                     
                     // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
                     self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
@@ -373,6 +380,11 @@ final class RootViewController: UIViewController {
 
     
     // MARK: - Properties - other private properties
+    
+    // to make the following code a bit more readable
+    var userPrefsMgDL: Bool {
+        return UserDefaults.standard.bloodGlucoseUnitIsMgDl
+    }
     
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryRootView)
@@ -1676,7 +1688,7 @@ final class RootViewController: UIViewController {
         // assign deviceName, needed in the closure when creating alert. As closures can create strong references (to bluetoothTransmitter in this case), I'm fetching the deviceName here
         let deviceName = bluetoothTransmitter.deviceName
         
-        let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: nil, placeHolder: "...", actionTitle: nil, cancelTitle: nil, actionHandler: {
+        let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: nil, keyboardType: userPrefsMgDL ? .numberPad:.decimalPad, text: nil, placeHolder: "...", actionTitle: nil, cancelTitle: nil, actionHandler: {
             (text:String) in
             
             guard let valueAsDouble = text.toDouble() else {
@@ -1687,7 +1699,7 @@ final class RootViewController: UIViewController {
             // store the calibration value entered by the user into the log
             trace("calibration : value %{public}@ entered by user", log: self.log, category: ConstantsLog.categoryRootView, type: .info, text.description)
             
-            let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgdl: self.userPrefsMgDL)
             
             var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
             
@@ -1940,7 +1952,7 @@ final class RootViewController: UIViewController {
             if UserDefaults.standard.showReadingInAppBadge {
                 
                 // rescale if unit is mmol
-                if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
+                if !userPrefsMgDL {
                     readingValueForBadge = readingValueForBadge.mgdlToMmol().round(toDecimalPlaces: 1)
                 } else {
                     readingValueForBadge = readingValueForBadge.round(toDecimalPlaces: 0)
@@ -1951,12 +1963,12 @@ final class RootViewController: UIViewController {
             }
             
             // Configure notificationContent title, which is bg value in correct unit, add also slopeArrow if !hideSlope and finally the difference with previous reading, if there is one
-            var calculatedValueAsString = lastReading[0].unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            var calculatedValueAsString = lastReading[0].unitizedString(unitIsMgDl: userPrefsMgDL)
             if !lastReading[0].hideSlope {
                 calculatedValueAsString = calculatedValueAsString + " " + lastReading[0].slopeArrow()
             }
             if lastReading.count > 1 {
-                calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: userPrefsMgDL)
             }
             notificationContent.title = calculatedValueAsString
             
@@ -1983,10 +1995,10 @@ final class RootViewController: UIViewController {
             if UserDefaults.standard.showReadingInAppBadge {
                 
                 // rescale of unit is mmol
-                readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: userPrefsMgDL)
                 
                 // if unit is mmol and if value needs to be multiplied by 10, then multiply by 10
-                if !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.multipleAppBadgeValueWith10 {
+                if !userPrefsMgDL && UserDefaults.standard.multipleAppBadgeValueWith10 {
                     readingValueForBadge = readingValueForBadge * 10.0
                 }
                 
@@ -2022,9 +2034,6 @@ final class RootViewController: UIViewController {
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
-        // to make the following code a bit more readable
-        let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-        
         // set minutesLabelOutlet.textColor to white, might still be red due to panning back in time
         self.minutesLabelOutlet.textColor = UIColor.white
         
@@ -2045,6 +2054,8 @@ final class RootViewController: UIViewController {
             
             valueLabelOutlet.attributedText = attributeString
             
+            // set value to value of latest chartPoint
+            self.valueViewOutlet.setBlank()
             return
         }
         
@@ -2055,7 +2066,7 @@ final class RootViewController: UIViewController {
         let lastButOneReading = latestReadings.count > 1 ? latestReadings[1] : nil
         
         // start creating text for valueLabelOutlet, first the calculated value
-        var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: mgdl)
+        var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: userPrefsMgDL)
         
         // if latestReading is older than 11 minutes, then it should be strikethrough
         if lastReading.timeStamp < Date(timeIntervalSinceNow: -60.0 * 11) {
@@ -2064,6 +2075,8 @@ final class RootViewController: UIViewController {
             attributeString.addAttribute(.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
             
             valueLabelOutlet.attributedText = attributeString
+            
+            valueViewOutlet.setValues(for: lastReading, _slope: nil, _isOld: true)
             
         } else {
             
@@ -2078,6 +2091,8 @@ final class RootViewController: UIViewController {
             
             valueLabelOutlet.attributedText = attributeString
             
+            valueViewOutlet.setValues(for: lastReading, _slope: lastReading.calculatedValueSlope, _isOld: false)
+            
         }
         
         // if data is stale (over 11 minutes old), show it as gray colour to indicate that it isn't current
@@ -2087,12 +2102,12 @@ final class RootViewController: UIViewController {
             
             valueLabelOutlet.textColor = UIColor.lightGray
             
-        } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
+        } else if lastReading.calculatedValue.bgValueRounded(mgdl: userPrefsMgDL) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: userPrefsMgDL).bgValueRounded(mgdl: userPrefsMgDL) || lastReading.calculatedValue.bgValueRounded(mgdl: userPrefsMgDL) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: userPrefsMgDL).bgValueRounded(mgdl: userPrefsMgDL) {
             
             // BG is higher than urgentHigh or lower than urgentLow objectives
             valueLabelOutlet.textColor = UIColor.red
             
-        } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
+        } else if lastReading.calculatedValue.bgValueRounded(mgdl: userPrefsMgDL) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: userPrefsMgDL).bgValueRounded(mgdl: userPrefsMgDL) || lastReading.calculatedValue.bgValueRounded(mgdl: userPrefsMgDL) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: userPrefsMgDL).bgValueRounded(mgdl: userPrefsMgDL) {
             
             // BG is between urgentHigh/high and low/urgentLow objectives
             valueLabelOutlet.textColor = UIColor.yellow
@@ -2113,11 +2128,11 @@ final class RootViewController: UIViewController {
         minutesAgoLabelOutlet.text = minutesAgoMinAgoText
         
         // create delta value text (without the units)
-        let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: false, highGranularity: true, mgdl: mgdl)
+        let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: false, highGranularity: true, mgdl: userPrefsMgDL)
         diffLabelOutlet.text = diffLabelText
         
         // set the delta unit label text
-        let diffLabelUnitText = mgdl ? Texts_Common.mgdl : Texts_Common.mmol
+        let diffLabelUnitText = userPrefsMgDL ? Texts_Common.mgdl : Texts_Common.mmol
         diffLabelUnitOutlet.text = diffLabelUnitText
         
         // update the chart up to now
@@ -2429,7 +2444,6 @@ final class RootViewController: UIViewController {
         }
         
         // declare constants/variables
-        let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         var daysToUseStatistics: Int = 0
         var fromDate: Date = Date()
         
@@ -2480,8 +2494,8 @@ final class RootViewController: UIViewController {
             
             
             // set the low/high "label" labels with the low/high user values that the user has chosen to use
-            self.lowLabelOutlet.text = "(<" + (isMgDl ? Int(statistics.lowLimitForTIR).description : statistics.lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
-            self.highLabelOutlet.text = "(>" + (isMgDl ? Int(statistics.highLimitForTIR).description : statistics.highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+            self.lowLabelOutlet.text = "(<" + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Int(statistics.lowLimitForTIR).description : statistics.lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+            self.highLabelOutlet.text = "(>" + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Int(statistics.highLimitForTIR).description : statistics.highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
             
             
             // set all label outlets with the correctly formatted calculated values
@@ -2496,7 +2510,7 @@ final class RootViewController: UIViewController {
             
             // if there are no values returned (new sensor?) then just leave the default "-" showing
             if statistics.averageStatisticValue.value > 0 {
-                self.averageStatisticLabelOutlet.text = (isMgDl ? Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics.averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
+                self.averageStatisticLabelOutlet.text = (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics.averageStatisticValue.round(toDecimalPlaces: 1).description) + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? " mg/dl" : " mmol/l")
             }
             
             // if there are no values returned (new sensor?) then just leave the default "-" showing
@@ -2933,12 +2947,10 @@ final class RootViewController: UIViewController {
         // if there is no active WCSession open (i.e. if there is no paired Apple Watch with the watch app installed and running), then do nothing and just return
         if let validSession = self.session, validSession.isReachable {
             
-            let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-            
             // make sure that the necessary objects are initialised and readings are available.
             if let bgReadingsAccessor = bgReadingsAccessor, let lastReading = bgReadingsAccessor.last(forSensor: nil) {
                 
-                let calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: mgdl)
+                let calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: userPrefsMgDL)
                 
                 var calculatedValueFullAsString: String = ""
                 var calculatedValueTrendAsString: String = ""
@@ -2967,7 +2979,7 @@ final class RootViewController: UIViewController {
                 let lastButOneReading = latestReadings.count > 1 ? latestReadings[1]:nil
                 
                 // create delta text from the last two readings
-                let deltaText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: mgdl)
+                let deltaText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: userPrefsMgDL)
                 
                 // create the WKSession messages in String format and send them. Although they are all sent almost immediately, they will be queued and sent in a background thread by the handler
                 validSession.sendMessage(["currentBGValueText" : calculatedValueAsString], replyHandler: nil, errorHandler: nil)
@@ -2976,19 +2988,19 @@ final class RootViewController: UIViewController {
                 
                 validSession.sendMessage(["currentBGValueTrend" : calculatedValueTrendAsString], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["currentBGValue" : lastReading.unitizedString(unitIsMgDl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                validSession.sendMessage(["currentBGValue" : lastReading.unitizedString(unitIsMgDl: userPrefsMgDL).description], replyHandler: nil, errorHandler: nil)
                 
                 validSession.sendMessage(["minutesAgoTextLocalized" : minutesAgoTextLocalized], replyHandler: nil, errorHandler: nil)
                 
                 validSession.sendMessage(["deltaTextLocalized" : deltaText], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["urgentLowMarkValueInUserChosenUnit" : UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                validSession.sendMessage(["urgentLowMarkValueInUserChosenUnit" : UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueRounded(mgdl: userPrefsMgDL).description], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["lowMarkValueInUserChosenUnit" : UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                validSession.sendMessage(["lowMarkValueInUserChosenUnit" : UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueRounded(mgdl: userPrefsMgDL).description], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["highMarkValueInUserChosenUnit" : UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                validSession.sendMessage(["highMarkValueInUserChosenUnit" : UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgdl: userPrefsMgDL).description], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["urgentHighMarkValueInUserChosenUnit" : UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                validSession.sendMessage(["urgentHighMarkValueInUserChosenUnit" : UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgdl: userPrefsMgDL).description], replyHandler: nil, errorHandler: nil)
                 
                 // send the timestamp last as this is what will eventually trigger the view refresh on the watch
                 validSession.sendMessage(["currentBGTimeStamp" : ISO8601DateFormatter().string(from: lastReading.timeStamp)], replyHandler: nil, errorHandler: nil)

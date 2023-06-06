@@ -94,5 +94,9 @@
 	<string>Light</string>
 	<key>view controller-based status bar</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Koulen-Regular.ttf</string>
+	</array>
 </dict>
 </plist>
