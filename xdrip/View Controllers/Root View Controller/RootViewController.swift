@@ -225,6 +225,7 @@ final class RootViewController: UIViewController {
                     // set value to value of latest chartPoint
                     self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: self.userPrefsMgDL)
                     
+                    // This will send either mg/dl or mmol/l down to the BGView
                     self.valueViewOutlet.directSetBGValue(_value: lastChartPointEarlierThanEndDate.y.scalar)
                     
                     // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
@@ -2076,7 +2077,7 @@ final class RootViewController: UIViewController {
             
             valueLabelOutlet.attributedText = attributeString
             
-            valueViewOutlet.setValues(for: lastReading, _slope: nil, _isOld: true)
+            valueViewOutlet.setValues(for: lastReading, slope: nil, isOld: false)
             
         } else {
             
@@ -2091,7 +2092,7 @@ final class RootViewController: UIViewController {
             
             valueLabelOutlet.attributedText = attributeString
             
-            valueViewOutlet.setValues(for: lastReading, _slope: lastReading.calculatedValueSlope, _isOld: false)
+            valueViewOutlet.setValues(for: lastReading, slope: lastReading.calculatedValueSlope, isOld: false)
             
         }
         

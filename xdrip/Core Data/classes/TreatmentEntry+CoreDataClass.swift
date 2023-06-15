@@ -194,7 +194,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
         case .BgCheck:
             dict["eventType"] = "BG Check" // maybe overwritten in next statement
             dict["glucose"] = self.value
-            dict["glucoseType"] = "Finger" + String(!UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ": " + self.value.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) + " " + Texts_Common.mmol : "")
+            dict["glucoseType"] = "Finger" + String(!UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ": " + self.value.mgdlToMmolAndToString(thisIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) + " " + Texts_Common.mmol : "")
             dict["units"] = ConstantsNightScout.mgDlNightscoutUnitString
 		default:
 			break

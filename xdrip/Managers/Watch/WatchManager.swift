@@ -106,6 +106,8 @@ class WatchManager: NSObject {
                 visualIndicator = ConstantsWatch.visualIndicatorNotUrgent
             case .urgent:
                 visualIndicator = ConstantsWatch.visualIndicatorUrgent
+            default:
+                break
             }
             
             // pre-append the indicator to the title

@@ -8,8 +8,12 @@
 
 import Foundation
 
+// Used to make `UIColor` Codable
 extension UIColor {
     
+    /// Returns the RGBA components of a `UIColor` as `Data` so that the colour can be stored in `UserDefaults`
+    ///
+    /// Returns `nil` if the API was unable to encode the colour into `JSON`
     var RGBA: Data? {
         var components: UIColor.RGBComps = RGBComps()
         
@@ -30,6 +34,10 @@ extension UIColor {
         return nil
     }
     
+    /// Reconstructs a `UIColor` from provided `Data`
+    ///
+    /// The `Data` should have been initially encoded as per the computed `RGBA` var.
+    /// Returns `nil` if the API is unable to create a `UIColor` from the received `Data`
     static func makeUIColourFrom(_data: Data) -> UIColor? {
         let json = JSONDecoder()
         do {

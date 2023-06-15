@@ -3,7 +3,7 @@
     <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -471,11 +471,8 @@
                                                 </connections>
                                             </label>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="w31-Mu-TAp" customClass="BGView" customModule="xdrip" customModuleProvider="target">
-                                                <rect key="frame" x="75" y="94" width="240" height="140"/>
+                                                <rect key="frame" x="20" y="25" width="350" height="107.66666666666669"/>
                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="140" id="ZiP-DC-FW4"/>
-                                                </constraints>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0nE-AX-r0w" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
                                                 <rect key="frame" x="10" y="132.66666666666663" width="380" height="183.33333333333337"/>
@@ -491,17 +488,18 @@
                                             <constraint firstAttribute="trailing" secondItem="0nE-AX-r0w" secondAttribute="trailing" id="4Kt-zl-bbl"/>
                                             <constraint firstItem="3dM-a1-kXd" firstAttribute="leading" secondItem="uyn-2k-K74" secondAttribute="trailing" constant="6" id="993-8L-UEa"/>
                                             <constraint firstAttribute="bottom" secondItem="0nE-AX-r0w" secondAttribute="bottom" id="AHg-65-gYO"/>
+                                            <constraint firstItem="w31-Mu-TAp" firstAttribute="trailing" secondItem="We3-bN-ffR" secondAttribute="trailing" id="BMb-4p-BWb"/>
                                             <constraint firstItem="We3-bN-ffR" firstAttribute="leading" secondItem="C16-NQ-F1Y" secondAttribute="leading" constant="20" id="DjD-bz-O8N"/>
-                                            <constraint firstAttribute="trailing" secondItem="w31-Mu-TAp" secondAttribute="trailing" constant="75" id="FXd-7u-kSp"/>
                                             <constraint firstItem="LHe-pP-hD1" firstAttribute="centerY" secondItem="7Wo-wd-80o" secondAttribute="centerY" id="Hu9-HI-HKK"/>
-                                            <constraint firstItem="w31-Mu-TAp" firstAttribute="top" secondItem="3dM-a1-kXd" secondAttribute="bottom" constant="67.670000000000002" id="KKy-N6-RiT"/>
-                                            <constraint firstItem="w31-Mu-TAp" firstAttribute="leading" secondItem="C16-NQ-F1Y" secondAttribute="leading" constant="75" id="KOI-v1-lqp"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="We3-bN-ffR" secondAttribute="trailing" id="LWb-Rj-dfs"/>
                                             <constraint firstItem="uyn-2k-K74" firstAttribute="top" secondItem="C16-NQ-F1Y" secondAttribute="top" id="Luq-xy-Lzu"/>
                                             <constraint firstAttribute="trailing" secondItem="LHe-pP-hD1" secondAttribute="trailing" constant="10" id="PCi-CB-TEm"/>
                                             <constraint firstItem="7Wo-wd-80o" firstAttribute="centerY" secondItem="uyn-2k-K74" secondAttribute="centerY" id="Qpl-lB-gwg"/>
+                                            <constraint firstItem="w31-Mu-TAp" firstAttribute="leading" secondItem="We3-bN-ffR" secondAttribute="leading" id="X8D-T0-iPb"/>
                                             <constraint firstItem="LHe-pP-hD1" firstAttribute="leading" secondItem="7Wo-wd-80o" secondAttribute="trailing" constant="6" id="ZVX-Fd-qvW"/>
                                             <constraint firstItem="0nE-AX-r0w" firstAttribute="leading" secondItem="C16-NQ-F1Y" secondAttribute="leading" constant="10" id="e97-Zw-ipJ"/>
+                                            <constraint firstItem="w31-Mu-TAp" firstAttribute="bottom" secondItem="We3-bN-ffR" secondAttribute="bottom" id="eeG-tW-hwK"/>
+                                            <constraint firstItem="w31-Mu-TAp" firstAttribute="top" secondItem="We3-bN-ffR" secondAttribute="top" id="gfV-SQ-CPJ"/>
                                             <constraint firstItem="7Wo-wd-80o" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="uyn-2k-K74" secondAttribute="trailing" symbolic="YES" id="hJM-6B-pjw"/>
                                             <constraint firstItem="7Wo-wd-80o" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="3dM-a1-kXd" secondAttribute="trailing" symbolic="YES" id="hyh-bh-J7V"/>
                                             <constraint firstItem="7Wo-wd-80o" firstAttribute="centerY" secondItem="3dM-a1-kXd" secondAttribute="centerY" id="k00-T6-lKp"/>

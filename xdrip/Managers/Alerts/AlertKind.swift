@@ -469,7 +469,7 @@ fileprivate func createAlertTitleForBgReadingAlerts(bgReading:BgReading, alertKi
     }
     
     // add unit
-    returnValue = returnValue + " " + bgReading.calculatedValue.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+    returnValue = returnValue + " " + bgReading.calculatedValue.mgdlToMmolAndToString(thisIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
     
     // add slopeArrow
     if !bgReading.hideSlope {

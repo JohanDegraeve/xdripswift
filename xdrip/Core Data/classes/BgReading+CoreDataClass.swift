@@ -67,6 +67,14 @@ public class BgReading: NSManagedObject {
         return r
     }
     
+    var mmol: MMOLL {
+        return MMOLL(calculatedValue.mgdlToMmol())
+    }
+    
+    var mgdl: MGDL {
+        return MGDL(calculatedValue)
+    }
+    
     /// returns a string with an arrow representation of the slope
     func slopeArrow() -> String {
         let slope_by_minute = calculatedValueSlope * 60000
@@ -166,15 +174,19 @@ public class BgReading: NSManagedObject {
      
      - Returns: a `String` depending on the current BG value
      */
-    func unitizedString(unitIsMgDl:Bool) -> String {
+    static func _unitizedString(calculatedValue: Double, unitIsMgDl:Bool) -> String {
         var returnValue:String
         if (calculatedValue >= 400) {
+            // mg/dL definitely too high
             returnValue = Texts_Common.HIGH
         } else if (calculatedValue >= 40) {
-            returnValue = calculatedValue.mgdlToMmolAndToString(mgdl: unitIsMgDl)
+            // mg/dL within a displayable range so convert to string dependant on user unit prefs
+            returnValue = calculatedValue.mgdlToMmolAndToString(thisIsMgDl: unitIsMgDl)
         } else if (calculatedValue > 12) {
+            // mg/dL definitely too low
             returnValue = Texts_Common.LOW
         } else {
+            // We have a special case value of <= 12
             switch(calculatedValue) {
             case 0:
                 returnValue = "??0"
@@ -208,6 +220,10 @@ public class BgReading: NSManagedObject {
         return returnValue
     }
     
+    func unitizedString(unitIsMgDl:Bool) -> String {
+        return BgReading._unitizedString(calculatedValue: calculatedValue, unitIsMgDl: unitIsMgDl)
+    }
+    
     /// creates string with difference from previous reading and also unit
     func unitizedDeltaString(previousBgReading:BgReading?, showUnit:Bool, highGranularity:Bool, mgdl:Bool) -> String {
         
@@ -228,7 +244,7 @@ public class BgReading: NSManagedObject {
             return "ERR";
         }
         
-        let valueAsString = value.mgdlToMmolAndToString(mgdl: mgdl)
+        let valueAsString = value.mgdlToMmolAndToString(thisIsMgDl: mgdl)
         
         var deltaSign:String = ""
         if (value > 0) { deltaSign = "+"; }

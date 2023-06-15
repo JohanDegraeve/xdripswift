@@ -38,14 +38,24 @@
 		9A360ADF2A2B7B470003D5F1 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360ADE2A2B7B470003D5F1 /* UIColor.swift */; };
 		9A360AE32A2B7B650003D5F1 /* NSParagraphStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */; };
 		9A360AE72A2B7B840003D5F1 /* NSLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */; };
-		9A360AF22A2BA2FC0003D5F1 /* Koulen-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A360AF02A2BA2FC0003D5F1 /* Koulen-Regular.ttf */; };
-		9A360AF32A2BA2FC0003D5F1 /* Koulen-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A360AF02A2BA2FC0003D5F1 /* Koulen-Regular.ttf */; };
-		9A360AF42A2BA2FC0003D5F1 /* Koulen-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A360AF02A2BA2FC0003D5F1 /* Koulen-Regular.ttf */; };
-		9A360AF52A2BA2FC0003D5F1 /* Koulen-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A360AF02A2BA2FC0003D5F1 /* Koulen-Regular.ttf */; };
-		9A360AF62A2BA2FC0003D5F1 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9A360AF12A2BA2FC0003D5F1 /* OFL.txt */; };
-		9A360AF72A2BA2FC0003D5F1 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9A360AF12A2BA2FC0003D5F1 /* OFL.txt */; };
-		9A360AF82A2BA2FC0003D5F1 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9A360AF12A2BA2FC0003D5F1 /* OFL.txt */; };
-		9A360AF92A2BA2FC0003D5F1 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9A360AF12A2BA2FC0003D5F1 /* OFL.txt */; };
+		9AB5FAE62A2FE4B700AAC3F1 /* Krub-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FACE2A2FE35700AAC3F1 /* Krub-SemiBold.ttf */; };
+		9AB5FAE82A30732B00AAC3F1 /* Krub-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FAD62A2FE35700AAC3F1 /* Krub-LightItalic.ttf */; };
+		9AB5FAE92A3073AE00AAC3F1 /* Krub-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FACD2A2FE35700AAC3F1 /* Krub-Regular.ttf */; };
+		9AB5FAEA2A30742A00AAC3F1 /* Krub-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FAD82A2FE35700AAC3F1 /* Krub-Bold.ttf */; };
+		9AB5FAEC2A3078D600AAC3F1 /* UIFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */; };
+		9AB5FAED2A3078D600AAC3F1 /* UIFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */; };
+		9AB5FAEE2A3078D600AAC3F1 /* UIFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */; };
+		9AB5FAEF2A3079B500AAC3F1 /* Krub-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FAD02A2FE35700AAC3F1 /* Krub-Light.ttf */; };
+		9AB5FAF12A31DFE900AAC3F1 /* Units Primitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */; };
+		9AEA74AC2A347765001202A6 /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */; };
+		9AEA74AD2A347765001202A6 /* Quicksand-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */; };
+		9AEA74AE2A347765001202A6 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A62A347765001202A6 /* Quicksand-Regular.ttf */; };
+		9AEA74AF2A347765001202A6 /* Quicksand-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A72A347765001202A6 /* Quicksand-SemiBold.ttf */; };
+		9AEA74B02A347765001202A6 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A82A347765001202A6 /* OFL.txt */; };
+		9AEA74B12A347765001202A6 /* Quicksand-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A92A347765001202A6 /* Quicksand-Light.ttf */; };
+		9AEA74B22A347765001202A6 /* Quicksand-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74AA2A347765001202A6 /* Quicksand-VariableFont_wght.ttf */; };
+		9AEA74B32A347765001202A6 /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74AB2A347765001202A6 /* README.txt */; };
+		9AEA74B52A348119001202A6 /* BGBackingBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEA74B42A348119001202A6 /* BGBackingBox.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
 		CE1B2FE125D0264B00F642F5 /* Main.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD425D0264900F642F5 /* Main.strings */; };
 		D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */; };
@@ -766,9 +776,30 @@
 		9A360ADE2A2B7B470003D5F1 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSParagraphStyle.swift; sourceTree = "<group>"; };
 		9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSLayoutConstraint.swift; sourceTree = "<group>"; };
-		9A360AF02A2BA2FC0003D5F1 /* Koulen-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Koulen-Regular.ttf"; sourceTree = "<group>"; };
-		9A360AF12A2BA2FC0003D5F1 /* OFL.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
 		9AB5FAC52A2E078C00AAC3F1 /* CHANGES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGES.md; sourceTree = "<group>"; };
+		9AB5FACC2A2FE35700AAC3F1 /* Krub-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Medium.ttf"; sourceTree = "<group>"; };
+		9AB5FACD2A2FE35700AAC3F1 /* Krub-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Regular.ttf"; sourceTree = "<group>"; };
+		9AB5FACE2A2FE35700AAC3F1 /* Krub-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-SemiBold.ttf"; sourceTree = "<group>"; };
+		9AB5FACF2A2FE35700AAC3F1 /* Krub-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
+		9AB5FAD02A2FE35700AAC3F1 /* Krub-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Light.ttf"; sourceTree = "<group>"; };
+		9AB5FAD12A2FE35700AAC3F1 /* Krub-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-ExtraLight.ttf"; sourceTree = "<group>"; };
+		9AB5FAD22A2FE35700AAC3F1 /* Krub-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-BoldItalic.ttf"; sourceTree = "<group>"; };
+		9AB5FAD32A2FE35700AAC3F1 /* Krub-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-MediumItalic.ttf"; sourceTree = "<group>"; };
+		9AB5FAD52A2FE35700AAC3F1 /* Krub-ExtraLightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
+		9AB5FAD62A2FE35700AAC3F1 /* Krub-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-LightItalic.ttf"; sourceTree = "<group>"; };
+		9AB5FAD72A2FE35700AAC3F1 /* Krub-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Italic.ttf"; sourceTree = "<group>"; };
+		9AB5FAD82A2FE35700AAC3F1 /* Krub-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Bold.ttf"; sourceTree = "<group>"; };
+		9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFont.swift; sourceTree = "<group>"; };
+		9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Units Primitives.swift"; sourceTree = "<group>"; };
+		9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
+		9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
+		9AEA74A62A347765001202A6 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
+		9AEA74A72A347765001202A6 /* Quicksand-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-SemiBold.ttf"; sourceTree = "<group>"; };
+		9AEA74A82A347765001202A6 /* OFL.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
+		9AEA74A92A347765001202A6 /* Quicksand-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Light.ttf"; sourceTree = "<group>"; };
+		9AEA74AA2A347765001202A6 /* Quicksand-VariableFont_wght.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-VariableFont_wght.ttf"; sourceTree = "<group>"; };
+		9AEA74AB2A347765001202A6 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		9AEA74B42A348119001202A6 /* BGBackingBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGBackingBox.swift; sourceTree = "<group>"; };
 		CE1B2FC825D0261500F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Alerts.strings; sourceTree = "<group>"; };
 		CE1B2FCD25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
 		CE1B2FCE25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/WatlaaView.strings; sourceTree = "<group>"; };
@@ -1689,14 +1720,39 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		9A360AEF2A2BA2FC0003D5F1 /* Koulen */ = {
+		9AB5FACB2A2FE35700AAC3F1 /* Krub */ = {
 			isa = PBXGroup;
 			children = (
-				9A360AF02A2BA2FC0003D5F1 /* Koulen-Regular.ttf */,
-				9A360AF12A2BA2FC0003D5F1 /* OFL.txt */,
+				9AB5FACC2A2FE35700AAC3F1 /* Krub-Medium.ttf */,
+				9AB5FACD2A2FE35700AAC3F1 /* Krub-Regular.ttf */,
+				9AB5FACE2A2FE35700AAC3F1 /* Krub-SemiBold.ttf */,
+				9AB5FACF2A2FE35700AAC3F1 /* Krub-SemiBoldItalic.ttf */,
+				9AB5FAD02A2FE35700AAC3F1 /* Krub-Light.ttf */,
+				9AB5FAD12A2FE35700AAC3F1 /* Krub-ExtraLight.ttf */,
+				9AB5FAD22A2FE35700AAC3F1 /* Krub-BoldItalic.ttf */,
+				9AB5FAD32A2FE35700AAC3F1 /* Krub-MediumItalic.ttf */,
+				9AB5FAD52A2FE35700AAC3F1 /* Krub-ExtraLightItalic.ttf */,
+				9AB5FAD62A2FE35700AAC3F1 /* Krub-LightItalic.ttf */,
+				9AB5FAD72A2FE35700AAC3F1 /* Krub-Italic.ttf */,
+				9AB5FAD82A2FE35700AAC3F1 /* Krub-Bold.ttf */,
 			);
-			path = Koulen;
+			path = Krub;
 			sourceTree = "<group>";
+		};
+		9AEA74A32A347765001202A6 /* Quicksand */ = {
+			isa = PBXGroup;
+			children = (
+				9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */,
+				9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */,
+				9AEA74A62A347765001202A6 /* Quicksand-Regular.ttf */,
+				9AEA74A72A347765001202A6 /* Quicksand-SemiBold.ttf */,
+				9AEA74A82A347765001202A6 /* OFL.txt */,
+				9AEA74A92A347765001202A6 /* Quicksand-Light.ttf */,
+				9AEA74AA2A347765001202A6 /* Quicksand-VariableFont_wght.ttf */,
+				9AEA74AB2A347765001202A6 /* README.txt */,
+			);
+			path = Quicksand;
+			sourceTree = SOURCE_ROOT;
 		};
 		D4028CBE2774A4B900341476 /* Treatments */ = {
 			isa = PBXGroup;
@@ -1761,6 +1817,8 @@
 				9A360ADE2A2B7B470003D5F1 /* UIColor.swift */,
 				9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */,
 				9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */,
+				9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */,
+				9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1786,7 +1844,8 @@
 		F8025E5A21F7AFA100ECF0C0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				9A360AEF2A2BA2FC0003D5F1 /* Koulen */,
+				9AEA74A32A347765001202A6 /* Quicksand */,
+				9AB5FACB2A2FE35700AAC3F1 /* Krub */,
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
 				F8B3A7B7226CC0B7004BA588 /* sounds */,
 			);
@@ -2671,6 +2730,7 @@
 				9A360AD82A2B77E90003D5F1 /* BGView.swift */,
 				F8BECB01235CE3E20060DAE1 /* BloodGlucoseChartView.swift */,
 				9A360AD72A2B77E80003D5F1 /* Watch App-Bridging-Header.h */,
+				9AEA74B42A348119001202A6 /* BGBackingBox.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -3388,9 +3448,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A360AF42A2BA2FC0003D5F1 /* Koulen-Regular.ttf in Resources */,
 				470B618C270C448100561E56 /* Assets.xcassets in Resources */,
-				9A360AF82A2BA2FC0003D5F1 /* OFL.txt in Resources */,
 				470B618A270C448000561E56 /* Interface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3399,9 +3457,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A360AF92A2BA2FC0003D5F1 /* OFL.txt in Resources */,
 				470B619D270C448200561E56 /* Assets.xcassets in Resources */,
-				9A360AF52A2BA2FC0003D5F1 /* Koulen-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3409,9 +3465,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A360AF32A2BA2FC0003D5F1 /* Koulen-Regular.ttf in Resources */,
 				F870D3D925126A49008967B0 /* MainInterface.storyboard in Resources */,
-				9A360AF72A2BA2FC0003D5F1 /* OFL.txt in Resources */,
 				F8E53FCE251D35FB00052CE5 /* Common.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3439,9 +3493,11 @@
 				F824378124CB7A9800BED341 /* Cartoon_Uh_Oh.caf in Resources */,
 				F64039B2281E90CF0051EFFE /* QuickActions.strings in Resources */,
 				F824377F24CB7A9800BED341 /* Sci-Fi_Alarm.caf in Resources */,
+				9AB5FAEF2A3079B500AAC3F1 /* Krub-Light.ttf in Resources */,
 				F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */,
 				F82437C324CB7A9900BED341 /* Metallic.caf in Resources */,
 				F82437C224CB7A9900BED341 /* Alert_Tone_Ringtone_2.caf in Resources */,
+				9AB5FAE62A2FE4B700AAC3F1 /* Krub-SemiBold.ttf in Resources */,
 				F81F370325C1583400520946 /* WatlaaView.strings in Resources */,
 				F824377E24CB7A9800BED341 /* Sci-Fi_Warning.caf in Resources */,
 				F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */,
@@ -3449,9 +3505,11 @@
 				F824377C24CB7A9800BED341 /* Machine_Charge.caf in Resources */,
 				F824377624CB7A9800BED341 /* Siri_Glucose_Dropping_Fast.caf in Resources */,
 				F824376F24CB7A9800BED341 /* Ambulance.caf in Resources */,
+				9AEA74AD2A347765001202A6 /* Quicksand-Medium.ttf in Resources */,
 				F824378B24CB7A9900BED341 /* Fly.caf in Resources */,
 				F8B48AA022B2FA7B009BCC01 /* HomeView.strings in Resources */,
 				F824377424CB7A9800BED341 /* Cartoon_Siren.caf in Resources */,
+				9AEA74B02A347765001202A6 /* OFL.txt in Resources */,
 				F824379424CB7A9900BED341 /* Cartoon_Ascend_Then_Descend.caf in Resources */,
 				F82437BC24CB7A9900BED341 /* Siri_Device_Muted.caf in Resources */,
 				F824377024CB7A9800BED341 /* Siri_Alert_Urgent_Low_Glucose.caf in Resources */,
@@ -3484,6 +3542,7 @@
 				F82437A324CB7A9900BED341 /* Siri_Alert_Glucose_Dropping_Fast.caf in Resources */,
 				F824379224CB7A9900BED341 /* Unpaved.caf in Resources */,
 				F824379D24CB7A9900BED341 /* Alarm_Buzzer.caf in Resources */,
+				9AEA74AE2A347765001202A6 /* Quicksand-Regular.ttf in Resources */,
 				F8B3A81F227DEC92004BA588 /* README.md in Resources */,
 				F82437B024CB7A9900BED341 /* In_A_Hurry.caf in Resources */,
 				F824378924CB7A9900BED341 /* Soft_Warm_Airy_Optimistic.caf in Resources */,
@@ -3497,6 +3556,7 @@
 				F82437A624CB7A9900BED341 /* Siri_Glucose_Rising_Fast.caf in Resources */,
 				F81F370825C1584A00520946 /* LibreStates.strings in Resources */,
 				F82437B724CB7A9900BED341 /* Cartoon_Tip_Toe_Sneaky_Walk.caf in Resources */,
+				9AEA74AF2A347765001202A6 /* Quicksand-SemiBold.ttf in Resources */,
 				F824379A24CB7A9900BED341 /* Siri_Alert_Device_Muted.caf in Resources */,
 				F824378024CB7A9800BED341 /* Sci-Fi_Alarm_Loop_4.caf in Resources */,
 				F824378C24CB7A9900BED341 /* Marimba_Descend.caf in Resources */,
@@ -3507,10 +3567,12 @@
 				F8B3A7C7226CC0B7004BA588 /* shortlow3.mp3 in Resources */,
 				F82437B324CB7A9900BED341 /* Rush.caf in Resources */,
 				F82437A024CB7A9900BED341 /* Siri_Missed_Readings.caf in Resources */,
+				9AEA74B12A347765001202A6 /* Quicksand-Light.ttf in Resources */,
 				F824377924CB7A9800BED341 /* Sci-Fi_Alarm_Loop_3.caf in Resources */,
 				F8B3A7CB226CC0B7004BA588 /* shortlow4.mp3 in Resources */,
 				4749EB9B25B36E010072DF8B /* LibreNFC.strings in Resources */,
 				F82437C624CB7A9900BED341 /* Siri_Alert_High_Glucose.caf in Resources */,
+				9AEA74B32A347765001202A6 /* README.txt in Resources */,
 				F82437A924CB7A9900BED341 /* Wake_Up_Will_You.caf in Resources */,
 				F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */,
 				F82437D024CB7A9900BED341 /* Sci-Fi_Engine_Shut_Down.caf in Resources */,
@@ -3522,13 +3584,13 @@
 				F824378724CB7A9900BED341 /* Ghost_Hover.caf in Resources */,
 				F8B3A80D227A3E98004BA588 /* AlertTypesSettingsView.strings in Resources */,
 				F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */,
-				9A360AF62A2BA2FC0003D5F1 /* OFL.txt in Resources */,
 				F824379C24CB7A9900BED341 /* Wrong_Answer.caf in Resources */,
 				F82437A424CB7A9900BED341 /* Alert_Tone_Ringtone_1.caf in Resources */,
+				9AB5FAEA2A30742A00AAC3F1 /* Krub-Bold.ttf in Resources */,
+				9AB5FAE82A30732B00AAC3F1 /* Krub-LightItalic.ttf in Resources */,
 				F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */,
 				F824377524CB7A9800BED341 /* Big_Clock_Ticking.caf in Resources */,
 				F82437BE24CB7A9900BED341 /* Cartoon_Dreamy_Glissando_Harp.caf in Resources */,
-				9A360AF22A2BA2FC0003D5F1 /* Koulen-Regular.ttf in Resources */,
 				F82437B424CB7A9900BED341 /* Siri_Urgent_High_Glucose.caf in Resources */,
 				F82437CC24CB7A9900BED341 /* Analog_Watch_Alarm.caf in Resources */,
 				F82437B524CB7A9900BED341 /* Alert_Tone_Busy.caf in Resources */,
@@ -3555,6 +3617,7 @@
 				F82437C924CB7A9900BED341 /* Computer_Magic.caf in Resources */,
 				F82437A124CB7A9900BED341 /* Jingle_All_The_Way.caf in Resources */,
 				470CE1FC246802EB00D5CB74 /* BluetoothPeripheralsView.strings in Resources */,
+				9AEA74AC2A347765001202A6 /* Quicksand-Bold.ttf in Resources */,
 				F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */,
 				F82437D324CB7A9900BED341 /* Soft_Marimba_Pad_Positive.caf in Resources */,
 				F824379924CB7A9900BED341 /* Magical_Twinkle.caf in Resources */,
@@ -3569,8 +3632,10 @@
 				F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */,
 				F8B48AA422B2FA9B009BCC01 /* CalibrationRequest.strings in Resources */,
 				F8B3A7B5226A0A71004BA588 /* Alerts.strings in Resources */,
+				9AEA74B22A347765001202A6 /* Quicksand-VariableFont_wght.ttf in Resources */,
 				F8B3A7D2226CC0B7004BA588 /* spaceship.mp3 in Resources */,
 				F82437B224CB7A9900BED341 /* Burglar_Alarm_Siren_2.caf in Resources */,
+				9AB5FAE92A3073AE00AAC3F1 /* Krub-Regular.ttf in Resources */,
 				F82437BD24CB7A9900BED341 /* Sci-Fi_Spaceship_Warm_Up.caf in Resources */,
 				F824378D24CB7A9900BED341 /* Soft_Warm_Airy_Reassuring.caf in Resources */,
 			);
@@ -3586,6 +3651,7 @@
 				470B6199270C448100561E56 /* ExtensionDelegate.swift in Sources */,
 				470B6197270C448100561E56 /* InterfaceController.swift in Sources */,
 				470B619B270C448100561E56 /* ComplicationController.swift in Sources */,
+				9AB5FAEE2A3078D600AAC3F1 /* UIFont.swift in Sources */,
 				47F8E95A2710255D00B8B02B /* ConstantsWatchApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3602,6 +3668,7 @@
 				F870D3EA25129C43008967B0 /* Glucose+GlucoseKit.swift in Sources */,
 				F8E53FAB2517733700052CE5 /* Double.swift in Sources */,
 				F8E53FE9251F7B8800052CE5 /* Texts.swift in Sources */,
+				9AB5FAED2A3078D600AAC3F1 /* UIFont.swift in Sources */,
 				F8E53FB92517F79400052CE5 /* ConstantsBGGraphBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3738,6 +3805,7 @@
 				F8F971B723A5914D00C3F17D /* BluetoothPeripheralType.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F8F1670E27273EA7001AA3D8 /* GlucoseDataRxMessage.swift in Sources */,
+				9AB5FAF12A31DFE900AAC3F1 /* Units Primitives.swift in Sources */,
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
 				F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */,
 				F8CB59CE27444D6300BA199E /* DexcomSessionStopResponse.swift in Sources */,
@@ -3903,6 +3971,7 @@
 				F8F9720E23A5915900C3F17D /* AuthRequestRxMessage.swift in Sources */,
 				F8A2BC3F25DB0D89001D1E78 /* BluetoothPeripheralManager+CGMAtomTransmitterDelegate.swift in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
+				9AEA74B52A348119001202A6 /* BGBackingBox.swift in Sources */,
 				F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */,
 				F8F9723023A5915900C3F17D /* M5StackUtilities.swift in Sources */,
 				F8297F52238ECA3200D74D66 /* BluetoothPeripheralViewController.swift in Sources */,
@@ -3968,6 +4037,7 @@
 				47150A4027F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift in Sources */,
 				F8A389ED23342EB10010F405 /* ConstantsNightScout.swift in Sources */,
 				F85FF3D1252F9FF9004E6FF1 /* SnoozeParameters+CoreDataClass.swift in Sources */,
+				9AB5FAEC2A3078D600AAC3F1 /* UIFont.swift in Sources */,
 				F857A32A253E2D9E00951BB2 /* LibreAlgorithmThresholds.swift in Sources */,
 				F8A1850C25643B16000EF8A0 /* Double+Smoothable.swift in Sources */,
 				F8CB59C8273EF9F800BA199E /* DexcomAlgorithmState.swift in Sources */,
