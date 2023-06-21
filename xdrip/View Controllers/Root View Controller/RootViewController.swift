@@ -1969,7 +1969,7 @@ final class RootViewController: UIViewController {
                 calculatedValueAsString = calculatedValueAsString + " " + lastReading[0].slopeArrow()
             }
             if lastReading.count > 1 {
-                calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: userPrefsMgDL)
+                calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: userPrefsMgDL).string
             }
             notificationContent.title = calculatedValueAsString
             
@@ -2069,6 +2069,10 @@ final class RootViewController: UIViewController {
         // start creating text for valueLabelOutlet, first the calculated value
         var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: userPrefsMgDL)
         
+        // create delta value text (without the units)
+        let diffLabelContent = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: false, highGranularity: true, mgdl: userPrefsMgDL)
+        diffLabelOutlet.text = diffLabelContent.string
+        
         // if latestReading is older than 11 minutes, then it should be strikethrough
         if lastReading.timeStamp < Date(timeIntervalSinceNow: -60.0 * 11) {
             
@@ -2092,7 +2096,7 @@ final class RootViewController: UIViewController {
             
             valueLabelOutlet.attributedText = attributeString
             
-            valueViewOutlet.setValues(for: lastReading, slope: lastReading.calculatedValueSlope, isOld: false)
+            valueViewOutlet.setValues(for: lastReading, slope: diffLabelContent, isOld: false)
             
         }
         
@@ -2127,10 +2131,6 @@ final class RootViewController: UIViewController {
         // configure the localized text in the "mins ago" label
         let minutesAgoMinAgoText = (minutesAgo == 1 ? Texts_Common.minute : Texts_Common.minutes) + " " + Texts_HomeView.ago
         minutesAgoLabelOutlet.text = minutesAgoMinAgoText
-        
-        // create delta value text (without the units)
-        let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: false, highGranularity: true, mgdl: userPrefsMgDL)
-        diffLabelOutlet.text = diffLabelText
         
         // set the delta unit label text
         let diffLabelUnitText = userPrefsMgDL ? Texts_Common.mgdl : Texts_Common.mmol

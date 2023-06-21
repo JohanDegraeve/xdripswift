@@ -131,7 +131,7 @@ public struct MMOLL :NumericType {
     
     /// Converts the current value to mg/dL
     var inMgDl: MGDL {
-        return MGDL(value.mmolToMgdl().rounded(.toNearestOrAwayFromZero))
+        return MGDL(value.mmolToMgdl())
     }
     
     /// Returns a `String` of the current value in the form `12.3`
@@ -292,6 +292,14 @@ public struct UniversalBGLevel {
         get {
             return _mgdl
         }
+    }
+    
+    public var isOld: Bool {
+        return timestamp.timeIntervalSinceNow < -660 // 11 mins
+    }
+    
+    public var userPrefersMGDL: Bool {
+        return UserDefaults.standard.bloodGlucoseUnitIsMgDl
     }
     
     var timestamp: Date

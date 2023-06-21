@@ -32,6 +32,9 @@ extension Double: RawRepresentable {
     }
     
     /// converts mgdl to mmol if parameter mgdl = false. If mgdl = true then just returns self
+    /// TODO: - Check semantics: if we pass in mg/dL and want mg/dL we get mg/dL
+    /// if we pass in mmol/dl and mgdl is true we get mmol/l back....?
+    /// Should we convert it if this is the case..?
     func mgdlToMmol(mgdl:Bool) -> Double {
         if mgdl {
             return self

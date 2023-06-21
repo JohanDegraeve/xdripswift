@@ -24,3 +24,14 @@ Changed passed in parameter of mgdlToMmolAndToString(_ :) to thisIsMgdL for ease
 Changed viewWillAppear(_ animated: Bool) in TreatmentsViewController to update black, translucent settings for ios 13.0+
 
 Changed String extension, hexStringToUIColor() to use UInt64 and scanHexInt64(_:) as per deprecated warning for ios 13.0+
+
+Modified unitizedDeltaString(previousBgReading:BgReading?, showUnit:Bool, highGranularity:Bool, mgdl:Bool) to return a Tuple of the string and the Double value.
+This is used by the new delta view in my code.
+
+For code gold, added
+
+    static let UsersUnits = {
+        return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
+    }()
+    
+To Texts_Common

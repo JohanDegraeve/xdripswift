@@ -225,15 +225,15 @@ public class BgReading: NSManagedObject {
     }
     
     /// creates string with difference from previous reading and also unit
-    func unitizedDeltaString(previousBgReading:BgReading?, showUnit:Bool, highGranularity:Bool, mgdl:Bool) -> String {
+    func unitizedDeltaString(previousBgReading:BgReading?, showUnit:Bool, highGranularity:Bool, mgdl:Bool) -> (string: String, doubleValue: Double) {
         
         guard let previousBgReading = previousBgReading else {
-            return "???"
+            return (string: "???", doubleValue: 0.0)
         }
         
         if timeStamp.timeIntervalSince(previousBgReading.timeStamp) > Double(ConstantsBGGraphBuilder.maxSlopeInMinutes * 60) {
             // don't show delta if there are not enough values or the values are more than 20 mintes apart
-            return "???";
+            return (string: "???", doubleValue: 0.0)
         }
         
         // delta value recalculated aligned with time difference between previous and this reading
@@ -241,7 +241,7 @@ public class BgReading: NSManagedObject {
 
         if(abs(value) > 100){
             // a delta > 100 will not happen with real BG values -> problematic sensor data
-            return "ERR";
+            return (string: "ERR", doubleValue: 0.0)
         }
         
         let valueAsString = value.mgdlToMmolAndToString(thisIsMgDl: mgdl)
@@ -251,19 +251,11 @@ public class BgReading: NSManagedObject {
         
         // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
         // show unitized zero deltas as +0 or +0.0 as per Nightscout format
-        if (mgdl) {
-            if (value > -1) && (value < 1) {
-                return "+0" + (showUnit ? (" " + Texts_Common.mgdl):"");
-            } else {
-                return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mgdl):"");
-            }
-        } else {
-            if (value > -0.1) && (value < 0.1) {
-                return "+0.0" + (showUnit ? (" " + Texts_Common.mmol):"");
-            } else {
-                return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mmol):"");
-            }
+        if (value > -1) && (value < 1) {
+            return (string: "+0" + (showUnit ? (" " + Texts_Common.UsersUnits):""), doubleValue: 0.0)
         }
+        
+        return (string: deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.UsersUnits):""), doubleValue: value)
     }
     
     /**
@@ -312,7 +304,7 @@ public class BgReading: NSManagedObject {
     }
     
     /**
-     Taken over form xdripplus.
+     Taken over from xdripplus.
      This function takes the current reading and the last reading and divides by the time interval between them (in msecs) to get a slope value.
      
      - Parameter currentBgReading : reading for which slope is calculated

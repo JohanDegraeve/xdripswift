@@ -14,7 +14,7 @@ extension UIFont {
     // Static vars to allow auto-complete of used `UIFonts`
     
     static let DefaultSize: CGFloat = 90.0
-    static let SmallSize: CGFloat = UIFont.DefaultSize / 5
+    static let SmallSize: CGFloat = UIFont.DefaultSize / 6
     
     // These are force unwrapped since we shouldn't be able to run without the resources
     
@@ -28,6 +28,6 @@ extension UIFont {
     static let InRangeFont: UIFont = UIFont(name: "Quicksand-Regular", size: UIFont.DefaultSize)!
     
     /// Small, light font - typically for the display of units.
-    static let SmallFont: UIFont = UIFont(name: "Quicksand-Medium", size: UIFont.SmallSize)!
+    static let SmallFont: UIFont = UIFont(name: "Quicksand-SemiBold", size: UIFont.SmallSize)!
 
 }

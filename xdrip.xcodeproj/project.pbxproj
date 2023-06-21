@@ -38,6 +38,8 @@
 		9A360ADF2A2B7B470003D5F1 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360ADE2A2B7B470003D5F1 /* UIColor.swift */; };
 		9A360AE32A2B7B650003D5F1 /* NSParagraphStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */; };
 		9A360AE72A2B7B840003D5F1 /* NSLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */; };
+		9A65B8702A3C4DF100791398 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A65B86F2A3C4DF100791398 /* UIView.swift */; };
+		9A65B8722A3CB85900791398 /* BGDeltaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A65B8712A3CB85900791398 /* BGDeltaView.swift */; };
 		9AB5FAE62A2FE4B700AAC3F1 /* Krub-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FACE2A2FE35700AAC3F1 /* Krub-SemiBold.ttf */; };
 		9AB5FAE82A30732B00AAC3F1 /* Krub-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FAD62A2FE35700AAC3F1 /* Krub-LightItalic.ttf */; };
 		9AB5FAE92A3073AE00AAC3F1 /* Krub-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FACD2A2FE35700AAC3F1 /* Krub-Regular.ttf */; };
@@ -47,6 +49,8 @@
 		9AB5FAEE2A3078D600AAC3F1 /* UIFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */; };
 		9AB5FAEF2A3079B500AAC3F1 /* Krub-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FAD02A2FE35700AAC3F1 /* Krub-Light.ttf */; };
 		9AB5FAF12A31DFE900AAC3F1 /* Units Primitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */; };
+		9ABB95012A4227B400A63285 /* UIBezierPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ABB95002A4227B400A63285 /* UIBezierPath.swift */; };
+		9ABC39562A4199710042AAEA /* BGTimeStampView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ABC39552A4199710042AAEA /* BGTimeStampView.swift */; };
 		9AEA74AC2A347765001202A6 /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */; };
 		9AEA74AD2A347765001202A6 /* Quicksand-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */; };
 		9AEA74AE2A347765001202A6 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A62A347765001202A6 /* Quicksand-Regular.ttf */; };
@@ -776,6 +780,8 @@
 		9A360ADE2A2B7B470003D5F1 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSParagraphStyle.swift; sourceTree = "<group>"; };
 		9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSLayoutConstraint.swift; sourceTree = "<group>"; };
+		9A65B86F2A3C4DF100791398 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
+		9A65B8712A3CB85900791398 /* BGDeltaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGDeltaView.swift; sourceTree = "<group>"; };
 		9AB5FAC52A2E078C00AAC3F1 /* CHANGES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGES.md; sourceTree = "<group>"; };
 		9AB5FACC2A2FE35700AAC3F1 /* Krub-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Medium.ttf"; sourceTree = "<group>"; };
 		9AB5FACD2A2FE35700AAC3F1 /* Krub-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Regular.ttf"; sourceTree = "<group>"; };
@@ -791,6 +797,8 @@
 		9AB5FAD82A2FE35700AAC3F1 /* Krub-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Bold.ttf"; sourceTree = "<group>"; };
 		9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFont.swift; sourceTree = "<group>"; };
 		9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Units Primitives.swift"; sourceTree = "<group>"; };
+		9ABB95002A4227B400A63285 /* UIBezierPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBezierPath.swift; sourceTree = "<group>"; };
+		9ABC39552A4199710042AAEA /* BGTimeStampView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGTimeStampView.swift; sourceTree = "<group>"; };
 		9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
 		9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
 		9AEA74A62A347765001202A6 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
@@ -1739,6 +1747,17 @@
 			path = Krub;
 			sourceTree = "<group>";
 		};
+		9ABC39542A4199420042AAEA /* BTVAdditions */ = {
+			isa = PBXGroup;
+			children = (
+				9A65B8712A3CB85900791398 /* BGDeltaView.swift */,
+				9AEA74B42A348119001202A6 /* BGBackingBox.swift */,
+				9A360AD82A2B77E90003D5F1 /* BGView.swift */,
+				9ABC39552A4199710042AAEA /* BGTimeStampView.swift */,
+			);
+			path = BTVAdditions;
+			sourceTree = "<group>";
+		};
 		9AEA74A32A347765001202A6 /* Quicksand */ = {
 			isa = PBXGroup;
 			children = (
@@ -1817,8 +1836,10 @@
 				9A360ADE2A2B7B470003D5F1 /* UIColor.swift */,
 				9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */,
 				9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */,
+				9A65B86F2A3C4DF100791398 /* UIView.swift */,
 				9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */,
 				9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */,
+				9ABB95002A4227B400A63285 /* UIBezierPath.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2727,10 +2748,9 @@
 		F8BECB00235CE3E20060DAE1 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				9A360AD82A2B77E90003D5F1 /* BGView.swift */,
+				9ABC39542A4199420042AAEA /* BTVAdditions */,
 				F8BECB01235CE3E20060DAE1 /* BloodGlucoseChartView.swift */,
 				9A360AD72A2B77E80003D5F1 /* Watch App-Bridging-Header.h */,
-				9AEA74B42A348119001202A6 /* BGBackingBox.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -3768,6 +3788,7 @@
 				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
 				F8C9784D2428052E00A09483 /* CGMSensorType.swift in Sources */,
 				F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */,
+				9A65B8702A3C4DF100791398 /* UIView.swift in Sources */,
 				F8F9723923A5928D00C3F17D /* M5StackBluetoothPeripheralViewModel.swift in Sources */,
 				F8F9722B23A5915900C3F17D /* CGMTransmitterDelegate.swift in Sources */,
 				F80859292364D61B00F3829D /* UserDefaults+charts.swift in Sources */,
@@ -3828,6 +3849,7 @@
 				F8A2BC3325DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift in Sources */,
 				F816E10E2437EAC9009EE65B /* BlueReader+CoreDataProperties.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
+				9A65B8722A3CB85900791398 /* BGDeltaView.swift in Sources */,
 				F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */,
 				F8F7B8EB259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift in Sources */,
 				D417E51C282EC8DB008DC467 /* ProgressBarViewController.swift in Sources */,
@@ -4043,6 +4065,7 @@
 				F8CB59C8273EF9F800BA199E /* DexcomAlgorithmState.swift in Sources */,
 				F890E07A247687AE008FB2EC /* URL.swift in Sources */,
 				F8B3A856227F28DC004BA588 /* AlertTypeSettingsViewController.swift in Sources */,
+				9ABB95012A4227B400A63285 /* UIBezierPath.swift in Sources */,
 				F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */,
 				F8B3A845227F090E004BA588 /* SettingsViewDexcomSettingsViewModel.swift in Sources */,
 				F8F9720C23A5915900C3F17D /* SensorDataTxMessage.swift in Sources */,
@@ -4053,6 +4076,7 @@
 				D41F32922827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift in Sources */,
 				F816E11624391A02009EE65B /* Droplet+BluetoothPeripheral.swift in Sources */,
 				F8FDFEAD260DE1B90047597D /* ConstantsUI.swift in Sources */,
+				9ABC39562A4199710042AAEA /* BGTimeStampView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
