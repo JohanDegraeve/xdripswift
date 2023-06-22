@@ -15,7 +15,7 @@ extension UIBezierPath {
      Rotates a path by `radians` within a given `CGRect`. The zero point is modified
      to be vertically straight up.
      
-     - Parameter radians: a `CGFloat` of radians from the 12 o'clock position.
+     - Parameter radians: a `CGFloat` of radians from the 12 o'clock position (in a clockwise direction).
      - Parameter rect: The `CGRect` that the path is to be based in.
      
      This function applies a transformation, a rotation, and then the inverse transformation
@@ -28,7 +28,14 @@ extension UIBezierPath {
     }
     
     /**
-     The same as `rotateBy(_: _:)` but takes degrees and not radians.
+     Rotates a path by `degrees` within a given `CGRect`. The zero point is modified
+     to be vertically straight up.
+     
+     - Parameter radians: a `CGFloat` of degrees from the 12 o'clock position (in a clockwise direction).
+     - Parameter rect: The `CGRect` that the path is to be based in.
+     
+     This function applies a transformation, a rotation, and then the inverse transformation
+     to get a path that's rotated around the centre of the `rect`.
      */
     func rotateBy(degrees: CGFloat, within rect: CGRect) {
         rotateBy(radians: (degrees / 360) * (CGFloat.pi * 2), within: rect)

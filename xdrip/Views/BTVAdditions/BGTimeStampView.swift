@@ -14,19 +14,16 @@ import UIKit
  
  If the `date` iVar is set to `nil` then 'Now' is displayed
  */
-class BGTimeStampView: UIView {
+class BGTimeStampView: UIStackView {
     
     var date: Date? = nil {
         didSet {
             
-            defer {
-                displayComponents(flag: false)
-                setNeedsDisplay()
-            }
-            
             guard let _date = date else {
                 // It's a current BG level so show now indicator
-                displayComponents(flag: false)
+                displayComponents(flag: true)
+                _displays[1].isHidden = false
+                _displays[1].text = _timeFormat.string(from: Date())
                 return
             }
             
@@ -49,12 +46,6 @@ class BGTimeStampView: UIView {
     /// Formatter for the date of the sample
     private var _dateFormat = DateFormatter()
     
-    /// Keep a constant of the second hand
-    let _secondHand: UIBezierPath = UIBezierPath()
-    
-    /// Keep a constant for the hour hand
-    let _hourHand: UIBezierPath = UIBezierPath()
-    
     /// Store the short, localised weekday symbols
     ///
     /// In order to allow for a problem getting the weekday from the `date` components, the last element is an error
@@ -70,18 +61,15 @@ class BGTimeStampView: UIView {
     private var _displays: [UILabel] = Array(repeating: UILabel(), count: 3)
     
     /// This is the image that's displayed when the BG level is current
-    private var _nowIndicator: UIImageView = UIImageView(image: UIImage(named: "BGNowIndicator")!.withRenderingMode(.automatic))
+    private var _nowIndicator: UIImage = UIImage(named: "BGNowIndicator")!.withRenderingMode(.automatic)
     
     var colour: UIColor = UIColor.white
-    
-    
-    
+
     /// D.R.Y. to hide and show all the views
     private func displayComponents(flag: Bool) {
         _displays[0].isHidden = !flag
         _displays[1].isHidden = !flag
         _displays[2].isHidden = !flag
-        _nowIndicator.isHidden = flag
     }
     
     override func didMoveToSuperview() {
@@ -93,30 +81,32 @@ class BGTimeStampView: UIView {
         
         _weekdays.append("???")
         
-        // Setup clockface
-        addSubview(_nowIndicator)
-        _nowIndicator.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.fixAllSides(of: _nowIndicator, to: self)
-        _nowIndicator.alpha = 0.0
+        axis = .vertical
         
-        _secondHand.lineWidth = 3.0
-        _hourHand.lineWidth = 2.0
+        for i in 0 ..< _displays.count {
+            addArrangedSubview(_displays[i])
+            _displays[i].translatesAutoresizingMaskIntoConstraints = false
+            let _left = NSLayoutConstraint.fix(constraint: .left, of: _displays[i], toSameOfView: self)
+            let _right = NSLayoutConstraint.fix(constraint: .right, of: _displays[i], toSameOfView: self)
+            backgroundColor = .blue
+        }
         
+        alignment = .center
+        spacing = 5.0
+        distribution = .equalSpacing
         
+        let _digitsAttributes: [NSAttributedString.Key : AnyObject] = [
+            NSAttributedString.Key.font : UIFont.SmallFont,
+            NSAttributedString.Key.paragraphStyle : NSParagraphStyle.centredText(),
+            NSAttributedString.Key.foregroundColor : UIColor.white
+        ]
         
-        backgroundColor = .red
-    }
-    
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
+        _displays[0].attributedText = NSAttributedString(string: "", attributes: _digitsAttributes)
+        _displays[1].attributedText = NSAttributedString(string: "", attributes: _digitsAttributes)
+        _displays[2].attributedText = NSAttributedString(string: "", attributes: _digitsAttributes)
         
-        UIColor.white.setStroke()
-        // Draw the second hand
-        _secondHand.move(to: CGPoint(x: rect.midX, y: rect.midY))
-        _secondHand.addLine(to: CGPoint(x: rect.midX, y: rect.midY + (rect.width * 0.4)))
-        _secondHand.rotateBy(degrees: 90, within: rect)
-        _secondHand.stroke()
-        
+        date = nil
+        backgroundColor = .clear
     }
 
 }
