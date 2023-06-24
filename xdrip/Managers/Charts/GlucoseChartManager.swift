@@ -145,7 +145,7 @@ public class GlucoseChartManager {
     /// if the class is iniatated by the view controller without specifying a Gesture Recogniser, then we are not displaying the main chart, but the static 24 hour chart from the landscape view controller
     private var isStatic24hrChart: Bool = false
     
-    /// - if glucoseChartPoints.count > 0, then this is the latest one that has timestamp less than endDate.
+    /// If glucoseChartPoints.count > 0, then this is the latest one that has timestamp less than endDate.
     private(set) var lastChartPointEarlierThanEndDate: ChartPoint?
     
     /// is chart in panned state or not, meaning is it currently shifted back in time

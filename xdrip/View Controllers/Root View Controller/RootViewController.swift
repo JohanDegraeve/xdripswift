@@ -214,7 +214,7 @@ final class RootViewController: UIViewController {
         
         glucoseChartManager.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: {
             
-            // user has been panning, if chart is panned backward, then need to set valueLabel to value of latest chartPoint shown in the chart, and minutesAgo text to timeStamp of latestChartPoint
+            // user has been panning, if chart is panned, then need to set valueLabel to value of latest chartPoint shown in the chart, and minutesAgo text to timeStamp of latestChartPoint
             if glucoseChartManager.chartIsPannedBackward {
                 
                 if let lastChartPointEarlierThanEndDate = glucoseChartManager.lastChartPointEarlierThanEndDate, let chartAxisValueDate = lastChartPointEarlierThanEndDate.x as? ChartAxisValueDate  {
@@ -225,8 +225,8 @@ final class RootViewController: UIViewController {
                     // set value to value of latest chartPoint
                     self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: self.userPrefsMgDL)
                     
-                    // This will send either mg/dl or mmol/l down to the BGView
-                    self.valueViewOutlet.directSetBGValue(_value: lastChartPointEarlierThanEndDate.y.scalar)
+                    // This can send either mg/dl or mmol/l down to the BGView depending on user setting
+                    self.valueViewOutlet.directSetBGValue(value: lastChartPointEarlierThanEndDate.y.scalar, date: chartAxisValueDate.date)
                     
                     // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
                     self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
@@ -257,7 +257,9 @@ final class RootViewController: UIViewController {
             } else {
                 
                 // chart is not panned, update labels is necessary
-                self.updateLabelsAndChart(overrideApplicationState: false)
+                // This code is reached when the user has panned to the last reading
+                // which is potentially current or old.
+                self.updateLabelsAndChart(overrideApplicationState: false, pannedToMostRecent: true)
                 
             }
             
@@ -521,7 +523,7 @@ final class RootViewController: UIViewController {
         updateScreenRotationSettings()
         
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
-        updateLabelsAndChart(overrideApplicationState: true)
+        updateLabelsAndChart(overrideApplicationState: true, forceReset: true)
         
         // show the mini-chart as required
         if !screenIsLocked {
@@ -2017,7 +2019,12 @@ final class RootViewController: UIViewController {
     /// - parameters:
     ///     - overrideApplicationState : if true, then update will be done even if state is not .active
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
-    @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
+    ///     - panToMostRecent : `Bool` to indicate whether the user has panned all the way to the latest reading. Default is `false` only set to `true` by the gesture recogniser
+    @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false, pannedToMostRecent: Bool = false) {
+        
+        defer {
+            self.valueViewOutlet.setNeedsDisplay()
+        }
         
         UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         
@@ -2081,7 +2088,7 @@ final class RootViewController: UIViewController {
             
             valueLabelOutlet.attributedText = attributeString
             
-            valueViewOutlet.setValues(for: lastReading, slope: nil, isOld: false)
+            valueViewOutlet.setValues(for: lastReading, slope: nil, isOld: true)
             
         } else {
             

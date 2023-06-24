@@ -8,6 +8,30 @@
 
 import UIKit
 
+class BTVRoundRectLabel: BTVRoundedBackingView {
+    
+    fileprivate var _label: UILabel = UILabel()
+    
+    var text: String = "" {
+        didSet {
+            _label.text = text
+        }
+    }
+    
+    var attributedText: NSAttributedString  = NSAttributedString() {
+        didSet {
+            _label.attributedText = attributedText
+        }
+    }
+    
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        addSubview(_label)
+        bringSubviewToFront(_label)
+        NSLayoutConstraint.fixAllSides(of: _label, to: self)
+    }
+}
+
 /**
  This class takes a `date` of the displayed BG level and splits it into day, date and time of
  sample.
@@ -21,19 +45,18 @@ class BGTimeStampView: UIStackView {
             
             guard let _date = date else {
                 // It's a current BG level so show now indicator
-                displayComponents(flag: true)
-                _displays[1].isHidden = false
-                _displays[1].text = _timeFormat.string(from: Date())
+                displayComponents(flag: false)
+                _displays[1].alpha = 1.0
+                _displays[1].attributedText = NSAttributedString(string: _timeFormat.string(from: Date()), attributes: _digitsAttributes)
                 return
             }
             
             displayComponents(flag: true)
             
-            let _dateComps = _calendar.dateComponents(_dateComponents, from: _date)
-            
-            _displays[0].text = _weekdays[_dateComps.weekday ?? (_weekdays.count - 1)]
-            _displays[1].text = _dateFormat.string(from: _date)
-            _displays[2].text = _timeFormat.string(from: _date)
+            let _dateComps = _calendar.dateComponents([.weekday], from: _date)
+            _displays[0].attributedText = NSAttributedString(string: _weekdays[(_dateComps.weekday ?? _weekdays.count) - 1], attributes: _digitsAttributes)
+            _displays[1].attributedText = NSAttributedString(string: _dateFormat.string(from: _date), attributes: _digitsAttributes)
+            _displays[2].attributedText = NSAttributedString(string: _timeFormat.string(from: _date), attributes: _digitsAttributes)
         }
     }
     
@@ -41,7 +64,13 @@ class BGTimeStampView: UIStackView {
     private var _dateComponents: Set<Calendar.Component> = Set()
     
     /// The current calendar so we don't have to keep setting up drawing re-draw
-    private let _calendar = Calendar.current
+    ///
+    /// According to
+    /// https://stackoverflow.com/a/39842835/19730436
+    /// The days can sometimes not match betweem a `Date` result and a `Calendar.components` one.
+    /// This creates a whole new calendar (as recommended in one of the comments to the SO answer).
+    /// The timezone is set when the view loads and is "UTC".
+    private var _calendar = Calendar(identifier: .gregorian)
     
     /// Formatter for the date of the sample
     private var _dateFormat = DateFormatter()
@@ -58,18 +87,47 @@ class BGTimeStampView: UIStackView {
     /// This array will hold the day, date and time of the `time`
     ///
     /// If the `date` is `nil` then they will all be hidden and the indicator shown
-    private var _displays: [UILabel] = Array(repeating: UILabel(), count: 3)
+    private var _displays: [BTVRoundRectLabel] = [BTVRoundRectLabel(), BTVRoundRectLabel(), BTVRoundRectLabel()]
     
     /// This is the image that's displayed when the BG level is current
     private var _nowIndicator: UIImage = UIImage(named: "BGNowIndicator")!.withRenderingMode(.automatic)
     
-    var colour: UIColor = UIColor.white
+    private var _digitsAttributes: [NSAttributedString.Key : AnyObject] = [
+        NSAttributedString.Key.font : UIFont.MiniFont,
+        NSAttributedString.Key.paragraphStyle : NSParagraphStyle.centredText(),
+        NSAttributedString.Key.foregroundColor : UIColor.black
+    ]
+    
+    var textColour: UIColor = UIColor.white {
+        didSet {
+            _digitsAttributes[NSAttributedString.Key.foregroundColor] = textColour
+        }
+    }
 
     /// D.R.Y. to hide and show all the views
     private func displayComponents(flag: Bool) {
-        _displays[0].isHidden = !flag
-        _displays[1].isHidden = !flag
-        _displays[2].isHidden = !flag
+        _displays[0].alpha = flag.rawCGFloatValue
+        _displays[1].alpha = flag.rawCGFloatValue
+        _displays[2].alpha = flag.rawCGFloatValue
+    }
+    
+    /// Set the border and translucent fill colours to the same
+    func setBorderAndFill(to colour:UIColor) {
+        _displays[0].fillColour = colour
+        _displays[0].strokeColour = colour
+        
+        _displays[1].fillColour = colour
+        _displays[1].strokeColour = colour
+        
+        _displays[2].fillColour = colour
+        _displays[2].strokeColour = colour
+    }
+    
+    /// Pass translucense flag to the backing subviews
+    func isTranslucent(flag: Bool) {
+        _displays[0].isTranslucent = flag
+        _displays[1].isTranslucent = flag
+        _displays[2].isTranslucent = flag
     }
     
     override func didMoveToSuperview() {
@@ -79,34 +137,25 @@ class BGTimeStampView: UIStackView {
         _dateFormat.dateStyle = .short
         _dateFormat.timeStyle = .none
         
+        _calendar.timeZone = TimeZone(abbreviation: "UTC")!
+        
         _weekdays.append("???")
         
         axis = .vertical
         
         for i in 0 ..< _displays.count {
             addArrangedSubview(_displays[i])
+            _displays[i].isTranslucent = true
             _displays[i].translatesAutoresizingMaskIntoConstraints = false
-            let _left = NSLayoutConstraint.fix(constraint: .left, of: _displays[i], toSameOfView: self)
-            let _right = NSLayoutConstraint.fix(constraint: .right, of: _displays[i], toSameOfView: self)
-            backgroundColor = .blue
+            _displays[i].attributedText = NSAttributedString(string: "", attributes: _digitsAttributes)
+            _displays[i].borderWidth = 1.0
+            _displays[i].fillColour = UIColor(red: 0.392, green: 0.827, blue: 0.933, alpha: 1.00)
+            _displays[i].strokeColour = UIColor(red: 0.392, green: 0.827, blue: 0.933, alpha: 1.00)
         }
         
-        alignment = .center
-        spacing = 5.0
-        distribution = .equalSpacing
+        alignment = .fill
+        distribution = .fillEqually
         
-        let _digitsAttributes: [NSAttributedString.Key : AnyObject] = [
-            NSAttributedString.Key.font : UIFont.SmallFont,
-            NSAttributedString.Key.paragraphStyle : NSParagraphStyle.centredText(),
-            NSAttributedString.Key.foregroundColor : UIColor.white
-        ]
-        
-        _displays[0].attributedText = NSAttributedString(string: "", attributes: _digitsAttributes)
-        _displays[1].attributedText = NSAttributedString(string: "", attributes: _digitsAttributes)
-        _displays[2].attributedText = NSAttributedString(string: "", attributes: _digitsAttributes)
-        
-        date = nil
         backgroundColor = .clear
     }
-
 }

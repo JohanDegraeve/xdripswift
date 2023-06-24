@@ -34,6 +34,7 @@
 		47B60F3726F389E2003198D3 /* LandscapeChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */; };
 		47F8E95A2710255D00B8B02B /* ConstantsWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F8E9592710255C00B8B02B /* ConstantsWatchApp.swift */; };
 		47FB28082636B04200042FFB /* StatisticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FB28072636B04200042FFB /* StatisticsManager.swift */; };
+		9A1895812A44381500219C8D /* Bool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A1895802A44381500219C8D /* Bool.swift */; };
 		9A360AD92A2B77E90003D5F1 /* BGView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AD82A2B77E90003D5F1 /* BGView.swift */; };
 		9A360ADF2A2B7B470003D5F1 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360ADE2A2B7B470003D5F1 /* UIColor.swift */; };
 		9A360AE32A2B7B650003D5F1 /* NSParagraphStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */; };
@@ -775,6 +776,7 @@
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xdrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xdrip/Version.xcconfig; sourceTree = "<group>"; };
+		9A1895802A44381500219C8D /* Bool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bool.swift; sourceTree = "<group>"; };
 		9A360AD72A2B77E80003D5F1 /* Watch App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Watch App-Bridging-Header.h"; sourceTree = "<group>"; };
 		9A360AD82A2B77E90003D5F1 /* BGView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BGView.swift; sourceTree = "<group>"; };
 		9A360ADE2A2B7B470003D5F1 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
@@ -1840,6 +1842,7 @@
 				9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */,
 				9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */,
 				9ABB95002A4227B400A63285 /* UIBezierPath.swift */,
+				9A1895802A44381500219C8D /* Bool.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -3702,6 +3705,7 @@
 				F8A5EEC2257D18DC0085E660 /* LibreNFCDelegate.swift in Sources */,
 				F8F9720523A5915900C3F17D /* TransmitterMessage.swift in Sources */,
 				F816E1282439DE55009EE65B /* CGMDexomG4TransmitterDelegate.swift in Sources */,
+				9A1895812A44381500219C8D /* Bool.swift in Sources */,
 				F8F1670A2727317D001AA3D8 /* DexcomTransmitterTimeRxMessage.swift in Sources */,
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
 				F8E3A2A523D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */,

@@ -27,7 +27,10 @@ extension UIFont {
     /// Regular font indicating in range BG or general message
     static let InRangeFont: UIFont = UIFont(name: "Quicksand-Regular", size: UIFont.DefaultSize)!
     
-    /// Small, light font - typically for the display of units.
+    /// Small, semi bold font - typically for the display of units.
     static let SmallFont: UIFont = UIFont(name: "Quicksand-SemiBold", size: UIFont.SmallSize)!
+    
+    /// Small, light font - typically for the display of units.
+    static let MiniFont: UIFont = UIFont(name: "Quicksand-SemiBold", size: UIFont.SmallSize * 0.75)!
 
 }

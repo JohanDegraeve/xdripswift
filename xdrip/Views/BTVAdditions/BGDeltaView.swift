@@ -35,7 +35,12 @@ class BGDeltaView: UIView {
     }
     
     /// Colour of arrow and delta numbers
-    var colour: UIColor = UIColor.green
+    var colour: UIColor = UIColor.green {
+        didSet {
+            tintColor = colour
+            _deltaValue.textColor = colour
+        }
+    }
     
     /// The digits go here
     private var _deltaValue: UILabel = UILabel()
@@ -95,8 +100,6 @@ class BGDeltaView: UIView {
         // Rotate the arrow according to the slope
         _arrowImageView.transform = CGAffineTransform(rotationAngle: _angle)
         _secondaryArrowImageView.alpha = ((max(abs(_angle / (CGFloat.pi / 2)), 0.5)) - 0.5) * 2
-        _deltaValue.textColor = UIColor(hue: 0.03, saturation: _secondaryArrowImageView.alpha, brightness: 1.0, alpha: 1.0)
-        tintColor = UIColor(hue: 0.03, saturation: _secondaryArrowImageView.alpha, brightness: 1.0, alpha: 1.0)
         _deltaValue.text = _slope.string
     }
 }
