@@ -160,6 +160,12 @@ class BluetoothPeripheralViewController: UIViewController {
             nfcScanWasSuccessful = true
         }
         
+        /// This is sent in the notification posting for `BGView`
+        var status: String = "here1"
+        
+        defer {
+            NotificationCenter.default.post(Notification(name: BGView.BTChangePost, object: self, userInfo: ["status" : status]))
+        }
         
         // if BluetoothPeripheral not nil
         if let bluetoothPeripheral = bluetoothPeripheral {
@@ -168,7 +174,7 @@ class BluetoothPeripheralViewController: UIViewController {
             if bluetoothPeripheralIsConnected(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager) {
                 
                 connectButtonOutlet?.setTitle(Texts_BluetoothPeripheralView.disconnect, for: .normal)
-                
+                status = "Connected...."
                 return Texts_BluetoothPeripheralView.connected
             }
             
@@ -225,7 +231,7 @@ class BluetoothPeripheralViewController: UIViewController {
                 
                 // if a successful NFC scan has taken place then set the status text to show that it is now scanning
                 if nfcScanWasSuccessful {
-                    
+                    status = "Scanning......."
                     // disable, while scanning there's no need to click that button
                     connectButtonOutlet?.disable()
                     
@@ -236,7 +242,7 @@ class BluetoothPeripheralViewController: UIViewController {
                 }
                 
                 if (!expectedBluetoothPeripheralType.needsTransmitterId() || (expectedBluetoothPeripheralType.needsTransmitterId() && transmitterId != nil)) && !isScanning {
-                    
+                    status = "needs scannin....?"
                     connectButtonOutlet?.setTitle(Texts_BluetoothPeripheralView.scan, for: .normal)
                     
                     return Texts_BluetoothPeripheralView.readyToScan
@@ -252,7 +258,7 @@ class BluetoothPeripheralViewController: UIViewController {
                 connectButtonOutlet?.disable()
                 
                 connectButtonOutlet?.setTitle(Texts_BluetoothPeripheralView.scanning, for: .normal)
-                
+                status = "scanning"
                 return Texts_BluetoothPeripheralView.scanning
                 
             }
@@ -1052,25 +1058,36 @@ class BluetoothPeripheralViewController: UIViewController {
               let keyPathEnum = UserDefaults.Key(rawValue: keyPath)
         else { return }
         
+        /// This is sent in the notification posting for `BGView`
+        var status: String = ""
+        
+        defer {
+            NotificationCenter.default.post(Notification(name: BGView.BTChangePost, object: self, userInfo: ["status" : status]))
+        }
+
         switch keyPathEnum {
         case UserDefaults.Key.nfcScanFailed:
             
             // if failedToScan wasn't change to true then no further processing
-            guard UserDefaults.standard.nfcScanFailed else {return}
+            
+            guard UserDefaults.standard.nfcScanFailed else {
+                status = "nfcScanFalied"
+                return
+            }
             
             // we know that the scan failed so set nfcScanSuccessful to false and also set nfcScanNeeded to false as it the scan process has finished so a scan isn't actually needed any more
             self.nfcScanSuccessful = false
             self.nfcScanNeeded = false
-                
+
             trace("in observeValue, nfcScanFailed has been set to true so will disconnect and offer to scan again", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .error)
             
             // let's first check if bluetoothPeripheral exists and then call the nfcScanFailed function accordingly
             if let bluetoothPeripheral = bluetoothPeripheral {
-                
+                status = "nfcScanFalied"
                 nfcScanFailed(for: bluetoothPeripheral)
                 
             } else {
-                
+                status = "nfcScanFalied"
                 nfcScanFailed(for: nil)
                 
             }
@@ -1079,7 +1096,10 @@ class BluetoothPeripheralViewController: UIViewController {
         case UserDefaults.Key.nfcScanSuccessful:
             
             // if scanSuccessful wasn't change to true then no further processing
-            guard UserDefaults.standard.nfcScanSuccessful else {return}
+            guard UserDefaults.standard.nfcScanSuccessful else {
+                status = "nfcScanFalied"
+                return
+            }
             
             // we know that the scan was successful so set nfcScanSuccessful to true and also set nfcScanNeeded to false as it the scan process has finished so a scan isn't actually needed any more
             self.nfcScanSuccessful = true
@@ -1097,8 +1117,15 @@ class BluetoothPeripheralViewController: UIViewController {
             // connect button label text needs to change because we should now be scanning
             _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: self.transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
             
+            status = "successful"
             // TODO: need to fix crash: This reload can sometimes cause a crash under certain circumstances
-            self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+            if Thread.isMainThread {
+                    self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+            } else {
+                DispatchQueue.main.sync {
+                    self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+                }
+            }
             
         default:
             break

@@ -346,6 +346,4 @@ public class BgReading: NSManagedObject {
         }
         return arrow
     }
-
-
 }

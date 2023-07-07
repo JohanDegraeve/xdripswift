@@ -34,9 +34,13 @@ extension NSLayoutConstraint {
         theSuperView.addSubview(aView)
         aView.translatesAutoresizingMaskIntoConstraints = false
         let left = NSLayoutConstraint.fix(constraint: .left, of: aView, toSameOfView: theSuperView, offset: delta)
-        let right = NSLayoutConstraint.fix(constraint: .right, of: aView, toSameOfView: theSuperView, offset: delta)
+        left.identifier = "left \(String(describing: aView.self))"
+        let right = NSLayoutConstraint.fix(constraint: .right, of: aView, toSameOfView: theSuperView, offset: -delta)
+        right.identifier = "right \(String(describing: aView.self))"
         let top = NSLayoutConstraint.fix(constraint: .top, of: aView, toSameOfView: theSuperView, offset: delta)
-        let bottom = NSLayoutConstraint.fix(constraint: .bottom, of: aView, toSameOfView: theSuperView, offset: delta)
+        top.identifier = "top \(String(describing: aView.self))"
+        let bottom = NSLayoutConstraint.fix(constraint: .bottom, of: aView, toSameOfView: theSuperView, offset: -delta)
+        bottom.identifier = "bottom \(String(describing: aView.self))"
         
         theSuperView.addConstraints([left, right, top, bottom])
     }

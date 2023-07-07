@@ -48,7 +48,7 @@ public prefix func - <T: NumericType> (number: T) -> T {
 
 extension NumericType {
     /// This returns the font and colour for use in the display according to the held bg value
-    /// - Paramter isOldValue: `Bool` to indicate we have a value that is not the current one.
+    /// - Paramter isOldValue: `Bool` to indicate we have a value that is not the current one (and so return a grey colour).
     /// - Returns: a `Tuple` containing the colour of the range that our BG level sits in
     /// and the `UIFont`
     func displaySettings(isOldValue: Bool) -> (colour: UIColor, font: UIFont) {
@@ -59,11 +59,11 @@ extension NumericType {
         
         switch self.rangeDescription {
         case .urgentLow, .urgentHigh:
-            retVal = (colour: UIColor.red, font: UIFont.UrgentFont)
+            retVal = (colour: ConstantsGlucoseChart.guidelineUrgentHighLow, font: UIFont.UrgentFont)
         case .low, .high:
-            retVal = (colour: UIColor.yellow, font: UIFont.NonUrgentFont)
+            retVal = (colour: ConstantsGlucoseChart.glucoseNotUrgentRangeColor, font: UIFont.NonUrgentFont)
         case .inRange:
-            retVal = (colour: UIColor.green, font: UIFont.InRangeFont)
+            retVal = (colour: ConstantsGlucoseChart.glucoseInRangeColor, font: UIFont.InRangeFont)
         case .rangeNR:
             retVal = (colour: UIColor.gray, font: UIFont.InRangeFont)
         case .special:
@@ -177,7 +177,7 @@ extension MMOLL :ExpressibleByFloatLiteral {
 
 //MARK: - mg/dL
 
-/// US/Europe units.
+/// US/European units.
 
 public struct MGDL :NumericType {
     public var value :Double
@@ -185,7 +185,7 @@ public struct MGDL :NumericType {
         self.value = value
     }
     
-    /// Returns a `String` of the current value in the form `12.3`
+    /// Returns a `String` of the current value in the form `123`
     var string: String {
         return String(format:"%.0f", self.value)
     }
@@ -203,7 +203,6 @@ public struct MGDL :NumericType {
     var lowRange: Range<MGDL> {
         return Range(uncheckedBounds: (MGDL(UserDefaults.standard.urgentLowMarkValue), MGDL(UserDefaults.standard.lowMarkValue)))
     }
-    
     
     /// The range of the users BG level that should be considered nicely in range (for once! :)) )
     ///
@@ -254,26 +253,35 @@ public struct MGDL :NumericType {
     }
 }
 
-extension MGDL :ExpressibleByIntegerLiteral {
+extension MGDL: ExpressibleByIntegerLiteral {
     public init(integerLiteral: IntegerLiteralType) {
         self.init(Double(integerLiteral))
     }
 }
 
-extension MGDL :ExpressibleByFloatLiteral {
+extension MGDL: ExpressibleByFloatLiteral {
     public init(floatLiteral: FloatLiteralType) {
         self.init(Double(floatLiteral))
     }
 }
 
-
-/// This is a struct to allow for BG level info to be passed around when there is no bgReading object available
-/// e.g. when the user is panning
+/** This is a struct to allow for BG level info to be passed around when there is no `NSManagedObject` available
+ e.g. when the user is panning.
+ 
+ It provides a way of not having to hold onto `NSManagedObject`s when traversing the logic of the `BGView`.
+ */
 public struct UniversalBGLevel {
+    
+    // Presumably there is a way of passing the BG object around but this struct is a lazy way out of
+    // reverse engineering the panning of the chart. It provides some convenience functions too.
     
     private var _mmoll: MMOLL = 0.0
     private var _mgdl: MGDL = 0.0
     
+    /// The mmol/L of the BG level.
+    ///
+    /// Setting this will update the `private` `ivar` holding the mg/dL value.
+    /// This class can be used as a converter between units if desired.
     public var mmoll: MMOLL {
         set {
             _mmoll = newValue
@@ -284,6 +292,10 @@ public struct UniversalBGLevel {
         }
     }
     
+    /// The mg/dL of the BG level.
+    ///
+    /// Setting this will update the `private` `ivar` holding the mmol/L value.
+    /// This class can be used as a converter between units if desired.
     public var mgdl: MGDL {
         set {
             _mgdl = newValue
@@ -294,15 +306,18 @@ public struct UniversalBGLevel {
         }
     }
     
-    public var isOld: Bool {
-        return timestamp.timeIntervalSinceNow < -660 // 11 mins
+    /// The time stamp of the BG Level
+    public var timestamp: Date
+    
+    /// Returns a `true` if the `timeStamp` is older than 90 seconds.
+    var isOld: Bool {
+        return UniversalBGLevel.isOld(_date: timestamp)
     }
     
-    public var userPrefersMGDL: Bool {
-        return UserDefaults.standard.bloodGlucoseUnitIsMgDl
+    /// Static `func` to return if a given `Date` is older than 1 minute 30" - i.e. it's a BG level that's out of date.
+    static func isOld(_date: Date) -> Bool {
+        return Date().timeIntervalSince(_date) > 89
     }
-    
-    var timestamp: Date
     
     init(_timestamp: Date = Date(), _mmoll: MMOLL? = nil, _mgdl: MGDL? = nil) {
         

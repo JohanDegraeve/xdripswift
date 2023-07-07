@@ -34,7 +34,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="xOs-aW-tPt">
-                                                        <rect key="frame" x="106.33333333333333" y="0.0" width="133.66666666666669" height="34.333333333333336"/>
+                                                        <rect key="frame" x="106.33333333333331" y="0.0" width="133.66666666666669" height="34.333333333333336"/>
                                                         <subviews>
                                                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="Uaf-Qc-290">
                                                                 <rect key="frame" x="0.0" y="0.0" width="40.333333333333336" height="34.333333333333336"/>
@@ -471,7 +471,7 @@
                                                 </connections>
                                             </label>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="w31-Mu-TAp" customClass="BGView" customModule="xdrip" customModuleProvider="target">
-                                                <rect key="frame" x="20" y="25" width="350" height="107.66666666666669"/>
+                                                <rect key="frame" x="20" y="25.000000000000007" width="350" height="107.66666666666669"/>
                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0nE-AX-r0w" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
@@ -540,10 +540,10 @@
                                                 <rect key="frame" x="10" y="4.6666666666666856" width="370" height="25"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qG7-Ub-mzA">
-                                                        <rect key="frame" x="0.0" y="0.0" width="194" height="25"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="253.33333333333334" height="25"/>
                                                         <subviews>
                                                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" apportionsSegmentWidthsByContent="YES" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Xuy-hn-ozf">
-                                                                <rect key="frame" x="0.0" y="0.0" width="194" height="26"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="253.33333333333334" height="26"/>
                                                                 <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <segments>
                                                                     <segment title="Today"/>
@@ -566,7 +566,7 @@
                                                         </constraints>
                                                     </view>
                                                     <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" apportionsSegmentWidthsByContent="YES" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="9LS-Vp-uGd">
-                                                        <rect key="frame" x="214" y="0.0" width="156" height="26"/>
+                                                        <rect key="frame" x="273.33333333333331" y="0.0" width="96.666666666666686" height="26"/>
                                                         <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <segments>
                                                             <segment title="3h"/>

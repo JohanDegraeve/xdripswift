@@ -8,154 +8,121 @@
 
 import UIKit
 
-class BTVRoundRectLabel: BTVRoundedBackingView {
-    
-    fileprivate var _label: UILabel = UILabel()
-    
-    var text: String = "" {
-        didSet {
-            _label.text = text
-        }
-    }
-    
-    var attributedText: NSAttributedString  = NSAttributedString() {
-        didSet {
-            _label.attributedText = attributedText
-        }
-    }
-    
-    override func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        addSubview(_label)
-        bringSubviewToFront(_label)
-        NSLayoutConstraint.fixAllSides(of: _label, to: self)
-    }
-}
-
 /**
  This class takes a `date` of the displayed BG level and splits it into day, date and time of
  sample.
  
- If the `date` iVar is set to `nil` then 'Now' is displayed
+ If the `date` iVar is set to `nil` then 'Now' is displayed.
+ It's made up of 3 `BTVRoundedRectLabel`s the top one holds the time, the middle is the day
+ and the bottom is the date.
+ 
+ When it's displaying the current time then only the top label is visible.
  */
 class BGTimeStampView: UIStackView {
+
+    /// These are 
+    private let _dateLabels: [BTVRoundRectLabel] = [BTVRoundRectLabel(), BTVRoundRectLabel(), BTVRoundRectLabel()]
+    
+    
+    /// The text attributes for the date labels
+    private var _dateAttributes: [NSAttributedString.Key : AnyObject] = [
+        NSAttributedString.Key.font : UIFont.MiniFont,
+        NSAttributedString.Key.paragraphStyle : NSParagraphStyle.centredText(),
+        NSAttributedString.Key.backgroundColor : UIColor.clear,
+        NSAttributedString.Key.foregroundColor : UIColor.white
+    ]
     
     var date: Date? = nil {
         didSet {
             
+            defer {
+                setNeedsDisplay()
+            }
+            
             guard let _date = date else {
-                // It's a current BG level so show now indicator
-                displayComponents(flag: false)
-                _displays[1].alpha = 1.0
-                _displays[1].attributedText = NSAttributedString(string: _timeFormat.string(from: Date()), attributes: _digitsAttributes)
+                
+                _dateAttributes[NSAttributedString.Key.backgroundColor] = UIColor.clear
+                _dateAttributes[NSAttributedString.Key.foregroundColor] = UIColor.white
+                
+                _dateLabels[0].attributedText = NSAttributedString(string: _timeFormat.string(from: Date()), attributes: _dateAttributes)
+                _dateLabels[0].isTranslucent = true
+                _dateLabels[0].alpha = 1.0
+                
+                _dateLabels[1].alpha = 0.0
+                
+                _dateLabels[2].alpha = 0.0
+                
+                borderColour = .white
                 return
             }
             
-            displayComponents(flag: true)
+            _dateAttributes[NSAttributedString.Key.backgroundColor] = UIColor.white
+            _dateAttributes[NSAttributedString.Key.foregroundColor] = UIColor.black
             
-            let _dateComps = _calendar.dateComponents([.weekday], from: _date)
-            _displays[0].attributedText = NSAttributedString(string: _weekdays[(_dateComps.weekday ?? _weekdays.count) - 1], attributes: _digitsAttributes)
-            _displays[1].attributedText = NSAttributedString(string: _dateFormat.string(from: _date), attributes: _digitsAttributes)
-            _displays[2].attributedText = NSAttributedString(string: _timeFormat.string(from: _date), attributes: _digitsAttributes)
+            _dateLabels[0].alpha = 1.0
+            _dateLabels[1].alpha = 1.0
+            _dateLabels[2].alpha = 1.0
+            
+            // Top 'pill' with time
+            _dateLabels[0].isTranslucent = false
+            _dateLabels[0].attributedText =  NSAttributedString(string: _timeFormat.string(from: _date), attributes: _dateAttributes)
+            _dateLabels[0].fillColour = _dateAttributes[NSAttributedString.Key.backgroundColor] as! UIColor
+            
+            // Middle 'pill' with day
+            _dateLabels[1].isTranslucent = false
+            _dateLabels[1].attributedText = NSAttributedString(string: _dayFormat.string(from: _date), attributes: _dateAttributes)
+            _dateLabels[1].fillColour = _dateAttributes[NSAttributedString.Key.backgroundColor] as! UIColor
+            
+            // Lower 'pill' with date
+            _dateLabels[2].isTranslucent = false
+            _dateLabels[2].attributedText =  NSAttributedString(string: _dateFormat.string(from: _date), attributes: _dateAttributes)
+            _dateLabels[2].fillColour = _dateAttributes[NSAttributedString.Key.backgroundColor] as! UIColor
         }
     }
     
-    /// This set will hold the components of the `date`
-    private var _dateComponents: Set<Calendar.Component> = Set()
+    private var _dateFormat: DateFormatter = DateFormatter()
+    private var _timeFormat: DateFormatter = DateFormatter()
+    private var _dayFormat: DateFormatter = DateFormatter()
+    private let _calendar: Calendar = Calendar.autoupdatingCurrent
     
-    /// The current calendar so we don't have to keep setting up drawing re-draw
-    ///
-    /// According to
-    /// https://stackoverflow.com/a/39842835/19730436
-    /// The days can sometimes not match betweem a `Date` result and a `Calendar.components` one.
-    /// This creates a whole new calendar (as recommended in one of the comments to the SO answer).
-    /// The timezone is set when the view loads and is "UTC".
-    private var _calendar = Calendar(identifier: .gregorian)
-    
-    /// Formatter for the date of the sample
-    private var _dateFormat = DateFormatter()
-    
-    /// Store the short, localised weekday symbols
-    ///
-    /// In order to allow for a problem getting the weekday from the `date` components, the last element is an error
-    /// message and the above `didSet` code will default to it
-    private var _weekdays: [String] = Calendar.current.shortWeekdaySymbols
-    
-    /// Formatter for the time of the sample
-    private var _timeFormat = DateFormatter()
-    
-    /// This array will hold the day, date and time of the `time`
-    ///
-    /// If the `date` is `nil` then they will all be hidden and the indicator shown
-    private var _displays: [BTVRoundRectLabel] = [BTVRoundRectLabel(), BTVRoundRectLabel(), BTVRoundRectLabel()]
-    
-    /// This is the image that's displayed when the BG level is current
-    private var _nowIndicator: UIImage = UIImage(named: "BGNowIndicator")!.withRenderingMode(.automatic)
-    
-    private var _digitsAttributes: [NSAttributedString.Key : AnyObject] = [
-        NSAttributedString.Key.font : UIFont.MiniFont,
-        NSAttributedString.Key.paragraphStyle : NSParagraphStyle.centredText(),
-        NSAttributedString.Key.foregroundColor : UIColor.black
-    ]
-    
-    var textColour: UIColor = UIColor.white {
+    var borderColour: UIColor = UIColor.white {
         didSet {
-            _digitsAttributes[NSAttributedString.Key.foregroundColor] = textColour
+            setNeedsDisplay()
         }
     }
-
-    /// D.R.Y. to hide and show all the views
-    private func displayComponents(flag: Bool) {
-        _displays[0].alpha = flag.rawCGFloatValue
-        _displays[1].alpha = flag.rawCGFloatValue
-        _displays[2].alpha = flag.rawCGFloatValue
-    }
     
-    /// Set the border and translucent fill colours to the same
-    func setBorderAndFill(to colour:UIColor) {
-        _displays[0].fillColour = colour
-        _displays[0].strokeColour = colour
-        
-        _displays[1].fillColour = colour
-        _displays[1].strokeColour = colour
-        
-        _displays[2].fillColour = colour
-        _displays[2].strokeColour = colour
-    }
-    
-    /// Pass translucense flag to the backing subviews
-    func isTranslucent(flag: Bool) {
-        _displays[0].isTranslucent = flag
-        _displays[1].isTranslucent = flag
-        _displays[2].isTranslucent = flag
-    }
+    var boxColour: UIColor = UIColor.white
     
     override func didMoveToSuperview() {
-        _timeFormat.dateStyle = .none
-        _timeFormat.timeStyle = .short
+        
+        backgroundColor = UIColor.clear
+        
+        for i in 0 ..< _dateLabels.count {
+            addArrangedSubview(_dateLabels[i])
+            _dateLabels[i].translatesAutoresizingMaskIntoConstraints = false
+            _dateLabels[i].borderWidth = 1.0
+        }
         
         _dateFormat.dateStyle = .short
         _dateFormat.timeStyle = .none
+        _dayFormat.dateFormat = "EE"
         
-        _calendar.timeZone = TimeZone(abbreviation: "UTC")!
-        
-        _weekdays.append("???")
-        
-        axis = .vertical
-        
-        for i in 0 ..< _displays.count {
-            addArrangedSubview(_displays[i])
-            _displays[i].isTranslucent = true
-            _displays[i].translatesAutoresizingMaskIntoConstraints = false
-            _displays[i].attributedText = NSAttributedString(string: "", attributes: _digitsAttributes)
-            _displays[i].borderWidth = 1.0
-            _displays[i].fillColour = UIColor(red: 0.392, green: 0.827, blue: 0.933, alpha: 1.00)
-            _displays[i].strokeColour = UIColor(red: 0.392, green: 0.827, blue: 0.933, alpha: 1.00)
-        }
+        _timeFormat.dateFormat = .none
+        _timeFormat.timeStyle = .short
         
         alignment = .fill
+        spacing = 5.0
+        axis = .vertical
         distribution = .fillEqually
+    }
+    
+    override func draw(_ rect: CGRect) {
         
-        backgroundColor = .clear
+        for i in 0 ..< _dateLabels.count {
+            _dateLabels[i].strokeColour = borderColour
+            _dateLabels[i].fillColour = boxColour
+        }
+        
+        super.draw(rect)
     }
 }

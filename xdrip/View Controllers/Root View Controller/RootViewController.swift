@@ -226,7 +226,7 @@ final class RootViewController: UIViewController {
                     self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: self.userPrefsMgDL)
                     
                     // This can send either mg/dl or mmol/l down to the BGView depending on user setting
-                    self.valueViewOutlet.directSetBGValue(value: lastChartPointEarlierThanEndDate.y.scalar, date: chartAxisValueDate.date)
+                    self.valueViewOutlet.directSetBGValue(value: lastChartPointEarlierThanEndDate.y.scalar, date: chartAxisValueDate.date, btManager: self.bluetoothPeripheralManager)
                     
                     // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
                     self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
@@ -282,7 +282,7 @@ final class RootViewController: UIViewController {
     @IBAction func chartDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
         
         // if the main chart is double-tapped then force a reset to return to the current date/time, refresh the chart and also all labels
-        updateLabelsAndChart(forceReset: true)
+        updateLabelsAndChart(forceReset: true, pannedToMostRecent: true)
         
     }
     
@@ -499,7 +499,6 @@ final class RootViewController: UIViewController {
     
     /// create the landscape view
     private var landscapeChartViewController: LandscapeChartViewController?
-
     
     // MARK: - overriden functions
     
@@ -514,6 +513,10 @@ final class RootViewController: UIViewController {
         glucoseChartManager?.cleanUpMemory()
         
     }
+    
+    private var _screenshotImage :UIImageView?
+    private var _blur: CIFilter? = CIFilter(name: "CIGaussianBlur", parameters: ["inputRadius" : NSNumber(value: 30.0)])
+    private var _layer: CALayer = CALayer()
     
     override func viewWillAppear(_ animated: Bool) {
         
@@ -551,17 +554,22 @@ final class RootViewController: UIViewController {
         
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
         
         updateWatchApp()
-        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
         self.configureWatchKitSession()
         
         // if the user requested to hide the help icon on the main screen, then remove it (and the flexible space next to it)
@@ -1480,9 +1488,11 @@ final class RootViewController: UIViewController {
         }
     }
     
+    // MARK: Transition from landscape to portrait
     override func willTransition(
         to newCollection: UITraitCollection,
         with coordinator: UIViewControllerTransitionCoordinator) {
+            
       super.willTransition(to: newCollection, with: coordinator)
       
       switch newCollection.verticalSizeClass {
@@ -1490,9 +1500,12 @@ final class RootViewController: UIViewController {
         showLandscape(with: coordinator)
       case .regular, .unspecified:
         hideLandscape(with: coordinator)
+          // Lets update the views as well
+          valueViewOutlet.setNeedsDisplay()
       @unknown default:
         fatalError()
       }
+            
     }
 
     
@@ -2068,7 +2081,7 @@ final class RootViewController: UIViewController {
         }
         
         // assign last reading
-        let lastReading = latestReadings[0]
+        let lastReading = latestReadings[0] // < The first element is the youngest
         
         // assign last but one reading
         let lastButOneReading = latestReadings.count > 1 ? latestReadings[1] : nil
@@ -2088,7 +2101,7 @@ final class RootViewController: UIViewController {
             
             valueLabelOutlet.attributedText = attributeString
             
-            valueViewOutlet.setValues(for: lastReading, slope: nil, isOld: true)
+            valueViewOutlet.setValues(for: lastReading, slope: nil, btManager: bluetoothPeripheralManager)
             
         } else {
             
@@ -2103,7 +2116,7 @@ final class RootViewController: UIViewController {
             
             valueLabelOutlet.attributedText = attributeString
             
-            valueViewOutlet.setValues(for: lastReading, slope: diffLabelContent, isOld: false)
+            valueViewOutlet.setValues(for: lastReading, slope: diffLabelContent, btManager: bluetoothPeripheralManager)
             
         }
         
@@ -3023,13 +3036,9 @@ final class RootViewController: UIViewController {
     fileprivate func updateScreenRotationSettings() {
         // if allowed, then permit the Root View Controller which is the main screen, to rotate left/right to show the landscape view
         if UserDefaults.standard.allowScreenRotation {
-            
             (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
-            
         } else {
-            
             (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
-            
         }
     }
     
@@ -3058,7 +3067,7 @@ final class RootViewController: UIViewController {
     
         // create stopDate
         let stopDate = Date()
-        
+
         // send stop sensor command to transmitter, don't check if there's an activeSensor in coredata or not, never know that there's a desync between coredata and transmitter
         if let cGMTransmitter = cGMTransmitter, sendToTransmitter {
             cGMTransmitter.stopSensor(stopDate: stopDate)
@@ -3071,18 +3080,17 @@ final class RootViewController: UIViewController {
 
         // set endDate of activeSensor to stopDate
         activeSensor.endDate = stopDate
-        
+
         // save changes to coreData
         coreDataManager.saveChanges()
-        
+
         // asign nil to activeSensor
         self.activeSensor = nil
-        
+
         // now that the activeSensor object has been destroyed, update (hide) the sensor countdown graphic
         updateSensorCountdown()
 
     }
-    
 }
 
 
@@ -3192,7 +3200,7 @@ extension RootViewController: UITabBarControllerDelegate {
             navigationController.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
             
         } else if let navigationController = viewController as? BluetoothPeripheralNavigationController, let bluetoothPeripheralManager = bluetoothPeripheralManager, let coreDataManager = coreDataManager {
-            
+            // User is looking for CGM bluetooth status
             navigationController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
             
         } else if let navigationController = viewController as? TreatmentsNavigationController, let coreDataManager = coreDataManager {
