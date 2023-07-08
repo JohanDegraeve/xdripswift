@@ -35,6 +35,7 @@ Added to String extensions:
 mgDl = "mg/dL"
 mmolL = "mmol/L"
 
+
 Changed passed in parameter of `mgdlToMmolAndToString(_ :)` to `thisIsMgdL` for ease of reading
 
 Changed `viewWillAppear(_ animated: Bool)` in `TreatmentsViewController` to update black, translucent settings for ios 13.0+
