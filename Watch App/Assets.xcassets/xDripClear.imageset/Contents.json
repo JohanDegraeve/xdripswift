@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "shuggah_title.png",
+      "filename" : "xDripClear.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "shuggah_title 1.png",
+      "filename" : "xDripClear 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "shuggah_title 2.png",
+      "filename" : "xDripClear 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
@@ -19,8 +19,5 @@
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "template-rendering-intent" : "template"
   }
 }

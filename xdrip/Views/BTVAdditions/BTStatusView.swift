@@ -20,7 +20,7 @@ class BTStatusView: UIView {
         }
     }
     
-    /// Passed in by the view controller to ascertain the connection status of the CGM
+    /// Passed in by the view controller to get the connection status of the CGM
     var btManager: BluetoothPeripheralManager? = nil {
         didSet {
             setNeedsDisplay()
@@ -50,7 +50,6 @@ class BTStatusView: UIView {
     
     override func didMoveToSuperview() {
         
-        // Connected
         let _stackView = UIStackView(arrangedSubviews: [_connected, _connecting, _disconnecting, _disconnected])
         _stackView.arrangedSubviews.forEach { view in
             if let _view = view as? BTVImageView {
@@ -89,37 +88,47 @@ class BTStatusView: UIView {
         
         super.draw(rect)
         
+        // Switch them all off
         _connected.alpha = _disabledAlpha
         _connecting.alpha = _disabledAlpha
         _disconnected.alpha = _disabledAlpha
         _disconnecting.alpha = _disabledAlpha
         
         if let _btman = btManager {
-            
+
+            // Get the main transmitter
             guard let _firstElement = _btman.bluetoothPeripherals.first, let _transmitter = _btman.getBluetoothTransmitter(for: _firstElement, createANewOneIfNecesssary: false) else {
+                // Turn on the disconnected icon
                 _disconnected.alpha = 1.0
                 status = nil
                 return
             }
             
-            status = _transmitter.getConnectionStatus() ?? .connecting // provide a default value
+            status = _transmitter.getConnectionStatus() ?? .connecting // < provide a default value
             
             switch status {
             case .connected:
                 _connected.alpha = 1.0
+                accessibilityLabel = "Bluetooth Connected"
             case .connecting:
                 _connecting.alpha = 1.0
+                accessibilityLabel = "Bluetooth Connecting"
             case .disconnected:
                 _disconnected.alpha = 1.0
+                accessibilityLabel = "Bluetooth disconnected"
             case .disconnecting:
                 _disconnecting.alpha = 1.0
+                accessibilityLabel = "Bluetooth disconnecting"
             case .none:
                 _disconnected.alpha = 1.0
+                accessibilityLabel = "Bluetooth disconnected"
             @unknown default:
-                break
+                _disconnected.alpha = 1.0
+                accessibilityLabel = "Bluetooth disconnected"
             }
         } else {
             _connecting.alpha = 1.0
+            accessibilityLabel = "Bluetooth status unknown"
         }
     }
 }

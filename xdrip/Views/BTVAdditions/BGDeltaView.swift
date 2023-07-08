@@ -8,6 +8,12 @@
 
 import UIKit
 
+/**
+ This class displays a dial with an arrow that indicates the rate of change of BG levels.
+ 
+ As the rate of change approaches the maximun (±3.5) then a second arrow's alpha is changed to make it more visible.
+ This should indicate to the user whether the rate of change is urgent or not.
+ */
 class BGDeltaView: UIView {
     
     /// When the slope is changed then this will be updated

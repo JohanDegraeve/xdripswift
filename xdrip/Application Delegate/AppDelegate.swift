@@ -16,46 +16,74 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryAppDelegate)
     
+    /// A gradient layer that's displayed when the app moves to the background
     private var _gradientLayer = CAGradientLayer()
-    private var titleView: UIImageView = UIImageView(image: UIImage(named: "ShuggahTitle")!)
+    /// This is the image of the words 'xDrip'
+    private var titleView: UIImageView = UIImageView(image: UIImage(named: "xDripClear")!)
+    /// This will hold the gradient and the title image for the cover screen
     private var _gradView = UIView()
-    private var _view: UIView!
+    ///This holds the aspect ratio of the title image so that the constraints will work correctly
     private var _titleAspect: CGFloat!
+    /// This is the constraint that keeps the xDrip title small in the cover view
+    private var _titleWidthConstraint: NSLayoutConstraint = NSLayoutConstraint()
     
-    // MARK: - Private D.R.Y
+    // MARK: -
     
+    /**
+     Function to hide or show the covering gradient and title words.
+     
+     Due to the nature of the snapshot that's created by iOS, it might be tempting to some users to read
+     a displayed level when the app has been moved to the background by swiping up. Covering the main
+     view with a 'pretty' gradient prevents this.
+     */
     private func showCover(flag: Bool) {
+        
+        // Get the main view
+        guard let _view = UIApplication.shared.delegate?.window??.rootViewController?.view else {
+            return
+        }
         
         // Check we're not trying to add the _gradView twice
         if let _ = _gradView.superview, flag == true { return }
         
         _gradView.frame = _view.frame
         _gradientLayer.frame = _view.frame
+        
+        
         if flag {
             // Just to be sure...
             _gradView.removeFromSuperview()
             NSLayoutConstraint.fixAllSides(of: _gradView, to: _view)
             // Remove and reapply to take care of aspect change with orientation
-            _gradView.removeConstraints(_gradView.constraints)
+            _gradView.removeConstraint(_titleWidthConstraint)
+            let _xConstraint: NSLayoutConstraint.Attribute = _view.frame.height < _view.frame.width ? .height : .width
             
-            // Assume it's in portrait:
-            let _width = NSLayoutConstraint.fix(constraint: .width, of: titleView, toSameOfView: _gradView, multiplier: 0.2)
-            let _height = NSLayoutConstraint.fix(constraint: .height, of: titleView, to: .width, ofView: titleView, multiplier: _titleAspect)
-            let _centreX = NSLayoutConstraint.fix(constraint: .centerX, of: titleView, toSameOfView: _gradView)
-            let _centreY = NSLayoutConstraint.fix(constraint: .centerY, of: titleView, toSameOfView: _gradView)
-            NSLayoutConstraint.activate([_centreX, _centreY])
+            _titleWidthConstraint = NSLayoutConstraint.fix(constraint: .width, of: titleView, to: _xConstraint, ofView: _gradView, multiplier: 0.2)
+            
+            NSLayoutConstraint.activate([_titleWidthConstraint])
+            
+            // The first time we get here, the constraints will need to be added
+            if _gradView.constraints.count < 2 {
+                let _height = NSLayoutConstraint.fix(constraint: .height, of: titleView, to: .width, ofView: titleView, multiplier: _titleAspect)
+                let _centreX = NSLayoutConstraint.fix(constraint: .centerX, of: titleView, toSameOfView: _gradView)
+                let _centreY = NSLayoutConstraint.fix(constraint: .centerY, of: titleView, toSameOfView: _gradView)
+                
+                NSLayoutConstraint.activate([_titleWidthConstraint, _height,_centreX, _centreY])
+            }
             
         } else if _gradView.superview == nil {
             //It's already off the hierarchy
             return
         }
         
+        // Animate on or off
         _gradView.alpha = (!flag).rawCGFloatValue
         _view.addSubview(_gradView)
         UIView.animate(withDuration: 0.2) {
             self._gradView.alpha = flag.rawCGFloatValue
         } completion: { finishedFlag in
             if !flag {
+                // If we were fading off then remove the view
                 self._gradView.removeFromSuperview()
             }
         }
@@ -69,24 +97,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         trace("in didFinishLaunchingWithOptions", log: log, category: ConstantsLog.categoryAppDelegate, type: .info)
         
         _gradientLayer.colors = [
-            UIColor(red: 0.002, green: 0.290, blue: 0.831, alpha: 1.00).cgColor,
-            UIColor(red: 0.853, green: 0.908, blue: 0.406, alpha: 1.00).cgColor
+            UIColor(red: 0.089, green: 0.295, blue: 0.518, alpha: 1.00).cgColor,
+            UIColor(red: 0.130, green: 0.465, blue: 0.817, alpha: 1.00).cgColor
         ]
-        _view = UIApplication.shared.delegate?.window??.rootViewController?.view
-        
-        if _view == nil { return true }
-        
-        // Make sure they're all gone
-        //_gradView.removeConstraints(_gradView.constraints)
-        // Fix the sides (this accounts for portrait or landscape orientation changes during operation)
-        NSLayoutConstraint.fixAllSides(of: _gradView, to: _view)
-        _gradientLayer.frame = _view.frame
+
         _gradientLayer.mask = nil
+        // Put the gradient in at the front layer
         _gradView.layer.insertSublayer(_gradientLayer, at: 0)
         titleView.translatesAutoresizingMaskIntoConstraints = false
         titleView.tintColor = .white
+        
+        // Add the app title
         _gradView.addSubview(titleView)
+        
+        // Grab a hold of the aspect so that we can make sure the constraints work properly
         _titleAspect = titleView.image!.size.height / titleView.image!.size.width
+        
         return true
         
     }

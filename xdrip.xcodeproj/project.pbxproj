@@ -36,23 +36,14 @@
 		9A1895812A44381500219C8D /* Bool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A1895802A44381500219C8D /* Bool.swift */; };
 		9A18CA002A56F1CD00B69D29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B618B270C448100561E56 /* Assets.xcassets */; };
 		9A360AD92A2B77E90003D5F1 /* BGView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AD82A2B77E90003D5F1 /* BGView.swift */; };
-		9A360ADF2A2B7B470003D5F1 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360ADE2A2B7B470003D5F1 /* UIColor.swift */; };
 		9A360AE32A2B7B650003D5F1 /* NSParagraphStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */; };
 		9A360AE72A2B7B840003D5F1 /* NSLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */; };
 		9A65B8702A3C4DF100791398 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A65B86F2A3C4DF100791398 /* UIView.swift */; };
 		9A65B8722A3CB85900791398 /* BGDeltaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A65B8712A3CB85900791398 /* BGDeltaView.swift */; };
 		9A94C44D2A4B78A70033FF61 /* BTVBaseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A94C44C2A4B78A70033FF61 /* BTVBaseViews.swift */; };
 		9A94C44F2A4D75220033FF61 /* BTStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A94C44E2A4D75220033FF61 /* BTStatusView.swift */; };
-		9AB5FAE62A2FE4B700AAC3F1 /* Krub-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FACE2A2FE35700AAC3F1 /* Krub-SemiBold.ttf */; };
-		9AB5FAE82A30732B00AAC3F1 /* Krub-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FAD62A2FE35700AAC3F1 /* Krub-LightItalic.ttf */; };
-		9AB5FAE92A3073AE00AAC3F1 /* Krub-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FACD2A2FE35700AAC3F1 /* Krub-Regular.ttf */; };
-		9AB5FAEA2A30742A00AAC3F1 /* Krub-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FAD82A2FE35700AAC3F1 /* Krub-Bold.ttf */; };
 		9AB5FAEC2A3078D600AAC3F1 /* UIFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */; };
-		9AB5FAED2A3078D600AAC3F1 /* UIFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */; };
-		9AB5FAEE2A3078D600AAC3F1 /* UIFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */; };
-		9AB5FAEF2A3079B500AAC3F1 /* Krub-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AB5FAD02A2FE35700AAC3F1 /* Krub-Light.ttf */; };
 		9AB5FAF12A31DFE900AAC3F1 /* Units Primitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */; };
-		9ABB95012A4227B400A63285 /* UIBezierPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ABB95002A4227B400A63285 /* UIBezierPath.swift */; };
 		9ABC39562A4199710042AAEA /* BGTimeStampView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ABC39552A4199710042AAEA /* BGTimeStampView.swift */; };
 		9AEA74AC2A347765001202A6 /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */; };
 		9AEA74AD2A347765001202A6 /* Quicksand-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */; };
@@ -781,7 +772,6 @@
 		9A1895802A44381500219C8D /* Bool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bool.swift; sourceTree = "<group>"; };
 		9A360AD72A2B77E80003D5F1 /* Watch App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Watch App-Bridging-Header.h"; sourceTree = "<group>"; };
 		9A360AD82A2B77E90003D5F1 /* BGView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BGView.swift; sourceTree = "<group>"; };
-		9A360ADE2A2B7B470003D5F1 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSParagraphStyle.swift; sourceTree = "<group>"; };
 		9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSLayoutConstraint.swift; sourceTree = "<group>"; };
 		9A65B86F2A3C4DF100791398 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
@@ -789,21 +779,8 @@
 		9A94C44C2A4B78A70033FF61 /* BTVBaseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTVBaseViews.swift; sourceTree = "<group>"; };
 		9A94C44E2A4D75220033FF61 /* BTStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTStatusView.swift; sourceTree = "<group>"; };
 		9AB5FAC52A2E078C00AAC3F1 /* CHANGES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGES.md; sourceTree = "<group>"; };
-		9AB5FACC2A2FE35700AAC3F1 /* Krub-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Medium.ttf"; sourceTree = "<group>"; };
-		9AB5FACD2A2FE35700AAC3F1 /* Krub-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Regular.ttf"; sourceTree = "<group>"; };
-		9AB5FACE2A2FE35700AAC3F1 /* Krub-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-SemiBold.ttf"; sourceTree = "<group>"; };
-		9AB5FACF2A2FE35700AAC3F1 /* Krub-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
-		9AB5FAD02A2FE35700AAC3F1 /* Krub-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Light.ttf"; sourceTree = "<group>"; };
-		9AB5FAD12A2FE35700AAC3F1 /* Krub-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-ExtraLight.ttf"; sourceTree = "<group>"; };
-		9AB5FAD22A2FE35700AAC3F1 /* Krub-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-BoldItalic.ttf"; sourceTree = "<group>"; };
-		9AB5FAD32A2FE35700AAC3F1 /* Krub-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-MediumItalic.ttf"; sourceTree = "<group>"; };
-		9AB5FAD52A2FE35700AAC3F1 /* Krub-ExtraLightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
-		9AB5FAD62A2FE35700AAC3F1 /* Krub-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-LightItalic.ttf"; sourceTree = "<group>"; };
-		9AB5FAD72A2FE35700AAC3F1 /* Krub-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Italic.ttf"; sourceTree = "<group>"; };
-		9AB5FAD82A2FE35700AAC3F1 /* Krub-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Krub-Bold.ttf"; sourceTree = "<group>"; };
 		9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFont.swift; sourceTree = "<group>"; };
 		9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Units Primitives.swift"; sourceTree = "<group>"; };
-		9ABB95002A4227B400A63285 /* UIBezierPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBezierPath.swift; sourceTree = "<group>"; };
 		9ABC39552A4199710042AAEA /* BGTimeStampView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGTimeStampView.swift; sourceTree = "<group>"; };
 		9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
 		9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
@@ -1734,23 +1711,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		9AB5FACB2A2FE35700AAC3F1 /* Krub */ = {
+		9AB0FBB72A59945100FA6B22 /* BTV Additions */ = {
 			isa = PBXGroup;
 			children = (
-				9AB5FACC2A2FE35700AAC3F1 /* Krub-Medium.ttf */,
-				9AB5FACD2A2FE35700AAC3F1 /* Krub-Regular.ttf */,
-				9AB5FACE2A2FE35700AAC3F1 /* Krub-SemiBold.ttf */,
-				9AB5FACF2A2FE35700AAC3F1 /* Krub-SemiBoldItalic.ttf */,
-				9AB5FAD02A2FE35700AAC3F1 /* Krub-Light.ttf */,
-				9AB5FAD12A2FE35700AAC3F1 /* Krub-ExtraLight.ttf */,
-				9AB5FAD22A2FE35700AAC3F1 /* Krub-BoldItalic.ttf */,
-				9AB5FAD32A2FE35700AAC3F1 /* Krub-MediumItalic.ttf */,
-				9AB5FAD52A2FE35700AAC3F1 /* Krub-ExtraLightItalic.ttf */,
-				9AB5FAD62A2FE35700AAC3F1 /* Krub-LightItalic.ttf */,
-				9AB5FAD72A2FE35700AAC3F1 /* Krub-Italic.ttf */,
-				9AB5FAD82A2FE35700AAC3F1 /* Krub-Bold.ttf */,
+				9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */,
+				9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */,
+				9A65B86F2A3C4DF100791398 /* UIView.swift */,
+				9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */,
+				9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */,
+				9A1895802A44381500219C8D /* Bool.swift */,
 			);
-			path = Krub;
+			path = "BTV Additions";
 			sourceTree = "<group>";
 		};
 		9ABC39542A4199420042AAEA /* BTVAdditions */ = {
@@ -1813,6 +1784,7 @@
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9AB0FBB72A59945100FA6B22 /* BTV Additions */,
 				F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */,
 				F8FDD6CA2553385000625B49 /* Array.swift */,
 				F8E51D602448E695001C9E5A /* Bundle.swift */,
@@ -1841,14 +1813,6 @@
 				F890E079247687AE008FB2EC /* URL.swift */,
 				F8BDD4232218790E006EAB84 /* UserDefaults.swift */,
 				F80859282364D61B00F3829D /* UserDefaults+charts.swift */,
-				9A360ADE2A2B7B470003D5F1 /* UIColor.swift */,
-				9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */,
-				9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */,
-				9A65B86F2A3C4DF100791398 /* UIView.swift */,
-				9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */,
-				9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */,
-				9ABB95002A4227B400A63285 /* UIBezierPath.swift */,
-				9A1895802A44381500219C8D /* Bool.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1875,7 +1839,6 @@
 			isa = PBXGroup;
 			children = (
 				9AEA74A32A347765001202A6 /* Quicksand */,
-				9AB5FACB2A2FE35700AAC3F1 /* Krub */,
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
 				F8B3A7B7226CC0B7004BA588 /* sounds */,
 			);
@@ -3521,11 +3484,9 @@
 				F824378124CB7A9800BED341 /* Cartoon_Uh_Oh.caf in Resources */,
 				F64039B2281E90CF0051EFFE /* QuickActions.strings in Resources */,
 				F824377F24CB7A9800BED341 /* Sci-Fi_Alarm.caf in Resources */,
-				9AB5FAEF2A3079B500AAC3F1 /* Krub-Light.ttf in Resources */,
 				F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */,
 				F82437C324CB7A9900BED341 /* Metallic.caf in Resources */,
 				F82437C224CB7A9900BED341 /* Alert_Tone_Ringtone_2.caf in Resources */,
-				9AB5FAE62A2FE4B700AAC3F1 /* Krub-SemiBold.ttf in Resources */,
 				F81F370325C1583400520946 /* WatlaaView.strings in Resources */,
 				F824377E24CB7A9800BED341 /* Sci-Fi_Warning.caf in Resources */,
 				F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */,
@@ -3615,8 +3576,6 @@
 				F8B3A7D3226CC0B7004BA588 /* xdripalert.aif in Resources */,
 				F824379C24CB7A9900BED341 /* Wrong_Answer.caf in Resources */,
 				F82437A424CB7A9900BED341 /* Alert_Tone_Ringtone_1.caf in Resources */,
-				9AB5FAEA2A30742A00AAC3F1 /* Krub-Bold.ttf in Resources */,
-				9AB5FAE82A30732B00AAC3F1 /* Krub-LightItalic.ttf in Resources */,
 				F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */,
 				F824377524CB7A9800BED341 /* Big_Clock_Ticking.caf in Resources */,
 				F82437BE24CB7A9900BED341 /* Cartoon_Dreamy_Glissando_Harp.caf in Resources */,
@@ -3664,7 +3623,6 @@
 				9AEA74B22A347765001202A6 /* Quicksand-VariableFont_wght.ttf in Resources */,
 				F8B3A7D2226CC0B7004BA588 /* spaceship.mp3 in Resources */,
 				F82437B224CB7A9900BED341 /* Burglar_Alarm_Siren_2.caf in Resources */,
-				9AB5FAE92A3073AE00AAC3F1 /* Krub-Regular.ttf in Resources */,
 				F82437BD24CB7A9900BED341 /* Sci-Fi_Spaceship_Warm_Up.caf in Resources */,
 				F824378D24CB7A9900BED341 /* Soft_Warm_Airy_Reassuring.caf in Resources */,
 			);
@@ -3680,7 +3638,6 @@
 				470B6199270C448100561E56 /* ExtensionDelegate.swift in Sources */,
 				470B6197270C448100561E56 /* InterfaceController.swift in Sources */,
 				470B619B270C448100561E56 /* ComplicationController.swift in Sources */,
-				9AB5FAEE2A3078D600AAC3F1 /* UIFont.swift in Sources */,
 				47F8E95A2710255D00B8B02B /* ConstantsWatchApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3697,7 +3654,6 @@
 				F870D3EA25129C43008967B0 /* Glucose+GlucoseKit.swift in Sources */,
 				F8E53FAB2517733700052CE5 /* Double.swift in Sources */,
 				F8E53FE9251F7B8800052CE5 /* Texts.swift in Sources */,
-				9AB5FAED2A3078D600AAC3F1 /* UIFont.swift in Sources */,
 				F8E53FB92517F79400052CE5 /* ConstantsBGGraphBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3890,7 +3846,6 @@
 				F8A2BC3725DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMMiaoMiaoTransmitterDelegate.swift in Sources */,
 				F8F7B8E6259A6EBF00C47B04 /* LibreSmoothing.swift in Sources */,
 				F8284237276BE78D0097E0C9 /* String+Dexcom.swift in Sources */,
-				9A360ADF2A2B7B470003D5F1 /* UIColor.swift in Sources */,
 				F808D2CA240325E40084B5DB /* CGMBubbleTransmitterDelegate.swift in Sources */,
 				F804870C2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift in Sources */,
 				F8CB59C22738206D00BA199E /* DexcomGlucoseDataTxMessage.swift in Sources */,
@@ -4077,7 +4032,6 @@
 				F8CB59C8273EF9F800BA199E /* DexcomAlgorithmState.swift in Sources */,
 				F890E07A247687AE008FB2EC /* URL.swift in Sources */,
 				F8B3A856227F28DC004BA588 /* AlertTypeSettingsViewController.swift in Sources */,
-				9ABB95012A4227B400A63285 /* UIBezierPath.swift in Sources */,
 				F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */,
 				F8B3A845227F090E004BA588 /* SettingsViewDexcomSettingsViewModel.swift in Sources */,
 				F8F9720C23A5915900C3F17D /* SensorDataTxMessage.swift in Sources */,

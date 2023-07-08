@@ -11,6 +11,15 @@ import Foundation
 
 
 /*
+ 
+ These are so that we can specify what a double is, directly.
+ So with these, a BG level can be written as
+ 
+ MMOLL(6.7)
+ MGDL(192)
+ 
+ This allows for strict typing of BG levels and is used in BGView to check the level sent in.
+ 
  Effectively we're creating new numeric literals. A good explanation here:
  
  https://fabiancanas.com/blog/2015/5/21/making-a-numeric-type-in-swift.html
@@ -80,7 +89,6 @@ extension NumericType {
 /// UK units.
 ///
 /// Uses `Double` as a base to accomodate the fractions
-
 public struct MMOLL :NumericType {
     
     public var value :Double

@@ -20,7 +20,7 @@ import UIKit
  */
 class BGTimeStampView: UIStackView {
 
-    /// These are 
+    /// These are the rounded, 'pill' views that hold the timestamp.
     private let _dateLabels: [BTVRoundRectLabel] = [BTVRoundRectLabel(), BTVRoundRectLabel(), BTVRoundRectLabel()]
     
     
@@ -42,13 +42,13 @@ class BGTimeStampView: UIStackView {
             guard let _date = date else {
                 
                 _dateAttributes[NSAttributedString.Key.backgroundColor] = UIColor.clear
-                _dateAttributes[NSAttributedString.Key.foregroundColor] = UIColor.white
+                _dateAttributes[NSAttributedString.Key.foregroundColor] = UIColor.black
                 
-                _dateLabels[0].attributedText = NSAttributedString(string: _timeFormat.string(from: Date()), attributes: _dateAttributes)
-                _dateLabels[0].isTranslucent = true
-                _dateLabels[0].alpha = 1.0
+                _dateLabels[1].attributedText = NSAttributedString(string: _timeFormat.string(from: Date()), attributes: _dateAttributes)
+                _dateLabels[1].isTranslucent = false
+                _dateLabels[1].alpha = 1.0
                 
-                _dateLabels[1].alpha = 0.0
+                _dateLabels[0].alpha = 0.0
                 
                 _dateLabels[2].alpha = 0.0
                 
@@ -56,25 +56,25 @@ class BGTimeStampView: UIStackView {
                 return
             }
             
-            _dateAttributes[NSAttributedString.Key.backgroundColor] = UIColor.white
-            _dateAttributes[NSAttributedString.Key.foregroundColor] = UIColor.black
+            _dateAttributes[NSAttributedString.Key.backgroundColor] = UIColor.clear
+            _dateAttributes[NSAttributedString.Key.foregroundColor] = UIColor.white
             
             _dateLabels[0].alpha = 1.0
             _dateLabels[1].alpha = 1.0
             _dateLabels[2].alpha = 1.0
             
             // Top 'pill' with time
-            _dateLabels[0].isTranslucent = false
+            _dateLabels[0].isTranslucent = true
             _dateLabels[0].attributedText =  NSAttributedString(string: _timeFormat.string(from: _date), attributes: _dateAttributes)
             _dateLabels[0].fillColour = _dateAttributes[NSAttributedString.Key.backgroundColor] as! UIColor
             
             // Middle 'pill' with day
-            _dateLabels[1].isTranslucent = false
+            _dateLabels[1].isTranslucent = true
             _dateLabels[1].attributedText = NSAttributedString(string: _dayFormat.string(from: _date), attributes: _dateAttributes)
             _dateLabels[1].fillColour = _dateAttributes[NSAttributedString.Key.backgroundColor] as! UIColor
             
             // Lower 'pill' with date
-            _dateLabels[2].isTranslucent = false
+            _dateLabels[2].isTranslucent = true
             _dateLabels[2].attributedText =  NSAttributedString(string: _dateFormat.string(from: _date), attributes: _dateAttributes)
             _dateLabels[2].fillColour = _dateAttributes[NSAttributedString.Key.backgroundColor] as! UIColor
         }

@@ -11,7 +11,7 @@ import UIKit
 
 extension NSLayoutConstraint {
     
-    // Shorthand functions for the dreade NSLayoutContraint methods
+    // Convenience functions for the NSLayoutContraint methods - I find them tedious to set out!
     
     /// Fixes a constraint of the `subView` to the same constraint of `superView`
     ///

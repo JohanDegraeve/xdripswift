@@ -11,10 +11,9 @@ import UIKit
 /**
  This is a custom `BTVRoundedBackingView` and is used to draw a rounded rectangle around the BG level.
  
- 
  The title is set to the user's desired units of the BG level,
  
- This hass a 3 element `UILabel` array that will hold the digits used to make up the BG reading
+ This has a 3 element `UILabel` array that will hold the digits used to make up the BG reading
  
 If the units are mmol/l then the views will hold 1, 2, 3 for 12.3 and if the units
 are mg/dl then they will hold 1, 2, 3 for 123. The units are shown by both the

@@ -19,7 +19,6 @@ final class RootViewController: UIViewController {
     
     @IBOutlet weak var toolbarOutlet: UIToolbar!
     
-    
     @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
     
     @IBAction func preSnoozeToolbarButtonAction(_ sender: UIBarButtonItem) {
@@ -91,22 +90,7 @@ final class RootViewController: UIViewController {
         screenLockAlert(showClock: true)
     }
     
-    
-    /// outlet for label that shows how many minutes ago and so on
-    @IBOutlet weak var minutesLabelOutlet: UILabel!
-    
-    @IBOutlet weak var minutesAgoLabelOutlet: UILabel!
-    
-    
-    /// outlet for label that shows difference with previous reading
-    @IBOutlet weak var diffLabelOutlet: UILabel!
-    
-    @IBOutlet weak var diffLabelUnitOutlet: UILabel!
-    
-    
     //MARK: - Outlets for main level display
-    /// outlet for label that shows the current reading
-    @IBOutlet weak var valueLabelOutlet: UILabel!
     
     /// New outlet for value reading
     @IBOutlet weak var valueViewOutlet: BGView!
@@ -218,35 +202,11 @@ final class RootViewController: UIViewController {
             if glucoseChartManager.chartIsPannedBackward {
                 
                 if let lastChartPointEarlierThanEndDate = glucoseChartManager.lastChartPointEarlierThanEndDate, let chartAxisValueDate = lastChartPointEarlierThanEndDate.x as? ChartAxisValueDate  {
-                    
-                    // valueLabel text should not be strikethrough (might still be strikethrough in case latest reading is older than 10 minutes
-                    self.valueLabelOutlet.attributedText = nil
-                    
-                    // set value to value of latest chartPoint
-                    self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: self.userPrefsMgDL)
+            
                     
                     // This can send either mg/dl or mmol/l down to the BGView depending on user setting
                     self.valueViewOutlet.directSetBGValue(value: lastChartPointEarlierThanEndDate.y.scalar, date: chartAxisValueDate.date, btManager: self.bluetoothPeripheralManager)
-                    
-                    // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
-                    self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
-                    self.minutesLabelOutlet.textColor = UIColor.red
-                    
-                    self.minutesAgoLabelOutlet.text = ""
-                    
-                    self.valueLabelOutlet.textColor = UIColor.lightGray
-                    
-                    // apply strikethrough to the BG value text format
-                    let attributedString = NSMutableAttributedString(string: self.valueLabelOutlet.text!)
-                    attributedString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributedString.length))
-                    
-                    self.valueLabelOutlet.attributedText = attributedString
-                    
-                    // don't show anything in diff outlet
-                    self.diffLabelOutlet.text = ""
-                    
-                    self.diffLabelUnitOutlet.text = ""
-                    
+    
                 } else {
                     
                     // this would only be the case if there's no readings withing the shown timeframe
@@ -566,9 +526,16 @@ final class RootViewController: UIViewController {
         updateWatchApp()
     }
     
+    @IBOutlet var _stackView: UIStackView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if let _tabBarController = tabBarController {
+            // Set the uistackview's bottom constraint to the top of the main tab bar
+            let _bottomConstraint = NSLayoutConstraint.fix(constraint: .bottom, of: _stackView, toSameOfView: view, offset: -_tabBarController.tabBar.frame.height * 2)
+            NSLayoutConstraint.activate([_bottomConstraint])
+        }
         
         self.configureWatchKitSession()
         
@@ -2055,26 +2022,11 @@ final class RootViewController: UIViewController {
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
-        // set minutesLabelOutlet.textColor to white, might still be red due to panning back in time
-        self.minutesLabelOutlet.textColor = UIColor.white
-        
         // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's not going to be a latestReading
         let latestReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
         
         // if there's no readings, then give empty fields and make sure the text isn't styled with strikethrough
         guard latestReadings.count > 0 else {
-            
-            valueLabelOutlet.textColor = UIColor.darkGray
-            minutesLabelOutlet.text = ""
-            minutesAgoLabelOutlet.text = ""
-            diffLabelOutlet.text = ""
-            diffLabelUnitOutlet.text = ""
-                
-            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: "---")
-            attributeString.addAttribute(.strikethroughStyle, value: 0, range: NSMakeRange(0, attributeString.length))
-            
-            valueLabelOutlet.attributedText = attributeString
-            
             // set value to value of latest chartPoint
             self.valueViewOutlet.setBlank()
             return
@@ -2091,15 +2043,13 @@ final class RootViewController: UIViewController {
         
         // create delta value text (without the units)
         let diffLabelContent = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: false, highGranularity: true, mgdl: userPrefsMgDL)
-        diffLabelOutlet.text = diffLabelContent.string
         
         // if latestReading is older than 11 minutes, then it should be strikethrough
         if lastReading.timeStamp < Date(timeIntervalSinceNow: -60.0 * 11) {
             
             let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
             attributeString.addAttribute(.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
-            
-            valueLabelOutlet.attributedText = attributeString
+    
             
             valueViewOutlet.setValues(for: lastReading, slope: nil, btManager: bluetoothPeripheralManager)
             
@@ -2110,51 +2060,9 @@ final class RootViewController: UIViewController {
                 calculatedValueAsString = calculatedValueAsString + " " + lastReading.slopeArrow()
             }
             
-            // no strikethrough needed, but attributedText may still be set to strikethrough from previous period during which there was no recent reading.
-            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
-            attributeString.addAttribute(.strikethroughStyle, value: 0, range: NSMakeRange(0, attributeString.length))
-            
-            valueLabelOutlet.attributedText = attributeString
-            
             valueViewOutlet.setValues(for: lastReading, slope: diffLabelContent, btManager: bluetoothPeripheralManager)
             
         }
-        
-        // if data is stale (over 11 minutes old), show it as gray colour to indicate that it isn't current
-        // if not, then set color, depending on value lower than low mark or higher than high mark
-        // set both HIGH and LOW BG values to red as previous yellow for hig is now not so obvious due to in-range colour of green.
-        if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
-            
-            valueLabelOutlet.textColor = UIColor.lightGray
-            
-        } else if lastReading.calculatedValue.bgValueRounded(mgdl: userPrefsMgDL) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: userPrefsMgDL).bgValueRounded(mgdl: userPrefsMgDL) || lastReading.calculatedValue.bgValueRounded(mgdl: userPrefsMgDL) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: userPrefsMgDL).bgValueRounded(mgdl: userPrefsMgDL) {
-            
-            // BG is higher than urgentHigh or lower than urgentLow objectives
-            valueLabelOutlet.textColor = UIColor.red
-            
-        } else if lastReading.calculatedValue.bgValueRounded(mgdl: userPrefsMgDL) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: userPrefsMgDL).bgValueRounded(mgdl: userPrefsMgDL) || lastReading.calculatedValue.bgValueRounded(mgdl: userPrefsMgDL) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: userPrefsMgDL).bgValueRounded(mgdl: userPrefsMgDL) {
-            
-            // BG is between urgentHigh/high and low/urgentLow objectives
-            valueLabelOutlet.textColor = UIColor.yellow
-            
-        } else {
-            
-            // BG is between high and low objectives so considered "in range"
-            valueLabelOutlet.textColor = UIColor.green
-        }
-        
-        // get minutes ago and create value text for minutes ago label
-        let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
-        let minutesAgoText = minutesAgo.description
-        minutesLabelOutlet.text = minutesAgoText
-        
-        // configure the localized text in the "mins ago" label
-        let minutesAgoMinAgoText = (minutesAgo == 1 ? Texts_Common.minute : Texts_Common.minutes) + " " + Texts_HomeView.ago
-        minutesAgoLabelOutlet.text = minutesAgoMinAgoText
-        
-        // set the delta unit label text
-        let diffLabelUnitText = userPrefsMgDL ? Texts_Common.mgdl : Texts_Common.mmol
-        diffLabelUnitOutlet.text = diffLabelUnitText
         
         // update the chart up to now
         updateChartWithResetEndDate()
@@ -2723,9 +2631,6 @@ final class RootViewController: UIViewController {
             
             if showClock {
                 
-                // set the value label font size to big
-                valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
-                
                 // de-clutter the screen. Hide the mini-chart, statistics view, controls and show the clock view
                 miniChartOutlet.isHidden = true
                 statisticsView.isHidden = true
@@ -2780,9 +2685,6 @@ final class RootViewController: UIViewController {
                 screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock")
             
             }
-
-            valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
-            
             // hide
             miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
@@ -2938,6 +2840,7 @@ final class RootViewController: UIViewController {
     
     func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
         
+        toolbarOutlet
         if let controller = landscapeChartViewController {
             controller.willMove(toParent: nil)
             coordinator.animate(alongsideTransition: { _ in

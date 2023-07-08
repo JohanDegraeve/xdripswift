@@ -41,7 +41,6 @@ class BTVRoundRectLabel: BTVRoundedBackingView {
     }
 }
 
-
 //MARK: -
 /// This class draws a rounded rect in a `UIView`
 ///
@@ -103,7 +102,7 @@ class BTVRoundedBackingView: UIView {
         super.draw(rect)
         
         //Draw main outline
-        var _boxPath = UIBezierPath(roundedRect: rect.insetBy(dx: borderWidth, dy: borderWidth), byRoundingCorners: .allCorners, cornerRadii: CGSize(width: 10.0, height: 10.0))
+        let _boxPath = UIBezierPath(roundedRect: rect.insetBy(dx: borderWidth, dy: borderWidth), byRoundingCorners: .allCorners, cornerRadii: CGSize(width: 10.0, height: 10.0))
         _boxPath.lineWidth = borderWidth
         _fillColour.setFill()
         _boxPath.fill()
