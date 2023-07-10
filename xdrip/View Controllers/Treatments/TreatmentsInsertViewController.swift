@@ -72,7 +72,8 @@ class TreatmentsInsertViewController : UIViewController {
 		
 		// Fixes dark mode issues
 		if let navigationBar = navigationController?.navigationBar {
-			navigationBar.barStyle = UIBarStyle.blackTranslucent
+			navigationBar.barStyle = UIBarStyle.black
+            navigationBar.isTranslucent = true
 			navigationBar.barTintColor  = UIColor.black
 			navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
 		}
@@ -81,7 +82,7 @@ class TreatmentsInsertViewController : UIViewController {
 		self.titleNavigation.title = Texts_TreatmentsView.newEntryTitle
         
         // update the BG Check placeholder text depending on BG unit being used
-        self.bgCheckTextField.placeholder = Double(0).mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        self.bgCheckTextField.placeholder = Double(0).mgdlToMmolAndToString(thisIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         
 		// Labels for each TextField
 		self.carbsLabel.text = Texts_TreatmentsView.carbs

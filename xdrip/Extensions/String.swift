@@ -2,6 +2,12 @@ import UIKit
 import CryptoSwift
 
 extension String {
+    // Attempt to avoid typos
+    static let mgDl = "mg/dL"
+    static let mmolL = "mmol/L"
+}
+
+extension String {
     //https://stackoverflow.com/questions/39677330/how-does-string-substring-work-in-swift
     //usage
     //let s = "hello"
@@ -11,6 +17,11 @@ extension String {
         let idx1 = index(startIndex, offsetBy: max(0, range.lowerBound))
         let idx2 = index(startIndex, offsetBy: min(self.count, range.upperBound))
         return String(self[idx1..<idx2])
+    }
+    
+    subscript (i: Int) -> String {
+        let start = self.index(startIndex, offsetBy: i)
+        return String(self[start ..< self.index(after: start)])
     }
 }
 
@@ -86,8 +97,8 @@ extension String {
             return UIColor.gray
         }
         
-        var rgbValue:UInt32 = 0
-        Scanner(string: cString).scanHexInt32(&rgbValue)
+        var rgbValue:UInt64 = 0
+        Scanner(string: cString).scanHexInt64(&rgbValue)
         
         return UIColor(
             red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,

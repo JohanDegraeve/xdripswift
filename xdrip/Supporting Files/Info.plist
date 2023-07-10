@@ -94,5 +94,13 @@
 	<string>Light</string>
 	<key>view controller-based status bar</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Quicksand-Light.ttf</string>
+		<string>Quicksand-Regular.ttf</string>
+		<string>Quicksand-Medium.ttf</string>
+		<string>Quicksand-SemiBold.ttf</string>
+		<string>Quicksand-Bold.ttf</string>
+	</array>
 </dict>
 </plist>

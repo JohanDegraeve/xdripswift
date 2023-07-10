@@ -106,6 +106,8 @@ class WatchManager: NSObject {
                 visualIndicator = ConstantsWatch.visualIndicatorNotUrgent
             case .urgent:
                 visualIndicator = ConstantsWatch.visualIndicatorUrgent
+            default:
+                break
             }
             
             // pre-append the indicator to the title
@@ -120,7 +122,7 @@ class WatchManager: NSObject {
         // add delta if needed
         if UserDefaults.standard.displayDeltaInCalendarEvent && lastReading.count > 1 {
             
-            title = title + " " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: UserDefaults.standard.displayUnitInCalendarEvent, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            title = title + " " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: UserDefaults.standard.displayUnitInCalendarEvent, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).string
             
         } else if UserDefaults.standard.displayUnitInCalendarEvent {
             

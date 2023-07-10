@@ -25,7 +25,7 @@ class BgReadingsAccessor {
     /// - Gives 2 latest readings with calculatedValue != 0, minimum time between the two readings specified by minimumTimeIntervalInMinutes
     ///
     /// - parameters:
-    ///     - minimumTimeIntervalInMinutes : minimum time between the two readings in seconds
+    ///     - minimumTimeIntervalInMinutes : minimum time between the two readings in minutes
     /// - returns: 0 1 or 2 readings, minimum time diff between the two readings
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
     func get2LatestBgReadings(minimumTimeIntervalInMinutes: Double) -> [BgReading] {

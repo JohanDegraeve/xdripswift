@@ -19,7 +19,6 @@ final class RootViewController: UIViewController {
     
     @IBOutlet weak var toolbarOutlet: UIToolbar!
     
-    
     @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
     
     @IBAction func preSnoozeToolbarButtonAction(_ sender: UIBarButtonItem) {
@@ -91,21 +90,11 @@ final class RootViewController: UIViewController {
         screenLockAlert(showClock: true)
     }
     
+    //MARK: - Outlets for main level display
     
-    /// outlet for label that shows how many minutes ago and so on
-    @IBOutlet weak var minutesLabelOutlet: UILabel!
-    
-    @IBOutlet weak var minutesAgoLabelOutlet: UILabel!
-    
-    
-    /// outlet for label that shows difference with previous reading
-    @IBOutlet weak var diffLabelOutlet: UILabel!
-    
-    @IBOutlet weak var diffLabelUnitOutlet: UILabel!
-    
-    
-    /// outlet for label that shows the current reading
-    @IBOutlet weak var valueLabelOutlet: UILabel!
+    /// New outlet for value reading
+    @IBOutlet weak var valueViewOutlet: BGView!
+    //-------------------------------------------
     
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
         
@@ -209,36 +198,15 @@ final class RootViewController: UIViewController {
         
         glucoseChartManager.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: {
             
-            // user has been panning, if chart is panned backward, then need to set valueLabel to value of latest chartPoint shown in the chart, and minutesAgo text to timeStamp of latestChartPoint
+            // user has been panning, if chart is panned, then need to set valueLabel to value of latest chartPoint shown in the chart, and minutesAgo text to timeStamp of latestChartPoint
             if glucoseChartManager.chartIsPannedBackward {
                 
                 if let lastChartPointEarlierThanEndDate = glucoseChartManager.lastChartPointEarlierThanEndDate, let chartAxisValueDate = lastChartPointEarlierThanEndDate.x as? ChartAxisValueDate  {
+            
                     
-                    // valueLabel text should not be strikethrough (might still be strikethrough in case latest reading is older than 10 minutes
-                    self.valueLabelOutlet.attributedText = nil
-                    
-                    // set value to value of latest chartPoint
-                    self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                    
-                    // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
-                    self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
-                    self.minutesLabelOutlet.textColor = UIColor.red
-                    
-                    self.minutesAgoLabelOutlet.text = ""
-                    
-                    self.valueLabelOutlet.textColor = UIColor.lightGray
-                    
-                    // apply strikethrough to the BG value text format
-                    let attributedString = NSMutableAttributedString(string: self.valueLabelOutlet.text!)
-                    attributedString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributedString.length))
-                    
-                    self.valueLabelOutlet.attributedText = attributedString
-                    
-                    // don't show anything in diff outlet
-                    self.diffLabelOutlet.text = ""
-                    
-                    self.diffLabelUnitOutlet.text = ""
-                    
+                    // This can send either mg/dl or mmol/l down to the BGView depending on user setting
+                    self.valueViewOutlet.directSetBGValue(value: lastChartPointEarlierThanEndDate.y.scalar, date: chartAxisValueDate.date, btManager: self.bluetoothPeripheralManager)
+    
                 } else {
                     
                     // this would only be the case if there's no readings withing the shown timeframe
@@ -249,7 +217,9 @@ final class RootViewController: UIViewController {
             } else {
                 
                 // chart is not panned, update labels is necessary
-                self.updateLabelsAndChart(overrideApplicationState: false)
+                // This code is reached when the user has panned to the last reading
+                // which is potentially current or old.
+                self.updateLabelsAndChart(overrideApplicationState: false, pannedToMostRecent: true)
                 
             }
             
@@ -272,7 +242,7 @@ final class RootViewController: UIViewController {
     @IBAction func chartDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
         
         // if the main chart is double-tapped then force a reset to return to the current date/time, refresh the chart and also all labels
-        updateLabelsAndChart(forceReset: true)
+        updateLabelsAndChart(forceReset: true, pannedToMostRecent: true)
         
     }
     
@@ -373,6 +343,11 @@ final class RootViewController: UIViewController {
 
     
     // MARK: - Properties - other private properties
+    
+    // to make the following code a bit more readable
+    var userPrefsMgDL: Bool {
+        return UserDefaults.standard.bloodGlucoseUnitIsMgDl
+    }
     
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryRootView)
@@ -484,7 +459,6 @@ final class RootViewController: UIViewController {
     
     /// create the landscape view
     private var landscapeChartViewController: LandscapeChartViewController?
-
     
     // MARK: - overriden functions
     
@@ -500,6 +474,10 @@ final class RootViewController: UIViewController {
         
     }
     
+    private var _screenshotImage :UIImageView?
+    private var _blur: CIFilter? = CIFilter(name: "CIGaussianBlur", parameters: ["inputRadius" : NSNumber(value: 30.0)])
+    private var _layer: CALayer = CALayer()
+    
     override func viewWillAppear(_ animated: Bool) {
         
         super.viewWillAppear(animated)
@@ -508,7 +486,7 @@ final class RootViewController: UIViewController {
         updateScreenRotationSettings()
         
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
-        updateLabelsAndChart(overrideApplicationState: true)
+        updateLabelsAndChart(overrideApplicationState: true, forceReset: true)
         
         // show the mini-chart as required
         if !screenIsLocked {
@@ -536,17 +514,29 @@ final class RootViewController: UIViewController {
         
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
         
         updateWatchApp()
-        
     }
+    
+    @IBOutlet var _stackView: UIStackView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if let _tabBarController = tabBarController {
+            // Set the uistackview's bottom constraint to the top of the main tab bar
+            let _bottomConstraint = NSLayoutConstraint.fix(constraint: .bottom, of: _stackView, toSameOfView: view, offset: -_tabBarController.tabBar.frame.height * 2)
+            NSLayoutConstraint.activate([_bottomConstraint])
+        }
+        
         self.configureWatchKitSession()
         
         // if the user requested to hide the help icon on the main screen, then remove it (and the flexible space next to it)
@@ -1465,9 +1455,11 @@ final class RootViewController: UIViewController {
         }
     }
     
+    // MARK: Transition from landscape to portrait
     override func willTransition(
         to newCollection: UITraitCollection,
         with coordinator: UIViewControllerTransitionCoordinator) {
+            
       super.willTransition(to: newCollection, with: coordinator)
       
       switch newCollection.verticalSizeClass {
@@ -1475,9 +1467,12 @@ final class RootViewController: UIViewController {
         showLandscape(with: coordinator)
       case .regular, .unspecified:
         hideLandscape(with: coordinator)
+          // Lets update the views as well
+          valueViewOutlet.setNeedsDisplay()
       @unknown default:
         fatalError()
       }
+            
     }
 
     
@@ -1676,7 +1671,7 @@ final class RootViewController: UIViewController {
         // assign deviceName, needed in the closure when creating alert. As closures can create strong references (to bluetoothTransmitter in this case), I'm fetching the deviceName here
         let deviceName = bluetoothTransmitter.deviceName
         
-        let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: nil, placeHolder: "...", actionTitle: nil, cancelTitle: nil, actionHandler: {
+        let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: nil, keyboardType: userPrefsMgDL ? .numberPad:.decimalPad, text: nil, placeHolder: "...", actionTitle: nil, cancelTitle: nil, actionHandler: {
             (text:String) in
             
             guard let valueAsDouble = text.toDouble() else {
@@ -1687,7 +1682,7 @@ final class RootViewController: UIViewController {
             // store the calibration value entered by the user into the log
             trace("calibration : value %{public}@ entered by user", log: self.log, category: ConstantsLog.categoryRootView, type: .info, text.description)
             
-            let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgdl: self.userPrefsMgDL)
             
             var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
             
@@ -1940,7 +1935,7 @@ final class RootViewController: UIViewController {
             if UserDefaults.standard.showReadingInAppBadge {
                 
                 // rescale if unit is mmol
-                if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
+                if !userPrefsMgDL {
                     readingValueForBadge = readingValueForBadge.mgdlToMmol().round(toDecimalPlaces: 1)
                 } else {
                     readingValueForBadge = readingValueForBadge.round(toDecimalPlaces: 0)
@@ -1951,12 +1946,12 @@ final class RootViewController: UIViewController {
             }
             
             // Configure notificationContent title, which is bg value in correct unit, add also slopeArrow if !hideSlope and finally the difference with previous reading, if there is one
-            var calculatedValueAsString = lastReading[0].unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            var calculatedValueAsString = lastReading[0].unitizedString(unitIsMgDl: userPrefsMgDL)
             if !lastReading[0].hideSlope {
                 calculatedValueAsString = calculatedValueAsString + " " + lastReading[0].slopeArrow()
             }
             if lastReading.count > 1 {
-                calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: userPrefsMgDL).string
             }
             notificationContent.title = calculatedValueAsString
             
@@ -1983,10 +1978,10 @@ final class RootViewController: UIViewController {
             if UserDefaults.standard.showReadingInAppBadge {
                 
                 // rescale of unit is mmol
-                readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: userPrefsMgDL)
                 
                 // if unit is mmol and if value needs to be multiplied by 10, then multiply by 10
-                if !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.multipleAppBadgeValueWith10 {
+                if !userPrefsMgDL && UserDefaults.standard.multipleAppBadgeValueWith10 {
                     readingValueForBadge = readingValueForBadge * 10.0
                 }
                 
@@ -2004,7 +1999,12 @@ final class RootViewController: UIViewController {
     /// - parameters:
     ///     - overrideApplicationState : if true, then update will be done even if state is not .active
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
-    @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
+    ///     - panToMostRecent : `Bool` to indicate whether the user has panned all the way to the latest reading. Default is `false` only set to `true` by the gesture recogniser
+    @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false, pannedToMostRecent: Bool = false) {
+        
+        defer {
+            self.valueViewOutlet.setNeedsDisplay()
+        }
         
         UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         
@@ -2022,102 +2022,47 @@ final class RootViewController: UIViewController {
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
-        // to make the following code a bit more readable
-        let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-        
-        // set minutesLabelOutlet.textColor to white, might still be red due to panning back in time
-        self.minutesLabelOutlet.textColor = UIColor.white
-        
         // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's not going to be a latestReading
         let latestReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
         
         // if there's no readings, then give empty fields and make sure the text isn't styled with strikethrough
         guard latestReadings.count > 0 else {
-            
-            valueLabelOutlet.textColor = UIColor.darkGray
-            minutesLabelOutlet.text = ""
-            minutesAgoLabelOutlet.text = ""
-            diffLabelOutlet.text = ""
-            diffLabelUnitOutlet.text = ""
-                
-            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: "---")
-            attributeString.addAttribute(.strikethroughStyle, value: 0, range: NSMakeRange(0, attributeString.length))
-            
-            valueLabelOutlet.attributedText = attributeString
-            
+            // set value to value of latest chartPoint
+            self.valueViewOutlet.setBlank()
             return
         }
         
         // assign last reading
-        let lastReading = latestReadings[0]
+        let lastReading = latestReadings[0] // < The first element is the youngest
         
         // assign last but one reading
         let lastButOneReading = latestReadings.count > 1 ? latestReadings[1] : nil
         
         // start creating text for valueLabelOutlet, first the calculated value
-        var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: mgdl)
+        var calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: userPrefsMgDL)
+        
+        // create delta value text (without the units)
+        let diffLabelContent = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: false, highGranularity: true, mgdl: userPrefsMgDL)
         
         // if latestReading is older than 11 minutes, then it should be strikethrough
         if lastReading.timeStamp < Date(timeIntervalSinceNow: -60.0 * 11) {
             
             let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
             attributeString.addAttribute(.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
+    
             
-            valueLabelOutlet.attributedText = attributeString
+            valueViewOutlet.setValues(for: lastReading, slope: nil, btManager: bluetoothPeripheralManager)
             
         } else {
             
+            // Setup the BG value and the slope
             if !lastReading.hideSlope {
                 calculatedValueAsString = calculatedValueAsString + " " + lastReading.slopeArrow()
             }
             
-            // no strikethrough needed, but attributedText may still be set to strikethrough from previous period during which there was no recent reading.
-            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: calculatedValueAsString)
-            attributeString.addAttribute(.strikethroughStyle, value: 0, range: NSMakeRange(0, attributeString.length))
-            
-            valueLabelOutlet.attributedText = attributeString
+            valueViewOutlet.setValues(for: lastReading, slope: diffLabelContent, btManager: bluetoothPeripheralManager)
             
         }
-        
-        // if data is stale (over 11 minutes old), show it as gray colour to indicate that it isn't current
-        // if not, then set color, depending on value lower than low mark or higher than high mark
-        // set both HIGH and LOW BG values to red as previous yellow for hig is now not so obvious due to in-range colour of green.
-        if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
-            
-            valueLabelOutlet.textColor = UIColor.lightGray
-            
-        } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
-            
-            // BG is higher than urgentHigh or lower than urgentLow objectives
-            valueLabelOutlet.textColor = UIColor.red
-            
-        } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
-            
-            // BG is between urgentHigh/high and low/urgentLow objectives
-            valueLabelOutlet.textColor = UIColor.yellow
-            
-        } else {
-            
-            // BG is between high and low objectives so considered "in range"
-            valueLabelOutlet.textColor = UIColor.green
-        }
-        
-        // get minutes ago and create value text for minutes ago label
-        let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
-        let minutesAgoText = minutesAgo.description
-        minutesLabelOutlet.text = minutesAgoText
-        
-        // configure the localized text in the "mins ago" label
-        let minutesAgoMinAgoText = (minutesAgo == 1 ? Texts_Common.minute : Texts_Common.minutes) + " " + Texts_HomeView.ago
-        minutesAgoLabelOutlet.text = minutesAgoMinAgoText
-        
-        // create delta value text (without the units)
-        let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: false, highGranularity: true, mgdl: mgdl)
-        diffLabelOutlet.text = diffLabelText
-        
-        // set the delta unit label text
-        let diffLabelUnitText = mgdl ? Texts_Common.mgdl : Texts_Common.mmol
-        diffLabelUnitOutlet.text = diffLabelUnitText
         
         // update the chart up to now
         updateChartWithResetEndDate()
@@ -2428,7 +2373,6 @@ final class RootViewController: UIViewController {
         }
         
         // declare constants/variables
-        let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         var daysToUseStatistics: Int = 0
         var fromDate: Date = Date()
         
@@ -2479,8 +2423,8 @@ final class RootViewController: UIViewController {
             
             
             // set the low/high "label" labels with the low/high user values that the user has chosen to use
-            self.lowLabelOutlet.text = "(<" + (isMgDl ? Int(statistics.lowLimitForTIR).description : statistics.lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
-            self.highLabelOutlet.text = "(>" + (isMgDl ? Int(statistics.highLimitForTIR).description : statistics.highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+            self.lowLabelOutlet.text = "(<" + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Int(statistics.lowLimitForTIR).description : statistics.lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
+            self.highLabelOutlet.text = "(>" + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Int(statistics.highLimitForTIR).description : statistics.highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
             
             
             // set all label outlets with the correctly formatted calculated values
@@ -2495,7 +2439,7 @@ final class RootViewController: UIViewController {
             
             // if there are no values returned (new sensor?) then just leave the default "-" showing
             if statistics.averageStatisticValue.value > 0 {
-                self.averageStatisticLabelOutlet.text = (isMgDl ? Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics.averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
+                self.averageStatisticLabelOutlet.text = (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics.averageStatisticValue.round(toDecimalPlaces: 1).description) + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? " mg/dl" : " mmol/l")
             }
             
             // if there are no values returned (new sensor?) then just leave the default "-" showing
@@ -2687,9 +2631,6 @@ final class RootViewController: UIViewController {
             
             if showClock {
                 
-                // set the value label font size to big
-                valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
-                
                 // de-clutter the screen. Hide the mini-chart, statistics view, controls and show the clock view
                 miniChartOutlet.isHidden = true
                 statisticsView.isHidden = true
@@ -2744,9 +2685,6 @@ final class RootViewController: UIViewController {
                 screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock")
             
             }
-
-            valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
-            
             // hide
             miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
@@ -2902,6 +2840,7 @@ final class RootViewController: UIViewController {
     
     func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
         
+        toolbarOutlet
         if let controller = landscapeChartViewController {
             controller.willMove(toParent: nil)
             coordinator.animate(alongsideTransition: { _ in
@@ -2932,12 +2871,10 @@ final class RootViewController: UIViewController {
         // if there is no active WCSession open (i.e. if there is no paired Apple Watch with the watch app installed and running), then do nothing and just return
         if let validSession = self.session, validSession.isReachable {
             
-            let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-            
             // make sure that the necessary objects are initialised and readings are available.
             if let bgReadingsAccessor = bgReadingsAccessor, let lastReading = bgReadingsAccessor.last(forSensor: nil) {
                 
-                let calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: mgdl)
+                let calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: userPrefsMgDL)
                 
                 var calculatedValueFullAsString: String = ""
                 var calculatedValueTrendAsString: String = ""
@@ -2966,7 +2903,7 @@ final class RootViewController: UIViewController {
                 let lastButOneReading = latestReadings.count > 1 ? latestReadings[1]:nil
                 
                 // create delta text from the last two readings
-                let deltaText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: mgdl)
+                let deltaText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: userPrefsMgDL)
                 
                 // create the WKSession messages in String format and send them. Although they are all sent almost immediately, they will be queued and sent in a background thread by the handler
                 validSession.sendMessage(["currentBGValueText" : calculatedValueAsString], replyHandler: nil, errorHandler: nil)
@@ -2975,19 +2912,19 @@ final class RootViewController: UIViewController {
                 
                 validSession.sendMessage(["currentBGValueTrend" : calculatedValueTrendAsString], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["currentBGValue" : lastReading.unitizedString(unitIsMgDl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                validSession.sendMessage(["currentBGValue" : lastReading.unitizedString(unitIsMgDl: userPrefsMgDL).description], replyHandler: nil, errorHandler: nil)
                 
                 validSession.sendMessage(["minutesAgoTextLocalized" : minutesAgoTextLocalized], replyHandler: nil, errorHandler: nil)
                 
                 validSession.sendMessage(["deltaTextLocalized" : deltaText], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["urgentLowMarkValueInUserChosenUnit" : UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                validSession.sendMessage(["urgentLowMarkValueInUserChosenUnit" : UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueRounded(mgdl: userPrefsMgDL).description], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["lowMarkValueInUserChosenUnit" : UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                validSession.sendMessage(["lowMarkValueInUserChosenUnit" : UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueRounded(mgdl: userPrefsMgDL).description], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["highMarkValueInUserChosenUnit" : UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                validSession.sendMessage(["highMarkValueInUserChosenUnit" : UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgdl: userPrefsMgDL).description], replyHandler: nil, errorHandler: nil)
                 
-                validSession.sendMessage(["urgentHighMarkValueInUserChosenUnit" : UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
+                validSession.sendMessage(["urgentHighMarkValueInUserChosenUnit" : UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgdl: userPrefsMgDL).description], replyHandler: nil, errorHandler: nil)
                 
                 // send the timestamp last as this is what will eventually trigger the view refresh on the watch
                 validSession.sendMessage(["currentBGTimeStamp" : ISO8601DateFormatter().string(from: lastReading.timeStamp)], replyHandler: nil, errorHandler: nil)
@@ -3002,13 +2939,9 @@ final class RootViewController: UIViewController {
     fileprivate func updateScreenRotationSettings() {
         // if allowed, then permit the Root View Controller which is the main screen, to rotate left/right to show the landscape view
         if UserDefaults.standard.allowScreenRotation {
-            
             (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
-            
         } else {
-            
             (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
-            
         }
     }
     
@@ -3037,7 +2970,7 @@ final class RootViewController: UIViewController {
     
         // create stopDate
         let stopDate = Date()
-        
+
         // send stop sensor command to transmitter, don't check if there's an activeSensor in coredata or not, never know that there's a desync between coredata and transmitter
         if let cGMTransmitter = cGMTransmitter, sendToTransmitter {
             cGMTransmitter.stopSensor(stopDate: stopDate)
@@ -3050,18 +2983,17 @@ final class RootViewController: UIViewController {
 
         // set endDate of activeSensor to stopDate
         activeSensor.endDate = stopDate
-        
+
         // save changes to coreData
         coreDataManager.saveChanges()
-        
+
         // asign nil to activeSensor
         self.activeSensor = nil
-        
+
         // now that the activeSensor object has been destroyed, update (hide) the sensor countdown graphic
         updateSensorCountdown()
 
     }
-    
 }
 
 
@@ -3171,7 +3103,7 @@ extension RootViewController: UITabBarControllerDelegate {
             navigationController.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
             
         } else if let navigationController = viewController as? BluetoothPeripheralNavigationController, let bluetoothPeripheralManager = bluetoothPeripheralManager, let coreDataManager = coreDataManager {
-            
+            // User is looking for CGM bluetooth status
             navigationController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
             
         } else if let navigationController = viewController as? TreatmentsNavigationController, let coreDataManager = coreDataManager {

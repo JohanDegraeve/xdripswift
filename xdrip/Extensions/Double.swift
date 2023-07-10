@@ -32,6 +32,9 @@ extension Double: RawRepresentable {
     }
     
     /// converts mgdl to mmol if parameter mgdl = false. If mgdl = true then just returns self
+    /// TODO: - Check semantics: if we pass in mg/dL and want mg/dL we get mg/dL
+    /// if we pass in mmol/dl and mgdl is true we get mmol/l back....?
+    /// Should we convert it if this is the case..?
     func mgdlToMmol(mgdl:Bool) -> Double {
         if mgdl {
             return self
@@ -84,11 +87,11 @@ extension Double: RawRepresentable {
         
     }
     
-    /// converts mmol to mgdl if parametermgdl = false and, converts value to string, round. Number of digits after decimal seperator depends on the unit. For mg/dl 0 digits after decimal seperator, for mmol, 1 digit after decimal seperator
+    /// converts mmol to mgdl if parameter thisIsMgDl = false and, converts value to string, round. Number of digits after decimal seperator depends on the unit. For mg/dl 0 digits after decimal seperator, for mmol, 1 digit after decimal seperator
     ///
     /// this function is actually a combination of mmolToMgdl if mgdl = true and bgValuetoString
-    func mgdlToMmolAndToString(mgdl:Bool) -> String {
-        if mgdl {
+    func mgdlToMmolAndToString(thisIsMgDl:Bool) -> String {
+        if thisIsMgDl {
             return String(format:"%.0f", self)
         } else {
             return String(format:"%.1f", self.mgdlToMmol())
@@ -99,6 +102,11 @@ extension Double: RawRepresentable {
     func asTimeStampInMilliSecondsToString() -> String {
         let asDate = Date(timeIntervalSince1970: self/1000)
         return asDate.description(with: .current)
+    }
+    
+    /// Takes the `Double` value - a mg/dL unit - and converts to a mmol/l `String` representation
+    var convertToMMOLString: String {
+        return BgReading._unitizedString(calculatedValue: self.mgdlToMmol(), unitIsMgDl: false)
     }
     
 }

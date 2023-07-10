@@ -17,7 +17,7 @@ enum ConstantsWatch {
 
 
 // Indentifiers for blood glucose range descriptions
-enum BgRangeDescription {
+public enum BgRangeDescription {
     
     /// bg range is "urgent" (either high or low)
     case urgent
@@ -27,4 +27,25 @@ enum BgRangeDescription {
     
     /// bg range is "in range"
     case inRange
+    
+    /// bg range is very high
+    case urgentHigh
+    
+    /// bg range is very low
+    case urgentLow
+    
+    /// bg is low but not urgent
+    case low
+    
+    /// bg is high but not urgent
+    case high
+    
+    /// bg is does not require a range description.
+    ///
+    /// Typically, this is when the user has panned the chart
+    /// so the value won't need a specific colour at that point
+    case rangeNR
+    
+    /// This is for mg/dL < 12
+    case special
 }

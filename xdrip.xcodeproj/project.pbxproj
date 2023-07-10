@@ -10,7 +10,6 @@
 		470824D2297484B500C52317 /* SwiftCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; };
 		470824D3297484B500C52317 /* SwiftCharts in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		470B618A270C448000561E56 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 470B6188270C448000561E56 /* Interface.storyboard */; };
-		470B618C270C448100561E56 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B618B270C448100561E56 /* Assets.xcassets */; };
 		470B6192270C448100561E56 /* Watch App WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 470B6191270C448100561E56 /* Watch App WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		470B6197270C448100561E56 /* InterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470B6196270C448100561E56 /* InterfaceController.swift */; };
 		470B6199270C448100561E56 /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470B6198270C448100561E56 /* ExtensionDelegate.swift */; };
@@ -34,6 +33,27 @@
 		47B60F3726F389E2003198D3 /* LandscapeChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */; };
 		47F8E95A2710255D00B8B02B /* ConstantsWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F8E9592710255C00B8B02B /* ConstantsWatchApp.swift */; };
 		47FB28082636B04200042FFB /* StatisticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FB28072636B04200042FFB /* StatisticsManager.swift */; };
+		9A1895812A44381500219C8D /* Bool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A1895802A44381500219C8D /* Bool.swift */; };
+		9A18CA002A56F1CD00B69D29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B618B270C448100561E56 /* Assets.xcassets */; };
+		9A360AD92A2B77E90003D5F1 /* BGView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AD82A2B77E90003D5F1 /* BGView.swift */; };
+		9A360AE32A2B7B650003D5F1 /* NSParagraphStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */; };
+		9A360AE72A2B7B840003D5F1 /* NSLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */; };
+		9A65B8702A3C4DF100791398 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A65B86F2A3C4DF100791398 /* UIView.swift */; };
+		9A65B8722A3CB85900791398 /* BGDeltaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A65B8712A3CB85900791398 /* BGDeltaView.swift */; };
+		9A94C44D2A4B78A70033FF61 /* BTVBaseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A94C44C2A4B78A70033FF61 /* BTVBaseViews.swift */; };
+		9A94C44F2A4D75220033FF61 /* BTStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A94C44E2A4D75220033FF61 /* BTStatusView.swift */; };
+		9AB5FAEC2A3078D600AAC3F1 /* UIFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */; };
+		9AB5FAF12A31DFE900AAC3F1 /* Units Primitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */; };
+		9ABC39562A4199710042AAEA /* BGTimeStampView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ABC39552A4199710042AAEA /* BGTimeStampView.swift */; };
+		9AEA74AC2A347765001202A6 /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */; };
+		9AEA74AD2A347765001202A6 /* Quicksand-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */; };
+		9AEA74AE2A347765001202A6 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A62A347765001202A6 /* Quicksand-Regular.ttf */; };
+		9AEA74AF2A347765001202A6 /* Quicksand-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A72A347765001202A6 /* Quicksand-SemiBold.ttf */; };
+		9AEA74B02A347765001202A6 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A82A347765001202A6 /* OFL.txt */; };
+		9AEA74B12A347765001202A6 /* Quicksand-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A92A347765001202A6 /* Quicksand-Light.ttf */; };
+		9AEA74B22A347765001202A6 /* Quicksand-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74AA2A347765001202A6 /* Quicksand-VariableFont_wght.ttf */; };
+		9AEA74B32A347765001202A6 /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74AB2A347765001202A6 /* README.txt */; };
+		9AEA74B52A348119001202A6 /* BGLevelBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEA74B42A348119001202A6 /* BGLevelBox.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
 		CE1B2FE125D0264B00F642F5 /* Main.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD425D0264900F642F5 /* Main.strings */; };
 		D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */; };
@@ -749,6 +769,28 @@
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xdrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xdrip/Version.xcconfig; sourceTree = "<group>"; };
+		9A1895802A44381500219C8D /* Bool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bool.swift; sourceTree = "<group>"; };
+		9A360AD72A2B77E80003D5F1 /* Watch App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Watch App-Bridging-Header.h"; sourceTree = "<group>"; };
+		9A360AD82A2B77E90003D5F1 /* BGView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BGView.swift; sourceTree = "<group>"; };
+		9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSParagraphStyle.swift; sourceTree = "<group>"; };
+		9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSLayoutConstraint.swift; sourceTree = "<group>"; };
+		9A65B86F2A3C4DF100791398 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
+		9A65B8712A3CB85900791398 /* BGDeltaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGDeltaView.swift; sourceTree = "<group>"; };
+		9A94C44C2A4B78A70033FF61 /* BTVBaseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTVBaseViews.swift; sourceTree = "<group>"; };
+		9A94C44E2A4D75220033FF61 /* BTStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTStatusView.swift; sourceTree = "<group>"; };
+		9AB5FAC52A2E078C00AAC3F1 /* CHANGES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGES.md; sourceTree = "<group>"; };
+		9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFont.swift; sourceTree = "<group>"; };
+		9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Units Primitives.swift"; sourceTree = "<group>"; };
+		9ABC39552A4199710042AAEA /* BGTimeStampView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGTimeStampView.swift; sourceTree = "<group>"; };
+		9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
+		9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
+		9AEA74A62A347765001202A6 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
+		9AEA74A72A347765001202A6 /* Quicksand-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-SemiBold.ttf"; sourceTree = "<group>"; };
+		9AEA74A82A347765001202A6 /* OFL.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
+		9AEA74A92A347765001202A6 /* Quicksand-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Light.ttf"; sourceTree = "<group>"; };
+		9AEA74AA2A347765001202A6 /* Quicksand-VariableFont_wght.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-VariableFont_wght.ttf"; sourceTree = "<group>"; };
+		9AEA74AB2A347765001202A6 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		9AEA74B42A348119001202A6 /* BGLevelBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGLevelBox.swift; sourceTree = "<group>"; };
 		CE1B2FC825D0261500F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Alerts.strings; sourceTree = "<group>"; };
 		CE1B2FCD25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
 		CE1B2FCE25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/WatlaaView.strings; sourceTree = "<group>"; };
@@ -1669,6 +1711,47 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		9AB0FBB72A59945100FA6B22 /* BTV Additions */ = {
+			isa = PBXGroup;
+			children = (
+				9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */,
+				9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */,
+				9A65B86F2A3C4DF100791398 /* UIView.swift */,
+				9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */,
+				9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */,
+				9A1895802A44381500219C8D /* Bool.swift */,
+			);
+			path = "BTV Additions";
+			sourceTree = "<group>";
+		};
+		9ABC39542A4199420042AAEA /* BTVAdditions */ = {
+			isa = PBXGroup;
+			children = (
+				9A94C44E2A4D75220033FF61 /* BTStatusView.swift */,
+				9A65B8712A3CB85900791398 /* BGDeltaView.swift */,
+				9AEA74B42A348119001202A6 /* BGLevelBox.swift */,
+				9A360AD82A2B77E90003D5F1 /* BGView.swift */,
+				9ABC39552A4199710042AAEA /* BGTimeStampView.swift */,
+				9A94C44C2A4B78A70033FF61 /* BTVBaseViews.swift */,
+			);
+			path = BTVAdditions;
+			sourceTree = "<group>";
+		};
+		9AEA74A32A347765001202A6 /* Quicksand */ = {
+			isa = PBXGroup;
+			children = (
+				9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */,
+				9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */,
+				9AEA74A62A347765001202A6 /* Quicksand-Regular.ttf */,
+				9AEA74A72A347765001202A6 /* Quicksand-SemiBold.ttf */,
+				9AEA74A82A347765001202A6 /* OFL.txt */,
+				9AEA74A92A347765001202A6 /* Quicksand-Light.ttf */,
+				9AEA74AA2A347765001202A6 /* Quicksand-VariableFont_wght.ttf */,
+				9AEA74AB2A347765001202A6 /* README.txt */,
+			);
+			path = Quicksand;
+			sourceTree = SOURCE_ROOT;
+		};
 		D4028CBE2774A4B900341476 /* Treatments */ = {
 			isa = PBXGroup;
 			children = (
@@ -1701,6 +1784,7 @@
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9AB0FBB72A59945100FA6B22 /* BTV Additions */,
 				F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */,
 				F8FDD6CA2553385000625B49 /* Array.swift */,
 				F8E51D602448E695001C9E5A /* Bundle.swift */,
@@ -1754,6 +1838,7 @@
 		F8025E5A21F7AFA100ECF0C0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9AEA74A32A347765001202A6 /* Quicksand */,
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
 				F8B3A7B7226CC0B7004BA588 /* sounds */,
 			);
@@ -2266,6 +2351,7 @@
 		F8AC425121ADEBD60078C348 = {
 			isa = PBXGroup;
 			children = (
+				9AB5FAC52A2E078C00AAC3F1 /* CHANGES.md */,
 				F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */,
 				666E283926F7E54C00ACE4DF /* Version.xcconfig */,
 				666E283826F7E54C00ACE4DF /* xDrip.xcconfig */,
@@ -2634,7 +2720,9 @@
 		F8BECB00235CE3E20060DAE1 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9ABC39542A4199420042AAEA /* BTVAdditions */,
 				F8BECB01235CE3E20060DAE1 /* BloodGlucoseChartView.swift */,
+				9A360AD72A2B77E80003D5F1 /* Watch App-Bridging-Header.h */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -3281,6 +3369,7 @@
 				TargetAttributes = {
 					470B6185270C448000561E56 = {
 						CreatedOnToolsVersion = 13.0;
+						LastSwiftMigration = 1430;
 					};
 					470B6190270C448100561E56 = {
 						CreatedOnToolsVersion = 13.0;
@@ -3351,7 +3440,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				470B618C270C448100561E56 /* Assets.xcassets in Resources */,
 				470B618A270C448000561E56 /* Interface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3406,9 +3494,11 @@
 				F824377C24CB7A9800BED341 /* Machine_Charge.caf in Resources */,
 				F824377624CB7A9800BED341 /* Siri_Glucose_Dropping_Fast.caf in Resources */,
 				F824376F24CB7A9800BED341 /* Ambulance.caf in Resources */,
+				9AEA74AD2A347765001202A6 /* Quicksand-Medium.ttf in Resources */,
 				F824378B24CB7A9900BED341 /* Fly.caf in Resources */,
 				F8B48AA022B2FA7B009BCC01 /* HomeView.strings in Resources */,
 				F824377424CB7A9800BED341 /* Cartoon_Siren.caf in Resources */,
+				9AEA74B02A347765001202A6 /* OFL.txt in Resources */,
 				F824379424CB7A9900BED341 /* Cartoon_Ascend_Then_Descend.caf in Resources */,
 				F82437BC24CB7A9900BED341 /* Siri_Device_Muted.caf in Resources */,
 				F824377024CB7A9800BED341 /* Siri_Alert_Urgent_Low_Glucose.caf in Resources */,
@@ -3441,6 +3531,7 @@
 				F82437A324CB7A9900BED341 /* Siri_Alert_Glucose_Dropping_Fast.caf in Resources */,
 				F824379224CB7A9900BED341 /* Unpaved.caf in Resources */,
 				F824379D24CB7A9900BED341 /* Alarm_Buzzer.caf in Resources */,
+				9AEA74AE2A347765001202A6 /* Quicksand-Regular.ttf in Resources */,
 				F8B3A81F227DEC92004BA588 /* README.md in Resources */,
 				F82437B024CB7A9900BED341 /* In_A_Hurry.caf in Resources */,
 				F824378924CB7A9900BED341 /* Soft_Warm_Airy_Optimistic.caf in Resources */,
@@ -3451,9 +3542,11 @@
 				F82437AC24CB7A9900BED341 /* Siri_Alert_Calibration_Needed.caf in Resources */,
 				F824379624CB7A9900BED341 /* Oringz.caf in Resources */,
 				F824377D24CB7A9800BED341 /* Open_Your_Eyes_And_See.caf in Resources */,
+				9A18CA002A56F1CD00B69D29 /* Assets.xcassets in Resources */,
 				F82437A624CB7A9900BED341 /* Siri_Glucose_Rising_Fast.caf in Resources */,
 				F81F370825C1584A00520946 /* LibreStates.strings in Resources */,
 				F82437B724CB7A9900BED341 /* Cartoon_Tip_Toe_Sneaky_Walk.caf in Resources */,
+				9AEA74AF2A347765001202A6 /* Quicksand-SemiBold.ttf in Resources */,
 				F824379A24CB7A9900BED341 /* Siri_Alert_Device_Muted.caf in Resources */,
 				F824378024CB7A9800BED341 /* Sci-Fi_Alarm_Loop_4.caf in Resources */,
 				F824378C24CB7A9900BED341 /* Marimba_Descend.caf in Resources */,
@@ -3464,10 +3557,12 @@
 				F8B3A7C7226CC0B7004BA588 /* shortlow3.mp3 in Resources */,
 				F82437B324CB7A9900BED341 /* Rush.caf in Resources */,
 				F82437A024CB7A9900BED341 /* Siri_Missed_Readings.caf in Resources */,
+				9AEA74B12A347765001202A6 /* Quicksand-Light.ttf in Resources */,
 				F824377924CB7A9800BED341 /* Sci-Fi_Alarm_Loop_3.caf in Resources */,
 				F8B3A7CB226CC0B7004BA588 /* shortlow4.mp3 in Resources */,
 				4749EB9B25B36E010072DF8B /* LibreNFC.strings in Resources */,
 				F82437C624CB7A9900BED341 /* Siri_Alert_High_Glucose.caf in Resources */,
+				9AEA74B32A347765001202A6 /* README.txt in Resources */,
 				F82437A924CB7A9900BED341 /* Wake_Up_Will_You.caf in Resources */,
 				F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */,
 				F82437D024CB7A9900BED341 /* Sci-Fi_Engine_Shut_Down.caf in Resources */,
@@ -3510,6 +3605,7 @@
 				F82437C924CB7A9900BED341 /* Computer_Magic.caf in Resources */,
 				F82437A124CB7A9900BED341 /* Jingle_All_The_Way.caf in Resources */,
 				470CE1FC246802EB00D5CB74 /* BluetoothPeripheralsView.strings in Resources */,
+				9AEA74AC2A347765001202A6 /* Quicksand-Bold.ttf in Resources */,
 				F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */,
 				F82437D324CB7A9900BED341 /* Soft_Marimba_Pad_Positive.caf in Resources */,
 				F824379924CB7A9900BED341 /* Magical_Twinkle.caf in Resources */,
@@ -3524,6 +3620,7 @@
 				F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */,
 				F8B48AA422B2FA9B009BCC01 /* CalibrationRequest.strings in Resources */,
 				F8B3A7B5226A0A71004BA588 /* Alerts.strings in Resources */,
+				9AEA74B22A347765001202A6 /* Quicksand-VariableFont_wght.ttf in Resources */,
 				F8B3A7D2226CC0B7004BA588 /* spaceship.mp3 in Resources */,
 				F82437B224CB7A9900BED341 /* Burglar_Alarm_Siren_2.caf in Resources */,
 				F82437BD24CB7A9900BED341 /* Sci-Fi_Spaceship_Warm_Up.caf in Resources */,
@@ -3570,6 +3667,7 @@
 				F8A5EEC2257D18DC0085E660 /* LibreNFCDelegate.swift in Sources */,
 				F8F9720523A5915900C3F17D /* TransmitterMessage.swift in Sources */,
 				F816E1282439DE55009EE65B /* CGMDexomG4TransmitterDelegate.swift in Sources */,
+				9A1895812A44381500219C8D /* Bool.swift in Sources */,
 				F8F1670A2727317D001AA3D8 /* DexcomTransmitterTimeRxMessage.swift in Sources */,
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
 				F8E3A2A523D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */,
@@ -3625,6 +3723,7 @@
 				F816E11C2439243B009EE65B /* Droplet+CoreDataProperties.swift in Sources */,
 				F821CF56229BF43A005C1E43 /* AlertKind.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
+				9A360AE72A2B7B840003D5F1 /* NSLayoutConstraint.swift in Sources */,
 				F8A2BC0D25DB0B12001D1E78 /* Atom+BluetoothPeripheral.swift in Sources */,
 				F8F9723123A5915900C3F17D /* M5StackAuthenticateTXMessage.swift in Sources */,
 				F8F9721223A5915900C3F17D /* FirmwareVersionTxMessage.swift in Sources */,
@@ -3655,6 +3754,7 @@
 				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
 				F8C9784D2428052E00A09483 /* CGMSensorType.swift in Sources */,
 				F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */,
+				9A65B8702A3C4DF100791398 /* UIView.swift in Sources */,
 				F8F9723923A5928D00C3F17D /* M5StackBluetoothPeripheralViewModel.swift in Sources */,
 				F8F9722B23A5915900C3F17D /* CGMTransmitterDelegate.swift in Sources */,
 				F80859292364D61B00F3829D /* UserDefaults+charts.swift in Sources */,
@@ -3672,6 +3772,7 @@
 				F8F9721323A5915900C3F17D /* BatteryStatusRxMessage.swift in Sources */,
 				F8A2BC3825DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMBluconTransmitterDelegate.swift in Sources */,
 				F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */,
+				9A94C44F2A4D75220033FF61 /* BTStatusView.swift in Sources */,
 				F8E51D612448E695001C9E5A /* Bundle.swift in Sources */,
 				F821CF61229BF4A2005C1E43 /* NightScoutUploadManager.swift in Sources */,
 				F8F9721023A5915900C3F17D /* TransmitterVersionRxMessage.swift in Sources */,
@@ -3692,6 +3793,7 @@
 				F8F971B723A5914D00C3F17D /* BluetoothPeripheralType.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F8F1670E27273EA7001AA3D8 /* GlucoseDataRxMessage.swift in Sources */,
+				9AB5FAF12A31DFE900AAC3F1 /* Units Primitives.swift in Sources */,
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
 				F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */,
 				F8CB59CE27444D6300BA199E /* DexcomSessionStopResponse.swift in Sources */,
@@ -3714,6 +3816,7 @@
 				F8A2BC3325DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift in Sources */,
 				F816E10E2437EAC9009EE65B /* BlueReader+CoreDataProperties.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
+				9A65B8722A3CB85900791398 /* BGDeltaView.swift in Sources */,
 				F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */,
 				F8F7B8EB259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift in Sources */,
 				D417E51C282EC8DB008DC467 /* ProgressBarViewController.swift in Sources */,
@@ -3730,10 +3833,12 @@
 				F8A1585B22EDB7EA007F5B5D /* ConstantsDexcomG5.swift in Sources */,
 				F816E0F524367132009EE65B /* GNSEntry+CoreDataProperties.swift in Sources */,
 				F898EDF4234A8A3200BFB79B /* UInt16.swift in Sources */,
+				9A94C44D2A4B78A70033FF61 /* BTVBaseViews.swift in Sources */,
 				F8BDD452221DEAB2006EAB84 /* TextsSettingsView.swift in Sources */,
 				F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */,
 				F8177023248CF78300AA3600 /* LibreSensorType.swift in Sources */,
 				F8C97859242AAE7B00A09483 /* MiaoMiao+BluetoothPeripheral.swift in Sources */,
+				9A360AE32A2B7B650003D5F1 /* NSParagraphStyle.swift in Sources */,
 				F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
 				F8B3A847227F090E004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,
@@ -3812,6 +3917,7 @@
 				F8F1670C27273774001AA3D8 /* GlucoseBackfillRxMessage.swift in Sources */,
 				F8F9720823A5915900C3F17D /* BatteryStatusTxMessage.swift in Sources */,
 				F8CB59C6273ECFE500BA199E /* DexcomG6GlucoseDataRxMessage.swift in Sources */,
+				9A360AD92A2B77E90003D5F1 /* BGView.swift in Sources */,
 				F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */,
 				F80D916524F5B3DE006840B5 /* Libre2+CoreDataClass.swift in Sources */,
 				D4028CC02774A50600341476 /* TreatmentsViewController.swift in Sources */,
@@ -3854,6 +3960,7 @@
 				F8F9720E23A5915900C3F17D /* AuthRequestRxMessage.swift in Sources */,
 				F8A2BC3F25DB0D89001D1E78 /* BluetoothPeripheralManager+CGMAtomTransmitterDelegate.swift in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
+				9AEA74B52A348119001202A6 /* BGLevelBox.swift in Sources */,
 				F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */,
 				F8F9723023A5915900C3F17D /* M5StackUtilities.swift in Sources */,
 				F8297F52238ECA3200D74D66 /* BluetoothPeripheralViewController.swift in Sources */,
@@ -3919,6 +4026,7 @@
 				47150A4027F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift in Sources */,
 				F8A389ED23342EB10010F405 /* ConstantsNightScout.swift in Sources */,
 				F85FF3D1252F9FF9004E6FF1 /* SnoozeParameters+CoreDataClass.swift in Sources */,
+				9AB5FAEC2A3078D600AAC3F1 /* UIFont.swift in Sources */,
 				F857A32A253E2D9E00951BB2 /* LibreAlgorithmThresholds.swift in Sources */,
 				F8A1850C25643B16000EF8A0 /* Double+Smoothable.swift in Sources */,
 				F8CB59C8273EF9F800BA199E /* DexcomAlgorithmState.swift in Sources */,
@@ -3934,6 +4042,7 @@
 				D41F32922827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift in Sources */,
 				F816E11624391A02009EE65B /* Droplet+BluetoothPeripheral.swift in Sources */,
 				F8FDFEAD260DE1B90047597D /* ConstantsUI.swift in Sources */,
+				9ABC39562A4199710042AAEA /* BGTimeStampView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4580,21 +4689,25 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "$(XDRIP_CODE_SIGN_IDENTITY_DEBUG)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = 7Z852L4L3D;
 				GENERATE_INFOPLIST_FILE = YES;
 				IBSC_MODULE = Watch_App_WatchKit_Extension;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = net.brightscreentv.xdripswift;
 				MAIN_APP_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=watchos*]" = net.brightscreentv.xdripswift.watchkitapp;
 				PRODUCT_NAME = "$(MAIN_APP_DISPLAY_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/Views/Watch App-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 7.0;
@@ -4608,21 +4721,24 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "$(XDRIP_CODE_SIGN_IDENTITY_RELEASE)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = 7Z852L4L3D;
 				GENERATE_INFOPLIST_FILE = YES;
 				IBSC_MODULE = Watch_App_WatchKit_Extension;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = net.brightscreentv.xdripswift;
 				MAIN_APP_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=watchos*]" = net.brightscreentv.xdripswift.watchkitapp;
 				PRODUCT_NAME = "$(MAIN_APP_DISPLAY_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/Views/Watch App-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 7.0;
@@ -4636,13 +4752,14 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = 7Z852L4L3D;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Watch App WatchKit Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
-				INFOPLIST_KEY_CLKComplicationPrincipalClass = "$(PRODUCT_MODULE_NAME).ComplicationController";
+				INFOPLIST_KEY_CLKComplicationPrincipalClass = Watch_App_WatchKit_Extension.ComplicationController;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2021 Johan Degraeve. All rights reserved.";
 				INFOPLIST_KEY_WKExtensionDelegateClassName = Watch_App_WatchKit_Extension.ExtensionDelegate;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -4651,6 +4768,7 @@
 				MAIN_APP_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp.watchkitextension";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=watchos*]" = net.brightscreentv.xdripswift.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -4668,13 +4786,14 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = 7Z852L4L3D;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Watch App WatchKit Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
-				INFOPLIST_KEY_CLKComplicationPrincipalClass = "$(PRODUCT_MODULE_NAME).ComplicationController";
+				INFOPLIST_KEY_CLKComplicationPrincipalClass = Watch_App_WatchKit_Extension.ComplicationController;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2021 Johan Degraeve. All rights reserved.";
 				INFOPLIST_KEY_WKExtensionDelegateClassName = Watch_App_WatchKit_Extension.ExtensionDelegate;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -4683,6 +4802,7 @@
 				MAIN_APP_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp.watchkitextension";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=watchos*]" = net.brightscreentv.xdripswift.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -4700,7 +4820,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_WIDGET_ENTITLEMENTS_DEBUG)";
 				CODE_SIGN_IDENTITY = "$(XDRIP_CODE_SIGN_IDENTITY_DEBUG)";
 				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = 7Z852L4L3D;
 				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4710,6 +4830,7 @@
 				);
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).xDrip4iOS-Widget";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = "net.brightscreentv.xdripswift.xDrip4iOS-Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -4724,7 +4845,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_WIDGET_ENTITLEMENTS_RELEASE)";
 				CODE_SIGN_IDENTITY = "$(XDRIP_CODE_SIGN_IDENTITY_RELEASE)";
 				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = 7Z852L4L3D;
 				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4734,6 +4855,7 @@
 				);
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).xDrip4iOS-Widget";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = "net.brightscreentv.xdripswift.xDrip4iOS-Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -4879,7 +5001,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_ENTITLEMENTS_DEBUG)";
 				CODE_SIGN_IDENTITY = "$(XDRIP_CODE_SIGN_IDENTITY_DEBUG)";
 				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = 7Z852L4L3D;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4888,6 +5010,7 @@
 				);
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = net.brightscreentv.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -4906,7 +5029,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_ENTITLEMENTS_RELEASE)";
 				CODE_SIGN_IDENTITY = "$(XDRIP_CODE_SIGN_IDENTITY_RELEASE)";
 				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = 7Z852L4L3D;
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4915,6 +5038,7 @@
 				);
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = net.brightscreentv.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";

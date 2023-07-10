@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:/Users/todddalton/XCODE PROJECTS/xdripswift/xdrip/Views/BGTimeStampView.swift">
+   </FileRef>
+   <FileRef
       location = "group:xDripConfigOverride.xcconfig">
    </FileRef>
    <FileRef

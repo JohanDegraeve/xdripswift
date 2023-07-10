@@ -16,6 +16,7 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("connected", tableName: filename, bundle: Bundle.main, value: "Connected", comment: "when Bluetooth Peripheral is shown, connection status, connected")
     }()
     
+    /// Returns the localised version of the English "Stop Scanning"
     static let donotconnect: String = {
         return NSLocalizedString("donotconnect", tableName: filename, bundle: Bundle.main, value: "Stop Scanning", comment: "text in button top right, this button will disable automatic connect")
     }()
@@ -72,6 +73,7 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("disconnect", tableName: filename, bundle: Bundle.main, value: "Disconnect", comment: "button text, to disconnect")
     }()
     
+    /// Returns the localised version of the Engish "Scanning"
     static let tryingToConnect: String = {
         return NSLocalizedString("tryingToConnect", tableName: filename, bundle: Bundle.main, value: "Scanning", comment: "text in status rown, when not connect but app is trying to connect")
     }()

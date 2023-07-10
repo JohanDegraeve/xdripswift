@@ -324,7 +324,15 @@ extension BluetoothPeripheralsViewController: UITableViewDataSource, UITableView
         }
         
         // detail is the connection status
-        cell.detailTextLabel?.text = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: false, nfcScanNeeded: nil,  nfcScanSuccessful: nil, connectButtonOutlet: nil, expectedBluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType(), transmitterId: nil, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
+        cell.detailTextLabel?.text = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(
+            bluetoothPeripheral: bluetoothPeripheral,
+            isScanning: false,
+            nfcScanNeeded: nil,
+            nfcScanSuccessful: nil,
+            connectButtonOutlet: nil,
+            expectedBluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType(),
+            transmitterId: nil,
+            bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
 
         // clicking the cell will always open a new screen which allows the user to edit the alert type - add disclosureIndicator
         // set color of disclosureIndicator to ConstantsUI.disclosureIndicatorColor
@@ -404,8 +412,7 @@ extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager, let bluetoothPeripheral =  bluetoothPeripheralManager.getBluetoothPeripheral(for: bluetoothTransmitter) else {return}
         
         // row with connection status in the view must be updated
-        updateRow(for: bluetoothPeripheral)
-        
+        updateRow(for: bluetoothPeripheral)        
     }
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {

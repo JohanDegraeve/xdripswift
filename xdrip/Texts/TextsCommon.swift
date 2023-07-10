@@ -8,6 +8,10 @@ class Texts_Common {
         return NSLocalizedString("common_Ok", tableName: filename, bundle: Bundle.main, value: "OK", comment: "literally 'OK'")
     }()
     
+    static let UsersUnits = {
+        return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
+    }()
+    
     //common_cancel
     static let Cancel = {
         return NSLocalizedString("common_cancel", tableName: filename, bundle: Bundle.main, value: "Cancel", comment: "literally 'Cancel'")
