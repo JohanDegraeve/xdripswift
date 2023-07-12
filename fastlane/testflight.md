@@ -47,8 +47,8 @@ This is also a common step for all "browser builds", do this step only once
 If you have previously built Loop or another app using the "browser build" method, you can can re-use your previous personal access token (`GH_PAT`) and skip ahead to `step 2`.
 1. Create a [new personal access token](https://github.com/settings/tokens/new):
     * Enter a name for your token. Something like "FastLane Access Token".
-    * 30 days is fine, or you can select longer if you'd like.
-    * Select the `repo` permission scope.
+    * Change the Expiration selection to `No expiration`.
+    * Select the `repo` and `workflow` permission scopes.
     * Click "Generate token".
     * Copy the token and record it. It will be used below as `GH_PAT`.
 1. In the forked Xdrip4iOS repo, go to Settings -> Secrets -> Actions.
