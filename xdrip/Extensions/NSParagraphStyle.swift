@@ -10,18 +10,18 @@ import Foundation
 
 extension NSParagraphStyle {
     static func centredText() -> NSParagraphStyle {
-        let _style = NSMutableParagraphStyle()
-        _style.alignment = .center
-        return _style
+        let style = NSMutableParagraphStyle()
+        style.alignment = .center
+        return style
     }
     static func rightJustifiedText() -> NSParagraphStyle {
-        let _style = NSMutableParagraphStyle()
-        _style.alignment = .right
-        return _style
+        let style = NSMutableParagraphStyle()
+        style.alignment = .right
+        return style
     }
     static func leftJustified() -> NSParagraphStyle {
-        let _style = NSMutableParagraphStyle()
-        _style.alignment = .left
-        return _style
+        let style = NSMutableParagraphStyle()
+        style.alignment = .left
+        return style
     }
 }

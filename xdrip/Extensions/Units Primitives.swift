@@ -89,64 +89,62 @@ extension NumericType {
 /// UK units.
 ///
 /// Uses `Double` as a base to accomodate the fractions
-public struct MMOLL :NumericType {
+public struct MmolL: NumericType {
     
     public var value :Double
     public init(_ value: Double) {
         self.value = value
     }
     
-    public init(_ mgdlValue: MGDL) {
+    public init(_ mgdlValue: MgDl) {
         self.value = mgdlValue.value
     }
     
     /// The range of the users BG level that should be considered urgent
     ///
     /// Accesses the `Userdefaults` to construct a `Range<mmolDl>` of 0 ... urgentLowMarkValue`
-    public var urgentLowRange: Range<MMOLL> {
-        return Range(uncheckedBounds: (0, MMOLL(UserDefaults.standard.urgentLowMarkValue.mgdlToMmol())))
+    public var urgentLowRange: Range<MmolL> {
+        return Range(uncheckedBounds: (0, MmolL(UserDefaults.standard.urgentLowMarkValue.mgdlToMmol())))
     }
     
     /// The range of the users BG level that should be considered low but non-urgent
     ///
     /// Accesses the `Userdefaults` to construct a `Range<mmolDl>` of `urgentLowMarkValue` ... `urgentLowMarkValue`
-    public var lowRange: Range<MMOLL> {
-        return Range(uncheckedBounds: (MMOLL(UserDefaults.standard.urgentLowMarkValue.mgdlToMmol()), MMOLL(UserDefaults.standard.lowMarkValue.mgdlToMmol())))
+    public var lowRange: Range<MmolL> {
+        return Range(uncheckedBounds: (MmolL(UserDefaults.standard.urgentLowMarkValue.mgdlToMmol()), MmolL(UserDefaults.standard.lowMarkValue.mgdlToMmol())))
     }
     
     /// The range of the users BG level that should be considered nicely in range (for once! :)) )
     ///
     /// Accesses the `Userdefaults` to construct a `Range<mmolDl>` of `lowMarkValue` ... `highMarkValue`
-    public var inRange: Range<MMOLL> {
-        return Range(uncheckedBounds: (MMOLL(UserDefaults.standard.lowMarkValue.mgdlToMmol()), MMOLL(UserDefaults.standard.highMarkValue.mgdlToMmol())))
+    public var inRange: Range<MmolL> {
+        return Range(uncheckedBounds: (MmolL(UserDefaults.standard.lowMarkValue.mgdlToMmol()), MmolL(UserDefaults.standard.highMarkValue.mgdlToMmol())))
     }
     
     /// The range of the users BG level that should be considered high but not urgent
     ///
     /// Accesses the `Userdefaults` to construct a `Range<mmolDl>` of `highMarkValue` ... `urgentHighMarkValue`
-    public var highRange: Range<MMOLL> {
-        return Range(uncheckedBounds: (MMOLL(UserDefaults.standard.highMarkValue.mgdlToMmol()), MMOLL(UserDefaults.standard.urgentHighMarkValue.mgdlToMmol())))
+    public var highRange: Range<MmolL> {
+        return Range(uncheckedBounds: (MmolL(UserDefaults.standard.highMarkValue.mgdlToMmol()), MmolL(UserDefaults.standard.urgentHighMarkValue.mgdlToMmol())))
     }
     
     /// The range of the users BG level that should be considered high but not urgent
     ///
     /// Accesses the `Userdefaults` to construct a `Range<mmolDl>` of `urgentHighMarkValue` ... `∞`
-    public var urgentHighRange: Range<MMOLL> {
-        return Range(uncheckedBounds: (MMOLL(UserDefaults.standard.urgentHighMarkValue.mgdlToMmol()), MMOLL(Double.greatestFiniteMagnitude)))
+    public var urgentHighRange: Range<MmolL> {
+        return Range(uncheckedBounds: (MmolL(UserDefaults.standard.urgentHighMarkValue.mgdlToMmol()), MmolL(Double.greatestFiniteMagnitude)))
     }
     
     
-    
     /// Converts the current value to mg/dL
-    var inMgDl: MGDL {
-        return MGDL(value.mmolToMgdl())
+    var inMgDl: MgDl {
+        return MgDl(value.mmolToMgdl())
     }
     
     /// Returns a `String` of the current value in the form `12.3`
     var string: String {
         return String(format:"%.1f", self.value)
     }
-    
     
     /// Returns a `String` of the current value with the units, in the form `12.3 mmol/L`
     var unitisedString: String {
@@ -171,13 +169,13 @@ public struct MMOLL :NumericType {
     }
 }
 
-extension MMOLL :ExpressibleByIntegerLiteral {
+extension MmolL: ExpressibleByIntegerLiteral {
     public init(integerLiteral: IntegerLiteralType) {
         self.init(Double(integerLiteral))
     }
 }
 
-extension MMOLL :ExpressibleByFloatLiteral {
+extension MmolL: ExpressibleByFloatLiteral {
     public init(floatLiteral: FloatLiteralType) {
         self.init(Double(floatLiteral))
     }
@@ -187,7 +185,7 @@ extension MMOLL :ExpressibleByFloatLiteral {
 
 /// US/European units.
 
-public struct MGDL :NumericType {
+public struct MgDl :NumericType {
     public var value :Double
     public init(_ value: Double) {
         self.value = value
@@ -201,36 +199,36 @@ public struct MGDL :NumericType {
     /// The range of the users BG level that should be considered urgent
     ///
     /// Accesses the `Userdefaults` to construct a `Range<mgDl>` of 0 ... `Int(urgentLowMarkValue)`
-    var urgentLowRange: Range<MGDL> {
-        return Range(uncheckedBounds: (0, MGDL(UserDefaults.standard.urgentLowMarkValue)))
+    var urgentLowRange: Range<MgDl> {
+        return Range(uncheckedBounds: (0, MgDl(UserDefaults.standard.urgentLowMarkValue)))
     }
     
     /// The range of the users BG level that should be considered low but non-urgent
     ///
     /// Accesses the `Userdefaults` to construct a `Range<mgDl>` of `Int(urgentLowMarkValue)` ... `Int(urgentLowMarkValue)`
-    var lowRange: Range<MGDL> {
-        return Range(uncheckedBounds: (MGDL(UserDefaults.standard.urgentLowMarkValue), MGDL(UserDefaults.standard.lowMarkValue)))
+    var lowRange: Range<MgDl> {
+        return Range(uncheckedBounds: (MgDl(UserDefaults.standard.urgentLowMarkValue), MgDl(UserDefaults.standard.lowMarkValue)))
     }
     
     /// The range of the users BG level that should be considered nicely in range (for once! :)) )
     ///
     /// Accesses the `Userdefaults` to construct a `Range<mgDl>` of `Int(lowMarkValue)` ... `Int(highMarkValue)`
-    var inRange: Range<MGDL> {
-        return Range(uncheckedBounds: (MGDL(UserDefaults.standard.lowMarkValue), MGDL(UserDefaults.standard.highMarkValue)))
+    var inRange: Range<MgDl> {
+        return Range(uncheckedBounds: (MgDl(UserDefaults.standard.lowMarkValue), MgDl(UserDefaults.standard.highMarkValue)))
     }
     
     /// The range of the users BG level that should be considered high but not urgent
     ///
     /// Accesses the `Userdefaults` to construct a `Range<mgDl>` of `Int(highMarkValue)` ... `Int(urgentHighMarkValue)`
-    var highRange: Range<MGDL> {
-        return Range(uncheckedBounds: (MGDL(UserDefaults.standard.highMarkValue), MGDL(UserDefaults.standard.urgentHighMarkValue)))
+    var highRange: Range<MgDl> {
+        return Range(uncheckedBounds: (MgDl(UserDefaults.standard.highMarkValue), MgDl(UserDefaults.standard.urgentHighMarkValue)))
     }
     
     /// The range of the users BG level that should be considered high but not urgent
     ///
     /// Accesses the `Userdefaults` to construct a `Range<mgDl>` of `Int(urgentHighMarkValue)` ... `Int(∞)`
-    var urgentHighRange: Range<MGDL> {
-        return Range(uncheckedBounds: (MGDL(UserDefaults.standard.urgentHighMarkValue), MGDL(Double.greatestFiniteMagnitude)))
+    var urgentHighRange: Range<MgDl> {
+        return Range(uncheckedBounds: (MgDl(UserDefaults.standard.urgentHighMarkValue), MgDl(Double.greatestFiniteMagnitude)))
     }
     
     /// Returns a `BgRangeDescription` according to the current value of `self`
@@ -251,8 +249,8 @@ public struct MGDL :NumericType {
     }
     
     /// Converts the current value to mmol/dL
-    var inMmolL: MMOLL {
-        return MMOLL(value.mgdlToMmol())
+    var inMmolL: MmolL {
+        return MmolL(value.mgdlToMmol())
     }
     
     /// Returns a `String` of the current value with the units, in the form `12.3 mg/dL`
@@ -261,13 +259,13 @@ public struct MGDL :NumericType {
     }
 }
 
-extension MGDL: ExpressibleByIntegerLiteral {
+extension MgDl: ExpressibleByIntegerLiteral {
     public init(integerLiteral: IntegerLiteralType) {
         self.init(Double(integerLiteral))
     }
 }
 
-extension MGDL: ExpressibleByFloatLiteral {
+extension MgDl: ExpressibleByFloatLiteral {
     public init(floatLiteral: FloatLiteralType) {
         self.init(Double(floatLiteral))
     }
@@ -283,20 +281,20 @@ public struct UniversalBGLevel {
     // Presumably there is a way of passing the BG object around but this struct is a lazy way out of
     // reverse engineering the panning of the chart. It provides some convenience functions too.
     
-    private var _mmoll: MMOLL = 0.0
-    private var _mgdl: MGDL = 0.0
+    private var pMmollValue: MmolL = 0.0
+    private var pMgdlValue: MgDl = 0.0
     
     /// The mmol/L of the BG level.
     ///
-    /// Setting this will update the `private` `ivar` holding the mg/dL value.
+    /// Setting this will update the `private ivar` holding the mg/dL value.
     /// This class can be used as a converter between units if desired.
-    public var mmoll: MMOLL {
+    public var mmollValue: MmolL {
         set {
-            _mmoll = newValue
-            _mgdl = _mmoll.inMgDl
+            pMmollValue = newValue
+            pMgdlValue = pMmollValue.inMgDl
         }
         get {
-            return _mmoll
+            return pMmollValue
         }
     }
     
@@ -304,22 +302,22 @@ public struct UniversalBGLevel {
     ///
     /// Setting this will update the `private` `ivar` holding the mmol/L value.
     /// This class can be used as a converter between units if desired.
-    public var mgdl: MGDL {
+    public var mgdlValue: MgDl {
         set {
-            _mgdl = newValue
-            _mmoll = _mgdl.inMmolL
+            pMgdlValue = newValue
+            pMmollValue = pMgdlValue.inMmolL
         }
         get {
-            return _mgdl
+            return pMgdlValue
         }
     }
     
     /// The time stamp of the BG Level
-    public var timestamp: Date
+    public var timeStamp: Date
     
     /// Returns a `true` if the `timeStamp` is older than 90 seconds.
     var isOld: Bool {
-        return UniversalBGLevel.isOld(_date: timestamp)
+        return UniversalBGLevel.isOld(_date: timeStamp)
     }
     
     /// Static `func` to return if a given `Date` is older than 1 minute 30" - i.e. it's a BG level that's out of date.
@@ -327,16 +325,16 @@ public struct UniversalBGLevel {
         return Date().timeIntervalSince(_date) > 89
     }
     
-    init(_timestamp: Date = Date(), _mmoll: MMOLL? = nil, _mgdl: MGDL? = nil) {
+    init(aTimeStamp: Date = Date(), aMmollValue: MmolL? = nil, aMgdlValue: MgDl? = nil) {
         
-        timestamp = _timestamp
+        timeStamp = aTimeStamp
         
-        if let __mmoll = _mmoll {
-            mmoll = __mmoll
+        if let aMmoll = aMmollValue {
+            pMmollValue = aMmoll
         }
         
-        if let __mgdl = _mgdl {
-            mgdl = __mgdl
+        if let aMgdl = aMgdlValue {
+            mgdlValue = aMgdl
         }
     }
 }

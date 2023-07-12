@@ -67,12 +67,12 @@ public class BgReading: NSManagedObject {
         return r
     }
     
-    var mmol: MMOLL {
-        return MMOLL(calculatedValue.mgdlToMmol())
+    var mmol: MmolL {
+        return MmolL(calculatedValue.mgdlToMmol())
     }
     
-    var mgdl: MGDL {
-        return MGDL(calculatedValue)
+    var mgdl: MgDl {
+        return MgDl(calculatedValue)
     }
     
     /// returns a string with an arrow representation of the slope

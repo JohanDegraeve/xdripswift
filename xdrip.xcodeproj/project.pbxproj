@@ -40,10 +40,11 @@
 		9A360AE72A2B7B840003D5F1 /* NSLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */; };
 		9A65B8702A3C4DF100791398 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A65B86F2A3C4DF100791398 /* UIView.swift */; };
 		9A65B8722A3CB85900791398 /* BGDeltaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A65B8712A3CB85900791398 /* BGDeltaView.swift */; };
-		9A94C44D2A4B78A70033FF61 /* BTVBaseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A94C44C2A4B78A70033FF61 /* BTVBaseViews.swift */; };
+		9A94C44D2A4B78A70033FF61 /* BGBaseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A94C44C2A4B78A70033FF61 /* BGBaseViews.swift */; };
 		9A94C44F2A4D75220033FF61 /* BTStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A94C44E2A4D75220033FF61 /* BTStatusView.swift */; };
 		9AB5FAEC2A3078D600AAC3F1 /* UIFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */; };
 		9AB5FAF12A31DFE900AAC3F1 /* Units Primitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */; };
+		9AB81BED2A5EA130009D9569 /* BGTimeStampView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB81BEC2A5EA130009D9569 /* BGTimeStampView.swift */; };
 		9ABC39562A4199710042AAEA /* BGTimeStampView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ABC39552A4199710042AAEA /* BGTimeStampView.swift */; };
 		9AEA74AC2A347765001202A6 /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */; };
 		9AEA74AD2A347765001202A6 /* Quicksand-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */; };
@@ -776,11 +777,12 @@
 		9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSLayoutConstraint.swift; sourceTree = "<group>"; };
 		9A65B86F2A3C4DF100791398 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		9A65B8712A3CB85900791398 /* BGDeltaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGDeltaView.swift; sourceTree = "<group>"; };
-		9A94C44C2A4B78A70033FF61 /* BTVBaseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTVBaseViews.swift; sourceTree = "<group>"; };
+		9A94C44C2A4B78A70033FF61 /* BGBaseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGBaseViews.swift; sourceTree = "<group>"; };
 		9A94C44E2A4D75220033FF61 /* BTStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTStatusView.swift; sourceTree = "<group>"; };
 		9AB5FAC52A2E078C00AAC3F1 /* CHANGES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGES.md; sourceTree = "<group>"; };
 		9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFont.swift; sourceTree = "<group>"; };
 		9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Units Primitives.swift"; sourceTree = "<group>"; };
+		9AB81BEC2A5EA130009D9569 /* BGTimeStampView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BGTimeStampView.swift; path = "/Users/todddalton/XCODE PROJECTS/xdripswift/xdrip/Views/BGTimeStampView.swift"; sourceTree = "<absolute>"; };
 		9ABC39552A4199710042AAEA /* BGTimeStampView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGTimeStampView.swift; sourceTree = "<group>"; };
 		9AEA74A42A347765001202A6 /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
 		9AEA74A52A347765001202A6 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
@@ -1711,32 +1713,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		9AB0FBB72A59945100FA6B22 /* BTV Additions */ = {
-			isa = PBXGroup;
-			children = (
-				9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */,
-				9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */,
-				9A65B86F2A3C4DF100791398 /* UIView.swift */,
-				9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */,
-				9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */,
-				9A1895802A44381500219C8D /* Bool.swift */,
-			);
-			path = "BTV Additions";
-			sourceTree = "<group>";
-		};
-		9ABC39542A4199420042AAEA /* BTVAdditions */ = {
-			isa = PBXGroup;
-			children = (
-				9A94C44E2A4D75220033FF61 /* BTStatusView.swift */,
-				9A65B8712A3CB85900791398 /* BGDeltaView.swift */,
-				9AEA74B42A348119001202A6 /* BGLevelBox.swift */,
-				9A360AD82A2B77E90003D5F1 /* BGView.swift */,
-				9ABC39552A4199710042AAEA /* BGTimeStampView.swift */,
-				9A94C44C2A4B78A70033FF61 /* BTVBaseViews.swift */,
-			);
-			path = BTVAdditions;
-			sourceTree = "<group>";
-		};
 		9AEA74A32A347765001202A6 /* Quicksand */ = {
 			isa = PBXGroup;
 			children = (
@@ -1784,7 +1760,12 @@
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				9AB0FBB72A59945100FA6B22 /* BTV Additions */,
+				9A360AE22A2B7B650003D5F1 /* NSParagraphStyle.swift */,
+				9A360AE62A2B7B840003D5F1 /* NSLayoutConstraint.swift */,
+				9A65B86F2A3C4DF100791398 /* UIView.swift */,
+				9AB5FAEB2A3078D600AAC3F1 /* UIFont.swift */,
+				9AB5FAF02A31DFE900AAC3F1 /* Units Primitives.swift */,
+				9A1895802A44381500219C8D /* Bool.swift */,
 				F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */,
 				F8FDD6CA2553385000625B49 /* Array.swift */,
 				F8E51D602448E695001C9E5A /* Bundle.swift */,
@@ -2720,7 +2701,13 @@
 		F8BECB00235CE3E20060DAE1 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				9ABC39542A4199420042AAEA /* BTVAdditions */,
+				9AB81BEC2A5EA130009D9569 /* BGTimeStampView.swift */,
+				9A94C44E2A4D75220033FF61 /* BTStatusView.swift */,
+				9A65B8712A3CB85900791398 /* BGDeltaView.swift */,
+				9AEA74B42A348119001202A6 /* BGLevelBox.swift */,
+				9A360AD82A2B77E90003D5F1 /* BGView.swift */,
+				9ABC39552A4199710042AAEA /* BGTimeStampView.swift */,
+				9A94C44C2A4B78A70033FF61 /* BGBaseViews.swift */,
 				F8BECB01235CE3E20060DAE1 /* BloodGlucoseChartView.swift */,
 				9A360AD72A2B77E80003D5F1 /* Watch App-Bridging-Header.h */,
 			);
@@ -3833,7 +3820,7 @@
 				F8A1585B22EDB7EA007F5B5D /* ConstantsDexcomG5.swift in Sources */,
 				F816E0F524367132009EE65B /* GNSEntry+CoreDataProperties.swift in Sources */,
 				F898EDF4234A8A3200BFB79B /* UInt16.swift in Sources */,
-				9A94C44D2A4B78A70033FF61 /* BTVBaseViews.swift in Sources */,
+				9A94C44D2A4B78A70033FF61 /* BGBaseViews.swift in Sources */,
 				F8BDD452221DEAB2006EAB84 /* TextsSettingsView.swift in Sources */,
 				F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */,
 				F8177023248CF78300AA3600 /* LibreSensorType.swift in Sources */,
@@ -3961,6 +3948,7 @@
 				F8A2BC3F25DB0D89001D1E78 /* BluetoothPeripheralManager+CGMAtomTransmitterDelegate.swift in Sources */,
 				F8BDD4242218790E006EAB84 /* UserDefaults.swift in Sources */,
 				9AEA74B52A348119001202A6 /* BGLevelBox.swift in Sources */,
+				9AB81BED2A5EA130009D9569 /* BGTimeStampView.swift in Sources */,
 				F81D6D5222C27F18005EFAE2 /* BgReading+DexcomShare.swift in Sources */,
 				F8F9723023A5915900C3F17D /* M5StackUtilities.swift in Sources */,
 				F8297F52238ECA3200D74D66 /* BluetoothPeripheralViewController.swift in Sources */,

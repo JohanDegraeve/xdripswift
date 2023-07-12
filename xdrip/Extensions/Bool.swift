@@ -13,6 +13,8 @@ import Foundation
 // This extension returns a very definite 1 or 0 depending on the Bool
 // Probably not entirely necessary but unless it affects perfomance too badly
 // it feels more secure to have a definite, numerical value
+// and it's useful for use in setting alpha values directly
+
 extension Bool {
     
     /// For D.R.Y. and readability.
