@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		47046EA22A69ACCE00A6F736 /* BgReadingsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47046EA12A69ACCE00A6F736 /* BgReadingsDetailView.swift */; };
 		470824D2297484B500C52317 /* SwiftCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; };
 		470824D3297484B500C52317 /* SwiftCharts in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		470B618A270C448000561E56 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 470B6188270C448000561E56 /* Interface.storyboard */; };
@@ -20,6 +21,7 @@
 		470CE1FC246802EB00D5CB74 /* BluetoothPeripheralsView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 470CE1FE246802EB00D5CB74 /* BluetoothPeripheralsView.strings */; };
 		470F021326DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470F021226DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift */; };
 		47150A4027F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */; };
+		47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47228B142996BDD2008725DB /* BgReadingsView.swift */; };
 		4749EB9B25B36E010072DF8B /* LibreNFC.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4749EB9D25B36E010072DF8B /* LibreNFC.strings */; };
 		47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47503384247420A200D2260B /* BluetoothPeripheralView.strings */; };
 		4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */; };
@@ -699,6 +701,7 @@
 		4166BFCB28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/LibreStates.strings; sourceTree = "<group>"; };
 		4166BFCC28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Snooze.strings; sourceTree = "<group>"; };
 		4166BFCD28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/LibreNFC.strings; sourceTree = "<group>"; };
+		47046EA12A69ACCE00A6F736 /* BgReadingsDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BgReadingsDetailView.swift; path = /Users/paulplant/Documents/GitHub/xdripswift/xdrip/SwiftUIViews/BgReadingsDetailView.swift; sourceTree = "<absolute>"; };
 		470B6186270C448000561E56 /* xDrip4iO5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xDrip4iO5.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		470B6189270C448000561E56 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		470B618B270C448100561E56 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -711,6 +714,7 @@
 		470CE1FF246802F400D5CB74 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
 		470F021226DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewSensorCountdownSettingsViewModel.swift; sourceTree = "<group>"; };
 		47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTreatmentsSettingsViewModel.swift; sourceTree = "<group>"; };
+		47228B142996BDD2008725DB /* BgReadingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingsView.swift; sourceTree = "<group>"; };
 		4749EB9C25B36E010072DF8B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		47503383247420A200D2260B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
 		4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsStatistics.swift; sourceTree = "<group>"; };
@@ -2158,6 +2162,8 @@
 			isa = PBXGroup;
 			children = (
 				F866974E2867A97000025441 /* Settings */,
+				47228B142996BDD2008725DB /* BgReadingsView.swift */,
+				47046EA12A69ACCE00A6F736 /* BgReadingsDetailView.swift */,
 			);
 			path = SwiftUIViews;
 			sourceTree = "<group>";
@@ -3575,6 +3581,7 @@
 				F8E3A2A523D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */,
 				D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */,
 				47ADD2E127FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift in Sources */,
+				47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */,
 				F81FA006228E09D40028C70F /* TextsCalibration.swift in Sources */,
 				F816E0F724367137009EE65B /* GNSEntry+CoreDataClass.swift in Sources */,
 				F8F9721923A5915900C3F17D /* CGMGNSEntryTransmitter.swift in Sources */,
@@ -3825,6 +3832,7 @@
 				F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */,
 				F80D916024F45EB3006840B5 /* LibreError.swift in Sources */,
 				F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */,
+				47046EA22A69ACCE00A6F736 /* BgReadingsDetailView.swift in Sources */,
 				F8F971B823A5914D00C3F17D /* BluetoothPeripheral.swift in Sources */,
 				F8F9721723A5915900C3F17D /* CGMDroplet1Transmitter.swift in Sources */,
 				F8A2BC2E25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDropletTransmitterDelegate.swift in Sources */,
@@ -4797,7 +4805,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OBJROOT = "";
@@ -4859,7 +4866,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OBJROOT = "";
@@ -4883,8 +4889,8 @@
 				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
-				INFOPLIST_FILE = "xdrip/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -4911,8 +4917,8 @@
 				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
-				INFOPLIST_FILE = "xdrip/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

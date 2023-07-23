@@ -3,7 +3,7 @@ import os
 import UIKit
 import xDrip4iOS_Widget
 
-public class NightScoutUploadManager: NSObject {
+public class NightScoutUploadManager: NSObject, ObservableObject {
     
     // MARK: - properties
     
@@ -346,6 +346,27 @@ public class NightScoutUploadManager: NSObject {
             }
             
         }
+        
+    }
+    
+    
+    /// tries to delete any entries from Nightscout that are within 1 second either side of the timestamp that is passed (this should normally just be a single entry/reading)
+    /// - parameters:
+    ///     - timeStampOfBgReadingToDelete : the timestamp of the BG reading that we want to try and remove
+    public func deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: Date) {
+        
+        // create a query that finds entries between 1 second before, and 1 second after, the timestamp
+        let queries = [URLQueryItem(name: "find[dateString][$gte]", value: String(timeStampOfBgReadingToDelete.addingTimeInterval(-1).ISOStringFromDate())), URLQueryItem(name: "find[dateString][$lte]", value: String(timeStampOfBgReadingToDelete.addingTimeInterval(+1).ISOStringFromDate()))]
+        
+        // send a DELETE http request with the queryItems
+        getOrDeleteRequest(path: nightScoutEntriesPath, queries: queries, httpMethod: "DELETE", completionHandler: { (data: Data?, nightScoutResult: NightScoutResult)  in
+            
+            // this is maybe redundant as Nightscout returns a successful result even if no entries were actually found/deleted
+            if nightScoutResult.successFull() {
+                trace("deleting BG reading/entry with timestamp %{public}@ from Nightscout", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info, timeStampOfBgReadingToDelete.description)
+            }
+            
+        })
         
     }
     
