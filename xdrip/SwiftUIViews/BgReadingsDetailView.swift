@@ -26,25 +26,23 @@ struct BgReadingsDetailView: View {
         
         List {
             
-            Section(header: Text("General")) {
+            Section(header: Text(Texts_BgReadings.generalSectionHeader)) {
                 
-                row(title: "Time", data: bgReading.timeStamp.toStringInUserLocale(timeStyle: .long, dateStyle: .long))
+                row(title: Texts_BgReadings.timestamp, data: bgReading.timeStamp.toStringInUserLocale(timeStyle: .long, dateStyle: .long))
                 
-                row(title: "Calculated Value", data: bgReading.calculatedValue.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).stringWithoutTrailingZeroes + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
+                row(title: Texts_BgReadings.calculatedValue, data: bgReading.calculatedValue.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).stringWithoutTrailingZeroes + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
                 
-                row(title: "Slope Arrow", data: bgReading.slopeArrow())
+                row(title: Texts_BgReadings.slopeArrow, data: bgReading.slopeArrow())
                 
             }
             
-            Section(header: Text("Internal Data")) {
+            Section(header: Text(Texts_BgReadings.internalDataSectionHeader)) {
                 
-                row(title: "ID", data: bgReading.id.description)
+                row(title: Texts_BgReadings.id, data: bgReading.id.description)
                 
-                row(title: "Device Name", data: bgReading.deviceName?.description ?? nilString)
+                row(title: Texts_BgReadings.deviceName, data: bgReading.deviceName?.description ?? nilString)
                 
-                row(title: "Raw Data", data: bgReading.rawData.stringWithoutTrailingZeroes)
-                
-                row(title: "Calibration Flag", data: bgReading.calibrationFlag.description)
+                row(title: Texts_BgReadings.rawData, data: bgReading.rawData.stringWithoutTrailingZeroes)
                 
                 // enabled below for testing. Will probably remove before final release
                 row(title: "a", data: bgReading.a == 0.0 ? nilString : bgReading.a.description)
@@ -62,7 +60,7 @@ struct BgReadingsDetailView: View {
             }
             
         }
-        .navigationTitle("Glucose Reading")
+        .navigationTitle(Texts_BgReadings.glucoseReadingTitle)
         
     }
     

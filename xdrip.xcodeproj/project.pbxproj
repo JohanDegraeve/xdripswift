@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		47046EA22A69ACCE00A6F736 /* BgReadingsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47046EA12A69ACCE00A6F736 /* BgReadingsDetailView.swift */; };
+		47046EA42A6E8BA700A6F736 /* TextsBgReadings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47046EA32A6E8BA700A6F736 /* TextsBgReadings.swift */; };
+		47046EA72A6E8F7B00A6F736 /* BgReadings.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47046EA92A6E8F7B00A6F736 /* BgReadings.strings */; };
 		470824D2297484B500C52317 /* SwiftCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; };
 		470824D3297484B500C52317 /* SwiftCharts in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		470B618A270C448000561E56 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 470B6188270C448000561E56 /* Interface.storyboard */; };
@@ -702,6 +704,9 @@
 		4166BFCC28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Snooze.strings; sourceTree = "<group>"; };
 		4166BFCD28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		47046EA12A69ACCE00A6F736 /* BgReadingsDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BgReadingsDetailView.swift; path = /Users/paulplant/Documents/GitHub/xdripswift/xdrip/SwiftUIViews/BgReadingsDetailView.swift; sourceTree = "<absolute>"; };
+		47046EA32A6E8BA700A6F736 /* TextsBgReadings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsBgReadings.swift; sourceTree = "<group>"; };
+		47046EA82A6E8F7B00A6F736 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BgReadings.strings; sourceTree = "<group>"; };
+		47046EAA2A6E8F8200A6F736 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/BgReadings.strings; sourceTree = "<group>"; };
 		470B6186270C448000561E56 /* xDrip4iO5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xDrip4iO5.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		470B6189270C448000561E56 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		470B618B270C448100561E56 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -2125,6 +2130,7 @@
 				F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */,
 				D4AC54412778C82B0097FF10 /* Treatments.strings */,
 				F81F370525C1583400520946 /* WatlaaView.strings */,
+				47046EA92A6E8F7B00A6F736 /* BgReadings.strings */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -2633,6 +2639,7 @@
 				F8B48A9322B2A705009BCC01 /* TextsSpeakReading.swift */,
 				D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */,
 				F830992723C32A13005741DF /* TextsWatlaaView.swift */,
+				47046EA32A6E8BA700A6F736 /* TextsBgReadings.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -3503,6 +3510,7 @@
 				F824379724CB7A9900BED341 /* Siri_Transmitter_Battery_Low.caf in Resources */,
 				F82437AE24CB7A9900BED341 /* Cell_Phone_Ring_Tone.caf in Resources */,
 				F82437C824CB7A9900BED341 /* Siri_Alert_Missed_Readings.caf in Resources */,
+				47046EA72A6E8F7B00A6F736 /* BgReadings.strings in Resources */,
 				F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.mp3 in Resources */,
 				F824377A24CB7A9800BED341 /* Sci-Fi_Spaceship_Message.caf in Resources */,
 				D4AC54502778C82C0097FF10 /* Treatments.strings in Resources */,
@@ -3601,6 +3609,7 @@
 				F8B3A85D22821BB6004BA588 /* Int.swift in Sources */,
 				F808D2CE2403292C0084B5DB /* Bubble+CoreDataProperties.swift in Sources */,
 				F8A2BC1A25DB0C28001D1E78 /* CGMAtomTransmitterDelegate.swift in Sources */,
+				47046EA42A6E8BA700A6F736 /* TextsBgReadings.swift in Sources */,
 				F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */,
 				F816E1002436734C009EE65B /* CGMGNSEntryTransmitterDelegate.swift in Sources */,
 				F82842322752CBE00097E0C9 /* DexcomSessionStopTxMessage.swift in Sources */,
@@ -3966,6 +3975,15 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		47046EA92A6E8F7B00A6F736 /* BgReadings.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				47046EA82A6E8F7B00A6F736 /* en */,
+				47046EAA2A6E8F8200A6F736 /* es */,
+			);
+			name = BgReadings.strings;
+			sourceTree = "<group>";
+		};
 		470B6188270C448000561E56 /* Interface.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

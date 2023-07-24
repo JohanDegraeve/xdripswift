@@ -61,12 +61,11 @@ struct BgReadingsView: View {
                     
                     HStack {
                         
-                        Text("Date")
+                        Text(Texts_BgReadings.selectDate)
                         
                         Spacer()
                         
                         Text(dateSelectedDayName)
-                            .fontWeight(.bold)
                             .foregroundColor(.secondary)
                         
                     }
@@ -118,18 +117,24 @@ struct BgReadingsView: View {
                     else {
                         
                         // this is shown when there is no data for the selected date
-                        Text("No readings to show...")
+                        Text(Texts_BgReadings.noReadingsToShow)
                         
                     }
                     
                 }
                 
             }
-            .navigationTitle("Glucose Readings")
+            .navigationTitle(Texts_BgReadings.glucoseReadingsTitle)
             .onChange(of: dateSelected, perform: { value in
+                
+                // update the filtered array with the newly selected date
                 filteredBgReadings = bgReadings.filter { Calendar.current.compare($0.timeStamp, to: dateSelected, toGranularity: .day) == .orderedSame}
+                
                 updateDayName(date: dateSelected)
+                
+                // hide the datePicker
                 self.datePickerReset = UUID()
+                
             })
             
         }
@@ -161,8 +166,8 @@ struct BgReadingsView: View {
             
         } else {
             
-            // this should never happen
-            dateSelected = "Error"
+            // this should never happen so it's not worth localizing it
+            dateSelectedDayName = "Error"
             
         }
         
@@ -233,7 +238,7 @@ struct BgReadingsView: View {
         
         dateFormatter.dateFormat = "EEEE"
         
-        dateSelectedDayName = dateFormatter.string(from: date)
+        dateSelectedDayName = dateFormatter.string(from: date).capitalized
         
     }
 }

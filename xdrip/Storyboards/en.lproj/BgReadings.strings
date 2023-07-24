@@ -1,0 +1,12 @@
+"glucoseReadingsTitle" = "Glucose Readings";
+"glucoseReadingTitle" = "Glucose Reading";
+"selectDate" = "Date";
+"noReadingsToShow" = "No readings to show...";
+"generalSectionHeader" = "General";
+"internalDataSectionHeader" = "Internal data";
+"timestamp" = "Timestamp";
+"calculatedValue" = "Calculated value";
+"slopeArrow" = "Slope arrow";
+"id" = "ID";
+"deviceName" = "Device name";
+"rawData" = "Raw data";
