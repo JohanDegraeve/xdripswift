@@ -1,0 +1,12 @@
+"glucoseReadingsTitle" = "Glucose Metingen";
+"glucoseReadingTitle" = "Glucose Meting";
+"selectDate" = "Datum";
+"noReadingsToShow" = "Geen metingen...";
+"generalSectionHeader" = "Algemeen";
+"internalDataSectionHeader" = "Interne data";
+"timestamp" = "Tijdstip";
+"calculatedValue" = "Berekende waarde";
+"slopeArrow" = "Helling arrow";
+"id" = "ID";
+"deviceName" = "Toestelnaam";
+"rawData" = "Ruwe data";
