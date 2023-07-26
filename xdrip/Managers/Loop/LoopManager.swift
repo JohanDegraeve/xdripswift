@@ -99,6 +99,8 @@ public class LoopManager:NSObject {
                 return
             }
             
+            //  double check that lastReadings.first exists, because in some cases lastReadings is empty but still lastReadings.count != nil
+            guard lastReadings.first != nil else {return}
             
             // convert to json Dexcom Share format
             var dictionary = [Dictionary<String, Any>]()
