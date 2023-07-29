@@ -56,7 +56,7 @@ struct SettingsViewHelpSettingsViewModel:SettingsViewModelProtocol {
             // important to check the the URLs actually exist in ConstansHomeView before trying to open them
             if languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
                 
-                guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode! + ConstantsHomeView.onlineHelpURLTranslated2) else { return .nothing}
+                guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated + languageCode!) else { return .nothing }
                 
                 UIApplication.shared.open(url)
                 

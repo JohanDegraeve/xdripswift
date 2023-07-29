@@ -64,7 +64,7 @@ final class RootViewController: UIViewController {
         // important to check the the URLs actually exist in ConstansHomeView before trying to open them
         if let languageCode = languageCode, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
             
-            guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
+            guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated + languageCode) else { return }
             
             UIApplication.shared.open(url)
             

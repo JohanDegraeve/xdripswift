@@ -27,8 +27,7 @@ enum ConstantsHomeView {
     /// example URL to show the online help in Spanish using Google Translate
     /// https://xdrip4ios-readthedocs-io.translate.goog/en/latest/?_x_tr_sl=auto&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=nui
     /// we'll use this to spilt into two separate strings
-    static let onlineHelpURLTranslated1 = "https://xdrip4ios-readthedocs-io.translate.goog/en/latest/?_x_tr_sl=auto&_x_tr_tl="
-    static let onlineHelpURLTranslated2 = "&_x_tr_hl=es&_x_tr_pto=nui"
+    static let onlineHelpURLTranslated = "https://xdrip4ios-readthedocs-io.translate.goog/en/latest/?_x_tr_sl=auto&_x_tr_tl="
 
     /// github.com repository URL for the project
     static let gitHubURL = "https://github.com/JohanDegraeve/xdripswift"
