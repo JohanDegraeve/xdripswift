@@ -2168,9 +2168,9 @@
 		F866974D2867A94D00025441 /* SwiftUIViews */ = {
 			isa = PBXGroup;
 			children = (
-				F866974E2867A97000025441 /* Settings */,
-				47228B142996BDD2008725DB /* BgReadingsView.swift */,
 				47046EA12A69ACCE00A6F736 /* BgReadingsDetailView.swift */,
+				47228B142996BDD2008725DB /* BgReadingsView.swift */,
+				F866974E2867A97000025441 /* Settings */,
 			);
 			path = SwiftUIViews;
 			sourceTree = "<group>";
@@ -2622,6 +2622,7 @@
 			children = (
 				F8B3A7B1226A0878004BA588 /* TextsAlerts.swift */,
 				F8B3A809227A3D11004BA588 /* TextsAlertTypeSettings.swift */,
+				47046EA32A6E8BA700A6F736 /* TextsBgReadings.swift */,
 				F8297F57238EE14E00D74D66 /* TextsBluetoothPeripheralsView.swift */,
 				F8297F58238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift */,
 				F81FA005228E09D40028C70F /* TextsCalibration.swift */,
@@ -2640,7 +2641,6 @@
 				F8B48A9322B2A705009BCC01 /* TextsSpeakReading.swift */,
 				D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */,
 				F830992723C32A13005741DF /* TextsWatlaaView.swift */,
-				47046EA32A6E8BA700A6F736 /* TextsBgReadings.swift */,
 			);
 			path = Texts;
 			sourceTree = "<group>";

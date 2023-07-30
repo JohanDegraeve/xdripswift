@@ -44,19 +44,6 @@ struct BgReadingsDetailView: View {
                 
                 row(title: Texts_BgReadings.rawData, data: bgReading.rawData.stringWithoutTrailingZeroes)
                 
-                // enabled below for testing. Will probably remove before final release
-                row(title: "a", data: bgReading.a == 0.0 ? nilString : bgReading.a.description)
-                
-                row(title: "b", data: bgReading.b == 0.0 ? nilString : bgReading.b.description)
-                
-                row(title: "c", data: bgReading.c == 0.0 ? nilString : bgReading.c.description)
-                
-                row(title: "ra", data: bgReading.ra == 0.0 ? nilString : bgReading.ra.description)
-                
-                row(title: "rb", data: bgReading.rb == 0.0 ? nilString : bgReading.rb.description)
-                
-                row(title: "rc", data: bgReading.rc == 0.0 ? nilString : bgReading.rc.description)
-                
             }
             
         }
