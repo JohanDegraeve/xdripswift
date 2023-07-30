@@ -1,0 +1,115 @@
+name: 4. Build xDrip4iOS
+run-name: Build xDrip4iOS (${{ github.ref_name }})
+on:
+  workflow_dispatch:
+  
+  ## Remove the "#" sign from the beginning of the line below to get automated builds on push (code changes in your repository)
+  #push:
+  
+  schedule:
+    - cron: '0 04 * * *' # Checks for updates at 04:00 UTC every day
+    - cron: '0 04 1 * *' # Builds the app on the 1th every month
+
+env:
+  UPSTREAM_REPO: JohanDegraeve/xdripswift
+  UPSTREAM_BRANCH: ${{ github.ref_name }} # branch on upstream repository to sync from (relpace with specific branch name if needed)
+  TARGET_BRANCH: ${{ github.ref_name }} # target branch on fork to be kept in sync, and target branch on upstream to be kept alive (relpace with specific branch name if needed)
+  SYNC_UPSTREAM: 'true' # set to 'false' or 'true' to disable / enable syncing of fork with upstream repository
+  
+jobs:
+  check_latest_from_upstream:
+    runs-on: ubuntu-latest
+    name: Check upstream
+    outputs: 
+      NEW_COMMITS: ${{ steps.sync.outputs.has_new_commits }}
+
+    steps:
+    - name: Checkout target repo
+      uses: actions/checkout@v3
+      with:
+        # optional: set the branch to checkout,
+        # sync action checks out your 'target_sync_branch' anyway
+        #submodules: recursive 
+        ref: ${{ env.TARGET_BRANCH }}
+
+    # REQUIRED step
+    # Step 2: run the sync action
+    - name: Sync upstream changes
+      if: ${{ env.SYNC_UPSTREAM == 'true' }} && github.repository_owner != 'JohanDegraeve' # do not run the upstream sync action on the upstream repository
+      id: sync
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+      with:
+        target_sync_branch: ${{ env.TARGET_BRANCH }}
+        shallow_since: 6 months ago
+        target_repo_token: ${{ secrets.GH_PAT }}
+        upstream_sync_branch: ${{ env.UPSTREAM_BRANCH }}
+        upstream_sync_repo: ${{ env.UPSTREAM_REPO }}
+      
+    # Step 3: Display a sample message based on the sync output var 'has_new_commits'
+    - name: New commits found
+      if: steps.sync.outputs.has_new_commits == 'true'
+      run: echo "New commits were found to sync."
+    
+    - name: No new commits
+      if: steps.sync.outputs.has_new_commits == 'false'
+      run: echo echo "There were no new commits."
+      
+    - name: Show value of 'has_new_commits'
+      run: |
+        echo ${{ steps.sync.outputs.has_new_commits }}
+        echo "NEW_COMMITS=${{ steps.sync.outputs.has_new_commits }}" >> $GITHUB_OUTPUT
+        
+    # Keep repository "alive": add empty commits to TARGET_BRANCH after "time_elapsed" days of inactivity to avoid inactivation of scheduled workflows
+    - name: Keep alive
+      if: github.ref == 'refs/heads/${{ env.TARGET_BRANCH }}'
+      uses: gautamkrishnar/keepalive-workflow@v1 # using the workflow with default settings
+      with:
+        time_elapsed: 50 # Time elapsed from the previous commit to trigger a new automated commit (in days)
+
+  build:
+    needs: check_latest_from_upstream
+    runs-on: macos-13
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '0 04 1 * *' || needs.check_latest_from_upstream.outputs.NEW_COMMITS == 'true' }} # runs if started manually, or if scheduled on the first each month, or if new commits were found
+    steps:
+      - name: Select Xcode version
+        run: "sudo xcode-select --switch /Applications/Xcode_14.3.app/Contents/Developer"
+
+      # Checks-out the repo
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      
+      # Patch Fastlane Match to not print tables
+      - name: Patch Match Tables
+        run: find /usr/local/lib/ruby/gems -name table_printer.rb | xargs sed -i "" "/puts(Terminal::Table.new(params))/d"
+      
+      # Build signed Xdrip4iOS IPA file
+      - name: Fastlane Build & Archive
+        run: fastlane build_xdrip4ios
+        env:
+          TEAMID: ${{ secrets.TEAMID }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          FASTLANE_KEY_ID: ${{ secrets.FASTLANE_KEY_ID }}
+          FASTLANE_ISSUER_ID: ${{ secrets.FASTLANE_ISSUER_ID }}
+          FASTLANE_KEY: ${{ secrets.FASTLANE_KEY }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      
+      # Upload to TestFlight
+      - name: Fastlane upload to TestFlight
+        run: fastlane release
+        env:
+          TEAMID: ${{ secrets.TEAMID }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          FASTLANE_KEY_ID: ${{ secrets.FASTLANE_KEY_ID }}
+          FASTLANE_ISSUER_ID: ${{ secrets.FASTLANE_ISSUER_ID }}
+          FASTLANE_KEY: ${{ secrets.FASTLANE_KEY }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
+      # Upload Build artifacts
+      - name: Upload build log, IPA and Symbol artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            artifacts
+            buildlog

@@ -1,0 +1,239 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+default_platform(:ios)
+
+TEAMID = ENV["TEAMID"]
+GH_PAT = ENV["GH_PAT"]
+GITHUB_WORKSPACE = ENV["GITHUB_WORKSPACE"]
+GITHUB_REPOSITORY_OWNER = ENV["GITHUB_REPOSITORY_OWNER"]
+FASTLANE_KEY_ID = ENV["FASTLANE_KEY_ID"]
+FASTLANE_ISSUER_ID = ENV["FASTLANE_ISSUER_ID"]
+FASTLANE_KEY = ENV["FASTLANE_KEY"]
+DEVICE_NAME = ENV["DEVICE_NAME"]
+DEVICE_ID = ENV["DEVICE_ID"]
+ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+
+platform :ios do
+  desc "Build Xdrip4iOS"
+  lane :build_xdrip4ios do
+    setup_ci if ENV['CI']
+    
+    update_project_team(
+      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      teamid: "#{TEAMID}"
+    )
+
+    api_key = app_store_connect_api_key(
+      key_id: "#{FASTLANE_KEY_ID}",
+      issuer_id: "#{FASTLANE_ISSUER_ID}",
+      key_content: "#{FASTLANE_KEY}"
+    )
+
+    previous_build_number = latest_testflight_build_number(
+      app_identifier: "com.#{TEAMID}.xdripswift",
+      api_key: api_key,
+    )
+
+    current_build_number = previous_build_number + 1
+
+    increment_build_number(
+      xcodeproj: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      build_number: current_build_number
+    )      
+    
+    match(
+      type: "appstore",
+      git_basic_authorization: Base64.strict_encode64("#{GITHUB_REPOSITORY_OWNER}:#{GH_PAT}"),
+      app_identifier: [
+        "com.#{TEAMID}.xdripswift",
+        "com.#{TEAMID}.xdripswift.xDrip4iOS-Widget",
+        "com.#{TEAMID}.xdripswift.watchkitapp",
+        "com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension"
+      ]
+    )
+
+    previous_build_number = latest_testflight_build_number(
+      app_identifier: "com.#{TEAMID}.xdripswift",
+      api_key: api_key,
+    )
+
+    current_build_number = previous_build_number + 1
+
+    increment_build_number(
+      xcodeproj: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      build_number: current_build_number
+    )
+    
+    mapping = Actions.lane_context[
+      SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING
+    ]
+
+    update_code_signing_settings(
+      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      profile_name: mapping["com.#{TEAMID}.xdripswift"],
+      code_sign_identity: "iPhone Distribution",
+      targets: ["xdrip"]
+    )
+
+    update_code_signing_settings(
+      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      profile_name: mapping["com.#{TEAMID}.xdripswift.xDrip4iOS-Widget"],
+      code_sign_identity: "iPhone Distribution",
+      targets: ["xDrip4iOS Widget"]
+    )
+    
+    update_code_signing_settings(
+      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      profile_name: mapping["com.#{TEAMID}.xdripswift.watchkitapp"],
+      code_sign_identity: "iPhone Distribution",
+      targets: ["Watch App"]
+    )
+
+    update_code_signing_settings(
+      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      profile_name: mapping["com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension"],
+      code_sign_identity: "iPhone Distribution",
+      targets: ["Watch App WatchKit Extension"]
+    )
+    
+    gym(
+      export_method: "app-store",
+      scheme: "xdrip",
+      output_name: "Xdrip4iOS.ipa",
+      configuration: "Release",
+      destination: 'generic/platform=iOS',
+      buildlog_path: 'buildlog'
+    )
+
+    copy_artifacts(
+      target_path: "artifacts",
+      artifacts: ["*.mobileprovision", "*.ipa", "*.dSYM.zip"]
+    )
+  end
+
+  desc "Push to TestFlight"
+  lane :release do
+    api_key = app_store_connect_api_key(
+      key_id: "#{FASTLANE_KEY_ID}",
+      issuer_id: "#{FASTLANE_ISSUER_ID}",
+      key_content: "#{FASTLANE_KEY}"
+    )
+    
+    upload_to_testflight(
+      api_key: api_key,
+      skip_submission: false,
+      ipa: "Xdrip4iOS.ipa",
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+  desc "Provision Identifiers and Certificates"
+  lane :identifiers do
+    setup_ci if ENV['CI']
+    ENV["MATCH_READONLY"] = false.to_s
+    
+    app_store_connect_api_key(
+      key_id: "#{FASTLANE_KEY_ID}",
+      issuer_id: "#{FASTLANE_ISSUER_ID}",
+      key_content: "#{FASTLANE_KEY}"
+    )
+
+    def configure_bundle_id(name, identifier, capabilities)
+      bundle_id = Spaceship::ConnectAPI::BundleId.find(identifier) || Spaceship::ConnectAPI::BundleId.create(name: name, identifier: identifier)
+      capabilities.each { |capability|
+        bundle_id.create_capability(capability)
+      }
+    end
+
+    configure_bundle_id("xdrip", "com.#{TEAMID}.xdripswift", [
+      Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS,
+      Spaceship::ConnectAPI::BundleIdCapability::Type::HEALTHKIT,
+      Spaceship::ConnectAPI::BundleIdCapability::Type::NFC_TAG_READING
+    ])
+
+    configure_bundle_id("xDrip4iOS Widget", "com.#{TEAMID}.xdripswift.xDrip4iOS-Widget", [
+      Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS
+    ])
+    
+    configure_bundle_id("Watch App", "com.#{TEAMID}.xdripswift.watchkitapp", [
+      Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS
+    ])
+    
+    configure_bundle_id("Watch App WatchKit Extension", "com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension", [
+      Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS,
+    ])
+    
+    
+  end
+
+  desc "Provision Certificates"
+  lane :certs do
+    setup_ci if ENV['CI']
+    ENV["MATCH_READONLY"] = false.to_s
+    
+    app_store_connect_api_key(
+      key_id: "#{FASTLANE_KEY_ID}",
+      issuer_id: "#{FASTLANE_ISSUER_ID}",
+      key_content: "#{FASTLANE_KEY}"
+    )
+    
+    match(
+      type: "appstore",
+      force: true,
+      git_basic_authorization: Base64.strict_encode64("#{GITHUB_REPOSITORY_OWNER}:#{GH_PAT}"),
+      app_identifier: [
+        "com.#{TEAMID}.xdripswift",
+        "com.#{TEAMID}.xdripswift.xDrip4iOS-Widget",
+        "com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension",
+        "com.#{TEAMID}.xdripswift.watchkitapp",
+      ]
+    )
+  end
+
+  desc "Validate Secrets"
+  lane :validate_secrets do
+    setup_ci if ENV['CI']
+    ENV["MATCH_READONLY"] = true.to_s
+
+    app_store_connect_api_key(
+      key_id: "#{FASTLANE_KEY_ID}",
+      issuer_id: "#{FASTLANE_ISSUER_ID}",
+      key_content: "#{FASTLANE_KEY}"
+    )
+
+    def find_bundle_id(identifier)
+      bundle_id = Spaceship::ConnectAPI::BundleId.find(identifier)
+    end
+
+    find_bundle_id("com.#{TEAMID}.loopkit.Loop")
+  end
+
+  desc "Nuke Certs"
+  lane :nuke_certs do
+    setup_ci if ENV['CI']
+    ENV["MATCH_READONLY"] = false.to_s
+    
+    app_store_connect_api_key(
+      key_id: "#{FASTLANE_KEY_ID}",
+      issuer_id: "#{FASTLANE_ISSUER_ID}",
+      key_content: "#{FASTLANE_KEY}"
+    )
+    
+    match_nuke(
+      type: "appstore",
+      team_id: "#{TEAMID}",
+      skip_confirmation: true,
+      git_basic_authorization: Base64.strict_encode64("#{GITHUB_REPOSITORY_OWNER}:#{GH_PAT}")
+    )
+  end
+end

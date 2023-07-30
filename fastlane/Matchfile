@@ -1,0 +1,10 @@
+
+GITHUB_REPOSITORY_OWNER ||= ENV["GITHUB_REPOSITORY_OWNER"]
+
+git_url("https://github.com/#{GITHUB_REPOSITORY_OWNER}/Match-Secrets.git")
+
+storage_mode("git")
+
+type("appstore")
+
+# The docs are available on https://docs.fastlane.tools/actions/match
