@@ -30,7 +30,7 @@ struct BgReadingsDetailView: View {
                 
                 row(title: Texts_BgReadings.timestamp, data: bgReading.timeStamp.toStringInUserLocale(timeStyle: .long, dateStyle: .long))
                 
-                row(title: Texts_BgReadings.calculatedValue, data: bgReading.calculatedValue.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).stringWithoutTrailingZeroes + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
+                row(title: Texts_BgReadings.calculatedValue, data: bgReading.calculatedValue.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).bgValuetoString(mgdl: isMgDl) + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
                 
                 row(title: Texts_BgReadings.slopeArrow, data: bgReading.slopeArrow())
                 

@@ -89,7 +89,7 @@ struct BgReadingsView: View {
                                     visualIndicator(bgRangeDescription: bgReading.bgRangeDescription())
                                         .font(.system(size: 10))
                                     
-                                    Text(bgReading.calculatedValue.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).stringWithoutTrailingZeroes)
+                                    Text(bgReading.calculatedValue.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).bgValuetoString(mgdl: isMgDl))
                                         .foregroundColor(.primary)
                                     
                                     Text(String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
