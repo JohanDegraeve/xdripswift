@@ -166,5 +166,8 @@ enum ConstantsLog {
     // for use in LoopManager
     static let categoryLoopManager =                            "LoopManager              "
     
+    /// for use in Bg Readings view
+    static let categoryBgReadingsView =                         "BgReadingsView           "
+    
 }
 

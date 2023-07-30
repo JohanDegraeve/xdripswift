@@ -1,0 +1,12 @@
+"glucoseReadingsTitle" = "Lecturas";
+"glucoseReadingTitle" = "Lectura";
+"selectDate" = "Fecha";
+"noReadingsToShow" = "No hay datos...";
+"generalSectionHeader" = "General";
+"internalDataSectionHeader" = "Datos internos";
+"timestamp" = "Fecha";
+"calculatedValue" = "Valor calculado";
+"slopeArrow" = "Flecha tendencia";
+"id" = "ID";
+"deviceName" = "Dispositivo";
+"rawData" = "Valor interno";

@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import os
 
-class BgReadingsAccessor {
+class BgReadingsAccessor: ObservableObject {
     
     // MARK: - Properties
     
@@ -192,6 +192,33 @@ class BgReadingsAccessor {
                 
                 try managedObjectContext.save()
                 
+                print("coredata saved")
+                
+            } catch {
+                
+                trace("in delete bgReading,  Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
+                
+                print("coredata save error")
+            }
+
+        }
+        
+    }
+    
+    
+    /// deletes bgReading
+    ///     - bgReading : bgReading to delete
+    func delete(bgReading: BgReading) {
+        
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            
+            coreDataManager.mainManagedObjectContext.delete(bgReading)
+            
+            // save changes to coredata
+            do {
+                
+                try coreDataManager.mainManagedObjectContext.save()
+                
             } catch {
                 
                 trace("in delete bgReading,  Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
@@ -201,6 +228,7 @@ class BgReadingsAccessor {
         }
         
     }
+    
     
     // MARK: - private helper functions
     

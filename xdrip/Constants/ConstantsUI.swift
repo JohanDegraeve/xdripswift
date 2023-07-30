@@ -14,6 +14,7 @@ enum ConstantsUI {
 
     /// List background color
     static let listBackGroundUIColor = UIColor.black
+    
     /// List background color
     static let listBackGroundColor = Color(listBackGroundUIColor)
     

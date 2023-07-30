@@ -8,9 +8,10 @@ import HealthKitUI
 import AVFoundation
 import PieCharts
 import WatchConnectivity
+import SwiftUI
 
 /// viewcontroller for the home screen
-final class RootViewController: UIViewController {
+final class RootViewController: UIViewController, ObservableObject {
     
     // MARK: - Properties - Outlets and Actions for buttons and labels in home screen
     
@@ -24,6 +25,12 @@ final class RootViewController: UIViewController {
     
     @IBAction func preSnoozeToolbarButtonAction(_ sender: UIBarButtonItem) {
         // opens the SnoozeViewController, see storyboard
+    }
+    
+    @IBOutlet weak var bgReadingsToolbarButtonOutlet: UIBarButtonItem!
+    
+    @IBAction func bgReadingsToolbarButtonAction(_ sender: UIBarButtonItem) {
+        showBgReadingsView()
     }
     
     @IBOutlet weak var sensorToolbarButtonOutlet: UIBarButtonItem!
@@ -334,6 +341,16 @@ final class RootViewController: UIViewController {
     }
     
     @IBOutlet var miniChartDoubleTapGestureRecognizer: UITapGestureRecognizer!
+    
+    
+    // MARK: - Actions for SwiftUI Hosting Controller integration
+    
+    @IBSegueAction func segueToBgReadingsView(_ coder: NSCoder) -> UIViewController? {
+                    
+        return UIHostingController(coder: coder, rootView: BgReadingsView().environmentObject(bgReadingsAccessor!).environmentObject(nightScoutUploadManager!))
+            
+    }
+    
     
     
     // MARK: - Constants for ApplicationManager usage
@@ -857,13 +874,9 @@ final class RootViewController: UIViewController {
             fatalError("In RootViewController, prepare for segue, Segue had no identifier")
         }
         
-        guard let segueIdentifierAsCase = SnoozeViewController.SegueIdentifiers(rawValue: segueIdentifier) else {
-            fatalError("In RootViewController, segueIdentifierAsCase could not be initialized")
-        }
+        switch segueIdentifier {
         
-        switch segueIdentifierAsCase {
-        
-        case SnoozeViewController.SegueIdentifiers.RootViewToSnoozeView:
+        case "RootViewToSnoozeView":
             
             guard let vc = segue.destination as? SnoozeViewController else {
                 
@@ -874,6 +887,8 @@ final class RootViewController: UIViewController {
             // configure view controller
             vc.configure(alertManager: alertManager)
             
+        default:
+            break
         }
     }
     
@@ -3060,6 +3075,15 @@ final class RootViewController: UIViewController {
         // now that the activeSensor object has been destroyed, update (hide) the sensor countdown graphic
         updateSensorCountdown()
 
+    }
+    
+    /// show the SwiftUI view via UIHostingController
+    private func showBgReadingsView() {
+        
+        let bgReadingsViewController = UIHostingController(rootView: BgReadingsView().environmentObject(self.bgReadingsAccessor!).environmentObject(nightScoutUploadManager!) as! BgReadingsView)
+        
+        navigationController?.pushViewController(bgReadingsViewController, animated: true)
+        
     }
     
 }
