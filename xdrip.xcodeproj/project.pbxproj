@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		47046EA22A69ACCE00A6F736 /* BgReadingsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47046EA12A69ACCE00A6F736 /* BgReadingsDetailView.swift */; };
 		47046EA42A6E8BA700A6F736 /* TextsBgReadings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47046EA32A6E8BA700A6F736 /* TextsBgReadings.swift */; };
 		47046EA72A6E8F7B00A6F736 /* BgReadings.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47046EA92A6E8F7B00A6F736 /* BgReadings.strings */; };
 		470824D2297484B500C52317 /* SwiftCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; };
@@ -36,6 +35,7 @@
 		47ADD2DF27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */; };
 		47ADD2E127FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47ADD2E027FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift */; };
 		47B60F3726F389E2003198D3 /* LandscapeChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */; };
+		47D9BC952A78498500AB85B2 /* BgReadingsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */; };
 		47F8E95A2710255D00B8B02B /* ConstantsWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F8E9592710255C00B8B02B /* ConstantsWatchApp.swift */; };
 		47FB28082636B04200042FFB /* StatisticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FB28072636B04200042FFB /* StatisticsManager.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
@@ -703,7 +703,6 @@
 		4166BFCB28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/LibreStates.strings; sourceTree = "<group>"; };
 		4166BFCC28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Snooze.strings; sourceTree = "<group>"; };
 		4166BFCD28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/LibreNFC.strings; sourceTree = "<group>"; };
-		47046EA12A69ACCE00A6F736 /* BgReadingsDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BgReadingsDetailView.swift; path = /Users/paulplant/Documents/GitHub/xdripswift/xdrip/SwiftUIViews/BgReadingsDetailView.swift; sourceTree = "<absolute>"; };
 		47046EA32A6E8BA700A6F736 /* TextsBgReadings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsBgReadings.swift; sourceTree = "<group>"; };
 		47046EA82A6E8F7B00A6F736 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BgReadings.strings; sourceTree = "<group>"; };
 		47046EAA2A6E8F8200A6F736 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/BgReadings.strings; sourceTree = "<group>"; };
@@ -754,6 +753,7 @@
 		47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesLayer.swift; sourceTree = "<group>"; };
 		47ADD2E027FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift; sourceTree = "<group>"; };
 		47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeChartViewController.swift; sourceTree = "<group>"; };
+		47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BgReadingsDetailView.swift; sourceTree = "<group>"; };
 		47DB06C02A6FB3CC00267BE3 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/BgReadings.strings; sourceTree = "<group>"; };
 		47F8E9592710255C00B8B02B /* ConstantsWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsWatchApp.swift; sourceTree = "<group>"; };
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
@@ -2168,7 +2168,7 @@
 		F866974D2867A94D00025441 /* SwiftUIViews */ = {
 			isa = PBXGroup;
 			children = (
-				47046EA12A69ACCE00A6F736 /* BgReadingsDetailView.swift */,
+				47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */,
 				47228B142996BDD2008725DB /* BgReadingsView.swift */,
 				F866974E2867A97000025441 /* Settings */,
 			);
@@ -3601,6 +3601,7 @@
 				F8B955EB2591355200C06016 /* CGMLibre2Transmitter+TestData.swift in Sources */,
 				F8B3A85B2280CCD1004BA588 /* AlertSettingsViewController.swift in Sources */,
 				F8F9722E23A5915900C3F17D /* M5StackTransmitterOpCode.swift in Sources */,
+				47D9BC952A78498500AB85B2 /* BgReadingsDetailView.swift in Sources */,
 				F816E0E22432A4D1009EE65B /* Blucon+BluetoothPeripheral.swift in Sources */,
 				F897E24B23FC86CF0075E0E8 /* CGMG5TransmitterDelegate.swift in Sources */,
 				F816E0F12433C31B009EE65B /* Blucon+CoreDataClass.swift in Sources */,
@@ -3842,7 +3843,6 @@
 				F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */,
 				F80D916024F45EB3006840B5 /* LibreError.swift in Sources */,
 				F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */,
-				47046EA22A69ACCE00A6F736 /* BgReadingsDetailView.swift in Sources */,
 				F8F971B823A5914D00C3F17D /* BluetoothPeripheral.swift in Sources */,
 				F8F9721723A5915900C3F17D /* CGMDroplet1Transmitter.swift in Sources */,
 				F8A2BC2E25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDropletTransmitterDelegate.swift in Sources */,
