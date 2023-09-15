@@ -4,32 +4,32 @@ import AVFoundation
 import AudioToolbox
 
 /// instance of this class will do the follower functionality. Just make an instance, it will listen to the settings, do the regular download if needed - it could be deallocated when isMaster setting in Userdefaults changes, but that's not necessary to do
-class NightScoutFollowManager:NSObject {
+class NightScoutFollowManager: NSObject {
     
     // MARK: - public properties
     
     // MARK: - private properties
     
     /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
-    private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
+    private let keyValueObserverTimeKeeper: KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryNightScoutFollowManager)
     
     /// when to do next download
-    private var nextFollowDownloadTimeStamp:Date
+    private var nextFollowDownloadTimeStamp: Date
     
     /// reference to coredatamanager
-    private var coreDataManager:CoreDataManager
+    private var coreDataManager: CoreDataManager
     
     /// reference to BgReadingsAccessor
-    private var bgReadingsAccessor:BgReadingsAccessor
+    private var bgReadingsAccessor: BgReadingsAccessor
     
     /// delegate to pass back glucosedata
-    private (set) weak var nightScoutFollowerDelegate:NightScoutFollowerDelegate?
+    private (set) weak var nightScoutFollowerDelegate: NightScoutFollowerDelegate?
     
     /// AVAudioPlayer to use
-    private var audioPlayer:AVAudioPlayer?
+    private var audioPlayer: AVAudioPlayer?
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create playsoundtimer
     private let applicationManagerKeyResumePlaySoundTimer = "NightScoutFollowerManager-ResumePlaySoundTimer"
@@ -38,15 +38,15 @@ class NightScoutFollowManager:NSObject {
     private let applicationManagerKeySuspendPlaySoundTimer = "NightScoutFollowerManager-SuspendPlaySoundTimer"
     
     /// closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
-    private var invalidateDownLoadTimerClosure:(() -> Void)?
+    private var invalidateDownLoadTimerClosure: (() -> Void)?
     
     // timer for playsound
-    private var playSoundTimer:RepeatingTimer?
+    private var playSoundTimer: RepeatingTimer?
 
     // MARK: - initializer
     
     /// initializer
-    public init(coreDataManager:CoreDataManager, nightScoutFollowerDelegate:NightScoutFollowerDelegate) {
+    public init(coreDataManager: CoreDataManager, nightScoutFollowerDelegate: NightScoutFollowerDelegate) {
         
         // initialize nextFollowDownloadTimeStamp to now, which is at the moment FollowManager is instantiated
         nextFollowDownloadTimeStamp = Date()
@@ -56,18 +56,20 @@ class NightScoutFollowManager:NSObject {
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.nightScoutFollowerDelegate = nightScoutFollowerDelegate
         
-        // creat audioplayer
-        do {
-            // set up url to create audioplayer
-            let soundFileName = ConstantsSuspensionPrevention.soundFileName
-            if let url = Bundle.main.url(forResource: soundFileName, withExtension: "")  {
-
-                try audioPlayer = AVAudioPlayer(contentsOf: url)
-
+        // set up audioplayer
+        if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "")  {
+            
+            // create audioplayer
+            do {
+                
+                audioPlayer = try AVAudioPlayer(contentsOf: url)
+                
+            } catch let error {
+                
+                trace("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .error, error.localizedDescription)
+                
             }
             
-        } catch let error {
-            trace("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .error, error.localizedDescription)
         }
 
         // call super.init
