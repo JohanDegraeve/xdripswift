@@ -3,19 +3,19 @@ enum ConstantsSounds: String, CaseIterable {
     
     // here using case iso properties because we want to iterate through them
     // name of the sound as shown to the user, and also stored in the alerttype
-    case batterwakeup = "Better Wake Up/betterwakeup.mp3"
-    case bruteforce = "Brute Force/bruteforce.mp3"
-    case modernalarm2 = "Modern Alert 2/modern2.mp3"
-    case modernalarm = "Modern Alert/modernalarm.mp3"
-    case shorthigh1 = "Short High 1/shorthigh1.mp3"
-    case shorthigh2 = "Short High 2/shorthigh2.mp3"
-    case shorthigh3 = "Short High 3/shorthigh3.mp3"
-    case shorthigh4 = "Short High 4/shorthigh4.mp3"
-    case shortlow1  = "Short Low 1/shortlow1.mp3"
-    case shortlow2  = "Short Low 2/shortlow2.mp3"
-    case shortlow3  = "Short Low 3/shortlow3.mp3"
-    case shortlow4  = "Short Low 4/shortlow4.mp3"
-    case spaceship = "Space Ship/spaceship.mp3"
+    case batterwakeup = "Better Wake Up/betterwakeup.caf"
+    case bruteforce = "Brute Force/bruteforce.caf"
+    case modernalarm2 = "Modern Alert 2/modern2.caf"
+    case modernalarm = "Modern Alert/modernalarm.caf"
+    case shorthigh1 = "Short High 1/shorthigh1.caf"
+    case shorthigh2 = "Short High 2/shorthigh2.caf"
+    case shorthigh3 = "Short High 3/shorthigh3.caf"
+    case shorthigh4 = "Short High 4/shorthigh4.caf"
+    case shortlow1  = "Short Low 1/shortlow1.caf"
+    case shortlow2  = "Short Low 2/shortlow2.caf"
+    case shortlow3  = "Short Low 3/shortlow3.caf"
+    case shortlow4  = "Short Low 4/shortlow4.caf"
+    case spaceship = "Space Ship/spaceship.caf"
     case xdripalert = "xDrip Alert/xdripalert.aif"
     
     // copied from Spike project https://github.com/SpikeApp/Spike/tree/master/src/assets/sounds
