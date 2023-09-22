@@ -465,7 +465,11 @@ class Texts_SettingsView {
     }()
     
     static let infoCalendarAccessDeniedByUser: String = {
-        return NSLocalizedString("infoCalendarAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it", comment: "If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown")
+        return String(format: NSLocalizedString("infoCalendarAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "You previously denied access to your calendars.\n\nGo to iPhone Settings > %@ > Calendars and enable full access.", comment: "If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
+    }()
+    
+    static let infoCalendarAccessWriteOnly: String = {
+        return String(format: NSLocalizedString("infoCalendarAccessWriteOnly", tableName: filename, bundle: Bundle.main, value: "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > %@ > Calendars and select 'Full Access'.", comment: "The user needs to update their calendar permissions"), ConstantsHomeView.applicationName)
     }()
     
     static let infoCalendarAccessRestricted: String = {
