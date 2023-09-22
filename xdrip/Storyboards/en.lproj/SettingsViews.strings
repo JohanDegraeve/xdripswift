@@ -99,7 +99,8 @@
 "settingsviews_displayTrendInCalendarEvent" = "Display Trend?";
 "displayUnitInCalendarEvent" = "Display Unit?";
 "displayDeltaInCalendarEvent" = "Display Delta?";
-"infoCalendarAccessDeniedByUser" = "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it.";
+"infoCalendarAccessDeniedByUser" = "You previously denied access to your calendars.\n\nGo to iPhone Settings > %@ > Calendars and enable full access.";
+"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > %@ > Calendars and select 'Full Access'.";
 "infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_CalenderIntervalTitle" = "Event Interval";
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
