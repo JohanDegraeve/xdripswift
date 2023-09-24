@@ -9,10 +9,11 @@
 import WatchKit
 import ClockKit
 
-class ExtensionDelegate: NSObject, WKExtensionDelegate {
+@main
+class ExtensionDelegate: NSObject, WKApplicationDelegate {
     
     static func shared() -> ExtensionDelegate {
-        return WKExtension.shared().extensionDelegate
+        return WKApplication.shared().extensionDelegate
     }
     
     func applicationDidFinishLaunching() {
@@ -61,7 +62,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate {
     }
 }
 
-fileprivate extension WKExtension {
+fileprivate extension WKApplication {
     var extensionDelegate: ExtensionDelegate! {
         return delegate as? ExtensionDelegate
     }

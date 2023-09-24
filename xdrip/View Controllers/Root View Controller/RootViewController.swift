@@ -3066,6 +3066,9 @@ final class RootViewController: UIViewController, ObservableObject {
         // set endDate of activeSensor to stopDate
         activeSensor.endDate = stopDate
         
+        // set the userdefaults maxSensorAgeInDays to 0 when stopping a sensor. This should prevent the bug where the countdown from still showing if the user changes to a different CGM type that doesn't use it at the present time (i.e. from Libre to Dexcom)
+        UserDefaults.standard.maxSensorAgeInDays = 0
+        
         // save changes to coreData
         coreDataManager.saveChanges()
         
