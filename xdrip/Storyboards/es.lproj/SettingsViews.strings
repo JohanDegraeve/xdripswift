@@ -87,7 +87,8 @@
 "settingsviews_displayTrendInCalendarEvent" = "Mostrar Tendencia?";
 "displayUnitInCalendarEvent" = "Mostrar Unidad?";
 "displayDeltaInCalendarEvent" = "Mostrar Delta?";
-"infoCalendarAccessDeniedByUser" = "Has denegado previamente permiso para acceder al calendario.\n\nPara habilitarlo de nuevo, ir a Configuración en tu iPhone, Privacidad, Calendarios y habilitarlo.";
+"infoCalendarAccessDeniedByUser" = "Has denegado previamente permiso para acceder al calendario.\n\nIr a Configuración iPhone > %@ > Calendarios y habilitarlo.";
+"infoCalendarAccessWriteOnly" = "No puedes usar Eventos de Calendario hasta que actualices los permisos de 'Sólo agregar eventos' a 'Acceso completo'.\n\nIr a Configuración iPhone > %@ > Calendarios y seleccionar 'Acceso completo'.";
 "infoCalendarAccessRestricted" = "No se puede autorizar a que %@ tenga acceso a tu calendario. Podría ser debido a que restricciones tipo Controles Parentales o similares lo están impidiendo.";
 "sectionTitleTrace" = "Rastrear/Issue Reporting";
 "sendTraceFile" = "Enviar Archivo de Rastreo";

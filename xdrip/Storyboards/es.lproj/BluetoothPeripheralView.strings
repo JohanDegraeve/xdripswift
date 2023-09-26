@@ -30,16 +30,6 @@
 "confirmDisconnectTitle" = "Confirmar Desconexión";
 "confirmDisconnectMessage" = "Haz click en 'Desconectar' para confirmar que deseas desconectar el transmisor.";
 "warmingUpUntil" = "Calentando hasta";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Read from Dexcom app";
-
-/// cell text, sensor start time
-"sensorStartDate" = "Sensor Started";
-
-/// cell text, transmitter start time
-"transmittterStartDate" = "Transmitter Started";
+"useOtherDexcomApp" = "Usar a la vez la app de Dexcom";
+"sensorStartDate" = "Sensor iniciado";
+"transmittterStartDate" = "Transmisor iniciado";
