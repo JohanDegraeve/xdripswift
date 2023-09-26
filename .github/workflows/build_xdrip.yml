@@ -17,7 +17,13 @@ env:
   SYNC_UPSTREAM: 'true' # set to 'false' or 'true' to disable / enable syncing of fork with upstream repository
   
 jobs:
+  validate:
+    name: Validate
+    uses: ./.github/workflows/validate_secrets.yml
+    secrets: inherit
+    
   check_latest_from_upstream:
+    needs: validate
     runs-on: ubuntu-latest
     name: Check upstream
     outputs: 
@@ -67,7 +73,7 @@ jobs:
         time_elapsed: 50 # Time elapsed from the previous commit to trigger a new automated commit (in days)
 
   build:
-    needs: check_latest_from_upstream
+    needs: [validate, check_latest_from_upstream]
     runs-on: macos-13
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '0 04 1 * *' || needs.check_latest_from_upstream.outputs.NEW_COMMITS == 'true' }} # runs if started manually, or if scheduled on the first each month, or if new commits were found
     steps:
