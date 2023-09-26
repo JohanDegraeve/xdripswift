@@ -72,7 +72,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '0 04 1 * *' || needs.check_latest_from_upstream.outputs.NEW_COMMITS == 'true' }} # runs if started manually, or if scheduled on the first each month, or if new commits were found
     steps:
       - name: Select Xcode version
-        run: "sudo xcode-select --switch /Applications/Xcode_14.3.app/Contents/Developer"
+        run: "sudo xcode-select --switch /Applications/Xcode_15.0.app/Contents/Developer"
 
       # Checks-out the repo
       - name: Checkout Repo
