@@ -1,15 +1,17 @@
 name: 3. Create Certificates
-run-name: Create Certificates
+run-name: Create Certificates (${{ github.ref_name }})
 on:
   workflow_dispatch:
 
 jobs:
-  secrets:
+  validate:
+    name: Validate
     uses: ./.github/workflows/validate_secrets.yml
     secrets: inherit
-
+  
   certificates:
-    needs: secrets
+    name: Create Certificates
+    needs: validate
     runs-on: macos-13
     steps:
       # Uncomment to manually select latest Xcode if needed
