@@ -1,15 +1,17 @@
 name: 2. Add Identifiers
-run-name: Add Identifiers
+run-name: Add Identifiers (${{ github.ref_name }})
 on:
   workflow_dispatch:
 
 jobs:
-  secrets:
+  validate:
+    name: Validate
     uses: ./.github/workflows/validate_secrets.yml
     secrets: inherit
-
+  
   identifiers:
-    needs: secrets
+    name: Add Identifiers
+    needs: validate
     runs-on: macos-13
     steps:
       # Uncomment to manually select latest Xcode if needed
@@ -24,9 +26,13 @@ jobs:
       - name: Patch Match Tables
         run: find /usr/local/lib/ruby/gems -name table_printer.rb | xargs sed -i "" "/puts(Terminal::Table.new(params))/d"
         
+      # Install project dependencies
+      - name: Install Project Dependencies
+        run: bundle install
+
       # Create or update identifiers for app
       - name: Fastlane Provision
-        run: fastlane identifiers
+        run: bundle exec fastlane identifiers
         env:
           TEAMID: ${{ secrets.TEAMID }}
           GH_PAT: ${{ secrets.GH_PAT }}

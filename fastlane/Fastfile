@@ -57,8 +57,7 @@ platform :ios do
       app_identifier: [
         "com.#{TEAMID}.xdripswift",
         "com.#{TEAMID}.xdripswift.xDrip4iOS-Widget",
-        "com.#{TEAMID}.xdripswift.watchkitapp",
-        "com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension"
+        "com.#{TEAMID}.xdripswift.watchkitapp"
       ]
     )
 
@@ -97,13 +96,6 @@ platform :ios do
       profile_name: mapping["com.#{TEAMID}.xdripswift.watchkitapp"],
       code_sign_identity: "iPhone Distribution",
       targets: ["Watch App"]
-    )
-
-    update_code_signing_settings(
-      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
-      profile_name: mapping["com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension"],
-      code_sign_identity: "iPhone Distribution",
-      targets: ["Watch App WatchKit Extension"]
     )
     
     gym(
@@ -169,10 +161,6 @@ platform :ios do
       Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS
     ])
     
-    configure_bundle_id("Watch App WatchKit Extension", "com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension", [
-      Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS,
-    ])
-    
     
   end
 
@@ -194,8 +182,7 @@ platform :ios do
       app_identifier: [
         "com.#{TEAMID}.xdripswift",
         "com.#{TEAMID}.xdripswift.xDrip4iOS-Widget",
-        "com.#{TEAMID}.xdripswift.watchkitapp.watchkitextension",
-        "com.#{TEAMID}.xdripswift.watchkitapp",
+        "com.#{TEAMID}.xdripswift.watchkitapp"
       ]
     )
   end
@@ -215,7 +202,13 @@ platform :ios do
       bundle_id = Spaceship::ConnectAPI::BundleId.find(identifier)
     end
 
-    find_bundle_id("com.#{TEAMID}.loopkit.Loop")
+    find_bundle_id("com.#{TEAMID}.xdripswift")
+
+    match(
+      type: "appstore",
+      git_basic_authorization: Base64.strict_encode64("#{GITHUB_REPOSITORY_OWNER}:#{GH_PAT}"),
+      app_identifier: [],
+    )
   end
 
   desc "Nuke Certs"
