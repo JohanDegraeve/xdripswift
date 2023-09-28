@@ -135,7 +135,6 @@ Note 2 - Depending on your build history, you may find some of the Identifiers a
     * xdripswift
     * xdripswift xDrip4iOS-Widget
     * Watch App
-    * Watch App WatchKit Extension
 1. Click on the identifier's name.
 1. On the "App Groups" capabilies, click on the "Configure" button.
 1. Select the "Loop App Group" _(yes, "Loop App Group" is correct)_
