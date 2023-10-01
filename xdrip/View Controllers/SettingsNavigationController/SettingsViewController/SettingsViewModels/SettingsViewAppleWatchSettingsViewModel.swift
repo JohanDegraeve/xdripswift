@@ -169,6 +169,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                 switch EKEventStore.authorizationStatus(for: .event) {
                     
                 case .notDetermined:
+#if swift(>=5.9)
                     if #available(iOS 17.0, *) {
                         // if iOS17 then run the new access request method
                         // https://developer.apple.com/documentation/eventkit/accessing_calendar_using_eventkit_and_eventkitui#4250785
@@ -183,6 +184,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                             }
                         })
                     } else {
+#endif
                         // Fallback on earlier versions as .requestAccess() was deprecated in iOS17 and doesn't work anymore
                         self.eventStore.requestAccess(to: .event, completion:
                                                         {(granted: Bool, error: Error?) -> Void in
@@ -194,7 +196,9 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                                 UserDefaults.standard.createCalendarEvent = true
                             }
                         })
+#if swift(>=5.9)
                     }
+#endif
                     
                 case .restricted:
                     // authorize not possible, according to apple doc "possibly due to active restrictions such as parental controls being in place", no need to change value of UserDefaults.standard.createCalendarEvent
