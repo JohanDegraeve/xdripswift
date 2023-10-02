@@ -169,7 +169,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                 switch EKEventStore.authorizationStatus(for: .event) {
                     
                 case .notDetermined:
-#if swift(>=5.3)
+#if swift(>=5.9)
                     // the user is building with Xcode 15 so may be building to >=iOS17 (with the new EventKit calendar access methods), or to <=iOS16 or earlier so we must use the old methods
                     if #available(iOS 17.0, *) {
                         // if >=iOS17 then run the new access request method
