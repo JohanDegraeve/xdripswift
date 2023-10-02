@@ -101,12 +101,17 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                 // by clicking row, show what it means to be restricted, according to Apple doc
                 return UITableViewCell.AccessoryType.disclosureIndicator
                 
+            case .authorized:
+                return UITableViewCell.AccessoryType.none
+                
+#if swift(>=5.9)
             case .writeOnly:
                 // by clicking row, show that the permission is restricted to Add Events Only instead of Full Access
                 return UITableViewCell.AccessoryType.disclosureIndicator
                 
-            case .authorized, .fullAccess:
+            case .fullAccess:
                 return UITableViewCell.AccessoryType.none
+#endif
                 
             @unknown default:
                 trace("in SettingsViewAppleWatchSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
