@@ -169,9 +169,10 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                 switch EKEventStore.authorizationStatus(for: .event) {
                     
                 case .notDetermined:
-#if swift(>=5.9)
+#if swift(>=5.3)
+                    // the user is building with Xcode 15 so may be building to >=iOS17 (with the new EventKit calendar access methods), or to <=iOS16 or earlier so we must use the old methods
                     if #available(iOS 17.0, *) {
-                        // if iOS17 then run the new access request method
+                        // if >=iOS17 then run the new access request method
                         // https://developer.apple.com/documentation/eventkit/accessing_calendar_using_eventkit_and_eventkitui#4250785
                         self.eventStore.requestFullAccessToEvents(completion:
                                                                     {(granted: Bool, error: Error?) -> Void in
@@ -184,8 +185,8 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                             }
                         })
                     } else {
-#endif
-                        // Fallback on earlier versions as .requestAccess() was deprecated in iOS17 and doesn't work anymore
+                        
+                        // Fallback on earlier versions as .requestAccess() was deprecated in iOS17 and doesn't work anymore. We can still use it with <=iOS16
                         self.eventStore.requestAccess(to: .event, completion:
                                                         {(granted: Bool, error: Error?) -> Void in
                             if !granted {
@@ -196,8 +197,20 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                                 UserDefaults.standard.createCalendarEvent = true
                             }
                         })
-#if swift(>=5.9)
+                        
                     }
+#else
+                    // so here we are still using <= Xcode14 or earlier so we can assume the user is also using <= iOS16 and must use the old methods
+                    self.eventStore.requestAccess(to: .event, completion:
+                                                    {(granted: Bool, error: Error?) -> Void in
+                        if !granted {
+                            trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access not granted", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                            UserDefaults.standard.createCalendarEvent = false
+                        } else {
+                            trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access granted", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                            UserDefaults.standard.createCalendarEvent = true
+                        }
+                    })
 #endif
                     
                 case .restricted:
