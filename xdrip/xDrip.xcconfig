@@ -4,10 +4,10 @@
 //
 //
 
-MAIN_APP_BUNDLE_IDENTIFIER = com.$(DEVELOPMENT_TEAM).xdripswift
+MAIN_APP_BUNDLE_IDENTIFIER = com.$(DEVELOPMENT_TEAM).xdripswift_v2
 
 // Application name [DEFAULT]
-MAIN_APP_DISPLAY_NAME = xDrip4iO5
+MAIN_APP_DISPLAY_NAME = xDrip4iO5v2
 
 // Entitlements [DEFAULT]
 XDRIP_ENTITLEMENTS_RELEASE = xdrip/xDrip.entitlements
