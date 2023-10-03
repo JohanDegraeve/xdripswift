@@ -101,12 +101,17 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                 // by clicking row, show what it means to be restricted, according to Apple doc
                 return UITableViewCell.AccessoryType.disclosureIndicator
                 
+            case .authorized:
+                return UITableViewCell.AccessoryType.none
+                
+#if swift(>=5.9)
             case .writeOnly:
                 // by clicking row, show that the permission is restricted to Add Events Only instead of Full Access
                 return UITableViewCell.AccessoryType.disclosureIndicator
                 
-            case .authorized, .fullAccess:
+            case .fullAccess:
                 return UITableViewCell.AccessoryType.none
+#endif
                 
             @unknown default:
                 trace("in SettingsViewAppleWatchSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
@@ -169,8 +174,10 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                 switch EKEventStore.authorizationStatus(for: .event) {
                     
                 case .notDetermined:
+#if swift(>=5.9)
+                    // the user is building with Xcode 15 so may be building to >=iOS17 (with the new EventKit calendar access methods), or to <=iOS16 or earlier so we must use the old methods
                     if #available(iOS 17.0, *) {
-                        // if iOS17 then run the new access request method
+                        // if >=iOS17 then run the new access request method
                         // https://developer.apple.com/documentation/eventkit/accessing_calendar_using_eventkit_and_eventkitui#4250785
                         self.eventStore.requestFullAccessToEvents(completion:
                                                                     {(granted: Bool, error: Error?) -> Void in
@@ -183,7 +190,8 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                             }
                         })
                     } else {
-                        // Fallback on earlier versions as .requestAccess() was deprecated in iOS17 and doesn't work anymore
+                        
+                        // Fallback on earlier versions as .requestAccess() was deprecated in iOS17 and doesn't work anymore. We can still use it with <=iOS16
                         self.eventStore.requestAccess(to: .event, completion:
                                                         {(granted: Bool, error: Error?) -> Void in
                             if !granted {
@@ -194,7 +202,21 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                                 UserDefaults.standard.createCalendarEvent = true
                             }
                         })
+                        
                     }
+#else
+                    // so here we are still using <= Xcode14 or earlier so we can assume the user is also using <= iOS16 and must use the old methods
+                    self.eventStore.requestAccess(to: .event, completion:
+                                                    {(granted: Bool, error: Error?) -> Void in
+                        if !granted {
+                            trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access not granted", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                            UserDefaults.standard.createCalendarEvent = false
+                        } else {
+                            trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access granted", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                            UserDefaults.standard.createCalendarEvent = true
+                        }
+                    })
+#endif
                     
                 case .restricted:
                     // authorize not possible, according to apple doc "possibly due to active restrictions such as parental controls being in place", no need to change value of UserDefaults.standard.createCalendarEvent
@@ -202,22 +224,29 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                     trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.createCalendarEvent = false
                     
+#if swift(>=5.9)
                 case .writeOnly:
                     // Full Access permission has not been granted to the app so we won't be able to delete old BG events, no need to change value of UserDefaults.standard.createCalendarEvent
                     trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access is 'Write Only', the user must update this to 'Full Access'", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.createCalendarEvent = false
-
+                    
+                case .fullAccess:
+                    // fullAccess is granted, no need to change value of UserDefaults.standard.createCalendarEvent
+                    trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access authorized", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    UserDefaults.standard.createCalendarEvent = true
+#endif
+                    
                 case .denied:
                     // access denied by user, need to change value of UserDefaults.standard.createCalendarEvent
                     // we will probably never come here because if it's denied, the uiview is not shown
                     trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access denied by user", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.createCalendarEvent = false
 
-                case .authorized, .fullAccess:
-                    // authorize successful (or fullAccess is granted), no need to change value of UserDefaults.standard.createCalendarEvent
+                case .authorized:
+                    // authorize successful, no need to change value of UserDefaults.standard.createCalendarEvent
                     trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access authorized", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.createCalendarEvent = true
-
+                    
                 @unknown default:
                     trace("in SettingsViewAppleWatchSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     
@@ -287,17 +316,23 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                 // by clicking row, show info how to authorized
                 return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoCalendarAccessDeniedByUser)
                 
-            case .notDetermined, .authorized, .fullAccess:
-                // if notDetermined, fullAccess or authorized, the uiview is shown, and app should only react on clicking the uiview, not the row
+            case .notDetermined, .authorized:
+                // if notDetermined or authorized, the uiview is shown, and app should only react on clicking the uiview, not the row
                 break
                 
             case .restricted:
                 // by clicking row, show what it means to be restricted, according to Apple doc
                 return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoCalendarAccessRestricted)
                 
+#if swift(>=5.9)
             case .writeOnly:
                 // by clicking row, show how to update the permissions
                 return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoCalendarAccessWriteOnly)
+                
+            case .fullAccess:
+                // if fullAccess, the uiview is shown, and app should only react on clicking the uiview, not the row
+                break
+#endif
                 
             @unknown default:
                 trace("in SettingsViewAppleWatchSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
