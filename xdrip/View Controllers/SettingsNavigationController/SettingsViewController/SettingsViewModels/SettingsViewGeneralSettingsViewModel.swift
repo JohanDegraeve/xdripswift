@@ -5,34 +5,23 @@ fileprivate enum Setting:Int, CaseIterable {
     /// blood glucose  unit
     case bloodGlucoseUnit = 0
     
-    /// choose between master and follower
-    case masterFollower = 1
-    
     /// should reading be shown in notification
-    case showReadingInNotification = 2
+    case showReadingInNotification = 1
     
     /// - minimum time between two readings, for which notification should be created (in minutes)
     /// - except if there's been a disconnect, in that case this value is not taken into account
-    case notificationInterval = 3
+    case notificationInterval = 2
     
     /// show reading in app badge
-    case showReadingInAppBadge = 4
+    case showReadingInAppBadge = 3
     
     /// if reading is shown in app badge, should value be multiplied with 10 yes or no
-    case multipleAppBadgeValueWith10 = 5
+    case multipleAppBadgeValueWith10 = 4
     
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
 class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
-    
-    private var coreDataManager: CoreDataManager?
-    
-    init(coreDataManager: CoreDataManager?) {
-        
-        self.coreDataManager = coreDataManager
-        
-    }
     
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
@@ -46,7 +35,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         
         // changing follower to master or master to follower requires changing ui for nightscout settings and transmitter type settings
         // the same applies when changing bloodGlucoseUnit, because off the seperate section with bgObjectives
-        if (index == Setting.masterFollower.rawValue || index == Setting.bloodGlucoseUnit.rawValue) {return true}
+        if (index == Setting.bloodGlucoseUnit.rawValue) {return true}
         
         return false
     }
@@ -66,51 +55,6 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
                 UserDefaults.standard.bloodGlucoseUnitIsMgDl ? (UserDefaults.standard.bloodGlucoseUnitIsMgDl = false) : (UserDefaults.standard.bloodGlucoseUnitIsMgDl = true)
                 
             })
-
-        case .masterFollower:
-            
-            // switching from master to follower will set cgm transmitter to nil and stop the sensor. If there's a sensor active then it's better to ask for a confirmation, if not then do the change without asking confirmation
-
-            if UserDefaults.standard.isMaster {
-                
-                if let coreDataManager = coreDataManager {
-                    
-                    if SensorsAccessor(coreDataManager: coreDataManager).fetchActiveSensor() != nil {
-
-                        return .askConfirmation(title: Texts_Common.warning, message: Texts_SettingsView.warningChangeFromMasterToFollower, actionHandler: {
-                            
-                            UserDefaults.standard.isMaster = false
-                            
-                        }, cancelHandler: nil)
-
-                    } else {
-                        
-                        // no sensor active
-                        // set to follower
-                        return SettingsSelectedRowAction.callFunction(function: {
-                            UserDefaults.standard.isMaster = false
-                        })
-                        
-                    }
-                    
-                } else {
-                    
-                    // coredata manager is nil, should normally not be the case
-                    return SettingsSelectedRowAction.callFunction(function: {
-                        UserDefaults.standard.isMaster = false
-                    })
-
-                }
-                
-                
-            } else {
-                
-                // switching from follower to master
-                return SettingsSelectedRowAction.callFunction(function: {
-                    UserDefaults.standard.isMaster = true
-                })
-
-            }
             
         case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return SettingsSelectedRowAction.nothing
@@ -146,9 +90,6 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         case .bloodGlucoseUnit:
             return Texts_SettingsView.labelSelectBgUnit
             
-        case .masterFollower:
-            return Texts_SettingsView.labelMasterOrFollower
-            
         case .showReadingInNotification:
             return Texts_SettingsView.showReadingInNotification
             
@@ -171,9 +112,6 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
             
         case .bloodGlucoseUnit:
             return UITableViewCell.AccessoryType.none
-    
-        case .masterFollower:
-            return UITableViewCell.AccessoryType.none
             
         case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return UITableViewCell.AccessoryType.none
@@ -191,9 +129,6 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
             
         case .bloodGlucoseUnit:
             return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl:Texts_Common.mmol
-            
-        case .masterFollower:
-            return UserDefaults.standard.isMaster ? Texts_SettingsView.master:Texts_SettingsView.follower
             
         case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return nil
@@ -221,7 +156,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
             return UISwitch(isOn: UserDefaults.standard.multipleAppBadgeValueWith10, action: {(isOn:Bool) in UserDefaults.standard.multipleAppBadgeValueWith10 = isOn})
 
-        case .bloodGlucoseUnit, .masterFollower:
+        case .bloodGlucoseUnit:
             return nil
             
         case .notificationInterval:

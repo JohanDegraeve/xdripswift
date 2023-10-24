@@ -28,10 +28,10 @@ fileprivate enum Setting:Int, CaseIterable {
 
 }
 
-class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
+class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
     
     /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewAppleWatchSettingsViewModel)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel)
     
     /// used for requesting authorization to access calendar
     let eventStore = EKEventStore()
@@ -114,7 +114,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
 #endif
                 
             @unknown default:
-                trace("in SettingsViewAppleWatchSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                trace("in SettingsViewCalendarEventsSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                 return UITableViewCell.AccessoryType.none
                 
             }
@@ -182,10 +182,10 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                         self.eventStore.requestFullAccessToEvents(completion:
                                                                     {(granted: Bool, error: Error?) -> Void in
                             if !granted {
-                                trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access not granted", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                                trace("in SettingsViewCalendarEventsSettingsViewModel, EKEventStore access not granted", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                                 UserDefaults.standard.createCalendarEvent = false
                             } else {
-                                trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access granted", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                                trace("in SettingsViewCalendarEventsSettingsViewModel, EKEventStore access granted", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                                 UserDefaults.standard.createCalendarEvent = true
                             }
                         })
@@ -221,7 +221,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                 case .restricted:
                     // authorize not possible, according to apple doc "possibly due to active restrictions such as parental controls being in place", no need to change value of UserDefaults.standard.createCalendarEvent
                     // we will probably never come here because if it's restricted, the uiview is not shown
-                    trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    trace("in SettingsViewCalendarEventsSettingsViewModel, EKEventStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.createCalendarEvent = false
                     
 #if swift(>=5.9)
@@ -239,7 +239,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                 case .denied:
                     // access denied by user, need to change value of UserDefaults.standard.createCalendarEvent
                     // we will probably never come here because if it's denied, the uiview is not shown
-                    trace("in SettingsViewAppleWatchSettingsViewModel, EKEventStore access denied by user", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    trace("in SettingsViewCalendarEventsSettingsViewModel, EKEventStore access denied by user", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.createCalendarEvent = false
 
                 case .authorized:
@@ -248,7 +248,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
                     UserDefaults.standard.createCalendarEvent = true
                     
                 @unknown default:
-                    trace("in SettingsViewAppleWatchSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    trace("in SettingsViewCalendarEventsSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     
                 }
                 
@@ -335,7 +335,7 @@ class SettingsViewAppleWatchSettingsViewModel: SettingsViewModelProtocol {
 #endif
                 
             @unknown default:
-                trace("in SettingsViewAppleWatchSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                trace("in SettingsViewCalendarEventsSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                 
             }
 

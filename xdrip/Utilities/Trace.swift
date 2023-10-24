@@ -383,7 +383,32 @@ class Trace {
         traceInfo.appendStringAndNewLine("App settings:")
 
         // master or follower mode?
-        traceInfo.appendStringAndNewLine("    Mode: " + (UserDefaults.standard.isMaster ? "Master" : "Follower"))
+        traceInfo.appendStringAndNewLine("    Mode: " + (UserDefaults.standard.isMaster ? "Master" : UserDefaults.standard.followerDataSourceType.descriptionForLogging()))
+        
+        // if follower mode, what is the data source selected
+        if UserDefaults.standard.followerDataSourceType == .libreLinkUp {
+            
+            if UserDefaults.standard.libreLinkUpEmail != nil {
+                
+                traceInfo.appendStringAndNewLine("       Username: Present")
+                
+            } else {
+                
+                traceInfo.appendStringAndNewLine("       Username: Missing")
+                
+            }
+            
+            if UserDefaults.standard.libreLinkUpPassword != nil {
+                
+                traceInfo.appendStringAndNewLine("       Password: Present")
+                
+            } else {
+                
+                traceInfo.appendStringAndNewLine("       Password: Missing")
+                
+            }
+            
+        }
 
         // is help icon hidden on or off
         traceInfo.appendStringAndNewLine("    Show help icon: " + UserDefaults.standard.showHelpIcon.description)

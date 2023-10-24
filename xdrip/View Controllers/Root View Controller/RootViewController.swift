@@ -395,37 +395,40 @@ final class RootViewController: UIViewController, ObservableObject {
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryRootView)
     
     /// coreDataManager to be used throughout the project
-    private var coreDataManager:CoreDataManager?
+    private var coreDataManager: CoreDataManager?
     
     /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
-    private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
+    private let keyValueObserverTimeKeeper: KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     
     /// calibrator to be used for calibration, value will depend on transmitter type
-    private var calibrator:Calibrator?
+    private var calibrator: Calibrator?
     
     /// BgReadingsAccessor instance
-    private var bgReadingsAccessor:BgReadingsAccessor?
+    private var bgReadingsAccessor: BgReadingsAccessor?
     
     /// CalibrationsAccessor instance
-    private var calibrationsAccessor:CalibrationsAccessor?
+    private var calibrationsAccessor: CalibrationsAccessor?
 	
     /// NightScoutUploadManager instance
-    private var nightScoutUploadManager:NightScoutUploadManager?
+    private var nightScoutUploadManager: NightScoutUploadManager?
     
     /// AlerManager instance
-    private var alertManager:AlertManager?
+    private var alertManager: AlertManager?
     
     /// LoopManager instance
-    private var loopManager:LoopManager?
+    private var loopManager: LoopManager?
     
     /// SoundPlayer instance
-    private var soundPlayer:SoundPlayer?
+    private var soundPlayer: SoundPlayer?
     
     /// nightScoutFollowManager instance
-    private var nightScoutFollowManager:NightScoutFollowManager?
+    private var nightScoutFollowManager: NightScoutFollowManager?
+    
+    /// libreLinkUpFollowManager instance
+    private var libreLinkUpFollowManager: LibreLinkUpFollowManager?
     
     /// dexcomShareUploadManager instance
-    private var dexcomShareUploadManager:DexcomShareUploadManager?
+    private var dexcomShareUploadManager: DexcomShareUploadManager?
     
     /// WatchManager instance
     private var watchManager: WatchManager?
@@ -945,7 +948,10 @@ final class RootViewController: UIViewController, ObservableObject {
         guard let soundPlayer = soundPlayer else { fatalError("In setupApplicationData, this looks very in appropriate, shame")}
         
         // setup nightscoutmanager
-        nightScoutFollowManager = NightScoutFollowManager(coreDataManager: coreDataManager, nightScoutFollowerDelegate: self)
+        nightScoutFollowManager = NightScoutFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+        
+        // setup nightscoutmanager
+        libreLinkUpFollowManager = LibreLinkUpFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
         
         // setup healthkitmanager
         healthKitManager = HealthKitManager(coreDataManager: coreDataManager)
@@ -3304,15 +3310,17 @@ extension RootViewController: UNUserNotificationCenterDelegate {
     }
 }
 
-// MARK: - conform to NightScoutFollowerDelegate protocol
+// MARK: - conform to FollowerDelegate protocol
 
-extension RootViewController:NightScoutFollowerDelegate {
+extension RootViewController: FollowerDelegate {
     
-    func nightScoutFollowerInfoReceived(followGlucoseDataArray: inout [NightScoutBgReading]) {
+    func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) {
         
-        if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor, let nightScoutFollowManager = nightScoutFollowManager {
+        if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor { //}, let followManager = (UserDefaults.standard.followerDataSourceType == .nightscout ? self.nightScoutFollowManager : self.libreLinkUpFollowManager) {
             
-            trace("nightScoutFollowerInfoReceived", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+            
+            trace("followerInfoReceived", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
 
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
@@ -3331,15 +3339,30 @@ extension RootViewController:NightScoutFollowerDelegate {
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for (_, followGlucoseData) in followGlucoseDataArray.enumerated().reversed() {
-
-                trace("    followGlucoseData timestamp = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
                 
                 if followGlucoseData.timeStamp > timeStampLastBgReading {
                     
-                    trace("    creating new bgreading timestamp = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
+                    trace("    creating new bgreading: value = %{public}@ %{public}@, timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info,  followGlucoseData.sgv.mgdlToMmol(mgdl: isMgDl).bgValuetoString(mgdl: isMgDl), isMgDl ? Texts_Common.mgdl : Texts_Common.mmol, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
                     
-                    // creata a new reading
-                    _ = nightScoutFollowManager.createBgReading(followGlucoseData: followGlucoseData)
+                    print("New BG reading retrieved: " + followGlucoseData.sgv.mgdlToMmol(mgdl: isMgDl).bgValuetoString(mgdl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol) + ", " + followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
+                    
+                    // create a new reading
+                    // we'll need to check which should be the active followerManager to know where to call the function
+                    switch UserDefaults.standard.followerDataSourceType {
+                        
+                    case .nightscout:
+                        
+                        if let followManager = nightScoutFollowManager {
+                            _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
+                        }
+                        
+                    case .libreLinkUp:
+                        
+                            if let followManager = libreLinkUpFollowManager {
+                                _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
+                            }
+                        
+                    }
                     
                     // a new reading was created
                     newReadingCreated = true
@@ -3352,7 +3375,7 @@ extension RootViewController:NightScoutFollowerDelegate {
             
             if newReadingCreated {
                 
-                trace("    new reading(s) received", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                trace("    new reading(s) successfully created", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                 
                 // save in core data
                 coreDataManager.saveChanges()
@@ -3368,6 +3391,13 @@ extension RootViewController:NightScoutFollowerDelegate {
                 
                 // update sensor countdown
                 updateSensorCountdown()
+                
+                // if we're downloading follower data from something other
+                // than Nightscout, then let's upload it to Nightscout
+                // (this will only happen if we're not following Nightscout
+                // and if the user has requested to upload follower BG values
+                // to Nightscout
+                nightScoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 // check alerts, create notification, set app badge
                 checkAlertsCreateNotificationAndSetAppBadge()
@@ -3397,6 +3427,8 @@ extension RootViewController:NightScoutFollowerDelegate {
     }
 }
 
+// MARK: - conform to UIGestureRecognizerDelegate protocol
+
 extension RootViewController: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -3415,7 +3447,9 @@ extension RootViewController: UIGestureRecognizerDelegate {
     
 }
 
-// WCSession delegate functions
+
+// MARK: - conform to WCSessionDelegate protocol
+
 extension RootViewController: WCSessionDelegate {
     
     func sessionDidBecomeInactive(_ session: WCSession) {

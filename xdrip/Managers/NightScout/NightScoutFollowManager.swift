@@ -26,7 +26,7 @@ class NightScoutFollowManager: NSObject {
     private var bgReadingsAccessor: BgReadingsAccessor
     
     /// delegate to pass back glucosedata
-    private (set) weak var nightScoutFollowerDelegate: NightScoutFollowerDelegate?
+    private (set) weak var followerDelegate: FollowerDelegate?
     
     /// AVAudioPlayer to use
     private var audioPlayer: AVAudioPlayer?
@@ -46,7 +46,7 @@ class NightScoutFollowManager: NSObject {
     // MARK: - initializer
     
     /// initializer
-    public init(coreDataManager: CoreDataManager, nightScoutFollowerDelegate: NightScoutFollowerDelegate) {
+    public init(coreDataManager: CoreDataManager, followerDelegate: FollowerDelegate) {
         
         // initialize nextFollowDownloadTimeStamp to now, which is at the moment FollowManager is instantiated
         nextFollowDownloadTimeStamp = Date()
@@ -54,7 +54,7 @@ class NightScoutFollowManager: NSObject {
         // initialize non optional private properties
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
-        self.nightScoutFollowerDelegate = nightScoutFollowerDelegate
+        self.followerDelegate = followerDelegate
         
         // set up audioplayer
         if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "")  {
@@ -77,6 +77,8 @@ class NightScoutFollowManager: NSObject {
         
         // changing from follower to master or vice versa also requires ... attention
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
+        // changing the follower data source
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue, options: .new, context: nil)
         // setting nightscout url also does require action
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new, context: nil)
         // setting nightscout API_SECRET also does require action
@@ -96,7 +98,7 @@ class NightScoutFollowManager: NSObject {
     ///     - followGlucoseData : glucose data from which new BgReading needs to be created
     /// - returns:
     ///     - BgReading : the new reading, not saved in the coredata
-    public func createBgReading(followGlucoseData:NightScoutBgReading) -> BgReading {
+    public func createBgReading(followGlucoseData: FollowerBgReading) -> BgReading {
         // for dev : creation of BgReading is done in seperate static function. This allows to do the BgReading creation in other place, as is done also for readings received from a transmitter.
         
         // create new bgReading
@@ -183,7 +185,7 @@ class NightScoutFollowManager: NSObject {
                 trace("in download, finished task", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
                 
                 // get array of FollowGlucoseData from json
-                var followGlucoseDataArray = [NightScoutBgReading]()
+                var followGlucoseDataArray = [FollowerBgReading]()
                 self.processDownloadResponse(data: data, urlResponse: response, error: error, followGlucoseDataArray: &followGlucoseDataArray)
                 
                 trace("    finished download,  %{public}@ readings", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info, followGlucoseDataArray.count.description)
@@ -191,9 +193,9 @@ class NightScoutFollowManager: NSObject {
                 // call to delegate and rescheduling the timer must be done in main thread;
                 DispatchQueue.main.sync {
                     
-                    // call delegate nightScoutFollowerInfoReceived which will process the new readings
-                    if let nightScoutFollowerDelegate = self.nightScoutFollowerDelegate {
-                        nightScoutFollowerDelegate.nightScoutFollowerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
+                    // call delegate followerInfoReceived which will process the new readings
+                    if let followerDelegate = self.followerDelegate {
+                        followerDelegate.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
                     }
 
                     // schedule new download
@@ -231,7 +233,7 @@ class NightScoutFollowManager: NSObject {
     ///     - error : error as result from dataTask
     ///     - followGlucoseData : array input by caller, result will be in that array. Can be empty array. Array must be initialized to empty array by caller
     /// - returns: FollowGlucoseData , possibly empty - first entry is the youngest
-    private func processDownloadResponse(data:Data?, urlResponse:URLResponse?, error:Error?, followGlucoseDataArray:inout [NightScoutBgReading] ) {
+    private func processDownloadResponse(data:Data?, urlResponse:URLResponse?, error:Error?, followGlucoseDataArray:inout [FollowerBgReading] ) {
         
         // log info
         trace("in processDownloadResponse", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
@@ -264,7 +266,7 @@ class NightScoutFollowManager: NSObject {
                             for entry in array {
 
                                 if let entry = entry as? [String:Any] {
-                                    if let followGlucoseData = NightScoutBgReading(json: entry) {
+                                    if let followGlucoseData = FollowerBgReading(json: entry) {
                                         
                                         // insert entry chronologically sorted, first is the youngest
                                         if followGlucoseDataArray.count == 0 {
@@ -359,7 +361,8 @@ class NightScoutFollowManager: NSObject {
     
     /// verifies values of applicable UserDefaults and either starts or stops follower mode, inclusive call to enableSuspensionPrevention or disableSuspensionPrevention - also first download is started if applicable
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
-        if !UserDefaults.standard.isMaster && UserDefaults.standard.nightScoutUrl != nil && UserDefaults.standard.nightScoutEnabled {
+        
+        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightScoutUrl != nil && UserDefaults.standard.nightScoutEnabled {
             
             // this will enable the suspension prevention sound playing
             enableSuspensionPrevention()
@@ -389,7 +392,7 @@ class NightScoutFollowManager: NSObject {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.isMaster, UserDefaults.Key.nightScoutUrl, UserDefaults.Key.nightScoutEnabled, UserDefaults.Key.nightScoutAPIKey, UserDefaults.Key.nightscoutToken :
+                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.nightScoutUrl, UserDefaults.Key.nightScoutEnabled, UserDefaults.Key.nightScoutAPIKey, UserDefaults.Key.nightscoutToken :
                     
                     // change by user, should not be done within 200 ms
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {

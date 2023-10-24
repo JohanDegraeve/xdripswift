@@ -30,7 +30,11 @@ class Texts_Common {
     }()
     
     static let password = {
-        return NSLocalizedString("common_password", tableName: filename, bundle: Bundle.main, value: "Password:", comment: "literally password")
+        return NSLocalizedString("common_password", tableName: filename, bundle: Bundle.main, value: "Password", comment: "literally password")
+    }()
+    
+    static let username = {
+        return NSLocalizedString("common_username", tableName: filename, bundle: Bundle.main, value: "Username", comment: "literally username")
     }()
     
     static let default0 = {

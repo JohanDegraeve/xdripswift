@@ -32,6 +32,52 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_restartNeeded", tableName: filename, bundle: Bundle.main, value: "(Restart required)", comment: "help settings, restart needed")
     }()
     
+    // MARK: - Section Data Source
+    
+    static let sectionTitleDataSource: String = {
+        return NSLocalizedString("settingsviews_sectionTitleDataSource", tableName: filename, bundle: Bundle.main, value: "Data Source", comment: "data source settings, section title")
+    }()
+    
+    static let labelMasterOrFollower: String = {
+        return NSLocalizedString("settingsviews_masterorfollower", tableName: filename, bundle: Bundle.main, value: "Use as Master or Follower?", comment: "data source settings, master or follower")
+    }()
+    
+    static let labelFollowerDataSourceType: String = {
+        return NSLocalizedString("settingsviews_labelFollowerDataSourceType", tableName: filename, bundle: Bundle.main, value: "Follower Data Source", comment: "data source settings, data source")
+    }()
+    
+    static let labelUploadFollowerDataToNightscout: String = {
+        return NSLocalizedString("settingsviews_labelUploadFollowerDataToNightscout", tableName: filename, bundle: Bundle.main, value: "Upload to Nightscout?", comment: "data source settings, enable Nightscout upload")
+    }()
+    
+    static let nightscoutNotEnabled: String = {
+        return NSLocalizedString("settingsviews_nightscoutNotEnabled", tableName: filename, bundle: Bundle.main, value: "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.", comment: "data source settings, enable Nightscout in the Nightscout section")
+    }()
+    
+    static let nightscoutNotEnabledRowText: String = {
+        return NSLocalizedString("settingsviews_nightscoutNotEnabledRowText", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "data source settings, show that Nightscout is disabled")
+    }()
+    
+    static let labelFollowerDataSourceRegion: String = {
+        return NSLocalizedString("settingsviews_labelFollowerDataSourceRegion", tableName: filename, bundle: Bundle.main, value: "Region", comment: "data source settings, data source region")
+    }()
+    
+    static let enterUsername = {
+        return NSLocalizedString("settingsviews_enterUsername", tableName: filename, bundle: Bundle.main, value: "Enter your username (e-mail)", comment: "follower settings, pop up that asks user to enter their username")
+    }()
+    
+    static let enterPassword = {
+        return NSLocalizedString("settingsviews_enterPassword", tableName: filename, bundle: Bundle.main, value: "Enter your password", comment: "follower settings, pop up that asks user to enter their password")
+    }()
+    
+    static let libreLinkUpReAcceptNeeded = {
+        return NSLocalizedString("settingsviews_libreLinkUpReAcceptNeeded", tableName: filename, bundle: Bundle.main, value: "Need to accept terms", comment: "libre link up follower settings, pop up that asks user to enter their region")
+    }()
+    
+    static let libreLinkUpNoActiveSensor = {
+        return NSLocalizedString("settingsviews_libreLinkUpNoActiveSensor", tableName: filename, bundle: Bundle.main, value: "No active sensor", comment: "libre link up follower settings, no active sensor")
+    }()
+    
     // MARK: - Section General
     
     static let sectionTitleGeneral: String = {
@@ -40,10 +86,6 @@ class Texts_SettingsView {
 
     static let labelSelectBgUnit:String = {
         return NSLocalizedString("settingsviews_selectbgunit", tableName: filename, bundle: Bundle.main, value: "Blood Glucose Units:", comment: "for text in pop up where user can select bg unit")
-    }()
-    
-    static let labelMasterOrFollower: String = {
-        return NSLocalizedString("settingsviews_masterorfollower", tableName: filename, bundle: Bundle.main, value: "Use as Master or Follower?", comment: "general settings, master or follower")
     }()
     
     static let master: String = {
@@ -582,11 +624,19 @@ class Texts_SettingsView {
     }()
 
     static let nsLog: String = {
-        return NSLocalizedString("nslog", tableName: filename, bundle: Bundle.main, value: "NSLog", comment: "deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog")
+        return NSLocalizedString("nslog", tableName: filename, bundle: Bundle.main, value: "NSLog", comment: "developer settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog")
     }()
     
     static let osLog: String = {
-        return NSLocalizedString("oslog", tableName: filename, bundle: Bundle.main, value: "OSLog", comment: "deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog")
+        return NSLocalizedString("oslog", tableName: filename, bundle: Bundle.main, value: "OSLog", comment: "developer settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog")
+    }()
+    
+    static let libreLinkUpVersion: String = {
+        return NSLocalizedString("libreLinkUpVersion", tableName: filename, bundle: Bundle.main, value: "LibreLinkUp version", comment: "developer settings, libre link up version number")
+    }()
+    
+    static let libreLinkUpVersionMessage = {
+        return String(format: NSLocalizedString("libreLinkUpVersionMessage", tableName: filename, bundle: Bundle.main, value: "\nSetting this value incorrectly could result in your LibreLinkUp account being locked.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the libre link up version"), ConstantsLibreLinkUp.libreLinkUpVersionDefault)        
     }()
     
     // MARK: - Section Housekeeper
