@@ -59,7 +59,7 @@ class Texts_SettingsView {
     }()
     
     static let labelFollowerDataSourceRegion: String = {
-        return NSLocalizedString("settingsviews_labelFollowerDataSourceRegion", tableName: filename, bundle: Bundle.main, value: "Region", comment: "data source settings, data source region")
+        return NSLocalizedString("settingsviews_labelFollowerDataSourceRegion", tableName: filename, bundle: Bundle.main, value: "Server (Country)", comment: "data source settings, data source region")
     }()
     
     static let enterUsername = {
