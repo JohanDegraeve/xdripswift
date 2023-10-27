@@ -1644,13 +1644,6 @@
 			path = "Watch App WatchKit Extension";
 			sourceTree = "<group>";
 		};
-		47DB06C72A6FCBB500267BE3 /* DataSource */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = DataSource;
-			sourceTree = "<group>";
-		};
 		47DB06CC2A7013EF00267BE3 /* Followers */ = {
 			isa = PBXGroup;
 			children = (
@@ -2098,7 +2091,6 @@
 				F8297F42238DC4AC00D74D66 /* BluetoothPeripheral */,
 				F8BECB03235CE5970060DAE1 /* Charts */,
 				F821CF4D229BF43A005C1E43 /* CoreData */,
-				47DB06C72A6FCBB500267BE3 /* DataSource */,
 				F81D6D4622BD5F43005EFAE2 /* DexcomShare */,
 				47DB06CC2A7013EF00267BE3 /* Followers */,
 				F821CF9122ADB064005C1E43 /* HealthKit */,
