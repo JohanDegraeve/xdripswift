@@ -48,7 +48,7 @@ class LibreLinkUpFollowManager: NSObject {
     /// closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure:(() -> Void)?
     
-    // timer for playsound
+    /// timer for playsound
     private var playSoundTimer:RepeatingTimer?
     
     /// http header array - need to append "version" key before making request
@@ -62,19 +62,22 @@ class LibreLinkUpFollowManager: NSObject {
         "Cache-Control": "no-cache",
     ]
     
+    /// keeps track of the api region in order to generate the correct URL
     private var libreLinkUpRegion: LibreLinkUpRegion?
     
-    // Login auth ticket
+    /// login auth ticket string
     private var libreLinkUpToken: String?
+    
+    /// login auth ticket expiry date as double
     private var libreLinkUpExpires: Double?
     
-    // User ID used to get connections (list of patient IDs)
+    /// User ID used to get connections (list of patient IDs)
     private var libreLinkUpId: String?
     
-    // Patient ID used to get graph data
+    /// Patient ID used to get graph data
     private var libreLinkUpPatientId: String?
     
-    // set a dateFormatter to correctly decode the received timestamps into UTC
+    /// dateFormatter to correctly decode the received timestamps into UTC
     private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -83,6 +86,7 @@ class LibreLinkUpFollowManager: NSObject {
         return formatter
     }()
     
+    /// generic jsonDecoder to format correctly the timestamps
     private lazy var jsonDecoder: JSONDecoder? = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(dateFormatter)
@@ -141,6 +145,7 @@ class LibreLinkUpFollowManager: NSObject {
         self.resetActiveSensorData()
         
         verifyUserDefaultsAndStartOrStopFollowMode()
+        
     }
     
     // MARK: - public functions
@@ -154,7 +159,6 @@ class LibreLinkUpFollowManager: NSObject {
         // for dev : creation of BgReading is done in seperate static function. This allows to do the BgReading creation in other place, as is done also for readings received from a transmitter.
         
         // create new bgReading
-        // using sgv as value for rawData because in some case these values are not available in NightScout
         let bgReading = BgReading(timeStamp: followGlucoseData.timeStamp, sensor: nil, calibration: nil, rawData: followGlucoseData.sgv, deviceName: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
         
         // set calculatedValue
@@ -201,13 +205,13 @@ class LibreLinkUpFollowManager: NSObject {
         
         trace("in download", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
-        /* TODO: keeping this commented out for now
-         trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
-         
-         UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
-         */
+        trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+
+        // TODO: crash here sometimes
+        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         
         Task {
+            
             do {
                 
                 // LibreLink follower based upon process outlined here:
@@ -241,9 +245,6 @@ class LibreLinkUpFollowManager: NSObject {
                         
                         // this will only happen if the account doesn't have an active sensor connected
                         resetActiveSensorData()
-                        
-                        // TODO: Remove after debug
-                        print("LibreLinkUp download not processed")
                         
                         throw LibreLinkUpFollowError.generalError
                         
@@ -281,6 +282,7 @@ class LibreLinkUpFollowManager: NSObject {
         }
     }
     
+    
     /// if needed, perform a login request and retreive authentication token and expiry date. Then retreive the patient ID.
     private func checkLoginAndConnections() async throws {
         
@@ -317,10 +319,6 @@ class LibreLinkUpFollowManager: NSObject {
                     
                     let newRegion = LibreLinkUpRegion(from: region)
                     
-                    // TODO: Remove after debug
-                    print("----------------------")
-                    print("Redirecting from region: " + (self.libreLinkUpRegion?.description ?? "nil") + " to new region: " + (newRegion?.description ?? "nil"))
-                    
                     trace("    in checkLoginAndConnections, redirect flag received. Switching region from '%{public}@' to '%{public}@' and repeating checkLogin", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, self.libreLinkUpRegion?.description ?? "nil", newRegion?.description ?? "nil")
                     
                     self.libreLinkUpRegion = newRegion
@@ -341,7 +339,7 @@ class LibreLinkUpFollowManager: NSObject {
                     
                 }
                 
-                // let's only update userdefaults if really necessary (i.e. if a new value is obtained, which it shouldn't be after the first login)
+                // let's only update userdefaults if really necessary (i.e. if a new value is obtained, which it shouldn't be after the initial login has already been done)
                 if let country = requestLoginResponse.data?.user?.country {
                     
                     if UserDefaults.standard.libreLinkUpCountry != country {
@@ -352,7 +350,6 @@ class LibreLinkUpFollowManager: NSObject {
                     
                 }
                 
-                // TODO: consider removing for production
                 trace("    in checkLoginAndConnections, retrieved user id is: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, userId)
                 
                 trace("    in checkLoginAndConnections, token expires on: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, Date(timeIntervalSince1970: expires).description)
@@ -369,21 +366,10 @@ class LibreLinkUpFollowManager: NSObject {
                 UserDefaults.standard.libreLinkUpPreventLogin = false
                 UserDefaults.standard.libreLinkUpReAcceptNeeded = false
                 
-                // TODO: Remove after debug
-                print("----------------------")
-                print("Login Successful")
-                print("Token expires: " + Date(timeIntervalSince1970: self.libreLinkUpExpires ?? 0).toStringInUserLocale(timeStyle: .short, dateStyle: .short))
-                print("Region: " + (self.libreLinkUpRegion?.description ?? "nil"))
-                print("User ID: " + userId.description)
-                
                 // so now we've got a valid authenticated login so we can pull the patient ID from the connections endpoint
                 // https://gist.github.com/khskekec/6c13ba01b10d3018d816706a32ae8ab2#get-connections
                 
                 if self.libreLinkUpPatientId == nil {
-                    
-                    // TODO: Remove after debug
-                    print("----------------------")
-                    print("Patient ID is nil, processing new Connections request to retrieve it")
                     
                     let connectionsResponse = try await requestConnections()
                     
@@ -397,19 +383,12 @@ class LibreLinkUpFollowManager: NSObject {
                     
                     trace("    in checkLoginAndConnections, patient id is: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, patientId.description)
                     
-                    // TODO: Remove after debug
-                    print("----------------------")
-                    print("Patient Id: " + patientId.description)
-                    
                     self.libreLinkUpPatientId = patientId
                     
                 }
                 
                 
             } catch LibreLinkUpFollowError.reAcceptNeeded {
-                
-                // TODO: Remove after debug
-                print("Privacy Policy or Terms of Use need re-accepting!")
                 
                 trace("    in checkLoginAndConnections, login failed with status 4. New terms of use or privacy policy must be accepted first", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
                 
@@ -418,9 +397,6 @@ class LibreLinkUpFollowManager: NSObject {
                 resetActiveSensorData()
                 
             } catch LibreLinkUpFollowError.invalidCredentials {
-                
-                // TODO: Remove after debug
-                print("Login failed!")
                 
                 trace("    in checkLoginAndConnections, login failed with status 2 - message 'notAuthenticated'. Login preventation activated until the user updates their account details", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
                 
@@ -437,10 +413,6 @@ class LibreLinkUpFollowManager: NSObject {
             
         } else {
             
-            // TODO: Remove after debug
-            print("----------------------")
-            print("Token and Patient ID already exist, no need to login or get connections")
-            
             trace("    in checkLoginAndConnections, skipping as token and patient ID already exist", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             
         }
@@ -450,8 +422,10 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// if needed, perform a login request and retreive authentication token and expiry date.
     /// based upon: https://gist.github.com/khskekec/6c13ba01b10d3018d816706a32ae8ab2#login
+    /// - Parameters:
+    ///     - none
+    /// - Returns: Response<RequestLoginResponse>, a json object with the server response to the login request
     private func requestLogin() async throws -> Response<RequestLoginResponse> {
-        
         
         if UserDefaults.standard.libreLinkUpPreventLogin {
             
@@ -471,13 +445,6 @@ class LibreLinkUpFollowManager: NSObject {
             throw LibreLinkUpFollowError.missingCredentials
             
         }
-        
-        // TODO: Remove after debug
-        print("----------------------")
-        print("requestLogin()")
-        print("Username: " + libreLinkUpEmail.description)
-        print("Password: " + libreLinkUpPassword.description)
-        print("Region: " + (self.libreLinkUpRegion?.description ?? "not set"))
         
         trace("    in requestLogin, running login request", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
@@ -516,11 +483,6 @@ class LibreLinkUpFollowManager: NSObject {
         let (data, response) = try await URLSession.shared.data(for: request)
         let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
         
-        // TODO: Remove after debug
-        print("----------------------")
-        print("Login URL: " + loginUrl)
-        //print(String(data: data, encoding: String.Encoding.utf8))
-        
         trace("    in requestLogin, server response status code: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, statusCode.description)
         
         trace("    in requestLogin, server response: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, String(data: data, encoding: String.Encoding.utf8) ?? "nil")
@@ -539,6 +501,9 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// using valid authentication ticket, we can now request the connections to find the patient ID
     /// based upon: https://gist.github.com/khskekec/6c13ba01b10d3018d816706a32ae8ab2#get-connections
+    /// - Parameters:
+    ///     - none
+        /// - Returns: Response<[RequestConnectionsResponse]>, an array of json objects with the server response to the connections request, each one will hold a patient id but we will just use the first one [0]
     private func requestConnections() async throws -> Response<[RequestConnectionsResponse]> {
         
         guard let connectionsUrl = self.libreLinkUpRegion?.urlConnections, let token = libreLinkUpToken else { throw LibreLinkUpFollowError.urlErrorConnections }
@@ -561,11 +526,6 @@ class LibreLinkUpFollowManager: NSObject {
         let (data, response) = try await URLSession.shared.data(for: request)
         let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
         
-        // TODO: Remove after debug
-        print("----------------------")
-        print("Connections URL: " + connectionsUrl)
-        //print(String(data: data, encoding: String.Encoding.utf8))
-        
         trace("    in requestConnections, server response status code: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, statusCode.description)
         
         if statusCode == 200 {
@@ -581,6 +541,9 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// using valid authentication ticket and the patient ID, we can now request the cgm data
     /// based upon: https://gist.github.com/khskekec/6c13ba01b10d3018d816706a32ae8ab2#get-cgm-data
+    /// - Parameters:
+    ///     - patientId: needed to correctly generate the graph URL
+    /// - Returns: Response<RequestGraphResponse>, a json object with the server response to the graph request
     private func requestGraph(patientId: String) async throws -> Response<RequestGraphResponse> {
         
         guard let token = self.libreLinkUpToken, self.libreLinkUpId != "", self.libreLinkUpPatientId != "" else {
@@ -609,11 +572,6 @@ class LibreLinkUpFollowManager: NSObject {
         let (data, response) = try await URLSession.shared.data(for: request)
         let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
         
-        // TODO: Remove after debug
-        print("----------------------")
-        print("Graph URL: " + graphURL)
-        //print(String(data: data, encoding: String.Encoding.utf8))
-        
         trace("    in requestGraph, server response status code: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, statusCode.description)
         
         if statusCode == 200 {
@@ -626,7 +584,9 @@ class LibreLinkUpFollowManager: NSObject {
         
     }
     
+    /// generic decoding function for all JSON struct types
     private func decode<T: Decodable>(_ type: T.Type, data: Data) throws -> T {
+        
         guard let jsonDecoder = jsonDecoder else {
             throw LibreLinkUpFollowError.decodingError
         }
@@ -634,6 +594,8 @@ class LibreLinkUpFollowManager: NSObject {
         return try jsonDecoder.decode(T.self, from: data)
     }
     
+    
+    /// clear the active sensor data from coredata (needed for UI)
     private func resetActiveSensorData() {
         
         UserDefaults.standard.libreLinkUpActiveSensorSerialNumber = nil
@@ -659,11 +621,9 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// process result from download
     /// - parameters:
-    ///     - data : data as result from dataTask
-    ///     - urlResponse : urlResponse as result from dataTask
-    ///     - error : error as result from dataTask
-    ///     - followGlucoseData : array input by caller, result will be in that array. Can be empty array. Array must be initialized to empty array by caller
-    /// - returns: FollowGlucoseData , possibly empty - first entry is the youngest
+    ///     - data : data as a struct defined to handle the server response for graph data
+    ///     - followGlucoseDataArray : array input by caller, result will be in that array. Can be empty array. Array must be initialized to empty array by caller
+    /// - returns: followGlucoseDataArray , possibly empty - first entry is the youngest
     private func processDownloadResponse(data: [RequestGraphResponseGlucoseMeasurement?], followGlucoseDataArray: inout [FollowerBgReading]) {
         
         // if data not nil then check if response is nil
@@ -806,7 +766,7 @@ class LibreLinkUpFollowManager: NSObject {
 }
 
 
-
+/// error throwing types for the follower
 private enum LibreLinkUpFollowError: Error {
     
     case generalError
@@ -823,6 +783,7 @@ private enum LibreLinkUpFollowError: Error {
     
 }
 
+/// make a custom description property to correctly log the error types
 extension LibreLinkUpFollowError: CustomStringConvertible {
     
     var description: String {
