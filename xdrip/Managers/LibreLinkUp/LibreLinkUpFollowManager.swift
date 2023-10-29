@@ -113,6 +113,16 @@ class LibreLinkUpFollowManager: NSObject {
         self.libreLinkUpId = nil
         self.libreLinkUpPatientId = nil
         
+        // run a quick check to see if the LibreLinkUp version stored in the constants file is newer than the one currently stored in the app. If it is, then update it. This will only happen if the user hasn't manually updated it before a new xDrip4iOS version is released.
+        if ConstantsLibreLinkUp.libreLinkUpVersionDefault.compare(UserDefaults.standard.libreLinkUpVersion ?? "0.0.0", options: .numeric) == .orderedDescending {
+            
+            trace("in init, updating coredata LibreLinkUp version from '%{public}@' to '%{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, UserDefaults.standard.libreLinkUpVersion ?? "nil", ConstantsLibreLinkUp.libreLinkUpVersionDefault)
+            
+            UserDefaults.standard.libreLinkUpVersion = ConstantsLibreLinkUp.libreLinkUpVersionDefault
+            
+        }
+        
+        
         // set up audioplayer
         if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "")  {
             

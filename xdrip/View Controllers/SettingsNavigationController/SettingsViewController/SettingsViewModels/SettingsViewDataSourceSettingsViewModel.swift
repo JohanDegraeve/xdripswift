@@ -477,27 +477,18 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             
             returnString = sn
             
-            // 0Exxxxxxxx0
-            if sn.range(of: #"^0E"#, options: .regularExpression) != nil {
-                
-                // must be a Libre 3 EU sensor
-                let newString = "Libre 3 EU (" + String(sn.dropLast()) + ")"
-                
-                returnString = newString
-                
-            } else if sn.range(of: #"^0F"#, options: .regularExpression) != nil {
-                
-                // 0Fxxxxxxxx0
-                // must be a Libre 3 US sensor
-                let newString = "Libre 3 US (" + String(sn.dropLast()) + ")"
-                
-                returnString = newString
-                
-            } else if sn.range(of: #"^MH"#, options: .regularExpression) != nil {
+            if sn.range(of: #"^MH"#, options: .regularExpression) != nil {
                 
                 // MHxxxxxxxx
                 // must be a L2 sensor
                 returnString = "Libre 2 (3" + sn + ")"
+                
+            } else if sn.range(of: #"^0D"#, options: .regularExpression) != nil || sn.range(of: #"^0E"#, options: .regularExpression) != nil || sn.range(of: #"^0F"#, options: .regularExpression) != nil{
+                
+                // must be a Libre 3 sensor
+                let newString = "Libre 3 (" + String(sn.dropLast()) + ")"
+                
+                returnString = newString
                 
             }
             

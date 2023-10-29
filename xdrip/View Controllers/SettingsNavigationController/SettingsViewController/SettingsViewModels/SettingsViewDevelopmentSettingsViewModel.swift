@@ -192,10 +192,6 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                     
                     UserDefaults.standard.libreLinkUpVersion = versionNumber.toNilIfLength0()
                     
-                } else {
-                    
-                    print("LibreLinkUp version entered by user '" + libreLinkUpVersion + "' is not in expected format. Ignoring...")
-                    
                 }
                 
             }, cancelHandler: nil, inputValidator: nil)
