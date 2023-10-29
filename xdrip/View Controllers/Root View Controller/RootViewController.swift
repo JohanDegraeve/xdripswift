@@ -3344,8 +3344,6 @@ extension RootViewController: FollowerDelegate {
                     
                     trace("    creating new bgreading: value = %{public}@ %{public}@, timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info,  followGlucoseData.sgv.mgdlToMmol(mgdl: isMgDl).bgValuetoString(mgdl: isMgDl), isMgDl ? Texts_Common.mgdl : Texts_Common.mmol, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
                     
-                    print("New BG reading retrieved: " + followGlucoseData.sgv.mgdlToMmol(mgdl: isMgDl).bgValuetoString(mgdl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol) + ", " + followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
-                    
                     // create a new reading
                     // we'll need to check which should be the active followerManager to know where to call the function
                     switch UserDefaults.standard.followerDataSourceType {

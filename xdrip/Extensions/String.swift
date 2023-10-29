@@ -252,9 +252,6 @@ extension String {
     /// use this to partially obscure a password, API-SECRET, token or other sensitive data. We want the user to see that something recognisable is there that makes sense to them, but it won't reveal any useful private information if they screenshot it
     func obscured() -> String {
         
-        // make sure that something useful has been passed to the function
-        //guard var obscuredString = stringToObscure else { return "" }
-        
         var obscuredString = self
         
         let stringLength: Int = obscuredString.count

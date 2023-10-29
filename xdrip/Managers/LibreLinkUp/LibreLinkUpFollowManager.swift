@@ -156,7 +156,6 @@ class LibreLinkUpFollowManager: NSObject {
     /// - returns:
     ///     - BgReading : the new reading, not saved in the coredata
     public func createBgReading(followGlucoseData: FollowerBgReading) -> BgReading {
-        // for dev : creation of BgReading is done in seperate static function. This allows to do the BgReading creation in other place, as is done also for readings received from a transmitter.
         
         // create new bgReading
         let bgReading = BgReading(timeStamp: followGlucoseData.timeStamp, sensor: nil, calibration: nil, rawData: followGlucoseData.sgv, deviceName: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
@@ -451,7 +450,7 @@ class LibreLinkUpFollowManager: NSObject {
         // create the authorization credentials
         guard let authCredentials = try? JSONSerialization.data(withJSONObject: [
             "email": libreLinkUpEmail,
-            "password": UserDefaults.standard.libreLinkUpPassword,
+            "password": libreLinkUpPassword,
         ]) else { throw LibreLinkUpFollowError.invalidCredentials }
         
         // if no region has been previously set, then use the generic login URL. This will give a valid 200 status code, but with no data payload except for a redirect flag and the correct region for the user account

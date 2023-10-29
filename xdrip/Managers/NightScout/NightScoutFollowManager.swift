@@ -99,7 +99,6 @@ class NightScoutFollowManager: NSObject {
     /// - returns:
     ///     - BgReading : the new reading, not saved in the coredata
     public func createBgReading(followGlucoseData: FollowerBgReading) -> BgReading {
-        // for dev : creation of BgReading is done in seperate static function. This allows to do the BgReading creation in other place, as is done also for readings received from a transmitter.
         
         // create new bgReading
         // using sgv as value for rawData because in some case these values are not available in NightScout
