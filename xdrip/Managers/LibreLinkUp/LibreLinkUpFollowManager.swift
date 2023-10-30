@@ -52,14 +52,13 @@ class LibreLinkUpFollowManager: NSObject {
     private var playSoundTimer:RepeatingTimer?
     
     /// http header array - need to append "version" key before making request
+    /// https://gist.github.com/khskekec/6c13ba01b10d3018d816706a32ae8ab2#headers
     private let libreLinkUpRequestHeaders = [
-        "User-Agent": "Mozilla/5.0",
-        "Content-Type": "application/json",
+        "accept-encoding": "gzip",
+        "cache-control": "no-cache",
+        "connection": "keep-alive",
+        "content-type": "application/json",
         "product": "llu.ios",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "keep-alive",
-        "Pragma": "no-cache",
-        "Cache-Control": "no-cache",
     ]
     
     /// keeps track of the api region in order to generate the correct URL
@@ -167,8 +166,11 @@ class LibreLinkUpFollowManager: NSObject {
     ///     - BgReading : the new reading, not saved in the coredata
     public func createBgReading(followGlucoseData: FollowerBgReading) -> BgReading {
         
+        // set the device name in the BG Reading, especially useful for later uploading the Nightscout
+        let deviceName = ConstantsHomeView.applicationName + " (LibreLinkUp)"
+        
         // create new bgReading
-        let bgReading = BgReading(timeStamp: followGlucoseData.timeStamp, sensor: nil, calibration: nil, rawData: followGlucoseData.sgv, deviceName: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        let bgReading = BgReading(timeStamp: followGlucoseData.timeStamp, sensor: nil, calibration: nil, rawData: followGlucoseData.sgv, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
         
         // set calculatedValue
         bgReading.calculatedValue = followGlucoseData.sgv
