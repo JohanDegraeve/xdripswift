@@ -51,10 +51,6 @@ extension UserDefaults {
         case libreLinkUpVersion = "libreLinkUpVersion"
         /// LibreLinkUp terms need to be re-accepted
         case libreLinkUpReAcceptNeeded = "libreLinkUpReAcceptNeeded"
-        /// LibreLinkUp active sensor serial number
-        case libreLinkUpActiveSensorSerialNumber = "libreLinkUpActiveSensorSerialNumber"
-        /// LibreLinkUp active sensor start date
-        case libreLinkUpActiveSensorStartDate = "libreLinkUpActiveSensorStartDate"
         
         // General
         
@@ -127,7 +123,7 @@ extension UserDefaults {
         /// For how many days should we keep Readings, Treatments and Calibrations?
         case retentionPeriodInDays = "retentionPeriodInDays"
         
-        // Sensor Countdown settings
+        // Sensor Info settings
         
         /// show the sensor countdown graphic where applicable?
         case showSensorCountdown = "showSensorCountdown"
@@ -135,6 +131,10 @@ extension UserDefaults {
         case showSensorCountdownAlternativeGraphics = "showSensorCountdownAlternativeGraphics"
         /// store the max sensor age in days if applicable to the active sensor type
         case maxSensorAgeInDays = "maxSensorAgeInDays"
+        /// active sensor serial number
+        case activeSensorSerialNumber = "activeSensorSerialNumber"
+        /// active sensor start date
+        case activeSensorStartDate = "activeSensorStartDate"
         
         
         // Transmitter
@@ -516,26 +516,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.libreLinkUpPreventLogin.rawValue)
-        }
-    }
-    
-    /// LibreLinkUp active sensor serial number. Optional as should be set to nil if no successful login has happened and/or if no active sensor is returned
-    @objc dynamic var libreLinkUpActiveSensorSerialNumber: String? {
-        get {
-            return string(forKey: Key.libreLinkUpActiveSensorSerialNumber.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.libreLinkUpActiveSensorSerialNumber.rawValue)
-        }
-    }
-    
-    /// LibreLinkUp active sensor start date. Optional as should be set to nil if no successful login has happened and/or if no active sensor is returned
-    var libreLinkUpActiveSensorStartDate: Double? {
-        get {
-            return double(forKey: Key.libreLinkUpActiveSensorStartDate.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.libreLinkUpActiveSensorStartDate.rawValue)
         }
     }
     
@@ -1134,7 +1114,7 @@ extension UserDefaults {
     }
     
     
-    // MARK: Sensor Countdown Settings
+    // MARK: Sensor Info Settings
     
     /// should the countdown graphic be shown in the applicable for the sensor type being used?
     @objc dynamic var showSensorCountdown: Bool {
@@ -1155,6 +1135,26 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.showSensorCountdownAlternativeGraphics.rawValue)
+        }
+    }
+    
+    /// active sensor serial number. Optional as should be set to nil if no successful login has happened and/or if no active sensor is returned
+    @objc dynamic var activeSensorSerialNumber: String? {
+        get {
+            return string(forKey: Key.activeSensorSerialNumber.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.activeSensorSerialNumber.rawValue)
+        }
+    }
+    
+    /// active sensor start date. Optional as should be set to nil if there is no sensor connected or if no successful follower login has happened and/or if no active sensor is returned
+    var activeSensorStartDate: Date? {
+        get {
+            return object(forKey: Key.activeSensorStartDate.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.activeSensorStartDate.rawValue)
         }
     }
     

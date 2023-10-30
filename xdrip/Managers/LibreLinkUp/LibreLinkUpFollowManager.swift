@@ -249,8 +249,8 @@ class LibreLinkUpFollowManager: NSObject {
                     if let startDate = graphResponse.data?.activeSensors?.first?.sensor?.a,
                        let serialNumber = graphResponse.data?.activeSensors?.first?.sensor?.sn {
                         
-                        UserDefaults.standard.libreLinkUpActiveSensorSerialNumber = serialNumber
-                        UserDefaults.standard.libreLinkUpActiveSensorStartDate = startDate
+                        UserDefaults.standard.activeSensorSerialNumber = serialNumber
+                        UserDefaults.standard.activeSensorStartDate = Date(timeIntervalSince1970: startDate)
                         
                     } else {
                         
@@ -609,9 +609,13 @@ class LibreLinkUpFollowManager: NSObject {
     /// clear the active sensor data from coredata (needed for UI)
     private func resetActiveSensorData() {
         
-        UserDefaults.standard.libreLinkUpActiveSensorSerialNumber = nil
-        UserDefaults.standard.libreLinkUpActiveSensorStartDate = nil
+        UserDefaults.standard.activeSensorSerialNumber = nil
+        UserDefaults.standard.activeSensorStartDate = nil
         UserDefaults.standard.libreLinkUpCountry = nil
+        
+        libreLinkUpToken = nil
+        libreLinkUpId = nil
+        libreLinkUpPatientId = nil
         
     }
     
@@ -756,9 +760,8 @@ class LibreLinkUpFollowManager: NSObject {
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
                         
                         // reset the token so that a new login process is forced when the download() function is later run
-                        libreLinkUpToken = nil
-                        libreLinkUpId = nil
-                        libreLinkUpPatientId = nil
+                        // this will also reset all activeSensor coredata values to update the UI
+                        resetActiveSensorData()
                         
                         verifyUserDefaultsAndStartOrStopFollowMode()
                         

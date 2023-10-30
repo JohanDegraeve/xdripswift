@@ -227,9 +227,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             
         case .followerSensorStartDate:
                 
-            if let startDateDouble = UserDefaults.standard.libreLinkUpActiveSensorStartDate, startDateDouble > 0 {
-                
-                let startDate = Date(timeIntervalSince1970: startDateDouble)
+            if let startDate = UserDefaults.standard.activeSensorStartDate {
                 
                 var startDateString = startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
                 
@@ -334,7 +332,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             
         case .followerSensorStartDate:
             
-            if let startDate = UserDefaults.standard.libreLinkUpActiveSensorStartDate, startDate > 0 {
+            if UserDefaults.standard.activeSensorStartDate != nil {
                 
                 return UITableViewCell.AccessoryType.disclosureIndicator
                 
@@ -386,9 +384,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                     return Texts_SettingsView.libreLinkUpReAcceptNeeded
                 } else {
                     
-                    if UserDefaults.standard.libreLinkUpActiveSensorSerialNumber != nil {
+                    if UserDefaults.standard.activeSensorSerialNumber != nil {
                         // nicely format the (incomplete) serial numbers from LibreLinkUp
-                        return processLibreLinkUpSensorInfo(sn: UserDefaults.standard.libreLinkUpActiveSensorSerialNumber)
+                        return processLibreLinkUpSensorInfo(sn: UserDefaults.standard.activeSensorSerialNumber)
                     } else if UserDefaults.standard.libreLinkUpPreventLogin {
                         return "Invalid User/Password"
                     } else {
@@ -403,13 +401,14 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerSensorStartDate:
             switch UserDefaults.standard.followerDataSourceType {
             case .libreLinkUp:
-                if let startDateDouble = UserDefaults.standard.libreLinkUpActiveSensorStartDate, startDateDouble > 0 {
-                    let startDate = Date(timeIntervalSince1970: startDateDouble)
+                if let startDate = UserDefaults.standard.activeSensorStartDate {
+                    
                     var startDateString = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
                     
                     startDateString += " (" + startDate.daysAndHoursAgo() + ")"
                     
                     return startDateString
+                    
                 } else {
                     return ""
                 }
@@ -421,7 +420,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             switch UserDefaults.standard.followerDataSourceType {
             case .libreLinkUp:
                 
-                if UserDefaults.standard.libreLinkUpActiveSensorSerialNumber != nil {
+                if UserDefaults.standard.activeSensorSerialNumber != nil {
                     
                     var returnString = UserDefaults.standard.libreLinkUpRegion?.description ?? ""
                     
@@ -462,8 +461,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     func resetLibreLinkUpUpData() {
         
         UserDefaults.standard.libreLinkUpRegion = nil
-        UserDefaults.standard.libreLinkUpActiveSensorStartDate = nil
-        UserDefaults.standard.libreLinkUpActiveSensorSerialNumber = nil
+        UserDefaults.standard.activeSensorStartDate = nil
+        UserDefaults.standard.activeSensorSerialNumber = nil
         UserDefaults.standard.libreLinkUpCountry = nil
         UserDefaults.standard.libreLinkUpPreventLogin = false
         
@@ -503,7 +502,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     private func addObservers() {
         
         // Listen for changes in the active sensor value to trigger the UI to be updated
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.libreLinkUpActiveSensorSerialNumber.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.activeSensorSerialNumber.rawValue, options: .new, context: nil)
         
     }
     
@@ -514,7 +513,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         else { return }
         
         switch keyPathEnum {
-        case UserDefaults.Key.libreLinkUpActiveSensorSerialNumber:
+        case UserDefaults.Key.activeSensorSerialNumber:
             
             // we have to run this in the main thread to avoid access errors
             DispatchQueue.main.async {
