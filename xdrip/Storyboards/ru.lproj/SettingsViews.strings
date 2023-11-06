@@ -34,9 +34,6 @@
 "settingsviews_daysToUseStatisticsMessage" = "Максимальное количество дней, которые мы должны попытаться использовать для расчета статистики?\n\n(Введите 0, чтобы рассчитать сегодня с полуночи)";
 "settingsviews_useStandardStatisticsRange" = "Стандартный диапазон?";
 "settingsviews_useIFCCA1C" = "Показывать HbA1c в mmols/mol?";
-"settingsviews_sectiontitlesensorcountdown" = "Возраст датчика";
-"settingsviews_showSensorCountdown" = "Показывать возраст датчика?";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Альтернативный график?";
 "settingsviews_sectiontitletransmitter" = "Транисмиттер";
 "settingsviews_transmittertype" = "Тип трансмиттера";
 "settingsviews_transmitterid" = "Идентификатор трансмиттера";

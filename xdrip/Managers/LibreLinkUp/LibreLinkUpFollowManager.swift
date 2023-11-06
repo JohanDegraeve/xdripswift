@@ -150,9 +150,6 @@ class LibreLinkUpFollowManager: NSObject {
         // setting LibreLinkUp password
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.libreLinkUpPassword.rawValue, options: .new, context: nil)
         
-        // we should reset all coredata that is related to the active sensor on initialize to prevent old values being used by the UI
-        self.resetActiveSensorData()
-        
         verifyUserDefaultsAndStartOrStopFollowMode()
         
     }
@@ -251,6 +248,26 @@ class LibreLinkUpFollowManager: NSObject {
                         
                         UserDefaults.standard.activeSensorSerialNumber = serialNumber
                         UserDefaults.standard.activeSensorStartDate = Date(timeIntervalSince1970: startDate)
+                        
+                        UserDefaults.standard.activeSensorMaxSensorAgeInDays = ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDays
+                        
+                        var activeSensorDescription = ""
+                        
+                        if serialNumber.range(of: #"^MH"#, options: .regularExpression) != nil {
+                            
+                            // MHxxxxxxxx
+                            // must be a L2 sensor
+                            activeSensorDescription = "Libre 2"
+                            
+                        } else if serialNumber.range(of: #"^0D"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0E"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0F"#, options: .regularExpression) != nil{
+                            
+                            // must be a Libre 3 sensor
+                            activeSensorDescription = "Libre 3"
+                            
+                        }
+                        
+                        UserDefaults.standard.activeSensorDescription = "LibreLinkUp (" + activeSensorDescription + ")"
+                                                   
                         
                     } else {
                         
@@ -611,6 +628,7 @@ class LibreLinkUpFollowManager: NSObject {
         
         UserDefaults.standard.activeSensorSerialNumber = nil
         UserDefaults.standard.activeSensorStartDate = nil
+        UserDefaults.standard.activeSensorMaxSensorAgeInDays = nil
         UserDefaults.standard.libreLinkUpCountry = nil
         
         libreLinkUpToken = nil

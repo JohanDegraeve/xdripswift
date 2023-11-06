@@ -206,9 +206,14 @@ final class RootViewController: UIViewController, ObservableObject {
     /// clock view
     @IBOutlet weak var clockView: UIView!
     @IBOutlet weak var clockLabelOutlet: UILabel!
-        
-    @IBOutlet weak var sensorCountdownOutlet: UIImageView!
     
+    
+    /// sensor info view
+    @IBOutlet weak var sensorInfoViewOutlet: UIView!
+    @IBOutlet weak var sensorProgressViewOutlet: UIProgressView!
+    @IBOutlet weak var sensorInfoSensorLabelOutlet: UILabel!
+    @IBOutlet weak var sensorInfoSensorCurrentAgeOutlet: UILabel!
+    @IBOutlet weak var sensorInfoSensorMaxAgeOutlet: UILabel!
     
     @IBAction func chartPanGestureRecognizerAction(_ sender: UIPanGestureRecognizer) {
         
@@ -548,8 +553,8 @@ final class RootViewController: UIViewController, ObservableObject {
             activityMonitorOutlet.isHidden = false
         }
         
-        // display the sensor countdown graphics if applicable
-        updateSensorCountdown()
+        // display the sensor info view if applicable
+        updateSensorInfoView(animate: true)
         
         // update statistics related outlets
         updateStatistics(animatePieChart: true, overrideApplicationState: true)
@@ -562,6 +567,14 @@ final class RootViewController: UIViewController, ObservableObject {
         self.tabBarController?.cleanTitles()
         
         updateWatchApp()
+        
+        // let's run the sensor info update 2 seconds after the view appears. This should give time for the follower modes to download and populate the info needed.
+        // if the sensor info view was previously hidden, then animate it so that it appears nicely, if not, don't
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            
+            self.updateSensorInfoView(animate: self.sensorInfoViewOutlet.isHidden)
+            
+        }
         
     }
     
@@ -701,6 +714,9 @@ final class RootViewController: UIViewController, ObservableObject {
         // enable or disable the buttons 'sensor' and 'calibrate' on top, depending on master or follower
         changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
         
+        // nillify the active sensor start date on start-up
+        UserDefaults.standard.activeSensorStartDate = nil
+        
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
         // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like initializing the views
         coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
@@ -716,8 +732,8 @@ final class RootViewController: UIViewController, ObservableObject {
             // update the mini-chart
             self.updateMiniChart()
             
-            // update sensor countdown
-            self.updateSensorCountdown()
+            // update sensor info
+            self.updateSensorInfoView(animate: true)
             
             // update statistics related outlets
             self.updateStatistics(animatePieChart: true, overrideApplicationState: true)
@@ -787,7 +803,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // add observer for nightScoutTreatmentsUpdateCounter, to reload the chart whenever a treatment is added or updated or deleted changes
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
         
-        // add observer for stopActiveSensor, this will reset the active sensor to nil when the user disconnects an intergrated transmitter/sensor (e.g. Libre 2 Direct). This will help ensure that the sensor countdown is updated disabled until a new sensor is started.
+        // add observer for stopActiveSensor, this will reset the active sensor to nil when the user disconnects an intergrated transmitter/sensor (e.g. Libre 2 Direct). This will help ensure that the sensor info is updated/disabled until a new sensor is started.
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.stopActiveSensor.rawValue, options: .new, context: nil)
 
         // setup delegate for UNUserNotificationCenter
@@ -844,16 +860,23 @@ final class RootViewController: UIViewController, ObservableObject {
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             
             // Schedule a call to updateLabelsAndChart when the app comes to the foreground, with a delay of 0.5 seconds. Because the application state is not immediately to .active, as a result, updates may not happen - especially the synctreatments may not happen because this may depend on the application state - by making a call just half a second later, when the status is surely = .active, the treatments sync will be done.
-            Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateLabelsAndChart), userInfo: nil, repeats:false)
+            //Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateLabelsAndChart), userInfo: nil, repeats:false)
 
-            self.updateLabelsAndChart(overrideApplicationState: true)
+            //self.updateLabelsAndChart(overrideApplicationState: true)
             
-            self.updateMiniChart()
-            
-            self.updateSensorCountdown()
-            
-            // update statistics related outlets
-            self.updateStatistics(animatePieChart: false)
+            // let's run the progress update in an async thread with a really small delay so that the animation updates smoothly after the view has appeared
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                
+                self.updateLabelsAndChart(overrideApplicationState: true)
+                
+                self.updateMiniChart()
+                
+                self.updateSensorInfoView(animate: true)
+                
+                // update statistics related outlets
+                self.updateStatistics(animatePieChart: true)
+                
+            }
             
         })
         
@@ -1308,8 +1331,8 @@ final class RootViewController: UIViewController, ObservableObject {
                     // update statistics related outlets
                     updateStatistics(animatePieChart: false)
                     
-                    // update sensor countdown graphic
-                    updateSensorCountdown()
+                    // update sensor info
+                    updateSensorInfoView(animate: false)
                     
                 }
                 
@@ -1388,7 +1411,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
         
-        case UserDefaults.Key.isMaster, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.daysToUseStatistics, UserDefaults.Key.showMiniChart :
+        case UserDefaults.Key.isMaster, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.daysToUseStatistics, UserDefaults.Key.showMiniChart, UserDefaults.Key.activeSensorStartDate :
             
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -1474,7 +1497,9 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 sensorStopDetected()
                 
-                updateSensorCountdown()
+                UserDefaults.standard.activeSensorStartDate = nil
+                
+                updateSensorInfoView(animate: false)
                 
                 UserDefaults.standard.stopActiveSensor = false
                 
@@ -2715,7 +2740,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 miniChartOutlet.isHidden = true
                 statisticsView.isHidden = true
                 segmentedControlsView.isHidden = true
-                sensorCountdownOutlet.isHidden = true
                 
                 if UserDefaults.standard.showClockWhenScreenIsLocked {
                     
@@ -2772,7 +2796,6 @@ final class RootViewController: UIViewController, ObservableObject {
             miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
             segmentedControlsView.isHidden = false
-            sensorCountdownOutlet.isHidden = !UserDefaults.standard.showSensorCountdown
             
             clockView.isHidden = true
             
@@ -2817,88 +2840,142 @@ final class RootViewController: UIViewController, ObservableObject {
 
     }
     
-    
-    /// this function will check if the user is using a time-sensitive sensor (such as a 14 day Libre, calculate the days remaining and then update the imageUI with the relevant svg image from the project assets.
-    private func updateSensorCountdown() {
+    /// sensor info panel
+    private func updateSensorInfoView(animate: Bool?) {
         
-        // if the user has chosen not to display the countdown graphic, then make sure the graphic is hidden and just return back without doing anything
-        if !UserDefaults.standard.showSensorCountdown {
-            sensorCountdownOutlet.isHidden = true
-            return
-        }
+        let isMaster: Bool = UserDefaults.standard.isMaster
         
-        // if there's no active sensor, there's nothing to do or show
-        guard activeSensor != nil else {
-            sensorCountdownOutlet.isHidden = true
-            return
-        }
+        // some calls to this function (such as when bringing the homescreen to the foreground<9 can specify to animate the progress view.
+        // normal updates such as receiving a new BG reading whilst the app is in the foreground shouldn't cause an animation
+        let animateProgressView: Bool = animate ?? false
         
-        // check that the sensor start date is not nil before unwrapping it
-        guard activeSensor?.startDate != nil else {
-            return
+        // used to track the active sensor type if there is one connected. Initialise it as Libre just so that it is actually initialised as something. We'll update it later as needed.
+        var sensorType: CGMSensorType = .Libre
+        
+        // check if there is an active sensor connected via cgmTransmitter in master mode
+        // if so, then use this value to override/set the coredata activeSensorStartDate
+        if let startDate = activeSensor?.startDate {
+            
+            UserDefaults.standard.activeSensorStartDate = startDate
+            
         }
         
         // check if there is a transmitter connected (needed as Dexcom will only connect briefly every 5 minutes)
         // if there is a transmitter connected, pull the current maxSensorAgeInDays and store in in UserDefaults
         if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let maxDays = cgmTransmitter.maxSensorAgeInDays() {
-            UserDefaults.standard.maxSensorAgeInDays = maxDays
+            
+            UserDefaults.standard.activeSensorMaxSensorAgeInDays = maxDays
+            
+            UserDefaults.standard.activeSensorDescription = cgmTransmitter.cgmTransmitterType().detailedDescription()
+        
+            // update the sensor type - needed to make sure we test with the correct warm-up times later
+            sensorType = cgmTransmitter.cgmTransmitterType().sensorType()
+                        
         }
         
-        // pull the boolean value from UserDefaults to see if you user prefers the alternative graphics (count-up instead of count-down)
-        let showSensorCountdownAlternativeGraphics = UserDefaults.standard.showSensorCountdownAlternativeGraphics
-
-        // check if the sensor type has a hard coded maximum sensor life previously stored.
-        if let maxSensorAgeInDays = UserDefaults.standard.maxSensorAgeInDays as Int?, maxSensorAgeInDays > 0 {
+        // let's just check that we've got enough information to display the view
+        // with sensor start date and max age, we can display the minimum needed
+        let sensorStartDate = UserDefaults.standard.activeSensorStartDate //?.addingTimeInterval(-86400*6.0)
+    
+        let sensorMaxAgeInMinutes: Double = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
         
-            // calculate how many hours the sensor has been used for since starting. We need to use hours instead of days because during the last day we need to see how many hours are left so that we can display the warning and urgent status graphics.
-            let currentSensorAgeInHours: Int = Calendar.current.dateComponents([.hour], from: activeSensor!.startDate - 5 * 60, to: Date()).hour!
+        if sensorStartDate != nil && sensorMaxAgeInMinutes > 0 {
             
-            // we need to calculate the hours so that we can see if we need to show the yellow (<12hrs remaining) or red (<6hrs remaining) graphics
-            let sensorCountdownHoursRemaining: Int = (maxSensorAgeInDays * 24) - currentSensorAgeInHours
+            sensorInfoViewOutlet.isHidden = false
             
-            // start programatically creating the asset name that we will loaded. This is based upon the max sensor days and the days "remaining". To get the full days, we need to round up the currentSensorAgeInHours to the nearest 24 hour block
-            var sensorCountdownAssetName: String = "sensor" +  String(maxSensorAgeInDays) + "_"
-
-            // find the amount of days remaining and add it to the asset name string. If there is less than 12 hours, add the corresponding warning/urgent label. If the sensor hours remaining is 0 or less, then the sensor is either expired or in the last 12 hours of "overtime" (e.g Libre sensors have an extra 12 hours before the stop working). If this happens, then instead of appending the days left, always show the "00" graphic.
-            if sensorCountdownHoursRemaining > 0 {
+            let sensorAgeInMinutes: Double = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate!, to: Date()).minute!)
+            
+            let sensorTimeLeftInMinutes: Double = sensorMaxAgeInMinutes - sensorAgeInMinutes
+            
+            // blank out the current sensor age label by default. If the sensor isn't in warm-up, then it will be filled in later
+            sensorInfoSensorCurrentAgeOutlet.text = ""
+            
+            // set-up the labels for the sensor time, total and also if still considered in warm-up
+            if !isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && sensorAgeInMinutes < ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre {
                 
-                sensorCountdownAssetName += String(format: "%02d", maxSensorAgeInDays - Int(round(Double(currentSensorAgeInHours / 24)) * 24) / 24)
+                // the LibreLinkUp active sensor is still in warm-up
+                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre * 60) {
+                    
+                    sensorInfoSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                }
                 
-                switch sensorCountdownHoursRemaining {
-
-                    case 7...12:
-                        sensorCountdownAssetName += "_warning"
-                    case 1...6:
-                        sensorCountdownAssetName += "_urgent"
-                    default: break
-
+            } else if isMaster && sensorType == .Libre && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
+                
+                // the connected Libre sensor is still in warm-up (as per defined minimum warm-up time)
+                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) {
+                    
+                    sensorInfoSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                    
+                }
+                
+            } else if isMaster && sensorType == .Dexcom && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 {
+                
+                // the connected Dexcom sensor is still in warm-up (as per defined standard Dexcom warm-up time)
+                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 * 60) {
+                    
+                    sensorInfoSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                    
                 }
                 
             } else {
                 
-                sensorCountdownAssetName += "00"
+                // fill in the labels to show sensor time elapsed and max age
+                sensorInfoSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
+                
+                sensorInfoSensorMaxAgeOutlet.text = " / " + sensorMaxAgeInMinutes.minutesToDaysAndHours()
                 
             }
             
-            // if the user prefers the alternative graphics (count-up), then append this to the end of the string
-            if showSensorCountdownAlternativeGraphics {
-                sensorCountdownAssetName += "_alt"
+            
+            // set progress background colour from constants file
+            sensorProgressViewOutlet.trackTintColor = ConstantsHomeView.sensorProgressViewTrackingColor
+            
+            
+            // let's colour the progress view bar if the sensor is soon to reach max days
+            if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
+                
+                // sensor is very close to ending
+                sensorInfoSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
+                sensorProgressViewOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
+                
+                                
+            } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
+                
+                // sensor will soon be close to ending
+                sensorInfoSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
+                sensorProgressViewOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
+                                
+            } else {
+                
+                // sensor is not close to ending, so let's keep it the standard colour
+                sensorProgressViewOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
+                
             }
             
-            // update the UIImage
-            sensorCountdownOutlet.image = UIImage(named: sensorCountdownAssetName)
+            // set the sensor/system description
+            sensorInfoSensorLabelOutlet.text = UserDefaults.standard.activeSensorDescription
+
+            // if the animatation is required, then first set the value to 0
+            if animateProgressView {
+                sensorProgressViewOutlet.setProgress(0.0, animated: false)
+            }
             
-            // show the sensor countdown image
-            sensorCountdownOutlet.isHidden = false
+            // let's run the progress update in an async thread with a really small delay so that the animation updates smoothly after the view has appeared
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                
+                self.sensorProgressViewOutlet.setProgress(Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes)), animated: animateProgressView)
+                
+            }
             
         } else {
-
-            // this must be a sensor without a maxSensorAge , so just make sure to hide the sensor countdown image and do nothing
-            sensorCountdownOutlet.isHidden = true
-
+            
+            // there is no sensor start date or max days available so let's completely hide the view
+            sensorInfoViewOutlet.isHidden = true
+            
         }
         
     }
+    
     
     func showLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
         
@@ -3072,8 +3149,10 @@ final class RootViewController: UIViewController, ObservableObject {
         // set endDate of activeSensor to stopDate
         activeSensor.endDate = stopDate
         
-        // set the userdefaults maxSensorAgeInDays to 0 when stopping a sensor. This should prevent the bug where the countdown from still showing if the user changes to a different CGM type that doesn't use it at the present time (i.e. from Libre to Dexcom)
+        // nillify all active sensor data in userdefaults. This helps to prevent the sensor view UI from displaying old data.
         UserDefaults.standard.maxSensorAgeInDays = 0
+        UserDefaults.standard.activeSensorStartDate = nil
+        UserDefaults.standard.activeSensorDescription = nil
         
         // save changes to coreData
         coreDataManager.saveChanges()
@@ -3081,8 +3160,8 @@ final class RootViewController: UIViewController, ObservableObject {
         // asign nil to activeSensor
         self.activeSensor = nil
         
-        // now that the activeSensor object has been destroyed, update (hide) the sensor countdown graphic
-        updateSensorCountdown()
+        // now that the activeSensor object has been destroyed, update (hide) the sensor info
+        updateSensorInfoView(animate: false)
 
     }
     
@@ -3108,6 +3187,9 @@ extension RootViewController: CGMTransmitterDelegate {
         trace("sensor stop detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
 
         stopSensor(cGMTransmitter: self.bluetoothPeripheralManager?.getCGMTransmitter(), sendToTransmitter: false)
+        
+        UserDefaults.standard.activeSensorStartDate = nil
+        UserDefaults.standard.activeSensorDescription = nil
 
     }
     
@@ -3123,6 +3205,8 @@ extension RootViewController: CGMTransmitterDelegate {
             
             // use sensorCode nil, in the end there will be no start sensor command sent to the transmitter because we just received the sensorStartTime from the transmitter, so it's already started
             startSensor(cGMTransmitter: self.bluetoothPeripheralManager?.getCGMTransmitter(), sensorStarDate: sensorStartDate, sensorCode: nil, coreDataManager: coreDataManager, sendToTransmitter: false)
+            
+            UserDefaults.standard.activeSensorStartDate = sensorStartDate
             
         }
         
@@ -3387,8 +3471,8 @@ extension RootViewController: FollowerDelegate {
                 // update statistics related outlets
                 updateStatistics(animatePieChart: false)
                 
-                // update sensor countdown
-                updateSensorCountdown()
+                // update sensor info. No need to animate for a simple update
+                updateSensorInfoView(animate: false)
                 
                 // if we're downloading follower data from something other
                 // than Nightscout, then let's upload it to Nightscout

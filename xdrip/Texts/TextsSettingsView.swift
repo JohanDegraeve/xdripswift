@@ -214,20 +214,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "Show HbA1c in mmols/mol?", comment: "statistics settings, use IFCC method for HbA1c?")
     }()
     
-    // MARK: - Section Sensor Countdown
-    
-    static let sectionTitleSensorCountdown: String = {
-        return NSLocalizedString("settingsviews_sectiontitlesensorcountdown", tableName: filename, bundle: Bundle.main, value: "Sensor Countdown", comment: "sensor countdown settings, section title")
-    }()
-
-    static let labelShowSensorCountdown: String = {
-        return NSLocalizedString("settingsviews_showSensorCountdown", tableName: filename, bundle: Bundle.main, value: "Show Sensor Countdown?", comment: "sensor countdown settings, show sensor countdown graphic on home screen")
-    }()
-    
-    static let labelShowSensorCountdownAlternativeGraphics: String = {
-        return NSLocalizedString("settingsviews_showSensorCountdownAlternativeGraphics", tableName: filename, bundle: Bundle.main, value: "Use Alternative Graphics?", comment: "sensor countdown settings, use alternative sensor countdown graphics on home screen")
-    }()
-    
     
     // MARK: - Section Transmitter
     

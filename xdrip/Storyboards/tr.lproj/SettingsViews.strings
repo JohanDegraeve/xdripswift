@@ -28,9 +28,6 @@
 "settingsviews_daysToUseStatisticsMessage" = "İstatistikleri hesaplamak için kullanmaya çalışmamız gereken maksimum gün sayısı?\n\n(Gece yarısından itibaren bugünü hesaplamak için 0 girin)";
 "settingsviews_useStandardStatisticsRange" = "Standart Aralık Kullanılsın mı?";
 "settingsviews_useIFCCA1C" = "HbA1c'yi mmol/mol olarak göstersin?";
-"settingsviews_sectiontitlesensorcountdown" = "Sensör Geri Sayımı";
-"settingsviews_showSensorCountdown" = "Sensör Geri Sayımını Göstersin mi?";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Alternatif Grafikler Kullanılsın mı?";
 "settingsviews_sectiontitletransmitter" = "Verici";
 "settingsviews_transmittertype" = "Verici Tipi";
 "settingsviews_transmitterid" = "Verici Kimliği";

@@ -291,10 +291,6 @@
 
 "settingsviews_showClockWhenScreenIsLocked" = "Uhr anzeigen wenn gesperrt?";
 
-"settingsviews_sectiontitlesensorcountdown" = "Zeit bis Sensorende";
-"settingsviews_showSensorCountdown" = "Zeit bis Sensorende anzeigen?";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Alternative Symbole verwenden?";
-
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////

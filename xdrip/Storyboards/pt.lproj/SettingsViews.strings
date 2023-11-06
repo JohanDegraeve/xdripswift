@@ -31,9 +31,6 @@
 "settingsviews_daysToUseStatisticsMessage" = "Máximo de dias que devemos tentar usar para calcular as estatísticas?\n\n(Introduza 0 para calcular desde a meia-noite de hoje)";
 "settingsviews_useStandardStatisticsRange" = "Usar Intervalo Padrão?";
 "settingsviews_useIFCCA1C" = "Mostar A1C em mmols/mol";
-"settingsviews_sectiontitlesensorcountdown" = "Dias Restantes do Sensor";
-"settingsviews_showSensorCountdown" = "Mostrar Dias Restantes do Sensor?";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Utilizar Gráficos Alternativos?";
 "settingsviews_sectiontitletransmitter" = "Transmissor";
 "settingsviews_transmittertype" = "Tipo de Transmissor";
 "settingsviews_transmitterid" = "ID de Transmissor";

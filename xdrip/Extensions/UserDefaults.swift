@@ -125,16 +125,18 @@ extension UserDefaults {
         
         // Sensor Info settings
         
-        /// show the sensor countdown graphic where applicable?
-        case showSensorCountdown = "showSensorCountdown"
-        /// does the user prefer the alternative "count up" graphics?
-        case showSensorCountdownAlternativeGraphics = "showSensorCountdownAlternativeGraphics"
         /// store the max sensor age in days if applicable to the active sensor type
         case maxSensorAgeInDays = "maxSensorAgeInDays"
         /// active sensor serial number
         case activeSensorSerialNumber = "activeSensorSerialNumber"
+        /// active transmitter id
+        case activeSensorTransmitterId = "activeSensorTransmitterId"
+        /// active sensor description
+        case activeSensorDescription = "activeSensorDescription"
         /// active sensor start date
         case activeSensorStartDate = "activeSensorStartDate"
+        /// active sensor max days (lifetime)
+        case activeSensorMaxSensorAgeInDays = "activeSensorMaxSensorAgeInDays"
         
         
         // Transmitter
@@ -1116,28 +1118,6 @@ extension UserDefaults {
     
     // MARK: Sensor Info Settings
     
-    /// should the countdown graphic be shown in the applicable for the sensor type being used?
-    @objc dynamic var showSensorCountdown: Bool {
-        // default value for bool in userdefaults is false, as default we want the sensor countdown to show when a compatible sensor is started
-        get {
-            return !bool(forKey: Key.showSensorCountdown.rawValue)
-        }
-        set {
-            set(!newValue, forKey: Key.showSensorCountdown.rawValue)
-        }
-    }
-    
-    /// does the user prefer to use the alternative countdown graphic? This would show a "count-up" and not the standard "count-down"
-    @objc dynamic var showSensorCountdownAlternativeGraphics: Bool {
-        // default value for bool in userdefaults is false, as default we want the show the normal countdown graphics so leave as false
-        get {
-            return bool(forKey: Key.showSensorCountdownAlternativeGraphics.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.showSensorCountdownAlternativeGraphics.rawValue)
-        }
-    }
-    
     /// active sensor serial number. Optional as should be set to nil if no successful login has happened and/or if no active sensor is returned
     @objc dynamic var activeSensorSerialNumber: String? {
         get {
@@ -1148,13 +1128,43 @@ extension UserDefaults {
         }
     }
     
+    /// active sensor description. Optional as should be set to nil if no successful login has happened and/or if no active sensor is returned
+    @objc dynamic var activeSensorDescription: String? {
+        get {
+            return string(forKey: Key.activeSensorDescription.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.activeSensorDescription.rawValue)
+        }
+    }
+    
+    /// active transmitter ID. Optional as should be set to nil if there is no transmitter connected. Used for the UI to configure sensor type in case no sensor serial number is availabel (for example Dexcom).
+    @objc dynamic var activeSensorTransmitterId: String? {
+        get {
+            return string(forKey: Key.activeSensorTransmitterId.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.activeSensorTransmitterId.rawValue)
+        }
+    }
+    
     /// active sensor start date. Optional as should be set to nil if there is no sensor connected or if no successful follower login has happened and/or if no active sensor is returned
-    var activeSensorStartDate: Date? {
+    @objc dynamic var activeSensorStartDate: Date? {
         get {
             return object(forKey: Key.activeSensorStartDate.rawValue) as? Date
         }
         set {
             set(newValue, forKey: Key.activeSensorStartDate.rawValue)
+        }
+    }
+    
+    /// active sensor max sensor days. Optional as should be set to nil if no successful login has happened and/or if no active sensor is returned
+    var activeSensorMaxSensorAgeInDays: Double? {
+        get {
+            return double(forKey: Key.activeSensorMaxSensorAgeInDays.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.activeSensorMaxSensorAgeInDays.rawValue)
         }
     }
     

@@ -23,4 +23,7 @@ enum ConstantsDexcomG5 {
     /// specifically for firefly. If calibration was created more than this period ago, but not yet sent to the transmitter, then it will not be sent anymore
     static let maxUnSentCalibrationAge = TimeInterval(minutes: 5)
     
+    /// how many days the sensor session lasts
+    static let maxSensorAgeInDays: Double = 10.0
+    
 }

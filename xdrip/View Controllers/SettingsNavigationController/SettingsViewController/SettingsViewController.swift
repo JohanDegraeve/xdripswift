@@ -44,9 +44,6 @@ final class SettingsViewController: UIViewController {
         /// statistics settings
         case statistics
         
-        /// sensor countdown settings
-        case sensorCountdown
-        
         /// alarms
         case alarms
         
@@ -95,8 +92,6 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewTreatmentsSettingsViewModel()
             case .statistics:
                 return SettingsViewStatisticsSettingsViewModel()
-            case .sensorCountdown:
-                return SettingsViewSensorCountdownSettingsViewModel()
             case .alarms:
                 return SettingsViewAlertSettingsViewModel()
             case .nightscout:

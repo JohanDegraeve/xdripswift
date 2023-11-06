@@ -293,7 +293,7 @@ class BluetoothPeripheralViewController: UIViewController {
                     
                     UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
                     
-                    // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the countdown sensor to be disabled until another sensor session is started with a max sensor age value
+                    // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the sensor info to be disabled until another sensor session is started with a max sensor age value
                     UserDefaults.standard.stopActiveSensor = true
                     
                 }
@@ -337,7 +337,7 @@ class BluetoothPeripheralViewController: UIViewController {
                 
                 UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
                 
-                // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the countdown sensor to be disabled until another sensor session is started with a max sensor age value
+                // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the sensor info to be disabled until another sensor session is started with a max sensor age value
                 UserDefaults.standard.stopActiveSensor = true
                 
             }
@@ -835,7 +835,7 @@ class BluetoothPeripheralViewController: UIViewController {
                 
                 UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
                 
-                // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the countdown sensor to be disabled until another sensor session is started with a max sensor age value
+                // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the sensor info to be disabled until another sensor session is started with a max sensor age value
                 UserDefaults.standard.stopActiveSensor = true
                 
             }

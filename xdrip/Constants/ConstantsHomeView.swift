@@ -32,4 +32,20 @@ enum ConstantsHomeView {
 
     /// github.com repository URL for the project
     static let gitHubURL = "https://github.com/JohanDegraeve/xdripswift"
+    
+    // MARK: - Sensor Info View
+    
+    /// progress view
+    static let sensorProgressViewProgressColorInitial: UIColor = .white
+    static let sensorProgressViewProgressColor: UIColor = .gray
+    static let sensorProgressViewTrackingColor: UIColor = UIColor(white: 0.15, alpha: 1.0)
+    
+    /// warning time left / colour
+    static let sensorProgressViewWarningInMinutes: Double = 60 * 24.0 // 24 hours before the sensor reaches max age
+    static let sensorProgressViewProgressColorWarning: UIColor = .systemYellow
+    
+    /// urgent time left / colour
+    static let sensorProgressViewUrgentInMinutes: Double = 60 * 12.0 // 12 hours before the sensor reaches max age
+    static let sensorProgressViewProgressColorUrgent: UIColor = .systemRed
+    
 }

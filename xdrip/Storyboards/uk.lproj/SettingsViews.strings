@@ -231,9 +231,6 @@
 /// treatments settings, section title
 "settingsviews_sectiontitletreatments" = "Treatments";
 
-/// sensor countdown settings, section title
-"settingsviews_sectiontitlesensorcountdown" = "Sensor Countdown";
-
 /// nightscout settings, when clicking the cell, test the url and api key
 "testUrlAndAPIKey" = "Test Connection?";
 
@@ -359,12 +356,6 @@
 
 /// home screen settings, target value
 "settingsviews_targetValue" = "Target Value";
-
-/// sensor countdown settings, show sensor countdown graphic on home screen
-"settingsviews_showSensorCountdown" = "Show Sensor Countdown?";
-
-/// sensor countdown settings, use alternative sensor countdown graphics on home screen
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Use Alternative Graphics?";
 
 /// help settings, section title
 "settingsviews_sectiontitlehelp" = "Help & Documentation";

@@ -42,7 +42,7 @@ protocol CGMTransmitter:AnyObject {
     
     /// maximum sensor age in days, nil if no maximum
     /// - default implementation returns nil
-    func maxSensorAgeInDays() -> Int?
+    func maxSensorAgeInDays() -> Double?
     
     /// to send a start sensor command to the transmitter
     /// - only useful for Dexcom - firefly type of transmitters, other transmitter types will have an empty implementation
@@ -264,6 +264,46 @@ enum CGMTransmitterType:String, CaseIterable {
         }
     }
     
+    func detailedDescription() -> String {
+        
+        switch self {
+            /// dexcom G5, G6
+        case .dexcom:
+            
+            if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId {
+                
+                if transmitterIdString.startsWith("4") {
+                    
+                    return "Dexcom G5"
+                    
+                } else if transmitterIdString.startsWith("8") {
+                    
+                    return "Dexcom G6"
+                    
+                } else if transmitterIdString.startsWith("5") {
+                    
+                    return "Dexcom One (5xxxxx)"
+                    
+                } else if transmitterIdString.startsWith("C") {
+                    
+                    return "Dexcom One"
+                    
+                }
+                
+            }
+            
+            return "Dexcom"
+            
+        case .Libre2:
+            return "Libre 2 Direct"
+            
+        default:
+            return self.rawValue
+            
+        }
+        
+    }
+    
 }
 
 extension CGMTransmitter {
@@ -287,7 +327,7 @@ extension CGMTransmitter {
     func requestNewReading() {}
 
     // default implementation, nil
-    func maxSensorAgeInDays() -> Int? {return nil}
+    func maxSensorAgeInDays() -> Double? {return nil}
     
     // default implementation, does nothing
     func startSensor(sensorCode: String?, startDate: Date) {}

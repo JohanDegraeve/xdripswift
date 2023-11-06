@@ -30,9 +30,6 @@
 "settingsviews_daysToUseStatisticsMessage" = "Máximos días a intentar usar para calcular las estadísticas?\n\n(Entrar 0 para calcular el día de hoy desde las 00:00hrs)";
 "settingsviews_useStandardStatisticsRange" = "Usar Rango Estándar?";
 "settingsviews_useIFCCA1C" = "Ver HbA1c en mmols/mol?";
-"settingsviews_sectiontitlesensorcountdown" = "Días Restantes del Sensor";
-"settingsviews_showSensorCountdown" = "Mostrar días restantes?";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Usar gráficas alternativas?";
 "settingsviews_sectiontitletransmitter" = "Transmisor";
 "settingsviews_transmittertype" = "Tipo de Transmisor";
 "settingsviews_transmitterid" = "ID del Transmisor";

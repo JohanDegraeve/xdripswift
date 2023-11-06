@@ -400,14 +400,29 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             
         case .followerSensorStartDate:
             switch UserDefaults.standard.followerDataSourceType {
+                
             case .libreLinkUp:
+                
                 if let startDate = UserDefaults.standard.activeSensorStartDate {
                     
-                    var startDateString = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
+                    let sensorTimeInMinutes = Int(Date().timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
                     
-                    startDateString += " (" + startDate.daysAndHoursAgo() + ")"
+                    if sensorTimeInMinutes < Int(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre) {
+                        
+                        // the Libre sensor is still in warm-up time so let's make it clear to the user
+                        let sensorReadyDateTime = startDate.addingTimeInterval(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre * 60)
+                        
+                        let startDateString = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                        
+                        return startDateString
+                        
+                    } else {
+                        
+                        let startDateString = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short) + " (" + startDate.daysAndHoursAgo() + ")"
+                        
+                        return startDateString
+                    }
                     
-                    return startDateString
                     
                 } else {
                     return ""

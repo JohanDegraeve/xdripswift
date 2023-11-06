@@ -125,14 +125,8 @@
 /// general settings, should the online help be translated automatically if needed
 "settingsviews_translateOnlineHelp" = "Käännä automaattisesti?";
 
-/// sensor countdown settings, use alternative sensor countdown graphics on home screen
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Käytä vaihtoehtoista grafiikkaa?";
-
 /// home screen settings, should the main glucose chart screen be allowed?
 "settingsviews_allowScreenRotation" = "Salli kaavion kierto?";
-
-/// sensor countdown settings, section title
-"settingsviews_sectiontitlesensorcountdown" = "Sensorin lähtölaskenta";
 
 /// help settings, section title
 "settingsviews_sectiontitlehelp" = "Ohje ja dokumentaatio";
@@ -142,9 +136,6 @@
 
 /// help settings, open the online help
 "settingsviews_showOnlineHelp" = "Avaa online ohje?";
-
-/// sensor countdown settings, show sensor countdown graphic on home screen
-"settingsviews_showSensorCountdown" = "Näytä sensorin lähtölaskenta?";
 
 /// web oop settings in bluetooth peripheral view : enabled or not
 "settingsviews_webooptransmitter" = "Käytä lähettimen algoritmiä?";

@@ -34,9 +34,6 @@
 "settingsviews_daysToUseStatisticsMessage" = "Μέγιστος αριθμός ημερών για στατιστικό υπολογισμό;\n\n(Εισαγάγετε 0 για υπολογισμό από σήμερα τα μεσάνυχτα)";
 "settingsviews_useStandardStatisticsRange" = "Χρήση Τυπικού εύρους;";
 "settingsviews_useIFCCA1C" = "Εμφάνιση HbA1c ως mmols/mol?";
-"settingsviews_sectiontitlesensorcountdown" = "Αντίστροφη μέτρηση αισθητήρα";
-"settingsviews_showSensorCountdown" = "Εμφάνιση αντίστροφης μέτρησης αισθητήρα;";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Χρήση εναλλακτικών γραφικών;";
 "settingsviews_sectiontitletransmitter" = "Πομπός";
 "settingsviews_transmittertype" = "Τύπος πομπού";
 "settingsviews_transmitterid" = "Αναγνωριστικό πομπού";

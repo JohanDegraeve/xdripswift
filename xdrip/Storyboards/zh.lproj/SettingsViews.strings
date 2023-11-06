@@ -257,14 +257,9 @@
 /// general settings, should the online help be translated automatically if needed
 "settingsviews_translateOnlineHelp" = "Translate Automatically?";
 
-/// sensor countdown settings, use alternative sensor countdown graphics on home screen
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Use Alternative Graphics?";
 
 /// home screen settings, should the main glucose chart screen be allowed?
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
-
-/// sensor countdown settings, section title
-"settingsviews_sectiontitlesensorcountdown" = "Sensor Countdown";
 
 /// help settings, section title
 "settingsviews_sectiontitlehelp" = "Help & Documentation";
@@ -274,9 +269,6 @@
 
 /// help settings, open the online help
 "settingsviews_showOnlineHelp" = "Open Online Help?";
-
-/// sensor countdown settings, show sensor countdown graphic on home screen
-"settingsviews_showSensorCountdown" = "Show Sensor Countdown?";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

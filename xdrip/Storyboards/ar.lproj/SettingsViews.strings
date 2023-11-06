@@ -100,13 +100,10 @@
 "settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";
 "settingsviews_showClockWhenScreenIsLocked" = "عرض الساعة عند القفل؟";
 "settingsviews_translateOnlineHelp" = "هل تريد الترجمة تلقائيًا؟";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "استخدام الرسومات البديلة؟";
 "settingsviews_allowScreenRotation" = "السماح بإلتفاف المخطط؟";
-"settingsviews_sectiontitlesensorcountdown" = "العد التنازلي للحساس";
 "settingsviews_sectiontitlehelp" = "المساعدة والتوثيق";
 "calendarEventsSectionTitle" = "أحداث التقويم";
 "settingsviews_showOnlineHelp" = "فتح المساعدة عبر الإنترنت؟";
-"settingsviews_showSensorCountdown" = "إظهار العد التنازلي للحساس؟";
 "settingsviews_webooptransmitter" = "استخدام خوارزمية جهاز الإرسال؟";
 "settingsviews_labelWebOOP" = "خوارزمية xDrip أو جهاز الإرسال";
 "settingsviews_showHelpIcon" = "إظهار رمز المساعدة؟";

@@ -439,12 +439,6 @@ class Trace {
         
         // how many hours are selected for the chart width
         traceInfo.appendStringAndNewLine("    Selected chart width: " + UserDefaults.standard.chartWidthInHours.description)
-
-        // is sensor countdown on or off
-        traceInfo.appendStringAndNewLine("    Show sensor countdown: " + UserDefaults.standard.showSensorCountdown.description)
-        
-        // is the sensor countdown using the count-up graphics?
-        traceInfo.appendStringAndNewLine("    Use alternative graphics: " + UserDefaults.standard.showSensorCountdownAlternativeGraphics.description)
   
         // are calendar events on or off
         traceInfo.appendStringAndNewLine("    Write calendar events: " + UserDefaults.standard.createCalendarEvent.description)
