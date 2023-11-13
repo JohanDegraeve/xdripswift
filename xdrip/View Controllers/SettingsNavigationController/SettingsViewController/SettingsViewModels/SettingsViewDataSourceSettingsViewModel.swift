@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import SwiftUI
+import os
 
 fileprivate enum Setting: Int, CaseIterable {
     
@@ -17,23 +17,26 @@ fileprivate enum Setting: Int, CaseIterable {
     /// if follower, what should be the data source
     case followerDataSourceType = 1
     
+    /// if follower, should we try and keep the app alive in the background
+    case followerKeepAliveType = 2
+    
     /// if follower data source is not Nightscout, should we upload the BG values to Nightscout?
-    case uploadFollowerDataToNightscout = 2
+    case followerUploadDataToNightscout = 3
     
     /// web follower username
-    case followerUserName = 3
+    case followerUserName = 4
     
     /// web follower username
-    case followerPassword = 4
+    case followerPassword = 5
     
     /// web follower sensor serial number (will not always be available)
-    case followerSensorSerialNumber = 5
+    case followerSensorSerialNumber = 6
     
     /// web follower sensor start date (will not always be available)
-    case followerSensorStartDate = 6
+    case followerSensorStartDate = 7
     
     /// web follower server region
-    case followerRegion = 7
+    case followerRegion = 8
     
 }
 
@@ -42,6 +45,12 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     
     private var coreDataManager: CoreDataManager?
     
+    /// the viewcontroller sets it by calling storeMessageHandler
+    private var messageHandler: ((String, String) -> Void)?
+    
+    /// for trace
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel)
+    
     init(coreDataManager: CoreDataManager?) {
         
         self.coreDataManager = coreDataManager
@@ -49,6 +58,17 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         super.init()
         
         addObservers()
+        
+    }
+    
+    private func callMessageHandlerInMainThread(title: String, message: String) {
+        
+        // unwrap messageHandler
+        guard let messageHandler = messageHandler else {return}
+        
+        DispatchQueue.main.async {
+            messageHandler(title, message)
+        }
         
     }
     
@@ -61,9 +81,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     }
     
     func storeUIViewController(uIViewController: UIViewController) {}
-
-    func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
-        // this ViewModel does need to send back messages to the viewcontroller asynchronously
+    
+    func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {
+        self.messageHandler = messageHandler
     }
     
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
@@ -163,20 +183,66 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                     
                     let newFollowerDataSourceType = UserDefaults.standard.followerDataSourceType
                     
-                    print("Follower source data type was changed from '" + oldFollowerDataSourceType.description + "' to '" + newFollowerDataSourceType.description + "'")
+                    trace("follower source data type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, oldFollowerDataSourceType.description, newFollowerDataSourceType.description)
                     
-                    if UserDefaults.standard.followerDataSourceType.needsUserNameAndPassword() && ( UserDefaults.standard.libreLinkUpEmail == nil || UserDefaults.standard.libreLinkUpPassword == nil) {
-                        
-                        _ = SettingsSelectedRowAction.showInfoText(title: "Account details needed", message: "In order to use LibreLinkUp follower mode, you need to add the e-mail address and password of the LibreLinkUpUp account that was invited to view BG values")
-                        
+                }
+                
+            }, cancelHandler: nil, didSelectRowHandler: nil)
+            
+        case .followerKeepAliveType:
+            
+            // data to be displayed in list from which user needs to pick a follower keep-alive type
+            var data = [String]()
+            
+            var selectedRow: Int?
+            
+            var index = 0
+            
+            let currentKeepAliveType = UserDefaults.standard.followerBackgroundKeepAliveType
+            
+            // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
+            for keepAliveType in FollowerBackgroundKeepAliveType.allCases {
+                
+                data.append(keepAliveType.description)
+                
+                if keepAliveType == currentKeepAliveType {
+                    selectedRow = index
+                }
+                
+                index += 1
+                
+            }
+            
+            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelfollowerKeepAliveType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+                
+                // we'll set this here so that we can use it for logging
+                let oldFollowerBackgroundKeepAliveType = UserDefaults.standard.followerBackgroundKeepAliveType
+                
+                if index != selectedRow {
+                    
+                    UserDefaults.standard.followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: index) ?? .normal
+                    
+                    let newFollowerBackgroundKeepAliveType = UserDefaults.standard.followerBackgroundKeepAliveType
+                    
+                    trace("follower background keep-alive type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, oldFollowerBackgroundKeepAliveType.description, newFollowerBackgroundKeepAliveType.description)
+                    
+                    var message = "\n"
+                    
+                    switch newFollowerBackgroundKeepAliveType {
+                    case .disabled:
+                        message += Texts_SettingsView.followerKeepAliveTypeDisabled
+                    case .normal:
+                        message += Texts_SettingsView.followerKeepAliveTypeNormal
+                    case .aggressive:
+                        message += Texts_SettingsView.followerKeepAliveTypeAggressive
                     }
                     
-                } else {
-                    print("Follower source data type was kept as '" + oldFollowerDataSourceType.description + "'")
+                    self.callMessageHandlerInMainThread(title: Texts_SettingsView.labelfollowerKeepAliveType, message: message)
+                    
                 }
             }, cancelHandler: nil, didSelectRowHandler: nil)
             
-        case .uploadFollowerDataToNightscout:
+        case .followerUploadDataToNightscout:
             
             return UserDefaults.standard.nightScoutEnabled ? .nothing : SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.nightscoutNotEnabled)
             
@@ -273,8 +339,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             switch UserDefaults.standard.followerDataSourceType {
             
             case .nightscout:
-                // no need to show any extra rows/settings as all Nightscout required parameters are set in the Nightscout section
-                return 2
+                // no need to show any extra rows/settings (beyond keep-alive) as all Nightscout required parameters are set in the Nightscout section
+                return 3
             
             case .libreLinkUp:
                 // show all sections
@@ -297,7 +363,10 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerDataSourceType:
             return Texts_SettingsView.labelFollowerDataSourceType
             
-        case .uploadFollowerDataToNightscout:
+        case .followerKeepAliveType:
+            return Texts_SettingsView.labelfollowerKeepAliveType
+            
+        case .followerUploadDataToNightscout:
             return Texts_SettingsView.labelUploadFollowerDataToNightscout
             
         case .followerUserName:
@@ -324,10 +393,10 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         
         switch setting {
     
-        case .masterFollower, .uploadFollowerDataToNightscout, .followerSensorSerialNumber, .followerRegion:
+        case .masterFollower, .followerUploadDataToNightscout, .followerSensorSerialNumber, .followerRegion:
             return UITableViewCell.AccessoryType.none
             
-        case .followerDataSourceType, .followerUserName, .followerPassword:
+        case .followerDataSourceType, .followerKeepAliveType, .followerUserName, .followerPassword:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
         case .followerSensorStartDate:
@@ -356,7 +425,11 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerDataSourceType:
             return UserDefaults.standard.followerDataSourceType.description
             
-        case .uploadFollowerDataToNightscout:
+        case .followerKeepAliveType:
+            //return nil
+            return UserDefaults.standard.followerBackgroundKeepAliveType.description
+            
+        case .followerUploadDataToNightscout:
             return UserDefaults.standard.nightScoutEnabled ? nil : Texts_SettingsView.nightscoutNotEnabledRowText
             
         case .followerUserName:
@@ -465,9 +538,12 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .masterFollower, .followerDataSourceType, .followerUserName, .followerPassword, .followerSensorSerialNumber, .followerSensorStartDate, .followerRegion:
             return nil
             
-        case .uploadFollowerDataToNightscout:
+        case .followerKeepAliveType:
+            return nil
             
-            return UserDefaults.standard.nightScoutEnabled ? UISwitch(isOn: UserDefaults.standard.uploadFollowerDataToNightscout, action: {(isOn:Bool) in UserDefaults.standard.uploadFollowerDataToNightscout = isOn}) : nil
+        case .followerUploadDataToNightscout:
+            
+            return UserDefaults.standard.nightScoutEnabled ? UISwitch(isOn: UserDefaults.standard.followerUploadDataToNightscout, action: {(isOn:Bool) in UserDefaults.standard.followerUploadDataToNightscout = isOn}) : nil
             
         }
 

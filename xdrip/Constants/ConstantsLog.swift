@@ -172,5 +172,8 @@ enum ConstantsLog {
     /// for use in Bg Readings view
     static let categoryBgReadingsView =                         "BgReadingsView           "
     
+    /// SettingsViewCalendarEventsSettingsViewModel logging
+    static let categorySettingsViewDataSourceSettingsViewModel =         "SettingsViewDataSourceSettingsViewModel"
+    
 }
 

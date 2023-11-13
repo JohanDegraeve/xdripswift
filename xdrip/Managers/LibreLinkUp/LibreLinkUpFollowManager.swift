@@ -53,13 +53,7 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// http header array - need to append "version" key before making request
     /// https://gist.github.com/khskekec/6c13ba01b10d3018d816706a32ae8ab2#headers
-    private let libreLinkUpRequestHeaders = [
-        "accept-encoding": "gzip",
-        "cache-control": "no-cache",
-        "connection": "keep-alive",
-        "content-type": "application/json",
-        "product": "llu.ios",
-    ]
+    private let libreLinkUpRequestHeaders = ConstantsLibreLinkUp.libreLinkUpRequestHeaders
     
     /// keeps track of the api region in order to generate the correct URL
     private var libreLinkUpRegion: LibreLinkUpRegion?
@@ -216,7 +210,9 @@ class LibreLinkUpFollowManager: NSObject {
         trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
 
         // TODO: crash here sometimes
-        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        DispatchQueue.main.async {
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        }
         
         Task {
             
@@ -707,17 +703,28 @@ class LibreLinkUpFollowManager: NSObject {
         
     }
     
-    /// launches timer that will regular play sound - this will be played only when app goes to background
+    /// launches timer that will regular play sound - this will be played only when app goes to background and only if the user wants to keep the app alive
     private func enableSuspensionPrevention() {
         
-        // create playSoundTimer
-        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(ConstantsSuspensionPrevention.interval)), eventHandler: {
+        // if keep-alive is disabled, then just return and do nothing
+        if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+            
+            print("not enabling suspension prevention as keep-alive is disabled")
+            
+            return
+            
+        }
+        
+        let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
+        
+        // create playSoundTimer depending on the keep-alive type selected
+        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: {
             // play the sound
             
             trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             
             if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, interval, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
                 audioPlayer.play()
             }
         })
@@ -744,8 +751,12 @@ class LibreLinkUpFollowManager: NSObject {
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
         if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && UserDefaults.standard.libreLinkUpEmail != nil && UserDefaults.standard.libreLinkUpPassword != nil {
             
-            // this will enable the suspension prevention sound playing
-            enableSuspensionPrevention()
+            // this will enable the suspension prevention sound playing if background keep-alive is enabled
+            if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
+                enableSuspensionPrevention()
+            } else {
+                disableSuspensionPrevention()
+            }
             
             // do initial download, this will also schedule future downloads
             download()

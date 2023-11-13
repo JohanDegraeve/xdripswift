@@ -17,22 +17,6 @@ public enum FollowerDataSourceType: Int, CaseIterable {
 
     case nightscout = 0
     case libreLinkUp = 1
-
-    /// this is used for presentation in UI table view. It allows to order the alert kinds in the view, different than they case ordering, and so allows to add new cases
-    init?(forSection section: Int) {
-        
-        switch section {
-            
-        case 0:
-            self = .nightscout
-        case 1:
-            self = .libreLinkUp
-            
-        default:
-            fatalError("in FollowerDataSourceType initializer init(forRowAt row: Int), there's no case for the rownumber")
-        }
-        
-    }
     
     var description: String {
         switch self {
@@ -49,19 +33,6 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "NS"
         case .libreLinkUp:
             return "LL"
-        }
-    }
-    
-    /// gives the raw value of the alertkind for a specific section in a uitableview, is the opposite of the initializer
-    static func followerDataSourceTypeRawValue(forSection section: Int) -> Int {
-        
-        switch section {
-        case 0:// nightscout
-            return 0
-        case 1:// libreLinkUp
-            return 1
-        default:
-            fatalError("in dataSourceRawValue, unknown case")
         }
     }
 

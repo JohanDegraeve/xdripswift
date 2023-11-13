@@ -383,31 +383,29 @@ class Trace {
         traceInfo.appendStringAndNewLine("App settings:")
 
         // master or follower mode?
-        traceInfo.appendStringAndNewLine("    Mode: " + (UserDefaults.standard.isMaster ? "Master" : UserDefaults.standard.followerDataSourceType.descriptionForLogging()))
+        traceInfo.appendStringAndNewLine("    Data Source Mode: " + (UserDefaults.standard.isMaster ? "Master" : UserDefaults.standard.followerDataSourceType.descriptionForLogging()))
         
+        // if follower mode, is background keep-alive enabled?
+        if !UserDefaults.standard.isMaster {
+            
+            traceInfo.appendStringAndNewLine("       Background follower keep-alive type: " + UserDefaults.standard.followerBackgroundKeepAliveType.description)
+            
+        }
+                
         // if follower mode, what is the data source selected
-        if UserDefaults.standard.followerDataSourceType == .libreLinkUp {
+        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp {
             
             if UserDefaults.standard.libreLinkUpEmail != nil {
-                
-                traceInfo.appendStringAndNewLine("       Username: Present")
-                
+                traceInfo.appendStringAndNewLine("    Username: Present")
             } else {
-                
-                traceInfo.appendStringAndNewLine("       Username: Missing")
-                
+                traceInfo.appendStringAndNewLine("    Username: Missing")
             }
             
             if UserDefaults.standard.libreLinkUpPassword != nil {
-                
-                traceInfo.appendStringAndNewLine("       Password: Present")
-                
+                traceInfo.appendStringAndNewLine("    Password: Present")
             } else {
-                
-                traceInfo.appendStringAndNewLine("       Password: Missing")
-                
+                traceInfo.appendStringAndNewLine("    Password: Missing")
             }
-            
         }
 
         // is help icon hidden on or off
@@ -459,7 +457,10 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Hide screen lock warning?: " + UserDefaults.standard.lockScreenDontShowAgain.description)
         traceInfo.appendStringAndNewLine("    NS log enabled: " + UserDefaults.standard.NSLogEnabled.description)
         traceInfo.appendStringAndNewLine("    OS log enabled: " + UserDefaults.standard.OSLogEnabled.description)
-        traceInfo.appendStringAndNewLine("    Smooth Libre Readings: " + UserDefaults.standard.smoothLibreValues .description + "\n")
+        traceInfo.appendStringAndNewLine("    Smooth Libre Readings: " + UserDefaults.standard.smoothLibreValues.description)
+        traceInfo.appendStringAndNewLine("    Suppress Unlock Payload Libre Readings: " + UserDefaults.standard.suppressUnLockPayLoad.description)
+        traceInfo.appendStringAndNewLine("    Suppress Loop Share: " + UserDefaults.standard.suppressLoopShare.description)
+        traceInfo.appendStringAndNewLine("    LibreLinkUp version: " + (UserDefaults.standard.libreLinkUpVersion?.description ?? "nil") + "\n")
 
         // BG chart threshold values
         traceInfo.appendStringAndNewLine("Chart threshold values:")
@@ -468,6 +469,15 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Target: " + UserDefaults.standard.targetMarkValueInUserChosenUnitRounded.description)
         traceInfo.appendStringAndNewLine("    High: " + UserDefaults.standard.highMarkValueInUserChosenUnitRounded.description)
         traceInfo.appendStringAndNewLine("    Urgent high: " + UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded.description + "\n")
+        
+        // show the active sensor information from coredata
+        traceInfo.appendStringAndNewLine(paragraphSeperator)
+        traceInfo.appendStringAndNewLine("Active Sensor Information (stored in Core Data):\n")
+        traceInfo.appendStringAndNewLine("    Active Sensor Description: " + (UserDefaults.standard.activeSensorDescription?.description ?? "nil"))
+        traceInfo.appendStringAndNewLine("    Active Sensor Start Date: " + (UserDefaults.standard.activeSensorStartDate?.description ?? "nil"))
+        traceInfo.appendStringAndNewLine("    Active Sensor Max Days: " + (UserDefaults.standard.activeSensorMaxSensorAgeInDays?.description ?? "nil"))
+        traceInfo.appendStringAndNewLine("    Active Transmitter ID (optional): " + (UserDefaults.standard.activeSensorTransmitterId?.description ?? "nil") + "\n")
+        
         
         // Info from coredata
         

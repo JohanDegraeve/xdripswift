@@ -568,11 +568,13 @@ final class RootViewController: UIViewController, ObservableObject {
         
         updateWatchApp()
         
-        // let's run the sensor info update 2 seconds after the view appears. This should give time for the follower modes to download and populate the info needed.
-        // if the sensor info view was previously hidden, then animate it so that it appears nicely, if not, don't
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+        // let's run the sensor info and chart update 1 second after the root view appears. This should give time for the follower modes to download and populate the info needed.
+        // no animation is needed as in most cases, we're just refreshing and displaying what is already shown on screen so we want to keep this refresh invisible.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             
-            self.updateSensorInfoView(animate: self.sensorInfoViewOutlet.isHidden)
+            self.updateSensorInfoView(animate: false)
+            
+            self.updateLabelsAndChart(overrideApplicationState: true)
             
         }
         
@@ -842,7 +844,17 @@ final class RootViewController: UIViewController, ObservableObject {
         })
         
         // add tracing when app goes from foreground to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyTraceAppGoesToBackGround, closure: {trace("Application did enter background", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyTraceAppGoesToBackGround, closure: {
+            
+            trace("Application did enter background", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            
+            if !UserDefaults.standard.isMaster {
+                
+                trace("    follower background keep-alive type: %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, UserDefaults.standard.followerBackgroundKeepAliveType.description)
+                
+            }
+            
+        })
         
         // add tracing when app comes to foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyTraceAppGoesToForeground, closure: {trace("Application will enter foreground", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
@@ -860,11 +872,6 @@ final class RootViewController: UIViewController, ObservableObject {
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             
             // Schedule a call to updateLabelsAndChart when the app comes to the foreground, with a delay of 0.5 seconds. Because the application state is not immediately to .active, as a result, updates may not happen - especially the synctreatments may not happen because this may depend on the application state - by making a call just half a second later, when the status is surely = .active, the treatments sync will be done.
-            //Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateLabelsAndChart), userInfo: nil, repeats:false)
-
-            //self.updateLabelsAndChart(overrideApplicationState: true)
-            
-            // let's run the progress update in an async thread with a really small delay so that the animation updates smoothly after the view has appeared
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 
                 self.updateLabelsAndChart(overrideApplicationState: true)
@@ -1982,8 +1989,8 @@ final class RootViewController: UIViewController, ObservableObject {
             // Create Notification Content
             let notificationContent = UNMutableNotificationContent()
             
-            // set value in badge if required
-            if UserDefaults.standard.showReadingInAppBadge {
+            // set value in badge if required and also only if master, or when background keep alive is enabled for followers
+            if UserDefaults.standard.showReadingInAppBadge && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster &&  UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
                 
                 // rescale if unit is mmol
                 if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
@@ -2024,9 +2031,9 @@ final class RootViewController: UIViewController, ObservableObject {
         }
         else {
             
-            // notification shouldn't be shown, but maybe the badge counter. Here the badge value needs to be shown in another way
+            // notification shouldn't be shown, but maybe the badge counter. Here the badge value needs to be shown in another way and also only if master, or when background keep alive is enabled for followers
             
-            if UserDefaults.standard.showReadingInAppBadge {
+            if UserDefaults.standard.showReadingInAppBadge && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
                 
                 // rescale of unit is mmol
                 readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
@@ -2052,7 +2059,9 @@ final class RootViewController: UIViewController, ObservableObject {
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
-        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        DispatchQueue.main.async {
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        }
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
         if let glucoseChartManager = glucoseChartManager  {

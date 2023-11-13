@@ -329,7 +329,9 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
             coreDataManager.saveChanges()
             
             // trigger nightscoutsync
-            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+            DispatchQueue.main.async {
+                UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+            }
             
 			// Reloads data and table.
 			self.reload()

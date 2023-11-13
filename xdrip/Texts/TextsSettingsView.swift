@@ -35,7 +35,7 @@ class Texts_SettingsView {
     // MARK: - Section Data Source
     
     static let sectionTitleDataSource: String = {
-        return NSLocalizedString("settingsviews_sectionTitleDataSource", tableName: filename, bundle: Bundle.main, value: "Data Source", comment: "data source settings, section title")
+        return NSLocalizedString("settingsviews_sectionTitleDataSource", tableName: filename, bundle: Bundle.main, value: "CGM Data Source", comment: "CGM data source settings, section title")
     }()
     
     static let labelMasterOrFollower: String = {
@@ -48,6 +48,22 @@ class Texts_SettingsView {
     
     static let labelUploadFollowerDataToNightscout: String = {
         return NSLocalizedString("settingsviews_labelUploadFollowerDataToNightscout", tableName: filename, bundle: Bundle.main, value: "Upload to Nightscout?", comment: "data source settings, enable Nightscout upload")
+    }()
+    
+    static let labelfollowerKeepAliveType: String = {
+        return NSLocalizedString("settingsviews_labelfollowerKeepAliveType", tableName: filename, bundle: Bundle.main, value: "Background Keep-alive", comment: "data source settings, enable background keep alive")
+    }()
+    
+    static let followerKeepAliveTypeDisabled: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeDisabled", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to disabled")
+    }()
+    
+    static let followerKeepAliveTypeNormal: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeNormal", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to normal")
+    }()
+    
+    static let followerKeepAliveTypeAggressive: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressive", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.", comment: "data source settings, keep-alive mode is set to aggressive")
     }()
     
     static let nightscoutNotEnabled: String = {

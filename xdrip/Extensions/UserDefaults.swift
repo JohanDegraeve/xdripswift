@@ -34,7 +34,9 @@ extension UserDefaults {
         /// which follower mode is selected?
         case followerDataSourceType = "followerDataSourceType"
         /// should follower data (if not from Nightscout) be uploaded to Nightscout?
-        case uploadFollowerDataToNightscout = "uploadFollowerDataToNightscout"
+        case followerUploadDataToNightscout = "followerUploadDataToNightscout"
+        /// should we try to keep the follower alive in the background? If so, which type?
+        case followerBackgroundKeepAliveType = "followerBackgroundKeepAliveType"
         
         // LibreLinkUp account info
         /// LibreLinkUp username
@@ -426,13 +428,36 @@ extension UserDefaults {
         }
     }
     
-    /// if using a follower mode other than Nightscout, should we upload the values to Nightscout? Yes or no (default no)
-    @objc dynamic var uploadFollowerDataToNightscout: Bool {
+    /// holds the enum integer of the type of follower keep-alive to be used
+    /// it would default to 0 (disabled) so to avoid this, we'll manually set it to normal the first time get is called
+    var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType {
         get {
-            return bool(forKey: Key.uploadFollowerDataToNightscout.rawValue)
+            
+            // check if the followerBackgroundKeepAliveType key has already been previously set. If not, then configure it as needed for first use
+            guard let _ = UserDefaults.standard.object(forKey: "followerBackgroundKeepAliveType") else {
+                
+                // this is the first time the keep-alive key has been called, so set it to 1 (normal). Needed because otherwise it would initialize to 0 (disabled).
+                set(FollowerBackgroundKeepAliveType.normal.rawValue, forKey: Key.followerBackgroundKeepAliveType.rawValue)
+                
+                let followerBackgroundKeepAliveTypeAsInt = integer(forKey: Key.followerBackgroundKeepAliveType.rawValue)
+                return FollowerBackgroundKeepAliveType(rawValue: followerBackgroundKeepAliveTypeAsInt) ?? .normal
+            }
+            
+            let followerBackgroundKeepAliveTypeAsInt = integer(forKey: Key.followerBackgroundKeepAliveType.rawValue)
+            return FollowerBackgroundKeepAliveType(rawValue: followerBackgroundKeepAliveTypeAsInt) ?? .normal
         }
         set {
-            set(newValue, forKey: Key.uploadFollowerDataToNightscout.rawValue)
+            set(newValue.rawValue, forKey: Key.followerBackgroundKeepAliveType.rawValue)
+        }
+    }
+    
+    /// should the follower CGM data be uploaded to Nightscout?
+    @objc dynamic var followerUploadDataToNightscout: Bool {
+        get {
+            return bool(forKey: Key.followerUploadDataToNightscout.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.followerUploadDataToNightscout.rawValue)
         }
     }
     
