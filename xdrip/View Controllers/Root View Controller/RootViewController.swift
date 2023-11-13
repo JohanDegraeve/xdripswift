@@ -1405,9 +1405,6 @@ final class RootViewController: UIViewController, ObservableObject {
 
             }
             
-        default:
-            break
-            
         }
         
     }
@@ -3329,7 +3326,7 @@ extension RootViewController: UNUserNotificationCenterDelegate {
         } else if notification.request.identifier == ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
             
             // call completionhandler to show the notification even though the app is in the foreground, without sound
-            completionHandler([.alert])
+            completionHandler([.banner, .list])
             
         } else if notification.request.identifier == ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             
@@ -3346,17 +3343,12 @@ extension RootViewController: UNUserNotificationCenterDelegate {
         }  else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForVolumeTest {
             
             // user is testing iOS Sound volume in the settings. Only the sound should be played, the alert itself will not be shown
-            if #available(iOS 14.0, *) {
-                completionHandler([.sound, .list])
-            } else {
-                // Fallback on earlier versions
-                completionHandler([.sound])
-            }
+            completionHandler([.sound, .list])
             
         } else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForxCGMTransmitterDelegatexDripError {
             
             // call completionhandler to show the notification even though the app is in the foreground, without sound
-            completionHandler([.alert])
+            completionHandler([.banner, .list])
             
         }
     }

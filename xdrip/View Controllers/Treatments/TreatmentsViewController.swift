@@ -100,7 +100,8 @@ class TreatmentsViewController : UIViewController {
 		
 		// Fixes dark mode issues
 		if let navigationBar = navigationController?.navigationBar {
-			navigationBar.barStyle = UIBarStyle.blackTranslucent
+			navigationBar.barStyle = UIBarStyle.black
+            navigationBar.isTranslucent = true
 			navigationBar.barTintColor  = UIColor.black
 			navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
 		}
