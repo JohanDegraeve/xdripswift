@@ -2932,13 +2932,23 @@ final class RootViewController: UIViewController, ObservableObject {
                 
             }
             
-            
-            // set progress background colour from constants file
+            // set progress view colours and text colours from constants file
             sensorProgressViewOutlet.trackTintColor = ConstantsHomeView.sensorProgressViewTrackingColor
+            sensorProgressViewOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
+            
+            sensorInfoSensorLabelOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
+            sensorInfoSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
+            sensorInfoSensorMaxAgeOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
             
             
-            // let's colour the progress view bar if the sensor is soon to reach max days
-            if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
+            // irrespective of all the above, if the current sensor age is over the max age, then just set everything to the expired colour to make it clear
+            if sensorTimeLeftInMinutes < 0 {
+                
+                sensorProgressViewOutlet.progressTintColor = ConstantsHomeView.sensorProgressExpired
+                sensorInfoSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
+                sensorInfoSensorMaxAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
+                
+            } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
                 
                 // sensor is very close to ending
                 sensorInfoSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
@@ -2951,12 +2961,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 sensorInfoSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
                 sensorProgressViewOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
                                 
-            } else {
-                
-                // sensor is not close to ending, so let's keep it the standard colour
-                sensorProgressViewOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
-                
             }
+            
             
             // set the sensor/system description
             sensorInfoSensorLabelOutlet.text = UserDefaults.standard.activeSensorDescription
