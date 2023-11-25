@@ -557,7 +557,7 @@ final class RootViewController: UIViewController, ObservableObject {
         updateSensorInfoView(animate: true)
         
         // update statistics related outlets
-        updateStatistics(animatePieChart: true, overrideApplicationState: true)
+        updateStatistics(animate: true, overrideApplicationState: true)
         
     }
     
@@ -657,47 +657,23 @@ final class RootViewController: UIViewController, ObservableObject {
                  break
              }
         
-                
-        // format the segmented control of the chart hours if possible (should normally be ok)
-        if #available(iOS 13.0, *) {
-            
-            // set the basic formatting. We basically want it to dissapear into the background
-            segmentedControlChartHours.backgroundColor = ConstantsUI.segmentedControlBackgroundColor
-            segmentedControlChartHours.tintColor = ConstantsUI.segmentedControlBackgroundColor
-            segmentedControlChartHours.layer.borderWidth = ConstantsUI.segmentedControlBorderWidth
-
-            
-            // format the unselected segments
-            segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlNormalTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.normal)
-            
-            // format the selected segment
-            segmentedControlChartHours.selectedSegmentTintColor = ConstantsUI.segmentedControlSelectedTintColor
-            
-            segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlSelectedTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.selected)
         
-        }
+        // format the segmented control of the chart hours. We basically want it to dissapear into the background
+        segmentedControlChartHours.backgroundColor = ConstantsUI.segmentedControlBackgroundColor
+        segmentedControlChartHours.tintColor = ConstantsUI.segmentedControlBackgroundColor
+        segmentedControlChartHours.layer.borderWidth = ConstantsUI.segmentedControlBorderWidth
+        segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlNormalTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.normal)
+        segmentedControlChartHours.selectedSegmentTintColor = ConstantsUI.segmentedControlSelectedTintColor
+        segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlSelectedTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.selected)
         
+        // set the basic formatting of the chart days
+        segmentedControlStatisticsDays.backgroundColor = ConstantsUI.segmentedControlBackgroundColor
+        segmentedControlStatisticsDays.tintColor = ConstantsUI.segmentedControlBackgroundColor
+        segmentedControlStatisticsDays.layer.borderWidth = ConstantsUI.segmentedControlBorderWidth
+        segmentedControlStatisticsDays.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlNormalTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.normal)
+        segmentedControlStatisticsDays.selectedSegmentTintColor = ConstantsUI.segmentedControlSelectedTintColor
+        segmentedControlStatisticsDays.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlSelectedTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.selected)
         
-        // format the segmented control of the chart hours if possible (should normally be ok)
-        if #available(iOS 13.0, *) {
-            
-            // set the basic formatting. We basically want it to dissapear into the background
-            segmentedControlStatisticsDays.backgroundColor = ConstantsUI.segmentedControlBackgroundColor
-            
-            segmentedControlStatisticsDays.tintColor = ConstantsUI.segmentedControlBackgroundColor
-            
-            segmentedControlStatisticsDays.layer.borderWidth = ConstantsUI.segmentedControlBorderWidth
-
-            
-            // format the unselected segments
-            segmentedControlStatisticsDays.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlNormalTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.normal)
-            
-            // format the selected segment
-            segmentedControlStatisticsDays.selectedSegmentTintColor = ConstantsUI.segmentedControlSelectedTintColor
-            
-            segmentedControlStatisticsDays.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlSelectedTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.selected)
-            
-        }
         
         // if a RTL localization is in use (such as arabic), then correctly align the low (<x) and high (>x) label outlets towards the centre of the (now reversed) horizontal stack views
         if UIView.userInterfaceLayoutDirection(for: view.semanticContentAttribute) == UIUserInterfaceLayoutDirection.rightToLeft {
@@ -738,7 +714,7 @@ final class RootViewController: UIViewController, ObservableObject {
             self.updateSensorInfoView(animate: true)
             
             // update statistics related outlets
-            self.updateStatistics(animatePieChart: true, overrideApplicationState: true)
+            self.updateStatistics(animate: true, overrideApplicationState: true)
             
             // create badge counter
             self.createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
@@ -840,6 +816,8 @@ final class RootViewController: UIViewController, ObservableObject {
             UIApplication.shared.isIdleTimerDisabled = false
             
             self.screenLockUpdate(enabled: false)
+                
+            self.sensorProgressViewOutlet.setProgress(0.0, animated: false)
             
         })
         
@@ -881,7 +859,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 self.updateSensorInfoView(animate: true)
                 
                 // update statistics related outlets
-                self.updateStatistics(animatePieChart: true)
+                self.updateStatistics(animate: true)
                 
             }
             
@@ -1336,7 +1314,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     updateMiniChart()
                     
                     // update statistics related outlets
-                    updateStatistics(animatePieChart: false)
+                    updateStatistics(animate: false)
                     
                     // update sensor info
                     updateSensorInfoView(animate: false)
@@ -1485,7 +1463,7 @@ final class RootViewController: UIViewController, ObservableObject {
         case UserDefaults.Key.daysToUseStatistics:
             
             // refresh statistics calculations/view is necessary
-            updateStatistics(animatePieChart: true, overrideApplicationState: false)
+            updateStatistics(animate: true, overrideApplicationState: false)
             
         case UserDefaults.Key.showClockWhenScreenIsLocked:
             
@@ -2469,7 +2447,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
     
     // helper function to calculate the statistics and update the pie chart and label outlets
-    private func updateStatistics(animatePieChart: Bool = false, overrideApplicationState: Bool = false) {
+    private func updateStatistics(animate: Bool = false, overrideApplicationState: Bool = false) {
         
         // don't calculate statis if app is not running in the foreground
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
@@ -2578,7 +2556,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             
             // disable the chart animation if it's just a normal update, enable it if the call comes from didAppear()
-            if animatePieChart {
+            if animate {
                 self.pieChartOutlet.animDuration = ConstantsStatistics.pieChartAnimationSpeed
             } else {
                 self.pieChartOutlet.animDuration = 0
@@ -2731,7 +2709,7 @@ final class RootViewController: UIViewController, ObservableObject {
             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
             
             // check if iOS13 or newer is being used. If it is, then take advantage of SF Symbols to fill in the lock icon to make it stand out more
-            if #available(iOS 13.0, *), showClock {
+            if showClock {
 
                 screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock.fill")
             
@@ -2789,12 +2767,8 @@ final class RootViewController: UIViewController, ObservableObject {
             
             screenLockToolbarButtonOutlet.tintColor = nil
             
-            // check if iOS13 or newer is being used. If it is, then set the lock icon back to the standard SF Symbol
-            if #available(iOS 13.0, *) {
-                
-                screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock")
-            
-            }
+            // set the lock icon back to the standard SF Symbol
+            screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock")
 
             valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
             
@@ -3476,7 +3450,7 @@ extension RootViewController: FollowerDelegate {
                 updateMiniChart()
                 
                 // update statistics related outlets
-                updateStatistics(animatePieChart: false)
+                updateStatistics(animate: false)
                 
                 // update sensor info. No need to animate for a simple update
                 updateSensorInfoView(animate: false)
